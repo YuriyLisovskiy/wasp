@@ -23,11 +23,41 @@
 #define LEAF_TCP_H
 
 #include "../globals.h"
+#include "../platform.h"
+
+using size_t = decltype(sizeof(int));
+#include <cstdint>
+#include <string>
+#include <vector>
+#include <thread>
+#include <functional>
+
 
 __INTERNAL_BEGIN__
 
-// TODO:
+typedef std::function<const std::string(const std::string&)> handler;
+
+class TcpServer
+{
+private:
+	uint16_t port;
+	std::string host;
+	std::vector<std::thread> pool;
+	handler handler;
+
+	void startListener();
+	void processRequest(const SOCKET& client);
+	static void sendResponse(const char* data, const SOCKET& connection);
+	static void closeSocket(const SOCKET& sock, const int& how);
+	static void cleanUp(const SOCKET& connection);
+	static std::string recvAll(const SOCKET& connection);
+public:
+	explicit TcpServer(const char* host, uint16_t port, leaf::internal::handler handler);
+	void listenAndServe();
+	~TcpServer();
+};
 
 __INTERNAL_END__
+
 
 #endif // LEAF_TCP_H

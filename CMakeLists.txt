@@ -13,6 +13,10 @@ set(PACKAGE_TESTS      "unit-tests")
 project(${PACKAGE_NAME})
 
 file(GLOB LIB_FILES
+        "src/utils/*/*.h"
+        "src/utils/*/*.cpp"
+        "src/utils/*.h"
+        "src/utils/*.cpp"
         "src/core/*.h"
         "src/core/*.cpp"
         "src/*.h"
@@ -24,9 +28,9 @@ file(GLOB TEST_FILES
     )
 
 set(LIB_SRC ${LIB_FILES})
-set(TEST_SRC ${TEST_FILES} src/platform.h)
+set(TEST_SRC ${TEST_FILES})
 
-# add_executable(${PACKAGE_NAME} ${LIB_SRC} "main.cpp")
+add_executable(${PACKAGE_NAME} ${LIB_SRC} "main.cpp")
 
 add_executable(${PACKAGE_TESTS} ${LIB_SRC} ${TEST_SRC} "tests/main.cpp")
 target_link_libraries(${PACKAGE_TESTS} gtest gtest_main rt pthread ${TEST_SRC})
