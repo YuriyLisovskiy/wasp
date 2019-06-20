@@ -19,7 +19,7 @@
  * tcp/ip server implementation.
  */
 
-#include "tcp.h"
+#include "tcp_server.h"
 #include <cstring>
 
 

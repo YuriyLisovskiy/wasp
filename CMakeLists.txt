@@ -8,6 +8,7 @@ set(PACKAGE_VERSION    "0.0.1-dev")
 set(PACKAGE_STRING     "${PACKAGE_NAME} ${PACKAGE_VERSION}")
 set(PACKAGE_TAR_NAME   "${PACKAGE_NAME}-${PACKAGE_VERSION}")
 set(PACKAGE_BUG_REPORT "https://github.com/YuriyLisovskiy/leaf/issues")
+
 set(PACKAGE_TESTS      "unit-tests")
 
 project(${PACKAGE_NAME})

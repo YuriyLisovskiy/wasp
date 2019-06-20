@@ -19,10 +19,11 @@
  * This header contains platform-specific global variables and macros for tcp server.
  */
 
-#ifndef LEAF_TCPLIB_H
-#define LEAF_TCPLIB_H
+#ifndef LEAF_TCP_DEF_H
+#define LEAF_TCP_DEF_H
 
 #include "../globals.h"
+
 
 __INTERNAL_BEGIN__
 
@@ -78,4 +79,5 @@ __INTERNAL_BEGIN__
 
 __INTERNAL_END__
 
-#endif //LEAF_TCPLIB_H
+
+#endif //LEAF_TCP_DEF_H

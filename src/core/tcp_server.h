@@ -19,12 +19,18 @@
  * tcp/ip server definition.
  */
 
-#ifndef LEAF_TCP_H
-#define LEAF_TCP_H
+#ifndef LEAF_TCP_SERVER_H
+#define LEAF_TCP_SERVER_H
 
 #include "../globals.h"
-#include "tcplib.h"
+#include "tcp_def.h"
 
+#ifndef size_t
+typedef unsigned int size_t;
+#endif
+
+#include <cstddef>
+#include <cstdio>
 #include <string>
 #include <vector>
 #include <thread>
@@ -58,4 +64,4 @@ public:
 __INTERNAL_END__
 
 
-#endif // LEAF_TCP_H
+#endif // LEAF_TCP_SERVER_H
