@@ -9,15 +9,13 @@ set(PACKAGE_STRING     "${PACKAGE_NAME} ${PACKAGE_VERSION}")
 set(PACKAGE_TAR_NAME   "${PACKAGE_NAME}-${PACKAGE_VERSION}")
 set(PACKAGE_BUG_REPORT "https://github.com/YuriyLisovskiy/leaf/issues")
 
-set(PACKAGE_TESTS      "unit-tests")
+set(PACKAGE_TESTS "unit-tests")
 
-set(CMAKE_CXX_FLAGS  "-pthread")
+set(CMAKE_CXX_FLAGS "-pthread")
 
 project(${PACKAGE_NAME})
 
 file(GLOB LIB_FILES
-        "src/utils/*/*.h"
-        "src/utils/*/*.cpp"
         "src/utils/*.h"
         "src/utils/*.cpp"
         "src/core/*.h"
