@@ -23,10 +23,8 @@
 #define LEAF_TCP_H
 
 #include "../globals.h"
-#include "../platform.h"
+#include "tcplib.h"
 
-using size_t = decltype(sizeof(int));
-#include <cstdint>
 #include <string>
 #include <vector>
 #include <thread>
