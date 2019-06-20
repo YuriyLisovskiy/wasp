@@ -24,11 +24,33 @@
 
 __INTERNAL_BEGIN__
 
-TcpServer::TcpServer(const TcpServer::Context& ctx)
+TcpServer::TcpServer(TcpServer::Context ctx)
 {
+	if (ctx.host == nullptr)
+	{
+		ctx.host = "127.0.0.1";
+	}
+
+	if (ctx.port == 0)
+	{
+		ctx.port = 8000;
+	}
+
 	this->_host = ctx.host;
 	this->_port = ctx.port;
+
+	if (ctx.handler == nullptr)
+	{
+		throw std::invalid_argument("Context::handler can not be nullptr");
+	}
+
 	this->_handler = ctx.handler;
+
+	if (ctx.logger == nullptr)
+	{
+		ctx.logger = leaf::Logger::getInstance();
+	}
+
 	this->_logger = ctx.logger;
 
 	this->_socketAddr = {};

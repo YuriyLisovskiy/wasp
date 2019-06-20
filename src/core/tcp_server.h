@@ -27,6 +27,7 @@
 #include <vector>
 #include <thread>
 #include <functional>
+//#include <exception>
 
 #include "../globals.h"
 #include "../utils/logger.h"
@@ -97,13 +98,13 @@ private:
 public:
 	struct Context
 	{
-		const char* host;
-		const uint16_t port;
-		tcpHandler handler;
-		ILogger* logger;
+		const char* host = nullptr;
+		uint16_t port = 0;
+		tcpHandler handler = nullptr;
+		ILogger* logger = nullptr;
 	};
 
-	explicit TcpServer(const TcpServer::Context& ctx);
+	explicit TcpServer(TcpServer::Context ctx);
 	void listenAndServe();
 	~TcpServer();
 };
