@@ -22,6 +22,12 @@ __LEAF_BEGIN__
 
 ILogger* Logger::instance = nullptr;
 
+Logger::~Logger()
+{
+	delete Logger::instance;
+	Logger::instance = nullptr;
+}
+
 ILogger* Logger::getInstance()
 {
 	if (Logger::instance == nullptr)
@@ -30,12 +36,6 @@ ILogger* Logger::getInstance()
 	}
 
 	return Logger::instance;
-}
-
-void Logger::deleteInstance()
-{
-	delete Logger::instance;
-	Logger::instance = nullptr;
 }
 
 void Logger::info(const std::string& msg)
@@ -88,7 +88,7 @@ void Logger::log(const std::string& msg, Logger::LogLevel logLevel)
 	std::time_t t = std::time(nullptr);
 	char now[100];
 	std::strftime(now, sizeof(now), "%F %T", std::localtime(&t));
-	this->writeToStream("[" + std::string(now) + "] [" + "thread id" + "] " + level + ":\t" + msg);
+	this->writeToStream("[" + std::string(now) + "] [" + "thread id" + "] " + level + ":\t" + msg + "\n");
 }
 
 void Logger::writeToStream(const std::string& msg)

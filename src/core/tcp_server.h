@@ -79,7 +79,6 @@ class TcpServer
 private:
 	uint16_t _port;
 	const char* _host;
-	std::vector<std::thread> pool;
 	tcpHandler _handler;
 	socket_t _socket;
 	sockaddr_in _socketAddr{};
@@ -93,7 +92,7 @@ private:
 	static void wsaCleanUp();
 	void cleanUp(const socket_t& connection);
 	std::string recvAll(const socket_t& connection);
-	void init();
+	int init();
 
 public:
 	struct Context

@@ -32,6 +32,7 @@ __LEAF_BEGIN__
 class ILogger
 {
 public:
+	virtual ~ILogger() = default;
 	virtual void info(const std::string& msg) = 0;
 	virtual void debug(const std::string& msg) = 0;
 	virtual void warning(const std::string& msg) = 0;
@@ -43,7 +44,6 @@ class Logger : public ILogger
 {
 public:
 	static ILogger* getInstance();
-	static void deleteInstance();
 
 	void info(const std::string& msg) override;
 	void debug(const std::string& msg) override;
@@ -60,7 +60,7 @@ private:
 	static ILogger* instance;
 
 	Logger() = default;
-	~Logger() = default;
+	~Logger() override;
 	void log(const std::string& msg, LogLevel logLevel);
 	void writeToStream(const std::string& msg);
 };

@@ -33,23 +33,14 @@ TcpServer::TcpServer(const TcpServer::Context& ctx)
 
 	this->_socketAddr = {};
 	this->_socket = {};
-
-	this->init();
 }
 
 TcpServer::~TcpServer()
 {
-	for (::std::thread& t : this->pool)
-	{
-		if (t.joinable())
-		{
-			t.join();
-		}
-	}
 	TcpServer::cleanUp(this->_socket);
 }
 
-void TcpServer::init()
+int TcpServer::init()
 {
 	this->_socketAddr.sin_family = AF_INET;
 	this->_socketAddr.sin_port = htons(this->_port);
@@ -64,7 +55,7 @@ void TcpServer::init()
 			__FILE__, __FUNCTION__, __LINE__
 		);
 		TcpServer::wsaCleanUp();
-		return;
+		return INVALID_SOCKET;
 	}
 
 	if (bind(this->_socket, (sockaddr*)&this->_socketAddr, sizeof(this->_socketAddr)) == SOCKET_ERROR)
@@ -74,7 +65,7 @@ void TcpServer::init()
 			__FILE__, __FUNCTION__, __LINE__
 		);
 		TcpServer::cleanUp(this->_socket);
-		return;
+		return SOCKET_ERROR;
 	}
 
 	if (listen(this->_socket, SOMAXCONN) == SOCKET_ERROR)
@@ -83,12 +74,19 @@ void TcpServer::init()
 			"Failed to listen at port " + std::to_string(ntohs(this->_socketAddr.sin_port)),
 			__FILE__, __FUNCTION__, __LINE__
 		);
-		return;
+		return SOCKET_ERROR;
 	}
+
+	return 0;
 }
 
 void TcpServer::listenAndServe()
 {
+	if (this->init() != 0)
+	{
+		return;
+	}
+
 #if defined(_WIN32) || defined(_WIN64)
 	int status;
 	WSADATA wsaData;
@@ -116,7 +114,7 @@ void TcpServer::startListener()
 			if (connection != INVALID_SOCKET)
 			{
 				std::thread newThread(&TcpServer::serveConnection, this, connection);
-				this->pool.push_back(std::move(newThread));
+				newThread.detach();
 			}
 			else
 			{
@@ -170,7 +168,6 @@ std::string TcpServer::recvAll(const socket_t& connection)
 		{
 			data += std::string(buffer);
 			size += msgSize;
-		//	data = data.substr(0, size);
 		}
 		else if (msgSize < 0)
 		{
@@ -179,7 +176,7 @@ std::string TcpServer::recvAll(const socket_t& connection)
 	}
 	while (msgSize >= MAX_BUFF_SIZE);
 
-	return data;
+	return data.substr(0, size);
 }
 
 void TcpServer::sendResponse(const char* data, const socket_t& connection)
