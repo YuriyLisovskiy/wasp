@@ -22,14 +22,22 @@
 #include "tcp_server.h"
 
 
-leaf::internal::TcpServer::TcpServer(const char* host, uint16_t port, leaf::internal::tcpHandler handler)
+__INTERNAL_BEGIN__
+
+TcpServer::TcpServer(const TcpServer::Context& ctx)
 {
-	this->host = std::string(host);
-	this->port = port;
-	this->handler = std::move(handler);
+	this->_host = ctx.host;
+	this->_port = ctx.port;
+	this->_handler = ctx.handler;
+	this->_logger = ctx.logger;
+
+	this->_socketAddr = {};
+	this->_socket = {};
+
+	this->init();
 }
 
-leaf::internal::TcpServer::~TcpServer()
+TcpServer::~TcpServer()
 {
 	for (::std::thread& t : this->pool)
 	{
@@ -38,96 +46,121 @@ leaf::internal::TcpServer::~TcpServer()
 			t.join();
 		}
 	}
+	TcpServer::cleanUp(this->_socket);
 }
 
-void leaf::internal::TcpServer::listenAndServe()
+void TcpServer::init()
 {
-	WSA_STARTUP();
+	this->_socketAddr.sin_family = AF_INET;
+	this->_socketAddr.sin_port = htons(this->_port);
+	inet_pton(AF_INET, this->_host, &(this->_socketAddr.sin_addr));
+
+	this->_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+
+	if (this->_socket == INVALID_SOCKET)
+	{
+		this->_logger->trace(
+			"Failed to initialize server at port " + std::to_string(ntohs(this->_socketAddr.sin_port)),
+			__FILE__, __FUNCTION__, __LINE__
+		);
+		TcpServer::wsaCleanUp();
+		return;
+	}
+
+	if (bind(this->_socket, (sockaddr*)&this->_socketAddr, sizeof(this->_socketAddr)) == SOCKET_ERROR)
+	{
+		this->_logger->trace(
+			"Failed to bind socket to port " + std::to_string(ntohs(this->_socketAddr.sin_port)),
+			__FILE__, __FUNCTION__, __LINE__
+		);
+		TcpServer::cleanUp(this->_socket);
+		return;
+	}
+
+	if (listen(this->_socket, SOMAXCONN) == SOCKET_ERROR)
+	{
+		this->_logger->trace(
+			"Failed to listen at port " + std::to_string(ntohs(this->_socketAddr.sin_port)),
+			__FILE__, __FUNCTION__, __LINE__
+		);
+		return;
+	}
+}
+
+void TcpServer::listenAndServe()
+{
+#if defined(_WIN32) || defined(_WIN64)
+	int status;
+	WSADATA wsaData;
+	status = WSAStartup(MAKEWORD(2, 2), &wsaData);
+	if (status != 0)
+	{
+		this->_logger->error("WSAStartup() failed with error #" + std::to_string(status));
+		return;
+	}
+#endif
+
 	this->startListener();
-	WSA_CLEANUP();
+	TcpServer::wsaCleanUp();
 }
 
-void leaf::internal::TcpServer::startListener()
+void TcpServer::startListener()
 {
-	SOCKET sock;
-	sockaddr_in addr = {};
-	socklen_t sa_size = sizeof(sockaddr_in);
-	addr.sin_family = AF_INET;
-	addr.sin_port = htons(this->port);
-	inet_pton(AF_INET, this->host.c_str(), &(addr.sin_addr));
-	if ((sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) == INVALID_SOCKET)
-	{
-		// TODO: log error
-		WSA_CLEANUP();
-		return;
-	}
-
-	if (bind(sock, (sockaddr*)&addr, sizeof(sockaddr_in)) == SOCKET_ERROR)
-	{
-		// TODO: log error
-		TcpServer::cleanUp(sock);
-		return;
-	}
-
-	if (listen(sock, SOMAXCONN) == SOCKET_ERROR)
-	{
-		// TODO: log error
-		return;
-	}
-
 	bool listening = true;
 	while (listening)
 	{
 		try
 		{
-			SOCKET connection = accept(sock, (sockaddr*)&addr, &sa_size);
+			socklen_t connectionLen = sizeof(this->_socketAddr);
+			socket_t connection = accept(this->_socket, (sockaddr*)&this->_socketAddr, &connectionLen);
 			if (connection != INVALID_SOCKET)
 			{
-				::std::thread newThread(&TcpServer::processRequest, this, connection);
+				std::thread newThread(&TcpServer::serveConnection, this, connection);
 				this->pool.push_back(std::move(newThread));
-				// TODO: add thread to pool
 			}
 			else
 			{
-				// TODO: log error
+				this->_logger->trace("Invalid socket connection", __FILE__, __FUNCTION__, __LINE__);
 			}
 		}
 		catch (const std::exception& exc)
 		{
-			// TODO: log error
+			this->_logger->trace(exc.what(), __FILE__, __FUNCTION__, __LINE__);
 			listening = false;
 		}
 		catch (const char* exc)
 		{
-			// TODO: log error
+			this->_logger->trace(exc, __FILE__, __FUNCTION__, __LINE__);
 			listening = false;
 		}
 		catch (...)
 		{
-			// TODO: log error
+			this->_logger->trace(
+				"Error occurred while listening for socket connection", __FILE__, __FUNCTION__, __LINE__
+			);
 			listening = false;
 		}
 	}
 }
 
-void leaf::internal::TcpServer::processRequest(const SOCKET& connection)
+void TcpServer::serveConnection(const socket_t& connection)
 {
 	std::string data = TcpServer::recvAll(connection);
 
-	const std::string resp = this->handler(data);
+	const std::string resp = this->_handler(data);
 
 	TcpServer::sendResponse(resp.c_str(), connection);
 
-	TcpServer::closeSocket(connection, SOCK_SEND);
-	TcpServer::closeSocket(connection, SOCK_RECEIVE);
+	TcpServer::closeConnection(connection, SOCKET_SEND);
+	TcpServer::closeConnection(connection, SOCKET_RECEIVE);
 
 	TcpServer::cleanUp(connection);
 }
 
-std::string leaf::internal::TcpServer::recvAll(const SOCKET& connection)
+std::string TcpServer::recvAll(const socket_t& connection)
 {
 	char buffer[MAX_BUFF_SIZE];
-	MSG_SIZE msgSize;
+	msg_size_t msgSize;
 	unsigned long size = 0;
 	std::string data;
 	do
@@ -141,7 +174,7 @@ std::string leaf::internal::TcpServer::recvAll(const SOCKET& connection)
 		}
 		else if (msgSize < 0)
 		{
-			// TODO: log error
+			this->_logger->trace("Received message size is less than zero", __FILE__, __FUNCTION__, __LINE__);
 		}
 	}
 	while (msgSize >= MAX_BUFF_SIZE);
@@ -149,29 +182,47 @@ std::string leaf::internal::TcpServer::recvAll(const SOCKET& connection)
 	return data;
 }
 
-void leaf::internal::TcpServer::sendResponse(const char* data, const SOCKET& connection)
+void TcpServer::sendResponse(const char* data, const socket_t& connection)
 {
 	if (send(connection, data, ::strlen(data), 0) == SOCKET_ERROR)
 	{
-		// TODO: log error
-		TcpServer::cleanUp(connection);
+		this->_logger->trace("Failed to send bytes to socket connection", __FILE__, __FUNCTION__, __LINE__);
+		this->cleanUp(connection);
 	}
 }
 
-void leaf::internal::TcpServer::closeSocket(const SOCKET& connection, const int& type)
+void TcpServer::closeConnection(const socket_t& connection, const int& type)
 {
 	if (shutdown(connection, type) == SOCKET_ERROR)
 	{
-		// TODO: log error
-		TcpServer::cleanUp(connection);
+		this->_logger->trace("Failed to shut down socket connection", __FILE__, __FUNCTION__, __LINE__);
+		this->cleanUp(connection);
 	}
 }
 
-void leaf::internal::TcpServer::cleanUp(const SOCKET& connection)
+int TcpServer::closeSocket(const socket_t& socket)
 {
-	if (CLOSE_SOCK(connection) == SOCKET_ERROR)
-	{
-		// TODO: log error
-	}
-	WSA_CLEANUP();
+#if defined(_WIN32) || defined(_WIN64)
+	return closesocket(socket);
+#elif defined(__unix__) || defined(__linux__)
+	return close(socket);
+#endif
 }
+
+void TcpServer::wsaCleanUp()
+{
+#if defined(_WIN32) || defined(_WIN64)
+	WSACleanup();
+#endif
+}
+
+void TcpServer::cleanUp(const socket_t& socket)
+{
+	if (TcpServer::closeSocket(socket) == SOCKET_ERROR)
+	{
+		this->_logger->trace("Failed to close socket connection", __FILE__, __FUNCTION__, __LINE__);
+	}
+	TcpServer::wsaCleanUp();
+}
+
+__INTERNAL_END__

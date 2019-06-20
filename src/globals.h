@@ -28,6 +28,4 @@
 #define __INTERNAL_BEGIN__ namespace leaf { namespace internal {
 #define __INTERNAL_END__ } }
 
-#define MAX_BUFF_SIZE 1024
-
 #endif //LEAF_MACRO_H
