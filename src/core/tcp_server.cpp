@@ -20,10 +20,9 @@
  */
 
 #include "tcp_server.h"
-#include <cstring>
 
 
-leaf::internal::TcpServer::TcpServer(const char* host, uint16_t port, leaf::internal::handler handler)
+leaf::internal::TcpServer::TcpServer(const char* host, uint16_t port, leaf::internal::tcpHandler handler)
 {
 	this->host = std::string(host);
 	this->port = port;
@@ -152,7 +151,7 @@ std::string leaf::internal::TcpServer::recvAll(const SOCKET& connection)
 
 void leaf::internal::TcpServer::sendResponse(const char* data, const SOCKET& connection)
 {
-	if (send(connection, data, strlen(data), 0) == SOCKET_ERROR)
+	if (send(connection, data, ::strlen(data), 0) == SOCKET_ERROR)
 	{
 		// TODO: log error
 		TcpServer::cleanUp(connection);

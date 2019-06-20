@@ -11,6 +11,8 @@ set(PACKAGE_BUG_REPORT "https://github.com/YuriyLisovskiy/leaf/issues")
 
 set(PACKAGE_TESTS      "unit-tests")
 
+set(CMAKE_CXX_FLAGS  "-pthread")
+
 project(${PACKAGE_NAME})
 
 file(GLOB LIB_FILES

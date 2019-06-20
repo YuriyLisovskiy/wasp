@@ -22,24 +22,18 @@
 #ifndef LEAF_TCP_SERVER_H
 #define LEAF_TCP_SERVER_H
 
-#include "../globals.h"
-#include "tcp_def.h"
-
-#ifndef size_t
-typedef unsigned int size_t;
-#endif
-
-#include <cstddef>
-#include <cstdio>
+#include <cstring>
 #include <string>
 #include <vector>
 #include <thread>
 #include <functional>
 
+#include "../globals.h"
+#include "tcp_def.h"
 
 __INTERNAL_BEGIN__
 
-typedef std::function<const std::string(const std::string&)> handler;
+typedef std::function<const std::string(const std::string&)> tcpHandler;
 
 class TcpServer
 {
@@ -47,7 +41,7 @@ private:
 	uint16_t port;
 	std::string host;
 	std::vector<std::thread> pool;
-	handler handler;
+	tcpHandler handler;
 
 	void startListener();
 	void processRequest(const SOCKET& client);
@@ -56,7 +50,7 @@ private:
 	static void cleanUp(const SOCKET& connection);
 	static std::string recvAll(const SOCKET& connection);
 public:
-	explicit TcpServer(const char* host, uint16_t port, leaf::internal::handler handler);
+	explicit TcpServer(const char* host, uint16_t port, leaf::internal::tcpHandler handler);
 	void listenAndServe();
 	~TcpServer();
 };
