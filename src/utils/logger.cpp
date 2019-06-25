@@ -94,7 +94,7 @@ void Logger::log(const std::string& msg, Logger::LogLevel logLevel)
 void Logger::writeToStream(const std::string& msg)
 {
 	// TODO: add multiple streams support
-	std::cout << msg;
+	std::cout << '\n' << msg;
 	std::cout.flush();
 }
 

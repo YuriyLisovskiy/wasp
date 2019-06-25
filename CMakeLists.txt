@@ -16,10 +16,14 @@ set(CMAKE_CXX_FLAGS "-pthread")
 project(${PACKAGE_NAME})
 
 file(GLOB LIB_FILES
+        "src/conf/*.h"
+        "src/conf/*.cpp"
         "src/utils/*.h"
         "src/utils/*.cpp"
         "src/core/*.h"
         "src/core/*.cpp"
+        "src/http/*.h"
+        "src/http/*.cpp"
         "src/*.h"
         "src/*.cpp"
     )

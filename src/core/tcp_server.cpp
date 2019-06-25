@@ -48,7 +48,7 @@ TcpServer::TcpServer(TcpServer::Context ctx)
 
 	if (ctx.logger == nullptr)
 	{
-		ctx.logger = leaf::Logger::getInstance();
+		ctx.logger = Logger::getInstance();
 	}
 
 	this->_logger = ctx.logger;
