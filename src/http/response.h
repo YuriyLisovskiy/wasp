@@ -20,8 +20,8 @@
  * TODO: write docs
  */
 
-#ifndef LEAF_HTTP_RESPONSE_H
-#define LEAF_HTTP_RESPONSE_H
+#ifndef WASP_HTTP_RESPONSE_H
+#define WASP_HTTP_RESPONSE_H
 
 #include <string>
 
@@ -41,4 +41,4 @@ public:
 __INTERNAL_END__
 
 
-#endif // LEAF_HTTP_RESPONSE_H
+#endif // WASP_HTTP_RESPONSE_H

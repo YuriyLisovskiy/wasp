@@ -20,8 +20,8 @@
  * TODO: write docs
  */
 
-#ifndef LEAF_HTTP_SERVER_H
-#define LEAF_HTTP_SERVER_H
+#ifndef WASP_HTTP_SERVER_H
+#define WASP_HTTP_SERVER_H
 
 #include <iostream>
 #include <cstdint>
@@ -72,4 +72,4 @@ private:
 __INTERNAL_END__
 
 
-#endif // LEAF_HTTP_SERVER_H
+#endif // WASP_HTTP_SERVER_H

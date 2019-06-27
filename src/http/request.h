@@ -20,8 +20,8 @@
  * TODO: write docs
  */
 
-#ifndef LEAF_HTTP_REQUEST_H
-#define LEAF_HTTP_REQUEST_H
+#ifndef WASP_HTTP_REQUEST_H
+#define WASP_HTTP_REQUEST_H
 
 #include <string>
 #include <map>
@@ -30,7 +30,7 @@
 #include "../utils/query_set.h"
 
 
-__LEAF_BEGIN__
+__WASP_BEGIN__
 
 class HttpRequest
 {
@@ -53,7 +53,7 @@ public:
 	explicit HttpRequest(const std::string& data);
 };
 
-__LEAF_END__
+__WASP_END__
 
 
-#endif // LEAF_HTTP_REQUEST_H
+#endif // WASP_HTTP_REQUEST_H

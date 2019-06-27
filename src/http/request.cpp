@@ -23,11 +23,11 @@
 #include "request.h"
 
 
-__LEAF_BEGIN__
+__WASP_BEGIN__
 
 HttpRequest::HttpRequest(const std::string& data)
 {
 
 }
 
-__LEAF_END__
+__WASP_END__

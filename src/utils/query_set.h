@@ -20,15 +20,15 @@
  * TODO: write docs
  */
 
-#ifndef LEAF_QUERY_SET_H
-#define LEAF_QUERY_SET_H
+#ifndef WASP_UTILS_QUERY_SET_H
+#define WASP_UTILS_QUERY_SET_H
 
 #include <map>
 
 #include "../globals.h"
 
 
-__LEAF_BEGIN__
+__WASP_BEGIN__
 
 template <typename _Key, typename _Val>
 class QuerySet
@@ -57,7 +57,7 @@ public:
 	}
 };
 
-__LEAF_END__
+__WASP_END__
 
 
-#endif // LEAF_QUERY_SET_H
+#endif // WASP_UTILS_QUERY_SET_H

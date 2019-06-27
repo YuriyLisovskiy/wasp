@@ -20,8 +20,8 @@
  * TODO: write docs.
  */
 
-#ifndef LEAF_STR_UTILS_H
-#define LEAF_STR_UTILS_H
+#ifndef WASP_STR_UTILS_H
+#define WASP_STR_UTILS_H
 
 #include <string>
 #include <cstdarg>
@@ -42,7 +42,7 @@ std::string _format(char const* fmt, va_list arg);
 __INTERNAL_END__
 
 
-__LEAF_BEGIN__
+__WASP_BEGIN__
 
 // ftoaFixed - carry out a fixed conversion of a double value to a string, with a precision of 5 decimal digits.
 // Values with absolute values less than 0.000001 are rounded to 0.0
@@ -72,7 +72,7 @@ T convert(const std::string& str)
 	return value;
 }
 
-__LEAF_END__
+__WASP_END__
 
 
-#endif // LEAF_STR_UTILS_H
+#endif // WASP_STR_UTILS_H

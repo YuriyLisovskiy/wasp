@@ -18,7 +18,7 @@
 #include "logger.h"
 
 
-__LEAF_BEGIN__
+__WASP_BEGIN__
 
 ILogger* Logger::instance = nullptr;
 
@@ -98,4 +98,4 @@ void Logger::writeToStream(const std::string& msg)
 	std::cout.flush();
 }
 
-__LEAF_END__
+__WASP_END__

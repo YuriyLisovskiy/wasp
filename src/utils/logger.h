@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LEAF_UTILS_LOGGER_H
-#define LEAF_UTILS_LOGGER_H
+#ifndef WASP_UTILS_LOGGER_H
+#define WASP_UTILS_LOGGER_H
 
 #include <iostream>
 #include <string>
@@ -27,7 +27,7 @@
 #include "../globals.h"
 
 
-__LEAF_BEGIN__
+__WASP_BEGIN__
 
 class ILogger
 {
@@ -65,7 +65,7 @@ private:
 	void writeToStream(const std::string& msg);
 };
 
-__LEAF_END__
+__WASP_END__
 
 
-#endif // LEAF_UTILS_LOGGER_H
+#endif // WASP_UTILS_LOGGER_H

@@ -19,13 +19,13 @@
  * This header contains global variables, constants and definitions.
  */
 
-#ifndef LEAF_MACRO_H
-#define LEAF_MACRO_H
+#ifndef WASP_MACRO_H
+#define WASP_MACRO_H
 
-#define __LEAF_BEGIN__ namespace leaf {
-#define __LEAF_END__ }
+#define __WASP_BEGIN__ namespace wasp {
+#define __WASP_END__ }
 
-#define __INTERNAL_BEGIN__ namespace leaf { namespace internal {
+#define __INTERNAL_BEGIN__ namespace wasp { namespace internal {
 #define __INTERNAL_END__ } }
 
-#endif //LEAF_MACRO_H
+#endif // WASP_MACRO_H

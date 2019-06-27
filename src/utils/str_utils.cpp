@@ -44,7 +44,7 @@ int normalize(double* val)
 
 std::string _format(char const* fmt, va_list args)
 {
-	leaf::QuerySet<std::string, std::string> values;
+	wasp::QuerySet<std::string, std::string> values;
 	std::stringstream stream;
 	std::string lastNumber;
 	std::string tempArg;
@@ -147,7 +147,7 @@ std::string _format(char const* fmt, va_list args)
 __INTERNAL_END__
 
 
-__LEAF_BEGIN__
+__WASP_BEGIN__
 
 std::string ftoaFixed(double value)
 {
@@ -235,4 +235,4 @@ std::string format(const char* fmt, ...)
 	return result;
 }
 
-__LEAF_END__
+__WASP_END__

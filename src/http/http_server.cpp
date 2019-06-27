@@ -63,7 +63,7 @@ const std::string HttpServer::_tcpHandler(const std::string& data)
 
 void HttpServer::listenAndServe()
 {
-	std::cout << leaf::format(STARTUP_MESSAGE, this->_schema, this->_host, this->_port);
+	std::cout << wasp::format(STARTUP_MESSAGE, this->_schema, this->_host, this->_port);
 	std::cout.flush();
 	this->_tcpServer->listenAndServe();
 }

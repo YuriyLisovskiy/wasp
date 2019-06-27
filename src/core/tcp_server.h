@@ -19,15 +19,14 @@
  * tcp/ip server definition.
  */
 
-#ifndef LEAF_TCP_SERVER_H
-#define LEAF_TCP_SERVER_H
+#ifndef WASP_CORE_TCP_SERVER_H
+#define WASP_CORE_TCP_SERVER_H
 
 #include <cstring>
 #include <string>
 #include <vector>
 #include <thread>
 #include <functional>
-//#include <exception>
 
 #include "../globals.h"
 #include "../utils/logger.h"
@@ -112,4 +111,4 @@ public:
 __INTERNAL_END__
 
 
-#endif // LEAF_TCP_SERVER_H
+#endif // WASP_CORE_TCP_SERVER_H

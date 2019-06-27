@@ -20,8 +20,8 @@
  * TODO: write docs
  */
 
-#ifndef LEAF_CONF_DEFAULTS_H
-#define LEAF_CONF_DEFAULTS_H
+#ifndef WASP_CONF_DEFAULTS_H
+#define WASP_CONF_DEFAULTS_H
 
 #include "../globals.h"
 
@@ -39,4 +39,4 @@ const char* const STARTUP_MESSAGE = "Leaf version 0.0.1-dev, using app settings"
 __INTERNAL_END__
 
 
-#endif // LEAF_DEFAULTS_H
+#endif // WASP_CONF_DEFAULTS_H
