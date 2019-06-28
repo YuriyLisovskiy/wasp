@@ -23,16 +23,18 @@
 #include "http_server.h"
 
 #include "../utils/str_utils.h"
+#include "../core/exceptions.h"
 
 
 __INTERNAL_BEGIN__
 
 HttpServer::HttpServer(HttpServer::Context& ctx)
 {
-	this->normalizeContext(ctx);
+	HttpServer::normalizeContext(ctx);
 
 	this->_host = ctx.host;
 	this->_port = ctx.port;
+	this->_logger = ctx.logger;
 
 	// default schema, https will be implemented in future. TODO.
 	this->_schema = "http";
@@ -56,9 +58,24 @@ HttpServer::~HttpServer()
 
 const std::string HttpServer::_tcpHandler(const std::string& data)
 {
-	HttpRequest request(data);
-	HttpResponse response = this->_httpHandler(request);
-	return response.toString();
+	try
+	{
+
+		std::cout << "\n===========================\n" << data << "\n===========================\n";
+
+		HttpRequestParser parser;
+		HttpRequest request = parser.parse(data);
+
+		HttpResponse response = this->_httpHandler(request);
+
+		return response.toString();
+	}
+	catch (const wasp::WaspHttpError& exc)
+	{
+		// TODO: send internal server error
+		this->_logger->trace(exc.what(), exc.file(), exc.function(), exc.line());
+		return "";
+	}
 }
 
 void HttpServer::listenAndServe()

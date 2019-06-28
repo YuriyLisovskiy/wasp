@@ -20,8 +20,8 @@
  * TODO: write docs
  */
 
-#ifndef WASP_UTILS_QUERY_SET_H
-#define WASP_UTILS_QUERY_SET_H
+#ifndef WASP_UTILS_QUERY_DICT_H
+#define WASP_UTILS_QUERY_DICT_H
 
 #include <map>
 
@@ -31,33 +31,58 @@
 __WASP_BEGIN__
 
 template <typename _Key, typename _Val>
-class QuerySet
+class QueryDict
 {
 private:
 	std::map<_Key, _Val> _map;
 
 public:
-	void set(_Key key, _Val val)
+	typedef typename std::map<_Key, _Val>::const_iterator const_iterator;
+	typedef typename std::map<_Key, _Val>::const_reverse_iterator const_reverse_iterator;
+
+	QueryDict() = default;
+	explicit QueryDict(const std::map<_Key, _Val>& srcMap)
 	{
-		this->_map[key] = val;
+		this->_map = srcMap;
 	}
 
 	_Val get(_Key key)
 	{
-		if (this->contains(key))
-		{
-			return this->_map[key];
-		}
-		return _Val();
+		return this->_map[key];
 	}
 
 	bool contains(_Key key)
 	{
 		return this->_map.find(key) != this->_map.end();
 	}
+
+	bool isEmpty()
+	{
+		return this->_map.empty();
+	}
+
+	const_iterator cbegin()
+	{
+		return this->_map.cbegin();
+	}
+
+	const_iterator cend()
+	{
+		return this->_map.cend();
+	}
+
+	const_reverse_iterator crbegin()
+	{
+		return this->_map.crbegin();
+	}
+
+	const_reverse_iterator crend()
+	{
+		return this->_map.crend();
+	}
 };
 
 __WASP_END__
 
 
-#endif // WASP_UTILS_QUERY_SET_H
+#endif // WASP_UTILS_QUERY_DICT_H

@@ -24,33 +24,44 @@
 #define WASP_HTTP_REQUEST_H
 
 #include <string>
+#include <vector>
 #include <map>
 
 #include "../globals.h"
-#include "../utils/query_set.h"
+#include "../utils/query_dict.h"
 
 
 __WASP_BEGIN__
 
 class HttpRequest
 {
-private:
-	std::string _uri;
-	std::string _path;
-	std::string _proto;
-	std::string _method;
-	QuerySet<std::string, std::string> _headers;
-
-	enum Method
-	{
-		Get, Head, Post, Put, Delete, Connect, Options, Trace
-	};
-
 public:
-	QuerySet<std::string, std::string> GET;
-	QuerySet<std::string, std::string> POST;
+	HttpRequest() : _majorVersion(0), _minorVersion(0), _keepAlive(false) {};
+	explicit HttpRequest(
+		std::string method, std::string path, size_t majorV, size_t minorV,
+		std::string query, bool keepAlive, std::string content,
+		const std::map<std::string, std::string>& headers,
+		const std::map<std::string, std::string>& getParameters,
+		const std::map<std::string, std::string>& postParameters
+	);
 
-	explicit HttpRequest(const std::string& data);
+	QueryDict<std::string, std::string> headers;
+	QueryDict<std::string, std::string> GET;
+	QueryDict<std::string, std::string> POST;
+
+	std::string version();
+	std::string path();
+	std::string method();
+	std::string body();
+
+private:
+	size_t _majorVersion;
+	size_t _minorVersion;
+	std::string _path;
+	std::string _query;
+	std::string _method;
+	bool _keepAlive;
+	std::string _body;
 };
 
 __WASP_END__

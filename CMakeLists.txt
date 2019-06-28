@@ -22,6 +22,8 @@ file(GLOB LIB_FILES
 		"src/utils/*.cpp"
 		"src/core/*.h"
 		"src/core/*.cpp"
+		"src/http/parsers/*.h"
+		"src/http/parsers/*.cpp"
 		"src/http/*.h"
 		"src/http/*.cpp"
 		"src/*.h"

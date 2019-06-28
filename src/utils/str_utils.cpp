@@ -44,7 +44,7 @@ int normalize(double* val)
 
 std::string _format(char const* fmt, va_list args)
 {
-	wasp::QuerySet<std::string, std::string> values;
+	std::map<std::string, std::string> values;
 	std::stringstream stream;
 	std::string lastNumber;
 	std::string tempArg;
@@ -74,9 +74,9 @@ std::string _format(char const* fmt, va_list args)
 					if (*fmt == '!')
 					{
 						fmt++;
-						if (*fmt != '!' && values.contains(lastNumber))
+						if (*fmt != '!' && values.find(lastNumber) != values.end())
 						{
-							stream << values.get(lastNumber);
+							stream << values[lastNumber];
 						}
 						else
 						{
@@ -88,15 +88,12 @@ std::string _format(char const* fmt, va_list args)
 									break;
 								case 'c':
 									tempArg = std::to_string(va_arg(args, int));
-									values.set(lastNumber, tempArg);
 									break;
 								case 's':
 									tempArg = std::string(va_arg(args, const char*));
-									values.set(lastNumber, tempArg);
 									break;
 								case 'd':
 									tempArg = std::to_string(va_arg(args, int));
-									values.set(lastNumber, tempArg);
 									break;
 								case 'x':
 									tempStream << std::hex << va_arg(args, int);
@@ -110,7 +107,7 @@ std::string _format(char const* fmt, va_list args)
 									tempArg = ftoaSci(va_arg(args, double));
 									break;
 							}
-							values.set(lastNumber, tempArg);
+							values[lastNumber] = tempArg;
 							stream << tempArg;
 						}
 						fmt++;

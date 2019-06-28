@@ -34,11 +34,12 @@
 #include "../core/tcp_server.h"
 #include "response.h"
 #include "request.h"
+#include "parsers/request_parser.h"
 
 
 __INTERNAL_BEGIN__
 
-typedef std::function<const HttpResponse(const HttpRequest)> httpHandler;
+typedef std::function<HttpResponse(HttpRequest&)> httpHandler;
 
 class HttpServer
 {
@@ -46,6 +47,8 @@ private:
 	const char* _host;
 	uint16_t _port;
 	const char* _schema;
+
+	ILogger* _logger;
 
 	TcpServer* _tcpServer;
 	httpHandler _httpHandler;
@@ -66,7 +69,7 @@ public:
 	~HttpServer();
 
 private:
-	void normalizeContext(HttpServer::Context& ctx);
+	static void normalizeContext(HttpServer::Context& ctx);
 };
 
 __INTERNAL_END__

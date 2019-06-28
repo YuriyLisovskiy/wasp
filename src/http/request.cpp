@@ -1,3 +1,9 @@
+#include <utility>
+
+#include <utility>
+
+#include <utility>
+
 /*
  * Copyright (c) 2019 Yuriy Lisovskiy
  *
@@ -20,14 +26,51 @@
  * TODO: write docs
  */
 
+#include <iostream>
+
 #include "request.h"
 
 
 __WASP_BEGIN__
 
-HttpRequest::HttpRequest(const std::string& data)
+HttpRequest::HttpRequest(
+	std::string method, std::string path, size_t majorV, size_t minorV,
+	std::string query, bool keepAlive, std::string content,
+	const std::map<std::string, std::string>& headers,
+	const std::map<std::string, std::string>& getParameters,
+	const std::map<std::string, std::string>& postParameters
+)
+:   _method(std::move(method)),
+	_path(std::move(path)),
+	_majorVersion(majorV),
+	_minorVersion(minorV),
+	_query(std::move(query)),
+	_keepAlive(keepAlive),
+	_body(std::move(content))
 {
+	this->headers = QueryDict<std::string, std::string>(headers);
+	this->GET = QueryDict<std::string, std::string>(getParameters);
+	this->POST = QueryDict<std::string, std::string>(postParameters);
+}
 
+std::string HttpRequest::version()
+{
+	return std::to_string(this->_majorVersion) + "." + std::to_string(this->_minorVersion);
+}
+
+std::string HttpRequest::path()
+{
+	return this->_path;
+}
+
+std::string HttpRequest::method()
+{
+	return this->_method;
+}
+
+std::string HttpRequest::body()
+{
+	return this->_body;
 }
 
 __WASP_END__

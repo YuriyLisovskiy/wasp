@@ -30,7 +30,6 @@
 #include <map>
 
 #include "../globals.h"
-#include "query_set.h"
 
 
 __INTERNAL_BEGIN__

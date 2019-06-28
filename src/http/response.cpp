@@ -23,7 +23,7 @@
 #include "response.h"
 
 
-__INTERNAL_BEGIN__
+__WASP_BEGIN__
 
 HttpResponse::HttpResponse(const HttpRequest& request)
 {
@@ -34,7 +34,9 @@ HttpResponse::HttpResponse(const HttpRequest& request)
 std::string HttpResponse::toString()
 {
 	std::string body("<form action=\"/hello\" method=\"post\" enctype=\"multipart/form-data\">\n"
-					 "\t<input type=\"file\" />\n"
+					 "\t<input type=\"file\" name=\"super_file\" />\n"
+					// "\t<input type=\"text\" name=\"first_name\" />\n"
+					 //"\t<input type=\"text\" name=\"last_name\" />\n"
 					 "\t<input type=\"submit\" value=\"send\" />\n"
 					 "\t</form>");
 
@@ -50,4 +52,4 @@ std::string HttpResponse::toString()
 				  body);
 }
 
-__INTERNAL_END__
+__WASP_END__

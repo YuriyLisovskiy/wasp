@@ -188,6 +188,7 @@ std::string TcpServer::recvAll(const socket_t& connection)
 		msgSize = recv(connection, buffer, MAX_BUFF_SIZE, 0);
 		if (msgSize > 0)
 		{
+			buffer[msgSize] = '\0';
 			data += std::string(buffer);
 			size += msgSize;
 		}

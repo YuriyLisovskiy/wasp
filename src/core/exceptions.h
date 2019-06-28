@@ -16,29 +16,46 @@
  */
 
 /*
- * http response definition.
- * TODO: write docs
+ * exceptions definition.
+ * TODO: write docs.
  */
 
-#ifndef WASP_HTTP_RESPONSE_H
-#define WASP_HTTP_RESPONSE_H
+#ifndef WASP_CORE_EXCEPTIONS_H
+#define WASP_CORE_EXCEPTIONS_H
 
+#include <exception>
 #include <string>
 
 #include "../globals.h"
-#include "request.h"
 
 
 __WASP_BEGIN__
 
-class HttpResponse
+class WaspException : public std::exception
+{
+protected:
+	const char* _exceptionType;
+	const char* _message;
+	int _line;
+	const char* _function;
+	const char* _file;
+
+public:
+	WaspException(const char* message, int line, const char* function, const char* file);
+
+	const char* what() const noexcept override;
+	virtual const int line() const noexcept;
+	virtual const char* function() const noexcept;
+	virtual const char* file() const noexcept;
+};
+
+class WaspHttpError : public WaspException
 {
 public:
-	explicit HttpResponse(const HttpRequest& request);
-	std::string toString();
+	WaspHttpError(const char* message, int line, const char* function, const char* file);
 };
 
 __WASP_END__
 
 
-#endif // WASP_HTTP_RESPONSE_H
+#endif // WASP_CORE_EXCEPTIONS_H
