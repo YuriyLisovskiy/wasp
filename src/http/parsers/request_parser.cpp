@@ -128,6 +128,59 @@ void HttpRequestParser::_parseVersionMajor(char input)
 	}
 }
 
+void HttpRequestParser::_parseVersionMinorBegin(char input)
+{
+	if (HttpRequestParser::isDigit(input))
+	{
+		this->_minorV = input - '0';
+		this->_state = ParserState::HttpVersionMinor;
+	}
+	else
+	{
+		throw wasp::WaspHttpError("unable to parse minor part of http protocol version", __LINE__, __FUNCTION__, __FILE__);
+	}
+}
+
+void HttpRequestParser::_parseVersionMinor(char input)
+{
+	if (input == '\r')
+	{
+		this->_state = ParserState::HttpVersionNewLine;
+	}
+	else if(HttpRequestParser::isDigit(input))
+	{
+		this->_minorV = this->_minorV * 10 + input - '0';
+	}
+	else
+	{
+		throw wasp::WaspHttpError("unable to parse minor part of http protocol version", __LINE__, __FUNCTION__, __FILE__);
+	}
+}
+
+void HttpRequestParser::_parseVersionNewLine(char input)
+{
+	if (input == '\n')
+	{
+		this->_state = ParserState::HeaderLineStart;
+	}
+	else
+	{
+		throw wasp::WaspHttpError("unable to parse http protocol main data", __LINE__, __FUNCTION__, __FILE__);
+	}
+}
+
+void HttpRequestParser::_parseHeaderSpaceBeforeValue(char input)
+{
+	if (input == ' ')
+	{
+		this->_state = ParserState::HeaderValue;
+	}
+	else
+	{
+		throw wasp::WaspHttpError("unable to parse http request header", __LINE__, __FUNCTION__, __FILE__);
+	}
+}
+
 wasp::HttpRequest HttpRequestParser::_parse(const std::string& data)
 {
 	auto begin = data.begin();
@@ -175,55 +228,15 @@ wasp::HttpRequest HttpRequestParser::_parse(const std::string& data)
 				break;
 			case ParserState::HttpVersionH:
 				this->_parseHttpWord(input, 'H', ParserState::HttpVersionHt);
-				/*
-				if (input == 'H')
-				{
-					this->_state = ParserState::HttpVersionHt;
-				}
-				else
-				{
-					throw wasp::WaspHttpError("unable to parse http protocol version", __LINE__, __FUNCTION__, __FILE__);
-				}
-				*/
 				break;
 			case ParserState::HttpVersionHt:
 				this->_parseHttpWord(input, 'T', ParserState::HttpVersionHtt);
-				/*
-				if (input == 'T')
-				{
-					this->_state = ParserState::HttpVersionHtt;
-				}
-				else
-				{
-					throw wasp::WaspHttpError("unable to parse http protocol version", __LINE__, __FUNCTION__, __FILE__);
-				}
-				*/
 				break;
 			case ParserState::HttpVersionHtt:
 				this->_parseHttpWord(input, 'T', ParserState::HttpVersionHttp);
-				/*
-				if (input == 'T')
-				{
-					this->_state = ParserState::HttpVersionHttp;
-				}
-				else
-				{
-					throw wasp::WaspHttpError("unable to parse http protocol version", __LINE__, __FUNCTION__, __FILE__);
-				}
-				*/
 				break;
 			case ParserState::HttpVersionHttp:
 				this->_parseHttpWord(input, 'P', ParserState::HttpVersionSlash);
-				/*
-				if (input == 'P')
-				{
-					this->_state = ParserState::HttpVersionSlash;
-				}
-				else
-				{
-					throw wasp::WaspHttpError("unable to parse http protocol version", __LINE__, __FUNCTION__, __FILE__);
-				}
-				*/
 				break;
 			case ParserState::HttpVersionSlash:
 				this->_parseVersionSlash(input);
@@ -235,39 +248,13 @@ wasp::HttpRequest HttpRequestParser::_parse(const std::string& data)
 				this->_parseVersionMajor(input);
 				break;
 			case ParserState::HttpVersionMinorBegin:
-				if (HttpRequestParser::isDigit(input))
-				{
-					this->_minorV = input - '0';
-					this->_state = ParserState::HttpVersionMinor;
-				}
-				else
-				{
-					throw wasp::WaspHttpError("unable to parse minor part of http protocol version", __LINE__, __FUNCTION__, __FILE__);
-				}
+				this->_parseVersionMinorBegin(input);
 				break;
 			case ParserState::HttpVersionMinor:
-				if (input == '\r')
-				{
-					this->_state = ParserState::HttpVersionNewLine;
-				}
-				else if(HttpRequestParser::isDigit(input))
-				{
-					this->_minorV = this->_minorV * 10 + input - '0';
-				}
-				else
-				{
-					throw wasp::WaspHttpError("unable to parse minor part of http protocol version", __LINE__, __FUNCTION__, __FILE__);
-				}
+				this->_parseVersionMinor(input);
 				break;
 			case ParserState::HttpVersionNewLine:
-				if (input == '\n')
-				{
-					this->_state = ParserState::HeaderLineStart;
-				}
-				else
-				{
-					throw wasp::WaspHttpError("unable to parse http protocol main data", __LINE__, __FUNCTION__, __FILE__);
-				}
+				this->_parseVersionNewLine(input);
 				break;
 			case ParserState::HeaderLineStart:
 				if (input == '\r')
@@ -323,14 +310,7 @@ wasp::HttpRequest HttpRequestParser::_parse(const std::string& data)
 				}
 				break;
 			case ParserState::HeaderSpaceBeforeValue:
-				if (input == ' ')
-				{
-					this->_state = ParserState::HeaderValue;
-				}
-				else
-				{
-					throw wasp::WaspHttpError("unable to parse http request header", __LINE__, __FUNCTION__, __FILE__);
-				}
+				this->_parseHeaderSpaceBeforeValue(input);
 				break;
 			case ParserState::HeaderValue:
 				if (input == '\r')
@@ -355,7 +335,7 @@ wasp::HttpRequest HttpRequestParser::_parse(const std::string& data)
 					newHeaderValue.clear();
 					this->_state = ParserState::ExpectingNewline_2;
 				}
-				else if (isControl(input))
+				else if (HttpRequestParser::isControl(input))
 				{
 					throw wasp::WaspHttpError("unable to parse http request header value", __LINE__, __FUNCTION__, __FILE__);
 				}
@@ -412,10 +392,10 @@ wasp::HttpRequest HttpRequestParser::_parse(const std::string& data)
 				}
 				else
 				{
-					this->_state = ParserState::Post;
+					this->_state = ParserState::PostOrPut;
 				}
 				break;
-			case ParserState::Post:
+			case ParserState::PostOrPut:
 				--this->_contentSize;
 				this->_content.push_back(input);
 
@@ -582,19 +562,16 @@ wasp::HttpRequest HttpRequestParser::_parse(const std::string& data)
 	throw wasp::WaspHttpError("unable to parse http request", __LINE__, __FUNCTION__, __FILE__);
 }
 
-// Check if a byte is an HTTP character.
 bool HttpRequestParser::isChar(uint c)
 {
 	return c >= 0 && c <= 127;
 }
 
-// Check if a byte is an HTTP control character.
 bool HttpRequestParser::isControl(uint c)
 {
 	return (c >= 0 && c <= 31) || (c == 127);
 }
 
-// Check if a byte is defined as an HTTP special character.
 bool HttpRequestParser::isSpecial(uint c)
 {
 	switch (c)
@@ -609,13 +586,10 @@ bool HttpRequestParser::isSpecial(uint c)
 	}
 }
 
-// Check if a byte is a digit.
 bool HttpRequestParser::isDigit(uint c)
 {
 	return c >= '0' && c <= '9';
 }
-
-HttpRequestParser::HttpRequestParser() = default;
 
 wasp::HttpRequest HttpRequestParser::buildHttpRequest()
 {

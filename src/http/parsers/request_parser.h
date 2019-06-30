@@ -92,7 +92,7 @@ private:
 		ExpectingNewline_2,
 		ExpectingNewline_3,
 
-		Post,
+		PostOrPut,
 		ChunkSize,
 		ChunkExtensionName,
 		ChunkExtensionValue,
@@ -115,11 +115,15 @@ private:
 	void _parseVersionSlash(char input);
 	void _parseVersionMajorBegin(char input);
 	void _parseVersionMajor(char input);
+	void _parseVersionMinorBegin(char input);
+	void _parseVersionMinor(char input);
+	void _parseVersionNewLine(char input);
+	void _parseHeaderSpaceBeforeValue(char input);
 
 	wasp::HttpRequest _parse(const std::string& data);
 
 public:
-	HttpRequestParser();
+	HttpRequestParser() = default;
 	wasp::HttpRequest parse(const std::string& data);
 };
 

@@ -35,8 +35,7 @@ std::string HttpResponse::toString()
 {
 	std::string body("<form action=\"/hello\" method=\"post\" enctype=\"multipart/form-data\">\n"
 					 "\t<input type=\"file\" name=\"super_file\" />\n"
-					// "\t<input type=\"text\" name=\"first_name\" />\n"
-					 //"\t<input type=\"text\" name=\"last_name\" />\n"
+					 "\t<input type=\"password\" name=\"first_name\" />\n"
 					 "\t<input type=\"submit\" value=\"send\" />\n"
 					 "\t</form>");
 
