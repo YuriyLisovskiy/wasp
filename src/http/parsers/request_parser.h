@@ -37,6 +37,7 @@ __INTERNAL_BEGIN__
 
 class HttpRequestParser
 {
+	friend class HttpRequestParserTest;
 private:
 	size_t _majorV{};
 	size_t _minorV{};
@@ -46,25 +47,25 @@ private:
 	bool _keepAlive{};
 	std::string _content;
 	std::map<std::string, std::string> _headers;
+	std::map<std::string, std::string> _getParameters;
+	std::map<std::string, std::string> _postParameters;
 
 	unsigned long long _contentSize{};
 	std::string _chunkSizeStr;
 	unsigned long long _chunkSize{};
 	bool _chunked{};
 
-	wasp::HttpRequest buildHttpRequest();
+	// Used only for POST, PUT or PATCH methods type
+	enum ContentType
+	{
+		ApplicationXWwwFormUrlencoded,
+		ApplicationJson,
+		MultipartFormData,
+		TextPlain
 
-	// Check if a byte is an HTTP character.
-	static inline bool isChar(uint c);
+	} _contentType{};
 
-	// Check if a byte is an HTTP control character.
-	static inline bool isControl(uint c);
-
-	// Check if a byte is defined as an HTTP special character.
-	static inline bool isSpecial(uint c);
-
-	// Check if a byte is a digit.
-	static inline bool isDigit(uint c);
+	wasp::HttpRequest _buildHttpRequest();
 
 	enum ParserState
 	{
@@ -72,6 +73,7 @@ private:
 		Method,
 		PathBegin,
 		Path,
+		Query,
 		HttpVersionH,
 		HttpVersionHt,
 		HttpVersionHtt,
@@ -92,7 +94,8 @@ private:
 		ExpectingNewline_2,
 		ExpectingNewline_3,
 
-		PostOrPut,
+		RequestBody,
+
 		ChunkSize,
 		ChunkExtensionName,
 		ChunkExtensionValue,
@@ -108,19 +111,47 @@ private:
 
 	} _state{};
 
-	void _parseMethodBegin(char input);
-	void _parseMethod(char input);
-	void _parsePathBegin(char input);
-	void _parseHttpWord(char input, char expectedInput, HttpRequestParser::ParserState newState);
-	void _parseVersionSlash(char input);
-	void _parseVersionMajorBegin(char input);
-	void _parseVersionMajor(char input);
-	void _parseVersionMinorBegin(char input);
-	void _parseVersionMinor(char input);
-	void _parseVersionNewLine(char input);
-	void _parseHeaderSpaceBeforeValue(char input);
+	enum QueryParserState
+	{
+		Key,
+		Val
+	};
 
-	wasp::HttpRequest _parse(const std::string& data);
+	void _parseHttpWord(char input, char expectedInput, HttpRequestParser::ParserState newState);
+
+	// Parses http request stream
+	void _parseRequest(const std::string& data);
+
+	// Parses 'application/json' content type
+	void _parseApplicationJson();
+
+	// Parses 'multipart/form-data' content type
+	void _parseMultipart();
+
+	// Parses 'text/plain' content type
+	void _parsePlainText();
+
+	// Parses url's query or 'application/x-www-form-urlencoded' content type
+	static std::map<std::string, std::string>* _parseQuery(const std::string& content);
+
+	void _setParameters(std::map<std::string, std::string>* params);
+
+	// Helpers
+	// Check if a byte is an HTTP character.
+	static bool isChar(uint c);
+
+	// Check if a byte is an HTTP control character.
+	static bool isControl(uint c);
+
+	// Check if a byte is defined as an HTTP special character.
+	static bool isSpecial(uint c);
+
+	// Check if a byte is a digit.
+	static bool isDigit(uint c);
+
+protected:
+	// May be overloaded for custom parser which is inherited from HttpRequestParser
+	virtual void setParameters(std::map<std::string, std::string>* params);
 
 public:
 	HttpRequestParser() = default;

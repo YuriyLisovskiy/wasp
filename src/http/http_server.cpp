@@ -60,13 +60,21 @@ const std::string HttpServer::_tcpHandler(const std::string& data)
 {
 	try
 	{
+		// TODO: remove in prod
+		wasp::datetime::Measure<std::chrono::milliseconds> measure;
 
-		std::cout << "\n===========================\n" << data << "\n===========================\n";
+		// TODO: remove in prod
+		measure.start();
 
 		HttpRequestParser parser;
 		HttpRequest request = parser.parse(data);
-
 		HttpResponse response = this->_httpHandler(request);
+
+		// TODO: remove in prod
+		measure.end();
+
+		// TODO: remove in prod
+		std::cout << '\n' << request.method() << " request took " << measure.elapsed() << " ms\n";
 
 		return response.toString();
 	}
@@ -99,7 +107,7 @@ void HttpServer::normalizeContext(HttpServer::Context& ctx)
 
 	if (ctx.handler == nullptr)
 	{
-		throw std::invalid_argument("HttpServer::Context::handler can not be nullptr");
+		throw wasp::WaspHttpError("HttpServer::Context::handler can not be nullptr", _ERROR_DETAILS_);
 	}
 
 	if (ctx.logger == nullptr)

@@ -16,18 +16,16 @@
  */
 
 /*
- * This header contains global variables, constants and definitions.
+ * globals
+ * TODO: write docs.
  */
 
-#ifndef WASP_MACRO_H
-#define WASP_MACRO_H
+#ifndef WASP_TESTS_GLOBALS_H
+#define WASP_TESTS_GLOBALS_H
 
-#define __WASP_BEGIN__ namespace wasp {
-#define __WASP_END__ }
 
-#define __INTERNAL_BEGIN__ namespace wasp { namespace internal {
-#define __INTERNAL_END__ } }
+#define __TESTS_BEGIN__ namespace wasp { namespace tests {
+#define __TESTS_END__ } }
 
-#define _ERROR_DETAILS_ __LINE__, __FUNCTION__, __FILE__
 
-#endif // WASP_MACRO_H
+#endif // WASP_TESTS_GLOBALS_H

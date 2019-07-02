@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include "http/parsers/request_parser_tests.h"
+
 int main(int argc, char *argv[])
 {
 	::testing::InitGoogleTest(&argc, argv);

@@ -16,18 +16,26 @@
  */
 
 /*
- * This header contains global variables, constants and definitions.
+ * BaseMiddleware
+ * TODO: write docs.
  */
 
-#ifndef WASP_MACRO_H
-#define WASP_MACRO_H
+#ifndef WASP_HTTP_MIDDLEWARE_BASE_MIDDLEWARE_H
+#define WASP_HTTP_MIDDLEWARE_BASE_MIDDLEWARE_H
 
-#define __WASP_BEGIN__ namespace wasp {
-#define __WASP_END__ }
+#include "../../globals.h"
+#include "../request.h"
 
-#define __INTERNAL_BEGIN__ namespace wasp { namespace internal {
-#define __INTERNAL_END__ } }
 
-#define _ERROR_DETAILS_ __LINE__, __FUNCTION__, __FILE__
+__WASP_BEGIN__
 
-#endif // WASP_MACRO_H
+class BaseMiddleware
+{
+public:
+	virtual void modify(HttpRequest& request) = 0;
+};
+
+__WASP_END__
+
+
+#endif // WASP_HTTP_MIDDLEWARE_BASE_MIDDLEWARE_H

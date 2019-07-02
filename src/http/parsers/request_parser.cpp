@@ -28,49 +28,35 @@ __INTERNAL_BEGIN__
 
 wasp::HttpRequest HttpRequestParser::parse(const std::string& data)
 {
-	return this->_parse(data);
-}
-
-void HttpRequestParser::_parseMethodBegin(char input)
-{
-	if (!isChar(input) || isControl(input) || isSpecial(input))
+	this->_parseRequest(data);
+	if (!this->_content.empty())
 	{
-		throw wasp::WaspHttpError("unable to parse method type", __LINE__, __FUNCTION__, __FILE__);
+		switch (this->_contentType)
+		{
+			case ContentType::ApplicationXWwwFormUrlencoded:
+				this->_setParameters(HttpRequestParser::_parseQuery(this->_content));
+				break;
+			case ContentType::ApplicationJson:
+				this->_parseApplicationJson();
+				break;
+			case ContentType::MultipartFormData:
+				this->_parseMultipart();
+				break;
+			case ContentType::TextPlain:
+				this->_parsePlainText();
+				break;
+		}
 	}
 	else
 	{
-		this->_state = ParserState::Method;
-		this->_method.push_back(input);
+		this->_setParameters(HttpRequestParser::_parseQuery(this->_query));
 	}
-}
 
-void HttpRequestParser::_parseMethod(char input)
-{
-	if (input == ' ')
-	{
-		this->_state = PathBegin;
-	}
-	else if (!isChar(input) || isControl(input) || isSpecial(input))
-	{
-		throw wasp::WaspHttpError("unable to parse http method type", __LINE__, __FUNCTION__, __FILE__);
-	}
-	else
-	{
-		this->_method.push_back(input);
-	}
-}
+	// TODO: parse cookies
+//	auto cookiesHeader = this->_headers.find("");
+//	if ()
 
-void HttpRequestParser::_parsePathBegin(char input)
-{
-	if (HttpRequestParser::isControl(input))
-	{
-		throw wasp::WaspHttpError("unable to parse http url path", __LINE__, __FUNCTION__, __FILE__);
-	}
-	else
-	{
-		this->_state = Path;
-		this->_path.push_back(input);
-	}
+	return this->_buildHttpRequest();
 }
 
 void HttpRequestParser::_parseHttpWord(char input, char expectedInput, HttpRequestParser::ParserState newState)
@@ -81,107 +67,11 @@ void HttpRequestParser::_parseHttpWord(char input, char expectedInput, HttpReque
 	}
 	else
 	{
-		throw wasp::WaspHttpError("unable to parse http protocol version", __LINE__, __FUNCTION__, __FILE__);
+		throw wasp::WaspHttpError("unable to parse http protocol version", _ERROR_DETAILS_);
 	}
 }
 
-void HttpRequestParser::_parseVersionSlash(char input)
-{
-	if (input == '/')
-	{
-		this->_majorV = 0;
-		this->_minorV = 0;
-		this->_state = ParserState::HttpVersionMajorBegin;
-	}
-	else
-	{
-		throw wasp::WaspHttpError("unable to parse http protocol version", __LINE__, __FUNCTION__, __FILE__);
-	}
-}
-
-void HttpRequestParser::_parseVersionMajorBegin(char input)
-{
-	if (HttpRequestParser::isDigit(input))
-	{
-		this->_majorV = input - '0';
-		this->_state = ParserState::HttpVersionMajor;
-	}
-	else
-	{
-		throw wasp::WaspHttpError("unable to parse major part of http protocol version", __LINE__, __FUNCTION__, __FILE__);
-	}
-}
-
-void HttpRequestParser::_parseVersionMajor(char input)
-{
-	if (input == '.')
-	{
-		this->_state = ParserState::HttpVersionMinorBegin;
-	}
-	else if (HttpRequestParser::isDigit(input))
-	{
-		this->_majorV = this->_majorV * 10 + input - '0';
-	}
-	else
-	{
-		throw wasp::WaspHttpError("unable to parse major part of http protocol version", __LINE__, __FUNCTION__, __FILE__);
-	}
-}
-
-void HttpRequestParser::_parseVersionMinorBegin(char input)
-{
-	if (HttpRequestParser::isDigit(input))
-	{
-		this->_minorV = input - '0';
-		this->_state = ParserState::HttpVersionMinor;
-	}
-	else
-	{
-		throw wasp::WaspHttpError("unable to parse minor part of http protocol version", __LINE__, __FUNCTION__, __FILE__);
-	}
-}
-
-void HttpRequestParser::_parseVersionMinor(char input)
-{
-	if (input == '\r')
-	{
-		this->_state = ParserState::HttpVersionNewLine;
-	}
-	else if(HttpRequestParser::isDigit(input))
-	{
-		this->_minorV = this->_minorV * 10 + input - '0';
-	}
-	else
-	{
-		throw wasp::WaspHttpError("unable to parse minor part of http protocol version", __LINE__, __FUNCTION__, __FILE__);
-	}
-}
-
-void HttpRequestParser::_parseVersionNewLine(char input)
-{
-	if (input == '\n')
-	{
-		this->_state = ParserState::HeaderLineStart;
-	}
-	else
-	{
-		throw wasp::WaspHttpError("unable to parse http protocol main data", __LINE__, __FUNCTION__, __FILE__);
-	}
-}
-
-void HttpRequestParser::_parseHeaderSpaceBeforeValue(char input)
-{
-	if (input == ' ')
-	{
-		this->_state = ParserState::HeaderValue;
-	}
-	else
-	{
-		throw wasp::WaspHttpError("unable to parse http request header", __LINE__, __FUNCTION__, __FILE__);
-	}
-}
-
-wasp::HttpRequest HttpRequestParser::_parse(const std::string& data)
+void HttpRequestParser::_parseRequest(const std::string& data)
 {
 	auto begin = data.begin();
 	auto end = data.end();
@@ -197,15 +87,67 @@ wasp::HttpRequest HttpRequestParser::_parse(const std::string& data)
 		switch (this->_state)
 		{
 			case ParserState::MethodBegin:
-				this->_parseMethodBegin(input);
+				if (!HttpRequestParser::isChar(input) || HttpRequestParser::isControl(input) || HttpRequestParser::isSpecial(input))
+				{
+					throw wasp::WaspHttpError("unable to parse method type", _ERROR_DETAILS_);
+				}
+				else
+				{
+					this->_state = ParserState::Method;
+					this->_method.push_back(input);
+				}
 				break;
 			case ParserState::Method:
-				this->_parseMethod(input);
+				if (input == ' ')
+				{
+					this->_state = PathBegin;
+				}
+				else if (!HttpRequestParser::isChar(input) || HttpRequestParser::isControl(input) || HttpRequestParser::isSpecial(input))
+				{
+					throw wasp::WaspHttpError("unable to parse http method type", _ERROR_DETAILS_);
+				}
+				else
+				{
+					this->_method.push_back(input);
+				}
 				break;
 			case ParserState::PathBegin:
-				this->_parsePathBegin(input);
+				if (HttpRequestParser::isControl(input))
+				{
+					throw wasp::WaspHttpError("unable to parse http url path", _ERROR_DETAILS_);
+				}
+				else
+				{
+					this->_state = Path;
+					this->_path.push_back(input);
+				}
 				break;
 			case ParserState::Path:
+				if (input == ' ')
+				{
+					this->_state = ParserState::HttpVersionH;
+				}
+				else if (input == '?')
+				{
+					this->_state = ParserState::Query;
+				}
+				else if (input == '\r')
+				{
+					this->_majorV = 0;
+					this->_minorV = 9;
+
+					return;
+				}
+				else if (HttpRequestParser::isControl(input))
+				{
+					throw wasp::WaspHttpError("unable to parse http url path", __LINE__, __FUNCTION__, __FILE__);
+				}
+				else
+				{
+					this->_path.push_back(input);
+				}
+				break;
+			case ParserState::Query:
 				if (input == ' ')
 				{
 					this->_state = ParserState::HttpVersionH;
@@ -215,15 +157,15 @@ wasp::HttpRequest HttpRequestParser::_parse(const std::string& data)
 					this->_majorV = 0;
 					this->_minorV = 9;
 
-					return this->buildHttpRequest();
+					return;
 				}
-				else if (isControl(input))
+				else if (HttpRequestParser::isControl(input))
 				{
-					throw wasp::WaspHttpError("unable to parse http url path", __LINE__, __FUNCTION__, __FILE__);
+					throw wasp::WaspHttpError("unable to parse http url query", __LINE__, __FUNCTION__, __FILE__);
 				}
 				else
 				{
-					this->_path.push_back(input);
+					this->_query.push_back(input);
 				}
 				break;
 			case ParserState::HttpVersionH:
@@ -239,22 +181,76 @@ wasp::HttpRequest HttpRequestParser::_parse(const std::string& data)
 				this->_parseHttpWord(input, 'P', ParserState::HttpVersionSlash);
 				break;
 			case ParserState::HttpVersionSlash:
-				this->_parseVersionSlash(input);
+				if (input == '/')
+				{
+					this->_majorV = 0;
+					this->_minorV = 0;
+					this->_state = ParserState::HttpVersionMajorBegin;
+				}
+				else
+				{
+					throw wasp::WaspHttpError("unable to parse http protocol version", _ERROR_DETAILS_);
+				}
 				break;
 			case ParserState::HttpVersionMajorBegin:
-				this->_parseVersionMajorBegin(input);
+				if (HttpRequestParser::isDigit(input))
+				{
+					this->_majorV = input - '0';
+					this->_state = ParserState::HttpVersionMajor;
+				}
+				else
+				{
+					throw wasp::WaspHttpError("unable to parse major part of http protocol version", _ERROR_DETAILS_);
+				}
 				break;
 			case ParserState::HttpVersionMajor:
-				this->_parseVersionMajor(input);
+				if (input == '.')
+				{
+					this->_state = ParserState::HttpVersionMinorBegin;
+				}
+				else if (HttpRequestParser::isDigit(input))
+				{
+					this->_majorV = this->_majorV * 10 + input - '0';
+				}
+				else
+				{
+					throw wasp::WaspHttpError("unable to parse major part of http protocol version", _ERROR_DETAILS_);
+				}
 				break;
 			case ParserState::HttpVersionMinorBegin:
-				this->_parseVersionMinorBegin(input);
+				if (HttpRequestParser::isDigit(input))
+				{
+					this->_minorV = input - '0';
+					this->_state = ParserState::HttpVersionMinor;
+				}
+				else
+				{
+					throw wasp::WaspHttpError("unable to parse minor part of http protocol version", _ERROR_DETAILS_);
+				}
 				break;
 			case ParserState::HttpVersionMinor:
-				this->_parseVersionMinor(input);
+				if (input == '\r')
+				{
+					this->_state = ParserState::HttpVersionNewLine;
+				}
+				else if(HttpRequestParser::isDigit(input))
+				{
+					this->_minorV = this->_minorV * 10 + input - '0';
+				}
+				else
+				{
+					throw wasp::WaspHttpError("unable to parse minor part of http protocol version", _ERROR_DETAILS_);
+				}
 				break;
 			case ParserState::HttpVersionNewLine:
-				this->_parseVersionNewLine(input);
+				if (input == '\n')
+				{
+					this->_state = ParserState::HeaderLineStart;
+				}
+				else
+				{
+					throw wasp::WaspHttpError("unable to parse http protocol main data", _ERROR_DETAILS_);
+				}
 				break;
 			case ParserState::HeaderLineStart:
 				if (input == '\r')
@@ -310,26 +306,31 @@ wasp::HttpRequest HttpRequestParser::_parse(const std::string& data)
 				}
 				break;
 			case ParserState::HeaderSpaceBeforeValue:
-				this->_parseHeaderSpaceBeforeValue(input);
+				if (input == ' ')
+				{
+					this->_state = ParserState::HeaderValue;
+				}
+				else
+				{
+					throw wasp::WaspHttpError("unable to parse http request header", _ERROR_DETAILS_);
+				}
 				break;
 			case ParserState::HeaderValue:
 				if (input == '\r')
 				{
-					if (this->_method == "POST" || this->_method == "PUT")
+					if (strcasecmp(newHeaderName.c_str(), "Content-Length") == 0)
 					{
-						if (strcasecmp(newHeaderName.c_str(), "Content-Length") == 0)
+						this->_contentSize = atoi(newHeaderValue.c_str());
+						this->_content.reserve(this->_contentSize);
+					}
+					else if (strcasecmp(newHeaderName.c_str(), "Transfer-Encoding") == 0)
+					{
+						if (strcasecmp(newHeaderValue.c_str(), "chunked") == 0)
 						{
-							this->_contentSize = atoi(newHeaderValue.c_str());
-							this->_content.reserve(this->_contentSize);
-						}
-						else if (strcasecmp(newHeaderName.c_str(), "Transfer-Encoding") == 0)
-						{
-							if (strcasecmp(newHeaderValue.c_str(), "chunked") == 0)
-							{
-								this->_chunked = true;
-							}
+							this->_chunked = true;
 						}
 					}
+
 					this->_headers[newHeaderName] = newHeaderValue;
 					newHeaderName.clear();
 					newHeaderValue.clear();
@@ -383,7 +384,7 @@ wasp::HttpRequest HttpRequestParser::_parse(const std::string& data)
 				{
 					if (input == '\n')
 					{
-						return this->buildHttpRequest();
+						return;
 					}
 					else
 					{
@@ -392,16 +393,33 @@ wasp::HttpRequest HttpRequestParser::_parse(const std::string& data)
 				}
 				else
 				{
-					this->_state = ParserState::PostOrPut;
+					auto contentType = this->_headers["Content-Type"];
+					if (contentType.find("multipart/form-data") != std::string::npos)
+					{
+						this->_contentType = ContentType::MultipartFormData;
+					}
+					else if (contentType.find("application/json") != std::string::npos)
+					{
+						this->_contentType = ContentType::ApplicationJson;
+					}
+					else if (contentType.find("text/plain") != std::string::npos)
+					{
+						this->_contentType = ContentType::TextPlain;
+					}
+					else
+					{
+						this->_contentType = ContentType::ApplicationXWwwFormUrlencoded;
+					}
+					this->_state = ParserState::RequestBody;
 				}
 				break;
-			case ParserState::PostOrPut:
+			case ParserState::RequestBody:
 				--this->_contentSize;
 				this->_content.push_back(input);
 
 				if (this->_contentSize == 0)
 				{
-					return this->buildHttpRequest();
+					return;
 				}
 				break;
 			case ParserState::ChunkSize:
@@ -492,7 +510,7 @@ wasp::HttpRequest HttpRequestParser::_parse(const std::string& data)
 			case ParserState::ChunkSizeNewLine_3:
 				if (input == '\n')
 				{
-					return this->buildHttpRequest();
+					return;
 				}
 				else
 				{
@@ -562,6 +580,89 @@ wasp::HttpRequest HttpRequestParser::_parse(const std::string& data)
 	throw wasp::WaspHttpError("unable to parse http request", __LINE__, __FUNCTION__, __FILE__);
 }
 
+void HttpRequestParser::_parseApplicationJson()
+{
+	// TODO
+}
+
+void HttpRequestParser::_parseMultipart()
+{
+	// TODO
+}
+
+void HttpRequestParser::_parsePlainText()
+{
+	// TODO
+}
+
+std::map<std::string, std::string>* HttpRequestParser::_parseQuery(const std::string& content)
+{
+	auto* result = new std::map<std::string, std::string>();
+	if (content.empty())
+	{
+		return result;
+	}
+
+	auto begin = content.begin();
+	auto end = content.end();
+	std::string itemKey;
+	std::string itemValue;
+
+	QueryParserState state = QueryParserState::Key;
+
+	while (begin != end)
+	{
+		char input = *begin++;
+		switch (state)
+		{
+			case QueryParserState::Key:
+				if (input == '=')
+				{
+					state = QueryParserState::Val;
+				}
+				else
+				{
+					itemKey.push_back(input);
+				}
+				break;
+			case QueryParserState::Val:
+				if (input == '&')
+				{
+					(*result)[itemKey] = itemValue;
+					itemKey.clear();
+					itemValue.clear();
+					state = QueryParserState::Key;
+				}
+				else
+				{
+					itemValue.push_back(input);
+				}
+				break;
+		}
+	}
+	(*result)[itemKey] = itemValue;
+
+	return result;
+}
+
+void HttpRequestParser::setParameters(std::map<std::string, std::string>* params)
+{
+	if (this->_method == "GET")
+	{
+		this->_getParameters = *params;
+	}
+	else if (this->_method == "POST")
+	{
+		this->_postParameters = *params;
+	}
+}
+
+void HttpRequestParser::_setParameters(std::map<std::string, std::string>* params)
+{
+	this->setParameters(params);
+	delete params;
+}
+
 bool HttpRequestParser::isChar(uint c)
 {
 	return c >= 0 && c <= 127;
@@ -591,7 +692,7 @@ bool HttpRequestParser::isDigit(uint c)
 	return c >= '0' && c <= '9';
 }
 
-wasp::HttpRequest HttpRequestParser::buildHttpRequest()
+wasp::HttpRequest HttpRequestParser::_buildHttpRequest()
 {
 	return wasp::HttpRequest(
 		this->_method,
@@ -602,8 +703,8 @@ wasp::HttpRequest HttpRequestParser::buildHttpRequest()
 		this->_keepAlive,
 		this->_content,
 		this->_headers,
-		std::map<std::string, std::string>(),
-		std::map<std::string, std::string>()
+		this->_getParameters,
+		this->_postParameters
 	);
 }
 

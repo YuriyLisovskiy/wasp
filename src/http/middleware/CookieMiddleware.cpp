@@ -16,18 +16,30 @@
  */
 
 /*
- * This header contains global variables, constants and definitions.
+ * CookieMiddleware implementation.
+ * TODO: write docs.
  */
 
-#ifndef WASP_MACRO_H
-#define WASP_MACRO_H
+#include "CookieMiddleware.h"
 
-#define __WASP_BEGIN__ namespace wasp {
-#define __WASP_END__ }
 
-#define __INTERNAL_BEGIN__ namespace wasp { namespace internal {
-#define __INTERNAL_END__ } }
+__WASP_BEGIN__
 
-#define _ERROR_DETAILS_ __LINE__, __FUNCTION__, __FILE__
+void CookieMiddleware::modify(wasp::HttpRequest& request)
+{
+	if (request.headers.contains("Cookie"))
+	{
+		request.COOKIES = QueryDict(this->_parseCookies(request.headers.get("Cookie")));
+	}
+}
 
-#endif // WASP_MACRO_H
+std::map<std::string, std::string> CookieMiddleware::_parseCookies(const std::string& content)
+{
+	std::map<std::string, std::string> result;
+
+	// TODO
+
+	return result;
+}
+
+__WASP_END__

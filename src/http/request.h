@@ -49,6 +49,15 @@ public:
 	QueryDict<std::string, std::string> GET;
 	QueryDict<std::string, std::string> POST;
 
+	// TODO
+	QueryDict<std::string, std::string> FILES;
+
+	// TODO
+	QueryDict<std::string, std::string> COOKIES;
+
+	// TODO
+	QueryDict<std::string, std::string> META;
+
 	std::string version();
 	std::string path();
 	std::string method();

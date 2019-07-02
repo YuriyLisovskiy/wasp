@@ -22,6 +22,8 @@ file(GLOB LIB_FILES
 		"src/utils/*.cpp"
 		"src/core/*.h"
 		"src/core/*.cpp"
+		"src/http/middleware/*.h"
+		"src/http/middleware/*.cpp"
 		"src/http/parsers/*.h"
 		"src/http/parsers/*.cpp"
 		"src/http/*.h"
@@ -31,6 +33,8 @@ file(GLOB LIB_FILES
 	)
 
 file(GLOB TEST_FILES
+		"tests/http/*.h"
+		"tests/http/parsers/*.h"
 		"tests/*.h"
 	)
 

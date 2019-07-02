@@ -35,6 +35,9 @@
 #include "response.h"
 #include "request.h"
 #include "parsers/request_parser.h"
+#include "../core/exceptions.h"
+
+#include "../utils/datetime.h"
 
 
 __INTERNAL_BEGIN__
