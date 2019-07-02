@@ -16,26 +16,17 @@
  */
 
 /*
- * BaseMiddleware
  * TODO: write docs.
  */
 
-#ifndef WASP_HTTP_MIDDLEWARE_BASE_MIDDLEWARE_H
-#define WASP_HTTP_MIDDLEWARE_BASE_MIDDLEWARE_H
-
-#include "../../globals.h"
-#include "../request.h"
+#include "settings.h"
 
 
 __WASP_BEGIN__
 
-class BaseMiddleware
+Settings::Settings()
 {
-public:
-	virtual void modify(HttpRequest& request) = 0;
-};
+	this->LOGGER = Logger::getInstance();
+}
 
 __WASP_END__
-
-
-#endif // WASP_HTTP_MIDDLEWARE_BASE_MIDDLEWARE_H

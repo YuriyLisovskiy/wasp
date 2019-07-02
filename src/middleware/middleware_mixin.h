@@ -16,38 +16,33 @@
  */
 
 /*
- * CookieMiddleware definition.
+ * BaseMiddleware
  * TODO: write docs.
  */
 
-#ifndef WASP_HTTP_MIDDLEWARE_COOKIE_MIDDLEWARE_H
-#define WASP_HTTP_MIDDLEWARE_COOKIE_MIDDLEWARE_H
+#ifndef WASP_MIDDLEWARE_MIDDLEWARE_MIXIN_H
+#define WASP_MIDDLEWARE_MIDDLEWARE_MIXIN_H
 
-#include <map>
-#include <string>
-
-#include "../../globals.h"
-#include "BaseMiddleware.h"
-#include "../../utils/query_dict.h"
+#include "../globals.h"
+#include "../http/request.h"
+#include "../http/response.h"
 
 
 __WASP_BEGIN__
 
-class CookieMiddleware : protected BaseMiddleware
+class MiddlewareMixin
 {
-private:
-	std::map<std::string, std::string> _parseCookies(const std::string& content);
-
-	enum State
+public:
+	virtual void processRequest(HttpRequest& request)
 	{
-
 	};
 
-public:
-	void modify(HttpRequest& request) final;
+	virtual void processResponse(const HttpRequest& request, HttpResponse& response)
+	{
+	};
 };
 
 __WASP_END__
 
 
-#endif // WASP_HTTP_MIDDLEWARE_COOKIE_MIDDLEWARE_H
+#endif // WASP_MIDDLEWARE_MIDDLEWARE_MIXIN_H

@@ -16,30 +16,31 @@
  */
 
 /*
- * CookieMiddleware implementation.
+ * CookieMiddleware definition.
  * TODO: write docs.
  */
 
-#include "CookieMiddleware.h"
+#ifndef WASP_HTTP_MIDDLEWARE_COOKIE_MIDDLEWARE_H
+#define WASP_HTTP_MIDDLEWARE_COOKIE_MIDDLEWARE_H
+
+#include "../globals.h"
+#include "middleware_mixin.h"
+#include "../http/request.h"
+#include "../http/response.h"
+#include "../utils/query_dict.h"
+#include "../http/parsers/cookie_parser.h"
 
 
 __WASP_BEGIN__
 
-void CookieMiddleware::modify(wasp::HttpRequest& request)
+class CookieMiddleware final: public MiddlewareMixin
 {
-	if (request.headers.contains("Cookie"))
-	{
-		request.COOKIES = QueryDict(this->_parseCookies(request.headers.get("Cookie")));
-	}
-}
-
-std::map<std::string, std::string> CookieMiddleware::_parseCookies(const std::string& content)
-{
-	std::map<std::string, std::string> result;
-
-	// TODO
-
-	return result;
-}
+public:
+	void processRequest(HttpRequest& request) final;
+	void processResponse(const HttpRequest& request, HttpResponse& response) final;
+};
 
 __WASP_END__
+
+
+#endif // WASP_HTTP_MIDDLEWARE_COOKIE_MIDDLEWARE_H

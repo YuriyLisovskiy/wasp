@@ -27,15 +27,18 @@
 #include <cstdint>
 #include <string>
 #include <functional>
+#include <vector>
 
 #include "../globals.h"
 #include "../utils/logger.h"
 #include "../conf/defaults.h"
+#include "../conf/settings.h"
 #include "../core/tcp_server.h"
 #include "response.h"
 #include "request.h"
 #include "parsers/request_parser.h"
 #include "../core/exceptions.h"
+#include "../middleware/middleware_mixin.h"
 
 #include "../utils/datetime.h"
 
@@ -56,6 +59,8 @@ private:
 	TcpServer* _tcpServer;
 	httpHandler _httpHandler;
 
+	std::vector<MiddlewareMixin*> _middleware;
+
 	const std::string _tcpHandler(const std::string& data);
 
 public:
@@ -64,10 +69,9 @@ public:
 		const char* host = nullptr;
 		uint16_t port = 0;
 		httpHandler handler = nullptr;
-		ILogger* logger = nullptr;
 	};
 
-	explicit HttpServer(HttpServer::Context& ctx);
+	explicit HttpServer(HttpServer::Context& ctx, const Settings& settings);
 	void listenAndServe();
 	~HttpServer();
 

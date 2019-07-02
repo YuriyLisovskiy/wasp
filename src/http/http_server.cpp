@@ -28,13 +28,13 @@
 
 __INTERNAL_BEGIN__
 
-HttpServer::HttpServer(HttpServer::Context& ctx)
+HttpServer::HttpServer(HttpServer::Context& ctx, const Settings& settings)
 {
 	HttpServer::normalizeContext(ctx);
 
 	this->_host = ctx.host;
 	this->_port = ctx.port;
-	this->_logger = ctx.logger;
+	this->_logger = settings.LOGGER;
 
 	// default schema, https will be implemented in future. TODO.
 	this->_schema = "http";
@@ -42,17 +42,20 @@ HttpServer::HttpServer(HttpServer::Context& ctx)
 	TcpServer::Context tcpContext{};
 	tcpContext.host = ctx.host;
 	tcpContext.port = ctx.port;
-
 	tcpContext.handler = std::bind(&HttpServer::_tcpHandler, this, std::placeholders::_1);
-	tcpContext.logger = ctx.logger;
+	tcpContext.logger = settings.LOGGER;
 
 	this->_httpHandler = ctx.handler;
-
+	this->_middleware = settings.MIDDLEWARE;
 	this->_tcpServer = new TcpServer(tcpContext);
 }
 
 HttpServer::~HttpServer()
 {
+	for (auto & middleware : this->_middleware)
+	{
+		delete middleware;
+	}
 	delete this->_tcpServer;
 }
 
@@ -68,7 +71,18 @@ const std::string HttpServer::_tcpHandler(const std::string& data)
 
 		HttpRequestParser parser;
 		HttpRequest request = parser.parse(data);
+
+		for (const auto& middleware : this->_middleware)
+		{
+			middleware->processRequest(request);
+		}
+
 		HttpResponse response = this->_httpHandler(request);
+
+		for (const auto& middleware : this->_middleware)
+		{
+			middleware->processResponse(request, response);
+		}
 
 		// TODO: remove in prod
 		measure.end();
@@ -108,11 +122,6 @@ void HttpServer::normalizeContext(HttpServer::Context& ctx)
 	if (ctx.handler == nullptr)
 	{
 		throw wasp::WaspHttpError("HttpServer::Context::handler can not be nullptr", _ERROR_DETAILS_);
-	}
-
-	if (ctx.logger == nullptr)
-	{
-		ctx.logger = Logger::getInstance();
 	}
 }
 
