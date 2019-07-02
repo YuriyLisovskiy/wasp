@@ -25,12 +25,14 @@
 
 __WASP_BEGIN__
 
-HttpResponse::HttpResponse(const HttpRequest& request)
+HttpResponse::HttpResponse(const std::string& content)
 {
-	// TODO:
+	this->_headers = QueryDict<std::string, std::string>(true);
+
+	// TODO: set default headers
 }
 
-// TODO:
+// TODO: build response
 std::string HttpResponse::toString()
 {
 	std::string body("<form action=\"/hello\" method=\"post\" enctype=\"text/plain\">\n"

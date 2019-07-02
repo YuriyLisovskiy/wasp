@@ -63,6 +63,11 @@ void Logger::trace(const std::string& msg, const char* file, const char* functio
 	this->writeToStream("Traceback (exception):\n  File \"" + std::string(file) + "\", line " + std::to_string(line) + ", in " + std::string(function) + "\n" + msg + "\n");
 }
 
+void Logger::trace(const char* msg, const char* file, const char* function, int line)
+{
+	this->trace(std::string(msg), file, function, line);
+}
+
 void Logger::log(const std::string& msg, Logger::LogLevel logLevel)
 {
 	std::string level;

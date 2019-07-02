@@ -24,6 +24,7 @@
 #define WASP_HTTP_RESPONSE_H
 
 #include <string>
+#include <map>
 
 #include "../globals.h"
 #include "request.h"
@@ -33,8 +34,13 @@ __WASP_BEGIN__
 
 class HttpResponse
 {
+private:
+	QueryDict<std::string, std::string> _headers;
+
 public:
-	explicit HttpResponse(const HttpRequest& request);
+	explicit HttpResponse(const std::string& content);
+	void setHeader(const std::string& key, const std::string& value);
+	void removeHeader(const std::string& key);
 	std::string toString();
 };
 

@@ -53,6 +53,14 @@ class WaspHttpError : public WaspException
 {
 public:
 	WaspHttpError(const char* message, int line, const char* function, const char* file);
+	WaspHttpError(const std::string& message, int line, const char* function, const char* file);
+};
+
+class QueryDictError : public WaspException
+{
+public:
+	QueryDictError(const char* message, int line, const char* function, const char* file);
+	QueryDictError(const std::string& message, int line, const char* function, const char* file);
 };
 
 __WASP_END__

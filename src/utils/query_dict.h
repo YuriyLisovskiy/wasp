@@ -26,6 +26,7 @@
 #include <map>
 
 #include "../globals.h"
+#include "../core/exceptions.h"
 
 
 __WASP_BEGIN__
@@ -34,14 +35,37 @@ template <typename _Key, typename _Val>
 class QueryDict
 {
 private:
+	bool _isMutable;
 	std::map<_Key, _Val> _map;
+
+	void _throw(const std::string& msg, int line, const char* function, const char* file)
+	{
+		throw QueryDictError(
+			std::string("unable to ") + msg + std::string(", instance is immutable"), line, function, file
+		);
+	}
 
 public:
 	typedef typename std::map<_Key, _Val>::const_iterator const_iterator;
 	typedef typename std::map<_Key, _Val>::const_reverse_iterator const_reverse_iterator;
 
-	QueryDict() = default;
-	explicit QueryDict(const std::map<_Key, _Val>& srcMap)
+	typedef typename std::map<_Key, _Val>::iterator iterator;
+	typedef typename std::map<_Key, _Val>::reverse_iterator reverse_iterator;
+
+	QueryDict() : _isMutable(false)
+	{
+	}
+
+	explicit QueryDict(bool isMutable) : _isMutable(isMutable)
+	{
+	}
+
+	explicit QueryDict(const std::map<_Key, _Val>& srcMap) : _isMutable(false)
+	{
+		this->_map = srcMap;
+	}
+
+	QueryDict(const std::map<_Key, _Val>& srcMap, bool isMutable) : _isMutable(isMutable)
 	{
 		this->_map = srcMap;
 	}
@@ -49,6 +73,15 @@ public:
 	_Val get(_Key key)
 	{
 		return this->_map[key];
+	}
+
+	void set(_Key key, _Val value)
+	{
+		if (!this->_isMutable)
+		{
+			this->_throw("set new value", _ERROR_DETAILS_);
+		}
+		this->_map[key] = value;
 	}
 
 	bool contains(_Key key)
@@ -79,6 +112,42 @@ public:
 	const_reverse_iterator crend()
 	{
 		return this->_map.crend();
+	}
+
+	iterator begin()
+	{
+		if (!this->_isMutable)
+		{
+			this->_throw("retrieve non-constant iterator", _ERROR_DETAILS_);
+		}
+		return this->_map.begin();
+	}
+
+	iterator end()
+	{
+		if (!this->_isMutable)
+		{
+			this->_throw("retrieve non-constant iterator", _ERROR_DETAILS_);
+		}
+		return this->_map.end();
+	}
+
+	reverse_iterator rbegin()
+	{
+		if (!this->_isMutable)
+		{
+			this->_throw("retrieve non-constant reverse iterator", _ERROR_DETAILS_);
+		}
+		return this->_map.rbegin();
+	}
+
+	reverse_iterator rend()
+	{
+		if (!this->_isMutable)
+		{
+			this->_throw("retrieve non-constant reverse iterator", _ERROR_DETAILS_);
+		}
+		return this->_map.rend();
 	}
 };
 

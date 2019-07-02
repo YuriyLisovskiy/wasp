@@ -38,7 +38,6 @@ struct Settings
 	Settings();
 
 	// Parameters
-	ILogger* LOGGER;
 	std::vector<MiddlewareMixin*> MIDDLEWARE;
 	std::string X_FRAME_OPTIONS;
 };

@@ -53,11 +53,28 @@ const char* WaspException::file() const noexcept
 	return this->_file;
 }
 
-// Http exception
-wasp::WaspHttpError::WaspHttpError(const char *message, int line, const char *function, const char *file)
+// WaspHttpError
+WaspHttpError::WaspHttpError(const char* message, int line, const char* function, const char* file)
 	: WaspException(message, line, function, file)
 {
 	this->_exceptionType = "WaspHttpError";
+}
+
+WaspHttpError::WaspHttpError(const std::string& message, int line, const char *function, const char *file)
+	: WaspHttpError(message.c_str(), line, function, file)
+{
+}
+
+// QueryDictError
+QueryDictError::QueryDictError(const char* message, int line, const char* function, const char* file)
+	: WaspException(message, line, function, file)
+{
+	this->_exceptionType = "QueryDictError";
+}
+
+QueryDictError::QueryDictError(const std::string& message, int line, const char *function, const char *file)
+	: QueryDictError(message.c_str(), line, function, file)
+{
 }
 
 __WASP_END__

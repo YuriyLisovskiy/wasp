@@ -26,7 +26,7 @@ __WASP_BEGIN__
 
 Settings::Settings()
 {
-	this->LOGGER = Logger::getInstance();
+
 }
 
 __WASP_END__

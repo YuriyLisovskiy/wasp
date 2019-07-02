@@ -38,7 +38,6 @@
 #include "request.h"
 #include "parsers/request_parser.h"
 #include "../core/exceptions.h"
-#include "../middleware/middleware_mixin.h"
 
 #include "../utils/datetime.h"
 
@@ -59,8 +58,6 @@ private:
 	TcpServer* _tcpServer;
 	httpHandler _httpHandler;
 
-	std::vector<MiddlewareMixin*> _middleware;
-
 	const std::string _tcpHandler(const std::string& data);
 
 public:
@@ -69,9 +66,10 @@ public:
 		const char* host = nullptr;
 		uint16_t port = 0;
 		httpHandler handler = nullptr;
+		ILogger* logger;
 	};
 
-	explicit HttpServer(HttpServer::Context& ctx, const Settings& settings);
+	explicit HttpServer(HttpServer::Context& ctx);
 	void listenAndServe();
 	~HttpServer();
 

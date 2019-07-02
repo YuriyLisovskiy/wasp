@@ -38,6 +38,7 @@ public:
 	virtual void warning(const std::string& msg) = 0;
 	virtual void error(const std::string& msg) = 0;
 	virtual void trace(const std::string& msg, const char* file, const char* function, int line) = 0;
+	virtual void trace(const char* msg, const char* file, const char* function, int line) = 0;
 };
 
 class Logger : public ILogger
@@ -50,6 +51,7 @@ public:
 	void warning(const std::string& msg) override;
 	void error(const std::string& msg) override;
 	void trace(const std::string& msg, const char* file, const char* function, int line) override;
+	void trace(const char* msg, const char* file, const char* function, int line) override;
 
 private:
 	enum LogLevel
