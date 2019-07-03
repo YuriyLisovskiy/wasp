@@ -41,8 +41,8 @@ file(GLOB TEST_FILES
 set(LIB_SRC ${LIB_FILES})
 set(TEST_SRC ${TEST_FILES})
 
-if(EXISTS "${PROJECT_SOURCE_DIR}/main.cpp")
-	add_executable(${PACKAGE_NAME} ${LIB_SRC} "main.cpp")
+if(EXISTS "${PROJECT_SOURCE_DIR}/examples/http_server.cpp")
+	add_executable(http_server_example ${LIB_SRC} "examples/http_server.cpp")
 else()
     message("main.cpp does not exist")
 endif()
