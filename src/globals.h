@@ -25,8 +25,8 @@
 #define __WASP_BEGIN__ namespace wasp {
 #define __WASP_END__ }
 
-#define __INTERNAL_BEGIN__ namespace wasp { namespace internal {
-#define __INTERNAL_END__ } }
+#define __INTERNAL_BEGIN__ __WASP_BEGIN__ namespace internal {
+#define __INTERNAL_END__ } __WASP_END__
 
 #define _ERROR_DETAILS_ __LINE__, __FUNCTION__, __FILE__
 
