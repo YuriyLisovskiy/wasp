@@ -20,6 +20,8 @@ file(GLOB LIB_FILES
 		"src/conf/*.cpp"
 		"src/utils/*.h"
 		"src/utils/*.cpp"
+		"src/utils/datetime/*.h"
+		"src/utils/datetime/*.cpp"
 		"src/core/*.h"
 		"src/core/*.cpp"
 		"src/middleware/*.h"

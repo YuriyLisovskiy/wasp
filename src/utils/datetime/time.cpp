@@ -16,21 +16,46 @@
  */
 
 /*
- * This header contains global variables, constants and definitions.
+ * time implementation.
+ * TODO: write docs.
  */
 
-#ifndef WASP_GLOBALS_H
-#define WASP_GLOBALS_H
+#include "time.h"
 
-#define __WASP_BEGIN__ namespace wasp {
-#define __WASP_END__ }
 
-#define __INTERNAL_BEGIN__ __WASP_BEGIN__ namespace internal {
-#define __INTERNAL_END__ } __WASP_END__
+__DATETIME_BEGIN__
 
-#define __DATETIME_BEGIN__ __WASP_BEGIN__ namespace dt {
-#define __DATETIME_END__ } __WASP_END__
+// 'Time' class implementation.
+Time::Time() : _hour(0), _minute(0), _second(0), _microsecond(0)
+{
+}
 
-#define _ERROR_DETAILS_ __LINE__, __FUNCTION__, __FILE__
+Time::Time(int hour, int minute, int second, int microsecond)
+{
+	this->_hour = hour;
+	this->_minute = minute;
+	this->_second = second;
+	this->_microsecond = microsecond;
+}
 
-#endif // WASP_GLOBALS_H
+int Time::hour()
+{
+	return this->_hour;
+}
+
+int Time::minute()
+{
+	return this->_minute;
+}
+
+int Time::second()
+{
+	return this->_second;
+}
+
+int Time::microsecond()
+{
+	return this->_microsecond;
+}
+
+__DATETIME_END__

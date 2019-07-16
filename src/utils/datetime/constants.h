@@ -16,21 +16,34 @@
  */
 
 /*
- * This header contains global variables, constants and definitions.
+ * Offsets of known time zones.
  */
 
-#ifndef WASP_GLOBALS_H
-#define WASP_GLOBALS_H
+#ifndef WASP_UTILS_DATETIME_CONSTANTS_H
+#define WASP_UTILS_DATETIME_CONSTANTS_H
 
-#define __WASP_BEGIN__ namespace wasp {
-#define __WASP_END__ }
+#include <map>
 
-#define __INTERNAL_BEGIN__ __WASP_BEGIN__ namespace internal {
-#define __INTERNAL_END__ } __WASP_END__
+#include "../../globals.h"
+#include "../query_dict.h"
 
-#define __DATETIME_BEGIN__ __WASP_BEGIN__ namespace dt {
-#define __DATETIME_END__ } __WASP_END__
 
-#define _ERROR_DETAILS_ __LINE__, __FUNCTION__, __FILE__
+__DATETIME_BEGIN__
 
-#endif // WASP_GLOBALS_H
+// The smallest year number allowed in a date or datetime object.
+const int MIN_YEAR = 1;
+
+// The largest year number allowed in a date or datetime object.
+const int MAX_YEAR = 9999;
+
+__DATETIME_END__
+
+
+__INTERNAL_BEGIN__
+
+extern QueryDict<std::string, int> TZ_TO_OFFSET;
+
+__INTERNAL_END__
+
+
+#endif // WASP_UTILS_DATETIME_CONSTANTS_H

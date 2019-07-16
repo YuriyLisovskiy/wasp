@@ -16,56 +16,60 @@
  */
 
 /*
- * datetime
+ * Date implementation.
  * TODO: write docs.
  */
 
-#ifndef WASP_UTILS_DATETIME_H
-#define WASP_UTILS_DATETIME_H
-
-#include <chrono>
-
-#include "../globals.h"
+#include "date.h"
 
 
-__WASP_BEGIN__
+__DATETIME_BEGIN__
 
-namespace datetime
+Date::Date() : _year(1970), _month(1), _dayOfWeek(1), _dayOfMonth(1), _dayOfYear(1)
 {
-
-template <typename _TimeT = std::chrono::milliseconds>
-class Measure
-{
-private:
-	std::chrono::high_resolution_clock::time_point _begin;
-	std::chrono::high_resolution_clock::time_point _end;
-
-public:
-	void start()
-	{
-		this->_begin = std::chrono::high_resolution_clock::now();
-	}
-
-	void end()
-	{
-		this->_end = std::chrono::high_resolution_clock::now();
-	}
-
-	double elapsed()
-	{
-		return std::chrono::duration_cast<_TimeT>(this->_end - this->_begin).count();
-	}
-
-	void reset()
-	{
-		this->_begin = 0;
-		this->_end = 0;
-	}
-};
-
 }
 
-__WASP_END__
+Date::Date(int year, int month, int dayOfWeek, int dayOfMonth, int dayOfYear)
+{
+	if (year < MIN_YEAR)
+	{
+		year = MIN_YEAR;
+	}
+	else if (year > MAX_YEAR)
+	{
+		year = MAX_YEAR;
+	}
 
+	this->_year = year;
+	this->_month = month;
+	this->_dayOfWeek = dayOfWeek;
+	this->_dayOfMonth = dayOfMonth;
+	this->_dayOfYear = dayOfYear;
+}
 
-#endif // WASP_UTILS_DATETIME_H
+int Date::year()
+{
+	return this->_year;
+}
+
+int Date::month()
+{
+	return this->_month;
+}
+
+int Date::dayOfWeek()
+{
+	return this->_dayOfWeek;
+}
+
+int Date::dayOfMonth()
+{
+	return this->_dayOfMonth;
+}
+
+int Date::dayOfYear()
+{
+	return this->_dayOfYear;
+}
+
+__DATETIME_END__

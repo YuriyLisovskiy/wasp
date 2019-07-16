@@ -16,21 +16,46 @@
  */
 
 /*
- * This header contains global variables, constants and definitions.
+ * Date definition.
+ * TODO: write docs.
  */
 
-#ifndef WASP_GLOBALS_H
-#define WASP_GLOBALS_H
+#ifndef WASP_UTILS_DATETIME_DATE_H
+#define WASP_UTILS_DATETIME_DATE_H
 
-#define __WASP_BEGIN__ namespace wasp {
-#define __WASP_END__ }
+#include <string>
 
-#define __INTERNAL_BEGIN__ __WASP_BEGIN__ namespace internal {
-#define __INTERNAL_END__ } __WASP_END__
+#include "../../globals.h"
+#include "constants.h"
 
-#define __DATETIME_BEGIN__ __WASP_BEGIN__ namespace dt {
-#define __DATETIME_END__ } __WASP_END__
 
-#define _ERROR_DETAILS_ __LINE__, __FUNCTION__, __FILE__
+__DATETIME_BEGIN__
 
-#endif // WASP_GLOBALS_H
+// An idealized naive date, assuming the current Gregorian calendar
+// always was, and always will be, in effect.
+//
+// Properties: _year, _month, _dayOfYear and _dayOfWeek.
+class Date
+{
+private:
+	int _year;
+	int _month;
+	int _dayOfWeek;
+	int _dayOfMonth;
+	int _dayOfYear;
+
+public:
+	Date();
+	Date(int year, int month, int dayOfWeek, int dayOfMonth, int dayOfYear);
+
+	int year();
+	int month();
+	int dayOfWeek();
+	int dayOfMonth();
+	int dayOfYear();
+};
+
+__DATETIME_END__
+
+
+#endif // WASP_UTILS_DATETIME_DATE_H
