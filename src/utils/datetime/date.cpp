@@ -16,21 +16,50 @@
  */
 
 /*
- * This header contains global variables, constants and definitions.
+ * Date implementation.
+ * TODO: write docs.
  */
 
-#ifndef WASP_GLOBALS_H
-#define WASP_GLOBALS_H
+#include "date.h"
 
-#define __WASP_BEGIN__ namespace wasp {
-#define __WASP_END__ }
 
-#define __INTERNAL_BEGIN__ __WASP_BEGIN__ namespace internal {
-#define __INTERNAL_END__ } __WASP_END__
+__DATETIME_BEGIN__
 
-#define __DATETIME_BEGIN__ __WASP_BEGIN__ namespace dt {
-#define __DATETIME_END__ } __WASP_END__
+Date::Date(int year, int month, int dayOfWeek, int dayOfYear)
+{
+	if (year < MIN_YEAR)
+	{
+		year = MIN_YEAR;
+	}
+	else if (year > MAX_YEAR)
+	{
+		year = MAX_YEAR;
+	}
 
-#define _ERROR_DETAILS_ __LINE__, __FUNCTION__, __FILE__
+	this->_year = year;
+	this->_month = month;
+	this->_dayOfWeek = dayOfWeek;
+	this->_dayOfYear = dayOfYear;
+}
 
-#endif // WASP_GLOBALS_H
+int Date::year()
+{
+	return this->_year;
+}
+
+int Date::month()
+{
+	return this->_month;
+}
+
+int Date::dayOfWeek()
+{
+	return this->_dayOfWeek;
+}
+
+int Date::dayOfYear()
+{
+	return this->_dayOfYear;
+}
+
+__DATETIME_END__

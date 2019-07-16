@@ -20,6 +20,8 @@ file(GLOB LIB_FILES
 		"src/conf/*.cpp"
 		"src/utils/*.h"
 		"src/utils/*.cpp"
+		"src/utils/datetime/*.h"
+		"src/utils/datetime/*.cpp"
 		"src/core/*.h"
 		"src/core/*.cpp"
 		"src/middleware/*.h"
@@ -39,7 +41,7 @@ file(GLOB TEST_FILES
 	)
 
 set(LIB_SRC ${LIB_FILES})
-set(TEST_SRC ${TEST_FILES} src/utils/datetime.cpp src/utils/tz.h)
+set(TEST_SRC ${TEST_FILES})
 
 if(EXISTS "${PROJECT_SOURCE_DIR}/examples/http_server.cpp")
 	add_executable(http_server_example ${LIB_SRC} "examples/http_server.cpp")
