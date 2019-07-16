@@ -22,9 +22,6 @@
 
 #include "http_server.h"
 
-#include "../utils/str_utils.h"
-#include "../core/exceptions.h"
-
 
 __INTERNAL_BEGIN__
 
@@ -59,7 +56,7 @@ const std::string HttpServer::_tcpHandler(const std::string& data)
 	try
 	{
 		// TODO: remove in prod
-		wasp::datetime::Measure<std::chrono::milliseconds> measure;
+		wasp::dt::Measure<std::chrono::milliseconds> measure;
 
 		// TODO: remove in prod
 		measure.start();

@@ -48,10 +48,12 @@ private:
 	TimeZone _tz;
 
 public:
-	DateTime(int year, int month, int dayOfWeek, int dayOfYear, int hour, int minute, int second, int microsecond, TimeZone tz);
-	DateTime(int year, int month, int dayOfWeek, int dayOfYear, int hour, int minute, int second, int microsecond, const std::string& tz);
+	DateTime();
+	DateTime(int year, int month, int dayOfWeek, int dayOfMonth, int dayOfYear, int hour, int minute, int second, int microsecond, TimeZone tz);
+	DateTime(int year, int month, int dayOfWeek, int dayOfMonth, int dayOfYear, int hour, int minute, int second, int microsecond, const std::string& tz);
 	DateTime(Date date, Time time, TimeZone tz);
 	DateTime(Date date, Time time, const std::string& tz);
+	explicit DateTime(time_t timestamp);
 
 	int year();
 	int month();
@@ -61,6 +63,8 @@ public:
 	int minute();
 	int second();
 	int microsecond();
+	Date date();
+	Time time();
 	TimeZone tz();
 
 	std::string strftime(const char* _format);
@@ -80,7 +84,7 @@ __DATETIME_END__
 __INTERNAL_BEGIN__
 
 // Returns current date and time as time_t
-time_t nowAsTimeT();
+time_t now();
 
 __INTERNAL_END__
 

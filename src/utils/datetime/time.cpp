@@ -26,6 +26,10 @@
 __DATETIME_BEGIN__
 
 // 'Time' class implementation.
+Time::Time() : _hour(0), _minute(0), _second(0), _microsecond(0)
+{
+}
+
 Time::Time(int hour, int minute, int second, int microsecond)
 {
 	this->_hour = hour;
@@ -52,37 +56,6 @@ int Time::second()
 int Time::microsecond()
 {
 	return this->_microsecond;
-}
-
-// 'Measure' class implementation.
-template<typename _TimeT>
-void Measure<_TimeT>::start()
-{
-	this->_begin = std::chrono::high_resolution_clock::now();
-}
-
-template<typename _TimeT>
-void Measure<_TimeT>::end()
-{
-	this->_end = std::chrono::high_resolution_clock::now();
-}
-
-template<typename _TimeT>
-double Measure<_TimeT>::elapsed(bool reset)
-{
-	auto result = std::chrono::duration_cast<_TimeT>(this->_end - this->_begin).count();
-	if (reset)
-	{
-		this->reset();
-	}
-	return result;
-}
-
-template<typename _TimeT>
-void Measure<_TimeT>::reset()
-{
-	this->_begin = 0;
-	this->_end = 0;
 }
 
 __DATETIME_END__

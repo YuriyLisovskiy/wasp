@@ -41,19 +41,18 @@ private:
 	int _year;
 	int _month;
 	int _dayOfWeek;
+	int _dayOfMonth;
 	int _dayOfYear;
 
 public:
-	Date() = default;
-	Date(int year, int month, int dayOfWeek, int dayOfYear);
+	Date();
+	Date(int year, int month, int dayOfWeek, int dayOfMonth, int dayOfYear);
 
 	int year();
 	int month();
 	int dayOfWeek();
+	int dayOfMonth();
 	int dayOfYear();
-
-	std::string format(const char* _format);
-	std::string format(const std::string& _format);
 };
 
 __DATETIME_END__

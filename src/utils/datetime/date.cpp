@@ -25,7 +25,11 @@
 
 __DATETIME_BEGIN__
 
-Date::Date(int year, int month, int dayOfWeek, int dayOfYear)
+Date::Date() : _year(1970), _month(1), _dayOfWeek(1), _dayOfMonth(1), _dayOfYear(1)
+{
+}
+
+Date::Date(int year, int month, int dayOfWeek, int dayOfMonth, int dayOfYear)
 {
 	if (year < MIN_YEAR)
 	{
@@ -39,6 +43,7 @@ Date::Date(int year, int month, int dayOfWeek, int dayOfYear)
 	this->_year = year;
 	this->_month = month;
 	this->_dayOfWeek = dayOfWeek;
+	this->_dayOfMonth = dayOfMonth;
 	this->_dayOfYear = dayOfYear;
 }
 
@@ -55,6 +60,11 @@ int Date::month()
 int Date::dayOfWeek()
 {
 	return this->_dayOfWeek;
+}
+
+int Date::dayOfMonth()
+{
+	return this->_dayOfMonth;
 }
 
 int Date::dayOfYear()

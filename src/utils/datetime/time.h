@@ -44,18 +44,13 @@ private:
 	int _microsecond;
 
 public:
-	Time() = default;
+	Time();
 	Time(int hour, int minute, int second, int microsecond);
 
 	int hour();
 	int minute();
 	int second();
 	int microsecond();
-
-	std::string strftime(const char* _format);
-	std::string strftime(const std::string& _format);
-	Time strptime(const char* _time, const char* _format);
-	Time strptime(const std::string& _time, const std::string& _format);
 };
 
 template <typename _TimeT = std::chrono::milliseconds>
@@ -66,10 +61,31 @@ private:
 	std::chrono::high_resolution_clock::time_point _end;
 
 public:
-	void start();
-	void end();
-	double elapsed(bool reset = true);
-	void reset();
+	void start()
+	{
+		this->_begin = std::chrono::high_resolution_clock::now();
+	}
+
+	void end()
+	{
+		this->_end = std::chrono::high_resolution_clock::now();
+	}
+
+	double elapsed(bool reset = true)
+	{
+		auto result = std::chrono::duration_cast<_TimeT>(this->_end - this->_begin).count();
+		if (reset)
+		{
+			this->reset();
+		}
+		return result;
+	}
+
+	void reset()
+	{
+		this->_begin = {};
+		this->_end = {};
+	}
 };
 
 __DATETIME_END__

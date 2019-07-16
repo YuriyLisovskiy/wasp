@@ -27,8 +27,10 @@
 #include <ctime>
 #include <sstream>
 #include <iomanip>
+#include <string>
 
 #include "../../globals.h"
+#include "constants.h"
 
 
 __DATETIME_BEGIN__
@@ -40,7 +42,7 @@ private:
 	// Offset in seconds.
 	int _offset;
 
-	// Time zone name
+	// Time zone name, i.e. America/Vancouver, US/Central, etc.
 	std::string _name;
 
 public:
@@ -52,12 +54,12 @@ public:
 		MICROSECONDS
 	};
 
-	TimeZone() = default;
+	TimeZone();
 	explicit TimeZone(time_t when);
 	explicit TimeZone(const std::string& name);
 
 	// offset parameter is time offset in seconds.
-	explicit TimeZone(int offset);
+	explicit TimeZone(int offset, std::string  name);
 
 	int getOffset(Units units);
 	std::string getName();

@@ -1,3 +1,5 @@
+#include <utility>
+
 /*
  * Copyright (c) 2019 Yuriy Lisovskiy
  *
@@ -25,7 +27,11 @@
 
 __DATETIME_BEGIN__
 
-TimeZone::TimeZone(time_t when)
+TimeZone::TimeZone() : _name("UTC"), _offset(0)
+{
+}
+
+TimeZone::TimeZone(time_t when) : _name("")
 {
 	auto const tm = *std::localtime(&when);
 	std::ostringstream os;
@@ -35,22 +41,22 @@ TimeZone::TimeZone(time_t when)
 	int m = std::stoi(s[0] + s.substr(3), nullptr, 10);
 
 	this->_offset = h * 3600 + m * 60;
-
-	// TODO: init this->_name by offset
 }
 
-TimeZone::TimeZone(int offset)
+TimeZone::TimeZone(int offset, std::string name) : _offset(offset), _name(std::move(name))
 {
-	this->_offset = offset;
-
-	// TODO: init this->_name by offset
 }
 
-TimeZone::TimeZone(const std::string& name)
+TimeZone::TimeZone(const std::string& name) : _name(name)
 {
-	// TODO: init this->_offset by name
-
-	this->_name = name;
+	if (internal::TZ_TO_OFFSET.contains(name))
+	{
+		this->_offset = internal::TZ_TO_OFFSET.get(name);
+	}
+	else
+	{
+		this->_offset = 0;
+	}
 }
 
 int TimeZone::getOffset(Units units = Units::SECONDS)
