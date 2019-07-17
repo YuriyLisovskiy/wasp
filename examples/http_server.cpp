@@ -31,22 +31,22 @@ using std::cout;
 
 wasp::HttpResponse handler(wasp::HttpRequest& request)
 {
-	cout << "\n\n" << request.method() << " " << request.path() << " " << request.version() << "\n\n";
-	auto begin = request.headers.cbegin();
-	auto end = request.headers.cend();
+	cout << "\n" << request.method() << " " << request.path() << " " << request.version() << "\n";
+//	auto begin = request.headers.cbegin();
+//	auto end = request.headers.cend();
 
-	while (begin != end)
-	{
-		cout << (*begin).first << ": " << (*begin).second << '\n';
-		begin++;
-	}
+//	while (begin != end)
+//	{
+//		cout << (*begin).first << ": " << (*begin).second << '\n';
+//		begin++;
+//	}
 
-	std::cout << '\n' << request.body() << "\n\n";
+	std::cout << request.body() << "\n";
 
-	for (auto it = request.COOKIES.cbegin(); it != request.COOKIES.cend(); it++)
-	{
-		std::cout << it->first << ": " << it->second << '\n';
-	}
+//	for (auto it = request.COOKIES.cbegin(); it != request.COOKIES.cend(); it++)
+//	{
+//		std::cout << it->first << ": " << it->second << '\n';
+//	}
 
 	return wasp::HttpResponse("hello, world");
 }
@@ -57,7 +57,7 @@ int main()
 	{
 		HttpServer::Context ctx{};
 		ctx.handler = handler;
-		ctx.port = 8000;
+		ctx.port = 5020;
 
 		HttpServer server(ctx);
 

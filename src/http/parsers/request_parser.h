@@ -28,6 +28,7 @@
 #include <cstdlib>
 #include <strings.h>
 #include <map>
+#include <iostream>
 
 #include "../../globals.h"
 #include "../request.h"
@@ -115,6 +116,23 @@ private:
 	{
 		Key,
 		Val
+	};
+
+	enum MultipartParserState
+	{
+		BoundaryBegin,
+		Boundary,
+		BoundaryEnd,
+		ContentDispositionBegin,
+		ContentDisposition,
+		NameBegin,
+		Name,
+		FileNameBegin,
+		FileName,
+		ContentTypeBegin,
+		ContentType,
+		ContentBegin,
+		Content,
 	};
 
 	void _parseHttpWord(char input, char expectedInput, HttpRequestParser::ParserState newState);

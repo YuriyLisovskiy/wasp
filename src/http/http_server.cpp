@@ -33,7 +33,7 @@ HttpServer::HttpServer(HttpServer::Context& ctx)
 	this->_port = ctx.port;
 	this->_logger = ctx.logger;
 
-	// default schema, https will be implemented in future. TODO.
+	// TODO: default schema, https will be implemented in future.
 	this->_schema = "http";
 
 	TcpServer::Context tcpContext{};
@@ -51,26 +51,23 @@ HttpServer::~HttpServer()
 	delete this->_tcpServer;
 }
 
-const std::string HttpServer::_tcpHandler(const std::string& data)
+const std::string HttpServer::_tcpHandler(const char* data)
 {
 	try
 	{
-		// TODO: remove in prod
+		// TODO: remove when release ------------------------:
 		wasp::dt::Measure<std::chrono::milliseconds> measure;
-
-		// TODO: remove in prod
 		measure.start();
+		// TODO: remove when release ------------------------^
 
 		HttpRequestParser parser;
 		HttpRequest request = parser.parse(data);
-
 		HttpResponse response = this->_httpHandler(request);
 
-		// TODO: remove in prod
+		// TODO: remove when release ------------------------:
 		measure.end();
-
-		// TODO: remove in prod
 		std::cout << '\n' << request.method() << " request took " << measure.elapsed() << " ms\n";
+		// TODO: remove when release ------------------------^
 
 		return response.toString();
 	}

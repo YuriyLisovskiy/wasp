@@ -53,8 +53,6 @@ wasp::HttpRequest HttpRequestParser::parse(const std::string& data)
 	}
 
 	// TODO: parse cookies
-//	auto cookiesHeader = this->_headers.find("");
-//	if ()
 
 	return this->_buildHttpRequest();
 }
@@ -587,7 +585,15 @@ void HttpRequestParser::_parseApplicationJson()
 
 void HttpRequestParser::_parseMultipart()
 {
-	// TODO
+	auto contentType = this->_headers["Content-Type"];
+	auto pos = contentType.find("boundary=");
+	if (pos == std::string::npos)
+	{
+		return;
+	}
+	auto boundary = contentType.substr(pos + 9);
+
+	// TODO: parse multipart data
 }
 
 void HttpRequestParser::_parsePlainText()

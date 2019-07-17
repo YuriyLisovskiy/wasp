@@ -48,12 +48,10 @@ public:
 	QueryDict<std::string, std::string> headers;
 	QueryDict<std::string, std::string> GET;
 	QueryDict<std::string, std::string> POST;
+	QueryDict<std::string, std::string> COOKIES;
 
 	// TODO
 	QueryDict<std::string, std::string> FILES;
-
-	// TODO
-	QueryDict<std::string, std::string> COOKIES;
 
 	// TODO
 	QueryDict<std::string, std::string> META;

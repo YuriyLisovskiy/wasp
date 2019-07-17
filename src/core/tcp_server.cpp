@@ -167,7 +167,7 @@ void TcpServer::serveConnection(const socket_t& connection)
 {
 	std::string data = TcpServer::recvAll(connection);
 
-	const std::string resp = this->_handler(data);
+	const std::string resp = this->_handler(data.c_str());
 
 	TcpServer::sendResponse(resp.c_str(), connection);
 
@@ -177,19 +177,20 @@ void TcpServer::serveConnection(const socket_t& connection)
 	TcpServer::cleanUp(connection);
 }
 
+// TODO: bug, sometimes POST request is read without request body
 std::string TcpServer::recvAll(const socket_t& connection)
 {
-	char buffer[MAX_BUFF_SIZE];
-	msg_size_t msgSize;
+	msg_size_t msgSize = 0;
 	unsigned long size = 0;
 	std::string data;
+	char* buffer = (char*) calloc(MAX_BUFF_SIZE, sizeof(char));
+
 	do
 	{
 		msgSize = recv(connection, buffer, MAX_BUFF_SIZE, 0);
 		if (msgSize > 0)
 		{
-			buffer[msgSize] = '\0';
-			data += std::string(buffer);
+			data.append(buffer, msgSize);
 			size += msgSize;
 		}
 		else if (msgSize < 0)
@@ -197,9 +198,10 @@ std::string TcpServer::recvAll(const socket_t& connection)
 			this->_logger->trace("Received message size is less than zero", __FILE__, __FUNCTION__, __LINE__);
 		}
 	}
-	while (msgSize >= MAX_BUFF_SIZE);
+	while (msgSize == MAX_BUFF_SIZE);
 
-	return data.substr(0, size);
+	free(buffer);
+	return data;
 }
 
 void TcpServer::sendResponse(const char* data, const socket_t& connection)

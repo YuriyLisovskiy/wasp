@@ -40,40 +40,36 @@ DateTime now()
 {
 	auto timeNow = internal::now();
 	auto localTime = std::localtime(&timeNow);
-	auto result = DateTime(
-		localTime->tm_year,
-		localTime->tm_mon,
-		localTime->tm_wday,
-		localTime->tm_mday,
-		localTime->tm_yday,
-		localTime->tm_hour,
-		localTime->tm_min,
-		localTime->tm_sec,
-		localTime->tm_sec * 1000000,
-		TimeZone(timeNow)
+	return DateTime(
+			localTime->tm_year,
+			localTime->tm_mon,
+			localTime->tm_wday,
+			localTime->tm_mday,
+			localTime->tm_yday,
+			localTime->tm_hour,
+			localTime->tm_min,
+			localTime->tm_sec,
+			localTime->tm_sec * 1000000,
+			TimeZone(localTime->tm_zone)
 	);
-	delete localTime;
-	return result;
 }
 
 DateTime utcnow()
 {
 	auto timeNow = internal::now();
 	auto gmTime = std::gmtime(&timeNow);
-	auto result = DateTime(
-		gmTime->tm_year,
-		gmTime->tm_mon,
-		gmTime->tm_wday,
-		gmTime->tm_mday,
-		gmTime->tm_yday,
-		gmTime->tm_hour,
-		gmTime->tm_min,
-		gmTime->tm_sec,
-		gmTime->tm_sec * 1000000,
-		TimeZone(timeNow)
+	return DateTime(
+			gmTime->tm_year,
+			gmTime->tm_mon,
+			gmTime->tm_wday,
+			gmTime->tm_mday,
+			gmTime->tm_yday,
+			gmTime->tm_hour,
+			gmTime->tm_min,
+			gmTime->tm_sec,
+			gmTime->tm_sec * 1000000,
+			TimeZone(gmTime->tm_zone)
 	);
-	delete gmTime;
-	return result;
 }
 
 
