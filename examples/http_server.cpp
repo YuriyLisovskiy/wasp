@@ -22,7 +22,6 @@
 #include "../src/http/http_server.h"
 #include "../src/http/request.h"
 #include "../src/http/response.h"
-#include "../src/middleware/cookies.h"
 
 
 using wasp::internal::HttpServer;
@@ -32,14 +31,14 @@ using std::cout;
 wasp::HttpResponse handler(wasp::HttpRequest& request)
 {
 	cout << "\n" << request.method() << " " << request.path() << " " << request.version() << "\n";
-//	auto begin = request.headers.cbegin();
-//	auto end = request.headers.cend();
+	auto begin = request.headers.cbegin();
+	auto end = request.headers.cend();
 
-//	while (begin != end)
-//	{
-//		cout << (*begin).first << ": " << (*begin).second << '\n';
-//		begin++;
-//	}
+	while (begin != end)
+	{
+		cout << (*begin).first << ": " << (*begin).second << '\n';
+		begin++;
+	}
 
 	std::cout << request.body() << "\n";
 
@@ -57,7 +56,7 @@ int main()
 	{
 		HttpServer::Context ctx{};
 		ctx.handler = handler;
-		ctx.port = 5020;
+		ctx.port = 5500;
 
 		HttpServer server(ctx);
 

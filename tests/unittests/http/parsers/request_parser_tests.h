@@ -15,11 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * request_parser_tests
- * TODO: write docs.
- */
-
 #ifndef WASP_HTTP_PARSERS_REQUEST_PARSER_TESTS_H
 #define WASP_HTTP_PARSERS_REQUEST_PARSER_TESTS_H
 
@@ -28,8 +23,8 @@
 
 #include <gtest/gtest.h>
 
-#include "../../../src/globals.h"
-#include "../../../src/http/parsers/request_parser.h"
+#include "../../../../src/globals.h"
+#include "../../../../src/http/parsers/request_parser.h"
 
 
 __INTERNAL_BEGIN__

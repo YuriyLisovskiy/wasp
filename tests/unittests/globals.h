@@ -15,11 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * globals
- * TODO: write docs.
- */
-
 #ifndef WASP_TESTS_GLOBALS_H
 #define WASP_TESTS_GLOBALS_H
 

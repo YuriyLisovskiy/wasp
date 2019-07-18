@@ -177,7 +177,8 @@ void TcpServer::serveConnection(const socket_t& connection)
 	TcpServer::cleanUp(connection);
 }
 
-// TODO: bug, sometimes POST request is read without request body
+// TODO: bug, second, third, etc. POST requests from browser (Google Chrome, at least)
+//  with 'multipart/form-data' content type are read without request body
 std::string TcpServer::recvAll(const socket_t& connection)
 {
 	msg_size_t msgSize = 0;

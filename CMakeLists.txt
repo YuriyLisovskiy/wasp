@@ -35,8 +35,8 @@ file(GLOB LIB_FILES
 	)
 
 file(GLOB TEST_FILES
-		"tests/http/*.h"
-		"tests/http/parsers/*.h"
+		"tests/unittests/http/*.h"
+		"tests/unittests/http/parsers/*.h"
 		"tests/*.h"
 	)
 
@@ -49,5 +49,5 @@ else()
     message("main.cpp does not exist")
 endif()
 
-add_executable(${PACKAGE_TESTS} ${LIB_SRC} ${TEST_SRC} "tests/main.cpp")
+add_executable(${PACKAGE_TESTS} ${LIB_SRC} ${TEST_SRC} "tests/unittests/main.cpp")
 target_link_libraries(${PACKAGE_TESTS} gtest gtest_main rt pthread ${TEST_SRC})
