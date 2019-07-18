@@ -59,30 +59,37 @@ public:
 	    _domain(std::move(domain)), _path(std::move(path)),
 	    _isSecure(isSecure), _isHttpOnly(isHttpOnly)
 	{
+		constexpr auto isEmpty = [](const std::string& str) -> bool { return str.empty(); };
+		static_assert(isEmpty(name), "cookie's name can not be empty");
+		if (typeid(value) == typeid(std::string))
+		{
+			static_assert(isEmpty(value), "cookie's value can not be empty");
+		}
+		static_assert(isEmpty(expires), "cookie's expiration time can not be empty");
 	}
 
 	std::string toString()
 	{
 		// Sets browser's directive 'Set-Cookie' and cookie's name and value.
-		std::string result = "Set-Cookie: " + this->_name + "=" + std::to_string(this->_value) + ";";
+		std::string result = "Set-Cookie: " + this->_name + "=" + std::to_string(this->_value);
 
 		// Sets domain if it is not an empty string.
-		result += this->_domain.size() > 0 ? " Domain=" + this->_domain + ";" : "";
+		result += this->_domain.size() > 0 ? "; Domain=" + this->_domain : "";
 
 		// Sets path if it is not an empty string.
-		result += this->_path.size() > 0 ? " Path=" + this->_path + ";" : "";
+		result += this->_path.size() > 0 ? "; Path=" + this->_path : "";
 
 		// Sets expiration time in '%a, %e %b %Y %T %Z' format,
 		// for instance, 'Thu, 18 Jul 2019 16:25:19 GMT'.
-		result += " Expires=" + this->_expires + ";";
+		result += "; Expires=" + this->_expires;
 
 		if (this->_isSecure)
 		{
-			result += " Secure;";
+			result += "; Secure";
 		}
 		if (this->_isHttpOnly)
 		{
-			result += " HttpOnly";
+			result += "; HttpOnly";
 		}
 		return result;
 	}

@@ -34,32 +34,25 @@
 
 __INTERNAL_BEGIN__
 
-class CookieTest : public ::testing::Test
+TEST(CookieTest, toStringTestAllParameters)
 {
-protected:
-	static void toStringTestAllParametersAreSet()
-	{
-		Cookie<int> cookie("hello", 1, "Thu, 18 Jul 2019 16:25:19 GMT", "localhost.com", "/hello", true, true);
-		std::string expected = "Set-Cookie: hello=1; Domain=localhost.com; Path=/hello; Expires=Thu, 18 Jul 2019 16:25:19 GMT; Secure; HttpOnly";
-		ASSERT_EQ(cookie.toString(), expected);
-	}
-
-	static void toStringTestOnlyRequiredParametersAreSet()
-	{
-		Cookie<int> cookie("hello", 2, "Thu, 18 Jul 2019 16:25:19 GMT");
-		std::string expected = "Set-Cookie: hello=2; Path=/; Expires=Thu, 18 Jul 2019 16:25:19 GMT; Secure;";
-		ASSERT_EQ(cookie.toString(), expected);
-	}
-};
-
-TEST_F(CookieTest, toStringTestAllParametersAreSet)
-{
-	CookieTest::toStringTestAllParametersAreSet();
+	Cookie<int> cookie("hello", 1, "Thu, 18 Jul 2019 16:25:19 GMT", "localhost.com", "/hello", true, true);
+	std::string expected = "Set-Cookie: hello=1; Domain=localhost.com; Path=/hello; Expires=Thu, 18 Jul 2019 16:25:19 GMT; Secure; HttpOnly";
+	ASSERT_EQ(cookie.toString(), expected);
 }
 
-TEST_F(CookieTest, toStringTestOnlyRequiredParametersAreSet)
+TEST(CookieTest, toStringTestHttpOnlyIsFalse)
 {
-	CookieTest::toStringTestOnlyRequiredParametersAreSet();
+	Cookie<int> cookie("hello", 1, "Thu, 18 Jul 2019 16:25:19 GMT", "localhost.com", "/hello", true, false);
+	std::string expected = "Set-Cookie: hello=1; Domain=localhost.com; Path=/hello; Expires=Thu, 18 Jul 2019 16:25:19 GMT; Secure";
+	ASSERT_EQ(cookie.toString(), expected);
+}
+
+TEST(CookieTest, toStringTestOnlyRequiredParameters)
+{
+	Cookie<int> cookie("hello", 2, "Thu, 18 Jul 2019 16:25:19 GMT");
+	std::string expected = "Set-Cookie: hello=2; Path=/; Expires=Thu, 18 Jul 2019 16:25:19 GMT; Secure;";
+	ASSERT_EQ(cookie.toString(), expected);
 }
 
 __INTERNAL_END__
