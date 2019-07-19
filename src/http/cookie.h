@@ -48,6 +48,7 @@ private:
 	bool _isHttpOnly;
 
 public:
+	Cookie();
 	Cookie(
 		std::string name,
 		std::string value,

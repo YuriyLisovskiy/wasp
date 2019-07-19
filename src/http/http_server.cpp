@@ -62,20 +62,27 @@ const std::string HttpServer::_tcpHandler(const char* data)
 
 		HttpRequestParser parser;
 		HttpRequest request = parser.parse(data);
-		HttpResponseBase response = this->_httpHandler(request);
+		HttpResponseBase* response = this->_httpHandler(request);
 
 		// TODO: remove when release ------------------------:
 		measure.end();
 		std::cout << '\n' << request.method() << " request took " << measure.elapsed() << " ms\n";
 		// TODO: remove when release ------------------------^
 
-		return response.toString();
+		std::string result = response->serialize();
+
+		std::cout << "Hello\n";
+
+	//	delete response;
+
+		return result;
 	}
 	catch (const wasp::WaspException& exc)
 	{
-		// TODO: send internal server error
 		this->_logger->trace(exc.what(), exc.file(), exc.function(), exc.line());
-		return "";
+
+		// TODO: send internal server error
+		return HttpResponse("<p>Internal Server Error</p>", 500).serialize();
 	}
 }
 

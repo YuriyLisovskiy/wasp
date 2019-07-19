@@ -28,8 +28,11 @@
 #include <cctype>
 #include <sstream>
 #include <map>
+#include <vector>
+#include <functional>
 
 #include "../globals.h"
+#include "query_dict.h"
 
 
 __INTERNAL_BEGIN__
@@ -69,6 +72,34 @@ T convert(const std::string& str)
 		throw std::invalid_argument("can not convert \"" + str + "\"");
 	}
 	return value;
+}
+
+template <typename _T>
+std::string join(const std::string& delimiter, std::vector<_T> array)
+{
+	std::string result;
+	for (auto it = array.begin(); it != array.end(); it++)
+	{
+		result.append(std::to_string(*it));
+		if (std::next(it) != array.end())
+		{
+			array.append(delimiter);
+		}
+	}
+}
+
+template <typename _Key, typename _Val>
+std::string join(const std::string& delimiter, QueryDict<_Key, _Val> _qd, std::function<std::string(std::pair<_Key, _Val>)> expr)
+{
+	std::string result;
+	for (auto it = _qd.cbegin(); it != _qd.cend(); it++)
+	{
+		result.append(expr(*it));
+		if (std::next(it) != _qd.cend())
+		{
+			result.append(delimiter);
+		}
+	}
 }
 
 __WASP_END__

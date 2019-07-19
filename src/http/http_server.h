@@ -45,7 +45,7 @@
 
 __INTERNAL_BEGIN__
 
-typedef std::function<HttpResponseBase(HttpRequest&)> httpHandler;
+typedef std::function<HttpResponseBase* (HttpRequest&)> httpHandler;
 
 class HttpServer
 {

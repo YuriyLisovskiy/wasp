@@ -24,6 +24,10 @@
 
 __WASP_BEGIN__
 
+Cookie::Cookie() : Cookie("", "", "")
+{
+}
+
 Cookie::Cookie(
 	std::string name,
 	std::string value,
@@ -39,10 +43,6 @@ Cookie::Cookie(
 	if (this->_name.empty())
 	{
 		throw CookieError("cookie's name can not be empty", _ERROR_DETAILS_);
-	}
-	if (this->_value.empty())
-	{
-		throw CookieError("cookie's value can not be empty", _ERROR_DETAILS_);
 	}
 	if (this->_expires.empty())
 	{

@@ -16,7 +16,7 @@
  */
 
 /*
- * http response implementation.
+ * HTTP/1.1 response base implementation.
  * TODO: write docs
  */
 
@@ -27,11 +27,12 @@ __WASP_BEGIN__
 
 HttpResponseBase::HttpResponseBase(
 	unsigned short int status,
-    std::string contentType,
+	std::string contentType,
 	const std::string& reason,
-    const std::string& charset
+	const std::string& charset
 )
 {
+	this->_streaming = false;
 	this->_headers = QueryDict<std::string, std::string>(true);
 	this->_closed = false;
 
@@ -99,9 +100,10 @@ void HttpResponseBase::setSignedCookie(
 	// TODO:
 }
 
-void HttpResponseBase::deleteCookie(const std::string& name)
+void HttpResponseBase::deleteCookie(const std::string& name, const std::string& path, const std::string& domain)
 {
-	// TODO:
+	bool isSecure = std::strncmp(name.c_str(), "__Secure-", 9) == 0 || std::strncmp(name.c_str(), "__Host-", 7) == 0;
+	this->_cookies.set(name, Cookie(name, "", "Thu, 01 Jan 1970 00:00:00 GMT", domain, path, isSecure));
 }
 
 std::string HttpResponseBase::getReasonPhrase()
@@ -126,24 +128,95 @@ void HttpResponseBase::setReasonPhrase(std::string value)
 	this->_reasonPhrase = value;
 }
 
-// TODO: build response
-std::string HttpResponseBase::toString()
+void HttpResponseBase::close()
 {
-	std::string body("<form action=\"/hello\" method=\"post\" enctype=\"multipart/form-data\">\n"
-					 "\t<input type=\"file\" name=\"super_file\" />\n"
-					 "\t<input type=\"password\" name=\"first_name\" />\n"
-					 "\t<input type=\"submit\" value=\"send\" />\n"
-					 "\t</form>\n"
-	                 "\t<img src=\"../../../Screenshot from 2019-07-17 17-19-44.png\" alt=\"image\" />");
+	this->_closed = true;
+}
 
-	this->_headers.set("Date", dt::now().strftime("%a, %d %b %Y %T %Z"));
+void HttpResponseBase::write(const std::string& content)
+{
+	throw WaspException("This HttpResponseBase instance is not writable", _ERROR_DETAILS_);
+}
 
-	return std::string("HTTP/1.1 200 OK\n"
-				//	"Content-Length: " + std::to_string(body.size()) + "\n"
-					"Connection: close\n"
-					"Content-Type: text/html\n"
-					"Server: Apache/2.2.8 (Ubuntu) mod_ssl/2.2.8 OpenSSL/0.9.8g\n\n" +
-				  body);
+void HttpResponseBase::flush()
+{
+}
+
+unsigned long int HttpResponseBase::tell()
+{
+	throw WaspException("This HttpResponseBase instance cannot tell its position", _ERROR_DETAILS_);
+}
+
+bool HttpResponseBase::readable()
+{
+	return false;
+}
+
+bool HttpResponseBase::seekable()
+{
+	return false;
+}
+
+bool HttpResponseBase::writable()
+{
+	return false;
+}
+
+void HttpResponseBase::writeLines(const std::vector<std::string>& lines)
+{
+	throw WaspException("This HttpResponseBase instance is not writable", _ERROR_DETAILS_);
+}
+
+std::string HttpResponseBase::serializeHeaders()
+{
+	return join<std::string, std::string>(
+		"\r\n", this->_headers,
+		[](std::pair<std::string, std::string> _p) -> std::string { return _p.first + ": " + _p.second; }
+	);
+}
+
+
+HttpResponse::HttpResponse(
+	const std::string& content,
+	unsigned short status,
+	const std::string& contentType,
+	const std::string& reason,
+	const std::string& charset
+) : HttpResponseBase(status, contentType, reason, charset)
+{
+	this->_content = content;
+	this->_streaming = false;
+}
+
+void HttpResponse::write(const std::string& content)
+{
+	this->_content.append(content);
+}
+
+unsigned long int HttpResponse::tell()
+{
+	return this->_content.size();
+}
+
+bool HttpResponse::writable()
+{
+	return true;
+}
+
+void HttpResponse::writeLines(const std::vector<std::string>& lines)
+{
+	for (const auto & line : lines)
+	{
+		this->write(line);
+	}
+}
+
+std::string HttpResponse::serialize() {
+	this->setHeader("Date", dt::now().strftime("%a, %d %b %Y %T %Z"));
+	this->setHeader("Content-Length", std::to_string(this->_content.size()));
+
+	return "HTTP/1.1 " + std::to_string(this->_status) + " " + this->getReasonPhrase() + "\r\n" +
+	       this->serializeHeaders() + "\r\n\r\n" + this->_content;
 }
 
 __WASP_END__

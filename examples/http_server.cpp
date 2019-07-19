@@ -28,7 +28,7 @@ using wasp::internal::HttpServer;
 using std::string;
 using std::cout;
 
-wasp::HttpResponseBase handler(wasp::HttpRequest& request)
+wasp::HttpResponseBase* handler(wasp::HttpRequest& request)
 {
 	cout << "\n" << request.method() << " " << request.path() << " " << request.version() << "\n";
 	auto begin = request.headers.cbegin();
@@ -47,7 +47,13 @@ wasp::HttpResponseBase handler(wasp::HttpRequest& request)
 //		std::cout << it->first << ": " << it->second << '\n';
 //	}
 
-	return wasp::HttpResponseBase();
+	std::string body("<form action=\"/hello\" method=\"post\" enctype=\"multipart/form-data\">\n"
+	                 "\t<input type=\"file\" name=\"super_file\" />\n"
+	                 "\t<input type=\"password\" name=\"first_name\" />\n"
+	                 "\t<input type=\"submit\" value=\"send\" />\n"
+	                 "\t</form>\n");
+
+	return new wasp::HttpResponse(body);
 }
 
 int main()
@@ -56,7 +62,7 @@ int main()
 	{
 		HttpServer::Context ctx{};
 		ctx.handler = handler;
-		ctx.port = 5500;
+		ctx.port = 9000;
 
 		HttpServer server(ctx);
 

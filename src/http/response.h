@@ -16,7 +16,7 @@
  */
 
 /*
- * http response definition.
+ * HTTP/1.1 response base definition.
  * TODO: write docs
  */
 
@@ -26,21 +26,28 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <cstring>
+#include <iterator>
 
 #include "../globals.h"
 #include "request.h"
 #include "cookie.h"
 #include "../core/exceptions.h"
 #include "status.h"
+#include "../utils/str_utils.h"
 
 #include "../utils/datetime/datetime.h"
 
 
 __WASP_BEGIN__
 
+// An HTTP response base class with dictionary-accessed headers.
+//
+// This class doesn't handle content. It should not be used directly.
+// Use the HttpResponse and StreamingHttpResponse subclasses instead.
 class HttpResponseBase
 {
-private:
+protected:
 	QueryDict<std::string, std::string> _headers;
 	QueryDict<std::string, Cookie> _cookies;
 	std::string _body;
@@ -48,6 +55,9 @@ private:
 	unsigned short int _status;
 	std::string _charset;
 	std::string _reasonPhrase;
+	bool _streaming;
+
+	std::string serializeHeaders();
 
 public:
 	explicit HttpResponseBase(
@@ -56,6 +66,7 @@ public:
 		const std::string& reason = "",
 		const std::string& charset = "utf-8"
 	);
+	virtual ~HttpResponseBase() = default;
 	void setHeader(const std::string& key, const std::string& value);
 	void removeHeader(const std::string& key);
 	bool hasHeader(const std::string& key);
@@ -79,12 +90,47 @@ public:
 	    bool isSecure = false,
 	    bool isHttpOnly = false
 	);
-	void deleteCookie(const std::string& key);
+	void deleteCookie(const std::string& name, const std::string& path, const std::string& domain);
 
 	std::string getReasonPhrase();
 	void setReasonPhrase(std::string value);
 
-	std::string toString();
+	// These methods partially implement the file-like object interface.
+	virtual void close();
+	virtual void write(const std::string& content);
+	virtual void flush();
+	virtual unsigned long int tell();
+
+	// These methods partially implement a stream-like object interface.
+	virtual bool readable();
+	virtual bool seekable();
+	virtual bool writable();
+	virtual void writeLines(const std::vector<std::string>& lines);
+
+	virtual std::string serialize() = 0;
+};
+
+// An HTTP response class with a string as content.
+//
+// This content that can be read, appended to, or replaced.
+class HttpResponse : public HttpResponseBase
+{
+private:
+	std::string _content;
+
+public:
+	explicit HttpResponse(
+		const std::string& content,
+		unsigned short int status = 200,
+		const std::string& contentType = "",
+		const std::string& reason = "",
+		const std::string& charset = "utf-8"
+	);
+	void write(const std::string& content) override;
+	unsigned long int tell() override;
+	bool writable() override;
+	void writeLines(const std::vector<std::string>& lines) override;
+	std::string serialize() override;
 };
 
 __WASP_END__
