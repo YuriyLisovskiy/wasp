@@ -25,23 +25,65 @@
 
 #include <string>
 #include <map>
+#include <vector>
 
 #include "../globals.h"
 #include "request.h"
+#include "cookie.h"
+#include "../core/exceptions.h"
+#include "status.h"
+
 #include "../utils/datetime/datetime.h"
 
 
 __WASP_BEGIN__
 
-class HttpResponse
+class HttpResponseBase
 {
 private:
 	QueryDict<std::string, std::string> _headers;
+	QueryDict<std::string, Cookie> _cookies;
+	std::string _body;
+	bool _closed;
+	unsigned short int _status;
+	std::string _charset;
+	std::string _reasonPhrase;
 
 public:
-	explicit HttpResponse(const std::string& content);
+	explicit HttpResponseBase(
+		unsigned short int status = 0,
+		std::string contentType = "",
+		const std::string& reason = "",
+		const std::string& charset = "utf-8"
+	);
 	void setHeader(const std::string& key, const std::string& value);
 	void removeHeader(const std::string& key);
+	bool hasHeader(const std::string& key);
+
+	void setCookie(
+		const std::string& name,
+		const std::string& value,
+		const std::string& expires = "",
+		const std::string& domain = "",
+		const std::string& path = "/",
+		bool isSecure = false,
+		bool isHttpOnly = false
+	);
+	void setSignedCookie(
+		const std::string& name,
+	    const std::string& value,
+		const std::string& salt = "",
+	    const std::string& expires = "",
+	    const std::string& domain = "",
+	    const std::string& path = "/",
+	    bool isSecure = false,
+	    bool isHttpOnly = false
+	);
+	void deleteCookie(const std::string& key);
+
+	std::string getReasonPhrase();
+	void setReasonPhrase(std::string value);
+
 	std::string toString();
 };
 

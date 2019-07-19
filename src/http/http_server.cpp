@@ -62,7 +62,7 @@ const std::string HttpServer::_tcpHandler(const char* data)
 
 		HttpRequestParser parser;
 		HttpRequest request = parser.parse(data);
-		HttpResponse response = this->_httpHandler(request);
+		HttpResponseBase response = this->_httpHandler(request);
 
 		// TODO: remove when release ------------------------:
 		measure.end();

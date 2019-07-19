@@ -1,5 +1,7 @@
 #include <utility>
 
+#include <utility>
+
 /*
  * Copyright (c) 2019 Yuriy Lisovskiy
  *
@@ -29,17 +31,16 @@
 #include <type_traits>
 
 #include "../globals.h"
+#include "../core/exceptions.h"
 
 
-__INTERNAL_BEGIN__
+__WASP_BEGIN__
 
-template <class _Val>
 class Cookie
 {
-	static_assert(std::is_fundamental<_Val>::value, "cookie value must be of built-in type");
 private:
 	std::string _name;
-	_Val _value;
+	std::string _value;
 	std::string _expires;
 	std::string _domain;
 	std::string _path;
@@ -49,53 +50,20 @@ private:
 public:
 	Cookie(
 		std::string name,
-		_Val value,
+		std::string value,
 		std::string expires,
 		std::string domain = "",
 		std::string path = "/",
 		bool isSecure = true,
 		bool isHttpOnly = false
-	) : _name(std::move(name)), _value(value), _expires(std::move(expires)),
-	    _domain(std::move(domain)), _path(std::move(path)),
-	    _isSecure(isSecure), _isHttpOnly(isHttpOnly)
-	{
-		constexpr auto isEmpty = [](const std::string& str) -> bool { return str.empty(); };
-		static_assert(isEmpty(name), "cookie's name can not be empty");
-		if (typeid(value) == typeid(std::string))
-		{
-			static_assert(isEmpty(value), "cookie's value can not be empty");
-		}
-		static_assert(isEmpty(expires), "cookie's expiration time can not be empty");
-	}
+	);
 
-	std::string toString()
-	{
-		// Sets browser's directive 'Set-Cookie' and cookie's name and value.
-		std::string result = "Set-Cookie: " + this->_name + "=" + std::to_string(this->_value);
+	std::string toString();
 
-		// Sets domain if it is not an empty string.
-		result += this->_domain.size() > 0 ? "; Domain=" + this->_domain : "";
-
-		// Sets path if it is not an empty string.
-		result += this->_path.size() > 0 ? "; Path=" + this->_path : "";
-
-		// Sets expiration time in '%a, %e %b %Y %T %Z' format,
-		// for instance, 'Thu, 18 Jul 2019 16:25:19 GMT'.
-		result += "; Expires=" + this->_expires;
-
-		if (this->_isSecure)
-		{
-			result += "; Secure";
-		}
-		if (this->_isHttpOnly)
-		{
-			result += "; HttpOnly";
-		}
-		return result;
-	}
+	bool operator==(const Cookie& right);
 };
 
-__INTERNAL_END__
+__WASP_END__
 
 
 #endif // WASP_HTTP_COOKIE_H

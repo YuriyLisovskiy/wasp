@@ -28,7 +28,7 @@ using wasp::internal::HttpServer;
 using std::string;
 using std::cout;
 
-wasp::HttpResponse handler(wasp::HttpRequest& request)
+wasp::HttpResponseBase handler(wasp::HttpRequest& request)
 {
 	cout << "\n" << request.method() << " " << request.path() << " " << request.version() << "\n";
 	auto begin = request.headers.cbegin();
@@ -47,7 +47,7 @@ wasp::HttpResponse handler(wasp::HttpRequest& request)
 //		std::cout << it->first << ": " << it->second << '\n';
 //	}
 
-	return wasp::HttpResponse("hello, world");
+	return wasp::HttpResponseBase();
 }
 
 int main()

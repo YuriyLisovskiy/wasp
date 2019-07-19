@@ -84,6 +84,15 @@ public:
 		this->_map[key] = value;
 	}
 
+	void remove(_Key key)
+	{
+		if (!this->_isMutable)
+		{
+			this->_throw("remove value", _ERROR_DETAILS_);
+		}
+		this->_map.erase(key);
+	}
+
 	bool contains(_Key key)
 	{
 		return this->_map.find(key) != this->_map.end();

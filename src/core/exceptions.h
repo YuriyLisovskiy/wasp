@@ -63,6 +63,20 @@ public:
 	QueryDictError(const std::string& message, int line, const char* function, const char* file);
 };
 
+class CookieError : public WaspException
+{
+public:
+	CookieError(const char* message, int line, const char* function, const char* file);
+	CookieError(const std::string& message, int line, const char* function, const char* file);
+};
+
+class ValueError : public WaspException
+{
+public:
+	ValueError(const char* message, int line, const char* function, const char* file);
+	ValueError(const std::string& message, int line, const char* function, const char* file);
+};
+
 __WASP_END__
 
 

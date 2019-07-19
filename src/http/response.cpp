@@ -25,33 +25,124 @@
 
 __WASP_BEGIN__
 
-HttpResponse::HttpResponse(const std::string& content)
+HttpResponseBase::HttpResponseBase(
+	unsigned short int status,
+    std::string contentType,
+	const std::string& reason,
+    const std::string& charset
+)
 {
 	this->_headers = QueryDict<std::string, std::string>(true);
+	this->_closed = false;
 
-	// TODO: set default headers
+	if (status != 0)
+	{
+		if (status < 100 || status > 599)
+		{
+			throw ValueError("HTTP status code must be an integer from 100 to 599.", _ERROR_DETAILS_);
+		}
+		this->_status = status;
+	}
+	else
+	{
+		this->_status = 200;
+	}
+
+	this->_charset = charset;
+
+	if (contentType.empty())
+	{
+		contentType = "text/html; charset=" + this->_charset;
+	}
+	this->_headers.set("Content-Type", contentType);
+}
+
+void HttpResponseBase::setHeader(const std::string& key, const std::string& value)
+{
+	this->_headers.set(key, value);
+}
+
+void HttpResponseBase::removeHeader(const std::string& key)
+{
+	this->_headers.remove(key);
+}
+
+bool HttpResponseBase::hasHeader(const std::string& key)
+{
+	return this->_headers.contains(key);
+}
+
+void HttpResponseBase::setCookie(
+	const std::string& name,
+	const std::string& value,
+	const std::string& expires,
+	const std::string& domain,
+	const std::string& path,
+	bool isSecure,
+	bool isHttpOnly
+)
+{
+	this->_cookies.set(name, Cookie(name, value, expires, domain, path, isSecure, isHttpOnly));
+}
+
+void HttpResponseBase::setSignedCookie(
+	const std::string& name,
+	const std::string& value,
+	const std::string& salt,
+	const std::string& expires,
+	const std::string& domain,
+	const std::string& path,
+	bool isSecure,
+	bool isHttpOnly
+)
+{
+	// TODO:
+}
+
+void HttpResponseBase::deleteCookie(const std::string& name)
+{
+	// TODO:
+}
+
+std::string HttpResponseBase::getReasonPhrase()
+{
+	if (!this->_reasonPhrase.empty())
+	{
+		return this->_reasonPhrase;
+	}
+	if (internal::HTTP_STATUS.contains(this->_status))
+	{
+		return internal::HTTP_STATUS.get(this->_status).first;
+	}
+	return "Unknown Status Code";
+}
+
+void HttpResponseBase::setReasonPhrase(std::string value)
+{
+	if (value.empty())
+	{
+		value = "Unknown Status Code";
+	}
+	this->_reasonPhrase = value;
 }
 
 // TODO: build response
-std::string HttpResponse::toString()
+std::string HttpResponseBase::toString()
 {
 	std::string body("<form action=\"/hello\" method=\"post\" enctype=\"multipart/form-data\">\n"
 					 "\t<input type=\"file\" name=\"super_file\" />\n"
 					 "\t<input type=\"password\" name=\"first_name\" />\n"
 					 "\t<input type=\"submit\" value=\"send\" />\n"
-					 "\t</form>");
+					 "\t</form>\n"
+	                 "\t<img src=\"../../../Screenshot from 2019-07-17 17-19-44.png\" alt=\"image\" />");
 
-	auto date = dt::now().strftime("%a, %d %b %Y %T %Z");
+	this->_headers.set("Date", dt::now().strftime("%a, %d %b %Y %T %Z"));
 
 	return std::string("HTTP/1.1 200 OK\n"
-					"Date: " + date + "\n"
-				  "Last-Modified: Sun, 26 Sep 2010 22:04:35 GMT\n"
-				  "ETag: \"45b6-834-49130cc1182c0\"\n"
-				  "Accept-Ranges: bytes\n"
-				  "Content-Length: " + std::to_string(body.size()) + "\n"
-				  "Connection: close\n"
-				  "Content-Type: text/html\n"
-				  "Server: Apache/2.2.8 (Ubuntu) mod_ssl/2.2.8 OpenSSL/0.9.8g\n\n" +
+				//	"Content-Length: " + std::to_string(body.size()) + "\n"
+					"Connection: close\n"
+					"Content-Type: text/html\n"
+					"Server: Apache/2.2.8 (Ubuntu) mod_ssl/2.2.8 OpenSSL/0.9.8g\n\n" +
 				  body);
 }
 

@@ -77,4 +77,28 @@ QueryDictError::QueryDictError(const std::string& message, int line, const char 
 {
 }
 
+// CookieError
+CookieError::CookieError(const char* message, int line, const char* function, const char* file)
+	: WaspException(message, line, function, file)
+{
+	this->_exceptionType = "CookieError";
+}
+
+CookieError::CookieError(const std::string& message, int line, const char *function, const char *file)
+	: CookieError(message.c_str(), line, function, file)
+{
+}
+
+// ValueError
+ValueError::ValueError(const char* message, int line, const char* function, const char* file)
+	: WaspException(message, line, function, file)
+{
+	this->_exceptionType = "ValueError";
+}
+
+ValueError::ValueError(const std::string& message, int line, const char *function, const char *file)
+	: ValueError(message.c_str(), line, function, file)
+{
+}
+
 __WASP_END__
