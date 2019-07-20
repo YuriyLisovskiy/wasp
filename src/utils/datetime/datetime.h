@@ -76,7 +76,7 @@ public:
 DateTime now();
 
 // Returns current date and time as utc time.
-DateTime utcnow();
+DateTime gmtnow();
 
 __DATETIME_END__
 

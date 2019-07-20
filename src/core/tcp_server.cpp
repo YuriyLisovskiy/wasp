@@ -19,6 +19,9 @@
  * tcp/ip server implementation.
  */
 
+// TODO: remove
+#include <unistd.h>
+
 #include "tcp_server.h"
 
 
@@ -167,25 +170,31 @@ void TcpServer::serveConnection(const socket_t& connection)
 {
 	std::string data = TcpServer::recvAll(connection);
 
-	const std::string resp = this->_handler(data.c_str());
+	const std::string resp = this->_handler(data);
 
 	TcpServer::sendResponse(resp.c_str(), connection);
 
-	TcpServer::closeConnection(connection, SOCKET_SEND);
-	TcpServer::closeConnection(connection, SOCKET_RECEIVE);
+//	TcpServer::closeSocket(connection);
+
+//	TcpServer::closeConnection(connection, SOCKET_SEND);
+//	TcpServer::closeConnection(connection, SOCKET_RECEIVE);
 
 	TcpServer::cleanUp(connection);
 }
 
 // TODO: bug, second, third, etc. POST requests from browser (Google Chrome, at least)
-//  with 'multipart/form-data' content type are read without request body
+//  with 'multipart/form-data' content type are read without request body.
 std::string TcpServer::recvAll(const socket_t& connection)
 {
+	// TODO: helps to receive POST request body, remove it after fix
+	//  receiving problem, that is described above.
+	::usleep(10000); // in microseconds
+
 	msg_size_t msgSize = 0;
 	unsigned long size = 0;
 	std::string data;
-	char* buffer = (char*) calloc(MAX_BUFF_SIZE, sizeof(char));
 
+	char* buffer = (char*) calloc(MAX_BUFF_SIZE, sizeof(char));
 	do
 	{
 		msgSize = recv(connection, buffer, MAX_BUFF_SIZE, 0);
@@ -207,7 +216,7 @@ std::string TcpServer::recvAll(const socket_t& connection)
 
 void TcpServer::sendResponse(const char* data, const socket_t& connection)
 {
-	if (send(connection, data, ::strlen(data), 0) == SOCKET_ERROR)
+	if (send(connection, data, std::strlen(data), 0) == SOCKET_ERROR)
 	{
 		this->_logger->trace("Failed to send bytes to socket connection", __FILE__, __FUNCTION__, __LINE__);
 		this->cleanUp(connection);

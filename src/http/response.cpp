@@ -169,10 +169,17 @@ void HttpResponseBase::writeLines(const std::vector<std::string>& lines)
 
 std::string HttpResponseBase::serializeHeaders()
 {
-	return join<std::string, std::string>(
-		"\r\n", this->_headers,
-		[](std::pair<std::string, std::string> _p) -> std::string { return _p.first + ": " + _p.second; }
-	);
+	auto expr = [](std::pair<std::string, std::string> _p) -> std::string { return _p.first + ": " + _p.second; };
+	std::string result;
+	for (auto it = this->_headers.cbegin(); it != this->_headers.cend(); it++)
+	{
+		result.append(expr(*it));
+		if (std::next(it) != this->_headers.cend())
+		{
+			result.append("\r\n");
+		}
+	}
+	return result;
 }
 
 
@@ -212,11 +219,15 @@ void HttpResponse::writeLines(const std::vector<std::string>& lines)
 }
 
 std::string HttpResponse::serialize() {
-	this->setHeader("Date", dt::now().strftime("%a, %d %b %Y %T %Z"));
+	this->setHeader("Date", dt::gmtnow().strftime("%a, %d %b %Y %T %Z"));
 	this->setHeader("Content-Length", std::to_string(this->_content.size()));
 
-	return "HTTP/1.1 " + std::to_string(this->_status) + " " + this->getReasonPhrase() + "\r\n" +
-	       this->serializeHeaders() + "\r\n\r\n" + this->_content;
+	auto reasonPhrase = this->getReasonPhrase();
+
+	auto headers = this->serializeHeaders();
+
+	return "HTTP/1.1 " + std::to_string(this->_status) + " " + reasonPhrase + "\r\n" +
+	       headers + "\r\n\r\n" + this->_content;
 }
 
 __WASP_END__

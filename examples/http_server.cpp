@@ -30,17 +30,17 @@ using std::cout;
 
 wasp::HttpResponseBase* handler(wasp::HttpRequest& request)
 {
-	cout << "\n" << request.method() << " " << request.path() << " " << request.version() << "\n";
-	auto begin = request.headers.cbegin();
-	auto end = request.headers.cend();
+//	cout << "\n" << request.method() << " " << request.path() << " " << request.version() << "\n";
+//	auto begin = request.headers.cbegin();
+//	auto end = request.headers.cend();
 
-	while (begin != end)
-	{
-		cout << (*begin).first << ": " << (*begin).second << '\n';
-		begin++;
-	}
+//	while (begin != end)
+//	{
+//		cout << (*begin).first << ": " << (*begin).second << '\n';
+//		begin++;
+//	}
 
-	std::cout << request.body() << "\n";
+//	std::cout << request.body() << "\n";
 
 //	for (auto it = request.COOKIES.cbegin(); it != request.COOKIES.cend(); it++)
 //	{
@@ -62,7 +62,7 @@ int main()
 	{
 		HttpServer::Context ctx{};
 		ctx.handler = handler;
-		ctx.port = 9000;
+		ctx.port = 5000;
 
 		HttpServer server(ctx);
 

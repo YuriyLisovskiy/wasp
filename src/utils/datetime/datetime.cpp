@@ -54,7 +54,7 @@ DateTime now()
 	);
 }
 
-DateTime utcnow()
+DateTime gmtnow()
 {
 	auto timeNow = internal::now();
 	auto gmTime = std::gmtime(&timeNow);

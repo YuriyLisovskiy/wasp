@@ -51,7 +51,7 @@ HttpServer::~HttpServer()
 	delete this->_tcpServer;
 }
 
-const std::string HttpServer::_tcpHandler(const char* data)
+const std::string HttpServer::_tcpHandler(const std::string& data)
 {
 	try
 	{
@@ -64,16 +64,13 @@ const std::string HttpServer::_tcpHandler(const char* data)
 		HttpRequest request = parser.parse(data);
 		HttpResponseBase* response = this->_httpHandler(request);
 
-		// TODO: remove when release ------------------------:
+		// TODO: remove when release -------------------------------------------------------------:
 		measure.end();
 		std::cout << '\n' << request.method() << " request took " << measure.elapsed() << " ms\n";
-		// TODO: remove when release ------------------------^
+		// TODO: remove when release -------------------------------------------------------------^
 
 		std::string result = response->serialize();
-
-		std::cout << "Hello\n";
-
-	//	delete response;
+		delete response;
 
 		return result;
 	}
