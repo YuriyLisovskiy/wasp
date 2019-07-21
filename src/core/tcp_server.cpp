@@ -178,7 +178,7 @@ std::string TcpServer::recvAll(const socket_t& connection)
 {
 	// TODO: helps to receive POST request body, remove it after fix
 	//  receiving problem, that is described above.
-	std::this_thread::sleep_for(std::chrono::milliseconds(50));
+	std::this_thread::sleep_for(std::chrono::milliseconds(20));
 
 	msg_size_t msgSize = 0;
 //	unsigned long size = 0;
