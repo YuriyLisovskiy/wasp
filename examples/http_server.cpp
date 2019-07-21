@@ -24,13 +24,9 @@
 #include "../src/http/response.h"
 
 
-using wasp::internal::HttpServer;
-using std::string;
-using std::cout;
-
 wasp::HttpResponseBase* handler(wasp::HttpRequest& request)
 {
-//	cout << "\n" << request.method() << " " << request.path() << " " << request.version() << "\n";
+	std::cout << "\n" << request.method() << " " << request.path() << " " << request.version() << "\n";
 //	auto begin = request.headers.cbegin();
 //	auto end = request.headers.cend();
 
@@ -60,17 +56,17 @@ int main()
 {
 	try
 	{
-		HttpServer::Context ctx{};
+		wasp::internal::HttpServer::Context ctx{};
 		ctx.handler = handler;
 		ctx.port = 5000;
 
-		HttpServer server(ctx);
+		wasp::internal::HttpServer server(ctx);
 
 		server.listenAndServe();
 	}
 	catch (const std::exception& exc)
 	{
-		cout << exc.what();
+		std::cout << exc.what();
 	}
 
 	return 0;

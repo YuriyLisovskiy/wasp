@@ -15,13 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * tcp/ip server implementation.
- */
-
-// TODO: remove
-#include <unistd.h>
-
 #include "tcp_server.h"
 
 
@@ -31,12 +24,12 @@ TcpServer::TcpServer(TcpServer::Context ctx)
 {
 	if (ctx.host == nullptr)
 	{
-		ctx.host = "127.0.0.1";
+		ctx.host = DEFAULT_HOST;
 	}
 
 	if (ctx.port == 0)
 	{
-		ctx.port = 8000;
+		ctx.port = DEFAULT_PORT;
 	}
 
 	this->_host = ctx.host;
@@ -69,7 +62,9 @@ int TcpServer::init()
 {
 	this->_socketAddr.sin_family = AF_INET;
 	this->_socketAddr.sin_port = htons(this->_port);
-	inet_pton(AF_INET, this->_host, &(this->_socketAddr.sin_addr));
+	this->_socketAddr.sin_addr.s_addr = inet_addr(this->_host);
+
+	memset(this->_socketAddr.sin_zero, '\0', sizeof this->_socketAddr.sin_zero);
 
 	this->_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
@@ -174,11 +169,6 @@ void TcpServer::serveConnection(const socket_t& connection)
 
 	TcpServer::sendResponse(resp.c_str(), connection);
 
-//	TcpServer::closeSocket(connection);
-
-//	TcpServer::closeConnection(connection, SOCKET_SEND);
-//	TcpServer::closeConnection(connection, SOCKET_RECEIVE);
-
 	TcpServer::cleanUp(connection);
 }
 
@@ -188,10 +178,10 @@ std::string TcpServer::recvAll(const socket_t& connection)
 {
 	// TODO: helps to receive POST request body, remove it after fix
 	//  receiving problem, that is described above.
-	::usleep(10000); // in microseconds
+	std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
 	msg_size_t msgSize = 0;
-	unsigned long size = 0;
+//	unsigned long size = 0;
 	std::string data;
 
 	char* buffer = (char*) calloc(MAX_BUFF_SIZE, sizeof(char));
@@ -201,9 +191,9 @@ std::string TcpServer::recvAll(const socket_t& connection)
 		if (msgSize > 0)
 		{
 			data.append(buffer, msgSize);
-			size += msgSize;
+//			size += msgSize;
 		}
-		else if (msgSize < 0)
+		else if (msgSize == -1)
 		{
 			this->_logger->trace("Received message size is less than zero", __FILE__, __FUNCTION__, __LINE__);
 		}
@@ -219,15 +209,6 @@ void TcpServer::sendResponse(const char* data, const socket_t& connection)
 	if (send(connection, data, std::strlen(data), 0) == SOCKET_ERROR)
 	{
 		this->_logger->trace("Failed to send bytes to socket connection", __FILE__, __FUNCTION__, __LINE__);
-		this->cleanUp(connection);
-	}
-}
-
-void TcpServer::closeConnection(const socket_t& connection, const int& type)
-{
-	if (shutdown(connection, type) == SOCKET_ERROR)
-	{
-		this->_logger->trace("Failed to shut down socket connection", __FILE__, __FUNCTION__, __LINE__);
 		this->cleanUp(connection);
 	}
 }

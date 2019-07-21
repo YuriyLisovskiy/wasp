@@ -28,19 +28,36 @@
 #include <thread>
 #include <functional>
 
-#include "../globals.h"
-#include "../utils/logger.h"
-
-
-__INTERNAL_BEGIN__
+// TODO: --------:
+#include <chrono>
+#include <thread>
+// TODO: --------^
 
 #if defined(_WIN32) || defined(_WIN64)
-// Windows-specific libs and definitions for working with tcp sockets
 
 #include <winsock2.h>
 #include <ws2tcpip.h>
 
 #pragma comment (lib, "Ws2_32.lib")
+
+#elif defined(__unix__) || defined(__linux__)
+
+#include <sys/socket.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+
+#else
+#error Library is not supported on this platform
+
+#endif
+
+#include "../globals.h"
+#include "../utils/logger.h"
+#include "../conf/defaults.h"
+
+__INTERNAL_BEGIN__
+
+#if defined(_WIN32) || defined(_WIN64)
 
 typedef SOCKET socket_t;
 typedef int msg_size_t;
@@ -50,11 +67,6 @@ typedef int msg_size_t;
 #define SOCKET_RECEIVE SD_RECEIVE
 
 #elif defined(__unix__) || defined(__linux__)
-// Linux-specific libs and definitions for working with tcp socket
-
-#include <sys/socket.h>
-#include <unistd.h>
-#include <arpa/inet.h>
 
 typedef int socket_t;
 typedef ssize_t msg_size_t;
@@ -63,7 +75,7 @@ typedef ssize_t msg_size_t;
 #define SOCKET_ERROR (-1)
 #define SOCKET_SEND SHUT_RDWR
 #define SOCKET_RECEIVE SHUT_RDWR
-#define WSA_LAST_ERR '\n'
+#define WSA_LAST_ERR errno
 
 #else
 #error Library is not supported on this platform
@@ -87,7 +99,6 @@ private:
 	void startListener();
 	void serveConnection(const socket_t& client);
 	void sendResponse(const char* data, const socket_t& connection);
-	void closeConnection(const socket_t& sock, const int& how);
 	static int closeSocket(const socket_t& socket);
 	static void wsaCleanUp();
 	void cleanUp(const socket_t& connection);

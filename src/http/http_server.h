@@ -72,6 +72,7 @@ public:
 
 	explicit HttpServer(HttpServer::Context& ctx);
 	void listenAndServe();
+	void finish();
 	~HttpServer();
 
 private:
