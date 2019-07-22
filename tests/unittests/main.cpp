@@ -2,6 +2,8 @@
 
 #include "http/parsers/request_parser_tests.h"
 #include "http/cookie_tests.h"
+#include "utils/mime_types_tests.h"
+
 
 int main(int argc, char *argv[])
 {

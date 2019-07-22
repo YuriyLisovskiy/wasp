@@ -16,24 +16,38 @@
  */
 
 /*
- * This header contains global variables, constants and definitions.
+ * mime_types definition.
+ * TODO: write docs.
  */
 
-#ifndef WASP_GLOBALS_H
-#define WASP_GLOBALS_H
+#ifndef WASP_UTILS_MIME_TYPES_H
+#define WASP_UTILS_MIME_TYPES_H
 
-#define __WASP_BEGIN__ namespace wasp {
-#define __WASP_END__ }
+#include <string>
 
-#define __INTERNAL_BEGIN__ __WASP_BEGIN__ namespace internal {
-#define __INTERNAL_END__ } __WASP_END__
+#include "../globals.h"
 
-#define __DATETIME_BEGIN__ __WASP_BEGIN__ namespace dt {
-#define __DATETIME_END__ } __WASP_END__
 
-#define __MIME_BEGIN__ __WASP_BEGIN__ namespace mime {
-#define __MIME_END__ } __WASP_END__
+__MIME_BEGIN__
 
-#define _ERROR_DETAILS_ __LINE__, __FUNCTION__, __FILE__
+namespace internal
+{
 
-#endif // WASP_GLOBALS_H
+std::string getExtFromFileName(const std::string& fileName);
+
+}
+
+std::string getExtensionFromPath(const std::string& path);
+
+std::string lookup(const std::string& str);
+
+std::string contentType(const std::string& str);
+
+std::string extension(const std::string& type);
+
+std::string charset(const std::string& type);
+
+__MIME_END__
+
+
+#endif // WASP_UTILS_MIME_TYPES_H
