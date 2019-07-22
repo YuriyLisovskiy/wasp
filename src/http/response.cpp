@@ -182,7 +182,7 @@ std::string HttpResponseBase::serializeHeaders()
 	return result;
 }
 
-
+// HttpResponse implementation
 HttpResponse::HttpResponse(
 	const std::string& content,
 	unsigned short status,
