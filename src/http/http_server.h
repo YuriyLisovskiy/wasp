@@ -40,7 +40,7 @@
 #include "../core/exceptions.h"
 
 #include "../utils/datetime/time.h"
-#include "../utils/str_utils.h"
+#include "../utils/str.h"
 
 
 __INTERNAL_BEGIN__

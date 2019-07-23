@@ -22,15 +22,70 @@
 #ifndef WASP_GLOBALS_H
 #define WASP_GLOBALS_H
 
+#include <string>
+
+
+// Main namespace.
+//
+// Full name: wasp
 #define __WASP_BEGIN__ namespace wasp {
 #define __WASP_END__ }
 
+// Main internal namespace.
+//
+// Full name: wasp::internal
 #define __INTERNAL_BEGIN__ __WASP_BEGIN__ namespace internal {
 #define __INTERNAL_END__ } __WASP_END__
 
+// This namespace is used in datetime module.
+//
+// Full name: wasp::dt
 #define __DATETIME_BEGIN__ __WASP_BEGIN__ namespace dt {
 #define __DATETIME_END__ } __WASP_END__
 
+// Used for string utils library.
+//
+// Full name: wasp::str
+#define __UTILS_STR_BEGIN__ __WASP_BEGIN__ namespace str {
+#define __UTILS_STR_END__ } __WASP_END__
+
+// String utils internals.
+//
+// Full name: wasp::str::internal
+#define __UTILS_STR_INTERNAL_BEGIN__ __UTILS_STR_BEGIN__ namespace internal {
+#define __UTILS_STR_INTERNAL_END__ } __UTILS_STR_END__
+
+// Namespace for media types utility functions.
+//
+// Full name: wasp::mime
+#define __MIME_BEGIN__ __WASP_BEGIN__ namespace mime {
+#define __MIME_END__ } __WASP_END__
+
+// Media types utility internals.
+//
+// Full name: wasp::mime::internal
+#define __MIME_INTERNAL_BEGIN__ __MIME_BEGIN__ namespace internal {
+#define __MIME_INTERNAL_END__ } __MIME_END__
+
+// Path functions namespace.
+//
+// Full name: wasp::path
+#define __PATH_BEGIN__ __WASP_BEGIN__ namespace path {
+#define __PATH_END__ } __WASP_END__
+
+// Path library internals.
+//
+// Full name: wasp::path::internal
+#define __PATH_INTERNAL_BEGIN__ __PATH_BEGIN__ namespace internal {
+#define __PATH_INTERNAL_END__ } __PATH_END__
+
+// Namespace for types lib.
+//
+// Full name: wasp::tps
+#define __TYPES_BEGIN__ __WASP_BEGIN__ namespace tps {
+#define __TYPES_END__ } __WASP_END__
+
+// Required parameters for Wasp's built-in logger.
 #define _ERROR_DETAILS_ __LINE__, __FUNCTION__, __FILE__
 
 #endif // WASP_GLOBALS_H

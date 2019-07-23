@@ -34,7 +34,7 @@
 #include "cookie.h"
 #include "../core/exceptions.h"
 #include "status.h"
-#include "../utils/str_utils.h"
+#include "../utils/str.h"
 
 #include "../utils/datetime/datetime.h"
 

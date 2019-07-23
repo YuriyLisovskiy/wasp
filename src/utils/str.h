@@ -20,8 +20,8 @@
  * TODO: write docs.
  */
 
-#ifndef WASP_STR_UTILS_H
-#define WASP_STR_UTILS_H
+#ifndef WASP_UTILS_STR_UTILS_H
+#define WASP_UTILS_STR_UTILS_H
 
 #include <string>
 #include <cstdarg>
@@ -30,37 +30,41 @@
 #include <map>
 #include <vector>
 #include <functional>
+#include <regex>
+#include <algorithm>
 
 #include "../globals.h"
 #include "query_dict.h"
 
 
-__INTERNAL_BEGIN__
+__UTILS_STR_INTERNAL_BEGIN__
 
-int normalize(double* val);
+// Normalizes value to exponent.
+extern int normalizeExp(double* val);
 
-std::string _format(char const* fmt, va_list arg);
+// Parses string and fill it with arguments list.
+extern std::string _format(char const* fmt, va_list args);
 
-__INTERNAL_END__
+__UTILS_STR_INTERNAL_END__
 
 
-__WASP_BEGIN__
+__UTILS_STR_BEGIN__
 
-// ftoaFixed - carry out a fixed conversion of a double value to a string, with a precision of 5 decimal digits.
+// Carries out a fixed conversion of a double value to a string, with a precision of 5 decimal digits.
 // Values with absolute values less than 0.000001 are rounded to 0.0
 // Note: this blindly assumes that the buffer will be large enough to hold the largest possible result.
 // The largest value we expect is an IEEE 754 double precision real, with maximum magnitude of approximately
 // e+308. The C standard requires an implementation to allow a single conversion to produce up to 512
 // characters, so that's what we really expect as the buffer size.
-std::string ftoaFixed(double value);
+extern std::string ftoaFixed(double value);
 
-// ftoaSci - converts double value to scientific number in string form.
-std::string ftoaSci(double value);
+// Converts double value to scientific number in string form.
+extern std::string ftoaSci(double value);
 
-// format - formats template with given arguments using internal::_format function.
-std::string format(const char* fmt, ...);
+// Formats template with given arguments using internal::_format function.
+extern std::string format(const char* fmt, ...);
 
-// convert - converts string to type T.
+// Converts string to type T.
 template<typename T>
 T convert(const std::string& str)
 {
@@ -102,7 +106,15 @@ std::string join(const std::string& delimiter, QueryDict<_Key, _Val> _qd, std::f
 	}
 }
 
-__WASP_END__
+// urlSplitType("type:opaqueString", typeOut, opaqueStringOut) --> "type", "opaqueString".
+extern void urlSplitType(const std::string& url, std::string& scheme, std::string& data);
+
+// Checks if string contains char.
+extern bool contains(const std::string& _str, char _char);
+
+extern std::string lower(const std::string& _str);
+
+__UTILS_STR_END__
 
 
-#endif // WASP_STR_UTILS_H
+#endif // WASP_UTILS_STR_UTILS_H

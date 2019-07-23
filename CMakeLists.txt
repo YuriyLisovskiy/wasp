@@ -37,6 +37,7 @@ file(GLOB LIB_FILES
 file(GLOB TEST_FILES
 		"tests/unittests/http/*.h"
 		"tests/unittests/http/parsers/*.h"
+		"tests/unittests/utils/*.h"
 		"tests/*.h"
 	)
 
