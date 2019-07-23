@@ -20,53 +20,135 @@
 
 #include <gtest/gtest.h>
 
-#include "../../../src/globals.h"
 #include "../../../src/utils/mime_types.h"
 
 
-TEST(MimeTypesTest, getExtFromFileNameTestSuccess)
+// Testing 'extFromFileName' function.
+TEST(MimeTypesTest, extFromFileNameTestSuccess)
 {
-	ASSERT_EQ(wasp::mime::internal::getExtFromFileName("foo.bar"), "bar");
-	ASSERT_EQ(wasp::mime::internal::getExtFromFileName(".bar"), "bar");
+	ASSERT_EQ(wasp::mime::extFromFileName("foo.bar"), "bar");
+	ASSERT_EQ(wasp::mime::extFromFileName(".bar"), "bar");
 }
 
-TEST(MimeTypesTest, getExtFromFileNameTestNoExtension)
+TEST(MimeTypesTest, extFromFileNameTestNoExtension)
 {
-	ASSERT_EQ(wasp::mime::internal::getExtFromFileName("foo"), "");
-	ASSERT_EQ(wasp::mime::internal::getExtFromFileName("bar"), "");
+	ASSERT_EQ(wasp::mime::extFromFileName("foo"), "");
+	ASSERT_EQ(wasp::mime::extFromFileName("bar"), "");
 }
 
-TEST(MimeTypesTest, getExtFromFileNameTestEmptyExtension)
+TEST(MimeTypesTest, extFromFileNameTestEmptyExtension)
 {
-	ASSERT_EQ(wasp::mime::internal::getExtFromFileName("foo."), "");
-	ASSERT_EQ(wasp::mime::internal::getExtFromFileName("bar."), "");
+	ASSERT_EQ(wasp::mime::extFromFileName("foo."), "");
+	ASSERT_EQ(wasp::mime::extFromFileName("bar."), "");
 }
 
-TEST(MimeTypesTest, getExtensionFromPathTestSuccess)
+// Testing 'extFromPath' function.
+TEST(MimeTypesTest, extFromPathTestSuccessWithSlashes)
 {
-	ASSERT_EQ(wasp::mime::getExtensionFromPath("foo.bar"), "bar");
-	ASSERT_EQ(wasp::mime::getExtensionFromPath("path/to/foo.bar"), "bar");
-	ASSERT_EQ(wasp::mime::getExtensionFromPath("/foo.bar"), "bar");
-	ASSERT_EQ(wasp::mime::getExtensionFromPath("./foo.bar"), "bar");
-	ASSERT_EQ(wasp::mime::getExtensionFromPath("./.foo.bar"), "bar");
+	ASSERT_EQ(wasp::mime::extFromPath("path/to/foo.bar"), "bar");
+	ASSERT_EQ(wasp::mime::extFromPath("/foo.bar"), "bar");
+	ASSERT_EQ(wasp::mime::extFromPath("./foo.bar"), "bar");
+	ASSERT_EQ(wasp::mime::extFromPath("./.foo.bar"), "bar");
 }
 
-TEST(MimeTypesTest, getExtensionFromPathTestNoExtension)
+TEST(MimeTypesTest, extFromPathTestSuccessWithoutSlashes)
 {
-	ASSERT_EQ(wasp::mime::getExtensionFromPath("foo"), "");
-	ASSERT_EQ(wasp::mime::getExtensionFromPath("path/to/foo"), "");
-	ASSERT_EQ(wasp::mime::getExtensionFromPath("/foo"), "");
-	ASSERT_EQ(wasp::mime::getExtensionFromPath("./foo"), "");
+	ASSERT_EQ(wasp::mime::extFromPath("foo.bar"), "bar");
+	ASSERT_EQ(wasp::mime::extFromPath(".foo.bar"), "bar");
+	ASSERT_EQ(wasp::mime::extFromPath("....foo.bar"), "bar");
 }
 
-TEST(MimeTypesTest, getExtensionFromPathTestEmptyExtension)
+TEST(MimeTypesTest, extFromPathTestNoExtension)
 {
-	ASSERT_EQ(wasp::mime::getExtensionFromPath("foo."), "");
-	ASSERT_EQ(wasp::mime::getExtensionFromPath("path/to/foo."), "");
-	ASSERT_EQ(wasp::mime::getExtensionFromPath("/foo."), "");
-	ASSERT_EQ(wasp::mime::getExtensionFromPath("./foo."), "");
-	ASSERT_EQ(wasp::mime::getExtensionFromPath("./.foo."), "");
-	ASSERT_EQ(wasp::mime::getExtensionFromPath("../.foo."), "");
+	ASSERT_EQ(wasp::mime::extFromPath("foo"), "");
+	ASSERT_EQ(wasp::mime::extFromPath("path/to/foo"), "");
+	ASSERT_EQ(wasp::mime::extFromPath("/foo"), "");
+	ASSERT_EQ(wasp::mime::extFromPath("./foo"), "");
+}
+
+TEST(MimeTypesTest, extFromPathTestEmptyExtension)
+{
+	ASSERT_EQ(wasp::mime::extFromPath("foo."), "");
+	ASSERT_EQ(wasp::mime::extFromPath("path/to/foo."), "");
+	ASSERT_EQ(wasp::mime::extFromPath("/foo."), "");
+	ASSERT_EQ(wasp::mime::extFromPath("./foo."), "");
+	ASSERT_EQ(wasp::mime::extFromPath("./.foo."), "");
+	ASSERT_EQ(wasp::mime::extFromPath("../.foo."), "");
+}
+
+// Testing 'guessContentType' function.
+TEST(MimeTypesTest, guessContentTypeTestAll)
+{
+	std::string type, encoding;
+
+	for (auto it = wasp::mime::TYPES_MAP.cbegin(); it != wasp::mime::TYPES_MAP.cend(); it++)
+	{
+		wasp::mime::guessContentType("./file" + it->first, type, encoding);
+		ASSERT_EQ(type, it->second);
+	}
+}
+
+TEST(MimeTypesTest, guessContentTypeTestTextSVGZ)
+{
+	std::string type, encoding;
+
+	wasp::mime::guessContentType("path/to/backup.svgz", type, encoding);
+	ASSERT_EQ(type, "application/gzip");
+	ASSERT_EQ(encoding, "gzip");
+}
+
+TEST(MimeTypesTest, guessContentTypeTestTextTGZ)
+{
+	std::string type, encoding;
+
+	wasp::mime::guessContentType("path/to/backup.tgz", type, encoding);
+	ASSERT_EQ(type, "application/gzip");
+	ASSERT_EQ(encoding, "gzip");
+}
+
+TEST(MimeTypesTest, guessContentTypeTestTextTAZ)
+{
+	std::string type, encoding;
+
+	wasp::mime::guessContentType("path/to/backup.taz", type, encoding);
+	ASSERT_EQ(type, "application/gzip");
+	ASSERT_EQ(encoding, "gzip");
+}
+
+TEST(MimeTypesTest, guessContentTypeTestTextTZ)
+{
+	std::string type, encoding;
+
+	wasp::mime::guessContentType("path/to/backup.tz", type, encoding);
+	ASSERT_EQ(type, "application/gzip");
+	ASSERT_EQ(encoding, "gzip");
+}
+
+TEST(MimeTypesTest, guessContentTypeTestTextTBZ2)
+{
+	std::string type, encoding;
+
+	wasp::mime::guessContentType("path/to/backup.tbz2", type, encoding);
+	ASSERT_EQ(type, "application/octet-stream");
+	ASSERT_EQ(encoding, "bzip2");
+}
+
+TEST(MimeTypesTest, guessContentTypeTestTextTXZ)
+{
+	std::string type, encoding;
+
+	wasp::mime::guessContentType("path/to/backup.txz", type, encoding);
+	ASSERT_EQ(type, "application/x-xz");
+	ASSERT_EQ(encoding, "xz");
+}
+
+TEST(MimeTypesTest, guessContentTypeTestTextZ)
+{
+	std::string type, encoding;
+
+	wasp::mime::guessContentType("path/to/backup.Z", type, encoding);
+	ASSERT_EQ(type, "application/x-z");
+	ASSERT_EQ(encoding, "compress");
 }
 
 #endif // WASP_UNIT_TESTS_MIME_TYPES_TESTS_H

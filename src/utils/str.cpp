@@ -19,12 +19,14 @@
  * TODO: write docs.
  */
 
-#include "str_utils.h"
+#include <iostream>
+
+#include "str.h"
 
 
-__INTERNAL_BEGIN__
+__UTILS_STR_INTERNAL_BEGIN__
 
-int normalize(double* val)
+int normalizeExp(double* val)
 {
 	int exponent = 0;
 	double value = *val;
@@ -101,10 +103,10 @@ std::string _format(char const* fmt, va_list args)
 									tempStream.clear();
 									break;
 								case 'f':
-									tempArg = ftoaFixed(va_arg(args, double));
+									tempArg = wasp::str::ftoaFixed(va_arg(args, double));
 									break;
 								case 'e':
-									tempArg = ftoaSci(va_arg(args, double));
+									tempArg = wasp::str::ftoaSci(va_arg(args, double));
 									break;
 							}
 							values[lastNumber] = tempArg;
@@ -141,10 +143,10 @@ std::string _format(char const* fmt, va_list args)
 	return stream.str();
 }
 
-__INTERNAL_END__
+__UTILS_STR_INTERNAL_END__
 
 
-__WASP_BEGIN__
+__UTILS_STR_BEGIN__
 
 std::string ftoaFixed(double value)
 {
@@ -160,7 +162,7 @@ std::string ftoaFixed(double value)
 		value = -value;
 	}
 
-	int exponent = internal::normalize(&value);
+	int exponent = wasp::str::internal::normalizeExp(&value);
 	int places = 0;
 	static const int width = 4;
 
@@ -206,7 +208,7 @@ std::string ftoaSci(double value)
 		value = -value;
 	}
 	static const int width = 4;
-	int exponent = internal::normalize(&value);
+	int exponent = wasp::str::internal::normalizeExp(&value);
 	int digit = value * 10.0;
 	result += std::to_string(digit) + '0';
 	value = value * 10.0 - digit;
@@ -227,9 +229,53 @@ std::string format(const char* fmt, ...)
 {
 	va_list args;
 	va_start(args, fmt);
-	std::string result = internal::_format(fmt, args);
+	std::string result = wasp::str::internal::_format(fmt, args);
 	va_end(args);
 	return result;
 }
 
-__WASP_END__
+void urlSplitType(const std::string& url, std::string& scheme, std::string& data)
+{
+	bool _break = false, colonFound = false;
+	auto it = url.begin();
+	while (it != url.end() && !_break)
+	{
+		switch (*it)
+		{
+			case '/':
+				_break = true;
+				break;
+			case ':':
+				colonFound = true;
+				_break = true;
+				break;
+			default:
+				scheme += *it;
+				break;
+		}
+		it++;
+	}
+	if (!scheme.empty() && colonFound)
+	{
+		data = std::string(it, url.end());
+	}
+	else
+	{
+		scheme = "";
+		data = url;
+	}
+}
+
+bool contains(const std::string& _str, char _char)
+{
+	return _str.find(_char) != std::string::npos;
+}
+
+std::string lower(const std::string& _str)
+{
+	std::string res(_str);
+	std::transform(res.begin(), res.end(), res.begin(), [](unsigned char c){ return std::tolower(c); });
+	return res;
+}
+
+__UTILS_STR_END__

@@ -15,9 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * mime_types definition.
- * TODO: write docs.
+/* Guess the MIME type of a file.
+ *
+ * Variables:
+ *
+ * SUFFIX_MAP -- dictionary mapping suffixes to suffixes
+ * ENCODINGS_MAP -- dictionary mapping suffixes to encodings
+ * TYPES_MAP -- dictionary mapping suffixes to types
+ *
+ *
+ * Functions:
+ *
+ * std::string extFromPath(const std::string& path) - retrieves an extension from file path.
+ *
+ * void guessContentType(const std::string& _path, std::string& type, std::string& encoding) -- guess
+ *  the MIME type and encoding of a URL.
  */
 
 #ifndef WASP_UTILS_MIME_TYPES_H
@@ -26,26 +38,32 @@
 #include <string>
 
 #include "../globals.h"
+#include "str.h"
+#include "query_dict.h"
+#include "path.h"
 
 
 __MIME_BEGIN__
 
-namespace internal
-{
+// Returns extension from file name,
+// i.e. 'foo.bar' - 'bar' will be returned.
+extern std::string extFromFileName(const std::string& fileName);
 
-std::string getExtFromFileName(const std::string& fileName);
+// Returns extension from file path,
+// i.e. 'path/to/foo.bar' - 'bar' will be returned.
+extern std::string extFromPath(const std::string& path);
 
-}
+// Returns content type from file path.
+extern void guessContentType(const std::string& _path, std::string& type, std::string& encoding);
 
-std::string getExtensionFromPath(const std::string& path);
+extern QueryDict<std::string, std::string> SUFFIX_MAP;
 
-std::string lookup(const std::string& str);
+extern QueryDict<std::string, std::string> ENCODINGS_MAP;
 
-std::string contentType(const std::string& str);
-
-std::string extension(const std::string& type);
-
-std::string charset(const std::string& type);
+// Before adding new types, make sure they are either registered with IANA,
+// at http://www.iana.org/assignments/media-types
+// or extensions, i.e. using the x- prefix
+extern QueryDict<std::string, std::string> TYPES_MAP;
 
 __MIME_END__
 
