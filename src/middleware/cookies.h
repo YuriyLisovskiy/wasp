@@ -27,7 +27,7 @@
 #include "middleware_mixin.h"
 #include "../http/request.h"
 #include "../http/response.h"
-#include "../utils/dict.h"
+#include "../collections/dict.h"
 #include "../http/parsers/cookie_parser.h"
 
 

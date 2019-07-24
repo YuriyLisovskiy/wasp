@@ -24,7 +24,7 @@
 #define WASP_HTTP_STATUS_H
 
 #include "../globals.h"
-#include "../utils/dict.h"
+#include "../collections/dict.h"
 
 
 __INTERNAL_BEGIN__

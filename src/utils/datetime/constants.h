@@ -25,7 +25,7 @@
 #include <map>
 
 #include "../../globals.h"
-#include "../dict.h"
+#include "../../collections/dict.h"
 
 
 __DATETIME_BEGIN__

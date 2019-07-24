@@ -39,7 +39,7 @@
 
 #include "../globals.h"
 #include "str.h"
-#include "dict.h"
+#include "../collections/dict.h"
 #include "path.h"
 
 

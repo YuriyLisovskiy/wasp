@@ -28,7 +28,7 @@
 #include <map>
 
 #include "../globals.h"
-#include "../utils/dict.h"
+#include "../collections/dict.h"
 
 
 __WASP_BEGIN__

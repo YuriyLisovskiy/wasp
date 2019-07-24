@@ -34,7 +34,7 @@ __WASP_BEGIN__
 template <typename _Key, typename _Val>
 class Dict
 {
-private:
+protected:
 	bool _isMutable;
 	std::map<_Key, _Val> _map;
 
@@ -70,7 +70,7 @@ public:
 		this->_map = srcMap;
 	}
 
-	_Val get(_Key key, _Val _default)
+	virtual _Val get(_Key key, _Val _default)
 	{
 		if (this->contains(key))
 		{
@@ -79,7 +79,7 @@ public:
 		return _default;
 	}
 
-	void set(_Key key, _Val value)
+	virtual void set(_Key key, _Val value)
 	{
 		if (!this->_isMutable)
 		{
@@ -88,18 +88,26 @@ public:
 		this->_map[key] = value;
 	}
 
-	void remove(_Key key)
+	virtual void remove(_Key key)
 	{
 		if (!this->_isMutable)
 		{
 			this->_throw("remove value", _ERROR_DETAILS_);
 		}
-		this->_map.erase(key);
+		if (this->contains(key))
+		{
+			this->_map.erase(key);
+		}
 	}
 
-	bool contains(_Key key)
+	virtual bool contains(_Key key)
 	{
 		return this->_map.find(key) != this->_map.end();
+	}
+
+	bool isMutable()
+	{
+		return this->_isMutable;
 	}
 
 	bool isEmpty()

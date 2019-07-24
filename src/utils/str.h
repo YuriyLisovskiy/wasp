@@ -34,7 +34,7 @@
 #include <algorithm>
 
 #include "../globals.h"
-#include "dict.h"
+#include "../collections/dict.h"
 
 
 __UTILS_STR_INTERNAL_BEGIN__
