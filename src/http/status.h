@@ -24,12 +24,12 @@
 #define WASP_HTTP_STATUS_H
 
 #include "../globals.h"
-#include "../utils/query_dict.h"
+#include "../utils/dict.h"
 
 
 __INTERNAL_BEGIN__
 
-extern QueryDict<unsigned short int, std::pair<std::string, std::string>> HTTP_STATUS;
+extern Dict<unsigned short int, std::pair<std::string, std::string>> HTTP_STATUS;
 
 __INTERNAL_END__
 

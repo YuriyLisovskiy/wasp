@@ -36,7 +36,7 @@ wasp::HttpResponseBase* handler(wasp::HttpRequest& request)
 		begin++;
 	}
 
-	std::cout << request.body() << "\n";
+//	std::cout << request.body() << "\n";
 
 //	for (auto it = request.COOKIES.cbegin(); it != request.COOKIES.cend(); it++)
 //	{
@@ -58,7 +58,7 @@ int main()
 	{
 		wasp::internal::HttpServer::Context ctx{};
 		ctx.handler = handler;
-		ctx.port = 8000;
+		ctx.port = 3000;
 
 		wasp::internal::HttpServer server(ctx);
 

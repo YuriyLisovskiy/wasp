@@ -33,7 +33,7 @@ HttpResponseBase::HttpResponseBase(
 )
 {
 	this->_streaming = false;
-	this->_headers = QueryDict<std::string, std::string>(true);
+	this->_headers = Dict<std::string, std::string>(true);
 	this->_closed = false;
 
 	if (status != 0)
@@ -112,11 +112,7 @@ std::string HttpResponseBase::getReasonPhrase()
 	{
 		return this->_reasonPhrase;
 	}
-	if (internal::HTTP_STATUS.contains(this->_status))
-	{
-		return internal::HTTP_STATUS.get(this->_status).first;
-	}
-	return "Unknown Status Code";
+	return internal::HTTP_STATUS.get(this->_status, {"Unknown Status Code", ""}).first;
 }
 
 void HttpResponseBase::setReasonPhrase(std::string value)

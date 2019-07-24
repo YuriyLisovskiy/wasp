@@ -65,15 +65,15 @@ WaspHttpError::WaspHttpError(const std::string& message, int line, const char *f
 {
 }
 
-// QueryDictError
-QueryDictError::QueryDictError(const char* message, int line, const char* function, const char* file)
+// DictError
+DictError::DictError(const char* message, int line, const char* function, const char* file)
 	: WaspException(message, line, function, file)
 {
-	this->_exceptionType = "QueryDictError";
+	this->_exceptionType = "DictError";
 }
 
-QueryDictError::QueryDictError(const std::string& message, int line, const char *function, const char *file)
-	: QueryDictError(message.c_str(), line, function, file)
+	DictError::DictError(const std::string& message, int line, const char *function, const char *file)
+	: DictError(message.c_str(), line, function, file)
 {
 }
 

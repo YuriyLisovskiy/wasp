@@ -34,7 +34,7 @@
 #include <algorithm>
 
 #include "../globals.h"
-#include "query_dict.h"
+#include "dict.h"
 
 
 __UTILS_STR_INTERNAL_BEGIN__
@@ -93,7 +93,7 @@ std::string join(const std::string& delimiter, std::vector<_T> array)
 }
 
 template <typename _Key, typename _Val>
-std::string join(const std::string& delimiter, QueryDict<_Key, _Val> _qd, std::function<std::string(std::pair<_Key, _Val>)> expr)
+std::string join(const std::string& delimiter, Dict<_Key, _Val> _qd, std::function<std::string(std::pair<_Key, _Val>)> expr)
 {
 	std::string result;
 	for (auto it = _qd.cbegin(); it != _qd.cend(); it++)

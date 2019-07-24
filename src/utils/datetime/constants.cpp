@@ -24,7 +24,7 @@
 
 __INTERNAL_BEGIN__
 
-QueryDict<std::string, int> TZ_TO_OFFSET(std::map<std::string, int> {
+Dict<std::string, int> TZ_TO_OFFSET(std::map<std::string, int> {
 		{"Etc/GMT+12", -43200},                       // GMT-12:00
 		{"Etc/GMT+11", -39600},                       // GMT-11:00
 		{"Pacific/Midway", -39600},                   // Samoa Standard Time

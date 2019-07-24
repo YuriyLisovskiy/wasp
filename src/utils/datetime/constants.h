@@ -25,7 +25,7 @@
 #include <map>
 
 #include "../../globals.h"
-#include "../query_dict.h"
+#include "../dict.h"
 
 
 __DATETIME_BEGIN__
@@ -41,7 +41,7 @@ __DATETIME_END__
 
 __INTERNAL_BEGIN__
 
-extern QueryDict<std::string, int> TZ_TO_OFFSET;
+extern Dict<std::string, int> TZ_TO_OFFSET;
 
 __INTERNAL_END__
 

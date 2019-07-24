@@ -84,35 +84,24 @@ void guessContentType(const std::string& _path, std::string& type, std::string& 
 		path::splitText(url, base, ext);
 		while (SUFFIX_MAP.contains(ext))
 		{
-			path::splitText(base + SUFFIX_MAP.get(ext), base, ext);
+			path::splitText(base + SUFFIX_MAP.get(ext, ""), base, ext);
 		}
-		if (ENCODINGS_MAP.contains(ext))
-		{
-			encoding = ENCODINGS_MAP.get(ext);
+		encoding = ENCODINGS_MAP.get(ext, "");
 		//	path::splitText(base, base, ext);
-		}
-		else
-		{
-			encoding = "";
-		}
 
 		std::string lowerExt = str::lower(ext);
 		if (TYPES_MAP.contains(ext))
 		{
-			type = TYPES_MAP.get(ext);
-		}
-		else if (TYPES_MAP.contains(lowerExt))
-		{
-			type = TYPES_MAP.get(lowerExt);
+			type = TYPES_MAP.get(ext, "");
 		}
 		else
 		{
-			type = "";
+			type = TYPES_MAP.get(lowerExt, "");
 		}
 	}
 }
 
-QueryDict<std::string, std::string> SUFFIX_MAP({
+Dict<std::string, std::string> SUFFIX_MAP({
 	{".svgz", ".svg.gz"},
 	{".tgz", ".tar.gz"},
 	{".taz", ".tar.gz"},
@@ -121,7 +110,7 @@ QueryDict<std::string, std::string> SUFFIX_MAP({
 	{".txz", ".tar.xz"}
 });
 
-QueryDict<std::string, std::string> ENCODINGS_MAP({
+Dict<std::string, std::string> ENCODINGS_MAP({
 	{".gz", "gzip"},
 	{".Z", "compress"},
 	{".bz2", "bzip2"},
@@ -129,7 +118,7 @@ QueryDict<std::string, std::string> ENCODINGS_MAP({
 });
 
 // If you add to these, please keep them sorted!
-QueryDict<std::string, std::string> TYPES_MAP({
+Dict<std::string, std::string> TYPES_MAP({
 	{".3gp", "video/3gpp"},
 	{".3gpp", "video/3gpp"},
 	{".7z", "application/x-7z-compressed"},

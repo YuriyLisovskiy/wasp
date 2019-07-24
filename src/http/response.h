@@ -48,8 +48,8 @@ __WASP_BEGIN__
 class HttpResponseBase
 {
 protected:
-	QueryDict<std::string, std::string> _headers;
-	QueryDict<std::string, Cookie> _cookies;
+	Dict<std::string, std::string> _headers;
+	Dict<std::string, Cookie> _cookies;
 	std::string _body;
 	bool _closed;
 	unsigned short int _status;

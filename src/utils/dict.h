@@ -32,7 +32,7 @@
 __WASP_BEGIN__
 
 template <typename _Key, typename _Val>
-class QueryDict
+class Dict
 {
 private:
 	bool _isMutable;
@@ -40,8 +40,8 @@ private:
 
 	void _throw(const std::string& msg, int line, const char* function, const char* file)
 	{
-		throw QueryDictError(
-			std::string("unable to ") + msg + std::string(", instance is immutable"), line, function, file
+		throw DictError(
+			std::string("unable to ") + msg + std::string(", Dict instance is immutable"), line, function, file
 		);
 	}
 
@@ -52,27 +52,31 @@ public:
 	typedef typename std::map<_Key, _Val>::iterator iterator;
 	typedef typename std::map<_Key, _Val>::reverse_iterator reverse_iterator;
 
-	QueryDict() : _isMutable(false)
+	Dict() : _isMutable(false)
 	{
 	}
 
-	explicit QueryDict(bool isMutable) : _isMutable(isMutable)
+	explicit Dict(bool isMutable) : _isMutable(isMutable)
 	{
 	}
 
-	explicit QueryDict(const std::map<_Key, _Val>& srcMap) : _isMutable(false)
+	explicit Dict(const std::map<_Key, _Val>& srcMap) : _isMutable(false)
 	{
 		this->_map = srcMap;
 	}
 
-	QueryDict(const std::map<_Key, _Val>& srcMap, bool isMutable) : _isMutable(isMutable)
+	Dict(const std::map<_Key, _Val>& srcMap, bool isMutable) : _isMutable(isMutable)
 	{
 		this->_map = srcMap;
 	}
 
-	_Val get(_Key key)
+	_Val get(_Key key, _Val _default)
 	{
-		return this->_map[key];
+		if (this->contains(key))
+		{
+			return this->_map[key];
+		}
+		return _default;
 	}
 
 	void set(_Key key, _Val value)

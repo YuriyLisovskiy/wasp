@@ -56,11 +56,11 @@ public:
 	WaspHttpError(const std::string& message, int line, const char* function, const char* file);
 };
 
-class QueryDictError : public WaspException
+class DictError : public WaspException
 {
 public:
-	QueryDictError(const char* message, int line, const char* function, const char* file);
-	QueryDictError(const std::string& message, int line, const char* function, const char* file);
+	DictError(const char* message, int line, const char* function, const char* file);
+	DictError(const std::string& message, int line, const char* function, const char* file);
 };
 
 class CookieError : public WaspException
