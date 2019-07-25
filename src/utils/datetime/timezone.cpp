@@ -49,14 +49,7 @@ TimeZone::TimeZone(int offset, std::string name) : _offset(offset), _name(std::m
 
 TimeZone::TimeZone(const std::string& name) : _name(name)
 {
-	if (internal::TZ_TO_OFFSET.contains(name))
-	{
-		this->_offset = internal::TZ_TO_OFFSET.get(name);
-	}
-	else
-	{
-		this->_offset = 0;
-	}
+	this->_offset = internal::TZ_TO_OFFSET.get(name, 0);
 }
 
 int TimeZone::getOffset(Units units = Units::SECONDS)

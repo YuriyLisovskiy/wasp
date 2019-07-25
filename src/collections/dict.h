@@ -32,16 +32,16 @@
 __WASP_BEGIN__
 
 template <typename _Key, typename _Val>
-class QueryDict
+class Dict
 {
-private:
+protected:
 	bool _isMutable;
 	std::map<_Key, _Val> _map;
 
-	void _throw(const std::string& msg, int line, const char* function, const char* file)
+	virtual void _throw(const std::string& msg, int line, const char* function, const char* file)
 	{
-		throw QueryDictError(
-			std::string("unable to ") + msg + std::string(", instance is immutable"), line, function, file
+		throw DictError(
+			std::string("unable to ") + msg + std::string(", Dict instance is immutable"), line, function, file
 		);
 	}
 
@@ -52,30 +52,34 @@ public:
 	typedef typename std::map<_Key, _Val>::iterator iterator;
 	typedef typename std::map<_Key, _Val>::reverse_iterator reverse_iterator;
 
-	QueryDict() : _isMutable(false)
+	Dict() : _isMutable(false)
 	{
 	}
 
-	explicit QueryDict(bool isMutable) : _isMutable(isMutable)
+	explicit Dict(bool isMutable) : _isMutable(isMutable)
 	{
 	}
 
-	explicit QueryDict(const std::map<_Key, _Val>& srcMap) : _isMutable(false)
-	{
-		this->_map = srcMap;
-	}
-
-	QueryDict(const std::map<_Key, _Val>& srcMap, bool isMutable) : _isMutable(isMutable)
+	explicit Dict(const std::map<_Key, _Val>& srcMap) : _isMutable(false)
 	{
 		this->_map = srcMap;
 	}
 
-	_Val get(_Key key)
+	Dict(const std::map<_Key, _Val>& srcMap, bool isMutable) : _isMutable(isMutable)
 	{
-		return this->_map[key];
+		this->_map = srcMap;
 	}
 
-	void set(_Key key, _Val value)
+	virtual _Val get(_Key key, _Val _default = _Val())
+	{
+		if (this->contains(key))
+		{
+			return this->_map[key];
+		}
+		return _default;
+	}
+
+	virtual void set(_Key key, _Val value)
 	{
 		if (!this->_isMutable)
 		{
@@ -84,18 +88,36 @@ public:
 		this->_map[key] = value;
 	}
 
-	void remove(_Key key)
+	virtual void remove(_Key key)
 	{
 		if (!this->_isMutable)
 		{
 			this->_throw("remove value", _ERROR_DETAILS_);
 		}
-		this->_map.erase(key);
+		if (this->contains(key))
+		{
+			this->_map.erase(key);
+		}
 	}
 
-	bool contains(_Key key)
+	void clear()
+	{
+		this->_map.clear();
+	}
+
+	size_t size()
+	{
+		return this->_map.size();
+	}
+
+	virtual bool contains(_Key key)
 	{
 		return this->_map.find(key) != this->_map.end();
+	}
+
+	bool isMutable()
+	{
+		return this->_isMutable;
 	}
 
 	bool isEmpty()

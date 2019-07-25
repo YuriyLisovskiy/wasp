@@ -39,7 +39,7 @@
 
 #include "../globals.h"
 #include "str.h"
-#include "query_dict.h"
+#include "../collections/dict.h"
 #include "path.h"
 
 
@@ -56,14 +56,14 @@ extern std::string extFromPath(const std::string& path);
 // Returns content type from file path.
 extern void guessContentType(const std::string& _path, std::string& type, std::string& encoding);
 
-extern QueryDict<std::string, std::string> SUFFIX_MAP;
+extern Dict<std::string, std::string> SUFFIX_MAP;
 
-extern QueryDict<std::string, std::string> ENCODINGS_MAP;
+extern Dict<std::string, std::string> ENCODINGS_MAP;
 
 // Before adding new types, make sure they are either registered with IANA,
 // at http://www.iana.org/assignments/media-types
 // or extensions, i.e. using the x- prefix
-extern QueryDict<std::string, std::string> TYPES_MAP;
+extern Dict<std::string, std::string> TYPES_MAP;
 
 __MIME_END__
 

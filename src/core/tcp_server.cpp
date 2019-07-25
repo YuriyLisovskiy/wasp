@@ -37,7 +37,7 @@ TcpServer::TcpServer(TcpServer::Context ctx)
 
 	if (ctx.handler == nullptr)
 	{
-		throw std::invalid_argument("Context::handler can not be nullptr");
+		throw std::invalid_argument("Context::handler can not be null");
 	}
 
 	this->_handler = ctx.handler;
@@ -165,9 +165,16 @@ void TcpServer::serveConnection(const socket_t& connection)
 {
 	std::string data = TcpServer::recvAll(connection);
 
-	const std::string resp = this->_handler(data);
-
-	TcpServer::sendResponse(resp.c_str(), connection);
+	if (!data.empty())
+	{
+		const std::string resp = this->_handler(data);
+		TcpServer::sendResponse(resp.c_str(), connection);
+	}
+	else
+	{
+		// TODO: send error response
+		std::cout << "\n==============\n!Empty request!\n==============\n";
+	}
 
 	TcpServer::cleanUp(connection);
 }
@@ -178,10 +185,10 @@ std::string TcpServer::recvAll(const socket_t& connection)
 {
 	// TODO: helps to receive POST request body, remove it after fix
 	//  receiving problem, that is described above.
-	std::this_thread::sleep_for(std::chrono::milliseconds(20));
+	std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
 	msg_size_t msgSize = 0;
-//	unsigned long size = 0;
+	unsigned long size = 0;
 	std::string data;
 
 	char* buffer = (char*) calloc(MAX_BUFF_SIZE, sizeof(char));
@@ -191,7 +198,7 @@ std::string TcpServer::recvAll(const socket_t& connection)
 		if (msgSize > 0)
 		{
 			data.append(buffer, msgSize);
-//			size += msgSize;
+			size += msgSize;
 		}
 		else if (msgSize == -1)
 		{
@@ -201,6 +208,11 @@ std::string TcpServer::recvAll(const socket_t& connection)
 	while (msgSize == MAX_BUFF_SIZE);
 
 	free(buffer);
+
+	if (data.size() != size)
+	{
+		this->_logger->error("Invalid request data total size");
+	}
 	return data;
 }
 

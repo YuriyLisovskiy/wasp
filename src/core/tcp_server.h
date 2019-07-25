@@ -82,7 +82,7 @@ typedef ssize_t msg_size_t;
 
 #endif
 
-#define MAX_BUFF_SIZE 8192
+#define MAX_BUFF_SIZE 2048
 
 typedef std::function<const std::string(const std::string&)> tcpHandler;
 

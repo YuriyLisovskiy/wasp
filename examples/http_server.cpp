@@ -27,16 +27,16 @@
 wasp::HttpResponseBase* handler(wasp::HttpRequest& request)
 {
 	std::cout << "\n" << request.method() << " " << request.path() << " " << request.version() << "\n";
-	auto begin = request.headers.cbegin();
-	auto end = request.headers.cend();
+//	auto begin = request.headers.cbegin();
+//	auto end = request.headers.cend();
 
-	while (begin != end)
-	{
-		std::cout << (*begin).first << ": " << (*begin).second << '\n';
-		begin++;
-	}
+//	while (begin != end)
+//	{
+//		std::cout << (*begin).first << ": " << (*begin).second << '\n';
+//		begin++;
+//	}
 
-	std::cout << request.body() << "\n";
+//	std::cout << request.body() << "\n";
 
 //	for (auto it = request.COOKIES.cbegin(); it != request.COOKIES.cend(); it++)
 //	{
@@ -58,7 +58,7 @@ int main()
 	{
 		wasp::internal::HttpServer::Context ctx{};
 		ctx.handler = handler;
-		ctx.port = 8000;
+		ctx.port = 3000;
 
 		wasp::internal::HttpServer server(ctx);
 

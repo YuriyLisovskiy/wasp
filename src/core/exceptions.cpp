@@ -1,3 +1,5 @@
+#include <utility>
+
 /*
  * Copyright (c) 2019 Yuriy Lisovskiy
  *
@@ -26,62 +28,101 @@
 __WASP_BEGIN__
 
 
-// Base Wasp exception
-WaspException::WaspException(const char *message, int line, const char *function, const char *file)
-	: _message(message), _line(line), _function(function), _file(file)
+// Base WaspError
+WaspError::WaspError(const char* message, int line, const char* function, const char* file)
+	: _message(message), _line(line), _function(function), _file(file), _exceptionType("WaspError")
 {
-	this->_exceptionType = "WaspException";
+	this->init();
 }
 
-const char* WaspException::what() const noexcept
+WaspError::WaspError(const char *message, int line, const char *function, const char *file, const char* exceptionType)
+	: _message(message), _line(line), _function(function), _file(file), _exceptionType(exceptionType)
 {
-	return (std::string(this->_exceptionType) + ": " + std::string(this->_message)).c_str();
+	this->init();
 }
 
-const int WaspException::line() const noexcept
+void WaspError::init()
+{
+	this->_fullMessage = this->_exceptionType + ": " + std::string(this->_message);
+}
+
+const char* WaspError::what() const noexcept
+{
+	return this->_fullMessage.c_str();
+}
+
+const int WaspError::line() const noexcept
 {
 	return this->_line;
 }
 
-const char* WaspException::function() const noexcept
+const char* WaspError::function() const noexcept
 {
 	return this->_function;
 }
 
-const char* WaspException::file() const noexcept
+const char* WaspError::file() const noexcept
 {
 	return this->_file;
 }
 
-// WaspHttpError
-WaspHttpError::WaspHttpError(const char* message, int line, const char* function, const char* file)
-	: WaspException(message, line, function, file)
-{
-	this->_exceptionType = "WaspHttpError";
-}
-
-WaspHttpError::WaspHttpError(const std::string& message, int line, const char *function, const char *file)
-	: WaspHttpError(message.c_str(), line, function, file)
+// HttpError
+HttpError::HttpError(const char* message, int line, const char* function, const char* file, const char* type)
+	: WaspError(message, line, function, file, type)
 {
 }
 
-// QueryDictError
-QueryDictError::QueryDictError(const char* message, int line, const char* function, const char* file)
-	: WaspException(message, line, function, file)
+HttpError::HttpError(const char* message, int line, const char* function, const char* file)
+	: HttpError(message, line, function, file, "HttpError")
 {
-	this->_exceptionType = "QueryDictError";
 }
 
-QueryDictError::QueryDictError(const std::string& message, int line, const char *function, const char *file)
-	: QueryDictError(message.c_str(), line, function, file)
+HttpError::HttpError(const std::string& message, int line, const char *function, const char *file)
+	: HttpError(message.c_str(), line, function, file)
+{
+}
+
+// DictError
+DictError::DictError(const char* message, int line, const char* function, const char* file, const char* type)
+	: WaspError(message, line, function, file, type)
+{
+}
+
+DictError::DictError(const char* message, int line, const char* function, const char* file)
+	: DictError(message, line, function, file, "DictError")
+{
+}
+
+	DictError::DictError(const std::string& message, int line, const char *function, const char *file)
+	: DictError(message.c_str(), line, function, file)
+{
+}
+
+// MultiValueDictError
+MultiValueDictError::MultiValueDictError(const char* message, int line, const char* function, const char* file, const char* type)
+	: DictError(message, line, function, file, type)
+{
+}
+
+MultiValueDictError::MultiValueDictError(const char* message, int line, const char* function, const char* file)
+	: MultiValueDictError(message, line, function, file, "MultiValueDictError")
+{
+}
+
+MultiValueDictError::MultiValueDictError(const std::string& message, int line, const char *function, const char *file)
+	: MultiValueDictError(message.c_str(), line, function, file)
 {
 }
 
 // CookieError
-CookieError::CookieError(const char* message, int line, const char* function, const char* file)
-	: WaspException(message, line, function, file)
+CookieError::CookieError(const char* message, int line, const char* function, const char* file, const char* type)
+	: WaspError(message, line, function, file, type)
 {
-	this->_exceptionType = "CookieError";
+}
+
+CookieError::CookieError(const char* message, int line, const char* function, const char* file)
+	: CookieError(message, line, function, file, "CookieError")
+{
 }
 
 CookieError::CookieError(const std::string& message, int line, const char *function, const char *file)
@@ -90,10 +131,14 @@ CookieError::CookieError(const std::string& message, int line, const char *funct
 }
 
 // ValueError
-ValueError::ValueError(const char* message, int line, const char* function, const char* file)
-	: WaspException(message, line, function, file)
+ValueError::ValueError(const char* message, int line, const char* function, const char* file, const char* type)
+	: WaspError(message, line, function, file, type)
 {
-	this->_exceptionType = "ValueError";
+}
+
+ValueError::ValueError(const char* message, int line, const char* function, const char* file)
+	: ValueError(message, line, function, file, "ValueError")
+{
 }
 
 ValueError::ValueError(const std::string& message, int line, const char *function, const char *file)

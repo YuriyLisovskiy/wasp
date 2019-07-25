@@ -24,13 +24,13 @@
 
 __INTERNAL_BEGIN__
 
-QueryDict<unsigned short int, std::pair<std::string, std::string>> HTTP_STATUS(
+Dict<unsigned short int, std::pair<std::string, std::string>> HTTP_STATUS(
 	std::map<unsigned short int, std::pair<std::string, std::string>>{
 
 		// Informational
-		{100, std::pair("Continue", "Request received, please continue")},
-		{101, std::pair("Switching Protocols", "Switching to new protocol; obey Upgrade header")},
-		{102, std::pair("Processing", "")},
+		{100, {"Continue", "Request received, please continue"}},
+		{101, {"Switching Protocols", "Switching to new protocol; obey Upgrade header"}},
+		{102, {"Processing", ""}},
 
 		// Success
 		{200, std::pair("OK", "Request fulfilled, document follows")},

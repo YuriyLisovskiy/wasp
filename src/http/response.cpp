@@ -33,7 +33,7 @@ HttpResponseBase::HttpResponseBase(
 )
 {
 	this->_streaming = false;
-	this->_headers = QueryDict<std::string, std::string>(true);
+	this->_headers = Dict<std::string, std::string>(true);
 	this->_closed = false;
 
 	if (status != 0)
@@ -112,11 +112,7 @@ std::string HttpResponseBase::getReasonPhrase()
 	{
 		return this->_reasonPhrase;
 	}
-	if (internal::HTTP_STATUS.contains(this->_status))
-	{
-		return internal::HTTP_STATUS.get(this->_status).first;
-	}
-	return "Unknown Status Code";
+	return internal::HTTP_STATUS.get(this->_status, {"Unknown Status Code", ""}).first;
 }
 
 void HttpResponseBase::setReasonPhrase(std::string value)
@@ -135,7 +131,7 @@ void HttpResponseBase::close()
 
 void HttpResponseBase::write(const std::string& content)
 {
-	throw WaspException("This HttpResponseBase instance is not writable", _ERROR_DETAILS_);
+	throw WaspError("This HttpResponseBase instance is not writable", _ERROR_DETAILS_);
 }
 
 void HttpResponseBase::flush()
@@ -144,7 +140,7 @@ void HttpResponseBase::flush()
 
 unsigned long int HttpResponseBase::tell()
 {
-	throw WaspException("This HttpResponseBase instance cannot tell its position", _ERROR_DETAILS_);
+	throw WaspError("This HttpResponseBase instance cannot tell its position", _ERROR_DETAILS_);
 }
 
 bool HttpResponseBase::readable()
@@ -164,7 +160,7 @@ bool HttpResponseBase::writable()
 
 void HttpResponseBase::writeLines(const std::vector<std::string>& lines)
 {
-	throw WaspException("This HttpResponseBase instance is not writable", _ERROR_DETAILS_);
+	throw WaspError("This HttpResponseBase instance is not writable", _ERROR_DETAILS_);
 }
 
 std::string HttpResponseBase::serializeHeaders()

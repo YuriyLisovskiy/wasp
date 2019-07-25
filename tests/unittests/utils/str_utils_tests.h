@@ -15,18 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * str_utils_tests
- * TODO: write docs.
- */
-
-#ifndef WASP_STR_UTILS_TESTS_H
-#define WASP_STR_UTILS_TESTS_H
+#ifndef WASP_UNIT_TESTS_UTILS_STR_TESTS_H
+#define WASP_UNIT_TESTS_UTILS_STR_TESTS_H
 
 #include <gtest/gtest.h>
 
+#include "../globals.h"
 #include "../../../src/utils/str.h"
 
+
+__UNIT_TESTS_BEGIN__
 
 TEST(StrUtilsUrlSplitTypeTestCase, TestSuccess)
 {
@@ -60,4 +58,7 @@ TEST(StrUtilsUrlSplitTypeTestCase, TestEmptyInput)
 	ASSERT_EQ(dataActual, "");
 }
 
-#endif // WASP_STR_UTILS_TESTS_H
+__UNIT_TESTS_END__
+
+
+#endif // WASP_UNIT_TESTS_UTILS_STR_TESTS_H
