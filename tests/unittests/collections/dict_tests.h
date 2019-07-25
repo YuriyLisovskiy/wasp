@@ -65,6 +65,26 @@ TEST(MutableDictTestCase, TestRemove)
 	ASSERT_EQ(testDict.get(1, 0), 0);
 }
 
+TEST(MutableDictTestCase, TestClear)
+{
+	wasp::Dict<int, int> testDict({
+		{1, 2}, {3, 4}
+	}, true);
+	ASSERT_FALSE(testDict.isEmpty());
+	testDict.clear();
+	ASSERT_TRUE(testDict.isEmpty());
+}
+
+TEST(MutableDictTestCase, TestSize)
+{
+	wasp::Dict<int, int> testDict(true);
+	ASSERT_EQ(testDict.size(), 0);
+	testDict.set(1, 2);
+	ASSERT_EQ(testDict.size(), 1);
+	testDict.set(2, 5);
+	ASSERT_EQ(testDict.size(), 2);
+}
+
 TEST(MutableDictTestCase, TestContains)
 {
 	wasp::Dict<int, int> testDict({

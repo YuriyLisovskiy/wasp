@@ -70,7 +70,7 @@ public:
 		this->_map = srcMap;
 	}
 
-	virtual _Val get(_Key key, _Val _default)
+	virtual _Val get(_Key key, _Val _default = _Val())
 	{
 		if (this->contains(key))
 		{
@@ -98,6 +98,16 @@ public:
 		{
 			this->_map.erase(key);
 		}
+	}
+
+	void clear()
+	{
+		this->_map.clear();
+	}
+
+	size_t size()
+	{
+		return this->_map.size();
 	}
 
 	virtual bool contains(_Key key)
