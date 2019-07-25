@@ -24,9 +24,11 @@
 #define WASP_MULTI_VALUE_DICT_H
 
 #include <vector>
+#include <initializer_list>
 
 #include "../globals.h"
 #include "dict.h"
+#include "../core/exceptions.h"
 
 
 __WASP_BEGIN__
@@ -37,14 +39,32 @@ class MultiValueDict : public Dict<_Key, std::vector<_Val>>
 protected:
 	void _throw(const std::string& msg, int line, const char* function, const char* file) override
 	{
-		throw MultiValueDict(
-				std::string("unable to ") + msg + std::string(", MultiValueDict instance is immutable"),
-				line, function, file
+		throw MultiValueDictError(
+			std::string("unable to ") + msg + std::string(", MultiValueDict instance is immutable"),
+			line, function, file
 		);
 	}
 
 public:
-	_Val get(_Key key, _Val _default) override
+	MultiValueDict() : Dict<_Key, std::vector<_Val>>()
+	{
+	}
+
+	explicit MultiValueDict(bool isMutable) : Dict<_Key, std::vector<_Val>>(isMutable)
+	{
+	}
+
+	explicit MultiValueDict(const std::map<_Key, std::vector<_Val>>& srcMap)
+		: Dict<_Key, std::vector<_Val>>(srcMap, false)
+	{
+	}
+
+	MultiValueDict(const std::map<_Key, std::vector<_Val>>& srcMap, bool isMutable)
+		: Dict<_Key, std::vector<_Val>>(srcMap, isMutable)
+	{
+	}
+
+	_Val get(_Key key, _Val _default = _Val())
 	{
 		if (this->contains(key))
 		{
@@ -57,16 +77,7 @@ public:
 		return _default;
 	}
 
-	void set(_Key key, _Val value) override
-	{
-		if (!this->_isMutable)
-		{
-			this->_throw("set new value", _ERROR_DETAILS_);
-		}
-		this->_map[key] = std::vector<_Val>{value};
-	}
-
-	std::vector<_Val> getList(_Key key, std::vector<_Val> _default = {})
+	std::vector<_Val> get(_Key key, std::vector<_Val> _default) override
 	{
 		if (this->contains(key))
 		{
@@ -79,16 +90,25 @@ public:
 		return _default;
 	}
 
-	void setList(_Key key, std::vector<_Val> list)
+	void set(_Key key, _Val value)
 	{
 		if (!this->_isMutable)
 		{
 			this->_throw("set new value", _ERROR_DETAILS_);
 		}
-		this->_map[key] = list;
+		this->_map[key] = std::vector<_Val>{value};
 	}
 
-	void appendList(_Key key, _Val val)
+	void set(_Key key, std::vector<_Val> value) override
+	{
+		if (!this->_isMutable)
+		{
+			this->_throw("set new value", _ERROR_DETAILS_);
+		}
+		this->_map[key] = value;
+	}
+
+	void append(_Key key, _Val val)
 	{
 		if (!this->_isMutable)
 		{
@@ -101,6 +121,25 @@ public:
 		else
 		{
 			this->set(key, val);
+		}
+	}
+
+	void append(_Key key, std::vector<_Val> vec)
+	{
+		if (!this->_isMutable)
+		{
+			this->_throw("append new value", _ERROR_DETAILS_);
+		}
+		if (this->contains(key))
+		{
+			for (const auto& item : vec)
+			{
+				this->_map[key].push_back(item);
+			}
+		}
+		else
+		{
+			this->set(key, vec);
 		}
 	}
 };
