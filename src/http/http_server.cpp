@@ -51,7 +51,7 @@ HttpServer::~HttpServer()
 	this->finish();
 }
 
-const std::string HttpServer::_tcpHandler(const std::string& data)
+std::string HttpServer::_tcpHandler(const std::string& data)
 {
 	try
 	{
@@ -60,26 +60,26 @@ const std::string HttpServer::_tcpHandler(const std::string& data)
 		measure.start();
 		// TODO: remove when release ------------------------^
 
-		HttpRequestParser parser;
-		HttpRequest request = parser.parse(data);
+		HttpRequest request = HttpRequestParser().parse(data);
 		HttpResponseBase* response = this->_httpHandler(request);
+
+		// WARNING! Probably not working for large responses.
+		std::string result = response->serialize();
+		delete response;
 
 		// TODO: remove when release -------------------------------------------------------------:
 		measure.end();
 		std::cout << '\n' << request.method() << " request took " << measure.elapsed() << " ms\n";
 		// TODO: remove when release -------------------------------------------------------------^
 
-		std::string result = response->serialize();
-		delete response;
-
 		return result;
 	}
 	catch (const wasp::WaspError& exc)
 	{
-		this->_logger->trace(exc.what(), exc.file(), exc.function(), exc.line());
+		this->_logger->trace(exc.what(), exc.line(), exc.function(), exc.file());
 
 		// TODO: send internal server error
-		return HttpResponse("<p>Internal Server Error</p>", 500).serialize();
+		return HttpResponse("<p style=\"font-size: 24px;\" >Internal Server Error</p>", 500).serialize();
 	}
 }
 

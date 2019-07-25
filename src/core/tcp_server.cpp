@@ -72,7 +72,7 @@ int TcpServer::init()
 	{
 		this->_logger->trace(
 			"Failed to initialize server at port " + std::to_string(ntohs(this->_socketAddr.sin_port)),
-			__FILE__, __FUNCTION__, __LINE__
+			_ERROR_DETAILS_
 		);
 		TcpServer::wsaCleanUp();
 		return INVALID_SOCKET;
@@ -82,7 +82,7 @@ int TcpServer::init()
 	{
 		this->_logger->trace(
 			"Failed to bind socket to port " + std::to_string(ntohs(this->_socketAddr.sin_port)),
-			__FILE__, __FUNCTION__, __LINE__
+			_ERROR_DETAILS_
 		);
 		TcpServer::cleanUp(this->_socket);
 		return SOCKET_ERROR;
@@ -92,7 +92,7 @@ int TcpServer::init()
 	{
 		this->_logger->trace(
 			"Failed to listen at port " + std::to_string(ntohs(this->_socketAddr.sin_port)),
-			__FILE__, __FUNCTION__, __LINE__
+			_ERROR_DETAILS_
 		);
 		return SOCKET_ERROR;
 	}
@@ -138,23 +138,23 @@ void TcpServer::startListener()
 			}
 			else
 			{
-				this->_logger->trace("Invalid socket connection", __FILE__, __FUNCTION__, __LINE__);
+				this->_logger->trace("Invalid socket connection", _ERROR_DETAILS_);
 			}
 		}
 		catch (const std::exception& exc)
 		{
-			this->_logger->trace(exc.what(), __FILE__, __FUNCTION__, __LINE__);
+			this->_logger->trace(exc.what(), _ERROR_DETAILS_);
 			listening = false;
 		}
 		catch (const char* exc)
 		{
-			this->_logger->trace(exc, __FILE__, __FUNCTION__, __LINE__);
+			this->_logger->trace(exc, _ERROR_DETAILS_);
 			listening = false;
 		}
 		catch (...)
 		{
 			this->_logger->trace(
-				"Error occurred while listening for socket connection", __FILE__, __FUNCTION__, __LINE__
+				"Error occurred while listening for socket connection", _ERROR_DETAILS_
 			);
 			listening = false;
 		}
@@ -163,19 +163,24 @@ void TcpServer::startListener()
 
 void TcpServer::serveConnection(const socket_t& connection)
 {
-	std::string data = TcpServer::recvAll(connection);
-
-	if (!data.empty())
+	try
 	{
-		const std::string resp = this->_handler(data);
-		TcpServer::sendResponse(resp.c_str(), connection);
-	}
-	else
-	{
-		// TODO: send error response
-		std::cout << "\n==============\n!Empty request!\n==============\n";
-	}
+		std::string data = TcpServer::recvAll(connection);
 
+		if (!data.empty())
+		{
+			std::string resp = this->_handler(data);
+			TcpServer::sendAll(resp.c_str(), connection);
+		}
+	}
+	catch (const WaspError& exc)
+	{
+		this->_logger->trace(exc.what(), exc.line(), exc.function(), exc.file());
+	}
+	catch (const std::exception& exc)
+	{
+		this->_logger->trace(exc.what(), _ERROR_DETAILS_);
+	}
 	TcpServer::cleanUp(connection);
 }
 
@@ -202,7 +207,8 @@ std::string TcpServer::recvAll(const socket_t& connection)
 		}
 		else if (msgSize == -1)
 		{
-			this->_logger->trace("Received message size is less than zero", __FILE__, __FUNCTION__, __LINE__);
+			free(buffer);
+			throw TcpError("Received message size is less than zero", _ERROR_DETAILS_);
 		}
 	}
 	while (msgSize == MAX_BUFF_SIZE);
@@ -211,17 +217,16 @@ std::string TcpServer::recvAll(const socket_t& connection)
 
 	if (data.size() != size)
 	{
-		this->_logger->error("Invalid request data total size");
+		throw TcpError("Invalid request data total size", _ERROR_DETAILS_);
 	}
 	return data;
 }
 
-void TcpServer::sendResponse(const char* data, const socket_t& connection)
+void TcpServer::sendAll(const char* data, const socket_t& connection)
 {
 	if (send(connection, data, std::strlen(data), 0) == SOCKET_ERROR)
 	{
-		this->_logger->trace("Failed to send bytes to socket connection", __FILE__, __FUNCTION__, __LINE__);
-		this->cleanUp(connection);
+		throw TcpError("Failed to send bytes to socket connection", _ERROR_DETAILS_);
 	}
 }
 
@@ -245,7 +250,7 @@ void TcpServer::cleanUp(const socket_t& socket)
 {
 	if (TcpServer::closeSocket(socket) == SOCKET_ERROR)
 	{
-		this->_logger->trace("Failed to close socket connection", __FILE__, __FUNCTION__, __LINE__);
+		this->_logger->trace("Failed to close socket connection", _ERROR_DETAILS_);
 	}
 	TcpServer::wsaCleanUp();
 }

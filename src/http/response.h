@@ -16,7 +16,7 @@
  */
 
 /*
- * HTTP/1.1 response base definition.
+ * HTTP/1.1 responses definition.
  * TODO: write docs
  */
 
@@ -96,14 +96,10 @@ public:
 	void setReasonPhrase(std::string value);
 
 	// These methods partially implement the file-like object interface.
-	virtual void close();
 	virtual void write(const std::string& content);
-	virtual void flush();
 	virtual unsigned long int tell();
 
 	// These methods partially implement a stream-like object interface.
-	virtual bool readable();
-	virtual bool seekable();
 	virtual bool writable();
 	virtual void writeLines(const std::vector<std::string>& lines);
 

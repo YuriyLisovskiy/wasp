@@ -124,33 +124,14 @@ void HttpResponseBase::setReasonPhrase(std::string value)
 	this->_reasonPhrase = value;
 }
 
-void HttpResponseBase::close()
-{
-	this->_closed = true;
-}
-
 void HttpResponseBase::write(const std::string& content)
 {
 	throw WaspError("This HttpResponseBase instance is not writable", _ERROR_DETAILS_);
 }
 
-void HttpResponseBase::flush()
-{
-}
-
 unsigned long int HttpResponseBase::tell()
 {
 	throw WaspError("This HttpResponseBase instance cannot tell its position", _ERROR_DETAILS_);
-}
-
-bool HttpResponseBase::readable()
-{
-	return false;
-}
-
-bool HttpResponseBase::seekable()
-{
-	return false;
 }
 
 bool HttpResponseBase::writable()

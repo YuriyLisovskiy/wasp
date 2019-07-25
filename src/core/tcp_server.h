@@ -54,6 +54,7 @@
 #include "../globals.h"
 #include "../utils/logger.h"
 #include "../conf/defaults.h"
+#include "exceptions.h"
 
 __INTERNAL_BEGIN__
 
@@ -84,7 +85,7 @@ typedef ssize_t msg_size_t;
 
 #define MAX_BUFF_SIZE 2048
 
-typedef std::function<const std::string(const std::string&)> tcpHandler;
+typedef std::function<std::string(const std::string&)> tcpHandler;
 
 class TcpServer
 {
@@ -95,14 +96,13 @@ private:
 	socket_t _socket;
 	sockaddr_in _socketAddr{};
 	ILogger* _logger;
-
 	void startListener();
 	void serveConnection(const socket_t& client);
-	void sendResponse(const char* data, const socket_t& connection);
 	static int closeSocket(const socket_t& socket);
 	static void wsaCleanUp();
 	void cleanUp(const socket_t& connection);
 	std::string recvAll(const socket_t& connection);
+	void sendAll(const char* data, const socket_t& connection);
 	int init();
 
 public:

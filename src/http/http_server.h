@@ -59,7 +59,7 @@ private:
 	TcpServer* _tcpServer;
 	httpHandler _httpHandler;
 
-	const std::string _tcpHandler(const std::string& data);
+	std::string _tcpHandler(const std::string& data);
 
 public:
 	struct Context
