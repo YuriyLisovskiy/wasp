@@ -131,7 +131,7 @@ void HttpResponseBase::close()
 
 void HttpResponseBase::write(const std::string& content)
 {
-	throw WaspException("This HttpResponseBase instance is not writable", _ERROR_DETAILS_);
+	throw WaspError("This HttpResponseBase instance is not writable", _ERROR_DETAILS_);
 }
 
 void HttpResponseBase::flush()
@@ -140,7 +140,7 @@ void HttpResponseBase::flush()
 
 unsigned long int HttpResponseBase::tell()
 {
-	throw WaspException("This HttpResponseBase instance cannot tell its position", _ERROR_DETAILS_);
+	throw WaspError("This HttpResponseBase instance cannot tell its position", _ERROR_DETAILS_);
 }
 
 bool HttpResponseBase::readable()
@@ -160,7 +160,7 @@ bool HttpResponseBase::writable()
 
 void HttpResponseBase::writeLines(const std::vector<std::string>& lines)
 {
-	throw WaspException("This HttpResponseBase instance is not writable", _ERROR_DETAILS_);
+	throw WaspError("This HttpResponseBase instance is not writable", _ERROR_DETAILS_);
 }
 
 std::string HttpResponseBase::serializeHeaders()

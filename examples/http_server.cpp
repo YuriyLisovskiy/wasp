@@ -27,14 +27,14 @@
 wasp::HttpResponseBase* handler(wasp::HttpRequest& request)
 {
 	std::cout << "\n" << request.method() << " " << request.path() << " " << request.version() << "\n";
-	auto begin = request.headers.cbegin();
-	auto end = request.headers.cend();
+//	auto begin = request.headers.cbegin();
+//	auto end = request.headers.cend();
 
-	while (begin != end)
-	{
-		std::cout << (*begin).first << ": " << (*begin).second << '\n';
-		begin++;
-	}
+//	while (begin != end)
+//	{
+//		std::cout << (*begin).first << ": " << (*begin).second << '\n';
+//		begin++;
+//	}
 
 //	std::cout << request.body() << "\n";
 

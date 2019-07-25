@@ -37,9 +37,12 @@ file(GLOB LIB_FILES
 	)
 
 file(GLOB TEST_FILES
+		"tests/unittests/*.h"
 		"tests/unittests/http/*.h"
 		"tests/unittests/http/parsers/*.h"
 		"tests/unittests/utils/*.h"
+		"tests/unittests/core/*.h"
+		"tests/unittests/core/exceptions/*.h"
 		"tests/unittests/collections/*.h"
 		"tests/*.h"
 	)

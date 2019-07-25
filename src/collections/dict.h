@@ -38,7 +38,7 @@ protected:
 	bool _isMutable;
 	std::map<_Key, _Val> _map;
 
-	void _throw(const std::string& msg, int line, const char* function, const char* file)
+	virtual void _throw(const std::string& msg, int line, const char* function, const char* file)
 	{
 		throw DictError(
 			std::string("unable to ") + msg + std::string(", Dict instance is immutable"), line, function, file

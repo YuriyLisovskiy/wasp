@@ -34,6 +34,15 @@ __WASP_BEGIN__
 template <typename _Key, typename _Val>
 class MultiValueDict : public Dict<_Key, std::vector<_Val>>
 {
+protected:
+	void _throw(const std::string& msg, int line, const char* function, const char* file) override
+	{
+		throw MultiValueDict(
+				std::string("unable to ") + msg + std::string(", MultiValueDict instance is immutable"),
+				line, function, file
+		);
+	}
+
 public:
 	_Val get(_Key key, _Val _default) override
 	{

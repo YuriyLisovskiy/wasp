@@ -38,8 +38,7 @@ __INTERNAL_BEGIN__
 
 class HttpRequestParser
 {
-	friend class HttpRequestParserTest;
-private:
+protected:
 	size_t _majorV{};
 	size_t _minorV{};
 	std::string _path;
@@ -167,7 +166,6 @@ private:
 	// Check if a byte is a digit.
 	static bool isDigit(uint c);
 
-protected:
 	// May be overloaded for custom parser which is inherited from HttpRequestParser
 	virtual void setParameters(std::map<std::string, std::string>* params);
 

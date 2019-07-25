@@ -31,17 +31,27 @@
 
 __WASP_BEGIN__
 
-class WaspException : public std::exception
+class WaspError : public std::exception
 {
 protected:
-	const char* _exceptionType;
+	std::string _fullMessage;
+	std::string _exceptionType;
 	const char* _message;
 	int _line;
 	const char* _function;
 	const char* _file;
 
+	// Use only when initializing of a derived exception!
+	WaspError(const char* message, int line, const char* function, const char* file, const char* type);
+
+	// Initializes '_fullMessage' member.
+	//
+	// Calls only in constructor.
+	void init();
+
 public:
-	WaspException(const char* message, int line, const char* function, const char* file);
+	WaspError(const char* message, int line, const char* function, const char* file);
+	~WaspError() noexcept override = default;
 
 	const char* what() const noexcept override;
 	virtual const int line() const noexcept;
@@ -49,29 +59,51 @@ public:
 	virtual const char* file() const noexcept;
 };
 
-class WaspHttpError : public WaspException
+class HttpError : public WaspError
 {
+protected:
+	// Use only when initializing of a derived exception!
+	HttpError(const char* message, int line, const char* function, const char* file, const char* type);
 public:
-	WaspHttpError(const char* message, int line, const char* function, const char* file);
-	WaspHttpError(const std::string& message, int line, const char* function, const char* file);
+	HttpError(const char* message, int line, const char* function, const char* file);
+	HttpError(const std::string& message, int line, const char* function, const char* file);
 };
 
-class DictError : public WaspException
+class DictError : public WaspError
 {
+protected:
+	// Use only when initializing of a derived exception!
+	DictError(const char* message, int line, const char* function, const char* file, const char* type);
 public:
 	DictError(const char* message, int line, const char* function, const char* file);
 	DictError(const std::string& message, int line, const char* function, const char* file);
 };
 
-class CookieError : public WaspException
+class MultiValueDictError : public DictError
 {
+protected:
+	// Use only when initializing of a derived exception!
+	MultiValueDictError(const char* message, int line, const char* function, const char* file, const char* type);
+public:
+	MultiValueDictError(const char* message, int line, const char* function, const char* file);
+	MultiValueDictError(const std::string& message, int line, const char* function, const char* file);
+};
+
+class CookieError : public WaspError
+{
+protected:
+	// Use only when initializing of a derived exception!
+	CookieError(const char* message, int line, const char* function, const char* file, const char* type);
 public:
 	CookieError(const char* message, int line, const char* function, const char* file);
 	CookieError(const std::string& message, int line, const char* function, const char* file);
 };
 
-class ValueError : public WaspException
+class ValueError : public WaspError
 {
+protected:
+	// Use only when initializing of a derived exception!
+	ValueError(const char* message, int line, const char* function, const char* file, const char* type);
 public:
 	ValueError(const char* message, int line, const char* function, const char* file);
 	ValueError(const std::string& message, int line, const char* function, const char* file);
