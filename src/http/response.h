@@ -44,7 +44,7 @@ __WASP_BEGIN__
 // An HTTP response base class with dictionary-accessed headers.
 //
 // This class doesn't handle content. It should not be used directly.
-// Use the HttpResponse and StreamingHttpResponse subclasses instead.
+// Use the HttpResponse subclass instead.
 class HttpResponseBase
 {
 protected:
@@ -96,22 +96,25 @@ public:
 	void setReasonPhrase(std::string value);
 
 	// These methods partially implement the file-like object interface.
+	virtual void close();
 	virtual void write(const std::string& content);
+	virtual void flush();
 	virtual unsigned long int tell();
 
 	// These methods partially implement a stream-like object interface.
+	virtual bool readable();
+	virtual bool seekable();
 	virtual bool writable();
 	virtual void writeLines(const std::vector<std::string>& lines);
 
 	virtual std::string serialize() = 0;
 };
 
+
 // An HTTP response class with a string as content.
-//
-// This content that can be read, appended to, or replaced.
 class HttpResponse : public HttpResponseBase
 {
-private:
+protected:
 	std::string _content;
 
 public:
@@ -122,12 +125,94 @@ public:
 		const std::string& reason = "",
 		const std::string& charset = "utf-8"
 	);
+	virtual void setContent(const std::string& content);
 	void write(const std::string& content) override;
 	unsigned long int tell() override;
 	bool writable() override;
 	void writeLines(const std::vector<std::string>& lines) override;
 	std::string serialize() override;
 };
+
+
+class HttpResponseNotModified : public HttpResponse
+{
+public:
+	explicit HttpResponseNotModified(
+		const std::string& content,
+		const std::string& contentType = "",
+		const std::string& charset = "utf-8"
+	);
+	void setContent(const std::string& content) override;
+};
+
+
+class HttpResponseBadRequest : public HttpResponse
+{
+public:
+	explicit HttpResponseBadRequest(
+		const std::string& content,
+		const std::string& contentType = "",
+		const std::string& charset = "utf-8"
+	);
+};
+
+
+class HttpResponseNotFound : public HttpResponse
+{
+public:
+	explicit HttpResponseNotFound(
+		const std::string& content,
+		const std::string& contentType = "",
+		const std::string& charset = "utf-8"
+	);
+};
+
+class HttpResponseForbidden : public HttpResponse
+{
+public:
+	explicit HttpResponseForbidden(
+		const std::string& content,
+		const std::string& contentType = "",
+		const std::string& charset = "utf-8"
+	);
+};
+
+
+class HttpResponseNotAllowed : public HttpResponse
+{
+public:
+	explicit HttpResponseNotAllowed(
+		const std::string& content,
+		const std::vector<std::string>& permittedMethods,
+		const std::string& contentType = "",
+		const std::string& charset = "utf-8"
+	);
+};
+
+
+class HttpResponseGone : public HttpResponse
+{
+public:
+	explicit HttpResponseGone(
+		const std::string& content,
+		const std::string& contentType = "",
+		const std::string& charset = "utf-8"
+	);
+};
+
+
+class HttpResponseServerError : public HttpResponse
+{
+public:
+	explicit HttpResponseServerError(
+		const std::string& content,
+		const std::string& contentType = "",
+		const std::string& charset = "utf-8"
+	);
+};
+
+
+// TODO: implement JsonResponse!
 
 __WASP_END__
 

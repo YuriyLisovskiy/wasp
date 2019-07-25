@@ -28,42 +28,57 @@
 __WASP_BEGIN__
 
 
-// Base WaspError
-WaspError::WaspError(const char* message, int line, const char* function, const char* file)
-	: _message(message), _line(line), _function(function), _file(file), _exceptionType("WaspError")
-{
-	this->init();
-}
-
-WaspError::WaspError(const char *message, int line, const char *function, const char *file, const char* exceptionType)
+// BaseException
+BaseException::BaseException(const char *message, int line, const char *function, const char *file, const char* exceptionType)
 	: _message(message), _line(line), _function(function), _file(file), _exceptionType(exceptionType)
 {
 	this->init();
 }
 
-void WaspError::init()
+BaseException::BaseException(const char* message, int line, const char* function, const char* file)
+	: BaseException(message, line, function, file, "BaseException")
+{
+}
+
+void BaseException::init()
 {
 	this->_fullMessage = this->_exceptionType + ": " + std::string(this->_message);
 }
 
-const char* WaspError::what() const noexcept
+const char* BaseException::what() const noexcept
 {
 	return this->_fullMessage.c_str();
 }
 
-const int WaspError::line() const noexcept
+const int BaseException::line() const noexcept
 {
 	return this->_line;
 }
 
-const char* WaspError::function() const noexcept
+const char* BaseException::function() const noexcept
 {
 	return this->_function;
 }
 
-const char* WaspError::file() const noexcept
+const char* BaseException::file() const noexcept
 {
 	return this->_file;
+}
+
+// WaspError
+WaspError::WaspError(const char* message, int line, const char* function, const char* file, const char* type)
+	: BaseException(message, line, function, file, type)
+{
+}
+
+WaspError::WaspError(const char* message, int line, const char* function, const char* file)
+	: WaspError(message, line, function, file, "WaspError")
+{
+}
+
+WaspError::WaspError(const std::string& message, int line, const char *function, const char *file)
+	: WaspError(message.c_str(), line, function, file)
+{
 }
 
 // HttpError
@@ -84,7 +99,7 @@ HttpError::HttpError(const std::string& message, int line, const char *function,
 
 // DictError
 DictError::DictError(const char* message, int line, const char* function, const char* file, const char* type)
-	: WaspError(message, line, function, file, type)
+	: BaseException(message, line, function, file, type)
 {
 }
 
@@ -132,7 +147,7 @@ CookieError::CookieError(const std::string& message, int line, const char *funct
 
 // ValueError
 ValueError::ValueError(const char* message, int line, const char* function, const char* file, const char* type)
-	: WaspError(message, line, function, file, type)
+	: BaseException(message, line, function, file, type)
 {
 }
 
@@ -159,6 +174,22 @@ TcpError::TcpError(const char* message, int line, const char* function, const ch
 
 TcpError::TcpError(const std::string& message, int line, const char *function, const char *file)
 	: TcpError(message.c_str(), line, function, file)
+{
+}
+
+// AttributeError
+AttributeError::AttributeError(const char* message, int line, const char* function, const char* file, const char* type)
+	: BaseException(message, line, function, file, type)
+{
+}
+
+AttributeError::AttributeError(const char* message, int line, const char* function, const char* file)
+	: AttributeError(message, line, function, file, "AttributeError")
+{
+}
+
+AttributeError::AttributeError(const std::string& message, int line, const char *function, const char *file)
+	: AttributeError(message.c_str(), line, function, file)
 {
 }
 

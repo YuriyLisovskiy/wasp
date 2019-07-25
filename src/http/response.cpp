@@ -124,14 +124,33 @@ void HttpResponseBase::setReasonPhrase(std::string value)
 	this->_reasonPhrase = value;
 }
 
+void HttpResponseBase::close()
+{
+	this->_closed = true;
+}
+
 void HttpResponseBase::write(const std::string& content)
 {
 	throw WaspError("This HttpResponseBase instance is not writable", _ERROR_DETAILS_);
 }
 
+void HttpResponseBase::flush()
+{
+}
+
 unsigned long int HttpResponseBase::tell()
 {
 	throw WaspError("This HttpResponseBase instance cannot tell its position", _ERROR_DETAILS_);
+}
+
+bool HttpResponseBase::readable()
+{
+	return false;
+}
+
+bool HttpResponseBase::seekable()
+{
+	return false;
 }
 
 bool HttpResponseBase::writable()
@@ -159,6 +178,7 @@ std::string HttpResponseBase::serializeHeaders()
 	return result;
 }
 
+
 // HttpResponse implementation
 HttpResponse::HttpResponse(
 	const std::string& content,
@@ -170,6 +190,11 @@ HttpResponse::HttpResponse(
 {
 	this->_content = content;
 	this->_streaming = false;
+}
+
+void HttpResponse::setContent(const std::string& content)
+{
+	this->_content = content;
 }
 
 void HttpResponse::write(const std::string& content)
@@ -205,6 +230,97 @@ std::string HttpResponse::serialize() {
 
 	return "HTTP/1.1 " + std::to_string(this->_status) + " " + reasonPhrase + "\r\n" +
 	       headers + "\r\n\r\n" + this->_content;
+}
+
+
+// HttpResponseNotModified implementation
+HttpResponseNotModified::HttpResponseNotModified(
+	const std::string& content,
+	const std::string& contentType,
+	const std::string& charset
+) : HttpResponse(content, 304, contentType, "", charset)
+{
+	this->removeHeader("Content-Type");
+}
+
+void HttpResponseNotModified::setContent(const std::string& content)
+{
+	if (!content.empty())
+	{
+		throw AttributeError("You cannot set content to a 304 (Not Modified) response", _ERROR_DETAILS_);
+	}
+	this->_content = "";
+}
+
+
+// HttpResponseBadRequest implementation
+HttpResponseBadRequest::HttpResponseBadRequest(
+	const std::string& content,
+	const std::string& contentType,
+	const std::string& charset
+) : HttpResponse(content, 400, contentType, "", charset)
+{
+}
+
+
+// HttpResponseNotFound implementation
+HttpResponseNotFound::HttpResponseNotFound(
+	const std::string& content,
+	const std::string& contentType,
+	const std::string& charset
+) : HttpResponse(content, 404, contentType, "", charset)
+{
+}
+
+
+// HttpResponseForbidden implementation
+HttpResponseForbidden::HttpResponseForbidden(
+	const std::string& content,
+	const std::string& contentType,
+	const std::string& charset
+) : HttpResponse(content, 403, contentType, "", charset)
+{
+}
+
+
+// HttpResponseForbidden implementation
+HttpResponseNotAllowed::HttpResponseNotAllowed(
+	const std::string& content,
+	const std::vector<std::string>& permittedMethods,
+	const std::string& contentType,
+	const std::string& charset
+) : HttpResponse(content, 405, contentType, "", charset)
+{
+	std::string methods;
+	for (size_t i = 0; i < permittedMethods.size(); i++)
+	{
+		methods += permittedMethods[i];
+		if (i < permittedMethods.size() - 1)
+		{
+			methods += ", ";
+		}
+	}
+	this->setHeader("Allow", methods);
+}
+
+
+// HttpResponseGone implementation
+HttpResponseGone::HttpResponseGone(
+	const std::string& content,
+	const std::string& contentType,
+	const std::string& charset
+) : HttpResponse(content, 410, contentType, "", charset)
+{
+}
+
+
+// HttpResponseServerError implementation
+HttpResponseServerError::HttpResponseServerError(
+	const std::string& content,
+	const std::string& contentType,
+	const std::string& charset
+) : HttpResponse(content, 500, contentType, "", charset)
+{
 }
 
 __WASP_END__

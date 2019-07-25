@@ -31,7 +31,7 @@
 
 __WASP_BEGIN__
 
-class WaspError : public std::exception
+class BaseException : public std::exception
 {
 protected:
 	std::string _fullMessage;
@@ -42,7 +42,7 @@ protected:
 	const char* _file;
 
 	// Use only when initializing of a derived exception!
-	WaspError(const char* message, int line, const char* function, const char* file, const char* type);
+	BaseException(const char* message, int line, const char* function, const char* file, const char* type);
 
 	// Initializes '_fullMessage' member.
 	//
@@ -50,14 +50,26 @@ protected:
 	void init();
 
 public:
-	WaspError(const char* message, int line, const char* function, const char* file);
-	~WaspError() noexcept override = default;
+	BaseException(const char* message, int line, const char* function, const char* file);
+	~BaseException() noexcept override = default;
 
 	const char* what() const noexcept override;
 	virtual const int line() const noexcept;
 	virtual const char* function() const noexcept;
 	virtual const char* file() const noexcept;
 };
+
+
+class WaspError : public BaseException
+{
+protected:
+	// Use only when initializing of a derived exception!
+	WaspError(const char* message, int line, const char* function, const char* file, const char* type);
+public:
+	WaspError(const char* message, int line, const char* function, const char* file);
+	WaspError(const std::string& message, int line, const char* function, const char* file);
+};
+
 
 class HttpError : public WaspError
 {
@@ -69,7 +81,8 @@ public:
 	HttpError(const std::string& message, int line, const char* function, const char* file);
 };
 
-class DictError : public WaspError
+
+class DictError : public BaseException
 {
 protected:
 	// Use only when initializing of a derived exception!
@@ -78,6 +91,7 @@ public:
 	DictError(const char* message, int line, const char* function, const char* file);
 	DictError(const std::string& message, int line, const char* function, const char* file);
 };
+
 
 class MultiValueDictError : public DictError
 {
@@ -89,6 +103,7 @@ public:
 	MultiValueDictError(const std::string& message, int line, const char* function, const char* file);
 };
 
+
 class CookieError : public WaspError
 {
 protected:
@@ -99,7 +114,8 @@ public:
 	CookieError(const std::string& message, int line, const char* function, const char* file);
 };
 
-class ValueError : public WaspError
+
+class ValueError : public BaseException
 {
 protected:
 	// Use only when initializing of a derived exception!
@@ -109,6 +125,7 @@ public:
 	ValueError(const std::string& message, int line, const char* function, const char* file);
 };
 
+
 class TcpError : public WaspError
 {
 protected:
@@ -117,6 +134,17 @@ protected:
 public:
 	TcpError(const char* message, int line, const char* function, const char* file);
 	TcpError(const std::string& message, int line, const char* function, const char* file);
+};
+
+
+class AttributeError : public BaseException
+{
+protected:
+	// Use only when initializing of a derived exception!
+	AttributeError(const char* message, int line, const char* function, const char* file, const char* type);
+public:
+	AttributeError(const char* message, int line, const char* function, const char* file);
+	AttributeError(const std::string& message, int line, const char* function, const char* file);
 };
 
 __WASP_END__

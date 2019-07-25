@@ -79,7 +79,7 @@ std::string HttpServer::_tcpHandler(const std::string& data)
 		this->_logger->trace(exc.what(), exc.line(), exc.function(), exc.file());
 
 		// TODO: send internal server error
-		return HttpResponse("<p style=\"font-size: 24px;\" >Internal Server Error</p>", 500).serialize();
+		return HttpResponseServerError("<p style=\"font-size: 24px;\" >Internal Server Error</p>").serialize();
 	}
 }
 
