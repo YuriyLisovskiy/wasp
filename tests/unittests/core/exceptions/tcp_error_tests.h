@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WASP_UNIT_TESTS_CORE_EXCEPTIONS_COOKIE_ERROR_TESTS_H
-#define WASP_UNIT_TESTS_CORE_EXCEPTIONS_COOKIE_ERROR_TESTS_H
+#ifndef WASP_UNIT_TESTS_CORE_EXCEPTIONS_HTTP_ERROR_TESTS_H
+#define WASP_UNIT_TESTS_CORE_EXCEPTIONS_HTTP_ERROR_TESTS_H
 
 #include <gtest/gtest.h>
 
@@ -26,43 +26,43 @@
 
 __UNIT_TESTS_BEGIN__
 
-class CookieErrorTestCase : public ::testing::Test
+class TcpErrorTestCase : public ::testing::Test
 {
 public:
-	const char* FullErrorMessage = "CookieError: Test error message from CookieErrorTestCase";
+	const char* FullErrorMessage = "TcpError: Test error message from TcpErrorTestCase";
 	const char* ErrorFunction = "testFunc";
 	const char* ErrorFile = "test_file.cpp";
 	const size_t ErrorLine = 1;
 
-	wasp::CookieError ConstCharConstructorError;
-	wasp::CookieError StringConstructorError;
+	wasp::TcpError ConstCharConstructorError;
+	wasp::TcpError StringConstructorError;
 
-	explicit CookieErrorTestCase()
-		: ConstCharConstructorError("Test error message from CookieErrorTestCase", this->ErrorLine, this->ErrorFunction, this->ErrorFile),
-		  StringConstructorError(std::string("Test error message from CookieErrorTestCase"), this->ErrorLine, this->ErrorFunction, this->ErrorFile)
+	explicit TcpErrorTestCase()
+		: ConstCharConstructorError("Test error message from TcpErrorTestCase", this->ErrorLine, this->ErrorFunction, this->ErrorFile),
+		  StringConstructorError(std::string("Test error message from TcpErrorTestCase"), this->ErrorLine, this->ErrorFunction, this->ErrorFile)
 	{
 	}
 };
 
-TEST_F(CookieErrorTestCase, TestWhat)
+TEST_F(TcpErrorTestCase, TestWhat)
 {
 	ASSERT_STREQ(this->ConstCharConstructorError.what(), this->FullErrorMessage);
 	ASSERT_STREQ(this->StringConstructorError.what(), this->FullErrorMessage);
 }
 
-TEST_F(CookieErrorTestCase, TestLine)
+TEST_F(TcpErrorTestCase, TestLine)
 {
 	ASSERT_EQ(this->ConstCharConstructorError.line(), this->ErrorLine);
 	ASSERT_EQ(this->StringConstructorError.line(), this->ErrorLine);
 }
 
-TEST_F(CookieErrorTestCase, TestFunction)
+TEST_F(TcpErrorTestCase, TestFunction)
 {
 	ASSERT_EQ(this->ConstCharConstructorError.function(), this->ErrorFunction);
 	ASSERT_EQ(this->StringConstructorError.function(), this->ErrorFunction);
 }
 
-TEST_F(CookieErrorTestCase, TestFile)
+TEST_F(TcpErrorTestCase, TestFile)
 {
 	ASSERT_EQ(this->ConstCharConstructorError.file(), this->ErrorFile);
 	ASSERT_EQ(this->StringConstructorError.file(), this->ErrorFile);
@@ -71,4 +71,4 @@ TEST_F(CookieErrorTestCase, TestFile)
 __UNIT_TESTS_END__
 
 
-#endif // WASP_UNIT_TESTS_CORE_EXCEPTIONS_COOKIE_ERROR_TESTS_H
+#endif // WASP_UNIT_TESTS_CORE_EXCEPTIONS_HTTP_ERROR_TESTS_H

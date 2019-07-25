@@ -74,7 +74,7 @@ std::string HttpServer::_tcpHandler(const std::string& data)
 
 		return result;
 	}
-	catch (const wasp::WaspError& exc)
+	catch (const wasp::BaseException& exc)
 	{
 		this->_logger->trace(exc.what(), exc.line(), exc.function(), exc.file());
 

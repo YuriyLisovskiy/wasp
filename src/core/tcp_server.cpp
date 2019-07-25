@@ -173,7 +173,7 @@ void TcpServer::serveConnection(const socket_t& connection)
 			TcpServer::sendAll(resp.c_str(), connection);
 		}
 	}
-	catch (const WaspError& exc)
+	catch (const BaseException& exc)
 	{
 		this->_logger->trace(exc.what(), exc.line(), exc.function(), exc.file());
 	}

@@ -42,11 +42,11 @@ Cookie::Cookie(
 {
 	if (this->_name.empty())
 	{
-		throw CookieError("cookie's name can not be empty", _ERROR_DETAILS_);
+		throw HttpError("cookie's name can not be empty", _ERROR_DETAILS_);
 	}
 	if (this->_expires.empty())
 	{
-		throw CookieError("cookie's expiration time can not be empty", _ERROR_DETAILS_);
+		throw HttpError("cookie's expiration time can not be empty", _ERROR_DETAILS_);
 	}
 }
 

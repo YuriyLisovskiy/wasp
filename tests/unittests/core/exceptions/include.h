@@ -18,11 +18,12 @@
 #ifndef WASP_UNIT_TESTS_CORE_EXCEPTIONS_INCLUDE_H
 #define WASP_UNIT_TESTS_CORE_EXCEPTIONS_INCLUDE_H
 
-#include "./cookie_error_tests.h"
+#include "./attribute_error_tests.h"
+#include "./base_exception_tests.h"
 #include "./dict_error_tests.h"
 #include "./http_error_tests.h"
 #include "./multi_dict_error.h"
+#include "./tcp_error_tests.h"
 #include "./value_error_tests.h"
-#include "./wasp_error_tests.h"
 
 #endif // WASP_UNIT_TESTS_CORE_EXCEPTIONS_INCLUDE_H

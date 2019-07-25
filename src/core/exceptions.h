@@ -60,18 +60,18 @@ public:
 };
 
 
-class WaspError : public BaseException
+class TcpError : public BaseException
 {
 protected:
 	// Use only when initializing of a derived exception!
-	WaspError(const char* message, int line, const char* function, const char* file, const char* type);
+	TcpError(const char* message, int line, const char* function, const char* file, const char* type);
 public:
-	WaspError(const char* message, int line, const char* function, const char* file);
-	WaspError(const std::string& message, int line, const char* function, const char* file);
+	TcpError(const char* message, int line, const char* function, const char* file);
+	TcpError(const std::string& message, int line, const char* function, const char* file);
 };
 
 
-class HttpError : public WaspError
+class HttpError : public BaseException
 {
 protected:
 	// Use only when initializing of a derived exception!
@@ -104,17 +104,6 @@ public:
 };
 
 
-class CookieError : public WaspError
-{
-protected:
-	// Use only when initializing of a derived exception!
-	CookieError(const char* message, int line, const char* function, const char* file, const char* type);
-public:
-	CookieError(const char* message, int line, const char* function, const char* file);
-	CookieError(const std::string& message, int line, const char* function, const char* file);
-};
-
-
 class ValueError : public BaseException
 {
 protected:
@@ -123,17 +112,6 @@ protected:
 public:
 	ValueError(const char* message, int line, const char* function, const char* file);
 	ValueError(const std::string& message, int line, const char* function, const char* file);
-};
-
-
-class TcpError : public WaspError
-{
-protected:
-	// Use only when initializing of a derived exception!
-	TcpError(const char* message, int line, const char* function, const char* file, const char* type);
-public:
-	TcpError(const char* message, int line, const char* function, const char* file);
-	TcpError(const std::string& message, int line, const char* function, const char* file);
 };
 
 

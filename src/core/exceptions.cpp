@@ -65,25 +65,27 @@ const char* BaseException::file() const noexcept
 	return this->_file;
 }
 
-// WaspError
-WaspError::WaspError(const char* message, int line, const char* function, const char* file, const char* type)
+
+// TcpError
+TcpError::TcpError(const char* message, int line, const char* function, const char* file, const char* type)
 	: BaseException(message, line, function, file, type)
 {
 }
 
-WaspError::WaspError(const char* message, int line, const char* function, const char* file)
-	: WaspError(message, line, function, file, "WaspError")
+TcpError::TcpError(const char* message, int line, const char* function, const char* file)
+	: TcpError(message, line, function, file, "TcpError")
 {
 }
 
-WaspError::WaspError(const std::string& message, int line, const char *function, const char *file)
-	: WaspError(message.c_str(), line, function, file)
+TcpError::TcpError(const std::string& message, int line, const char *function, const char *file)
+	: TcpError(message.c_str(), line, function, file)
 {
 }
+
 
 // HttpError
 HttpError::HttpError(const char* message, int line, const char* function, const char* file, const char* type)
-	: WaspError(message, line, function, file, type)
+	: BaseException(message, line, function, file, type)
 {
 }
 
@@ -96,6 +98,7 @@ HttpError::HttpError(const std::string& message, int line, const char *function,
 	: HttpError(message.c_str(), line, function, file)
 {
 }
+
 
 // DictError
 DictError::DictError(const char* message, int line, const char* function, const char* file, const char* type)
@@ -113,6 +116,7 @@ DictError::DictError(const char* message, int line, const char* function, const 
 {
 }
 
+
 // MultiValueDictError
 MultiValueDictError::MultiValueDictError(const char* message, int line, const char* function, const char* file, const char* type)
 	: DictError(message, line, function, file, type)
@@ -129,21 +133,6 @@ MultiValueDictError::MultiValueDictError(const std::string& message, int line, c
 {
 }
 
-// CookieError
-CookieError::CookieError(const char* message, int line, const char* function, const char* file, const char* type)
-	: WaspError(message, line, function, file, type)
-{
-}
-
-CookieError::CookieError(const char* message, int line, const char* function, const char* file)
-	: CookieError(message, line, function, file, "CookieError")
-{
-}
-
-CookieError::CookieError(const std::string& message, int line, const char *function, const char *file)
-	: CookieError(message.c_str(), line, function, file)
-{
-}
 
 // ValueError
 ValueError::ValueError(const char* message, int line, const char* function, const char* file, const char* type)
@@ -161,21 +150,6 @@ ValueError::ValueError(const std::string& message, int line, const char *functio
 {
 }
 
-// TcpError
-TcpError::TcpError(const char* message, int line, const char* function, const char* file, const char* type)
-	: WaspError(message, line, function, file, type)
-{
-}
-
-TcpError::TcpError(const char* message, int line, const char* function, const char* file)
-	: TcpError(message, line, function, file, "TcpError")
-{
-}
-
-TcpError::TcpError(const std::string& message, int line, const char *function, const char *file)
-	: TcpError(message.c_str(), line, function, file)
-{
-}
 
 // AttributeError
 AttributeError::AttributeError(const char* message, int line, const char* function, const char* file, const char* type)
