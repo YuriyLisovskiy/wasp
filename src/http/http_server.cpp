@@ -74,7 +74,7 @@ const std::string HttpServer::_tcpHandler(const std::string& data)
 
 		return result;
 	}
-	catch (const wasp::WaspException& exc)
+	catch (const wasp::WaspError& exc)
 	{
 		this->_logger->trace(exc.what(), exc.file(), exc.function(), exc.line());
 
@@ -109,7 +109,7 @@ void HttpServer::normalizeContext(HttpServer::Context& ctx)
 
 	if (ctx.handler == nullptr)
 	{
-		throw wasp::WaspHttpError("HttpServer::Context::handler can not be nullptr", _ERROR_DETAILS_);
+		throw wasp::HttpError("HttpServer::Context::handler can not be nullptr", _ERROR_DETAILS_);
 	}
 
 	if (ctx.logger == nullptr)

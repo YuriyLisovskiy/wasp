@@ -65,7 +65,7 @@ void HttpRequestParser::_parseHttpWord(char input, char expectedInput, HttpReque
 	}
 	else
 	{
-		throw wasp::WaspHttpError("unable to parse http protocol version", _ERROR_DETAILS_);
+		throw wasp::HttpError("unable to parse http protocol version", _ERROR_DETAILS_);
 	}
 }
 
@@ -87,7 +87,7 @@ void HttpRequestParser::_parseRequest(const std::string& data)
 			case ParserState::MethodBegin:
 				if (!HttpRequestParser::isChar(input) || HttpRequestParser::isControl(input) || HttpRequestParser::isSpecial(input))
 				{
-					throw wasp::WaspHttpError("unable to parse method type", _ERROR_DETAILS_);
+					throw wasp::HttpError("unable to parse method type", _ERROR_DETAILS_);
 				}
 				else
 				{
@@ -102,7 +102,7 @@ void HttpRequestParser::_parseRequest(const std::string& data)
 				}
 				else if (!HttpRequestParser::isChar(input) || HttpRequestParser::isControl(input) || HttpRequestParser::isSpecial(input))
 				{
-					throw wasp::WaspHttpError("unable to parse http method type", _ERROR_DETAILS_);
+					throw wasp::HttpError("unable to parse http method type", _ERROR_DETAILS_);
 				}
 				else
 				{
@@ -112,7 +112,7 @@ void HttpRequestParser::_parseRequest(const std::string& data)
 			case ParserState::PathBegin:
 				if (HttpRequestParser::isControl(input))
 				{
-					throw wasp::WaspHttpError("unable to parse http url path", _ERROR_DETAILS_);
+					throw wasp::HttpError("unable to parse http url path", _ERROR_DETAILS_);
 				}
 				else
 				{
@@ -138,7 +138,7 @@ void HttpRequestParser::_parseRequest(const std::string& data)
 				}
 				else if (HttpRequestParser::isControl(input))
 				{
-					throw wasp::WaspHttpError("unable to parse http url path", __LINE__, __FUNCTION__, __FILE__);
+					throw wasp::HttpError("unable to parse http url path", __LINE__, __FUNCTION__, __FILE__);
 				}
 				else
 				{
@@ -159,7 +159,7 @@ void HttpRequestParser::_parseRequest(const std::string& data)
 				}
 				else if (HttpRequestParser::isControl(input))
 				{
-					throw wasp::WaspHttpError("unable to parse http url query", __LINE__, __FUNCTION__, __FILE__);
+					throw wasp::HttpError("unable to parse http url query", __LINE__, __FUNCTION__, __FILE__);
 				}
 				else
 				{
@@ -187,7 +187,7 @@ void HttpRequestParser::_parseRequest(const std::string& data)
 				}
 				else
 				{
-					throw wasp::WaspHttpError("unable to parse http protocol version", _ERROR_DETAILS_);
+					throw wasp::HttpError("unable to parse http protocol version", _ERROR_DETAILS_);
 				}
 				break;
 			case ParserState::HttpVersionMajorBegin:
@@ -198,7 +198,7 @@ void HttpRequestParser::_parseRequest(const std::string& data)
 				}
 				else
 				{
-					throw wasp::WaspHttpError("unable to parse major part of http protocol version", _ERROR_DETAILS_);
+					throw wasp::HttpError("unable to parse major part of http protocol version", _ERROR_DETAILS_);
 				}
 				break;
 			case ParserState::HttpVersionMajor:
@@ -212,7 +212,7 @@ void HttpRequestParser::_parseRequest(const std::string& data)
 				}
 				else
 				{
-					throw wasp::WaspHttpError("unable to parse major part of http protocol version", _ERROR_DETAILS_);
+					throw wasp::HttpError("unable to parse major part of http protocol version", _ERROR_DETAILS_);
 				}
 				break;
 			case ParserState::HttpVersionMinorBegin:
@@ -223,7 +223,7 @@ void HttpRequestParser::_parseRequest(const std::string& data)
 				}
 				else
 				{
-					throw wasp::WaspHttpError("unable to parse minor part of http protocol version", _ERROR_DETAILS_);
+					throw wasp::HttpError("unable to parse minor part of http protocol version", _ERROR_DETAILS_);
 				}
 				break;
 			case ParserState::HttpVersionMinor:
@@ -237,7 +237,7 @@ void HttpRequestParser::_parseRequest(const std::string& data)
 				}
 				else
 				{
-					throw wasp::WaspHttpError("unable to parse minor part of http protocol version", _ERROR_DETAILS_);
+					throw wasp::HttpError("unable to parse minor part of http protocol version", _ERROR_DETAILS_);
 				}
 				break;
 			case ParserState::HttpVersionNewLine:
@@ -247,7 +247,7 @@ void HttpRequestParser::_parseRequest(const std::string& data)
 				}
 				else
 				{
-					throw wasp::WaspHttpError("unable to parse http protocol main data", _ERROR_DETAILS_);
+					throw wasp::HttpError("unable to parse http protocol main data", _ERROR_DETAILS_);
 				}
 				break;
 			case ParserState::HeaderLineStart:
@@ -261,7 +261,7 @@ void HttpRequestParser::_parseRequest(const std::string& data)
 				}
 				else if(!isChar(input) || isControl(input) || isSpecial(input))
 				{
-					throw wasp::WaspHttpError("unable to parse http request header", __LINE__, __FUNCTION__, __FILE__);
+					throw wasp::HttpError("unable to parse http request header", __LINE__, __FUNCTION__, __FILE__);
 				}
 				else
 				{
@@ -281,7 +281,7 @@ void HttpRequestParser::_parseRequest(const std::string& data)
 				}
 				else if (isControl(input))
 				{
-					throw wasp::WaspHttpError("unable to parse http request", __LINE__, __FUNCTION__, __FILE__);
+					throw wasp::HttpError("unable to parse http request", __LINE__, __FUNCTION__, __FILE__);
 				}
 				else
 				{
@@ -296,7 +296,7 @@ void HttpRequestParser::_parseRequest(const std::string& data)
 				}
 				else if (!isChar(input) || isControl(input) || isSpecial(input))
 				{
-					throw wasp::WaspHttpError("unable to parse http request header name", __LINE__, __FUNCTION__, __FILE__);
+					throw wasp::HttpError("unable to parse http request header name", __LINE__, __FUNCTION__, __FILE__);
 				}
 				else
 				{
@@ -310,7 +310,7 @@ void HttpRequestParser::_parseRequest(const std::string& data)
 				}
 				else
 				{
-					throw wasp::WaspHttpError("unable to parse http request header", _ERROR_DETAILS_);
+					throw wasp::HttpError("unable to parse http request header", _ERROR_DETAILS_);
 				}
 				break;
 			case ParserState::HeaderValue:
@@ -318,7 +318,7 @@ void HttpRequestParser::_parseRequest(const std::string& data)
 				{
 					if (strcasecmp(newHeaderName.c_str(), "Content-Length") == 0)
 					{
-						this->_contentSize = atoi(newHeaderValue.c_str());
+						this->_contentSize = strtol(newHeaderValue.c_str(), nullptr, 0);
 						this->_content.reserve(this->_contentSize);
 					}
 					else if (strcasecmp(newHeaderName.c_str(), "Transfer-Encoding") == 0)
@@ -336,7 +336,7 @@ void HttpRequestParser::_parseRequest(const std::string& data)
 				}
 				else if (HttpRequestParser::isControl(input))
 				{
-					throw wasp::WaspHttpError("unable to parse http request header value", __LINE__, __FUNCTION__, __FILE__);
+					throw wasp::HttpError("unable to parse http request header value", __LINE__, __FUNCTION__, __FILE__);
 				}
 				else
 				{
@@ -350,7 +350,7 @@ void HttpRequestParser::_parseRequest(const std::string& data)
 				}
 				else
 				{
-					throw wasp::WaspHttpError("unable to parse http request", __LINE__, __FUNCTION__, __FILE__);
+					throw wasp::HttpError("unable to parse http request", __LINE__, __FUNCTION__, __FILE__);
 				}
 				break;
 			case ParserState::ExpectingNewline_3:
@@ -386,7 +386,7 @@ void HttpRequestParser::_parseRequest(const std::string& data)
 					}
 					else
 					{
-						throw wasp::WaspHttpError("unable to parse http request", __LINE__, __FUNCTION__, __FILE__);
+						throw wasp::HttpError("unable to parse http request", __LINE__, __FUNCTION__, __FILE__);
 					}
 				}
 				else
@@ -435,7 +435,7 @@ void HttpRequestParser::_parseRequest(const std::string& data)
 				}
 				else
 				{
-					throw wasp::WaspHttpError("unable to parse http request", __LINE__, __FUNCTION__, __FILE__);
+					throw wasp::HttpError("unable to parse http request", __LINE__, __FUNCTION__, __FILE__);
 				}
 				break;
 			case ParserState::ChunkExtensionName:
@@ -453,7 +453,7 @@ void HttpRequestParser::_parseRequest(const std::string& data)
 				}
 				else
 				{
-					throw wasp::WaspHttpError("unable to parse http request", __LINE__, __FUNCTION__, __FILE__);
+					throw wasp::HttpError("unable to parse http request", __LINE__, __FUNCTION__, __FILE__);
 				}
 				break;
 			case ParserState::ChunkExtensionValue:
@@ -467,7 +467,7 @@ void HttpRequestParser::_parseRequest(const std::string& data)
 				}
 				else
 				{
-					throw wasp::WaspHttpError("unable to parse http request", __LINE__, __FUNCTION__, __FILE__);
+					throw wasp::HttpError("unable to parse http request", __LINE__, __FUNCTION__, __FILE__);
 				}
 				break;
 			case ParserState::ChunkSizeNewLine:
@@ -488,7 +488,7 @@ void HttpRequestParser::_parseRequest(const std::string& data)
 				}
 				else
 				{
-					throw wasp::WaspHttpError("unable to parse http request", __LINE__, __FUNCTION__, __FILE__);
+					throw wasp::HttpError("unable to parse http request", __LINE__, __FUNCTION__, __FILE__);
 				}
 				break;
 			case ParserState::ChunkSizeNewLine_2:
@@ -502,7 +502,7 @@ void HttpRequestParser::_parseRequest(const std::string& data)
 				}
 				else
 				{
-					throw wasp::WaspHttpError("unable to parse http request", __LINE__, __FUNCTION__, __FILE__);
+					throw wasp::HttpError("unable to parse http request", __LINE__, __FUNCTION__, __FILE__);
 				}
 				break;
 			case ParserState::ChunkSizeNewLine_3:
@@ -512,7 +512,7 @@ void HttpRequestParser::_parseRequest(const std::string& data)
 				}
 				else
 				{
-					throw wasp::WaspHttpError("unable to parse http request", __LINE__, __FUNCTION__, __FILE__);
+					throw wasp::HttpError("unable to parse http request", __LINE__, __FUNCTION__, __FILE__);
 				}
 			case ParserState::ChunkTrailerName:
 				if (isalnum(input))
@@ -525,7 +525,7 @@ void HttpRequestParser::_parseRequest(const std::string& data)
 				}
 				else
 				{
-					throw wasp::WaspHttpError("unable to parse http request", __LINE__, __FUNCTION__, __FILE__);
+					throw wasp::HttpError("unable to parse http request", __LINE__, __FUNCTION__, __FILE__);
 				}
 				break;
 			case ParserState::ChunkTrailerValue:
@@ -539,7 +539,7 @@ void HttpRequestParser::_parseRequest(const std::string& data)
 				}
 				else
 				{
-					throw wasp::WaspHttpError("unable to parse http request", __LINE__, __FUNCTION__, __FILE__);
+					throw wasp::HttpError("unable to parse http request", __LINE__, __FUNCTION__, __FILE__);
 				}
 				break;
 			case ParserState::ChunkData:
@@ -557,7 +557,7 @@ void HttpRequestParser::_parseRequest(const std::string& data)
 				}
 				else
 				{
-					throw wasp::WaspHttpError("unable to parse http request", __LINE__, __FUNCTION__, __FILE__);
+					throw wasp::HttpError("unable to parse http request", __LINE__, __FUNCTION__, __FILE__);
 				}
 				break;
 			case ParserState::ChunkDataNewLine_2:
@@ -567,15 +567,15 @@ void HttpRequestParser::_parseRequest(const std::string& data)
 				}
 				else
 				{
-					throw wasp::WaspHttpError("unable to parse http request", __LINE__, __FUNCTION__, __FILE__);
+					throw wasp::HttpError("unable to parse http request", __LINE__, __FUNCTION__, __FILE__);
 				}
 				break;
 			default:
-				throw wasp::WaspHttpError("unable to parse http request", __LINE__, __FUNCTION__, __FILE__);
+				throw wasp::HttpError("unable to parse http request", __LINE__, __FUNCTION__, __FILE__);
 		}
 	}
 
-	throw wasp::WaspHttpError("unable to parse http request", __LINE__, __FUNCTION__, __FILE__);
+	throw wasp::HttpError("unable to parse http request", __LINE__, __FUNCTION__, __FILE__);
 }
 
 void HttpRequestParser::_parseApplicationJson()

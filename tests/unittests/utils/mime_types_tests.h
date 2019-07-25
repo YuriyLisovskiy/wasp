@@ -20,30 +20,33 @@
 
 #include <gtest/gtest.h>
 
+#include "../globals.h"
 #include "../../../src/utils/mime_types.h"
 
 
+__UNIT_TESTS_BEGIN__
+
 // Testing 'extFromFileName' function.
-TEST(MimeTypesTest, extFromFileNameTestSuccess)
+TEST(MimeTypesTestCase, extFromFileNameTestSuccess)
 {
 	ASSERT_EQ(wasp::mime::extFromFileName("foo.bar"), "bar");
 	ASSERT_EQ(wasp::mime::extFromFileName(".bar"), "bar");
 }
 
-TEST(MimeTypesTest, extFromFileNameTestNoExtension)
+TEST(MimeTypesTestCase, extFromFileNameTestNoExtension)
 {
 	ASSERT_EQ(wasp::mime::extFromFileName("foo"), "");
 	ASSERT_EQ(wasp::mime::extFromFileName("bar"), "");
 }
 
-TEST(MimeTypesTest, extFromFileNameTestEmptyExtension)
+TEST(MimeTypesTestCase, extFromFileNameTestEmptyExtension)
 {
 	ASSERT_EQ(wasp::mime::extFromFileName("foo."), "");
 	ASSERT_EQ(wasp::mime::extFromFileName("bar."), "");
 }
 
 // Testing 'extFromPath' function.
-TEST(MimeTypesTest, extFromPathTestSuccessWithSlashes)
+TEST(MimeTypesTestCase, extFromPathTestSuccessWithSlashes)
 {
 	ASSERT_EQ(wasp::mime::extFromPath("path/to/foo.bar"), "bar");
 	ASSERT_EQ(wasp::mime::extFromPath("/foo.bar"), "bar");
@@ -51,14 +54,14 @@ TEST(MimeTypesTest, extFromPathTestSuccessWithSlashes)
 	ASSERT_EQ(wasp::mime::extFromPath("./.foo.bar"), "bar");
 }
 
-TEST(MimeTypesTest, extFromPathTestSuccessWithoutSlashes)
+TEST(MimeTypesTestCase, extFromPathTestSuccessWithoutSlashes)
 {
 	ASSERT_EQ(wasp::mime::extFromPath("foo.bar"), "bar");
 	ASSERT_EQ(wasp::mime::extFromPath(".foo.bar"), "bar");
 	ASSERT_EQ(wasp::mime::extFromPath("....foo.bar"), "bar");
 }
 
-TEST(MimeTypesTest, extFromPathTestNoExtension)
+TEST(MimeTypesTestCase, extFromPathTestNoExtension)
 {
 	ASSERT_EQ(wasp::mime::extFromPath("foo"), "");
 	ASSERT_EQ(wasp::mime::extFromPath("path/to/foo"), "");
@@ -66,7 +69,7 @@ TEST(MimeTypesTest, extFromPathTestNoExtension)
 	ASSERT_EQ(wasp::mime::extFromPath("./foo"), "");
 }
 
-TEST(MimeTypesTest, extFromPathTestEmptyExtension)
+TEST(MimeTypesTestCase, extFromPathTestEmptyExtension)
 {
 	ASSERT_EQ(wasp::mime::extFromPath("foo."), "");
 	ASSERT_EQ(wasp::mime::extFromPath("path/to/foo."), "");
@@ -77,7 +80,7 @@ TEST(MimeTypesTest, extFromPathTestEmptyExtension)
 }
 
 // Testing 'guessContentType' function.
-TEST(MimeTypesTest, guessContentTypeTestAll)
+TEST(MimeTypesTestCase, guessContentTypeTestAll)
 {
 	std::string type, encoding;
 
@@ -88,7 +91,7 @@ TEST(MimeTypesTest, guessContentTypeTestAll)
 	}
 }
 
-TEST(MimeTypesTest, guessContentTypeTestTextSVGZ)
+TEST(MimeTypesTestCase, guessContentTypeTestTextSVGZ)
 {
 	std::string type, encoding;
 
@@ -97,7 +100,7 @@ TEST(MimeTypesTest, guessContentTypeTestTextSVGZ)
 	ASSERT_EQ(encoding, "gzip");
 }
 
-TEST(MimeTypesTest, guessContentTypeTestTextTGZ)
+TEST(MimeTypesTestCase, guessContentTypeTestTextTGZ)
 {
 	std::string type, encoding;
 
@@ -106,7 +109,7 @@ TEST(MimeTypesTest, guessContentTypeTestTextTGZ)
 	ASSERT_EQ(encoding, "gzip");
 }
 
-TEST(MimeTypesTest, guessContentTypeTestTextTAZ)
+TEST(MimeTypesTestCase, guessContentTypeTestTextTAZ)
 {
 	std::string type, encoding;
 
@@ -115,7 +118,7 @@ TEST(MimeTypesTest, guessContentTypeTestTextTAZ)
 	ASSERT_EQ(encoding, "gzip");
 }
 
-TEST(MimeTypesTest, guessContentTypeTestTextTZ)
+TEST(MimeTypesTestCase, guessContentTypeTestTextTZ)
 {
 	std::string type, encoding;
 
@@ -124,7 +127,7 @@ TEST(MimeTypesTest, guessContentTypeTestTextTZ)
 	ASSERT_EQ(encoding, "gzip");
 }
 
-TEST(MimeTypesTest, guessContentTypeTestTextTBZ2)
+TEST(MimeTypesTestCase, guessContentTypeTestTextTBZ2)
 {
 	std::string type, encoding;
 
@@ -133,7 +136,7 @@ TEST(MimeTypesTest, guessContentTypeTestTextTBZ2)
 	ASSERT_EQ(encoding, "bzip2");
 }
 
-TEST(MimeTypesTest, guessContentTypeTestTextTXZ)
+TEST(MimeTypesTestCase, guessContentTypeTestTextTXZ)
 {
 	std::string type, encoding;
 
@@ -142,7 +145,7 @@ TEST(MimeTypesTest, guessContentTypeTestTextTXZ)
 	ASSERT_EQ(encoding, "xz");
 }
 
-TEST(MimeTypesTest, guessContentTypeTestTextZ)
+TEST(MimeTypesTestCase, guessContentTypeTestTextZ)
 {
 	std::string type, encoding;
 
@@ -150,5 +153,8 @@ TEST(MimeTypesTest, guessContentTypeTestTextZ)
 	ASSERT_EQ(type, "application/x-z");
 	ASSERT_EQ(encoding, "compress");
 }
+
+__UNIT_TESTS_END__
+
 
 #endif // WASP_UNIT_TESTS_MIME_TYPES_TESTS_H

@@ -15,18 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * dict_tests
- * TODO: write docs.
- */
-
-#ifndef WASP_DICT_TESTS_H
-#define WASP_DICT_TESTS_H
+#ifndef WASP_UNIT_TESTS_COLLECTIONS_DICT_TESTS_H
+#define WASP_UNIT_TESTS_COLLECTIONS_DICT_TESTS_H
 
 #include <gtest/gtest.h>
 
+#include "../globals.h"
 #include "../../../src/collections/dict.h"
 
+
+__UNIT_TESTS_BEGIN__
 
 // Mutable dict testing.
 TEST(MutableDictTestCase, TestGetItemExists)
@@ -162,4 +160,7 @@ TEST(ImmutableDictTestCase, TestREndThrows)
 	ASSERT_THROW(testDict.rend(), wasp::DictError);
 }
 
-#endif // WASP_DICT_TESTS_H
+__UNIT_TESTS_END__
+
+
+#endif // WASP_UNIT_TESTS_COLLECTIONS_DICT_TESTS_H

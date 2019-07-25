@@ -15,23 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <gtest/gtest.h>
+#ifndef WASP_UNIT_TESTS_CORE_EXCEPTIONS_INCLUDE_H
+#define WASP_UNIT_TESTS_CORE_EXCEPTIONS_INCLUDE_H
 
-// collections tests
-#include "collections/include.h"
+#include "./cookie_error_tests.h"
+#include "./dict_error_tests.h"
+#include "./http_error_tests.h"
+#include "./multi_dict_error.h"
+#include "./value_error_tests.h"
+#include "./wasp_error_tests.h"
 
-// core tests
-#include "core/include.h"
-
-// http tests
-#include "http/include.h"
-
-// utils tests
-#include "utils/include.h"
-
-
-int main(int argc, char *argv[])
-{
-	::testing::InitGoogleTest(&argc, argv);
-	return RUN_ALL_TESTS();
-}
+#endif // WASP_UNIT_TESTS_CORE_EXCEPTIONS_INCLUDE_H
