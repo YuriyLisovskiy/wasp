@@ -81,6 +81,16 @@ public:
 	HttpError(const std::string& message, int line, const char* function, const char* file);
 };
 
+class ParseError : public BaseException
+{
+protected:
+	// Use only when initializing of a derived exception!
+	ParseError(const char* message, int line, const char* function, const char* file, const char* type);
+public:
+	ParseError(const char* message, int line, const char* function, const char* file);
+	ParseError(const std::string& message, int line, const char* function, const char* file);
+};
+
 
 class DictError : public BaseException
 {

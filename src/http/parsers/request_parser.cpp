@@ -21,7 +21,6 @@
  */
 
 #include "request_parser.h"
-#include "../../core/exceptions.h"
 
 
 __INTERNAL_BEGIN__
@@ -296,7 +295,7 @@ void HttpRequestParser::_parseRequest(const std::string& data)
 				}
 				else if (!isChar(input) || isControl(input) || isSpecial(input))
 				{
-					throw wasp::HttpError("unable to parse http request header name", __LINE__, __FUNCTION__, __FILE__);
+					throw wasp::HttpError("unable to parse http request header name", _ERROR_DETAILS_);
 				}
 				else
 				{
@@ -336,7 +335,7 @@ void HttpRequestParser::_parseRequest(const std::string& data)
 				}
 				else if (HttpRequestParser::isControl(input))
 				{
-					throw wasp::HttpError("unable to parse http request header value", __LINE__, __FUNCTION__, __FILE__);
+					throw wasp::HttpError("unable to parse http request header value", _ERROR_DETAILS_);
 				}
 				else
 				{
@@ -350,14 +349,14 @@ void HttpRequestParser::_parseRequest(const std::string& data)
 				}
 				else
 				{
-					throw wasp::HttpError("unable to parse http request", __LINE__, __FUNCTION__, __FILE__);
+					throw wasp::HttpError("unable to parse http request", _ERROR_DETAILS_);
 				}
 				break;
 			case ParserState::ExpectingNewline_3:
 				connectionIt = std::find_if(
 					this->_headers.begin(),
 					this->_headers.end(),
-					[](std::pair<std::string, std::string> item) -> bool
+					[](const std::pair<std::string, std::string>& item) -> bool
 					{
 						return strcasecmp(item.first.c_str(), "Connection") == 0;
 					}

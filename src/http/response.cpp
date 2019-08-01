@@ -165,7 +165,7 @@ void HttpResponseBase::writeLines(const std::vector<std::string>& lines)
 
 std::string HttpResponseBase::serializeHeaders()
 {
-	auto expr = [](std::pair<std::string, std::string> _p) -> std::string { return _p.first + ": " + _p.second; };
+	auto expr = [](const std::pair<std::string, std::string>& _p) -> std::string { return _p.first + ": " + _p.second; };
 	std::string result;
 	for (auto it = this->_headers.cbegin(); it != this->_headers.cend(); it++)
 	{

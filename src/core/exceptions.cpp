@@ -100,6 +100,23 @@ HttpError::HttpError(const std::string& message, int line, const char *function,
 }
 
 
+// ParseError
+ParseError::ParseError(const char* message, int line, const char* function, const char* file, const char* type)
+	: BaseException(message, line, function, file, type)
+{
+}
+
+ParseError::ParseError(const char* message, int line, const char* function, const char* file)
+	: ParseError(message, line, function, file, "ParseError")
+{
+}
+
+ParseError::ParseError(const std::string& message, int line, const char *function, const char *file)
+	: ParseError(message.c_str(), line, function, file)
+{
+}
+
+
 // DictError
 DictError::DictError(const char* message, int line, const char* function, const char* file, const char* type)
 	: BaseException(message, line, function, file, type)
