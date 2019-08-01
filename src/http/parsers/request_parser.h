@@ -61,7 +61,7 @@ protected:
 		ApplicationXWwwFormUrlencoded,
 		ApplicationJson,
 		MultipartFormData,
-		TextPlain
+		Other
 
 	} _contentType{};
 
@@ -74,6 +74,7 @@ protected:
 		PathBegin,
 		Path,
 		Query,
+		Fragment,
 		HttpVersionH,
 		HttpVersionHt,
 		HttpVersionHtt,
@@ -144,9 +145,6 @@ protected:
 
 	// Parses 'multipart/form-data' content type
 	void _parseMultipart();
-
-	// Parses 'text/plain' content type
-	void _parsePlainText();
 
 	// Parses url's query or 'application/x-www-form-urlencoded' content type
 	static std::map<std::string, std::string>* _parseQuery(const std::string& content);

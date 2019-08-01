@@ -78,7 +78,7 @@ protected:
 public:
 	UrlParser();
 
-	bool parse(const std::string& str);
+	void parse(const std::string& str);
 
 	void checkIfParsed() const;
 

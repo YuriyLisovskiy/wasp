@@ -135,6 +135,30 @@ public:
 	AttributeError(const std::string& message, int line, const char* function, const char* file);
 };
 
+
+// The user did something suspicious
+class SuspiciousOperation : public BaseException
+{
+protected:
+	// Use only when initializing of a derived exception!
+	SuspiciousOperation(const char* message, int line, const char* function, const char* file, const char* type);
+public:
+	SuspiciousOperation(const char* message, int line, const char* function, const char* file);
+	SuspiciousOperation(const std::string& message, int line, const char* function, const char* file);
+};
+
+
+// Redirect to scheme not in allowed list
+class DisallowedRedirect : public SuspiciousOperation
+{
+protected:
+	// Use only when initializing of a derived exception!
+	DisallowedRedirect(const char* message, int line, const char* function, const char* file, const char* type);
+public:
+	DisallowedRedirect(const char* message, int line, const char* function, const char* file);
+	DisallowedRedirect(const std::string& message, int line, const char* function, const char* file);
+};
+
 __WASP_END__
 
 

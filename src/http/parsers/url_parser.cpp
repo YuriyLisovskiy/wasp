@@ -114,7 +114,7 @@ bool UrlParser::isUnreserved(char ch) const
 	return std::isalnum(ch) || ch == '-' || ch == '.' || ch == '_' || ch == '~';
 }
 
-bool UrlParser::parse(const std::string& str)
+void UrlParser::parse(const std::string& str)
 {
 	std::string usernameOrHostname;
 	std::string portOrPassword;
@@ -312,7 +312,6 @@ bool UrlParser::parse(const std::string& str)
 	}
 
 	this->_isParsed = true;
-	return this->_isParsed;
 }
 
 __INTERNAL_END__

@@ -184,4 +184,38 @@ AttributeError::AttributeError(const std::string& message, int line, const char 
 {
 }
 
+
+// SuspiciousOperation
+SuspiciousOperation::SuspiciousOperation(const char* message, int line, const char* function, const char* file, const char* type)
+	: BaseException(message, line, function, file, type)
+{
+}
+
+SuspiciousOperation::SuspiciousOperation(const char* message, int line, const char* function, const char* file)
+	: SuspiciousOperation(message, line, function, file, "SuspiciousOperation")
+{
+}
+
+SuspiciousOperation::SuspiciousOperation(const std::string& message, int line, const char *function, const char *file)
+	: SuspiciousOperation(message.c_str(), line, function, file)
+{
+}
+
+
+// DisallowedRedirect
+DisallowedRedirect::DisallowedRedirect(const char* message, int line, const char* function, const char* file, const char* type)
+	: SuspiciousOperation(message, line, function, file, type)
+{
+}
+
+DisallowedRedirect::DisallowedRedirect(const char* message, int line, const char* function, const char* file)
+	: DisallowedRedirect(message, line, function, file, "DisallowedRedirect")
+{
+}
+
+DisallowedRedirect::DisallowedRedirect(const std::string& message, int line, const char *function, const char *file)
+	: DisallowedRedirect(message.c_str(), line, function, file)
+{
+}
+
 __WASP_END__

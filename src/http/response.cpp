@@ -233,6 +233,57 @@ std::string HttpResponse::serialize() {
 }
 
 
+// HttpResponseRedirectBase implementation
+HttpResponseRedirectBase::HttpResponseRedirectBase(
+	const std::string& redirectTo,
+	const std::string& content,
+	unsigned short int status,
+	const std::string& contentType,
+	const std::string& reason,
+	const std::string& charset
+) : HttpResponse(content, status, contentType, reason, charset)
+{
+	if (status < 300 || status > 399)
+	{
+		throw ValueError("invalid status", _ERROR_DETAILS_);
+	}
+	this->setHeader("Location", internal::iriToUri(redirectTo));
+	internal::UrlParser parser;
+	parser.parse(redirectTo);
+	if (!parser.scheme().empty() && this->_allowedHosts.find(parser.scheme()) == this->_allowedHosts.end())
+	{
+		throw DisallowedRedirect("Unsafe redirect to URL with protocol " + parser.scheme(), _ERROR_DETAILS_);
+	}
+}
+
+std::string HttpResponseRedirectBase::url()
+{
+	return this->_headers.get("Location");
+}
+
+
+// HttpResponseRedirect implementation
+HttpResponseRedirect::HttpResponseRedirect(
+	const std::string& redirectTo,
+	const std::string& content,
+	const std::string& contentType,
+	const std::string& charset
+) : HttpResponseRedirectBase(redirectTo, content, 302, contentType, "", charset)
+{
+}
+
+
+// HttpResponsePermanentRedirect implementation
+HttpResponsePermanentRedirect::HttpResponsePermanentRedirect(
+	const std::string& redirectTo,
+	const std::string& content,
+	const std::string& contentType,
+	const std::string& charset
+) : HttpResponseRedirectBase(redirectTo, content, 301, contentType, "", charset)
+{
+}
+
+
 // HttpResponseNotModified implementation
 HttpResponseNotModified::HttpResponseNotModified(
 	const std::string& content,

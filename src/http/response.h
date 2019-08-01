@@ -28,6 +28,7 @@
 #include <vector>
 #include <cstring>
 #include <iterator>
+#include <set>
 
 #include "../globals.h"
 #include "request.h"
@@ -35,6 +36,8 @@
 #include "../core/exceptions.h"
 #include "status.h"
 #include "../utils/str.h"
+#include "parsers/url_parser.h"
+#include "../utils/encoding.h"
 
 #include "../utils/datetime/datetime.h"
 
@@ -131,6 +134,51 @@ public:
 	bool writable() override;
 	void writeLines(const std::vector<std::string>& lines) override;
 	std::string serialize() override;
+};
+
+
+// TODO: implement FileResponse!
+
+
+class HttpResponseRedirectBase : public HttpResponse
+{
+protected:
+	const std::set<std::string> _allowedHosts = {"http", "https", "ftp"};
+
+public:
+	explicit HttpResponseRedirectBase(
+		const std::string& redirectTo,
+		const std::string& content,
+		unsigned short int status,
+		const std::string& contentType = "",
+		const std::string& reason = "",
+		const std::string& charset = "utf-8"
+	);
+	std::string url();
+};
+
+
+class HttpResponseRedirect : public HttpResponseRedirectBase
+{
+public:
+	explicit HttpResponseRedirect(
+		const std::string& redirectTo,
+		const std::string& content = "",
+		const std::string& contentType = "",
+		const std::string& charset = "utf-8"
+	);
+};
+
+
+class HttpResponsePermanentRedirect : public HttpResponseRedirectBase
+{
+public:
+	explicit HttpResponsePermanentRedirect(
+		const std::string& redirectTo,
+		const std::string& content = "",
+		const std::string& contentType = "",
+		const std::string& charset = "utf-8"
+	);
 };
 
 
