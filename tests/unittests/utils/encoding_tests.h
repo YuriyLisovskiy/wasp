@@ -15,11 +15,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WASP_UNIT_TESTS_UTILS_INCLUDE_H
-#define WASP_UNIT_TESTS_UTILS_INCLUDE_H
+#ifndef WASP_UNIT_TESTS_UTILS_ENCODING_TESTS_H
+#define WASP_UNIT_TESTS_UTILS_ENCODING_TESTS_H
 
-#include "./mime_types_tests.h"
-#include "./str_utils_tests.h"
-#include "./encoding_tests.h"
+#include "../globals.h"
+#include "../../../src/utils/encoding.h"
 
-#endif // WASP_UNIT_TESTS_UTILS_INCLUDE_H
+
+__UNIT_TESTS_BEGIN__
+
+TEST(EncodeUrlTestCase, encode)
+{
+	std::string expected("https://hostName/deepLinkAction.do?userName=peter%40nable.com&password=Hello%25There&method=defaultDashboard");
+	std::string toEncode("https://hostName/deepLinkAction.do?userName=peter@nable.com&password=Hello%There&method=defaultDashboard");
+	ASSERT_EQ(wasp::internal::encodeUrl(toEncode), expected);
+}
+
+__UNIT_TESTS_END__
+
+
+#endif // WASP_UNIT_TESTS_UTILS_ENCODING_TESTS_H

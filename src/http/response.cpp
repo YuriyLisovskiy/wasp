@@ -247,7 +247,7 @@ HttpResponseRedirectBase::HttpResponseRedirectBase(
 	{
 		throw ValueError("invalid status", _ERROR_DETAILS_);
 	}
-	this->setHeader("Location", internal::iriToUri(redirectTo));
+	this->setHeader("Location", internal::encodeUrl(redirectTo));
 	internal::UrlParser parser;
 	parser.parse(redirectTo);
 	if (!parser.scheme().empty() && this->_allowedHosts.find(parser.scheme()) == this->_allowedHosts.end())

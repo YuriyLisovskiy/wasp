@@ -114,6 +114,11 @@ extern bool contains(const std::string& _str, char _char);
 
 extern std::string lower(const std::string& _str);
 
+extern std::string upper(const std::string& _str);
+
+// Splits the string vector of strings relatively for the character.
+extern std::vector<std::string> split(const std::string& str, char delimiter = ' ');
+
 __UTILS_STR_END__
 
 
