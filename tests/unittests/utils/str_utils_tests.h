@@ -58,6 +58,51 @@ TEST(StrUtilsUrlSplitTypeTestCase, TestEmptyInput)
 	ASSERT_EQ(dataActual, "");
 }
 
+TEST(StrUtilsSplitTestCase, TestSplitByDefaultChar)
+{
+	std::string toSplit("Alphanumeric and printable shellcode");
+	std::vector<std::string> expected = {"Alphanumeric", "and", "printable", "shellcode"};
+	auto actual = wasp::str::split(toSplit);
+	ASSERT_EQ(expected.size(), actual.size());
+	for (size_t i = 0; i < expected.size(); i++)
+	{
+		ASSERT_EQ(expected[i], actual[i]);
+	}
+}
+
+TEST(StrUtilsSplitTestCase, TestSplit)
+{
+	std::string toSplit("Alphanumeric:and: printable : shellcode");
+	std::vector<std::string> expected = {"Alphanumeric", "and", " printable ", " shellcode"};
+	auto actual = wasp::str::split(toSplit, ':');
+	ASSERT_EQ(expected.size(), actual.size());
+	for (size_t i = 0; i < expected.size(); i++)
+	{
+		ASSERT_EQ(expected[i], actual[i]);
+	}
+}
+
+TEST(StrUtilsJoinVectorTestCase, TestJoinStringVectorWithSpace)
+{
+	std::string expected = "Alphanumeric and printable shellcode";
+	std::vector<std::string> strVec = {"Alphanumeric", "and", "printable", "shellcode"};
+	ASSERT_EQ(wasp::str::join<std::string>(" ", strVec), expected);
+}
+
+TEST(StrUtilsJoinVectorTestCase, TestJoinIntVectorWithComma)
+{
+	std::string expected = "{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}";
+	std::vector<int> intVec = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+	ASSERT_EQ("{" + wasp::str::join<int>(", ", intVec) + "}", expected);
+}
+
+TEST(StrUtilsJoinVectorTestCase, TestJoinCharVectorWithputSpace)
+{
+	std::string expected = "Alphanumeric";
+	std::vector<char> intVec = {'A', 'l', 'p', 'h', 'a', 'n', 'u', 'm', 'e', 'r', 'i', 'c'};
+	ASSERT_EQ(wasp::str::join("", intVec), expected);
+}
+
 __UNIT_TESTS_END__
 
 
