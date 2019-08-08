@@ -103,6 +103,36 @@ TEST(StrUtilsJoinVectorTestCase, TestJoinCharVectorWithputSpace)
 	ASSERT_EQ(wasp::str::join("", intVec), expected);
 }
 
+// Dict
+TEST(StrUtilsJoinDictTestCase, TestJoinStringVectorWithSpace)
+{
+	std::string expected = "Alphanumeric and printable shellcode";
+	wasp::Dict<std::string, std::string> strDict = wasp::Dict<std::string, std::string>(
+		std::map<std::string, std::string>{
+			{"Alphanumeric", "and"},
+			{"printable", "shellcode"}
+		}
+	);
+	ASSERT_EQ(wasp::str::join(" ", strDict), expected);
+}
+
+TEST(StrUtilsJoinDictTestCase, TestJoinIntDictWithAsJson)
+{
+	std::string expected = "{\n\t\"key1\": \"some value\",\n\t\"some other key\": \"2019\"\n}";
+	wasp::Dict<std::string, std::string> strDict = wasp::Dict<std::string, std::string>(
+		std::map<std::string, std::string>{
+			{"key1", "some value"},
+			{"some other key", "2019"}
+		}
+	);
+	std::string actual = wasp::str::join<std::string, std::string>(
+		",\n\t",
+		strDict,
+		[](const std::pair<std::string, std::string>& p) -> std::string { return "\"" + p.first + "\": \"" + p.second + "\""; }
+	);
+	ASSERT_EQ("{\n\t" + actual + "\n}", expected);
+}
+
 __UNIT_TESTS_END__
 
 
