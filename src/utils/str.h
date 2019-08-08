@@ -81,29 +81,42 @@ T convert(const std::string& str)
 template <typename _T>
 std::string join(const std::string& delimiter, std::vector<_T> array)
 {
-	std::string result;
+	std::ostringstream oss;
 	for (auto it = array.begin(); it != array.end(); it++)
 	{
-		result.append(std::to_string(*it));
+		oss << *it;
 		if (std::next(it) != array.end())
 		{
-			array.append(delimiter);
+			oss << delimiter;
 		}
 	}
+	return oss.str();
 }
 
 template <typename _Key, typename _Val>
-std::string join(const std::string& delimiter, Dict<_Key, _Val> _qd, std::function<std::string(std::pair<_Key, _Val>)> expr)
+std::string join(
+	const std::string& delimiter,
+	Dict<_Key, _Val> _qd,
+	const std::function<std::string(const std::pair<_Key, _Val>&)>& expr = {}
+)
 {
-	std::string result;
+	std::ostringstream oss;
 	for (auto it = _qd.cbegin(); it != _qd.cend(); it++)
 	{
-		result.append(expr(*it));
+		if (expr)
+		{
+			oss << expr(*it);
+		}
+		else
+		{
+			oss << (*it).first << delimiter << (*it).second;
+		}
 		if (std::next(it) != _qd.cend())
 		{
-			result.append(delimiter);
+			oss << delimiter;
 		}
 	}
+	return oss.str();
 }
 
 // urlSplitType("type:opaqueString", typeOut, opaqueStringOut) --> "type", "opaqueString".
@@ -113,6 +126,11 @@ extern void urlSplitType(const std::string& url, std::string& scheme, std::strin
 extern bool contains(const std::string& _str, char _char);
 
 extern std::string lower(const std::string& _str);
+
+extern std::string upper(const std::string& _str);
+
+// Splits the string vector of strings relatively for the character.
+extern std::vector<std::string> split(const std::string& str, char delimiter = ' ');
 
 __UTILS_STR_END__
 

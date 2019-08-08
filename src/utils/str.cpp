@@ -278,4 +278,31 @@ std::string lower(const std::string& _str)
 	return res;
 }
 
+std::string upper(const std::string& _str)
+{
+	std::string res(_str);
+	std::transform(res.begin(), res.end(), res.begin(), [](unsigned char c){ return std::toupper(c); });
+	return res;
+}
+
+std::vector<std::string> split(const std::string& str, char delimiter)
+{
+	std::vector<std::string> result;
+	std::string current;
+	for (const char& _char : str)
+	{
+		if (_char == delimiter)
+		{
+			result.push_back(current);
+			current.clear();
+		}
+		else
+		{
+			current += _char;
+		}
+	}
+	result.push_back(current);
+	return result;
+}
+
 __UTILS_STR_END__

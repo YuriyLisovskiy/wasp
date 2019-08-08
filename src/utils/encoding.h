@@ -20,39 +20,36 @@
  * TODO: write docs.
  */
 
-#ifndef WASP_ENCODING_H
-#define WASP_ENCODING_H
+#ifndef WASP_UTILS_ENCODING_H
+#define WASP_UTILS_ENCODING_H
 
-#import <string>
+#include <string>
+#include <sstream>
+#include <iomanip>
 
 #include "../globals.h"
 
 
 __INTERNAL_BEGIN__
 
-// Convert an Internationalized Resource Identifier (IRI) portion to a URI
-// portion that is suitable for inclusion in a URL.
-// This is the algorithm from section 3.1 of RFC 3987, slightly simplified
-// since the input is assumed to be a string rather than an arbitrary byte
-// stream.
+// Converts character to percent-encoded character and writes it to stream.
 //
-// Take an IRI string, e.g. '/I ♥ Wasp/' and return a string containing the
-// encoded result with ASCII chars only (e.g. '/I%20%E2%99%A5%20Wasp/').
+// @safe - string which contains chars that must not be converted. If char 'c'
+// is in this sequence, it will be written to stream without converting.
 //
-// The list of safe characters here is constructed from the "reserved" and
-// "unreserved" characters specified in sections 2.2 and 2.3 of RFC 3986:
-//     reserved    = gen-delims / sub-delims
-//     gen-delims  = ":" / "/" / "?" / "#" / "[" / "]" / "@"
-//     sub-delims  = "!" / "$" / "&" / "'" / "(" / ")"
-//                   / "*" / "+" / "," / ";" / "="
-//     unreserved  = ALPHA / DIGIT / "-" / "." / "_" / "~"
-//
-// The % character is also added to the list of safe characters here, as the
-// end of section 3.1 of RFC 3987 specifically mentions that % must not be
-// converted.
-extern std::string iriToUri(const std::string& iri);
+// RFC 3986 section 2.2 Reserved Characters: ! * ' ( ) ; : @ & = + $ , / ? # [ ]
+// RFC 3986 section 2.3 Unreserved Characters: ALPHA NUMERIC - _ . ~
+extern void escape(std::ostringstream& stream, char c, const std::string& safe = "");
 
 __INTERNAL_END__
 
 
-#endif // WASP_ENCODING_H
+__WASP_BEGIN__
+
+// Encodes url using percent-encoding.
+extern std::string encodeUrl(const std::string& url);
+
+__WASP_END__
+
+
+#endif // WASP_UTILS_ENCODING_H

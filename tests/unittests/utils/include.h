@@ -20,5 +20,6 @@
 
 #include "./mime_types_tests.h"
 #include "./str_utils_tests.h"
+#include "./encoding_tests.h"
 
 #endif // WASP_UNIT_TESTS_UTILS_INCLUDE_H
