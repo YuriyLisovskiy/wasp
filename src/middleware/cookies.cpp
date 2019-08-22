@@ -27,12 +27,9 @@ __WASP_BEGIN__
 
 void CookieMiddleware::processRequest(wasp::HttpRequest& request)
 {
-	if (request.headers.contains("Cookie"))
-	{
-		auto* cookies = internal::CookieParser::parseRequestCookies(request.headers.get("Cookie"));
-		request.COOKIES = QueryDict(*cookies);
-		delete cookies;
-	}
+	auto* cookies = internal::CookieParser::parseRequestCookies(request.headers.get("Cookie", ""));
+	request.COOKIES = Dict(*cookies);
+	delete cookies;
 }
 
 void CookieMiddleware::processResponse(const wasp::HttpRequest& request, wasp::HttpResponse& response)

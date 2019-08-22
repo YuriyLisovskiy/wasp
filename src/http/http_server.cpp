@@ -22,89 +22,76 @@
 
 #include "http_server.h"
 
-#include "../utils/str_utils.h"
-#include "../core/exceptions.h"
-
 
 __INTERNAL_BEGIN__
 
-HttpServer::HttpServer(HttpServer::Context& ctx, const Settings& settings)
+HttpServer::HttpServer(HttpServer::Context& ctx)
 {
 	HttpServer::normalizeContext(ctx);
 
 	this->_host = ctx.host;
 	this->_port = ctx.port;
-	this->_logger = settings.LOGGER;
+	this->_logger = ctx.logger;
 
-	// default schema, https will be implemented in future. TODO.
+	// TODO: default schema, https will be implemented in future.
 	this->_schema = "http";
 
 	TcpServer::Context tcpContext{};
 	tcpContext.host = ctx.host;
 	tcpContext.port = ctx.port;
 	tcpContext.handler = std::bind(&HttpServer::_tcpHandler, this, std::placeholders::_1);
-	tcpContext.logger = settings.LOGGER;
+	tcpContext.logger = ctx.logger;
 
 	this->_httpHandler = ctx.handler;
-	this->_middleware = settings.MIDDLEWARE;
 	this->_tcpServer = new TcpServer(tcpContext);
 }
 
 HttpServer::~HttpServer()
 {
-	for (auto & middleware : this->_middleware)
-	{
-		delete middleware;
-	}
-	delete this->_tcpServer;
+	this->finish();
 }
 
-const std::string HttpServer::_tcpHandler(const std::string& data)
+std::string HttpServer::_tcpHandler(const std::string& data)
 {
 	try
 	{
-		// TODO: remove in prod
-		wasp::datetime::Measure<std::chrono::milliseconds> measure;
-
-		// TODO: remove in prod
+		// TODO: remove when release ------------------------:
+		wasp::dt::Measure<std::chrono::milliseconds> measure;
 		measure.start();
+		// TODO: remove when release ------------------------^
 
-		HttpRequestParser parser;
-		HttpRequest request = parser.parse(data);
+		HttpRequest request = HttpRequestParser().parse(data);
+		HttpResponseBase* response = this->_httpHandler(request);
 
-		for (const auto& middleware : this->_middleware)
-		{
-			middleware->processRequest(request);
-		}
+		// WARNING! Probably not working for large responses.
+		std::string result = response->serialize();
+		delete response;
 
-		HttpResponse response = this->_httpHandler(request);
-
-		for (const auto& middleware : this->_middleware)
-		{
-			middleware->processResponse(request, response);
-		}
-
-		// TODO: remove in prod
+		// TODO: remove when release -------------------------------------------------------------:
 		measure.end();
-
-		// TODO: remove in prod
 		std::cout << '\n' << request.method() << " request took " << measure.elapsed() << " ms\n";
+		// TODO: remove when release -------------------------------------------------------------^
 
-		return response.toString();
+		return result;
 	}
-	catch (const wasp::WaspHttpError& exc)
+	catch (const wasp::BaseException& exc)
 	{
-		// TODO: send internal server error
-		this->_logger->trace(exc.what(), exc.file(), exc.function(), exc.line());
-		return "";
+		this->_logger->trace(exc.what(), exc.line(), exc.function(), exc.file());
+
+		return HttpResponseServerError("<p style=\"font-size: 24px;\" >Internal Server Error</p>").serialize();
 	}
 }
 
 void HttpServer::listenAndServe()
 {
-	std::cout << wasp::format(STARTUP_MESSAGE, this->_schema, this->_host, this->_port);
+	std::cout << wasp::str::format(STARTUP_MESSAGE, this->_schema, this->_host, this->_port);
 	std::cout.flush();
 	this->_tcpServer->listenAndServe();
+}
+
+void HttpServer::finish()
+{
+	delete this->_tcpServer;
 }
 
 void HttpServer::normalizeContext(HttpServer::Context& ctx)
@@ -121,7 +108,12 @@ void HttpServer::normalizeContext(HttpServer::Context& ctx)
 
 	if (ctx.handler == nullptr)
 	{
-		throw wasp::WaspHttpError("HttpServer::Context::handler can not be nullptr", _ERROR_DETAILS_);
+		throw wasp::HttpError("HttpServer::Context::handler can not be nullptr", _ERROR_DETAILS_);
+	}
+
+	if (ctx.logger == nullptr)
+	{
+		ctx.logger = Logger::getInstance();
 	}
 }
 

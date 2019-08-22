@@ -15,57 +15,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * datetime
- * TODO: write docs.
- */
+#ifndef WASP_UNIT_TESTS_UTILS_PATH_TESTS_H
+#define WASP_UNIT_TESTS_UTILS_PATH_TESTS_H
 
-#ifndef WASP_UTILS_DATETIME_H
-#define WASP_UTILS_DATETIME_H
-
-#include <chrono>
+#include <gtest/gtest.h>
 
 #include "../globals.h"
+#include "../../../src/utils/path.h"
 
 
-__WASP_BEGIN__
+__UNIT_TESTS_BEGIN__
 
-namespace datetime
+TEST(PathTestCase, baseName)
 {
+	std::string expected("/bar");
+	std::string fullPath("/foo/bar");
+	ASSERT_EQ(wasp::path::baseName(fullPath), expected);
 
-template <typename _TimeT = std::chrono::milliseconds>
-class Measure
-{
-private:
-	std::chrono::high_resolution_clock::time_point _begin;
-	std::chrono::high_resolution_clock::time_point _end;
+	expected = "bar";
+	fullPath = "bar";
+	ASSERT_EQ(wasp::path::baseName(fullPath), expected);
 
-public:
-	void start()
-	{
-		this->_begin = std::chrono::high_resolution_clock::now();
-	}
-
-	void end()
-	{
-		this->_end = std::chrono::high_resolution_clock::now();
-	}
-
-	double elapsed()
-	{
-		return std::chrono::duration_cast<_TimeT>(this->_end - this->_begin).count();
-	}
-
-	void reset()
-	{
-		this->_begin = 0;
-		this->_end = 0;
-	}
-};
-
+	expected = "/bar";
+	fullPath = "/bar";
+	ASSERT_EQ(wasp::path::baseName(fullPath), expected);
 }
 
-__WASP_END__
+__UNIT_TESTS_END__
 
 
-#endif // WASP_UTILS_DATETIME_H
+#endif // WASP_UNIT_TESTS_UTILS_PATH_TESTS_H

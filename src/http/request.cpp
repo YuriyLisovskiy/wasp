@@ -1,9 +1,3 @@
-#include <utility>
-
-#include <utility>
-
-#include <utility>
-
 /*
  * Copyright (c) 2019 Yuriy Lisovskiy
  *
@@ -48,9 +42,9 @@ HttpRequest::HttpRequest(
 	_keepAlive(keepAlive),
 	_body(std::move(content))
 {
-	this->headers = QueryDict<std::string, std::string>(headers);
-	this->GET = QueryDict<std::string, std::string>(getParameters);
-	this->POST = QueryDict<std::string, std::string>(postParameters);
+	this->headers = Dict<std::string, std::string>(headers);
+	this->GET = Dict<std::string, std::string>(getParameters);
+	this->POST = Dict<std::string, std::string>(postParameters);
 }
 
 std::string HttpRequest::version()

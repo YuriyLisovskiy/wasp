@@ -28,7 +28,7 @@
 #include <map>
 
 #include "../globals.h"
-#include "../utils/query_dict.h"
+#include "../collections/dict.h"
 
 
 __WASP_BEGIN__
@@ -45,18 +45,16 @@ public:
 		const std::map<std::string, std::string>& postParameters
 	);
 
-	QueryDict<std::string, std::string> headers;
-	QueryDict<std::string, std::string> GET;
-	QueryDict<std::string, std::string> POST;
+	Dict<std::string, std::string> headers;
+	Dict<std::string, std::string> GET;
+	Dict<std::string, std::string> POST;
+	Dict<std::string, std::string> COOKIES;
 
 	// TODO
-	QueryDict<std::string, std::string> FILES;
+	Dict<std::string, std::string> FILES;
 
 	// TODO
-	QueryDict<std::string, std::string> COOKIES;
-
-	// TODO
-	QueryDict<std::string, std::string> META;
+	Dict<std::string, std::string> META;
 
 	std::string version();
 	std::string path();

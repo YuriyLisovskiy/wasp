@@ -20,6 +20,10 @@ file(GLOB LIB_FILES
 		"src/conf/*.cpp"
 		"src/utils/*.h"
 		"src/utils/*.cpp"
+		"src/utils/datetime/*.h"
+		"src/utils/datetime/*.cpp"
+		"src/collections/*.h"
+		"src/collections/*.cpp"
 		"src/core/*.h"
 		"src/core/*.cpp"
 		"src/middleware/*.h"
@@ -33,19 +37,24 @@ file(GLOB LIB_FILES
 	)
 
 file(GLOB TEST_FILES
-		"tests/http/*.h"
-		"tests/http/parsers/*.h"
+		"tests/unittests/*.h"
+		"tests/unittests/http/*.h"
+		"tests/unittests/http/parsers/*.h"
+		"tests/unittests/utils/*.h"
+		"tests/unittests/core/*.h"
+		"tests/unittests/core/exceptions/*.h"
+		"tests/unittests/collections/*.h"
 		"tests/*.h"
 	)
 
 set(LIB_SRC ${LIB_FILES})
 set(TEST_SRC ${TEST_FILES})
 
-if(EXISTS "${PROJECT_SOURCE_DIR}/main.cpp")
-	add_executable(${PACKAGE_NAME} ${LIB_SRC} "main.cpp")
+if(EXISTS "${PROJECT_SOURCE_DIR}/examples/http_server.cpp")
+	add_executable(http_server_example ${LIB_SRC} "examples/http_server.cpp")
 else()
     message("main.cpp does not exist")
 endif()
 
-add_executable(${PACKAGE_TESTS} ${LIB_SRC} ${TEST_SRC} "tests/main.cpp")
+add_executable(${PACKAGE_TESTS} ${LIB_SRC} ${TEST_SRC} "tests/unittests/main.cpp")
 target_link_libraries(${PACKAGE_TESTS} gtest gtest_main rt pthread ${TEST_SRC})

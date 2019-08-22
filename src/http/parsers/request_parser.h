@@ -28,6 +28,7 @@
 #include <cstdlib>
 #include <strings.h>
 #include <map>
+#include <iostream>
 
 #include "../../globals.h"
 #include "../request.h"
@@ -37,8 +38,7 @@ __INTERNAL_BEGIN__
 
 class HttpRequestParser
 {
-	friend class HttpRequestParserTest;
-private:
+protected:
 	size_t _majorV{};
 	size_t _minorV{};
 	std::string _path;
@@ -61,7 +61,7 @@ private:
 		ApplicationXWwwFormUrlencoded,
 		ApplicationJson,
 		MultipartFormData,
-		TextPlain
+		Other
 
 	} _contentType{};
 
@@ -74,6 +74,7 @@ private:
 		PathBegin,
 		Path,
 		Query,
+		Fragment,
 		HttpVersionH,
 		HttpVersionHt,
 		HttpVersionHtt,
@@ -117,6 +118,23 @@ private:
 		Val
 	};
 
+	enum MultipartParserState
+	{
+		BoundaryBegin,
+		Boundary,
+		BoundaryEnd,
+		ContentDispositionBegin,
+		ContentDisposition,
+		NameBegin,
+		Name,
+		FileNameBegin,
+		FileName,
+		ContentTypeBegin,
+		ContentType,
+		ContentBegin,
+		Content,
+	};
+
 	void _parseHttpWord(char input, char expectedInput, HttpRequestParser::ParserState newState);
 
 	// Parses http request stream
@@ -127,9 +145,6 @@ private:
 
 	// Parses 'multipart/form-data' content type
 	void _parseMultipart();
-
-	// Parses 'text/plain' content type
-	void _parsePlainText();
 
 	// Parses url's query or 'application/x-www-form-urlencoded' content type
 	static std::map<std::string, std::string>* _parseQuery(const std::string& content);
@@ -149,7 +164,6 @@ private:
 	// Check if a byte is a digit.
 	static bool isDigit(uint c);
 
-protected:
 	// May be overloaded for custom parser which is inherited from HttpRequestParser
 	virtual void setParameters(std::map<std::string, std::string>* params);
 

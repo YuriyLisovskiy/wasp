@@ -15,17 +15,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * globals
- * TODO: write docs.
- */
+#include <gtest/gtest.h>
 
-#ifndef WASP_TESTS_GLOBALS_H
-#define WASP_TESTS_GLOBALS_H
+// collections tests
+#include "collections/include.h"
+
+// core tests
+#include "core/include.h"
+
+// http tests
+#include "http/include.h"
+
+// utils tests
+#include "utils/include.h"
 
 
-#define __TESTS_BEGIN__ namespace wasp { namespace tests {
-#define __TESTS_END__ } }
-
-
-#endif // WASP_TESTS_GLOBALS_H
+int main(int argc, char *argv[])
+{
+	::testing::InitGoogleTest(&argc, argv);
+	return RUN_ALL_TESTS();
+}

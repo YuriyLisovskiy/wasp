@@ -15,10 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * tcp/ip server implementation.
- */
-
 #include "tcp_server.h"
 
 
@@ -28,12 +24,12 @@ TcpServer::TcpServer(TcpServer::Context ctx)
 {
 	if (ctx.host == nullptr)
 	{
-		ctx.host = "127.0.0.1";
+		ctx.host = DEFAULT_HOST;
 	}
 
 	if (ctx.port == 0)
 	{
-		ctx.port = 8000;
+		ctx.port = DEFAULT_PORT;
 	}
 
 	this->_host = ctx.host;
@@ -41,7 +37,7 @@ TcpServer::TcpServer(TcpServer::Context ctx)
 
 	if (ctx.handler == nullptr)
 	{
-		throw std::invalid_argument("Context::handler can not be nullptr");
+		throw std::invalid_argument("Context::handler can not be null");
 	}
 
 	this->_handler = ctx.handler;
@@ -66,7 +62,9 @@ int TcpServer::init()
 {
 	this->_socketAddr.sin_family = AF_INET;
 	this->_socketAddr.sin_port = htons(this->_port);
-	inet_pton(AF_INET, this->_host, &(this->_socketAddr.sin_addr));
+	this->_socketAddr.sin_addr.s_addr = inet_addr(this->_host);
+
+	memset(this->_socketAddr.sin_zero, '\0', sizeof this->_socketAddr.sin_zero);
 
 	this->_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
@@ -74,7 +72,7 @@ int TcpServer::init()
 	{
 		this->_logger->trace(
 			"Failed to initialize server at port " + std::to_string(ntohs(this->_socketAddr.sin_port)),
-			__FILE__, __FUNCTION__, __LINE__
+			_ERROR_DETAILS_
 		);
 		TcpServer::wsaCleanUp();
 		return INVALID_SOCKET;
@@ -84,7 +82,7 @@ int TcpServer::init()
 	{
 		this->_logger->trace(
 			"Failed to bind socket to port " + std::to_string(ntohs(this->_socketAddr.sin_port)),
-			__FILE__, __FUNCTION__, __LINE__
+			_ERROR_DETAILS_
 		);
 		TcpServer::cleanUp(this->_socket);
 		return SOCKET_ERROR;
@@ -94,7 +92,7 @@ int TcpServer::init()
 	{
 		this->_logger->trace(
 			"Failed to listen at port " + std::to_string(ntohs(this->_socketAddr.sin_port)),
-			__FILE__, __FUNCTION__, __LINE__
+			_ERROR_DETAILS_
 		);
 		return SOCKET_ERROR;
 	}
@@ -140,23 +138,23 @@ void TcpServer::startListener()
 			}
 			else
 			{
-				this->_logger->trace("Invalid socket connection", __FILE__, __FUNCTION__, __LINE__);
+				this->_logger->trace("Invalid socket connection", _ERROR_DETAILS_);
 			}
 		}
 		catch (const std::exception& exc)
 		{
-			this->_logger->trace(exc.what(), __FILE__, __FUNCTION__, __LINE__);
+			this->_logger->trace(exc.what(), _ERROR_DETAILS_);
 			listening = false;
 		}
 		catch (const char* exc)
 		{
-			this->_logger->trace(exc, __FILE__, __FUNCTION__, __LINE__);
+			this->_logger->trace(exc, _ERROR_DETAILS_);
 			listening = false;
 		}
 		catch (...)
 		{
 			this->_logger->trace(
-				"Error occurred while listening for socket connection", __FILE__, __FUNCTION__, __LINE__
+				"Error occurred while listening for socket connection", _ERROR_DETAILS_
 			);
 			listening = false;
 		}
@@ -165,58 +163,70 @@ void TcpServer::startListener()
 
 void TcpServer::serveConnection(const socket_t& connection)
 {
-	std::string data = TcpServer::recvAll(connection);
+	try
+	{
+		std::string data = TcpServer::recvAll(connection);
 
-	const std::string resp = this->_handler(data);
-
-	TcpServer::sendResponse(resp.c_str(), connection);
-
-	TcpServer::closeConnection(connection, SOCKET_SEND);
-	TcpServer::closeConnection(connection, SOCKET_RECEIVE);
-
+		if (!data.empty())
+		{
+			std::string resp = this->_handler(data);
+			TcpServer::sendAll(resp.c_str(), connection);
+		}
+	}
+	catch (const BaseException& exc)
+	{
+		this->_logger->trace(exc.what(), exc.line(), exc.function(), exc.file());
+	}
+	catch (const std::exception& exc)
+	{
+		this->_logger->trace(exc.what(), _ERROR_DETAILS_);
+	}
 	TcpServer::cleanUp(connection);
 }
 
+// TODO: bug, second, third, etc. POST requests from browser (Google Chrome, at least)
+//  with 'multipart/form-data' content type are read without request body.
 std::string TcpServer::recvAll(const socket_t& connection)
 {
-	char buffer[MAX_BUFF_SIZE];
-	msg_size_t msgSize;
+	// TODO: helps to receive POST request body, remove it after fix
+	//  receiving problem, that is described above.
+	std::this_thread::sleep_for(std::chrono::milliseconds(50));
+
+	msg_size_t msgSize = 0;
 	unsigned long size = 0;
 	std::string data;
+
+	char* buffer = (char*) calloc(MAX_BUFF_SIZE, sizeof(char));
 	do
 	{
 		msgSize = recv(connection, buffer, MAX_BUFF_SIZE, 0);
 		if (msgSize > 0)
 		{
-			buffer[msgSize] = '\0';
-			data += std::string(buffer);
+			data.append(buffer, msgSize);
 			size += msgSize;
 		}
-		else if (msgSize < 0)
+		else if (msgSize == -1)
 		{
-			this->_logger->trace("Received message size is less than zero", __FILE__, __FUNCTION__, __LINE__);
+			free(buffer);
+			throw TcpError("Received message size is less than zero", _ERROR_DETAILS_);
 		}
 	}
-	while (msgSize >= MAX_BUFF_SIZE);
+	while (msgSize == MAX_BUFF_SIZE);
 
-	return data.substr(0, size);
-}
+	free(buffer);
 
-void TcpServer::sendResponse(const char* data, const socket_t& connection)
-{
-	if (send(connection, data, ::strlen(data), 0) == SOCKET_ERROR)
+	if (data.size() != size)
 	{
-		this->_logger->trace("Failed to send bytes to socket connection", __FILE__, __FUNCTION__, __LINE__);
-		this->cleanUp(connection);
+		throw TcpError("Invalid request data total size", _ERROR_DETAILS_);
 	}
+	return data;
 }
 
-void TcpServer::closeConnection(const socket_t& connection, const int& type)
+void TcpServer::sendAll(const char* data, const socket_t& connection)
 {
-	if (shutdown(connection, type) == SOCKET_ERROR)
+	if (send(connection, data, std::strlen(data), 0) == SOCKET_ERROR)
 	{
-		this->_logger->trace("Failed to shut down socket connection", __FILE__, __FUNCTION__, __LINE__);
-		this->cleanUp(connection);
+		throw TcpError("Failed to send bytes to socket connection", _ERROR_DETAILS_);
 	}
 }
 
@@ -240,7 +250,7 @@ void TcpServer::cleanUp(const socket_t& socket)
 {
 	if (TcpServer::closeSocket(socket) == SOCKET_ERROR)
 	{
-		this->_logger->trace("Failed to close socket connection", __FILE__, __FUNCTION__, __LINE__);
+		this->_logger->trace("Failed to close socket connection", _ERROR_DETAILS_);
 	}
 	TcpServer::wsaCleanUp();
 }

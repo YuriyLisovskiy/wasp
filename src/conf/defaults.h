@@ -32,7 +32,7 @@ const char* const DEFAULT_HOST = "127.0.0.1";
 
 const uint16_t DEFAULT_PORT = 8000;
 
-const char* const STARTUP_MESSAGE = "Leaf version 0.0.1-dev, using app settings"
+const char* const STARTUP_MESSAGE = "Wasp version 0.0.1-dev, using app settings"
 									"\nStarting development server at {0!s}://{1!s}:{2!d}/"
 		                            "\nQuit the server with CONTROL-C.";
 

@@ -15,11 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * request_parser_tests
- * TODO: write docs.
- */
-
 #ifndef WASP_HTTP_PARSERS_REQUEST_PARSER_TESTS_H
 #define WASP_HTTP_PARSERS_REQUEST_PARSER_TESTS_H
 
@@ -28,13 +23,13 @@
 
 #include <gtest/gtest.h>
 
-#include "../../../src/globals.h"
-#include "../../../src/http/parsers/request_parser.h"
+#include "../../../../src/globals.h"
+#include "../../../../src/http/parsers/request_parser.h"
 
 
 __INTERNAL_BEGIN__
 
-class HttpRequestParserTest : public ::testing::Test
+class HttpRequestParserTestCase : public ::testing::Test, HttpRequestParser
 {
 protected:
 	static void isCharTest()
@@ -127,47 +122,47 @@ private:
 	}
 };
 
-TEST_F(HttpRequestParserTest, IsCharTest)
+TEST_F(HttpRequestParserTestCase, IsCharTest)
 {
-	HttpRequestParserTest::isCharTest();
+	HttpRequestParserTestCase::isCharTest();
 }
 
-TEST_F(HttpRequestParserTest, IsNotCharTest)
+TEST_F(HttpRequestParserTestCase, IsNotCharTest)
 {
-	HttpRequestParserTest::isNotCharTest();
+	HttpRequestParserTestCase::isNotCharTest();
 }
 
-TEST_F(HttpRequestParserTest, IsControlTest)
+TEST_F(HttpRequestParserTestCase, IsControlTest)
 {
-	HttpRequestParserTest::isControlTest();
+	HttpRequestParserTestCase::isControlTest();
 }
 
-TEST_F(HttpRequestParserTest, IsNotControlTest)
+TEST_F(HttpRequestParserTestCase, IsNotControlTest)
 {
-	HttpRequestParserTest::isNotControlTest();
+	HttpRequestParserTestCase::isNotControlTest();
 }
 
-TEST_F(HttpRequestParserTest, IsSpecialTest)
+TEST_F(HttpRequestParserTestCase, IsSpecialTest)
 {
-	HttpRequestParserTest::isSpecialTest();
+	HttpRequestParserTestCase::isSpecialTest();
 }
 
-TEST_F(HttpRequestParserTest, IsNotSpecialTest)
+TEST_F(HttpRequestParserTestCase, IsNotSpecialTest)
 {
-	HttpRequestParserTest::isNotSpecialTest();
+	HttpRequestParserTestCase::isNotSpecialTest();
 }
 
-TEST_F(HttpRequestParserTest, IsDigitTest)
+TEST_F(HttpRequestParserTestCase, IsDigitTest)
 {
-	HttpRequestParserTest::isDigitTest();
+	HttpRequestParserTestCase::isDigitTest();
 }
 
-TEST_F(HttpRequestParserTest, IsNotDigitTest)
+TEST_F(HttpRequestParserTestCase, IsNotDigitTest)
 {
-	HttpRequestParserTest::isNotDigitTest();
+	HttpRequestParserTestCase::isNotDigitTest();
 }
 
-TEST_F(HttpRequestParserTest, ParseQueryTest)
+TEST_F(HttpRequestParserTestCase, ParseQueryTest)
 {
 	this->parseQueryTest();
 }
