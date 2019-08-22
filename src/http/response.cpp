@@ -287,13 +287,14 @@ void FileResponse::_setHeaders()
 	}
 	std::string disposition = this->_asAttachment ? "attachment" : "inline";
 	std::string fileExpr;
+	std::string fileName = path::baseName(this->_filePath);
 	try
 	{
-		fileExpr = "filename=\"" + encoding::encode(this->_filePath, encoding::ASCII) + "\"";
+		fileExpr = "filename=\"" + encoding::encode(fileName, encoding::ASCII) + "\"";
 	}
 	catch (const EncodingError& e)
 	{
-		fileExpr = "filename*=utf-8''" + encoding::quote(this->_filePath);
+		fileExpr = "filename*=utf-8''" + encoding::quote(fileName);
 	}
 	this->_headers.set("Content-Disposition", disposition + "; " + fileExpr);
 }
