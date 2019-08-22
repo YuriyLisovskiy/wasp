@@ -185,6 +185,40 @@ AttributeError::AttributeError(const std::string& message, int line, const char 
 }
 
 
+// FileDoesNotExistError
+FileDoesNotExistError::FileDoesNotExistError(const char* message, int line, const char* function, const char* file, const char* type)
+	: BaseException(message, line, function, file, type)
+{
+}
+
+FileDoesNotExistError::FileDoesNotExistError(const char* message, int line, const char* function, const char* file)
+	: FileDoesNotExistError(message, line, function, file, "FileDoesNotExistError")
+{
+}
+
+FileDoesNotExistError::FileDoesNotExistError(const std::string& message, int line, const char *function, const char *file)
+	: FileDoesNotExistError(message.c_str(), line, function, file)
+{
+}
+
+
+// EncodingError
+EncodingError::EncodingError(const char* message, int line, const char* function, const char* file, const char* type)
+	: BaseException(message, line, function, file, type)
+{
+}
+
+EncodingError::EncodingError(const char* message, int line, const char* function, const char* file)
+	: EncodingError(message, line, function, file, "EncodingError")
+{
+}
+
+EncodingError::EncodingError(const std::string& message, int line, const char *function, const char *file)
+	: EncodingError(message.c_str(), line, function, file)
+{
+}
+
+
 // SuspiciousOperation
 SuspiciousOperation::SuspiciousOperation(const char* message, int line, const char* function, const char* file, const char* type)
 	: BaseException(message, line, function, file, type)

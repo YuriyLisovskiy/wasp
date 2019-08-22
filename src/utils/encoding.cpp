@@ -23,7 +23,9 @@
 #include "encoding.h"
 
 
-__WASP_BEGIN__
+__WASP_ENCODING_BEGIN__
+
+const char* ASCII = "ascii";
 
 std::string encodeUrl(const std::string& url)
 {
@@ -97,10 +99,37 @@ std::string encodeUrl(const std::string& url)
 	return oss.str();
 }
 
-__WASP_END__
+std::string quote(const std::string& _str, const std::string& safe)
+{
+	std::ostringstream oss;
+	oss.fill('0');
+	oss << std::hex;
+	for (const auto& _char : _str)
+	{
+		internal::escape(oss, _char, safe);
+	}
+	return oss.str();
+}
+
+std::string encode(const std::string& _str, const char* encoding, Mode mode)
+{
+	std::string result;
+	if (encoding == ASCII)
+	{
+		result = internal::encodeAscii(_str, mode);
+	}
+	// TODO: add more encodings here.
+	else
+	{
+		throw EncodingError("unknown encoding: " + std::string(encoding), _ERROR_DETAILS_);
+	}
+	return result;
+}
+
+__WASP_ENCODING_END__
 
 
-__INTERNAL_BEGIN__
+__WASP_ENCODING_INTERNAL_BEGIN__
 
 void escape(std::ostringstream& stream, char c, const std::string& safe)
 {
@@ -116,4 +145,32 @@ void escape(std::ostringstream& stream, char c, const std::string& safe)
 	}
 }
 
-__INTERNAL_END__
+std::string encodeAscii(const std::string& _str, Mode mode)
+{
+	std::string res;
+	for (size_t i = 0; i < _str.size(); i++)
+	{
+		auto _char = static_cast<unsigned char>(_str[i]);
+		switch (mode)
+		{
+			case Mode::STRICT:
+				if (_char > 127)
+				{
+					throw EncodingError(
+						"'ascii' codec can't encode character in position " + std::to_string(i) + ": ordinal not in range [0;127]",
+						_ERROR_DETAILS_
+					);
+				}
+				break;
+			case Mode::IGNORE:
+				continue;
+			case Mode::REPLACE:
+				res += '?';
+				continue;
+		}
+		res += _char;
+	}
+	return res;
+}
+
+__WASP_ENCODING_INTERNAL_END__

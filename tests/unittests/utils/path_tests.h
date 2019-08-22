@@ -15,12 +15,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WASP_UNIT_TESTS_UTILS_INCLUDE_H
-#define WASP_UNIT_TESTS_UTILS_INCLUDE_H
+#ifndef WASP_UNIT_TESTS_UTILS_PATH_TESTS_H
+#define WASP_UNIT_TESTS_UTILS_PATH_TESTS_H
 
-#include "./encoding_tests.h"
-#include "./mime_types_tests.h"
-#include "./path_tests.h"
-#include "./str_utils_tests.h"
+#include <gtest/gtest.h>
 
-#endif // WASP_UNIT_TESTS_UTILS_INCLUDE_H
+#include "../globals.h"
+#include "../../../src/utils/path.h"
+
+
+__UNIT_TESTS_BEGIN__
+
+TEST(PathTestCase, baseName)
+{
+	std::string expected("/bar");
+	std::string fullPath("/foo/bar");
+	ASSERT_EQ(wasp::path::baseName(fullPath), expected);
+
+	expected = "bar";
+	fullPath = "bar";
+	ASSERT_EQ(wasp::path::baseName(fullPath), expected);
+
+	expected = "/bar";
+	fullPath = "/bar";
+	ASSERT_EQ(wasp::path::baseName(fullPath), expected);
+}
+
+__UNIT_TESTS_END__
+
+
+#endif // WASP_UNIT_TESTS_UTILS_PATH_TESTS_H

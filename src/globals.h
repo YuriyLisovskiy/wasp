@@ -79,11 +79,17 @@
 #define __PATH_INTERNAL_BEGIN__ __PATH_BEGIN__ namespace internal {
 #define __PATH_INTERNAL_END__ } __PATH_END__
 
-// Namespace for types lib.
+// Namespace for encoding lib.
 //
-// Full name: wasp::tps
-#define __TYPES_BEGIN__ __WASP_BEGIN__ namespace tps {
-#define __TYPES_END__ } __WASP_END__
+// Full name: wasp::encoding
+#define __WASP_ENCODING_BEGIN__ __WASP_BEGIN__ namespace encoding {
+#define __WASP_ENCODING_END__ } __WASP_END__
+
+// Encoding internals.
+//
+// Full name: wasp::encoding::internal
+#define __WASP_ENCODING_INTERNAL_BEGIN__ __WASP_ENCODING_BEGIN__ namespace internal {
+#define __WASP_ENCODING_INTERNAL_END__ } __WASP_ENCODING_END__
 
 // Required parameters for Wasp's built-in logger.
 #define _ERROR_DETAILS_ __LINE__, __FUNCTION__, __FILE__

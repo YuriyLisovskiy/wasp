@@ -305,4 +305,20 @@ std::vector<std::string> split(const std::string& str, char delimiter)
 	return result;
 }
 
+bool startsWith(const std::string& src, const std::string& prefix)
+{
+	if (src.size() < prefix.size())
+	{
+		return false;
+	}
+	for (size_t i = 0 ; i < prefix.size(); i++)
+	{
+		if (src[i] != prefix[i])
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
 __UTILS_STR_END__

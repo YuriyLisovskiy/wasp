@@ -23,6 +23,13 @@
 #ifndef WASP_UTILS_PATH_H
 #define WASP_UTILS_PATH_H
 
+#if defined(_WIN32) || defined(_WIN64)
+#include <io.h>
+#define access _access_s
+#else
+#include <unistd.h>
+#endif
+
 #include <string>
 
 #include "../globals.h"
@@ -49,6 +56,10 @@ __PATH_BEGIN__
 // pathname component; the root is everything before that.
 // It is always true that root + ext == p.
 extern void splitText(const std::string& fullPath, std::string& rootOut, std::string& extOut);
+
+extern bool exists(const std::string& path);
+
+extern std::string baseName(const std::string& path);
 
 __PATH_END__
 

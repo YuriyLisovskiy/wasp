@@ -29,6 +29,7 @@
 #include <cstring>
 #include <iterator>
 #include <set>
+#include <fstream>
 
 #include "../globals.h"
 #include "request.h"
@@ -38,6 +39,8 @@
 #include "../utils/str.h"
 #include "parsers/url_parser.h"
 #include "../utils/encoding.h"
+#include "../utils/path.h"
+#include "../utils/mime_types.h"
 
 #include "../utils/datetime/datetime.h"
 
@@ -137,7 +140,28 @@ public:
 };
 
 
-// TODO: implement FileResponse!
+class FileResponse : public HttpResponseBase
+{
+private:
+	bool _asAttachment;
+	std::string _filePath;
+	std::vector<char> _content;
+
+protected:
+	void _read();
+	void _setHeaders();
+
+public:
+	explicit FileResponse(
+			bool asAttachment = false,
+			const std::string& filePath = "",
+			unsigned short int status = 0,
+			const std::string& contentType = "",
+			const std::string& reason = "",
+			const std::string& charset = "utf-8"
+	);
+	std::string serialize() override;
+};
 
 
 class HttpResponseRedirectBase : public HttpResponse

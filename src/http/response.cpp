@@ -220,7 +220,8 @@ void HttpResponse::writeLines(const std::vector<std::string>& lines)
 	}
 }
 
-std::string HttpResponse::serialize() {
+std::string HttpResponse::serialize()
+{
 	this->setHeader("Date", dt::gmtnow().strftime("%a, %d %b %Y %T %Z"));
 	this->setHeader("Content-Length", std::to_string(this->_content.size()));
 
@@ -229,7 +230,72 @@ std::string HttpResponse::serialize() {
 	auto headers = this->serializeHeaders();
 
 	return "HTTP/1.1 " + std::to_string(this->_status) + " " + reasonPhrase + "\r\n" +
-	       headers + "\r\n\r\n" + this->_content;
+		   headers + "\r\n\r\n" + this->_content;
+}
+
+
+// FileResponse implementation
+FileResponse::FileResponse(
+	bool asAttachment,
+	const std::string& filePath,
+	unsigned short status,
+	const std::string& contentType,
+	const std::string& reason,
+	const std::string& charset
+) : HttpResponseBase(status, contentType, reason, charset)
+{
+	this->_asAttachment = asAttachment;
+	this->_filePath = filePath;
+	if (!path::exists(this->_filePath))
+	{
+		throw FileDoesNotExistError("file '" + this->_filePath + "' does not exist", _ERROR_DETAILS_);
+	}
+	this->_read();
+}
+
+std::string FileResponse::serialize()
+{
+	auto reasonPhrase = this->getReasonPhrase();
+	this->_setHeaders();
+	this->setHeader("Date", dt::gmtnow().strftime("%a, %d %b %Y %T %Z"));
+	auto headers = this->serializeHeaders();
+	return "HTTP/1.1 " + std::to_string(this->_status) + " " + reasonPhrase + "\r\n" +
+		   headers + "\r\n\r\n" + std::string(this->_content.begin(), this->_content.end());
+}
+
+void FileResponse::_read()
+{
+	std::ifstream is(this->_filePath);
+	std::istream_iterator<char> start(is), end;
+	this->_content = std::vector<char>(start, end);
+}
+
+void FileResponse::_setHeaders()
+{
+	auto encodingMap = Dict<std::string, std::string>({
+		{"bzip2", "application/x-bzip"},
+		{"gzip", "application/gzip"},
+		{"xz", "application/x-xz"}
+	});
+	this->setHeader("Content-Length", std::to_string(this->_content.size()));
+	if (str::startsWith(this->_headers.get("Content-Type", ""), "text/html"))
+	{
+		std::string contentType, encoding;
+		mime::guessContentType(this->_filePath, contentType, encoding);
+		contentType = encodingMap.get(encoding, contentType);
+		this->_headers.set("Content-Type", !contentType.empty() ? contentType : "application/octet-stream");
+	}
+	std::string disposition = this->_asAttachment ? "attachment" : "inline";
+	std::string fileExpr;
+	try
+	{
+		fileExpr = "filename=\"" + encoding::encode(this->_filePath, encoding::ASCII) + "\"";
+	}
+	catch (const EncodingError& e)
+	{
+		fileExpr = "filename*=utf-8''" + encoding::quote(this->_filePath);
+	}
+	this->_headers.set("Content-Disposition", disposition + "; " + fileExpr);
 }
 
 
@@ -247,7 +313,7 @@ HttpResponseRedirectBase::HttpResponseRedirectBase(
 	{
 		throw ValueError("invalid status", _ERROR_DETAILS_);
 	}
-	this->setHeader("Location", wasp::encodeUrl(redirectTo));
+	this->setHeader("Location", encoding::encodeUrl(redirectTo));
 	internal::UrlParser parser;
 	parser.parse(redirectTo);
 	if (!parser.scheme().empty() && this->_allowedHosts.find(parser.scheme()) == this->_allowedHosts.end())

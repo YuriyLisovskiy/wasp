@@ -63,4 +63,19 @@ void splitText(const std::string& fullPath, std::string& rootOut, std::string& e
 	internal::_splitText(fullPath, '/', '\0', '.', rootOut, extOut);
 }
 
+bool exists(const std::string& path)
+{
+	return access(path.c_str(), 0) == 0;
+}
+
+std::string baseName(const std::string& path)
+{
+	size_t pos = path.rfind('/');
+	if (pos == std::string::npos)
+	{
+		pos = 0;
+	}
+	return std::string(path.begin() + pos, path.end());
+}
+
 __PATH_END__

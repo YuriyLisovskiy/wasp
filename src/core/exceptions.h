@@ -136,6 +136,28 @@ public:
 };
 
 
+class FileDoesNotExistError : public BaseException
+{
+protected:
+	// Use only when initializing of a derived exception!
+	FileDoesNotExistError(const char* message, int line, const char* function, const char* file, const char* type);
+public:
+	FileDoesNotExistError(const char* message, int line, const char* function, const char* file);
+	FileDoesNotExistError(const std::string& message, int line, const char* function, const char* file);
+};
+
+
+class EncodingError : public BaseException
+{
+protected:
+	// Use only when initializing of a derived exception!
+	EncodingError(const char* message, int line, const char* function, const char* file, const char* type);
+public:
+	EncodingError(const char* message, int line, const char* function, const char* file);
+	EncodingError(const std::string& message, int line, const char* function, const char* file);
+};
+
+
 // The user did something suspicious
 class SuspiciousOperation : public BaseException
 {

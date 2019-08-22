@@ -132,6 +132,8 @@ extern std::string upper(const std::string& _str);
 // Splits the string vector of strings relatively for the character.
 extern std::vector<std::string> split(const std::string& str, char delimiter = ' ');
 
+extern bool startsWith(const std::string& src, const std::string& prefix);
+
 __UTILS_STR_END__
 
 

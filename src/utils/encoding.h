@@ -28,9 +28,38 @@
 #include <iomanip>
 
 #include "../globals.h"
+#include "../core/exceptions.h"
 
 
-__INTERNAL_BEGIN__
+__WASP_ENCODING_BEGIN__
+
+// Encodes url using percent-encoding.
+extern std::string encodeUrl(const std::string& url);
+
+extern std::string quote(const std::string& _str, const std::string& safe = "");
+
+extern const char* ASCII;
+
+enum Mode
+{
+	STRICT, IGNORE, REPLACE
+};
+
+// Encode string to given encoding.
+//
+// Available encodings:
+//  - ascii
+//
+// Modes:
+//  - strict: throws EncodingError if string violates encoding rules;
+//  - ignore: removes offending symbols from string;
+//  - replace: replaces offending symbols by question mark ('?').
+extern std::string encode(const std::string& _str, const char* encoding, Mode mode = Mode::STRICT);
+
+__WASP_ENCODING_END__
+
+
+__WASP_ENCODING_INTERNAL_BEGIN__
 
 // Converts character to percent-encoded character and writes it to stream.
 //
@@ -41,15 +70,9 @@ __INTERNAL_BEGIN__
 // RFC 3986 section 2.3 Unreserved Characters: ALPHA NUMERIC - _ . ~
 extern void escape(std::ostringstream& stream, char c, const std::string& safe = "");
 
-__INTERNAL_END__
+extern std::string encodeAscii(const std::string& _str, Mode mode);
 
-
-__WASP_BEGIN__
-
-// Encodes url using percent-encoding.
-extern std::string encodeUrl(const std::string& url);
-
-__WASP_END__
+__WASP_ENCODING_INTERNAL_END__
 
 
 #endif // WASP_UTILS_ENCODING_H
