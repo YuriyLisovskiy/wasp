@@ -39,7 +39,7 @@ HttpServer::HttpServer(HttpServer::Context& ctx)
 	TcpServer::Context tcpContext{};
 	tcpContext.host = ctx.host;
 	tcpContext.port = ctx.port;
-	tcpContext.handler = std::bind(&HttpServer::_tcpHandler, this, std::placeholders::_1);
+	tcpContext.handler = std::bind(&HttpServer::_tcpHandler, this, std::placeholders::_1, std::placeholders::_2);
 	tcpContext.logger = ctx.logger;
 
 	this->_httpHandler = ctx.handler;
@@ -51,7 +51,7 @@ HttpServer::~HttpServer()
 	this->finish();
 }
 
-std::string HttpServer::_tcpHandler(const std::string& data)
+void HttpServer::_tcpHandler(const std::string& data, const socket_t& client)
 {
 	try
 	{
@@ -67,18 +67,21 @@ std::string HttpServer::_tcpHandler(const std::string& data)
 		std::string result = response->serialize();
 		delete response;
 
+		this->_tcpServer->write(result.c_str(), client);
+
 		// TODO: remove when release -------------------------------------------------------------:
 		measure.end();
 		std::cout << '\n' << request.method() << " request took " << measure.elapsed() << " ms\n";
 		// TODO: remove when release -------------------------------------------------------------^
-
-		return result;
 	}
 	catch (const wasp::BaseException& exc)
 	{
 		this->_logger->trace(exc.what(), exc.line(), exc.function(), exc.file());
 
-		return HttpResponseServerError("<p style=\"font-size: 24px;\" >Internal Server Error</p>").serialize();
+		this->_tcpServer->write(
+			HttpResponseServerError("<p style=\"font-size: 24px;\" >Internal Server Error</p>").serialize().c_str(),
+			client
+		);
 	}
 }
 

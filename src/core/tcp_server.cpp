@@ -169,8 +169,7 @@ void TcpServer::serveConnection(const socket_t& connection)
 
 		if (!data.empty())
 		{
-			std::string resp = this->_handler(data);
-			TcpServer::sendAll(resp.c_str(), connection);
+			this->_handler(data, connection);
 		}
 	}
 	catch (const BaseException& exc)
@@ -222,7 +221,7 @@ std::string TcpServer::recvAll(const socket_t& connection)
 	return data;
 }
 
-void TcpServer::sendAll(const char* data, const socket_t& connection)
+void TcpServer::write(const char* data, const socket_t& connection)
 {
 	if (send(connection, data, std::strlen(data), 0) == SOCKET_ERROR)
 	{

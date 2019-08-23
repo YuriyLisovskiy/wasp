@@ -85,7 +85,7 @@ typedef ssize_t msg_size_t;
 
 #define MAX_BUFF_SIZE 2048
 
-typedef std::function<std::string(const std::string&)> tcpHandler;
+typedef std::function<void(const std::string&, const socket_t&)> tcpHandler;
 
 class TcpServer
 {
@@ -102,7 +102,6 @@ private:
 	static void wsaCleanUp();
 	void cleanUp(const socket_t& connection);
 	std::string recvAll(const socket_t& connection);
-	void sendAll(const char* data, const socket_t& connection);
 	int init();
 
 public:
@@ -116,6 +115,7 @@ public:
 
 	explicit TcpServer(TcpServer::Context ctx);
 	void listenAndServe();
+	void write(const char* data, const socket_t& connection);
 	~TcpServer();
 };
 
