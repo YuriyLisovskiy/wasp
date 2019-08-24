@@ -43,7 +43,7 @@ void handler(wasp::HttpRequest& request, const wasp::internal::socket_t& client)
 //		std::cout << it->first << ": " << it->second << '\n';
 //	}
 
-	auto response = new wasp::FileResponse("/home/yuriylisovskiy/Desktop/BurpSettings.json");
+	auto response = new wasp::FileResponse("/home/user/Desktop/file.json");
 	HttpServer::send(response, client);
 	delete response;
 

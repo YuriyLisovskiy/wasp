@@ -80,7 +80,7 @@ public:
 	~HttpServer();
 
 private:
-	static void normalizeContext(HttpServer::Context& ctx);
+	static void _normalizeContext(HttpServer::Context& ctx);
 };
 
 __INTERNAL_END__

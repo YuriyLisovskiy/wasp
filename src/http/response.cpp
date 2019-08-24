@@ -22,6 +22,8 @@
 
 #include "response.h"
 
+#include <utility>
+
 
 __WASP_BEGIN__
 
@@ -252,7 +254,7 @@ std::string StreamingHttpResponse::serialize()
 
 // FileResponse implementation
 FileResponse::FileResponse(
-	const std::string& filePath,
+	std::string filePath,
 	bool asAttachment,
 	unsigned short status,
 	const std::string& contentType,
@@ -262,8 +264,8 @@ FileResponse::FileResponse(
 	_bytesRead(0),
 	_totalBytesRead(0),
 	_asAttachment(asAttachment),
-	_filePath(filePath),
-	_headersIsInited(false)
+	_filePath(std::move(filePath)),
+	_headersIsGot(false)
 {
 	if (!path::exists(this->_filePath))
 	{
@@ -276,19 +278,16 @@ FileResponse::FileResponse(
 	this->_fileStream.seekg(0);
 }
 
-bool FileResponse::readChunk()
+std::string FileResponse::getChunk()
 {
-	if (!this->_headersIsInited)
+	std::string chunk;
+	if (!this->_headersIsGot)
 	{
-		this->_initHeaders();
-		_headersIsInited = true;
-		return true;
+		chunk = this->_getHeadersChunk();
+		_headersIsGot = true;
 	}
 	else
 	{
-		this->_lastChunk.clear();
-		this->_lastChunk = std::string(FileResponse::CHUNK_SIZE, '\0');
-
 		size_t bytesToRead;
 		if ((this->_totalBytesRead + FileResponse::CHUNK_SIZE) > this->_fileSize)
 		{
@@ -299,11 +298,16 @@ bool FileResponse::readChunk()
 			bytesToRead = FileResponse::CHUNK_SIZE;
 		}
 
-		this->_fileStream.read(this->_lastChunk.data(), bytesToRead);
-		this->_bytesRead = this->_fileStream.gcount();
-		this->_totalBytesRead += this->_bytesRead;
-		return bytesToRead;
+		if (bytesToRead > 0)
+		{
+			chunk = std::string(FileResponse::CHUNK_SIZE, '\0');
+
+			this->_fileStream.read(chunk.data(), bytesToRead);
+			this->_bytesRead = this->_fileStream.gcount();
+			this->_totalBytesRead += this->_bytesRead;
+		}
 	}
+	return chunk.substr(0, this->_bytesRead);
 }
 
 void FileResponse::_setHeaders()
@@ -335,20 +339,18 @@ void FileResponse::_setHeaders()
 	this->_headers.set("Content-Disposition", disposition + "; " + fileExpr);
 }
 
-void FileResponse::_initHeaders()
+std::string FileResponse::_getHeadersChunk()
 {
 	auto reasonPhrase = this->getReasonPhrase();
 	this->_setHeaders();
 	this->setHeader("Date", dt::gmtnow().strftime("%a, %d %b %Y %T %Z"));
 	auto headers = this->serializeHeaders();
 
-	this->_lastChunk = "HTTP/1.1 " + std::to_string(this->_status) + " " + reasonPhrase + "\r\n" + headers + "\r\n\r\n";
-	this->_bytesRead = this->_lastChunk.size();
-}
+	std::string headersChunk = "HTTP/1.1 " + std::to_string(this->_status) + " " + reasonPhrase + "\r\n"
+		+ headers + "\r\n\r\n";
+	this->_bytesRead = headersChunk.size();
 
-std::string FileResponse::getLastChunk()
-{
-	return this->_lastChunk.substr(0, this->_bytesRead);
+	return headersChunk;
 }
 
 unsigned long int FileResponse::tell()

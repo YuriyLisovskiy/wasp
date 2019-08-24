@@ -27,13 +27,13 @@ __INTERNAL_BEGIN__
 
 HttpServer::HttpServer(HttpServer::Context& ctx)
 {
-	HttpServer::normalizeContext(ctx);
+	HttpServer::_normalizeContext(ctx);
 
 	this->_host = ctx.host;
 	this->_port = ctx.port;
 	this->_logger = ctx.logger;
 
-	// TODO: default schema, https will be implemented in future.
+	// Default schema, https will be implemented in future.
 	this->_schema = "http";
 
 	TcpServer::Context tcpContext{};
@@ -97,14 +97,15 @@ void HttpServer::send(HttpResponseBase* response, const socket_t& client)
 
 void HttpServer::send(StreamingHttpResponse* response, const socket_t& client)
 {
-	while (response->readChunk())
+	std::string chunk;
+	while (!(chunk = response->getChunk()).empty())
 	{
-		TcpServer::write(response->getLastChunk().c_str(), response->tell(), client);
+		TcpServer::write(chunk.c_str(), chunk.size(), client);
 	}
 	response->close();
 }
 
-void HttpServer::normalizeContext(HttpServer::Context& ctx)
+void HttpServer::_normalizeContext(HttpServer::Context& ctx)
 {
 	if (ctx.host == nullptr)
 	{

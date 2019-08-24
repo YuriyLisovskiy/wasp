@@ -150,38 +150,39 @@ public:
 		const std::string& charset = "utf-8"
 	);
 	std::string serialize() final;
-	virtual bool readChunk() = 0;
-	virtual std::string getLastChunk() = 0;
+	virtual std::string getChunk() = 0;
 };
 
 
 class FileResponse final : public StreamingHttpResponse
 {
 private:
-	static const size_t CHUNK_SIZE = 1024 * 1024;   // 1 mb
+	static const size_t CHUNK_SIZE = 1024 * 1024;   // 1 mb per chunk
 
 	bool _asAttachment;
 	std::string _filePath;
-	std::string _lastChunk;
+
 	size_t _bytesRead;
 	size_t _totalBytesRead;
 	size_t _fileSize;
 	std::ifstream _fileStream;
-	bool _headersIsInited;
+
+	// Identifies whether headers where read or not.
+	bool _headersIsGot;
+
 	void _setHeaders();
-	void _initHeaders();
+	std::string _getHeadersChunk();
 
 public:
 	explicit FileResponse(
-		const std::string& filePath,
+		std::string  filePath,
 		bool asAttachment = false,
 		unsigned short int status = 0,
 		const std::string& contentType = "",
 		const std::string& reason = "",
 		const std::string& charset = "utf-8"
 	);
-	bool readChunk() override;
-	std::string getLastChunk() override;
+	std::string getChunk() override;
 	void close() override;
 	unsigned long int tell() override;
 };
