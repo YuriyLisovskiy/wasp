@@ -100,21 +100,7 @@ protected:
 		ASSERT_FALSE(HttpRequestParser::isDigit('o'));
 	}
 
-	void parseQueryTest()
-	{
-		auto expected = std::map<std::string, std::string> {
-			std::pair<std::string, std::string>("hello", "world"),
-			std::pair<std::string, std::string>("world", "hello"),
-			std::pair<std::string, std::string>("hello_key", "hello_value"),
-			std::pair<std::string, std::string>("world_key", "world_value"),
-		};
-		auto actual = HttpRequestParser::_parseQuery("hello=world&world=hello&hello_key=hello_value&world_key=world_value");
-		ASSERT_TRUE(this->mapsAreEqual(expected, *actual));
-		delete actual;
-	}
 private:
-	HttpRequestParser parser;
-
 	template <typename _Map>
 	bool mapsAreEqual(const _Map& lhs, const _Map& rhs)
 	{
@@ -160,11 +146,6 @@ TEST_F(HttpRequestParserTestCase, IsDigitTest)
 TEST_F(HttpRequestParserTestCase, IsNotDigitTest)
 {
 	HttpRequestParserTestCase::isNotDigitTest();
-}
-
-TEST_F(HttpRequestParserTestCase, ParseQueryTest)
-{
-	this->parseQueryTest();
 }
 
 __INTERNAL_END__

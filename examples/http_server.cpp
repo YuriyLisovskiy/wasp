@@ -38,25 +38,29 @@ void handler(wasp::HttpRequest& request, const wasp::internal::socket_t& client)
 
 //	std::cout << request.body() << "\n";
 
+	std::cout << request.POST.get("first_name") << '\n';
+
 //	for (auto it = request.COOKIES.cbegin(); it != request.COOKIES.cend(); it++)
 //	{
 //		std::cout << it->first << ": " << it->second << '\n';
 //	}
 
+/*
 	auto response = new wasp::FileResponse("/home/user/Desktop/file.json");
 	HttpServer::send(response, client);
 	delete response;
+*/
 
-/*
 	std::string body("<form action=\"/hello\" method=\"post\" enctype=\"multipart/form-data\">\n"
 					 "\t<input type=\"file\" name=\"super_file\" />\n"
-					 "\t<input type=\"password\" name=\"first_name\" />\n"
+					 "\t<input type=\"text\" name=\"first_name\" />\n"
+					 "\t<input type=\"text\" name=\"first_name\" />\n"
 					 "\t<input type=\"submit\" value=\"send\" />\n"
 					 "\t</form>\n");
 	auto response = new wasp::HttpResponse(body);
 	HttpServer::send(response, client);
 	delete response;
-*/
+
 }
 
 int main()
@@ -65,7 +69,7 @@ int main()
 	{
 		HttpServer::Context ctx{};
 		ctx.handler = handler;
-		ctx.port = 3000;
+		ctx.port = 8000;
 
 		HttpServer server(ctx);
 

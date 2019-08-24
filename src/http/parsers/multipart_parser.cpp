@@ -16,41 +16,40 @@
  */
 
 /*
- * CookieParser definition.
+ * multipart_parser implementation.
  * TODO: write docs.
  */
 
-#ifndef WASP_HTTP_PARSERS_COOKIE_PARSER_H
-#define WASP_HTTP_PARSERS_COOKIE_PARSER_H
-
-#include <map>
-#include <string>
-
-#include "../../globals.h"
+#include "multipart_parser.h"
 
 
 __INTERNAL_BEGIN__
 
-class CookieParser
+MultipartParser::MultipartParser(const UploadHandler& uploadHandler)
 {
-private:
-	enum ReqCookieParserState
+	this->_uploadHandler = uploadHandler;
+}
+
+void MultipartParser::parse(const std::string& contentType, const std::string& body)
+{
+	auto pos = contentType.find("boundary=");
+	if (pos == std::string::npos)
 	{
-		Key,
-		Val
-	};
+		return;
+	}
+	auto boundary = contentType.substr(pos + 9);
 
-	enum RespCookieParserState
-	{
+	// TODO: parse multipart data
+}
 
-	};
+MultiValueDict<std::string, std::string> MultipartParser::getFilesParameters()
+{
+	return MultiValueDict<std::string, std::string>();
+}
 
-public:
-	static std::map<std::string, std::string>* parseRequestCookies(const std::string& content);
-	static std::map<std::string, std::string>* parseResponseCookies(const std::string& content);
-};
+Dict<std::string, std::string> MultipartParser::getPostParameters()
+{
+	return Dict<std::string, std::string>();
+}
 
 __INTERNAL_END__
-
-
-#endif // WASP_HTTP_PARSERS_COOKIE_PARSER_H

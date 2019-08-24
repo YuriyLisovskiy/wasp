@@ -32,6 +32,9 @@
 
 #include "../../globals.h"
 #include "../request.h"
+#include "multipart_parser.h"
+#include "../request_parameters.h"
+#include "query_parser.h"
 
 
 __INTERNAL_BEGIN__
@@ -47,8 +50,8 @@ protected:
 	bool _keepAlive{};
 	std::string _content;
 	std::map<std::string, std::string> _headers;
-	std::map<std::string, std::string> _getParameters;
-	std::map<std::string, std::string> _postParameters;
+	RequestParameters<std::string, std::string> _getParameters;
+	RequestParameters<std::string, std::string> _postParameters;
 
 	unsigned long long _contentSize{};
 	std::string _chunkSizeStr;
@@ -112,29 +115,6 @@ protected:
 
 	} _state{};
 
-	enum QueryParserState
-	{
-		Key,
-		Val
-	};
-
-	enum MultipartParserState
-	{
-		BoundaryBegin,
-		Boundary,
-		BoundaryEnd,
-		ContentDispositionBegin,
-		ContentDisposition,
-		NameBegin,
-		Name,
-		FileNameBegin,
-		FileName,
-		ContentTypeBegin,
-		ContentType,
-		ContentBegin,
-		Content,
-	};
-
 	void _parseHttpWord(char input, char expectedInput, HttpRequestParser::ParserState newState);
 
 	// Parses http request stream
@@ -143,13 +123,7 @@ protected:
 	// Parses 'application/json' content type
 	void _parseApplicationJson();
 
-	// Parses 'multipart/form-data' content type
-	void _parseMultipart();
-
-	// Parses url's query or 'application/x-www-form-urlencoded' content type
-	static std::map<std::string, std::string>* _parseQuery(const std::string& content);
-
-	void _setParameters(std::map<std::string, std::string>* params);
+	void _setParameters(RequestParameters<std::string, std::string>* params);
 
 	// Helpers
 	// Check if a byte is an HTTP character.
@@ -165,7 +139,7 @@ protected:
 	static bool isDigit(uint c);
 
 	// May be overloaded for custom parser which is inherited from HttpRequestParser
-	virtual void setParameters(std::map<std::string, std::string>* params);
+	virtual void setParameters(RequestParameters<std::string, std::string>* params);
 
 public:
 	HttpRequestParser() = default;

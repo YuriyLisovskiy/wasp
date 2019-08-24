@@ -29,6 +29,7 @@
 
 #include "../globals.h"
 #include "../collections/dict.h"
+#include "request_parameters.h"
 
 
 __WASP_BEGIN__
@@ -41,17 +42,17 @@ public:
 		std::string method, std::string path, size_t majorV, size_t minorV,
 		std::string query, bool keepAlive, std::string content,
 		const std::map<std::string, std::string>& headers,
-		const std::map<std::string, std::string>& getParameters,
-		const std::map<std::string, std::string>& postParameters
+		const RequestParameters<std::string, std::string>& getParameters,
+		const RequestParameters<std::string, std::string>& postParameters
 	);
 
 	Dict<std::string, std::string> headers;
-	Dict<std::string, std::string> GET;
-	Dict<std::string, std::string> POST;
+	RequestParameters<std::string, std::string> GET;
+	RequestParameters<std::string, std::string> POST;
 	Dict<std::string, std::string> COOKIES;
 
 	// TODO
-	Dict<std::string, std::string> FILES;
+	RequestParameters<std::string, std::string> FILES;
 
 	// TODO
 	Dict<std::string, std::string> META;

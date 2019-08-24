@@ -28,18 +28,20 @@ __INTERNAL_BEGIN__
 wasp::HttpRequest HttpRequestParser::parse(const std::string& data)
 {
 	this->_parseRequest(data);
+	QueryParser queryParser;
 	if (!this->_content.empty())
 	{
 		switch (this->_contentType)
 		{
 			case ContentType::ApplicationXWwwFormUrlencoded:
-				this->_setParameters(HttpRequestParser::_parseQuery(this->_content));
+
+				this->_setParameters(queryParser.parse(this->_content));
 				break;
 			case ContentType::ApplicationJson:
-				this->_parseApplicationJson();
+				// TODO: parse application/json data
 				break;
 			case ContentType::MultipartFormData:
-				this->_parseMultipart();
+				// TODO
 				break;
 			case ContentType::Other:
 				break;
@@ -49,7 +51,7 @@ wasp::HttpRequest HttpRequestParser::parse(const std::string& data)
 	}
 	else
 	{
-		this->_setParameters(HttpRequestParser::_parseQuery(this->_query));
+		this->_setParameters(queryParser.parse(this->_query));
 	}
 	return this->_buildHttpRequest();
 }
@@ -591,70 +593,7 @@ void HttpRequestParser::_parseApplicationJson()
 	// TODO
 }
 
-void HttpRequestParser::_parseMultipart()
-{
-	auto contentType = this->_headers["Content-Type"];
-	auto pos = contentType.find("boundary=");
-	if (pos == std::string::npos)
-	{
-		return;
-	}
-	auto boundary = contentType.substr(pos + 9);
-
-	// TODO: parse multipart data
-}
-
-std::map<std::string, std::string>* HttpRequestParser::_parseQuery(const std::string& content)
-{
-	auto* result = new std::map<std::string, std::string>();
-	if (content.empty())
-	{
-		return result;
-	}
-
-	auto begin = content.begin();
-	auto end = content.end();
-	std::string itemKey;
-	std::string itemValue;
-
-	QueryParserState state = QueryParserState::Key;
-
-	while (begin != end)
-	{
-		char input = *begin++;
-		switch (state)
-		{
-			case QueryParserState::Key:
-				if (input == '=')
-				{
-					state = QueryParserState::Val;
-				}
-				else
-				{
-					itemKey.push_back(input);
-				}
-				break;
-			case QueryParserState::Val:
-				if (input == '&')
-				{
-					(*result)[itemKey] = itemValue;
-					itemKey.clear();
-					itemValue.clear();
-					state = QueryParserState::Key;
-				}
-				else
-				{
-					itemValue.push_back(input);
-				}
-				break;
-		}
-	}
-	(*result)[itemKey] = itemValue;
-
-	return result;
-}
-
-void HttpRequestParser::setParameters(std::map<std::string, std::string>* params)
+void HttpRequestParser::setParameters(RequestParameters<std::string, std::string>* params)
 {
 	if (this->_method == "GET")
 	{
@@ -666,7 +605,7 @@ void HttpRequestParser::setParameters(std::map<std::string, std::string>* params
 	}
 }
 
-void HttpRequestParser::_setParameters(std::map<std::string, std::string>* params)
+void HttpRequestParser::_setParameters(RequestParameters<std::string, std::string>* params)
 {
 	this->setParameters(params);
 	delete params;
