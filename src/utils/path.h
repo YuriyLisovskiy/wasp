@@ -31,8 +31,10 @@
 #endif
 
 #include <string>
+#include <fstream>
 
 #include "../globals.h"
+#include "../core/exceptions.h"
 
 
 __PATH_INTERNAL_BEGIN__
@@ -60,6 +62,8 @@ extern void splitText(const std::string& fullPath, std::string& rootOut, std::st
 extern bool exists(const std::string& path);
 
 extern std::string baseName(const std::string& path);
+
+extern size_t getSize(const std::string& path);
 
 __PATH_END__
 

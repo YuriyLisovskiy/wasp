@@ -27,19 +27,19 @@ __INTERNAL_BEGIN__
 
 HttpServer::HttpServer(HttpServer::Context& ctx)
 {
-	HttpServer::normalizeContext(ctx);
+	HttpServer::_normalizeContext(ctx);
 
 	this->_host = ctx.host;
 	this->_port = ctx.port;
 	this->_logger = ctx.logger;
 
-	// TODO: default schema, https will be implemented in future.
+	// Default schema, https will be implemented in future.
 	this->_schema = "http";
 
 	TcpServer::Context tcpContext{};
 	tcpContext.host = ctx.host;
 	tcpContext.port = ctx.port;
-	tcpContext.handler = std::bind(&HttpServer::_tcpHandler, this, std::placeholders::_1);
+	tcpContext.handler = std::bind(&HttpServer::_tcpHandler, this, std::placeholders::_1, std::placeholders::_2);
 	tcpContext.logger = ctx.logger;
 
 	this->_httpHandler = ctx.handler;
@@ -51,7 +51,7 @@ HttpServer::~HttpServer()
 	this->finish();
 }
 
-std::string HttpServer::_tcpHandler(const std::string& data)
+void HttpServer::_tcpHandler(const std::string& data, const socket_t& client)
 {
 	try
 	{
@@ -61,24 +61,20 @@ std::string HttpServer::_tcpHandler(const std::string& data)
 		// TODO: remove when release ------------------------^
 
 		HttpRequest request = HttpRequestParser().parse(data);
-		HttpResponseBase* response = this->_httpHandler(request);
-
-		// WARNING! Probably not working for large responses.
-		std::string result = response->serialize();
-		delete response;
+		this->_httpHandler(request, client);
 
 		// TODO: remove when release -------------------------------------------------------------:
 		measure.end();
 		std::cout << '\n' << request.method() << " request took " << measure.elapsed() << " ms\n";
 		// TODO: remove when release -------------------------------------------------------------^
-
-		return result;
 	}
 	catch (const wasp::BaseException& exc)
 	{
 		this->_logger->trace(exc.what(), exc.line(), exc.function(), exc.file());
-
-		return HttpResponseServerError("<p style=\"font-size: 24px;\" >Internal Server Error</p>").serialize();
+		TcpServer::send(
+			HttpResponseServerError("<p style=\"font-size: 24px;\" >Internal Server Error</p>").serialize().c_str(),
+			client
+		);
 	}
 }
 
@@ -94,7 +90,22 @@ void HttpServer::finish()
 	delete this->_tcpServer;
 }
 
-void HttpServer::normalizeContext(HttpServer::Context& ctx)
+void HttpServer::send(HttpResponseBase* response, const socket_t& client)
+{
+	TcpServer::send(response->serialize().c_str(), client);
+}
+
+void HttpServer::send(StreamingHttpResponse* response, const socket_t& client)
+{
+	std::string chunk;
+	while (!(chunk = response->getChunk()).empty())
+	{
+		TcpServer::write(chunk.c_str(), chunk.size(), client);
+	}
+	response->close();
+}
+
+void HttpServer::_normalizeContext(HttpServer::Context& ctx)
 {
 	if (ctx.host == nullptr)
 	{
