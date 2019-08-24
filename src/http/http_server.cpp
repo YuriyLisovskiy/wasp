@@ -61,13 +61,7 @@ void HttpServer::_tcpHandler(const std::string& data, const socket_t& client)
 		// TODO: remove when release ------------------------^
 
 		HttpRequest request = HttpRequestParser().parse(data);
-		HttpResponseBase* response = this->_httpHandler(request);
-
-		// WARNING! Probably not working for large responses.
-		std::string result = response->serialize();
-		delete response;
-
-		this->_tcpServer->write(result.c_str(), client);
+		this->_httpHandler(request, client);
 
 		// TODO: remove when release -------------------------------------------------------------:
 		measure.end();
@@ -77,8 +71,7 @@ void HttpServer::_tcpHandler(const std::string& data, const socket_t& client)
 	catch (const wasp::BaseException& exc)
 	{
 		this->_logger->trace(exc.what(), exc.line(), exc.function(), exc.file());
-
-		this->_tcpServer->write(
+		TcpServer::send(
 			HttpResponseServerError("<p style=\"font-size: 24px;\" >Internal Server Error</p>").serialize().c_str(),
 			client
 		);
@@ -95,6 +88,20 @@ void HttpServer::listenAndServe()
 void HttpServer::finish()
 {
 	delete this->_tcpServer;
+}
+
+void HttpServer::send(HttpResponseBase* response, const socket_t& client)
+{
+	TcpServer::send(response->serialize().c_str(), client);
+}
+
+void HttpServer::send(StreamingHttpResponse* response, const socket_t& client)
+{
+	while (response->readChunk())
+	{
+		TcpServer::write(response->getLastChunk().c_str(), response->tell(), client);
+	}
+	response->close();
 }
 
 void HttpServer::normalizeContext(HttpServer::Context& ctx)

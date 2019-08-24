@@ -28,6 +28,7 @@
 #include <string>
 #include <functional>
 #include <vector>
+#include <fstream>
 
 #include "../globals.h"
 #include "../utils/logger.h"
@@ -45,7 +46,8 @@
 
 __INTERNAL_BEGIN__
 
-typedef std::function<HttpResponseBase* (HttpRequest&)> httpHandler;
+typedef std::function<void(HttpRequest&, const socket_t&)> httpHandler;
+// typedef std::function<HttpResponseBase* (HttpRequest&, const socket_t&)> httpHandler;
 
 class HttpServer
 {
@@ -73,6 +75,8 @@ public:
 	explicit HttpServer(HttpServer::Context& ctx);
 	void listenAndServe();
 	void finish();
+	static void send(HttpResponseBase* response, const socket_t& client);
+	static void send(StreamingHttpResponse* response, const socket_t& client);
 	~HttpServer();
 
 private:

@@ -234,40 +234,76 @@ std::string HttpResponse::serialize()
 }
 
 
-// FileResponse implementation
-FileResponse::FileResponse(
-	bool asAttachment,
-	const std::string& filePath,
-	unsigned short status,
+// StreamingHttpResponse implementation
+StreamingHttpResponse::StreamingHttpResponse(
+	unsigned short int status,
 	const std::string& contentType,
 	const std::string& reason,
 	const std::string& charset
 ) : HttpResponseBase(status, contentType, reason, charset)
 {
-	this->_asAttachment = asAttachment;
-	this->_filePath = filePath;
+}
+
+std::string StreamingHttpResponse::serialize()
+{
+	throw HttpError("This StreamingHttpResponse or its child instance cannot be serialized", _ERROR_DETAILS_);
+}
+
+
+// FileResponse implementation
+FileResponse::FileResponse(
+	const std::string& filePath,
+	bool asAttachment,
+	unsigned short status,
+	const std::string& contentType,
+	const std::string& reason,
+	const std::string& charset
+) : StreamingHttpResponse(status, contentType, reason, charset),
+	_bytesRead(0),
+	_totalBytesRead(0),
+	_asAttachment(asAttachment),
+	_filePath(filePath),
+	_headersIsInited(false)
+{
 	if (!path::exists(this->_filePath))
 	{
 		throw FileDoesNotExistError("file '" + this->_filePath + "' does not exist", _ERROR_DETAILS_);
 	}
-	this->_read();
+
+	// Initializing file stream.
+	this->_fileStream = std::ifstream(this->_filePath, std::ifstream::binary | std::ios::ate);
+	this->_fileSize = this->_fileStream.tellg();
+	this->_fileStream.seekg(0);
 }
 
-std::string FileResponse::serialize()
+bool FileResponse::readChunk()
 {
-	auto reasonPhrase = this->getReasonPhrase();
-	this->_setHeaders();
-	this->setHeader("Date", dt::gmtnow().strftime("%a, %d %b %Y %T %Z"));
-	auto headers = this->serializeHeaders();
-	return "HTTP/1.1 " + std::to_string(this->_status) + " " + reasonPhrase + "\r\n" +
-		   headers + "\r\n\r\n" + std::string(this->_content.begin(), this->_content.end());
-}
+	if (!this->_headersIsInited)
+	{
+		this->_initHeaders();
+		_headersIsInited = true;
+		return true;
+	}
+	else
+	{
+		this->_lastChunk.clear();
+		this->_lastChunk = std::string(FileResponse::CHUNK_SIZE, '\0');
 
-void FileResponse::_read()
-{
-	std::ifstream is(this->_filePath);
-	std::istream_iterator<char> start(is), end;
-	this->_content = std::vector<char>(start, end);
+		size_t bytesToRead;
+		if ((this->_totalBytesRead + FileResponse::CHUNK_SIZE) > this->_fileSize)
+		{
+			bytesToRead = this->_fileSize - this->_totalBytesRead;
+		}
+		else
+		{
+			bytesToRead = FileResponse::CHUNK_SIZE;
+		}
+
+		this->_fileStream.read(this->_lastChunk.data(), bytesToRead);
+		this->_bytesRead = this->_fileStream.gcount();
+		this->_totalBytesRead += this->_bytesRead;
+		return bytesToRead;
+	}
 }
 
 void FileResponse::_setHeaders()
@@ -277,7 +313,7 @@ void FileResponse::_setHeaders()
 		{"gzip", "application/gzip"},
 		{"xz", "application/x-xz"}
 	});
-	this->setHeader("Content-Length", std::to_string(this->_content.size()));
+	this->setHeader("Content-Length", std::to_string(path::getSize(this->_filePath)));
 	if (str::startsWith(this->_headers.get("Content-Type", ""), "text/html"))
 	{
 		std::string contentType, encoding;
@@ -297,6 +333,33 @@ void FileResponse::_setHeaders()
 		fileExpr = "filename*=utf-8''" + encoding::quote(fileName);
 	}
 	this->_headers.set("Content-Disposition", disposition + "; " + fileExpr);
+}
+
+void FileResponse::_initHeaders()
+{
+	auto reasonPhrase = this->getReasonPhrase();
+	this->_setHeaders();
+	this->setHeader("Date", dt::gmtnow().strftime("%a, %d %b %Y %T %Z"));
+	auto headers = this->serializeHeaders();
+
+	this->_lastChunk = "HTTP/1.1 " + std::to_string(this->_status) + " " + reasonPhrase + "\r\n" + headers + "\r\n\r\n";
+	this->_bytesRead = this->_lastChunk.size();
+}
+
+std::string FileResponse::getLastChunk()
+{
+	return this->_lastChunk.substr(0, this->_bytesRead);
+}
+
+unsigned long int FileResponse::tell()
+{
+	return this->_bytesRead;
+}
+
+void FileResponse::close()
+{
+	StreamingHttpResponse::close();
+	this->_fileStream.close();
 }
 
 

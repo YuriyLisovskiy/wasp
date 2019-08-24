@@ -78,4 +78,13 @@ std::string baseName(const std::string& path)
 	return std::string(path.begin() + pos, path.end());
 }
 
+size_t getSize(const std::string& path)
+{
+	if (!exists(path))
+	{
+		throw FileDoesNotExistError("file '" + path + "' does not exist", _ERROR_DETAILS_);
+	}
+	return std::ifstream(path, std::ifstream::ate | std::ifstream::binary).tellg();
+}
+
 __PATH_END__

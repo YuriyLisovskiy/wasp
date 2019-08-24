@@ -115,7 +115,8 @@ public:
 
 	explicit TcpServer(TcpServer::Context ctx);
 	void listenAndServe();
-	void write(const char* data, const socket_t& connection);
+	static void send(const char* data, const socket_t& connection);
+	static void write(const char* data, size_t bytesToWrite, const socket_t& connection);
 	~TcpServer();
 };
 

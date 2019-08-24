@@ -140,27 +140,50 @@ public:
 };
 
 
-class FileResponse : public HttpResponseBase
+class StreamingHttpResponse : public HttpResponseBase
+{
+public:
+	explicit StreamingHttpResponse(
+		unsigned short int status = 0,
+		const std::string& contentType = "",
+		const std::string& reason = "",
+		const std::string& charset = "utf-8"
+	);
+	std::string serialize() final;
+	virtual bool readChunk() = 0;
+	virtual std::string getLastChunk() = 0;
+};
+
+
+class FileResponse final : public StreamingHttpResponse
 {
 private:
+	static const size_t CHUNK_SIZE = 1024 * 1024;   // 1 mb
+
 	bool _asAttachment;
 	std::string _filePath;
-	std::vector<char> _content;
-
-protected:
-	void _read();
+	std::string _lastChunk;
+	size_t _bytesRead;
+	size_t _totalBytesRead;
+	size_t _fileSize;
+	std::ifstream _fileStream;
+	bool _headersIsInited;
 	void _setHeaders();
+	void _initHeaders();
 
 public:
 	explicit FileResponse(
-			bool asAttachment = false,
-			const std::string& filePath = "",
-			unsigned short int status = 0,
-			const std::string& contentType = "",
-			const std::string& reason = "",
-			const std::string& charset = "utf-8"
+		const std::string& filePath,
+		bool asAttachment = false,
+		unsigned short int status = 0,
+		const std::string& contentType = "",
+		const std::string& reason = "",
+		const std::string& charset = "utf-8"
 	);
-	std::string serialize() override;
+	bool readChunk() override;
+	std::string getLastChunk() override;
+	void close() override;
+	unsigned long int tell() override;
 };
 
 
@@ -238,6 +261,7 @@ public:
 		const std::string& charset = "utf-8"
 	);
 };
+
 
 class HttpResponseForbidden : public HttpResponse
 {

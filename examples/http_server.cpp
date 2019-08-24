@@ -20,11 +20,11 @@
 #include <vector>
 
 #include "../src/http/http_server.h"
-#include "../src/http/request.h"
-#include "../src/http/response.h"
+
+using wasp::internal::HttpServer;
 
 
-wasp::HttpResponseBase* handler(wasp::HttpRequest& request)
+void handler(wasp::HttpRequest& request, const wasp::internal::socket_t& client)
 {
 	std::cout << "\n" << request.method() << " " << request.path() << " " << request.version() << "\n";
 //	auto begin = request.headers.cbegin();
@@ -43,24 +43,31 @@ wasp::HttpResponseBase* handler(wasp::HttpRequest& request)
 //		std::cout << it->first << ": " << it->second << '\n';
 //	}
 
-	std::string body("<form action=\"/hello\" method=\"post\" enctype=\"multipart/form-data\">\n"
-	                 "\t<input type=\"file\" name=\"super_file\" />\n"
-	                 "\t<input type=\"password\" name=\"first_name\" />\n"
-	                 "\t<input type=\"submit\" value=\"send\" />\n"
-	                 "\t</form>\n");
+	auto response = new wasp::FileResponse("/home/yuriylisovskiy/Desktop/BurpSettings.json");
+	HttpServer::send(response, client);
+	delete response;
 
-	return new wasp::HttpResponse(body);
+/*
+	std::string body("<form action=\"/hello\" method=\"post\" enctype=\"multipart/form-data\">\n"
+					 "\t<input type=\"file\" name=\"super_file\" />\n"
+					 "\t<input type=\"password\" name=\"first_name\" />\n"
+					 "\t<input type=\"submit\" value=\"send\" />\n"
+					 "\t</form>\n");
+	auto response = new wasp::HttpResponse(body);
+	HttpServer::send(response, client);
+	delete response;
+*/
 }
 
 int main()
 {
 	try
 	{
-		wasp::internal::HttpServer::Context ctx{};
+		HttpServer::Context ctx{};
 		ctx.handler = handler;
 		ctx.port = 3000;
 
-		wasp::internal::HttpServer server(ctx);
+		HttpServer server(ctx);
 
 		server.listenAndServe();
 	}
