@@ -143,7 +143,9 @@ protected:
 
 public:
 	HttpRequestParser() = default;
+
 	wasp::HttpRequest parse(const std::string& data);
+	void reset();
 };
 
 __INTERNAL_END__

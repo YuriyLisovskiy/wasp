@@ -34,7 +34,6 @@ wasp::HttpRequest HttpRequestParser::parse(const std::string& data)
 		switch (this->_contentType)
 		{
 			case ContentType::ApplicationXWwwFormUrlencoded:
-
 				this->_setParameters(queryParser.parse(this->_content));
 				break;
 			case ContentType::ApplicationJson:
@@ -53,7 +52,22 @@ wasp::HttpRequest HttpRequestParser::parse(const std::string& data)
 	{
 		this->_setParameters(queryParser.parse(this->_query));
 	}
+
 	return this->_buildHttpRequest();
+}
+
+void HttpRequestParser::reset()
+{
+	this->_majorV = 0;
+	this->_minorV = 0;
+	this->_path.clear();
+	this->_query.clear();
+	this->_method.clear();
+	this->_keepAlive = false;
+	this->_content.clear();
+	this->_headers.clear();
+	this->_getParameters = RequestParameters<std::string, std::string>();
+	this->_postParameters = RequestParameters<std::string, std::string>();
 }
 
 void HttpRequestParser::_parseHttpWord(char input, char expectedInput, HttpRequestParser::ParserState newState)

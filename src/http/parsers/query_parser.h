@@ -39,6 +39,7 @@ private:
 		Key,
 		Val
 	};
+
 	Dict<std::string, std::string> _dict;
 	MultiValueDict<std::string, std::string> _multiDict;
 
@@ -46,7 +47,8 @@ private:
 
 public:
 	explicit QueryParser();
-	RequestParameters<std::string, std::string>* parse(const std::string& content);
+	
+	RequestParameters<std::string, std::string>* parse(const std::string& data);
 	void reset();
 };
 
