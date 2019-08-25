@@ -20,6 +20,30 @@
 
 __INTERNAL_BEGIN__
 
+// TODO: temporary function ========================================:
+bool set_socket_blocking(int fd, bool blocking)
+{
+	if (fd < 0)
+	{
+		return false;
+	}
+
+#if defined(_WIN32) || defined(_WIN64)
+	unsigned long mode = blocking ? 0 : 1;
+	return ioctlsocket(fd, FIONBIO, &mode) == 0;
+#else
+	int flags = fcntl(fd, F_GETFL, 0);
+	if (flags == -1)
+	{
+		return false;
+	}
+
+	flags = blocking ? (flags & ~O_NONBLOCK) : (flags | O_NONBLOCK);
+	return fcntl(fd, F_SETFL, flags) == 0;
+#endif
+}
+// TODO: temporary function ========================================^
+
 TcpServer::TcpServer(TcpServer::Context ctx)
 {
 	if (ctx.host == nullptr)
@@ -134,6 +158,10 @@ void TcpServer::startListener()
 
 			if (connection != INVALID_SOCKET)
 			{
+				// TODO: browser can't connect while post request with
+				//  multipart/form-data enctype (if non-blocking socket)
+				set_socket_blocking(connection, false);
+
 				std::thread newThread(&TcpServer::serveConnection, this, connection);
 				newThread.detach();
 			}
@@ -191,9 +219,6 @@ std::string TcpServer::recvAll(const socket_t& connection)
 	msg_size_t ret = 0;
 	unsigned long size = 0;
 	std::string data;
-
-	// TODO: browser can't connect while post request with multipart/form-data enctype (if non-blocking socket)
-	fcntl(connection, F_SETFL, O_NONBLOCK);
 
 	char* buffer = (char*) calloc(MAX_BUFF_SIZE, sizeof(char));
 	do
