@@ -20,6 +20,8 @@
  * TODO: write docs.
  */
 
+#include <iostream>
+
 #include "request_parser.h"
 
 
@@ -27,6 +29,8 @@ __INTERNAL_BEGIN__
 
 wasp::HttpRequest HttpRequestParser::parse(const std::string& data)
 {
+//	std::cout << '\n' << data << '\n';
+
 	this->_parseRequest(data);
 	QueryParser queryParser;
 	if (!this->_content.empty())
@@ -84,17 +88,16 @@ void HttpRequestParser::_parseHttpWord(char input, char expectedInput, HttpReque
 
 void HttpRequestParser::_parseRequest(const std::string& data)
 {
-	auto begin = data.begin();
-	auto end = data.end();
-
 	std::string newHeaderName;
 	std::string newHeaderValue;
 
 	std::map<std::string, std::string>::iterator connectionIt;
 
-	while (begin != end)
+	std::cout << '\n' << data << '\n';
+
+	for (size_t i = 0; i < data.size(); i++)
 	{
-		char input = *begin++;
+		char input = data[i];
 		switch (this->_state)
 		{
 			case ParserState::MethodBegin:
@@ -436,14 +439,11 @@ void HttpRequestParser::_parseRequest(const std::string& data)
 				}
 				break;
 			case ParserState::RequestBody:
-				--this->_contentSize;
-				this->_content.push_back(input);
-
-				if (this->_contentSize == 0)
+				this->_content.append(data.substr(i));
+				if (this->_content.size() == this->_contentSize)
 				{
 					return;
 				}
-				break;
 			case ParserState::ChunkSize:
 				if (isalnum(input))
 				{

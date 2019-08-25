@@ -26,7 +26,7 @@ using wasp::internal::HttpServer;
 
 void handler(wasp::HttpRequest& request, const wasp::internal::socket_t& client)
 {
-	std::cout << "\n" << request.method() << " " << request.path() << " " << request.version() << "\n";
+//	std::cout << "\n" << request.method() << " " << request.path() << " " << request.version() << "\n";
 //	auto begin = request.headers.cbegin();
 //	auto end = request.headers.cend();
 
@@ -37,8 +37,6 @@ void handler(wasp::HttpRequest& request, const wasp::internal::socket_t& client)
 //	}
 
 //	std::cout << request.body() << "\n";
-
-	std::cout << request.POST.get("first_name") << '\n';
 
 //	for (auto it = request.COOKIES.cbegin(); it != request.COOKIES.cend(); it++)
 //	{
@@ -53,7 +51,6 @@ void handler(wasp::HttpRequest& request, const wasp::internal::socket_t& client)
 
 	std::string body("<form action=\"/hello\" method=\"post\" enctype=\"multipart/form-data\">\n"
 					 "\t<input type=\"file\" name=\"super_file\" />\n"
-					 "\t<input type=\"text\" name=\"first_name\" />\n"
 					 "\t<input type=\"text\" name=\"first_name\" />\n"
 					 "\t<input type=\"submit\" value=\"send\" />\n"
 					 "\t</form>\n");

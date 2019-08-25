@@ -66,7 +66,7 @@ int TcpServer::init()
 
 	memset(this->_socketAddr.sin_zero, '\0', sizeof this->_socketAddr.sin_zero);
 
-	this->_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	this->_socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
 
 	if (this->_socket == INVALID_SOCKET)
 	{
@@ -131,6 +131,7 @@ void TcpServer::startListener()
 		{
 			socklen_t connectionLen = sizeof(this->_socketAddr);
 			socket_t connection = accept(this->_socket, (sockaddr*)&this->_socketAddr, &connectionLen);
+
 			if (connection != INVALID_SOCKET)
 			{
 				std::thread newThread(&TcpServer::serveConnection, this, connection);
@@ -183,34 +184,64 @@ void TcpServer::serveConnection(const socket_t& connection)
 	TcpServer::cleanUp(connection);
 }
 
-// TODO: bug, second, third, etc. POST requests from browser (Google Chrome, at least)
-//  with 'multipart/form-data' content type are read without request body.
 std::string TcpServer::recvAll(const socket_t& connection)
 {
-	// TODO: helps to receive POST request body, remove it after fix
-	//  receiving problem, that is described above.
-	std::this_thread::sleep_for(std::chrono::milliseconds(50));
+//	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
-	msg_size_t msgSize = 0;
+	msg_size_t ret = 0;
 	unsigned long size = 0;
 	std::string data;
+
+	// TODO: browser can't connect while post request with multipart/form-data enctype (if non-blocking socket)
+	fcntl(connection, F_SETFL, O_NONBLOCK);
 
 	char* buffer = (char*) calloc(MAX_BUFF_SIZE, sizeof(char));
 	do
 	{
-		msgSize = recv(connection, buffer, MAX_BUFF_SIZE, 0);
-		if (msgSize > 0)
+		// TODO: recv hangs after all request has been read (if blocking socket)
+		ret = read(connection, buffer, MAX_BUFF_SIZE);
+		if (ret > 0)
 		{
-			data.append(buffer, msgSize);
-			size += msgSize;
+			data.append(buffer, ret);
+			size += ret;
 		}
-		else if (msgSize == -1)
+		else if (ret == -1)
 		{
-			free(buffer);
-			throw TcpError("Received message size is less than zero", _ERROR_DETAILS_);
+			switch (errno)
+			{
+				case EBADF:
+				case EFAULT:
+				case EINVAL:
+				case ENXIO:
+					// Fatal error.
+					free(buffer);
+					throw TcpError("Read: critical error: " + std::to_string(errno), _ERROR_DETAILS_);
+				case EIO:
+				case ENOBUFS:
+				case ENOMEM:
+					// Resource acquisition failure or device error.
+					free(buffer);
+					throw TcpError("Read: resource failure: " + std::to_string(errno), _ERROR_DETAILS_);
+				case EINTR:
+					// TODO: Check for user interrupt flags.
+				case ETIMEDOUT:
+				case EAGAIN:
+					// Temporary error.
+					continue;
+				case ECONNRESET:
+				case ENOTCONN:
+					// Connection broken.
+					// Return the data we have available and exit
+					// as if the connection was closed correctly.
+					ret = 0;
+					break;
+				default:
+					free(buffer);
+					throw TcpError("Read: returned -1: " + std::to_string(errno), _ERROR_DETAILS_);
+			}
 		}
 	}
-	while (msgSize == MAX_BUFF_SIZE);
+	while (ret > 0);
 
 	free(buffer);
 
