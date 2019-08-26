@@ -41,6 +41,7 @@ HttpServer::HttpServer(HttpServer::Context& ctx)
 	tcpContext.port = ctx.port;
 	tcpContext.handler = std::bind(&HttpServer::_tcpHandler, this, std::placeholders::_1, std::placeholders::_2);
 	tcpContext.logger = ctx.logger;
+	tcpContext.maxRequestSize = ctx.maxRequestSize;
 
 	this->_httpHandler = ctx.handler;
 	this->_tcpServer = new TcpServer(tcpContext);
@@ -115,6 +116,11 @@ void HttpServer::_normalizeContext(HttpServer::Context& ctx)
 	if (ctx.port == 0)
 	{
 		ctx.port = DEFAULT_PORT;
+	}
+
+	if (ctx.maxRequestSize == 0)
+	{
+		ctx.maxRequestSize = MAX_REQUEST_SIZE;
 	}
 
 	if (ctx.handler == nullptr)

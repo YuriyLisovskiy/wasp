@@ -32,16 +32,20 @@ TcpServer::TcpServer(TcpServer::Context ctx)
 		ctx.port = DEFAULT_PORT;
 	}
 
+	if (ctx.maxRequestSize <= 0)
+	{
+		ctx.maxRequestSize = MAX_REQUEST_SIZE;
+	}
+	this->_maxRequestSize = ctx.maxRequestSize;
+
 	this->_host = ctx.host;
 	this->_port = ctx.port;
-
 	if (ctx.handler == nullptr)
 	{
 		throw std::invalid_argument("Context::handler can not be null");
 	}
 
 	this->_handler = ctx.handler;
-
 	if (ctx.logger == nullptr)
 	{
 		ctx.logger = Logger::getInstance();
@@ -119,12 +123,16 @@ void TcpServer::_serveConnection(const socket_t& connection)
 {
 	try
 	{
-		std::string data = TcpServer::RecvAll(connection);
+		std::string data = this->_recvAll(connection);
 
 		if (!data.empty())
 		{
 			this->_handler(data, connection);
 		}
+	}
+	catch (const SuspiciousOperation& exc)
+	{
+		this->_logger->trace(exc.what(), exc.line(), exc.function(), exc.file());
 	}
 	catch (const BaseException& exc)
 	{
@@ -220,7 +228,7 @@ TcpServer::ReadResult TcpServer::HandleError(
 	return ReadResult::None;
 }
 
-std::string TcpServer::RecvAll(const socket_t& connection)
+std::string TcpServer::_recvAll(const socket_t& connection)
 {
 	msg_size_t ret = 0;
 	int status = 0;
@@ -238,7 +246,8 @@ std::string TcpServer::RecvAll(const socket_t& connection)
 	do
 	{
 		// Wait 20 ms
-		status = poll(&descriptor, 1, SO_RCVTIMEO);
+		int timeout = SO_RCVTIMEO;
+		status = poll(&descriptor, 1, timeout);
 		if (status == -1)
 		{
 			TcpServer::HandleError(buffer, status, _ERROR_DETAILS_);
@@ -260,6 +269,10 @@ std::string TcpServer::RecvAll(const socket_t& connection)
 			{
 				data.append(buffer, ret);
 				size += ret;
+				if (size > this->_maxRequestSize)
+				{
+					throw SuspiciousOperation("Request data is too big", _ERROR_DETAILS_);
+				}
 			}
 			else if (ret == -1)
 			{

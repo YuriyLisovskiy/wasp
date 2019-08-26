@@ -47,7 +47,6 @@
 __INTERNAL_BEGIN__
 
 typedef std::function<void(HttpRequest&, const socket_t&)> httpHandler;
-// typedef std::function<HttpResponseBase* (HttpRequest&, const socket_t&)> httpHandler;
 
 class HttpServer
 {
@@ -70,6 +69,7 @@ public:
 		uint16_t port = 0;
 		httpHandler handler = nullptr;
 		ILogger* logger;
+		size_t maxRequestSize = 0;
 	};
 
 	explicit HttpServer(HttpServer::Context& ctx);

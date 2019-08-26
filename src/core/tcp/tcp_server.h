@@ -53,6 +53,7 @@ private:
 	uint16_t _port;
 	const char* _host;
 	ServerSocket _serverSocket;
+	size_t _maxRequestSize;
 	tcpHandler _handler;
 	ILogger* _logger;
 
@@ -63,11 +64,11 @@ private:
 
 	int _init();
 	void _cleanUp(const socket_t& connection);
+	std::string _recvAll(const socket_t& connection);
 	void _serveConnection(const socket_t& client);
 	void _startListener();
 
 	static ReadResult HandleError(char* buffer, int& status, int line, const char *function, const char *file);
-	static std::string RecvAll(const socket_t& connection);
 	static bool SetSocketBlocking(int _sock, bool blocking);
 	static void WSACleanUp();
 
@@ -78,6 +79,7 @@ public:
 		uint16_t port = 0;
 		tcpHandler handler = nullptr;
 		ILogger* logger = nullptr;
+		size_t maxRequestSize = 0;
 	};
 
 	explicit TcpServer(TcpServer::Context ctx);
