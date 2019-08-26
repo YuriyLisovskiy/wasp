@@ -105,6 +105,13 @@ private:
 	std::string recvAll(const socket_t& connection);
 	int init();
 
+	enum ReadResult
+	{
+		Continue, None
+	};
+
+	ReadResult _handleError(char* buffer, int& status, int line, const char *function, const char *file);
+
 public:
 	struct Context
 	{

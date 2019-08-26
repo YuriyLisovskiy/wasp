@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <poll.h>
 #include "tcp_server.h"
 
 
@@ -124,6 +125,45 @@ int TcpServer::init()
 	return 0;
 }
 
+TcpServer::ReadResult TcpServer::_handleError(
+	char* buffer, int& status, int line, const char *function, const char *file
+)
+{
+	switch (errno)
+	{
+		case EBADF:
+		case EFAULT:
+		case EINVAL:
+		case ENXIO:
+			// Fatal error.
+			free(buffer);
+			throw TcpError("Critical error: " + std::to_string(errno), line, function, file);
+		case EIO:
+		case ENOBUFS:
+		case ENOMEM:
+			// Resource acquisition failure or device error.
+			free(buffer);
+			throw TcpError("Resource failure: " + std::to_string(errno), line, function, file);
+		case EINTR:
+			// TODO: Check for user interrupt flags.
+		case ETIMEDOUT:
+		case EAGAIN:
+			// Temporary error.
+			return ReadResult::Continue;
+		case ECONNRESET:
+		case ENOTCONN:
+			// Connection broken.
+			// Return the data we have available and exit
+			// as if the connection was closed correctly.
+			status = 0;
+			break;
+		default:
+			free(buffer);
+			throw TcpError("Returned -1: " + std::to_string(errno), line, function, file);
+	}
+	return ReadResult::None;
+}
+
 void TcpServer::listenAndServe()
 {
 	if (this->init() != 0)
@@ -155,6 +195,8 @@ void TcpServer::startListener()
 		{
 			socklen_t connectionLen = sizeof(this->_socketAddr);
 			socket_t connection = accept(this->_socket, (sockaddr*)&this->_socketAddr, &connectionLen);
+
+		//	std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
 			if (connection != INVALID_SOCKET)
 			{
@@ -214,59 +256,86 @@ void TcpServer::serveConnection(const socket_t& connection)
 
 std::string TcpServer::recvAll(const socket_t& connection)
 {
-//	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
 	msg_size_t ret = 0;
+	int status = 0;
 	unsigned long size = 0;
 	std::string data;
+
+	// Poll descriptor structure
+	struct pollfd descriptor{};
+
+	// от sock1 мы будем ожидать входящих данных
+	descriptor.fd = connection;
+	descriptor.events = POLLIN;
 
 	char* buffer = (char*) calloc(MAX_BUFF_SIZE, sizeof(char));
 	do
 	{
-		// TODO: recv hangs after all request has been read (if blocking socket)
-		ret = read(connection, buffer, MAX_BUFF_SIZE);
-		if (ret > 0)
+		// Wait 20 ms
+		status = poll(&descriptor, 1, SO_RCVTIMEO);
+		if (status == -1)
 		{
-			data.append(buffer, ret);
-			size += ret;
+			this->_handleError(buffer, status, _ERROR_DETAILS_);
 		}
-		else if (ret == -1)
+		else if (status == 0)
 		{
-			switch (errno)
+			// Timeout, skip
+		}
+		else
+		{
+			// Reset the descriptor.revents to reuse the structure
+			if (descriptor.revents == POLLIN)
 			{
-				case EBADF:
-				case EFAULT:
-				case EINVAL:
-				case ENXIO:
-					// Fatal error.
-					free(buffer);
-					throw TcpError("Read: critical error: " + std::to_string(errno), _ERROR_DETAILS_);
-				case EIO:
-				case ENOBUFS:
-				case ENOMEM:
-					// Resource acquisition failure or device error.
-					free(buffer);
-					throw TcpError("Read: resource failure: " + std::to_string(errno), _ERROR_DETAILS_);
-				case EINTR:
-					// TODO: Check for user interrupt flags.
-				case ETIMEDOUT:
-				case EAGAIN:
-					// Temporary error.
-					continue;
-				case ECONNRESET:
-				case ENOTCONN:
-					// Connection broken.
-					// Return the data we have available and exit
-					// as if the connection was closed correctly.
-					ret = 0;
-					break;
-				default:
-					free(buffer);
-					throw TcpError("Read: returned -1: " + std::to_string(errno), _ERROR_DETAILS_);
+				descriptor.revents = 0;
+			}
+
+			ret = read(connection, buffer, MAX_BUFF_SIZE);
+			if (ret > 0)
+			{
+				data.append(buffer, ret);
+				size += ret;
+			}
+			else if (ret == -1)
+			{
+				this->_handleError(buffer, status, _ERROR_DETAILS_);
+				/*
+				switch (errno)
+				{
+					case EBADF:
+					case EFAULT:
+					case EINVAL:
+					case ENXIO:
+						// Fatal error.
+						free(buffer);
+						throw TcpError("Read: critical error: " + std::to_string(errno), _ERROR_DETAILS_);
+					case EIO:
+					case ENOBUFS:
+					case ENOMEM:
+						// Resource acquisition failure or device error.
+						free(buffer);
+						throw TcpError("Read: resource failure: " + std::to_string(errno), _ERROR_DETAILS_);
+					case EINTR:
+						// TODO: Check for user interrupt flags.
+					case ETIMEDOUT:
+					case EAGAIN:
+						// Temporary error.
+						continue;
+					case ECONNRESET:
+					case ENOTCONN:
+						// Connection broken.
+						// Return the data we have available and exit
+						// as if the connection was closed correctly.
+						status = 0;
+						break;
+					default:
+						free(buffer);
+						throw TcpError("Read: returned -1: " + std::to_string(errno), _ERROR_DETAILS_);
+				}
+				*/
 			}
 		}
 	}
-	while (ret > 0);
+	while (status > 0);
 
 	free(buffer);
 
