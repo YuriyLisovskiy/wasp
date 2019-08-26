@@ -230,7 +230,7 @@ std::string TcpServer::RecvAll(const socket_t& connection)
 	// Poll descriptor structure
 	struct pollfd descriptor{};
 
-	// от sock1 мы будем ожидать входящих данных
+	// Only input stream is available
 	descriptor.fd = connection;
 	descriptor.events = POLLIN;
 
@@ -264,40 +264,6 @@ std::string TcpServer::RecvAll(const socket_t& connection)
 			else if (ret == -1)
 			{
 				TcpServer::HandleError(buffer, status, _ERROR_DETAILS_);
-				/*
-				switch (errno)
-				{
-					case EBADF:
-					case EFAULT:
-					case EINVAL:
-					case ENXIO:
-						// Fatal error.
-						free(buffer);
-						throw TcpError("Read: critical error: " + std::to_string(errno), _ERROR_DETAILS_);
-					case EIO:
-					case ENOBUFS:
-					case ENOMEM:
-						// Resource acquisition failure or device error.
-						free(buffer);
-						throw TcpError("Read: resource failure: " + std::to_string(errno), _ERROR_DETAILS_);
-					case EINTR:
-						// TODO: Check for user interrupt flags.
-					case ETIMEDOUT:
-					case EAGAIN:
-						// Temporary error.
-						continue;
-					case ECONNRESET:
-					case ENOTCONN:
-						// Connection broken.
-						// Return the data we have available and exit
-						// as if the connection was closed correctly.
-						status = 0;
-						break;
-					default:
-						free(buffer);
-						throw TcpError("Read: returned -1: " + std::to_string(errno), _ERROR_DETAILS_);
-				}
-				*/
 			}
 		}
 	}
