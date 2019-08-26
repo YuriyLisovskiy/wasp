@@ -50,7 +50,7 @@ const char* BaseException::what() const noexcept
 	return this->_fullMessage.c_str();
 }
 
-const int BaseException::line() const noexcept
+int BaseException::line() const noexcept
 {
 	return this->_line;
 }
@@ -63,6 +63,23 @@ const char* BaseException::function() const noexcept
 const char* BaseException::file() const noexcept
 {
 	return this->_file;
+}
+
+
+// SocketError
+SocketError::SocketError(const char* message, int line, const char* function, const char* file, const char* type)
+	: BaseException(message, line, function, file, type)
+{
+}
+
+SocketError::SocketError(const char* message, int line, const char* function, const char* file)
+	: SocketError(message, line, function, file, "SocketError")
+{
+}
+
+SocketError::SocketError(const std::string& message, int line, const char *function, const char *file)
+	: SocketError(message.c_str(), line, function, file)
+{
 }
 
 

@@ -71,7 +71,7 @@ void HttpServer::_tcpHandler(const std::string& data, const socket_t& client)
 	catch (const wasp::BaseException& exc)
 	{
 		this->_logger->trace(exc.what(), exc.line(), exc.function(), exc.file());
-		TcpServer::send(
+		TcpServer::Send(
 			HttpResponseServerError("<p style=\"font-size: 24px;\" >Internal Server Error</p>").serialize().c_str(),
 			client
 		);
@@ -92,7 +92,7 @@ void HttpServer::finish()
 
 void HttpServer::send(HttpResponseBase* response, const socket_t& client)
 {
-	TcpServer::send(response->serialize().c_str(), client);
+	TcpServer::Send(response->serialize().c_str(), client);
 }
 
 void HttpServer::send(StreamingHttpResponse* response, const socket_t& client)
@@ -100,7 +100,7 @@ void HttpServer::send(StreamingHttpResponse* response, const socket_t& client)
 	std::string chunk;
 	while (!(chunk = response->getChunk()).empty())
 	{
-		TcpServer::write(chunk.c_str(), chunk.size(), client);
+		TcpServer::Write(chunk.c_str(), chunk.size(), client);
 	}
 	response->close();
 }

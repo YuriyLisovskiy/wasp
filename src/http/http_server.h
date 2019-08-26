@@ -34,7 +34,7 @@
 #include "../utils/logger.h"
 #include "../conf/defaults.h"
 #include "../conf/settings.h"
-#include "../core/tcp_server.h"
+#include "../core/tcp/tcp_server.h"
 #include "response.h"
 #include "request.h"
 #include "parsers/request_parser.h"

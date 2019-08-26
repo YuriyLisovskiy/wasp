@@ -57,7 +57,6 @@ void handler(wasp::HttpRequest& request, const wasp::internal::socket_t& client)
 	auto response = new wasp::HttpResponse(body);
 	HttpServer::send(response, client);
 	delete response;
-
 }
 
 int main()

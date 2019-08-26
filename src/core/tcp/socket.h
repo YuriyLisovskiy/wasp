@@ -16,23 +16,15 @@
  */
 
 /*
- * tcp/ip server definition.
+ * socket definition.
+ * TODO: write docs.
  */
 
-#ifndef WASP_CORE_TCP_SERVER_H
-#define WASP_CORE_TCP_SERVER_H
+#ifndef WASP_CORE_TCP_SOCKET_H
+#define WASP_CORE_TCP_SOCKET_H
 
 #include <cstring>
-#include <string>
-#include <vector>
-#include <thread>
-#include <functional>
 #include <fcntl.h>
-
-// TODO: --------:
-#include <chrono>
-#include <thread>
-// TODO: --------^
 
 #if defined(_WIN32) || defined(_WIN64)
 
@@ -52,10 +44,8 @@
 
 #endif
 
-#include "../globals.h"
-#include "../utils/logger.h"
-#include "../conf/defaults.h"
-#include "exceptions.h"
+#include "../../globals.h"
+#include "../exceptions.h"
 
 __INTERNAL_BEGIN__
 
@@ -67,6 +57,8 @@ typedef int msg_size_t;
 #define WSA_LAST_ERR WSAGetLastError()
 #define SOCKET_SEND SD_SEND
 #define SOCKET_RECEIVE SD_RECEIVE
+
+static inline int poll(struct pollfd *pfd, int nfds, int timeout) { return WSAPoll (pfd, nfds, timeout); }
 
 #elif defined(__unix__) || defined(__linux__)
 
@@ -84,51 +76,20 @@ typedef ssize_t msg_size_t;
 
 #endif
 
-#define MAX_BUFF_SIZE 8192 * 8 - 1
 
-typedef std::function<void(const std::string&, const socket_t&)> tcpHandler;
-
-class TcpServer
+class Socket
 {
-private:
-	uint16_t _port;
-	const char* _host;
-	tcpHandler _handler;
+protected:
+	bool _closed;
 	socket_t _socket;
-	sockaddr_in _socketAddr{};
-	ILogger* _logger;
-	void startListener();
-	void serveConnection(const socket_t& client);
-	static int closeSocket(const socket_t& socket);
-	static void wsaCleanUp();
-	void cleanUp(const socket_t& connection);
-	std::string recvAll(const socket_t& connection);
-	int init();
-
-	enum ReadResult
-	{
-		Continue, None
-	};
-
-	ReadResult _handleError(char* buffer, int& status, int line, const char *function, const char *file);
 
 public:
-	struct Context
-	{
-		const char* host = nullptr;
-		uint16_t port = 0;
-		tcpHandler handler = nullptr;
-		ILogger* logger = nullptr;
-	};
-
-	explicit TcpServer(TcpServer::Context ctx);
-	void listenAndServe();
-	static void send(const char* data, const socket_t& connection);
-	static void write(const char* data, size_t bytesToWrite, const socket_t& connection);
-	~TcpServer();
+	explicit Socket(socket_t sock);
+	int close();
+	bool setSocketBlocking(bool blocking);
 };
 
 __INTERNAL_END__
 
 
-#endif // WASP_CORE_TCP_SERVER_H
+#endif // WASP_CORE_TCP_SOCKET_H
