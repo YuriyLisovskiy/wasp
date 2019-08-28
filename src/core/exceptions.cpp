@@ -83,23 +83,6 @@ SocketError::SocketError(const std::string& message, int line, const char *funct
 }
 
 
-// TcpError
-TcpError::TcpError(const char* message, int line, const char* function, const char* file, const char* type)
-	: BaseException(message, line, function, file, type)
-{
-}
-
-TcpError::TcpError(const char* message, int line, const char* function, const char* file)
-	: TcpError(message, line, function, file, "TcpError")
-{
-}
-
-TcpError::TcpError(const std::string& message, int line, const char *function, const char *file)
-	: TcpError(message.c_str(), line, function, file)
-{
-}
-
-
 // HttpError
 HttpError::HttpError(const char* message, int line, const char* function, const char* file, const char* type)
 	: BaseException(message, line, function, file, type)

@@ -65,7 +65,8 @@ int main()
 	{
 		HttpServer::Context ctx{};
 		ctx.handler = handler;
-		ctx.port = 8000;
+		ctx.port = 3000;
+		ctx.maxBodySize = 33300000;
 
 		HttpServer server(ctx);
 

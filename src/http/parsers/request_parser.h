@@ -24,11 +24,11 @@
 #define WASP_HTTP_PARSERS_REQUEST_PARSER_H
 
 #include <algorithm>
-#include <string>
 #include <cstdlib>
-#include <strings.h>
-#include <map>
 #include <iostream>
+#include <map>
+#include <string>
+#include <strings.h>
 
 #include "../../globals.h"
 #include "../request.h"
@@ -67,8 +67,6 @@ protected:
 		Other
 
 	} _contentType{};
-
-	wasp::HttpRequest _buildHttpRequest();
 
 	enum ParserState
 	{
@@ -118,12 +116,14 @@ protected:
 	void _parseHttpWord(char input, char expectedInput, HttpRequestParser::ParserState newState);
 
 	// Parses http request stream
-	void _parseRequest(const std::string& data);
-
-	// Parses 'application/json' content type
-	void _parseApplicationJson();
+//	void _parseRequest(const std::string& data);
 
 	void _setParameters(RequestParameters<std::string, std::string>* params);
+
+	// May be overloaded for custom parser which is inherited from HttpRequestParser
+	virtual void setParameters(RequestParameters<std::string, std::string>* params);
+
+	void _parseBody(const std::string& data);
 
 	// Helpers
 	// Check if a byte is an HTTP character.
@@ -138,13 +138,13 @@ protected:
 	// Check if a byte is a digit.
 	static bool isDigit(uint c);
 
-	// May be overloaded for custom parser which is inherited from HttpRequestParser
-	virtual void setParameters(RequestParameters<std::string, std::string>* params);
-
 public:
 	HttpRequestParser() = default;
 
-	wasp::HttpRequest parse(const std::string& data);
+	wasp::HttpRequest buildHttpRequest();
+	Dict<std::string, std::string> getHeaders();
+	void parseBody(const std::string& data);
+	void parseHeaders(const std::string& data);
 	void reset();
 };
 

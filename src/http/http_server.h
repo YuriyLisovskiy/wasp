@@ -58,7 +58,7 @@ private:
 	const char* _host;
 	uint16_t _port;
 	const char* _schema;
-	size_t _maxRequestSize;
+	size_t _maxBodySize;
 	ServerSocket _serverSocket;
 	httpHandler _httpHandler;
 	bool _finished;
@@ -66,20 +66,22 @@ private:
 
 	enum ReadResult
 	{
-		Continue, None
+		Continue, Break, None
 	};
 
 	int _init();
-	void _cleanUp(const socket_t& connection);
-	std::string _recvAll(const socket_t& connection);
-	void _serveConnection(const socket_t& client);
+	void _cleanUp(const socket_t& client);
+	HttpRequest _handleRequest(const socket_t& client);
+	std::string _readBody(const socket_t& client, const std::string& bodyBeginning, size_t bodyLength);
+	std::string _readHeaders(const socket_t& client, std::string& bodyBeginning);
 	void _startListener();
-	void _tcpHandler(const std::string& data, const socket_t& client);
+	void _serveConnection(const socket_t& client);
+	void _threadFunc(const socket_t& client);
 
-	static ReadResult _handleError(char* buffer, int& status, int line, const char *function, const char *file);
-	static void _send(const char* data, const socket_t& connection);
+	static ReadResult _handleError(char* buffer, int line, const char *function, const char *file);
+	static void _send(const char* data, const socket_t& client);
 	static bool _setSocketBlocking(int _sock, bool blocking);
-	static void _write(const char* data, size_t bytesToWrite, const socket_t& connection);
+	static void _write(const char* data, size_t bytesToWrite, const socket_t& client);
 	static void _wsaCleanUp();
 
 public:
@@ -89,7 +91,7 @@ public:
 		uint16_t port = 0;
 		httpHandler handler = nullptr;
 		ILogger* logger;
-		size_t maxRequestSize = 0;
+		size_t maxBodySize = 0;
 	};
 
 	explicit HttpServer(HttpServer::Context& ctx);

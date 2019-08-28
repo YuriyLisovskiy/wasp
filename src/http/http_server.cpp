@@ -64,13 +64,13 @@ int HttpServer::_init()
 	return 0;
 }
 
-void HttpServer::_cleanUp(const socket_t& socket)
+void HttpServer::_cleanUp(const socket_t& client)
 {
 	int ret;
 #if defined(_WIN32) || defined(_WIN64)
-	ret = ::closesocket(socket);
+	ret = ::closesocket(client);
 #elif defined(__unix__) || defined(__linux__)
-	ret = ::close(socket);
+	ret = ::close(client);
 #else
 	ret = SOCKET_ERROR;
 #endif
@@ -81,7 +81,8 @@ void HttpServer::_cleanUp(const socket_t& socket)
 	HttpServer::_wsaCleanUp();
 }
 
-std::string HttpServer::_recvAll(const socket_t& connection)
+/*
+HttpRequest HttpServer::_handleRequest(const socket_t& client)
 {
 	msg_size_t ret = 0;
 	int status = 0;
@@ -89,35 +90,37 @@ std::string HttpServer::_recvAll(const socket_t& connection)
 	std::string data;
 
 	// Poll descriptor structure
-	struct pollfd descriptor{};
+//	struct pollfd descriptor{};
 
 	// Only input stream is available
-	descriptor.fd = connection;
-	descriptor.events = POLLIN;
+//	descriptor.fd = connection;
+//	descriptor.events = POLLIN;
+
+	HttpRequestParser parser;
 
 	char* buffer = (char*) calloc(MAX_BUFF_SIZE, sizeof(char));
 	do
 	{
 		// Wait 20 ms
-		int timeout = SO_RCVTIMEO;
-		status = poll(&descriptor, 1, timeout);
-		if (status == -1)
-		{
-			HttpServer::_handleError(buffer, status, _ERROR_DETAILS_);
-		}
-		else if (status == 0)
-		{
-			// Timeout, skip
-		}
-		else
-		{
+//		int timeout = SO_RCVTIMEO;
+//		status = poll(&descriptor, 1, timeout);
+//		if (status == -1)
+//		{
+//			HttpServer::_handleError(buffer, status, _ERROR_DETAILS_);
+//		}
+//		else if (status == 0)
+//		{
+//			// Timeout, skip
+//		}
+//		else
+//		{
 			// Reset the descriptor.revents to reuse the structure
-			if (descriptor.revents == POLLIN)
-			{
-				descriptor.revents = 0;
-			}
+//			if (descriptor.revents == POLLIN)
+//			{
+//				descriptor.revents = 0;
+//			}
 
-			ret = read(connection, buffer, MAX_BUFF_SIZE);
+			ret = read(client, buffer, MAX_BUFF_SIZE);
 			if (ret > 0)
 			{
 				data.append(buffer, ret);
@@ -129,9 +132,9 @@ std::string HttpServer::_recvAll(const socket_t& connection)
 			}
 			else if (ret == -1)
 			{
-				HttpServer::_handleError(buffer, status, _ERROR_DETAILS_);
+				HttpServer::_handleError(buffer, _ERROR_DETAILS_);
 			}
-		}
+//		}
 	}
 	while (status > 0);
 
@@ -139,35 +142,130 @@ std::string HttpServer::_recvAll(const socket_t& connection)
 
 	if (data.size() != size)
 	{
-		throw TcpError("Invalid request data total size", _ERROR_DETAILS_);
+		throw HttpError("Invalid request data total size", _ERROR_DETAILS_);
 	}
+	return parser.buildHttpRequest();
+}
+*/
+
+HttpRequest HttpServer::_handleRequest(const socket_t& client)
+{
+	HttpRequestParser parser;
+	std::string bodyBeginning;
+
+	parser.parseHeaders(this->_readHeaders(client, bodyBeginning));
+	Dict<std::string, std::string> headers = parser.getHeaders();
+	if (headers.contains("Content-Length"))
+	{
+		size_t bodyLength = strtol(headers.get("Content-Length").c_str(), nullptr, 10);
+		std::string body = this->_readBody(client, bodyBeginning, bodyLength);
+		parser.parseBody(body);
+	}
+
+	return parser.buildHttpRequest();
+}
+
+std::string HttpServer::_readBody(
+	const wasp::internal::socket_t& client, const std::string& bodyBeginning, size_t bodyLength
+)
+{
+	std::string data;
+	if (bodyLength <= 0)
+	{
+		return data;
+	}
+
+	size_t size = bodyBeginning.size();
+	if (size == bodyLength)
+	{
+		return bodyBeginning;
+	}
+
+	msg_size_t ret = 0;
+	char* buffer = (char*) calloc(MAX_BUFF_SIZE, sizeof(char));
+	while (size < bodyLength)
+	{
+		ret = read(client, buffer, MAX_BUFF_SIZE);
+		if (ret > 0)
+		{
+			data.append(buffer, ret);
+			size += ret;
+			if (size > this->_maxBodySize)
+			{
+				throw SuspiciousOperation("Request data is too big", _ERROR_DETAILS_);
+			}
+		}
+		else if (ret == -1)
+		{
+			HttpServer::ReadResult status = HttpServer::_handleError(buffer, _ERROR_DETAILS_);
+			if (status == HttpServer::ReadResult::Continue)
+			{
+				continue;
+			}
+			else if (status == HttpServer::ReadResult::Break)
+			{
+				break;
+			}
+		}
+	}
+
+	free(buffer);
+	data = bodyBeginning + data;
+	if (data.size() != bodyLength)
+	{
+		throw HttpError("Actual body size is not equal to header's value", _ERROR_DETAILS_);
+	}
+
 	return data;
 }
 
-void HttpServer::_serveConnection(const socket_t& connection)
+std::string HttpServer::_readHeaders(const wasp::internal::socket_t& client, std::string& bodyBeginning)
 {
-	try
-	{
-		std::string data = this->_recvAll(connection);
+	msg_size_t ret = 0;
+	unsigned long size = 0;
+	std::string data;
+	size_t headersDelimiterPos = std::string::npos;
+	std::string delimiter = "\r\n\r\n";
 
-		if (!data.empty())
+	char* buffer = (char*) calloc(MAX_BUFF_SIZE, sizeof(char));
+	do
+	{
+		ret = read(client, buffer, MAX_BUFF_SIZE);
+		if (ret > 0)
 		{
-			this->_tcpHandler(data, connection);
+			data.append(buffer, ret);
+			size += ret;
+		//	if (size > this->_maxRequestSize)
+		//	{
+		//		throw SuspiciousOperation("Request data is too big", _ERROR_DETAILS_);
+		//	}
+			// TODO: check headers size
 		}
+		else if (ret == -1)
+		{
+			HttpServer::ReadResult status = HttpServer::_handleError(buffer, _ERROR_DETAILS_);
+			if (status == HttpServer::ReadResult::Continue)
+			{
+				continue;
+			}
+			else if (status == HttpServer::ReadResult::Break)
+			{
+				break;
+			}
+		}
+		headersDelimiterPos = data.rfind(delimiter);
 	}
-	catch (const SuspiciousOperation& exc)
+	while (headersDelimiterPos == std::string::npos);
+
+	free(buffer);
+	if (headersDelimiterPos == std::string::npos)
 	{
-		this->_logger->trace(exc.what(), exc.line(), exc.function(), exc.file());
+		throw HttpError("Invalid http request has been received", _ERROR_DETAILS_);
 	}
-	catch (const BaseException& exc)
-	{
-		this->_logger->trace(exc.what(), exc.line(), exc.function(), exc.file());
-	}
-	catch (const std::exception& exc)
-	{
-		this->_logger->trace(exc.what(), _ERROR_DETAILS_);
-	}
-	HttpServer::_cleanUp(connection);
+
+	headersDelimiterPos += delimiter.size();
+	bodyBeginning = data.substr(headersDelimiterPos);
+	return data.substr(0, headersDelimiterPos);
 }
 
 void HttpServer::_startListener()
@@ -181,9 +279,9 @@ void HttpServer::_startListener()
 
 			if (connection != INVALID_SOCKET)
 			{
-				HttpServer::_setSocketBlocking(connection, false);
+			//	HttpServer::_setSocketBlocking(connection, false);
 
-				std::thread newThread(&HttpServer::_serveConnection, this, connection);
+				std::thread newThread(&HttpServer::_threadFunc, this, connection);
 				newThread.detach();
 			}
 			else
@@ -211,8 +309,9 @@ void HttpServer::_startListener()
 	}
 }
 
-void HttpServer::_tcpHandler(const std::string& data, const socket_t& client)
+void HttpServer::_serveConnection(const socket_t& client)
 {
+	HttpResponseBase* errorResponse = nullptr;
 	try
 	{
 		// TODO: remove when release ------------------------:
@@ -220,27 +319,58 @@ void HttpServer::_tcpHandler(const std::string& data, const socket_t& client)
 		measure.start();
 		// TODO: remove when release ------------------------^
 
-		HttpRequest request = HttpRequestParser().parse(data);
+		HttpRequest request = this->_handleRequest(client);
 		this->_httpHandler(request, client);
 
 		// TODO: remove when release -------------------------------------------------------------:
 		measure.end();
-		std::cout << '\n' << request.method() << " request took " << measure.elapsed() << " ms\n";
+		std::cout << '\n' << request.method() + " request took " << measure.elapsed() << " ms\n";
 		// TODO: remove when release -------------------------------------------------------------^
+	}
+	catch (const SuspiciousOperation& exc)
+	{
+		this->_logger->trace(exc.what(), exc.line(), exc.function(), exc.file());
+		errorResponse = new HttpResponseBadRequest(
+			"<p style=\"font-size: 24px;\" >Bad Request</p>"
+		);
 	}
 	catch (const wasp::BaseException& exc)
 	{
 		this->_logger->trace(exc.what(), exc.line(), exc.function(), exc.file());
-		HttpServer::_send(
-				HttpResponseServerError("<p style=\"font-size: 24px;\" >Internal Server Error</p>").serialize().c_str(),
-				client
+		errorResponse = new HttpResponseServerError(
+			"<p style=\"font-size: 24px;\" >Internal Server Error</p>"
 		);
 	}
+	catch (const std::exception& exc)
+	{
+		this->_logger->trace(exc.what(), _ERROR_DETAILS_);
+		errorResponse = new HttpResponseServerError(
+			"<p style=\"font-size: 24px;\" >Internal Server Error</p>"
+		);
+	}
+	if (errorResponse != nullptr)
+	{
+		HttpServer::_send(errorResponse->serialize().c_str(), client);
+		delete errorResponse;
+	}
+}
+
+void HttpServer::_threadFunc(const socket_t& client)
+{
+	try
+	{
+		this->_serveConnection(client);
+	}
+	catch (const std::exception& exc)
+	{
+		this->_logger->trace(exc.what(), _ERROR_DETAILS_);
+	}
+	HttpServer::_cleanUp(client);
 }
 
 // Private static functions.
 HttpServer::ReadResult HttpServer::_handleError(
-	char* buffer, int& status, int line, const char *function, const char *file
+	char* buffer, int line, const char *function, const char *file
 )
 {
 	switch (errno)
@@ -251,13 +381,13 @@ HttpServer::ReadResult HttpServer::_handleError(
 		case ENXIO:
 			// Fatal error.
 			free(buffer);
-			throw TcpError("Critical error: " + std::to_string(errno), line, function, file);
+			throw HttpError("Critical error: " + std::to_string(errno), line, function, file);
 		case EIO:
 		case ENOBUFS:
 		case ENOMEM:
 			// Resource acquisition failure or device error.
 			free(buffer);
-			throw TcpError("Resource failure: " + std::to_string(errno), line, function, file);
+			throw HttpError("Resource failure: " + std::to_string(errno), line, function, file);
 		case EINTR:
 			// TODO: Check for user interrupt flags.
 		case ETIMEDOUT:
@@ -269,13 +399,11 @@ HttpServer::ReadResult HttpServer::_handleError(
 			// Connection broken.
 			// Return the data we have available and exit
 			// as if the connection was closed correctly.
-			status = 0;
-			break;
+			return HttpServer::ReadResult::Break;
 		default:
 			free(buffer);
-			throw TcpError("Returned -1: " + std::to_string(errno), line, function, file);
+			throw HttpError("Returned -1: " + std::to_string(errno), line, function, file);
 	}
-	return HttpServer::ReadResult::None;
 }
 
 void HttpServer::_normalizeContext(HttpServer::Context& ctx)
@@ -290,9 +418,9 @@ void HttpServer::_normalizeContext(HttpServer::Context& ctx)
 		ctx.port = DEFAULT_PORT;
 	}
 
-	if (ctx.maxRequestSize == 0)
+	if (ctx.maxBodySize == 0)
 	{
-		ctx.maxRequestSize = MAX_REQUEST_SIZE;
+		ctx.maxBodySize = MAX_BODY_SIZE;
 	}
 
 	if (ctx.handler == nullptr)
@@ -306,11 +434,11 @@ void HttpServer::_normalizeContext(HttpServer::Context& ctx)
 	}
 }
 
-void HttpServer::_send(const char* data, const socket_t& connection)
+void HttpServer::_send(const char* data, const socket_t& client)
 {
-	if (::send(connection, data, std::strlen(data), 0) == SOCKET_ERROR)
+	if (::send(client, data, std::strlen(data), 0) == SOCKET_ERROR)
 	{
-		throw TcpError("Failed to send bytes to socket connection", _ERROR_DETAILS_);
+		throw HttpError("Failed to send bytes to socket connection", _ERROR_DETAILS_);
 	}
 }
 
@@ -336,11 +464,11 @@ bool HttpServer::_setSocketBlocking(int _sock, bool blocking)
 #endif
 }
 
-void HttpServer::_write(const char* data, size_t bytesToWrite, const socket_t& connection)
+void HttpServer::_write(const char* data, size_t bytesToWrite, const socket_t& client)
 {
-	if (::write(connection, data, bytesToWrite) == -1)
+	if (::write(client, data, bytesToWrite) == -1)
 	{
-		throw TcpError("Failed to send bytes to socket connection", _ERROR_DETAILS_);
+		throw HttpError("Failed to send bytes to socket connection", _ERROR_DETAILS_);
 	}
 }
 
@@ -360,7 +488,7 @@ HttpServer::HttpServer(HttpServer::Context& ctx) : _finished(true)
 	this->_port = ctx.port;
 	this->_logger = ctx.logger;
 
-	this->_maxRequestSize = ctx.maxRequestSize;
+	this->_maxBodySize = ctx.maxBodySize;
 
 	// Default schema, https will be implemented in future.
 	this->_schema = "http";

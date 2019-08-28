@@ -88,17 +88,6 @@ public:
 };
 
 
-class TcpError : public BaseException
-{
-protected:
-	// Use only when initializing of a derived exception!
-	TcpError(const char* message, int line, const char* function, const char* file, const char* type);
-public:
-	TcpError(const char* message, int line, const char* function, const char* file);
-	TcpError(const std::string& message, int line, const char* function, const char* file);
-};
-
-
 class HttpError : public BaseException
 {
 protected:
