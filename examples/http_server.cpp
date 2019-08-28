@@ -49,6 +49,8 @@ void handler(wasp::HttpRequest& request, const wasp::internal::socket_t& client)
 	delete response;
 */
 
+	std::cout << request.body() << '\n';
+
 	std::string body("<form action=\"/hello\" method=\"post\" enctype=\"multipart/form-data\">\n"
 					 "\t<input type=\"file\" name=\"super_file\" />\n"
 					 "\t<input type=\"text\" name=\"first_name\" />\n"
@@ -65,7 +67,7 @@ int main()
 	{
 		HttpServer::Context ctx{};
 		ctx.handler = handler;
-		ctx.port = 3000;
+		ctx.port = 8000;
 		ctx.maxBodySize = 33300000;
 
 		HttpServer server(ctx);

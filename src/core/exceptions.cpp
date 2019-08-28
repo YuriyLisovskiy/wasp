@@ -252,4 +252,21 @@ DisallowedRedirect::DisallowedRedirect(const std::string& message, int line, con
 {
 }
 
+
+// EntityTooLargeError
+EntityTooLargeError::EntityTooLargeError(const char* message, int line, const char* function, const char* file, const char* type)
+		: BaseException(message, line, function, file, type)
+{
+}
+
+EntityTooLargeError::EntityTooLargeError(const char* message, int line, const char* function, const char* file)
+		: EntityTooLargeError(message, line, function, file, "EntityTooLargeError")
+{
+}
+
+EntityTooLargeError::EntityTooLargeError(const std::string& message, int line, const char *function, const char *file)
+		: EntityTooLargeError(message.c_str(), line, function, file)
+{
+}
+
 __WASP_END__

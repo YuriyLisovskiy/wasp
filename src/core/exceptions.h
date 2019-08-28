@@ -187,6 +187,18 @@ public:
 };
 
 
+// Length of request's header is too large.
+class EntityTooLargeError : public BaseException
+{
+protected:
+	// Use only when initializing of a derived exception!
+	EntityTooLargeError(const char* message, int line, const char* function, const char* file, const char* type);
+public:
+	EntityTooLargeError(const char* message, int line, const char* function, const char* file);
+	EntityTooLargeError(const std::string& message, int line, const char* function, const char* file);
+};
+
+
 // Redirect to scheme not in allowed list
 class DisallowedRedirect : public SuspiciousOperation
 {
