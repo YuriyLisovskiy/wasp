@@ -24,6 +24,8 @@ file(GLOB LIB_FILES
 		"src/utils/datetime/*.cpp"
 		"src/collections/*.h"
 		"src/collections/*.cpp"
+		"src/core/sockets/*.h"
+		"src/core/sockets/*.cpp"
 		"src/core/*.h"
 		"src/core/*.cpp"
 		"src/middleware/*.h"

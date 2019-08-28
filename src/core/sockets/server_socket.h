@@ -16,29 +16,34 @@
  */
 
 /*
- * Default constants.
- * TODO: write docs
+ * server_socket definition.
+ * TODO: write docs.
  */
 
-#ifndef WASP_CONF_DEFAULTS_H
-#define WASP_CONF_DEFAULTS_H
+#ifndef WASP_CORE_TCP_SERVER_SOCKET_H
+#define WASP_CORE_TCP_SERVER_SOCKET_H
 
-#include "../globals.h"
-
+#include "../../globals.h"
+#include "socket.h"
+#include "../exceptions.h"
 
 __INTERNAL_BEGIN__
 
-const char* const DEFAULT_HOST = "127.0.0.1";
+class ServerSocket : public Socket
+{
+private:
+	sockaddr_in _socketAddr{};
 
-const uint16_t DEFAULT_PORT = 8000;
+public:
+	ServerSocket();
 
-const char* const STARTUP_MESSAGE = "Wasp version 0.0.1-dev, using app settings"
-									"\nStarting development server at {0!s}://{1!s}:{2!d}/"
-		                            "\nQuit the server with CONTROL-C.";
-
-const size_t MAX_BODY_SIZE = 2621440; // 2.5 MB
+	socket_t create(const char* host, uint16_t port);
+	int bind();
+	int listen();
+	socket_t accept();
+};
 
 __INTERNAL_END__
 
 
-#endif // WASP_CONF_DEFAULTS_H
+#endif // WASP_CORE_TCP_SERVER_SOCKET_H

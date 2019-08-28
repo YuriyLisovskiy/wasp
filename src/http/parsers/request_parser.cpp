@@ -20,81 +20,44 @@
  * TODO: write docs.
  */
 
+#include <iostream>
+
 #include "request_parser.h"
 
 
 __INTERNAL_BEGIN__
 
-wasp::HttpRequest HttpRequestParser::parse(const std::string& data)
+// Public methods.
+wasp::HttpRequest HttpRequestParser::buildHttpRequest()
 {
-	this->_parseRequest(data);
-	QueryParser queryParser;
-	if (!this->_content.empty())
-	{
-		switch (this->_contentType)
-		{
-			case ContentType::ApplicationXWwwFormUrlencoded:
-				this->_setParameters(queryParser.parse(this->_content));
-				break;
-			case ContentType::ApplicationJson:
-				// TODO: parse application/json data
-				break;
-			case ContentType::MultipartFormData:
-				// TODO
-				break;
-			case ContentType::Other:
-				break;
-			default:
-				break;
-		}
-	}
-	else
-	{
-		this->_setParameters(queryParser.parse(this->_query));
-	}
-
-	return this->_buildHttpRequest();
+	return wasp::HttpRequest(
+		this->_method,
+		this->_path,
+		this->_majorV,
+		this->_minorV,
+		this->_query,
+		this->_keepAlive,
+		this->_content,
+		this->_headers,
+		this->_getParameters,
+		this->_postParameters
+	);
 }
 
-void HttpRequestParser::reset()
+Dict<std::string, std::string> HttpRequestParser::getHeaders()
 {
-	this->_majorV = 0;
-	this->_minorV = 0;
-	this->_path.clear();
-	this->_query.clear();
-	this->_method.clear();
-	this->_keepAlive = false;
-	this->_content.clear();
-	this->_headers.clear();
-	this->_getParameters = RequestParameters<std::string, std::string>();
-	this->_postParameters = RequestParameters<std::string, std::string>();
+	return Dict<std::string, std::string>(this->_headers);
 }
 
-void HttpRequestParser::_parseHttpWord(char input, char expectedInput, HttpRequestParser::ParserState newState)
+void HttpRequestParser::parseHeaders(const std::string& data)
 {
-	if (input == expectedInput)
-	{
-		this->_state = newState;
-	}
-	else
-	{
-		throw ParseError("unable to parse http protocol version", _ERROR_DETAILS_);
-	}
-}
-
-void HttpRequestParser::_parseRequest(const std::string& data)
-{
-	auto begin = data.begin();
-	auto end = data.end();
-
 	std::string newHeaderName;
 	std::string newHeaderValue;
 
 	std::map<std::string, std::string>::iterator connectionIt;
 
-	while (begin != end)
+	for (const char& input : data)
 	{
-		char input = *begin++;
 		switch (this->_state)
 		{
 			case ParserState::MethodBegin:
@@ -404,11 +367,7 @@ void HttpRequestParser::_parseRequest(const std::string& data)
 				}
 				else if (this->_contentSize == 0)
 				{
-					if (input == '\n')
-					{
-						return;
-					}
-					else
+					if (input != '\n')
 					{
 						throw ParseError("unable to parse http request", _ERROR_DETAILS_);
 					}
@@ -434,16 +393,109 @@ void HttpRequestParser::_parseRequest(const std::string& data)
 					}
 					this->_state = ParserState::RequestBody;
 				}
-				break;
-			case ParserState::RequestBody:
-				--this->_contentSize;
-				this->_content.push_back(input);
+				return;
+			default:
+				throw ParseError("unable to parse http request", _ERROR_DETAILS_);
+		}
+	}
 
-				if (this->_contentSize == 0)
-				{
-					return;
-				}
-				break;
+	throw ParseError("unable to parse http request", _ERROR_DETAILS_);
+}
+
+void HttpRequestParser::parseBody(const std::string& data)
+{
+	QueryParser queryParser;
+	if (data.empty())
+	{
+		this->_setParameters(queryParser.parse(this->_query));
+	}
+	else
+	{
+		this->_parseBody(data);
+		if (!this->_content.empty())
+		{
+			switch (this->_contentType)
+			{
+				case ContentType::ApplicationXWwwFormUrlencoded:
+					this->_setParameters(queryParser.parse(this->_content));
+					break;
+				case ContentType::ApplicationJson:
+					// TODO: parse application/json data
+					break;
+				case ContentType::MultipartFormData:
+					// TODO: parse multipart/form-data data
+					break;
+				case ContentType::Other:
+					break;
+				default:
+					break;
+			}
+		}
+	}
+}
+
+void HttpRequestParser::reset()
+{
+	this->_majorV = 0;
+	this->_minorV = 0;
+	this->_path.clear();
+	this->_query.clear();
+	this->_method.clear();
+	this->_keepAlive = false;
+	this->_content.clear();
+	this->_headers.clear();
+	this->_getParameters = RequestParameters<std::string, std::string>();
+	this->_postParameters = RequestParameters<std::string, std::string>();
+}
+
+// Private methods.
+void HttpRequestParser::_parseHttpWord(char input, char expectedInput, HttpRequestParser::ParserState newState)
+{
+	if (input == expectedInput)
+	{
+		this->_state = newState;
+	}
+	else
+	{
+		throw ParseError("unable to parse http protocol version", _ERROR_DETAILS_);
+	}
+}
+
+void HttpRequestParser::setParameters(RequestParameters<std::string, std::string>* params)
+{
+	if (this->_method == "GET")
+	{
+		this->_getParameters = *params;
+	}
+	else if (this->_method == "POST")
+	{
+		this->_postParameters = *params;
+	}
+}
+
+void HttpRequestParser::_setParameters(RequestParameters<std::string, std::string>* params)
+{
+	this->setParameters(params);
+	delete params;
+}
+
+void HttpRequestParser::_parseBody(const std::string& data)
+{
+	if (this->_state == ParserState::RequestBody)
+	{
+		// size of '\r\n'
+		unsigned endingSize = 2;
+		this->_content.append(data.substr(0, data.size() - endingSize));
+		if (this->_content.size() == this->_contentSize - endingSize)
+		{
+			return;
+		}
+	}
+
+	for (const char& input : data)
+	{
+		switch (this->_state)
+		{
 			case ParserState::ChunkSize:
 				if (isalnum(input))
 				{
@@ -602,29 +654,7 @@ void HttpRequestParser::_parseRequest(const std::string& data)
 	throw ParseError("unable to parse http request", _ERROR_DETAILS_);
 }
 
-void HttpRequestParser::_parseApplicationJson()
-{
-	// TODO
-}
-
-void HttpRequestParser::setParameters(RequestParameters<std::string, std::string>* params)
-{
-	if (this->_method == "GET")
-	{
-		this->_getParameters = *params;
-	}
-	else if (this->_method == "POST")
-	{
-		this->_postParameters = *params;
-	}
-}
-
-void HttpRequestParser::_setParameters(RequestParameters<std::string, std::string>* params)
-{
-	this->setParameters(params);
-	delete params;
-}
-
+// Private static functions.
 bool HttpRequestParser::isChar(uint c)
 {
 	return c >= 0 && c <= 127;
@@ -652,22 +682,6 @@ bool HttpRequestParser::isSpecial(uint c)
 bool HttpRequestParser::isDigit(uint c)
 {
 	return c >= '0' && c <= '9';
-}
-
-wasp::HttpRequest HttpRequestParser::_buildHttpRequest()
-{
-	return wasp::HttpRequest(
-		this->_method,
-		this->_path,
-		this->_majorV,
-		this->_minorV,
-		this->_query,
-		this->_keepAlive,
-		this->_content,
-		this->_headers,
-		this->_getParameters,
-		this->_postParameters
-	);
 }
 
 __INTERNAL_END__

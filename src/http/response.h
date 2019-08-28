@@ -298,6 +298,17 @@ public:
 };
 
 
+class HttpResponseEntityTooLarge : public HttpResponse
+{
+public:
+	explicit HttpResponseEntityTooLarge(
+			const std::string& content,
+			const std::string& contentType = "",
+			const std::string& charset = "utf-8"
+	);
+};
+
+
 class HttpResponseServerError : public HttpResponse
 {
 public:

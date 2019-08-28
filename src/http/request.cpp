@@ -20,8 +20,6 @@
  * TODO: write docs
  */
 
-#include <iostream>
-
 #include "request.h"
 
 

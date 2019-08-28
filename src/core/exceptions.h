@@ -16,8 +16,25 @@
  */
 
 /*
- * exceptions definition.
- * TODO: write docs.
+ * Exceptions list:
+ * - Base:
+ *  - BaseException.
+ *
+ * - Server errors:
+ *  - HttpError;
+ *  - SocketError;
+ *  - TcpError.
+ *
+ * - Wasp errors:
+ *  - AttributeError;
+ *  - DictError;
+ *  - DisallowedRedirect;
+ *  - EncodingError;
+ *  - FileDoesNotExistError;
+ *  - MultiValueDictError;
+ *  - ParseError;
+ *  - SuspiciousOperation;
+ *  - ValueError.
  */
 
 #ifndef WASP_CORE_EXCEPTIONS_H
@@ -53,21 +70,21 @@ public:
 	BaseException(const char* message, int line, const char* function, const char* file);
 	~BaseException() noexcept override = default;
 
-	const char* what() const noexcept override;
-	virtual const int line() const noexcept;
-	virtual const char* function() const noexcept;
-	virtual const char* file() const noexcept;
+	[[nodiscard]] const char* what() const noexcept override;
+	[[nodiscard]] virtual int line() const noexcept;
+	[[nodiscard]] virtual const char* function() const noexcept;
+	[[nodiscard]] virtual const char* file() const noexcept;
 };
 
 
-class TcpError : public BaseException
+class SocketError : public BaseException
 {
 protected:
 	// Use only when initializing of a derived exception!
-	TcpError(const char* message, int line, const char* function, const char* file, const char* type);
+	SocketError(const char* message, int line, const char* function, const char* file, const char* type);
 public:
-	TcpError(const char* message, int line, const char* function, const char* file);
-	TcpError(const std::string& message, int line, const char* function, const char* file);
+	SocketError(const char* message, int line, const char* function, const char* file);
+	SocketError(const std::string& message, int line, const char* function, const char* file);
 };
 
 
@@ -167,6 +184,18 @@ protected:
 public:
 	SuspiciousOperation(const char* message, int line, const char* function, const char* file);
 	SuspiciousOperation(const std::string& message, int line, const char* function, const char* file);
+};
+
+
+// Length of request's header is too large.
+class EntityTooLargeError : public BaseException
+{
+protected:
+	// Use only when initializing of a derived exception!
+	EntityTooLargeError(const char* message, int line, const char* function, const char* file, const char* type);
+public:
+	EntityTooLargeError(const char* message, int line, const char* function, const char* file);
+	EntityTooLargeError(const std::string& message, int line, const char* function, const char* file);
 };
 
 

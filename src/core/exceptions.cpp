@@ -50,7 +50,7 @@ const char* BaseException::what() const noexcept
 	return this->_fullMessage.c_str();
 }
 
-const int BaseException::line() const noexcept
+int BaseException::line() const noexcept
 {
 	return this->_line;
 }
@@ -66,19 +66,19 @@ const char* BaseException::file() const noexcept
 }
 
 
-// TcpError
-TcpError::TcpError(const char* message, int line, const char* function, const char* file, const char* type)
+// SocketError
+SocketError::SocketError(const char* message, int line, const char* function, const char* file, const char* type)
 	: BaseException(message, line, function, file, type)
 {
 }
 
-TcpError::TcpError(const char* message, int line, const char* function, const char* file)
-	: TcpError(message, line, function, file, "TcpError")
+SocketError::SocketError(const char* message, int line, const char* function, const char* file)
+	: SocketError(message, line, function, file, "SocketError")
 {
 }
 
-TcpError::TcpError(const std::string& message, int line, const char *function, const char *file)
-	: TcpError(message.c_str(), line, function, file)
+SocketError::SocketError(const std::string& message, int line, const char *function, const char *file)
+	: SocketError(message.c_str(), line, function, file)
 {
 }
 
@@ -249,6 +249,23 @@ DisallowedRedirect::DisallowedRedirect(const char* message, int line, const char
 
 DisallowedRedirect::DisallowedRedirect(const std::string& message, int line, const char *function, const char *file)
 	: DisallowedRedirect(message.c_str(), line, function, file)
+{
+}
+
+
+// EntityTooLargeError
+EntityTooLargeError::EntityTooLargeError(const char* message, int line, const char* function, const char* file, const char* type)
+		: BaseException(message, line, function, file, type)
+{
+}
+
+EntityTooLargeError::EntityTooLargeError(const char* message, int line, const char* function, const char* file)
+		: EntityTooLargeError(message, line, function, file, "EntityTooLargeError")
+{
+}
+
+EntityTooLargeError::EntityTooLargeError(const std::string& message, int line, const char *function, const char *file)
+		: EntityTooLargeError(message.c_str(), line, function, file)
 {
 }
 
