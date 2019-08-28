@@ -29,12 +29,14 @@
 #include <functional>
 #include <vector>
 #include <fstream>
+#include <thread>
+#include <poll.h>
 
 #include "../globals.h"
 #include "../utils/logger.h"
 #include "../conf/defaults.h"
 #include "../conf/settings.h"
-#include "../core/tcp/tcp_server.h"
+#include "../core/sockets/server_socket.h"
 #include "response.h"
 #include "request.h"
 #include "parsers/request_parser.h"
@@ -46,6 +48,8 @@
 
 __INTERNAL_BEGIN__
 
+#define MAX_BUFF_SIZE 8192 * 8 - 1
+
 typedef std::function<void(HttpRequest&, const socket_t&)> httpHandler;
 
 class HttpServer
@@ -54,13 +58,29 @@ private:
 	const char* _host;
 	uint16_t _port;
 	const char* _schema;
-
+	size_t _maxRequestSize;
+	ServerSocket _serverSocket;
+	httpHandler _httpHandler;
+	bool _finished;
 	ILogger* _logger;
 
-	TcpServer* _tcpServer;
-	httpHandler _httpHandler;
+	enum ReadResult
+	{
+		Continue, None
+	};
 
+	int _init();
+	void _cleanUp(const socket_t& connection);
+	std::string _recvAll(const socket_t& connection);
+	void _serveConnection(const socket_t& client);
+	void _startListener();
 	void _tcpHandler(const std::string& data, const socket_t& client);
+
+	static ReadResult _handleError(char* buffer, int& status, int line, const char *function, const char *file);
+	static void _send(const char* data, const socket_t& connection);
+	static bool _setSocketBlocking(int _sock, bool blocking);
+	static void _write(const char* data, size_t bytesToWrite, const socket_t& connection);
+	static void _wsaCleanUp();
 
 public:
 	struct Context
@@ -73,11 +93,11 @@ public:
 	};
 
 	explicit HttpServer(HttpServer::Context& ctx);
-	void listenAndServe();
+	~HttpServer();
 	void finish();
+	void listenAndServe();
 	static void send(HttpResponseBase* response, const socket_t& client);
 	static void send(StreamingHttpResponse* response, const socket_t& client);
-	~HttpServer();
 
 private:
 	static void _normalizeContext(HttpServer::Context& ctx);

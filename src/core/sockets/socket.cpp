@@ -31,7 +31,12 @@ Socket::Socket(socket_t sock) : _socket(sock), _closed(true)
 
 int Socket::close()
 {
-	if (!this->_closed && this->_socket != -1)
+	if (this->_closed)
+	{
+		return 0;
+	}
+
+	if (this->_socket != -1)
 	{
 #if defined(_WIN32) || defined(_WIN64)
 		return ::closesocket(this->_socket);
