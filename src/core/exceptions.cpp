@@ -117,6 +117,23 @@ ParseError::ParseError(const std::string& message, int line, const char *functio
 }
 
 
+// MultiPartParserError
+MultiPartParserError::MultiPartParserError(const char* message, int line, const char* function, const char* file, const char* type)
+	: ParseError(message, line, function, file, type)
+{
+}
+
+MultiPartParserError::MultiPartParserError(const char* message, int line, const char* function, const char* file)
+	: MultiPartParserError(message, line, function, file, "ParseError")
+{
+}
+
+MultiPartParserError::MultiPartParserError(const std::string& message, int line, const char *function, const char *file)
+	: MultiPartParserError(message.c_str(), line, function, file)
+{
+}
+
+
 // DictError
 DictError::DictError(const char* message, int line, const char* function, const char* file, const char* type)
 	: BaseException(message, line, function, file, type)

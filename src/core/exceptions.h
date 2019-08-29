@@ -109,6 +109,17 @@ public:
 };
 
 
+class MultiPartParserError : public ParseError
+{
+protected:
+	// Use only when initializing of a derived exception!
+	MultiPartParserError(const char* message, int line, const char* function, const char* file, const char* type);
+public:
+	MultiPartParserError(const char* message, int line, const char* function, const char* file);
+	MultiPartParserError(const std::string& message, int line, const char* function, const char* file);
+};
+
+
 class DictError : public BaseException
 {
 protected:

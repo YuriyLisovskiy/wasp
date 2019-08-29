@@ -27,6 +27,8 @@
 #include <functional>
 
 #include "../../globals.h"
+#include "../../utils/str.h"
+#include "../../core/exceptions.h"
 #include "../../collections/dict.h"
 #include "../../collections/multi_dict.h"
 
@@ -40,23 +42,35 @@ class MultipartParser
 private:
 	UploadHandler _uploadHandler;
 
+	Dict<std::string, std::string> _dict;
+	MultiValueDict<std::string, std::string> _multiDict;
+
 protected:
 	enum ParserState
 	{
 		BoundaryBegin,
 		Boundary,
 		BoundaryEnd,
+		BodyEnd,
 		ContentDispositionBegin,
 		ContentDisposition,
 		NameBegin,
 		Name,
+		NameEnd,
 		FileNameBegin,
 		FileName,
 		ContentTypeBegin,
 		ContentType,
 		ContentBegin,
-		Content,
-	};
+		Content
+
+	} _state;
+
+	void _appendParameter(const std::string& key, const std::string& value);
+//	void _appendFile(const std::string& key, const std::string& value);
+
+	static std::string _getBoundary(const std::string& contentType);
+	static void _assertBoundary(const std::string& actual, const std::string& expected);
 
 public:
 	explicit MultipartParser(const UploadHandler& uploadHandler);
