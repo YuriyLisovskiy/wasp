@@ -405,6 +405,7 @@ void HttpRequestParser::parseHeaders(const std::string& data)
 void HttpRequestParser::parseBody(const std::string& data)
 {
 	QueryParser queryParser;
+	MultipartParser multipartParser;
 	if (data.empty())
 	{
 		this->_setParameters(queryParser.parse(this->_query));
@@ -423,9 +424,7 @@ void HttpRequestParser::parseBody(const std::string& data)
 					// TODO: parse application/json data
 					break;
 				case ContentType::MultipartFormData:
-
-					// TODO: parse multipart/form-data data
-
+					multipartParser.parse(this->_headers["Content-Type"], this->_content);
 					break;
 				case ContentType::Other:
 					break;

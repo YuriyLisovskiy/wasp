@@ -73,6 +73,7 @@ protected:
 	static void _assertBoundary(const std::string& actual, const std::string& expected);
 
 public:
+	explicit MultipartParser();
 	explicit MultipartParser(const UploadHandler& uploadHandler);
 	void parse(const std::string& contentType, const std::string& body);
 	MultiValueDict<std::string, std::string> getFilesParameters();

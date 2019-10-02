@@ -23,7 +23,6 @@
 #include "./dict_error_tests.h"
 #include "./http_error_tests.h"
 #include "./multi_dict_error.h"
-#include "./tcp_error_tests.h"
 #include "./value_error_tests.h"
 
 #endif // WASP_UNIT_TESTS_CORE_EXCEPTIONS_INCLUDE_H

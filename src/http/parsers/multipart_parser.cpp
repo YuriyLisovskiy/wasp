@@ -55,12 +55,13 @@ std::string MultipartParser::_getBoundary(const std::string& contentType)
 		throw MultiPartParserError("Unable to parse request body: boundary is empty", _ERROR_DETAILS_);
 	}
 
+	str::ltrim(boundary, '-');
 	return boundary;
 }
 
 void MultipartParser::_assertBoundary(const std::string& actual, const std::string& expected)
 {
-	if (actual != expected)
+	if (str::trim(actual, '-') != str::trim(expected, '-'))
 	{
 		throw MultiPartParserError("Unable to parse request body: invalid boundary", _ERROR_DETAILS_);
 	}
@@ -68,6 +69,12 @@ void MultipartParser::_assertBoundary(const std::string& actual, const std::stri
 
 
 // Public methods.
+MultipartParser::MultipartParser()
+{
+//	this->_uploadHandler = uploadHandler;
+	this->_state = ParserState::BoundaryBegin;
+}
+
 MultipartParser::MultipartParser(const UploadHandler& uploadHandler)
 {
 	this->_uploadHandler = uploadHandler;
@@ -80,6 +87,8 @@ void MultipartParser::parse(const std::string& contentType, const std::string& b
 	std::string currentBoundary;
 	std::string key, value;
 	std::string fileContentType;
+	std::string fileName;
+	size_t endPos = 0;
 	auto begin = body.begin();
 	auto end = body.end();
 	while (begin != end)
@@ -88,20 +97,23 @@ void MultipartParser::parse(const std::string& contentType, const std::string& b
 		switch (this->_state)
 		{
 			case ParserState::BoundaryBegin:
-				currentBoundary.clear();
-				if (input != '-')
+				if (input == '\r' || input == '\n')
 				{
-					this->_state = ParserState::Boundary;
+					throw MultiPartParserError("Unable to parse request body: invalid boundary structure", _ERROR_DETAILS_);
+				}
+				if (input == '-')
+				{
+					currentBoundary += '-';
 				}
 				else
 				{
-					currentBoundary += '-';
+					currentBoundary += input;
+					this->_state = ParserState::Boundary;
 				}
 				break;
 			case ParserState::Boundary:
 				if (input == '\r')
 				{
-					input = *begin++;
 					this->_state = ParserState::BoundaryEnd;
 				}
 				else if (input == '-')
@@ -215,12 +227,85 @@ void MultipartParser::parse(const std::string& contentType, const std::string& b
 				}
 				break;
 			case ParserState::FileNameBegin:
+				fileName.clear();
+				if (input == '=')
+				{
+					input = *begin++;
+					if (input == '"')
+					{
+						this->_state = ParserState::FileName;
+					}
+					else
+					{
+						throw MultiPartParserError("Unable to parse filename: missing \" before filename", _ERROR_DETAILS_);
+					}
+				}
+				else if (input == '\r')
+				{
+					throw MultiPartParserError("Unable to parse filename: invalid filename structure", _ERROR_DETAILS_);
+				}
 				break;
 			case ParserState::FileName:
+				if (input == '"')
+				{
+					input = *begin++;
+					if (input == '\r')
+					{
+						input = *begin++;
+						if (input == '\n')
+						{
+							this->_state = ParserState::ContentTypeBegin;
+						}
+						else
+						{
+							throw MultiPartParserError("Unable to parse filename: missing end of line", _ERROR_DETAILS_);
+						}
+					}
+					else
+					{
+						throw MultiPartParserError("Unable to parse filename: control symbol \\r", _ERROR_DETAILS_);
+					}
+				}
+				else
+				{
+					fileName += input;
+				}
 				break;
 			case ParserState::ContentTypeBegin:
+				if (input == ':')
+				{
+					input = *begin++;
+					if (input == ' ')
+					{
+						this->_state = ParserState::ContentType;
+					}
+					else
+					{
+						throw MultiPartParserError("Unable to parse content type: invalid content type structure", _ERROR_DETAILS_);
+					}
+				}
+				else if (input == '\r')
+				{
+					throw MultiPartParserError("Unable to parse content type: invalid content type structure", _ERROR_DETAILS_);
+				}
 				break;
 			case ParserState::ContentType:
+				if (input == '\r')
+				{
+					input = *begin++;
+					if (input == '\n')
+					{
+						this->_state = ParserState::ContentBegin;
+					}
+					else
+					{
+						throw MultiPartParserError("Unable to parse content type: missing end of line", _ERROR_DETAILS_);
+					}
+				}
+				else
+				{
+					fileContentType += input;
+				}
 				break;
 			case ParserState::ContentBegin:
 				if (input == '\r')
@@ -237,40 +322,39 @@ void MultipartParser::parse(const std::string& contentType, const std::string& b
 				}
 				break;
 			case ParserState::Content:
-				if (input == '\r')
+				endPos = body.find("\r\n" + currentBoundary, endPos);
+				if (endPos == std::string::npos)
 				{
-					input = *begin++;
-					if (input == '\n')
-					{
-						this->_state = ParserState::BoundaryBegin;
-						if (fileContentType.empty())
-						{
-							this->_appendParameter(key, value);
-							value.clear();
-						}
-						else
-						{
-							// TODO: append file
-						}
-						key.clear();
-						fileContentType.clear();
-					}
-					else
-					{
-						throw MultiPartParserError("Unable to parse request body: invalid content structure", _ERROR_DETAILS_);
-					}
+					throw MultiPartParserError("Unable to parse request body: invalid content structure", _ERROR_DETAILS_);
+				}
+
+				if (fileContentType.empty())
+				{
+					value = std::string(begin, begin + endPos);
 				}
 				else
 				{
-					if (fileContentType.empty())
-					{
-						value += input;
-					}
-					else
-					{
-						// TODO: append to vector<char>
-					}
+					// TODO: append to vector<char>
 				}
+
+				// 2 is size of \r\n
+				// TODO: begin is not increased!
+				begin += (endPos + 2);
+				endPos += ("\r\n" + currentBoundary).size();
+				currentBoundary.clear();
+				this->_state = ParserState::BoundaryBegin;
+				if (fileContentType.empty())
+				{
+					this->_appendParameter(key, value);
+					value.clear();
+				}
+				else
+				{
+					print("file is appended")
+					// TODO: append file
+				}
+				key.clear();
+				fileContentType.clear();
 				break;
 			default:
 				throw MultiPartParserError("Unable to parse request body", _ERROR_DETAILS_);
