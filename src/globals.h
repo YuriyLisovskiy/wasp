@@ -94,8 +94,10 @@
 // Required parameters for Wasp's built-in logger.
 #define _ERROR_DETAILS_ __LINE__, __FUNCTION__, __FILE__
 
-#include <iostream>
+__WASP_BEGIN__
 
-#define print(msg) std::cout << msg << '\n';
+typedef unsigned char byte;
+
+__WASP_END__
 
 #endif // WASP_GLOBALS_H

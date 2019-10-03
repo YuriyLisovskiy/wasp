@@ -143,7 +143,7 @@ public:
 
 	wasp::HttpRequest buildHttpRequest();
 	Dict<std::string, std::string> getHeaders();
-	void parseBody(const std::string& data);
+	void parseBody(const std::string& data, const std::string& mediaRoot);
 	void parseHeaders(const std::string& data);
 	void reset();
 };

@@ -20,8 +20,6 @@
  * TODO: write docs.
  */
 
-#include <iostream>
-
 #include "request_parser.h"
 
 
@@ -402,10 +400,10 @@ void HttpRequestParser::parseHeaders(const std::string& data)
 	throw ParseError("unable to parse http request", _ERROR_DETAILS_);
 }
 
-void HttpRequestParser::parseBody(const std::string& data)
+void HttpRequestParser::parseBody(const std::string& data, const std::string& mediaRoot)
 {
 	QueryParser queryParser;
-	MultipartParser multipartParser;
+	MultipartParser multipartParser(mediaRoot);
 	if (data.empty())
 	{
 		this->_setParameters(queryParser.parse(this->_query));

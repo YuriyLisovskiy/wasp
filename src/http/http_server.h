@@ -41,6 +41,7 @@
 #include "request.h"
 #include "parsers/request_parser.h"
 #include "../core/exceptions.h"
+#include "../core/files/uploaded_file.h"
 
 #include "../utils/datetime/time.h"
 #include "../utils/str.h"
@@ -63,6 +64,7 @@ private:
 	httpHandler _httpHandler;
 	bool _finished;
 	ILogger* _logger;
+	std::string _mediaRoot;
 
 	enum ReadResult
 	{
@@ -92,6 +94,7 @@ public:
 		httpHandler handler = nullptr;
 		ILogger* logger;
 		size_t maxBodySize = 0;
+		std::string mediaRoot;
 	};
 
 	explicit HttpServer(HttpServer::Context& ctx);

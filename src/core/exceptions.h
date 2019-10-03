@@ -175,6 +175,17 @@ public:
 };
 
 
+class FileError : public BaseException
+{
+protected:
+	// Use only when initializing of a derived exception!
+	FileError(const char* message, int line, const char* function, const char* file, const char* type);
+public:
+	FileError(const char* message, int line, const char* function, const char* file);
+	FileError(const std::string& message, int line, const char* function, const char* file);
+};
+
+
 class EncodingError : public BaseException
 {
 protected:

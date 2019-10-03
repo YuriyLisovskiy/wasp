@@ -92,14 +92,16 @@ HttpRequest HttpServer::_handleRequest(const socket_t& client)
 	{
 		size_t bodyLength = strtol(headers.get("Content-Length").c_str(), nullptr, 10);
 		std::string body = this->_readBody(client, bodyBeginning, bodyLength);
-		parser.parseBody(body);
+		parser.parseBody(body, this->_mediaRoot);
 	}
 
 	return parser.buildHttpRequest();
 }
 
 std::string HttpServer::_readBody(
-	const wasp::internal::socket_t& client, const std::string& bodyBeginning, size_t bodyLength
+	const wasp::internal::socket_t& client,
+	const std::string& bodyBeginning,
+	size_t bodyLength
 )
 {
 	std::string data;
@@ -365,6 +367,9 @@ void HttpServer::_normalizeContext(HttpServer::Context& ctx)
 	{
 		ctx.logger = Logger::getInstance();
 	}
+
+	str::rtrim(ctx.mediaRoot, '/');
+	str::rtrim(ctx.mediaRoot, '\\');
 }
 
 void HttpServer::_send(const char* data, const socket_t& client)
@@ -427,6 +432,8 @@ HttpServer::HttpServer(HttpServer::Context& ctx) : _finished(true)
 	this->_schema = "http";
 
 	this->_httpHandler = ctx.handler;
+
+	this->_mediaRoot = ctx.mediaRoot;
 }
 
 HttpServer::~HttpServer()

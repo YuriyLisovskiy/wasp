@@ -219,6 +219,23 @@ FileDoesNotExistError::FileDoesNotExistError(const std::string& message, int lin
 }
 
 
+// FileError
+FileError::FileError(const char* message, int line, const char* function, const char* file, const char* type)
+	: BaseException(message, line, function, file, type)
+{
+}
+
+FileError::FileError(const char* message, int line, const char* function, const char* file)
+	: FileError(message, line, function, file, "FileError")
+{
+}
+
+FileError::FileError(const std::string& message, int line, const char *function, const char *file)
+	: FileError(message.c_str(), line, function, file)
+{
+}
+
+
 // EncodingError
 EncodingError::EncodingError(const char* message, int line, const char* function, const char* file, const char* type)
 	: BaseException(message, line, function, file, type)

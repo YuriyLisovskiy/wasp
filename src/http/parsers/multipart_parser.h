@@ -25,25 +25,36 @@
 
 #include <string>
 #include <functional>
+#include <fstream>
 
 #include "../../globals.h"
 #include "../../utils/str.h"
 #include "../../core/exceptions.h"
 #include "../../collections/dict.h"
 #include "../../collections/multi_dict.h"
+#include "../../core/files/base.h"
+#include "../../core/files/uploaded_file.h"
 
 
 __INTERNAL_BEGIN__
 
-typedef std::function<void(const std::string&, const std::string&)> UploadHandler;
+typedef std::function<UploadedFile(
+	const std::string&,
+	const std::vector<byte>&,
+	const std::string&,
+	const std::string&
+)> UploadHandler;
 
 class MultipartParser
 {
 private:
-	UploadHandler _uploadHandler;
+	std::string _mediaRoot;
 
-	Dict<std::string, std::string> _dict;
-	MultiValueDict<std::string, std::string> _multiDict;
+	Dict<std::string, std::string> _postValues;
+	MultiValueDict<std::string, std::string> _multiPostValue;
+
+	Dict<std::string, UploadedFile> _fileValues;
+	MultiValueDict<std::string, UploadedFile> _multiFileValue;
 
 protected:
 	enum ParserState
@@ -67,17 +78,21 @@ protected:
 	} _state;
 
 	void _appendParameter(const std::string& key, const std::string& value);
-//	void _appendFile(const std::string& key, const std::string& value);
+	void _appendFile(
+		const std::string& key,
+		const std::string& fileName,
+		const std::string& contentType,
+		const std::vector<byte>& data
+	);
 
 	static std::string _getBoundary(const std::string& contentType);
 	static void _assertBoundary(const std::string& actual, const std::string& expected);
 
 public:
-	explicit MultipartParser();
-	explicit MultipartParser(const UploadHandler& uploadHandler);
+	explicit MultipartParser(const std::string& mediaRoot = "");
 	void parse(const std::string& contentType, const std::string& body);
-	MultiValueDict<std::string, std::string> getFilesParameters();
-	Dict<std::string, std::string> getPostParameters();
+	MultiValueDict<std::string, std::string> getFilesParams();
+	Dict<std::string, std::string> getPostParams();
 };
 
 __INTERNAL_END__
