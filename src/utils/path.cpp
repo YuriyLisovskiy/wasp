@@ -87,4 +87,11 @@ size_t getSize(const std::string& path)
 	return std::ifstream(path, std::ifstream::ate | std::ifstream::binary).tellg();
 }
 
+std::string cwd()
+{
+	char buffer[FILENAME_MAX];
+	getcwd(buffer, FILENAME_MAX);
+	return std::string(buffer);
+}
+
 __PATH_END__

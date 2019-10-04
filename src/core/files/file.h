@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WASP_CORE_FILES_BASE_H
-#define WASP_CORE_FILES_BASE_H
+#ifndef WASP_CORE_FILES_FILE_H
+#define WASP_CORE_FILES_FILE_H
 
 #include <fstream>
 #include <string>
@@ -75,4 +75,4 @@ public:
 __WASP_END__
 
 
-#endif // WASP_CORE_FILES_BASE_H
+#endif // WASP_CORE_FILES_FILE_H

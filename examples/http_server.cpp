@@ -69,6 +69,7 @@ int main()
 		ctx.handler = handler;
 		ctx.port = 3000;
 		ctx.maxBodySize = 33300000;
+		ctx.mediaRoot = "/home/yuriylisovskiy/Desktop/media/";
 
 		HttpServer server(ctx);
 

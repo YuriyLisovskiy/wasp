@@ -25,7 +25,10 @@
 
 #if defined(_WIN32) || defined(_WIN64)
 #include <io.h>
+#include <direct.h>
+
 #define access _access_s
+#define getcwd _getcwd
 #else
 #include <unistd.h>
 #endif
@@ -64,6 +67,8 @@ extern bool exists(const std::string& path);
 extern std::string baseName(const std::string& path);
 
 extern size_t getSize(const std::string& path);
+
+extern std::string cwd();
 
 __PATH_END__
 

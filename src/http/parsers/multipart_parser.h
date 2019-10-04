@@ -32,7 +32,7 @@
 #include "../../core/exceptions.h"
 #include "../../collections/dict.h"
 #include "../../collections/multi_dict.h"
-#include "../../core/files/base.h"
+#include "../../core/files/file.h"
 #include "../../core/files/uploaded_file.h"
 
 

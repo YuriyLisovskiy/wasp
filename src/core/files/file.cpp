@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "base.h"
+#include "file.h"
 
 
 __WASP_BEGIN__
@@ -129,7 +129,7 @@ void File::close()
 {
 	if (this->_file.is_open())
 	{
-		this->close();
+		this->_file.close();
 	}
 }
 
@@ -176,7 +176,7 @@ void File::write(std::vector<byte> bytes)
 		throw FileError("file is open only for reading: " + this->_name, _ERROR_DETAILS_);
 	}
 
-	this->_file.write((char*) bytes.data(), bytes.size());
+	this->_file.write((char*) bytes.data(), bytes.size() * sizeof(byte));
 }
 
 size_t File::size()
