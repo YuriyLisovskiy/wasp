@@ -50,7 +50,6 @@ protected:
 	bool _keepAlive{};
 	std::string _content;
 	std::map<std::string, std::string> _headers;
-	Dict<std::string, std::string>* _cookies = nullptr;
 	HttpRequest::Parameters<std::string, std::string>* _getParameters = nullptr;
 	HttpRequest::Parameters<std::string, std::string>* _postParameters = nullptr;
 	HttpRequest::Parameters<std::string, UploadedFile>* _filesParameters = nullptr;

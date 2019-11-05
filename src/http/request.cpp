@@ -25,7 +25,6 @@ HttpRequest::HttpRequest(
 	std::string method, std::string path, size_t majorV, size_t minorV,
 	std::string query, bool keepAlive, std::string content,
 	const std::map<std::string, std::string>& headers,
-	const Dict<std::string, std::string>& cookies,
 	const HttpRequest::Parameters<std::string, std::string>& getParameters,
 	const HttpRequest::Parameters<std::string, std::string>& postParameters,
 	const HttpRequest::Parameters<std::string, UploadedFile>& filesParameters
@@ -39,7 +38,6 @@ HttpRequest::HttpRequest(
 	_body(std::move(content))
 {
 	this->headers = Dict<std::string, std::string>(headers);
-	this->COOKIES = cookies;
 	this->GET = getParameters;
 	this->POST = postParameters;
 	this->FILES = filesParameters;

@@ -20,12 +20,15 @@
 #include <vector>
 
 #include "../src/http/http_server.h"
+#include "../src/middleware/cookies.h"
 
 using wasp::internal::HttpServer;
 
 
 void handler(wasp::HttpRequest& request, const wasp::internal::socket_t& client)
 {
+	wasp::CookieMiddleware().processRequest(request);
+
 //	std::cout << "\n" << request.method() << " " << request.path() << " " << request.version() << "\n";
 //	auto begin = request.headers.cbegin();
 //	auto end = request.headers.cend();
@@ -74,7 +77,7 @@ int main()
 	{
 		HttpServer::Context ctx{};
 		ctx.handler = handler;
-		ctx.port = 8000;
+		ctx.port = 5000;
 		ctx.maxBodySize = 33300000;
 		ctx.mediaRoot = "/home/yuriylisovskiy/Desktop/media/";
 
