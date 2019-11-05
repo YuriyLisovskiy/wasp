@@ -38,34 +38,31 @@ void handler(wasp::HttpRequest& request, const wasp::internal::socket_t& client)
 
 //	std::cout << request.body() << "\n";
 
-//	for (auto it = request.COOKIES.cbegin(); it != request.COOKIES.cend(); it++)
+//	for (auto it = request.headers.cbegin(); it != request.headers.cend(); it++)
 //	{
-//		std::cout << it->first << ": " << it->second << '\n';
+//		std::cout << '\n' << it->first << ": " << it->second;
 //	}
 
-/*
-	auto response = new wasp::FileResponse("/home/user/Desktop/file.json");
-	HttpServer::send(response, client);
-	delete response;
-*/
 
-	auto keys_get = request.GET.keys();
-	auto keys_post = request.POST.keys();
-	auto keys_files = request.FILES.keys();
-	auto keys_cookies = request.COOKIES.keys();
+//	auto response = new wasp::FileResponse("/home/yuriylisovskiy/Desktop/file.json");
+//	HttpServer::send(response, client);
+//	delete response;
 
 	wasp::print(
-		"\nGet: ", keys_get.size(),
-		"\nPost: ", keys_post.size(),
-		"\nFiles: ", keys_files.size(),
-		"\nCookies: ", keys_cookies.size()
+		"\nGet: ", request.GET.keys().size(),
+		"\nPost: ", request.POST.keys().size(),
+		"\nFiles: ", request.FILES.keys().size(),
+		"\nCookies: ", request.COOKIES.keys().size()
 	);
 
-	std::string body("<form action=\"/hello\" method=\"post\" enctype=\"multipart/form-data\">\n"
-					 "\t<input type=\"file\" name=\"super_file\" />\n"
-					 "\t<input type=\"text\" name=\"first_name\" />\n"
-					 "\t<input type=\"submit\" value=\"send\" />\n"
-					 "\t</form>\n");
+	std::string body(
+		"<form action=\"/hello\" method=\"post\" enctype=\"multipart/form-data\">\n"
+		"\t<input type=\"file\" name=\"super_file\" />\n"
+		"\t<input type=\"text\" name=\"first_name\" />\n"
+		"\t<input type=\"submit\" value=\"send\" />\n"
+		"\t</form>\n"
+	);
+
 	auto response = new wasp::HttpResponse(body);
 	HttpServer::send(response, client);
 	delete response;
