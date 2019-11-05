@@ -123,8 +123,6 @@ void File::open()
 	}
 }
 
-// TODO: test this function
-// TODO: throws segmentation fault
 void File::close()
 {
 	if (this->_file.is_open())
@@ -150,17 +148,22 @@ std::vector<byte> File::read(size_t n)
 		throw FileError("file is open only for writing: " + this->_name, _ERROR_DETAILS_);
 	}
 
-	std::vector<byte> bytes;
-	char* buffer = new char;
-	size_t i = 0;
-	while (i != n && !this->_file.eof())
+	size_t actualSize = this->size();
+	if (n > actualSize)
 	{
-		this->_file.read(buffer, 1);
-		bytes.push_back((byte) *buffer);
-		i++;
+		n = actualSize;
 	}
 
-	delete buffer;
+	std::vector<byte> bytes;
+	char* buffer = new char[n];
+	this->_file.read(buffer, n);
+
+	for (size_t i = 0; i < n; i++)
+	{
+		bytes.push_back((byte) *buffer);
+	}
+
+	delete[] buffer;
 	return bytes;
 }
 
@@ -176,7 +179,7 @@ void File::write(std::vector<byte> bytes)
 		throw FileError("file is open only for reading: " + this->_name, _ERROR_DETAILS_);
 	}
 
-	this->_file.write((char*) bytes.data(), bytes.size() * sizeof(byte));
+	this->_file.write((char*) bytes.data(), bytes.size());
 }
 
 size_t File::size()

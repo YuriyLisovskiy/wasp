@@ -15,11 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * query_parser implementation.
- * TODO: write docs.
- */
-
 #include "query_parser.h"
 
 
@@ -29,42 +24,40 @@ QueryParser::QueryParser() : _dict(true), _multiDict(true)
 {
 }
 
-RequestParameters<std::string, std::string>* QueryParser::parse(const std::string& content)
+HttpRequest::Parameters<std::string, std::string>* QueryParser::parse(const std::string& content)
 {
 	if (content.empty())
 	{
-		return new RequestParameters<std::string, std::string>();
+		return new HttpRequest::Parameters<std::string, std::string>();
 	}
 
 	auto begin = content.begin();
 	auto end = content.end();
 	std::string itemKey;
 	std::string itemValue;
-
-	ParserState state = ParserState::Key;
-
+	QueryParser::State state = QueryParser::State::Key;
 	while (begin != end)
 	{
 		char input = *begin++;
 		switch (state)
 		{
-			case ParserState::Key:
+			case QueryParser::State::Key:
 				if (input == '=')
 				{
-					state = ParserState::Val;
+					state = QueryParser::State::Val;
 				}
 				else
 				{
 					itemKey.push_back(input);
 				}
 				break;
-			case ParserState::Val:
+			case QueryParser::State::Val:
 				if (input == '&')
 				{
-					this->_appendParameter(itemKey, itemValue);
+					this->appendParameter(itemKey, itemValue);
 					itemKey.clear();
 					itemValue.clear();
-					state = ParserState::Key;
+					state = QueryParser::State::Key;
 				}
 				else
 				{
@@ -73,24 +66,19 @@ RequestParameters<std::string, std::string>* QueryParser::parse(const std::strin
 				break;
 		}
 	}
-	this->_appendParameter(itemKey, itemValue);
 
-	return new RequestParameters<std::string, std::string>(this->_dict, this->_multiDict);
+	this->appendParameter(itemKey, itemValue);
+	return new HttpRequest::Parameters<std::string, std::string>(this->_dict, this->_multiDict);
 }
 
-void QueryParser::_appendParameter(const std::string& key, const std::string& value)
+void QueryParser::appendParameter(const std::string& key, const std::string& value)
 {
 	if (!this->_dict.contains(key))
 	{
 		this->_dict.set(key, value);
 	}
-	this->_multiDict.append(key, value);
-}
 
-void QueryParser::reset()
-{
-	this->_dict.clear();
-	this->_multiDict.clear();
+	this->_multiDict.append(key, value);
 }
 
 __INTERNAL_END__

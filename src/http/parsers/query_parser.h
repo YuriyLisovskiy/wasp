@@ -24,17 +24,16 @@
 #define WASP_QUERY_PARSER_H
 
 #include "../../globals.h"
-#include "../request_parameters.h"
+#include "../request.h"
 #include "../../collections/dict.h"
 #include "../../collections/multi_dict.h"
 
 
 __INTERNAL_BEGIN__
 
-class QueryParser
+struct QueryParser
 {
-private:
-	enum ParserState
+	enum State
 	{
 		Key,
 		Val
@@ -43,13 +42,9 @@ private:
 	Dict<std::string, std::string> _dict;
 	MultiValueDict<std::string, std::string> _multiDict;
 
-	void _appendParameter(const std::string& key, const std::string& value);
-
-public:
 	explicit QueryParser();
-	
-	RequestParameters<std::string, std::string>* parse(const std::string& data);
-	void reset();
+	void appendParameter(const std::string& key, const std::string& value);
+	HttpRequest::Parameters<std::string, std::string>* parse(const std::string& data);
 };
 
 __INTERNAL_END__

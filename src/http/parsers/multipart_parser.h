@@ -34,16 +34,10 @@
 #include "../../collections/multi_dict.h"
 #include "../../core/files/file.h"
 #include "../../core/files/uploaded_file.h"
+#include "../request.h"
 
 
 __INTERNAL_BEGIN__
-
-typedef std::function<UploadedFile(
-	const std::string&,
-	const std::vector<byte>&,
-	const std::string&,
-	const std::string&
-)> UploadHandler;
 
 class MultipartParser
 {
@@ -57,7 +51,7 @@ private:
 	MultiValueDict<std::string, UploadedFile> _multiFileValue;
 
 protected:
-	enum ParserState
+	enum State
 	{
 		BoundaryBegin,
 		Boundary,
@@ -82,6 +76,8 @@ protected:
 		const std::string& key,
 		const std::string& fileName,
 		const std::string& contentType,
+		const std::string& boundary,
+		const std::string& contentDisposition,
 		const std::vector<byte>& data
 	);
 
@@ -91,8 +87,8 @@ protected:
 public:
 	explicit MultipartParser(const std::string& mediaRoot = "");
 	void parse(const std::string& contentType, const std::string& body);
-	MultiValueDict<std::string, std::string> getFilesParams();
-	Dict<std::string, std::string> getPostParams();
+	HttpRequest::Parameters<std::string, UploadedFile>* getFilesParams();
+	HttpRequest::Parameters<std::string, std::string>* getPostParams();
 };
 
 __INTERNAL_END__

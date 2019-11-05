@@ -15,11 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * url_parser implementation.
- * TODO: write docs.
- */
-
 #include "url_parser.h"
 
 
@@ -123,68 +118,68 @@ void UrlParser::parse(const std::string& str)
 	this->_url.path = "/";
 	this->_url.integerPort = 0;
 
-	ParserState state = ParserState::Scheme;
+	UrlParser::State state = UrlParser::State::Scheme;
 
 	for (char ch : str)
 	{
 		switch (state)
 		{
-			case ParserState::Scheme:
+			case UrlParser::State::Scheme:
 				if (std::isalnum(ch) || ch == '+' || ch == '-' || ch == '.')
 				{
 					this->_url.scheme += ch;
 				}
 				else if (ch == ':')
 				{
-					state = ParserState::FirstSlashAfterScheme;
+					state = UrlParser::State::FirstSlashAfterScheme;
 				}
 				else
 				{
 					throw ParseError("unable to parse url scheme", _ERROR_DETAILS_);
 				}
 				break;
-			case ParserState::FirstSlashAfterScheme:
+			case UrlParser::State::FirstSlashAfterScheme:
 				if (ch == '/')
 				{
-					state = ParserState::SecondSlashAfterScheme;
+					state = UrlParser::State::SecondSlashAfterScheme;
 				}
 				else if (std::isalnum(ch))
 				{
 					usernameOrHostname = ch;
-					state = ParserState::UsernameOrHostname;
+					state = UrlParser::State::UsernameOrHostname;
 				}
 				else
 				{
 					throw ParseError("unable to parse the first slash after scheme", _ERROR_DETAILS_);
 				}
 				break;
-			case ParserState::SecondSlashAfterScheme:
+			case UrlParser::State::SecondSlashAfterScheme:
 				if (ch == '/')
 				{
-					state = ParserState::UsernameOrHostname;
+					state = UrlParser::State::UsernameOrHostname;
 				}
 				else
 				{
 					throw ParseError("unable to parse the second slash after scheme", _ERROR_DETAILS_);
 				}
 				break;
-			case ParserState::UsernameOrHostname:
+			case UrlParser::State::UsernameOrHostname:
 				if (this->isUnreserved(ch) || ch == '%')
 				{
 					usernameOrHostname += ch;
 				}
 				else if (ch == ':')
 				{
-					state = ParserState::PortOrPassword;
+					state = UrlParser::State::PortOrPassword;
 				}
 				else if (ch == '@')
 				{
-					state = ParserState::Hostname;
+					state = UrlParser::State::Hostname;
 					std::swap(this->_url.username, usernameOrHostname);
 				}
 				else if (ch == '/')
 				{
-					state = ParserState::Path;
+					state = UrlParser::State::Path;
 					std::swap(this->_url.hostname, usernameOrHostname);
 				}
 				else
@@ -192,24 +187,24 @@ void UrlParser::parse(const std::string& str)
 					throw ParseError("unable to parse username or hostname", _ERROR_DETAILS_);
 				}
 				break;
-			case ParserState::Password:
+			case UrlParser::State::Password:
 				if (isalnum(ch) || ch == '%')
 				{
 					this->_url.password += ch;
 				}
 				else if (ch == '@')
 				{
-					state = ParserState::Hostname;
+					state = UrlParser::State::Hostname;
 				}
 				else
 				{
 					throw ParseError("unable to parse password", _ERROR_DETAILS_);
 				}
 				break;
-			case ParserState::Hostname:
+			case UrlParser::State::Hostname:
 				if (ch == '[' && this->_url.hostname.empty())
 				{
-					state = ParserState::IPV6Hostname;
+					state = UrlParser::State::IPV6Hostname;
 				}
 				else if (isUnreserved(ch) || ch == '%')
 				{
@@ -217,20 +212,20 @@ void UrlParser::parse(const std::string& str)
 				}
 				else if (ch == ':')
 				{
-					state = ParserState::Port;
+					state = UrlParser::State::Port;
 				}
 				else if (ch == '/')
 				{
-					state = ParserState::Path;
+					state = UrlParser::State::Path;
 				}
 				else
 				{
 					throw ParseError("unable to parse hostname", _ERROR_DETAILS_);
 				}
 				break;
-			case ParserState::IPV6Hostname:
+			case UrlParser::State::IPV6Hostname:
 				std::abort(); // TODO
-			case ParserState::PortOrPassword:
+			case UrlParser::State::PortOrPassword:
 				if (std::isdigit(ch))
 				{
 					portOrPassword += ch;
@@ -240,21 +235,21 @@ void UrlParser::parse(const std::string& str)
 					std::swap(this->_url.hostname, usernameOrHostname);
 					std::swap(this->_url.port, portOrPassword);
 					this->_url.integerPort = std::strtol(this->_url.port.c_str(), nullptr, 0);
-					state = ParserState::Path;
+					state = UrlParser::State::Path;
 				}
 				else if (std::isalnum(ch) || ch == '%')
 				{
 					std::swap(this->_url.username, usernameOrHostname);
 					std::swap(this->_url.password, portOrPassword);
 					this->_url.password += ch;
-					state = ParserState::Password;
+					state = UrlParser::State::Password;
 				}
 				else
 				{
 					throw ParseError("unable to parse port or password", _ERROR_DETAILS_);
 				}
 				break;
-			case ParserState::Port:
+			case UrlParser::State::Port:
 				if (std::isdigit(ch))
 				{
 					portOrPassword += ch;
@@ -270,35 +265,35 @@ void UrlParser::parse(const std::string& str)
 					throw ParseError("unable to parse port", _ERROR_DETAILS_);
 				}
 				break;
-			case ParserState::Path:
+			case UrlParser::State::Path:
 				if (ch == '#')
 				{
-					state = ParserState::Fragment;
+					state = UrlParser::State::Fragment;
 				}
 				else if (ch == '?')
 				{
-					state = ParserState::Query;
+					state = UrlParser::State::Query;
 				}
 				else
 				{
 					this->_url.path += ch;
 				}
 				break;
-			case ParserState::Query:
+			case UrlParser::State::Query:
 				if (ch == '#')
 				{
-					state = ParserState::Fragment;
+					state = UrlParser::State::Fragment;
 				}
 				else if (ch == '?')
 				{
-					state = ParserState::Query;
+					state = UrlParser::State::Query;
 				}
 				else
 				{
 					this->_url.query += ch;
 				}
 				break;
-			case ParserState::Fragment:
+			case UrlParser::State::Fragment:
 				this->_url.fragment += ch;
 				break;
 		}

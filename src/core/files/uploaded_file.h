@@ -23,8 +23,6 @@
 #ifndef WASP_CORE_FILES_UPLOADED_FILE_H
 #define WASP_CORE_FILES_UPLOADED_FILE_H
 
-#include <sys/stat.h>
-
 #include "../../globals.h"
 
 
@@ -34,6 +32,8 @@ class UploadedFile
 {
 private:
 	std::string _name;
+	std::string _boundary;
+	std::string _contentDisposition;
 	std::string _charset;
 	std::string _contentType;
 	size_t _size{};
@@ -43,7 +43,9 @@ public:
 		const std::string& name,
 		size_t size,
 		const std::string& contentType = "",
-		const std::string& charset = ""
+		const std::string& charset = "",
+		const std::string& boundary = "",
+		const std::string& contentDisposition = ""
 	);
 	UploadedFile() = default;
 	UploadedFile(const UploadedFile& copy)
@@ -51,6 +53,8 @@ public:
 		if (this != &copy)
 		{
 			this->_name = copy._name;
+			this->_boundary = copy._boundary;
+			this->_contentDisposition = copy._contentDisposition;
 			this->_charset = copy._charset;
 			this->_contentType = copy._contentType;
 			this->_size = copy._size;
@@ -62,6 +66,8 @@ public:
 		if (this != &copy)
 		{
 			this->_name = copy._name;
+			this->_boundary = copy._boundary;
+			this->_contentDisposition = copy._contentDisposition;
 			this->_charset = copy._charset;
 			this->_contentType = copy._contentType;
 			this->_size = copy._size;
@@ -70,10 +76,12 @@ public:
 		return *this;
 	}
 
-	std::string getName();
-	std::string getCharset();
-	std::string getContentType();
-	size_t getSize();
+	std::string name();
+	std::string boundary();
+	std::string contentDisposition();
+	std::string charset();
+	std::string contentType();
+	size_t size();
 	bool exists();
 };
 

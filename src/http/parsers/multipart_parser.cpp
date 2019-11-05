@@ -15,11 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * multipart_parser implementation.
- * TODO: write docs.
- */
-
 #include "multipart_parser.h"
 
 
@@ -40,6 +35,8 @@ void MultipartParser::_appendFile(
 	const std::string& key,
 	const std::string& fileName,
 	const std::string& contentType,
+	const std::string& boundary,
+	const std::string& contentDisposition,
 	const std::vector<byte>& data
 )
 {
@@ -47,14 +44,13 @@ void MultipartParser::_appendFile(
 	if (!rootIsEmpty)
 	{
 		File file(data, this->_mediaRoot + "/" + fileName);
-	//  TODO: closing the file throws segfault
-	//	if (file.isOpen())
-	//	{
-	//		file.close();
-	//	}
+		if (file.isOpen())
+		{
+			file.close();
+		}
 	}
 
-	UploadedFile file(this->_mediaRoot + "/" + fileName, rootIsEmpty ? 0 : data.size(), contentType, "");
+	UploadedFile file(this->_mediaRoot + "/" + fileName, rootIsEmpty ? 0 : data.size(), contentType, "", boundary);
 	if (!this->_fileValues.contains(key))
 	{
 		this->_fileValues.set(key, file);
@@ -100,7 +96,7 @@ void MultipartParser::_assertBoundary(const std::string& actual, const std::stri
 MultipartParser::MultipartParser(const std::string& mediaRoot)
 {
 	this->_mediaRoot = mediaRoot;
-	this->_state = ParserState::BoundaryBegin;
+	this->_state = MultipartParser::State::BoundaryBegin;
 	this->_multiPostValue = MultiValueDict<std::string, std::string>(true);
 	this->_postValues = Dict<std::string, std::string>(true);
 	this->_multiFileValue = MultiValueDict<std::string, UploadedFile>(true);
@@ -111,6 +107,7 @@ void MultipartParser::parse(const std::string& contentType, const std::string& b
 {
 	std::string boundary = MultipartParser::_getBoundary(contentType);
 	std::string currentBoundary;
+	std::string contentDisposition;
 	std::string key, value;
 	std::vector<byte> file;
 	std::string fileContentType;
@@ -123,7 +120,7 @@ void MultipartParser::parse(const std::string& contentType, const std::string& b
 		char input = *begin++;
 		switch (this->_state)
 		{
-			case ParserState::BoundaryBegin:
+			case MultipartParser::State::BoundaryBegin:
 				if (input == '\r' || input == '\n')
 				{
 					throw MultiPartParserError("Unable to parse request body: invalid boundary structure", _ERROR_DETAILS_);
@@ -135,48 +132,48 @@ void MultipartParser::parse(const std::string& contentType, const std::string& b
 				else
 				{
 					currentBoundary += input;
-					this->_state = ParserState::Boundary;
+					this->_state = MultipartParser::State::Boundary;
 				}
 				break;
-			case ParserState::Boundary:
+			case MultipartParser::State::Boundary:
 				if (input == '\r')
 				{
-					this->_state = ParserState::BoundaryEnd;
+					this->_state = MultipartParser::State::BoundaryEnd;
 				}
 				else if (input == '-')
 				{
-					this->_state = ParserState::BodyEnd;
+					this->_state = MultipartParser::State::BodyEnd;
 				}
 				else
 				{
 					currentBoundary += input;
 				}
 				break;
-			case ParserState::BoundaryEnd:
+			case MultipartParser::State::BoundaryEnd:
 				if (input == '\n')
 				{
 					this->_assertBoundary(currentBoundary, boundary);
-					this->_state = ParserState::ContentDispositionBegin;
+					this->_state = MultipartParser::State::ContentDispositionBegin;
 				}
 				else
 				{
 					throw MultiPartParserError("Unable to parse request body: invalid boundary ending", _ERROR_DETAILS_);
 				}
 				break;
-			case ParserState::BodyEnd:
+			case MultipartParser::State::BodyEnd:
 				if (input == '-')
 				{
 					this->_assertBoundary(currentBoundary, boundary);
 					return;
 				}
 				break;
-			case ParserState::ContentDispositionBegin:
+			case MultipartParser::State::ContentDispositionBegin:
 				if (input == ':')
 				{
 					input = *begin++;
 					if (input == ' ')
 					{
-						this->_state = ParserState::ContentDisposition;
+						this->_state = MultipartParser::State::ContentDisposition;
 					}
 					else
 					{
@@ -184,28 +181,31 @@ void MultipartParser::parse(const std::string& contentType, const std::string& b
 					}
 				}
 				break;
-			case ParserState::ContentDisposition:
-				// Save content-disposition type maybe
+			case MultipartParser::State::ContentDisposition:
 				if (input == ';')
 				{
 					input = *begin++;
 					if (input == ' ')
 					{
-						this->_state = ParserState::NameBegin;
+						this->_state = MultipartParser::State::NameBegin;
 					}
 					else
 					{
 						throw MultiPartParserError("Unable to parse request body: invalid content disposition", _ERROR_DETAILS_);
 					}
 				}
+				else
+				{
+					contentDisposition += input;
+				}
 				break;
-			case ParserState::NameBegin:
+			case MultipartParser::State::NameBegin:
 				if (input == '=')
 				{
 					input = *begin++;
 					if (input == '"')
 					{
-						this->_state = ParserState::Name;
+						this->_state = MultipartParser::State::Name;
 					}
 					else
 					{
@@ -213,23 +213,23 @@ void MultipartParser::parse(const std::string& contentType, const std::string& b
 					}
 				}
 				break;
-			case ParserState::Name:
+			case MultipartParser::State::Name:
 				if (input == '"')
 				{
-					this->_state = ParserState::NameEnd;
+					this->_state = MultipartParser::State::NameEnd;
 				}
 				else
 				{
 					key += input;
 				}
 				break;
-			case ParserState::NameEnd:
+			case MultipartParser::State::NameEnd:
 				if (input == ';')
 				{
 					input = *begin++;
 					if (input == ' ')
 					{
-						this->_state = ParserState::FileNameBegin;
+						this->_state = MultipartParser::State::FileNameBegin;
 					}
 					else
 					{
@@ -241,7 +241,7 @@ void MultipartParser::parse(const std::string& contentType, const std::string& b
 					input = *begin++;
 					if (input == '\n')
 					{
-						this->_state = ParserState::ContentBegin;
+						this->_state = MultipartParser::State::ContentBegin;
 					}
 					else
 					{
@@ -253,14 +253,14 @@ void MultipartParser::parse(const std::string& contentType, const std::string& b
 					throw MultiPartParserError("Unable to parse request body: invalid content disposition", _ERROR_DETAILS_);
 				}
 				break;
-			case ParserState::FileNameBegin:
+			case MultipartParser::State::FileNameBegin:
 				fileName.clear();
 				if (input == '=')
 				{
 					input = *begin++;
 					if (input == '"')
 					{
-						this->_state = ParserState::FileName;
+						this->_state = MultipartParser::State::FileName;
 					}
 					else
 					{
@@ -272,7 +272,7 @@ void MultipartParser::parse(const std::string& contentType, const std::string& b
 					throw MultiPartParserError("Unable to parse filename: invalid filename structure", _ERROR_DETAILS_);
 				}
 				break;
-			case ParserState::FileName:
+			case MultipartParser::State::FileName:
 				if (input == '"')
 				{
 					input = *begin++;
@@ -281,7 +281,7 @@ void MultipartParser::parse(const std::string& contentType, const std::string& b
 						input = *begin++;
 						if (input == '\n')
 						{
-							this->_state = ParserState::ContentTypeBegin;
+							this->_state = MultipartParser::State::ContentTypeBegin;
 						}
 						else
 						{
@@ -298,13 +298,13 @@ void MultipartParser::parse(const std::string& contentType, const std::string& b
 					fileName += input;
 				}
 				break;
-			case ParserState::ContentTypeBegin:
+			case MultipartParser::State::ContentTypeBegin:
 				if (input == ':')
 				{
 					input = *begin++;
 					if (input == ' ')
 					{
-						this->_state = ParserState::ContentType;
+						this->_state = MultipartParser::State::ContentType;
 					}
 					else
 					{
@@ -316,13 +316,13 @@ void MultipartParser::parse(const std::string& contentType, const std::string& b
 					throw MultiPartParserError("Unable to parse content type: invalid content type structure", _ERROR_DETAILS_);
 				}
 				break;
-			case ParserState::ContentType:
+			case MultipartParser::State::ContentType:
 				if (input == '\r')
 				{
 					input = *begin++;
 					if (input == '\n')
 					{
-						this->_state = ParserState::ContentBegin;
+						this->_state = MultipartParser::State::ContentBegin;
 					}
 					else
 					{
@@ -334,7 +334,7 @@ void MultipartParser::parse(const std::string& contentType, const std::string& b
 					fileContentType += input;
 				}
 				break;
-			case ParserState::ContentBegin:
+			case MultipartParser::State::ContentBegin:
 				if (input == '\r')
 				{
 					input = *begin++;
@@ -347,7 +347,7 @@ void MultipartParser::parse(const std::string& contentType, const std::string& b
 							throw MultiPartParserError("Unable to parse request body: invalid content structure", _ERROR_DETAILS_);
 						}
 
-						this->_state = ParserState::Content;
+						this->_state = MultipartParser::State::Content;
 					}
 					else
 					{
@@ -355,7 +355,7 @@ void MultipartParser::parse(const std::string& contentType, const std::string& b
 					}
 				}
 				break;
-			case ParserState::Content:
+			case MultipartParser::State::Content:
 				if (contentIxd + 1 == endPos)
 				{
 					input = *begin++;
@@ -373,7 +373,7 @@ void MultipartParser::parse(const std::string& contentType, const std::string& b
 					endPos += 2;
 
 					currentBoundary.clear();
-					this->_state = ParserState::BoundaryBegin;
+					this->_state = MultipartParser::State::BoundaryBegin;
 					if (fileContentType.empty())
 					{
 						this->_appendParameter(key, value);
@@ -381,9 +381,11 @@ void MultipartParser::parse(const std::string& contentType, const std::string& b
 					}
 					else
 					{
-						this->_appendFile(key, fileName, fileContentType, file);
+						this->_appendFile(key, fileName, fileContentType, boundary, contentDisposition, file);
 						file.clear();
+						contentDisposition.clear();
 					}
+
 					key.clear();
 					fileContentType.clear();
 				}
@@ -408,14 +410,14 @@ void MultipartParser::parse(const std::string& contentType, const std::string& b
 	throw MultiPartParserError("Unable to parse request body", _ERROR_DETAILS_);
 }
 
-MultiValueDict<std::string, std::string> MultipartParser::getFilesParams()
+HttpRequest::Parameters<std::string, UploadedFile>* MultipartParser::getFilesParams()
 {
-	return MultiValueDict<std::string, std::string>();
+	return new HttpRequest::Parameters<std::string, UploadedFile>(this->_fileValues, this->_multiFileValue);
 }
 
-Dict<std::string, std::string> MultipartParser::getPostParams()
+HttpRequest::Parameters<std::string, std::string>* MultipartParser::getPostParams()
 {
-	return Dict<std::string, std::string>();
+	return new HttpRequest::Parameters<std::string, std::string>(this->_postValues, this->_multiPostValue);
 }
 
 __INTERNAL_END__

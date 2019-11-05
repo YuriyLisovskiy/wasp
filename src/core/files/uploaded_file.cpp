@@ -24,39 +24,52 @@ UploadedFile::UploadedFile(
 	const std::string& name,
 	size_t size,
 	const std::string& contentType,
-	const std::string& charset
+	const std::string& charset,
+	const std::string& boundary,
+	const std::string& contentDisposition
 )
 {
 	this->_name = name;
+	this->_boundary = boundary;
+	this->_contentDisposition = contentDisposition;
 	this->_contentType = contentType;
 	this->_charset = charset;
 	this->_size = size;
 }
 
-std::string UploadedFile::getName()
+std::string UploadedFile::name()
 {
 	return this->_name;
 }
 
-std::string UploadedFile::getCharset()
+std::string UploadedFile::boundary()
+{
+	return this->_boundary;
+}
+
+std::string UploadedFile::contentDisposition()
+{
+	return this->_contentDisposition;
+}
+
+std::string UploadedFile::charset()
 {
 	return this->_charset;
 }
 
-std::string UploadedFile::getContentType()
+std::string UploadedFile::contentType()
 {
 	return this->_contentType;
 }
 
-size_t UploadedFile::getSize()
+size_t UploadedFile::size()
 {
 	return this->_size;
 }
 
 bool UploadedFile::exists()
 {
-	struct stat buffer{};
-	return stat(this->_name.c_str(), &buffer) == 0;
+	return this->_size != 0;
 }
 
 __WASP_END__

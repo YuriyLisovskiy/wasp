@@ -18,11 +18,12 @@
 #ifndef WASP_FILE_TESTS_H
 #define WASP_FILE_TESTS_H
 
-#include <gtest/gtest.h>
 #include <vector>
 #include <string>
 #include <cstdio>
 #include <fstream>
+
+#include <gtest/gtest.h>
 
 #include "../../globals.h"
 #include "../../../../src/utils/path.h"
@@ -47,6 +48,22 @@ void clear(const std::string& path)
 	if (std::remove(path.c_str()) != 0)
 	{
 		print("Unable to remove file: \"" + path + "\"");
+		ASSERT_TRUE(false);
+	}
+}
+
+void createTestFile(const std::string& path, const std::vector<byte>& data)
+{
+	std::fstream f(path, std::ios::out);
+	if (f.is_open())
+	{
+		f.write((char*) data.data(), data.size());
+		f.close();
+	}
+	else
+	{
+		print("Unable to create file: \"" + path + "\"");
+		ASSERT_TRUE(false);
 	}
 }
 
@@ -61,9 +78,15 @@ void assertFileContent(const std::string& fp, const std::vector<byte>& data, boo
 	std::fstream f(fp, mode);
 	if (f.is_open())
 	{
-		char* buffer = new char[data.size()];
-		f.read(buffer, data.size());
-		for (size_t i = 0; i < data.size(); i++)
+		size_t n = data.size();
+		char* buffer = new char[n];
+		f.read(buffer, n);
+		buffer[n] = '\0';
+
+		std::string actual(buffer);
+		ASSERT_EQ(actual.size(), n);
+
+		for (size_t i = 0; i < n; i++)
 		{
 			ASSERT_EQ(data[i], buffer[i]);
 		}
@@ -73,6 +96,44 @@ void assertFileContent(const std::string& fp, const std::vector<byte>& data, boo
 	else
 	{
 		ASSERT_TRUE(false);
+	}
+}
+
+TEST(FileTestCase, TestWriteMode)
+{
+	std::string filePath = path::cwd() + "/test.txt";
+	File file(filePath, "w");
+	file.open();
+	if (file.isOpen())
+	{
+		std::vector<byte> byteArray = strToBytes("hello, world");
+		file.write(byteArray);
+		file.close();
+		assertFileContent(filePath, byteArray, false);
+		clear(filePath);
+	}
+	else
+	{
+		print("File is not open");
+	}
+}
+
+TEST(FileTestCase, TestWriteBinaryMode)
+{
+	std::string filePath = path::cwd() + "/test.txt";
+	File file(filePath, "wb");
+	file.open();
+	if (file.isOpen())
+	{
+		std::vector<byte> byteArray = strToBytes("hello, world");
+		file.write(byteArray);
+		file.close();
+		assertFileContent(filePath, byteArray, true);
+		clear(filePath);
+	}
+	else
+	{
+		print("File is not open");
 	}
 }
 

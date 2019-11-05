@@ -15,11 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * http_parser implementation.
- * TODO: write docs.
- */
-
 #include "request_parser.h"
 
 
@@ -28,7 +23,28 @@ __INTERNAL_BEGIN__
 // Public methods.
 wasp::HttpRequest HttpRequestParser::buildHttpRequest()
 {
-	return wasp::HttpRequest(
+	HttpRequest::Parameters<std::string, std::string> gets;
+	if (this->_getParameters)
+	{
+		gets = *this->_getParameters;
+		delete this->_getParameters;
+	}
+
+	HttpRequest::Parameters<std::string, std::string> posts;
+	if (this->_postParameters)
+	{
+		posts = *this->_postParameters;
+		delete this->_postParameters;
+	}
+
+	HttpRequest::Parameters<std::string, UploadedFile> files;
+	if (this->_filesParameters)
+	{
+		files = *this->_filesParameters;
+		delete this->_filesParameters;
+	}
+
+	wasp::HttpRequest request(
 		this->_method,
 		this->_path,
 		this->_majorV,
@@ -37,9 +53,11 @@ wasp::HttpRequest HttpRequestParser::buildHttpRequest()
 		this->_keepAlive,
 		this->_content,
 		this->_headers,
-		this->_getParameters,
-		this->_postParameters
+		gets,
+		posts,
+		files
 	);
+	return request;
 }
 
 Dict<std::string, std::string> HttpRequestParser::getHeaders()
@@ -402,11 +420,11 @@ void HttpRequestParser::parseHeaders(const std::string& data)
 
 void HttpRequestParser::parseBody(const std::string& data, const std::string& mediaRoot)
 {
-	QueryParser queryParser;
-	MultipartParser multipartParser(mediaRoot);
+	QueryParser qp;
+	MultipartParser mp(mediaRoot);
 	if (data.empty())
 	{
-		this->_setParameters(queryParser.parse(this->_query));
+		this->_setParameters(qp.parse(this->_query));
 	}
 	else
 	{
@@ -416,35 +434,23 @@ void HttpRequestParser::parseBody(const std::string& data, const std::string& me
 			switch (this->_contentType)
 			{
 				case ContentType::ApplicationXWwwFormUrlencoded:
-					this->_setParameters(queryParser.parse(this->_content));
+					this->_setParameters(qp.parse(this->_content));
 					break;
 				case ContentType::ApplicationJson:
 					// TODO: parse application/json data
 					break;
 				case ContentType::MultipartFormData:
-					multipartParser.parse(this->_headers["Content-Type"], this->_content);
+					mp.parse(this->_headers["Content-Type"], this->_content);
+					this->_postParameters = mp.getPostParams();
+					this->_filesParameters = mp.getFilesParams();
 					break;
 				case ContentType::Other:
 					break;
 				default:
-					break;
+					throw ParseError("Unknown content type", _ERROR_DETAILS_);
 			}
 		}
 	}
-}
-
-void HttpRequestParser::reset()
-{
-	this->_majorV = 0;
-	this->_minorV = 0;
-	this->_path.clear();
-	this->_query.clear();
-	this->_method.clear();
-	this->_keepAlive = false;
-	this->_content.clear();
-	this->_headers.clear();
-	this->_getParameters = RequestParameters<std::string, std::string>();
-	this->_postParameters = RequestParameters<std::string, std::string>();
 }
 
 // Private methods.
@@ -460,22 +466,16 @@ void HttpRequestParser::_parseHttpWord(char input, char expectedInput, HttpReque
 	}
 }
 
-void HttpRequestParser::setParameters(RequestParameters<std::string, std::string>* params)
+void HttpRequestParser::_setParameters(HttpRequest::Parameters<std::string, std::string>* params)
 {
 	if (this->_method == "GET")
 	{
-		this->_getParameters = *params;
+		this->_getParameters = params;
 	}
 	else if (this->_method == "POST")
 	{
-		this->_postParameters = *params;
+		this->_postParameters = params;
 	}
-}
-
-void HttpRequestParser::_setParameters(RequestParameters<std::string, std::string>* params)
-{
-	this->setParameters(params);
-	delete params;
 }
 
 void HttpRequestParser::_parseBody(const std::string& data)

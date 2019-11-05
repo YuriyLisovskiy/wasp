@@ -29,7 +29,8 @@
 
 #include "../globals.h"
 #include "../collections/dict.h"
-#include "request_parameters.h"
+#include "../collections/multi_dict.h"
+#include "../core/files/uploaded_file.h"
 
 
 __WASP_BEGIN__
@@ -37,25 +38,68 @@ __WASP_BEGIN__
 class HttpRequest
 {
 public:
+	template <typename _Key, typename _Val>
+	class Parameters
+	{
+	private:
+		Dict<_Key, _Val> _dict;
+		MultiValueDict<_Key, _Val> _multiDict;
+
+	public:
+		explicit Parameters() = default;
+
+		explicit Parameters(Dict<_Key, _Val> dict, MultiValueDict<_Key, _Val> multiDict)
+		{
+			this->_dict = dict;
+			this->_multiDict = multiDict;
+		}
+
+		_Val get(_Key key, _Val _default = _Val{})
+		{
+			return this->_dict.get(key, _default);
+		}
+
+		std::vector<_Val> getList(_Key key, std::vector<_Val> _default = std::vector<_Val>{})
+		{
+			return this->_multiDict.get(key, _default);
+		}
+
+		bool contains(_Key key)
+		{
+			return this->_dict.contains(key);
+		}
+
+		bool containsList(_Key key)
+		{
+			return this->_multiDict.contains(key);
+		}
+
+		size_t size()
+		{
+			return this->_dict.size();
+		}
+
+		std::vector<std::string> keys()
+		{
+			return this->_dict.keys();
+		}
+	};
+
 	HttpRequest() : _majorVersion(0), _minorVersion(0), _keepAlive(false) {};
 	explicit HttpRequest(
 		std::string method, std::string path, size_t majorV, size_t minorV,
 		std::string query, bool keepAlive, std::string content,
 		const std::map<std::string, std::string>& headers,
-		const RequestParameters<std::string, std::string>& getParameters,
-		const RequestParameters<std::string, std::string>& postParameters
+		const HttpRequest::Parameters<std::string, std::string>& getParameters,
+		const HttpRequest::Parameters<std::string, std::string>& postParameters,
+		const HttpRequest::Parameters<std::string, UploadedFile>& filesParameters
 	);
 
 	Dict<std::string, std::string> headers;
-	RequestParameters<std::string, std::string> GET;
-	RequestParameters<std::string, std::string> POST;
+	HttpRequest::Parameters<std::string, std::string> GET;
+	HttpRequest::Parameters<std::string, std::string> POST;
 	Dict<std::string, std::string> COOKIES;
-
-	// TODO
-	RequestParameters<std::string, std::string> FILES;
-
-	// TODO
-	Dict<std::string, std::string> META;
+	HttpRequest::Parameters<std::string, UploadedFile> FILES;
 
 	std::string version();
 	std::string path();

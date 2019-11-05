@@ -33,7 +33,6 @@
 #include "../../globals.h"
 #include "../request.h"
 #include "multipart_parser.h"
-#include "../request_parameters.h"
 #include "query_parser.h"
 
 
@@ -50,8 +49,9 @@ protected:
 	bool _keepAlive{};
 	std::string _content;
 	std::map<std::string, std::string> _headers;
-	RequestParameters<std::string, std::string> _getParameters;
-	RequestParameters<std::string, std::string> _postParameters;
+	HttpRequest::Parameters<std::string, std::string>* _getParameters = nullptr;
+	HttpRequest::Parameters<std::string, std::string>* _postParameters = nullptr;
+	HttpRequest::Parameters<std::string, UploadedFile>* _filesParameters = nullptr;
 
 	unsigned long long _contentSize{};
 	std::string _chunkSizeStr;
@@ -115,13 +115,8 @@ protected:
 
 	void _parseHttpWord(char input, char expectedInput, HttpRequestParser::ParserState newState);
 
-	// Parses http request stream
-//	void _parseRequest(const std::string& data);
-
-	void _setParameters(RequestParameters<std::string, std::string>* params);
-
 	// May be overloaded for custom parser which is inherited from HttpRequestParser
-	virtual void setParameters(RequestParameters<std::string, std::string>* params);
+	virtual void _setParameters(HttpRequest::Parameters<std::string, std::string>* params);
 
 	void _parseBody(const std::string& data);
 
@@ -145,7 +140,6 @@ public:
 	Dict<std::string, std::string> getHeaders();
 	void parseBody(const std::string& data, const std::string& mediaRoot);
 	void parseHeaders(const std::string& data);
-	void reset();
 };
 
 __INTERNAL_END__

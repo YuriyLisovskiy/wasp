@@ -22,6 +22,7 @@
 #ifndef WASP_GLOBALS_H
 #define WASP_GLOBALS_H
 
+#include <iostream>
 #include <string>
 
 
@@ -97,6 +98,12 @@
 __WASP_BEGIN__
 
 typedef unsigned char byte;
+
+template<class... Args>
+void print(Args... args)
+{
+	(std::cout << ... << args) << "\n";
+}
 
 __WASP_END__
 

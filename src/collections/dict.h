@@ -24,6 +24,7 @@
 #define WASP_UTILS_QUERY_DICT_H
 
 #include <map>
+#include <vector>
 
 #include "../globals.h"
 #include "../core/exceptions.h"
@@ -123,6 +124,17 @@ public:
 	bool isEmpty()
 	{
 		return this->_map.empty();
+	}
+
+	virtual std::vector<_Key> keys()
+	{
+		std::vector<_Key> keys;
+		for (auto it = this->cbegin(); it != this->cend(); it++)
+		{
+			keys.push_back(it->first);
+		}
+
+		return keys;
 	}
 
 	const_iterator cbegin()
