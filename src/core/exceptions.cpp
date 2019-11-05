@@ -50,7 +50,7 @@ const char* BaseException::what() const noexcept
 	return this->_fullMessage.c_str();
 }
 
-const int BaseException::line() const noexcept
+int BaseException::line() const noexcept
 {
 	return this->_line;
 }
@@ -66,19 +66,19 @@ const char* BaseException::file() const noexcept
 }
 
 
-// TcpError
-TcpError::TcpError(const char* message, int line, const char* function, const char* file, const char* type)
+// SocketError
+SocketError::SocketError(const char* message, int line, const char* function, const char* file, const char* type)
 	: BaseException(message, line, function, file, type)
 {
 }
 
-TcpError::TcpError(const char* message, int line, const char* function, const char* file)
-	: TcpError(message, line, function, file, "TcpError")
+SocketError::SocketError(const char* message, int line, const char* function, const char* file)
+	: SocketError(message, line, function, file, "SocketError")
 {
 }
 
-TcpError::TcpError(const std::string& message, int line, const char *function, const char *file)
-	: TcpError(message.c_str(), line, function, file)
+SocketError::SocketError(const std::string& message, int line, const char *function, const char *file)
+	: SocketError(message.c_str(), line, function, file)
 {
 }
 
@@ -113,6 +113,23 @@ ParseError::ParseError(const char* message, int line, const char* function, cons
 
 ParseError::ParseError(const std::string& message, int line, const char *function, const char *file)
 	: ParseError(message.c_str(), line, function, file)
+{
+}
+
+
+// MultiPartParserError
+MultiPartParserError::MultiPartParserError(const char* message, int line, const char* function, const char* file, const char* type)
+	: ParseError(message, line, function, file, type)
+{
+}
+
+MultiPartParserError::MultiPartParserError(const char* message, int line, const char* function, const char* file)
+	: MultiPartParserError(message, line, function, file, "ParseError")
+{
+}
+
+MultiPartParserError::MultiPartParserError(const std::string& message, int line, const char *function, const char *file)
+	: MultiPartParserError(message.c_str(), line, function, file)
 {
 }
 
@@ -202,6 +219,23 @@ FileDoesNotExistError::FileDoesNotExistError(const std::string& message, int lin
 }
 
 
+// FileError
+FileError::FileError(const char* message, int line, const char* function, const char* file, const char* type)
+	: BaseException(message, line, function, file, type)
+{
+}
+
+FileError::FileError(const char* message, int line, const char* function, const char* file)
+	: FileError(message, line, function, file, "FileError")
+{
+}
+
+FileError::FileError(const std::string& message, int line, const char *function, const char *file)
+	: FileError(message.c_str(), line, function, file)
+{
+}
+
+
 // EncodingError
 EncodingError::EncodingError(const char* message, int line, const char* function, const char* file, const char* type)
 	: BaseException(message, line, function, file, type)
@@ -249,6 +283,23 @@ DisallowedRedirect::DisallowedRedirect(const char* message, int line, const char
 
 DisallowedRedirect::DisallowedRedirect(const std::string& message, int line, const char *function, const char *file)
 	: DisallowedRedirect(message.c_str(), line, function, file)
+{
+}
+
+
+// EntityTooLargeError
+EntityTooLargeError::EntityTooLargeError(const char* message, int line, const char* function, const char* file, const char* type)
+		: BaseException(message, line, function, file, type)
+{
+}
+
+EntityTooLargeError::EntityTooLargeError(const char* message, int line, const char* function, const char* file)
+		: EntityTooLargeError(message, line, function, file, "EntityTooLargeError")
+{
+}
+
+EntityTooLargeError::EntityTooLargeError(const std::string& message, int line, const char *function, const char *file)
+		: EntityTooLargeError(message.c_str(), line, function, file)
 {
 }
 

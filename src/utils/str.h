@@ -134,6 +134,24 @@ extern std::vector<std::string> split(const std::string& str, char delimiter = '
 
 extern bool startsWith(const std::string& src, const std::string& prefix);
 
+// Trims left part of string in-place
+extern void ltrim(std::string& s, char ch = ' ');
+
+// Trims right part of string in-place
+extern void rtrim(std::string& s, char ch = ' ');
+
+// Trims both left and right parts of string in-place
+extern void trim(std::string& s, char ch = ' ');
+
+// Trims left part of string and returns a copy of trimmed string
+extern std::string ltrim(const std::string& s, char ch = ' ');
+
+// Trims right part of string and returns a copy of trimmed string
+extern std::string rtrim(const std::string& s, char ch = ' ');
+
+// Trims both left and right parts of string and returns a copy of trimmed string
+extern std::string trim(const std::string& s, char ch = ' ');
+
 __UTILS_STR_END__
 
 

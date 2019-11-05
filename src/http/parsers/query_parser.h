@@ -16,41 +16,38 @@
  */
 
 /*
- * CookieParser definition.
+ * query_parser definition.
  * TODO: write docs.
  */
 
-#ifndef WASP_HTTP_PARSERS_COOKIE_PARSER_H
-#define WASP_HTTP_PARSERS_COOKIE_PARSER_H
-
-#include <map>
-#include <string>
+#ifndef WASP_QUERY_PARSER_H
+#define WASP_QUERY_PARSER_H
 
 #include "../../globals.h"
+#include "../request.h"
+#include "../../collections/dict.h"
+#include "../../collections/multi_dict.h"
 
 
 __INTERNAL_BEGIN__
 
-class CookieParser
+struct QueryParser
 {
-private:
-	enum ReqCookieParserState
+	enum State
 	{
 		Key,
 		Val
 	};
 
-	enum RespCookieParserState
-	{
+	Dict<std::string, std::string> _dict;
+	MultiValueDict<std::string, std::string> _multiDict;
 
-	};
-
-public:
-	static std::map<std::string, std::string>* parseRequestCookies(const std::string& content);
-	static std::map<std::string, std::string>* parseResponseCookies(const std::string& content);
+	explicit QueryParser();
+	void appendParameter(const std::string& key, const std::string& value);
+	HttpRequest::Parameters<std::string, std::string>* parse(const std::string& data);
 };
 
 __INTERNAL_END__
 
 
-#endif // WASP_HTTP_PARSERS_COOKIE_PARSER_H
+#endif // WASP_QUERY_PARSER_H

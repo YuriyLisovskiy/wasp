@@ -15,42 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * CookieParser definition.
- * TODO: write docs.
- */
+#include <gtest/gtest.h>
 
-#ifndef WASP_HTTP_PARSERS_COOKIE_PARSER_H
-#define WASP_HTTP_PARSERS_COOKIE_PARSER_H
-
-#include <map>
-#include <string>
-
-#include "../../globals.h"
+#include "./include.h"
 
 
-__INTERNAL_BEGIN__
-
-class CookieParser
+int main(int argc, char *argv[])
 {
-private:
-	enum ReqCookieParserState
-	{
-		Key,
-		Val
-	};
-
-	enum RespCookieParserState
-	{
-
-	};
-
-public:
-	static std::map<std::string, std::string>* parseRequestCookies(const std::string& content);
-	static std::map<std::string, std::string>* parseResponseCookies(const std::string& content);
-};
-
-__INTERNAL_END__
-
-
-#endif // WASP_HTTP_PARSERS_COOKIE_PARSER_H
+	::testing::InitGoogleTest(&argc, argv);
+	return RUN_ALL_TESTS();
+}

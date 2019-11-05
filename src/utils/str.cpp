@@ -19,8 +19,6 @@
  * TODO: write docs.
  */
 
-#include <iostream>
-
 #include "str.h"
 
 
@@ -319,6 +317,47 @@ bool startsWith(const std::string& src, const std::string& prefix)
 		}
 	}
 	return true;
+}
+
+void ltrim(std::string& s, char ch)
+{
+	s.erase(s.begin(), std::find_if(s.begin(), s.end(), [ch](char chr) {
+		return ch != chr;
+	}));
+}
+
+void rtrim(std::string& s, char ch)
+{
+	s.erase(std::find_if(s.rbegin(), s.rend(), [ch](int chr) {
+		return ch != chr;
+	}).base(), s.end());
+}
+
+void trim(std::string& s, char ch)
+{
+	ltrim(s, ch);
+	rtrim(s, ch);
+}
+
+std::string ltrim(const std::string& s, char ch)
+{
+	std::string copy = s;
+	ltrim(copy, ch);
+	return copy;
+}
+
+std::string rtrim(const std::string& s, char ch)
+{
+	std::string copy = s;
+	rtrim(copy, ch);
+	return copy;
+}
+
+std::string trim(const std::string& s, char ch)
+{
+	std::string copy = s;
+	trim(copy, ch);
+	return copy;
 }
 
 __UTILS_STR_END__

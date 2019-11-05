@@ -25,5 +25,4 @@
 #define __UNIT_TESTS_BEGIN__ __TESTS_BEGIN__ namespace unittests {
 #define __UNIT_TESTS_END__ } __TESTS_END__
 
-
 #endif // WASP_TESTS_GLOBALS_H

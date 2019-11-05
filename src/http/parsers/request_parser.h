@@ -24,14 +24,16 @@
 #define WASP_HTTP_PARSERS_REQUEST_PARSER_H
 
 #include <algorithm>
-#include <string>
 #include <cstdlib>
-#include <strings.h>
-#include <map>
 #include <iostream>
+#include <map>
+#include <string>
+#include <strings.h>
 
 #include "../../globals.h"
 #include "../request.h"
+#include "multipart_parser.h"
+#include "query_parser.h"
 
 
 __INTERNAL_BEGIN__
@@ -47,8 +49,9 @@ protected:
 	bool _keepAlive{};
 	std::string _content;
 	std::map<std::string, std::string> _headers;
-	std::map<std::string, std::string> _getParameters;
-	std::map<std::string, std::string> _postParameters;
+	HttpRequest::Parameters<std::string, std::string>* _getParameters = nullptr;
+	HttpRequest::Parameters<std::string, std::string>* _postParameters = nullptr;
+	HttpRequest::Parameters<std::string, UploadedFile>* _filesParameters = nullptr;
 
 	unsigned long long _contentSize{};
 	std::string _chunkSizeStr;
@@ -64,8 +67,6 @@ protected:
 		Other
 
 	} _contentType{};
-
-	wasp::HttpRequest _buildHttpRequest();
 
 	enum ParserState
 	{
@@ -112,44 +113,12 @@ protected:
 
 	} _state{};
 
-	enum QueryParserState
-	{
-		Key,
-		Val
-	};
-
-	enum MultipartParserState
-	{
-		BoundaryBegin,
-		Boundary,
-		BoundaryEnd,
-		ContentDispositionBegin,
-		ContentDisposition,
-		NameBegin,
-		Name,
-		FileNameBegin,
-		FileName,
-		ContentTypeBegin,
-		ContentType,
-		ContentBegin,
-		Content,
-	};
-
 	void _parseHttpWord(char input, char expectedInput, HttpRequestParser::ParserState newState);
 
-	// Parses http request stream
-	void _parseRequest(const std::string& data);
+	// May be overloaded for custom parser which is inherited from HttpRequestParser
+	virtual void _setParameters(HttpRequest::Parameters<std::string, std::string>* params);
 
-	// Parses 'application/json' content type
-	void _parseApplicationJson();
-
-	// Parses 'multipart/form-data' content type
-	void _parseMultipart();
-
-	// Parses url's query or 'application/x-www-form-urlencoded' content type
-	static std::map<std::string, std::string>* _parseQuery(const std::string& content);
-
-	void _setParameters(std::map<std::string, std::string>* params);
+	void _parseBody(const std::string& data);
 
 	// Helpers
 	// Check if a byte is an HTTP character.
@@ -164,12 +133,13 @@ protected:
 	// Check if a byte is a digit.
 	static bool isDigit(uint c);
 
-	// May be overloaded for custom parser which is inherited from HttpRequestParser
-	virtual void setParameters(std::map<std::string, std::string>* params);
-
 public:
 	HttpRequestParser() = default;
-	wasp::HttpRequest parse(const std::string& data);
+
+	wasp::HttpRequest buildHttpRequest();
+	Dict<std::string, std::string> getHeaders();
+	void parseBody(const std::string& data, const std::string& mediaRoot);
+	void parseHeaders(const std::string& data);
 };
 
 __INTERNAL_END__

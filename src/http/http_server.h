@@ -29,16 +29,19 @@
 #include <functional>
 #include <vector>
 #include <fstream>
+#include <thread>
+#include <poll.h>
 
 #include "../globals.h"
 #include "../utils/logger.h"
 #include "../conf/defaults.h"
 #include "../conf/settings.h"
-#include "../core/tcp_server.h"
+#include "../core/sockets/server_socket.h"
 #include "response.h"
 #include "request.h"
 #include "parsers/request_parser.h"
 #include "../core/exceptions.h"
+#include "../core/files/uploaded_file.h"
 
 #include "../utils/datetime/time.h"
 #include "../utils/str.h"
@@ -46,8 +49,9 @@
 
 __INTERNAL_BEGIN__
 
+#define MAX_BUFF_SIZE 8192 * 8 - 1
+
 typedef std::function<void(HttpRequest&, const socket_t&)> httpHandler;
-// typedef std::function<HttpResponseBase* (HttpRequest&, const socket_t&)> httpHandler;
 
 class HttpServer
 {
@@ -55,13 +59,32 @@ private:
 	const char* _host;
 	uint16_t _port;
 	const char* _schema;
-
-	ILogger* _logger;
-
-	TcpServer* _tcpServer;
+	size_t _maxBodySize;
+	ServerSocket _serverSocket;
 	httpHandler _httpHandler;
+	bool _finished;
+	ILogger* _logger;
+	std::string _mediaRoot;
 
-	void _tcpHandler(const std::string& data, const socket_t& client);
+	enum ReadResult
+	{
+		Continue, Break, None
+	};
+
+	int _init();
+	void _cleanUp(const socket_t& client);
+	HttpRequest _handleRequest(const socket_t& client);
+	std::string _readBody(const socket_t& client, const std::string& bodyBeginning, size_t bodyLength);
+	std::string _readHeaders(const socket_t& client, std::string& bodyBeginning);
+	void _startListener();
+	void _serveConnection(const socket_t& client);
+	void _threadFunc(const socket_t& client);
+
+	static ReadResult _handleError(char* buffer, int line, const char *function, const char *file);
+	static void _send(const char* data, const socket_t& client);
+	static bool _setSocketBlocking(int _sock, bool blocking);
+	static void _write(const char* data, size_t bytesToWrite, const socket_t& client);
+	static void _wsaCleanUp();
 
 public:
 	struct Context
@@ -70,14 +93,16 @@ public:
 		uint16_t port = 0;
 		httpHandler handler = nullptr;
 		ILogger* logger;
+		size_t maxBodySize = 0;
+		std::string mediaRoot;
 	};
 
 	explicit HttpServer(HttpServer::Context& ctx);
-	void listenAndServe();
+	~HttpServer();
 	void finish();
+	void listenAndServe();
 	static void send(HttpResponseBase* response, const socket_t& client);
 	static void send(StreamingHttpResponse* response, const socket_t& client);
-	~HttpServer();
 
 private:
 	static void _normalizeContext(HttpServer::Context& ctx);

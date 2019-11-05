@@ -19,5 +19,6 @@
 #define WASP_UNIT_TESTS_CORE_INCLUDE_H
 
 #include "./exceptions/include.h"
+#include "./files/include.h"
 
 #endif // WASP_UNIT_TESTS_CORE_INCLUDE_H

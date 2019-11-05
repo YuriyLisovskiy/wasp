@@ -26,7 +26,7 @@ using wasp::internal::HttpServer;
 
 void handler(wasp::HttpRequest& request, const wasp::internal::socket_t& client)
 {
-	std::cout << "\n" << request.method() << " " << request.path() << " " << request.version() << "\n";
+//	std::cout << "\n" << request.method() << " " << request.path() << " " << request.version() << "\n";
 //	auto begin = request.headers.cbegin();
 //	auto end = request.headers.cend();
 
@@ -43,20 +43,32 @@ void handler(wasp::HttpRequest& request, const wasp::internal::socket_t& client)
 //		std::cout << it->first << ": " << it->second << '\n';
 //	}
 
+/*
 	auto response = new wasp::FileResponse("/home/user/Desktop/file.json");
 	HttpServer::send(response, client);
 	delete response;
+*/
 
-/*
+	auto keys_get = request.GET.keys();
+	auto keys_post = request.POST.keys();
+	auto keys_files = request.FILES.keys();
+	auto keys_cookies = request.COOKIES.keys();
+
+	wasp::print(
+		"\nGet: ", keys_get.size(),
+		"\nPost: ", keys_post.size(),
+		"\nFiles: ", keys_files.size(),
+		"\nCookies: ", keys_cookies.size()
+	);
+
 	std::string body("<form action=\"/hello\" method=\"post\" enctype=\"multipart/form-data\">\n"
 					 "\t<input type=\"file\" name=\"super_file\" />\n"
-					 "\t<input type=\"password\" name=\"first_name\" />\n"
+					 "\t<input type=\"text\" name=\"first_name\" />\n"
 					 "\t<input type=\"submit\" value=\"send\" />\n"
 					 "\t</form>\n");
 	auto response = new wasp::HttpResponse(body);
 	HttpServer::send(response, client);
 	delete response;
-*/
 }
 
 int main()
@@ -65,7 +77,9 @@ int main()
 	{
 		HttpServer::Context ctx{};
 		ctx.handler = handler;
-		ctx.port = 3000;
+		ctx.port = 8000;
+		ctx.maxBodySize = 33300000;
+		ctx.mediaRoot = "/home/yuriylisovskiy/Desktop/media/";
 
 		HttpServer server(ctx);
 

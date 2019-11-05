@@ -15,42 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * CookieParser definition.
- * TODO: write docs.
- */
+#ifndef WASP_UNIT_TESTS_CORE_FILES_INCLUDE_H
+#define WASP_UNIT_TESTS_CORE_FILES_INCLUDE_H
 
-#ifndef WASP_HTTP_PARSERS_COOKIE_PARSER_H
-#define WASP_HTTP_PARSERS_COOKIE_PARSER_H
+#include "./file_tests.h"
 
-#include <map>
-#include <string>
-
-#include "../../globals.h"
-
-
-__INTERNAL_BEGIN__
-
-class CookieParser
-{
-private:
-	enum ReqCookieParserState
-	{
-		Key,
-		Val
-	};
-
-	enum RespCookieParserState
-	{
-
-	};
-
-public:
-	static std::map<std::string, std::string>* parseRequestCookies(const std::string& content);
-	static std::map<std::string, std::string>* parseResponseCookies(const std::string& content);
-};
-
-__INTERNAL_END__
-
-
-#endif // WASP_HTTP_PARSERS_COOKIE_PARSER_H
+#endif // WASP_UNIT_TESTS_CORE_FILES_INCLUDE_H

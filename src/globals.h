@@ -22,6 +22,7 @@
 #ifndef WASP_GLOBALS_H
 #define WASP_GLOBALS_H
 
+#include <iostream>
 #include <string>
 
 
@@ -93,5 +94,29 @@
 
 // Required parameters for Wasp's built-in logger.
 #define _ERROR_DETAILS_ __LINE__, __FUNCTION__, __FILE__
+
+__WASP_BEGIN__
+
+typedef unsigned char byte;
+
+template<class... Args>
+void print(Args&&... args)
+{
+	(std::cout << ... << args) << "\n";
+}
+
+template<class... Args>
+bool all(Args&&... args)
+{
+	return (... && args);
+}
+
+template<class... Args>
+bool any(Args&&... args)
+{
+	return (... || args);
+}
+
+__WASP_END__
 
 #endif // WASP_GLOBALS_H

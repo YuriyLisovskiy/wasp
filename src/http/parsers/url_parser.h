@@ -35,10 +35,10 @@
 
 __INTERNAL_BEGIN__
 
-class UrlParser
+struct UrlParser
 {
 private:
-	enum ParserState
+	enum State
 	{
 		Scheme,
 		FirstSlashAfterScheme,
@@ -55,7 +55,7 @@ private:
 	};
 
 protected:
-	bool isUnreserved(char ch) const;
+	[[nodiscard]] bool isUnreserved(char ch) const;
 
 	bool _isParsed;
 
@@ -82,15 +82,15 @@ public:
 
 	void checkIfParsed() const;
 
-	std::string scheme() const;
-	std::string username() const;
-	std::string password() const;
-	std::string hostname() const;
-	std::string port() const;
-	std::string path() const;
-	std::string query() const;
-	std::string fragment() const;
-	uint16_t httpPort() const;
+	[[nodiscard]] std::string scheme() const;
+	[[nodiscard]] std::string username() const;
+	[[nodiscard]] std::string password() const;
+	[[nodiscard]] std::string hostname() const;
+	[[nodiscard]] std::string port() const;
+	[[nodiscard]] std::string path() const;
+	[[nodiscard]] std::string query() const;
+	[[nodiscard]] std::string fragment() const;
+	[[nodiscard]] uint16_t httpPort() const;
 };
 
 __INTERNAL_END__

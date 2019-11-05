@@ -133,6 +133,73 @@ TEST(StrUtilsJoinDictTestCase, TestJoinIntDictWithAsJson)
 	ASSERT_EQ("{\n\t" + actual + "\n}", expected);
 }
 
+// Trim functions
+TEST(StrUtilsLTrimTestCase, TestLeftTrimmingInPlace)
+{
+	std::string expected = "Hello, World   ";
+	std::string actual = "       " + expected;
+	wasp::str::ltrim(actual);
+	ASSERT_EQ(actual, expected);
+
+	expected = "Hello, World  - ---";
+	actual = "------" + expected;
+	wasp::str::ltrim(actual, '-');
+	ASSERT_EQ(actual, expected);
+}
+
+TEST(StrUtilsRTrimTestCase, TestRightTrimmingInPlace)
+{
+	std::string expected = "      Hello, World";
+	std::string actual = expected + "       ";
+	wasp::str::rtrim(actual);
+	ASSERT_EQ(actual, expected);
+
+	expected = "--------Hello, World";
+	actual = expected + "------";
+	wasp::str::rtrim(actual, '-');
+	ASSERT_EQ(actual, expected);
+}
+
+TEST(StrUtilsTrimTestCase, TestTrimmingInPlace)
+{
+	std::string expected = "Hello, World      --- - ---";
+	std::string actual = "       " + expected + "      ";
+	wasp::str::trim(actual);
+	ASSERT_EQ(actual, expected);
+
+	expected = "Hello, World";
+	actual = "------" + expected + "----";
+	wasp::str::trim(actual, '-');
+	ASSERT_EQ(actual, expected);
+}
+
+TEST(StrUtilsLTrimTestCase, TestLeftTrimmingCopy)
+{
+	std::string expected = "Hello, World   ";
+	ASSERT_EQ(wasp::str::ltrim("       " + expected), expected);
+
+	expected = "Hello, World  - ---";
+	ASSERT_EQ(wasp::str::ltrim("------" + expected, '-'), expected);
+}
+
+TEST(StrUtilsRTrimTestCase, TestRightTrimmingCopy)
+{
+	std::string expected = "      Hello, World";
+	ASSERT_EQ(wasp::str::rtrim(expected + "       "), expected);
+
+	expected = "--------Hello, World";
+	ASSERT_EQ(wasp::str::rtrim(expected + "------", '-'), expected);
+}
+
+TEST(StrUtilsTrimTestCase, TestTrimmingCopy)
+{
+	std::string expected = "Hello, World      --- - ---";
+	ASSERT_EQ(wasp::str::trim("       " + expected + "      "), expected);
+
+	expected = "Hello, World";
+	ASSERT_EQ(wasp::str::trim("------" + expected + "----", '-'), expected);
+}
+
 __UNIT_TESTS_END__
 
 

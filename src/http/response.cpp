@@ -497,6 +497,16 @@ HttpResponseGone::HttpResponseGone(
 }
 
 
+// HttpResponseEntityTooLarge implementation
+HttpResponseEntityTooLarge::HttpResponseEntityTooLarge(
+		const std::string& content,
+		const std::string& contentType,
+		const std::string& charset
+) : HttpResponse(content, 413, contentType, "", charset)
+{
+}
+
+
 // HttpResponseServerError implementation
 HttpResponseServerError::HttpResponseServerError(
 	const std::string& content,

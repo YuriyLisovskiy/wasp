@@ -15,14 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * http request implementation.
- * TODO: write docs
- */
-
-#include <iostream>
-
 #include "request.h"
+#include "../core/files/uploaded_file.h"
 
 
 __WASP_BEGIN__
@@ -31,8 +25,9 @@ HttpRequest::HttpRequest(
 	std::string method, std::string path, size_t majorV, size_t minorV,
 	std::string query, bool keepAlive, std::string content,
 	const std::map<std::string, std::string>& headers,
-	const std::map<std::string, std::string>& getParameters,
-	const std::map<std::string, std::string>& postParameters
+	const HttpRequest::Parameters<std::string, std::string>& getParameters,
+	const HttpRequest::Parameters<std::string, std::string>& postParameters,
+	const HttpRequest::Parameters<std::string, UploadedFile>& filesParameters
 )
 :   _method(std::move(method)),
 	_path(std::move(path)),
@@ -43,8 +38,9 @@ HttpRequest::HttpRequest(
 	_body(std::move(content))
 {
 	this->headers = Dict<std::string, std::string>(headers);
-	this->GET = Dict<std::string, std::string>(getParameters);
-	this->POST = Dict<std::string, std::string>(postParameters);
+	this->GET = getParameters;
+	this->POST = postParameters;
+	this->FILES = filesParameters;
 }
 
 std::string HttpRequest::version()

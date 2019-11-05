@@ -16,41 +16,34 @@
  */
 
 /*
- * CookieParser definition.
+ * server_socket definition.
  * TODO: write docs.
  */
 
-#ifndef WASP_HTTP_PARSERS_COOKIE_PARSER_H
-#define WASP_HTTP_PARSERS_COOKIE_PARSER_H
-
-#include <map>
-#include <string>
+#ifndef WASP_CORE_TCP_SERVER_SOCKET_H
+#define WASP_CORE_TCP_SERVER_SOCKET_H
 
 #include "../../globals.h"
-
+#include "socket.h"
+#include "../exceptions.h"
 
 __INTERNAL_BEGIN__
 
-class CookieParser
+class ServerSocket : public Socket
 {
 private:
-	enum ReqCookieParserState
-	{
-		Key,
-		Val
-	};
-
-	enum RespCookieParserState
-	{
-
-	};
+	sockaddr_in _socketAddr{};
 
 public:
-	static std::map<std::string, std::string>* parseRequestCookies(const std::string& content);
-	static std::map<std::string, std::string>* parseResponseCookies(const std::string& content);
+	ServerSocket();
+
+	socket_t create(const char* host, uint16_t port);
+	int bind();
+	int listen();
+	socket_t accept();
 };
 
 __INTERNAL_END__
 
 
-#endif // WASP_HTTP_PARSERS_COOKIE_PARSER_H
+#endif // WASP_CORE_TCP_SERVER_SOCKET_H
