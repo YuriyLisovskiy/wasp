@@ -3,10 +3,10 @@ cmake_minimum_required(VERSION 3.13)
 set(CMAKE_CXX_STANDARD 17)
 
 # package information
-set(PACKAGE_NAME       "wasp")
-set(PACKAGE_VERSION    "0.0.1-dev")
-set(PACKAGE_STRING     "${PACKAGE_NAME} ${PACKAGE_VERSION}")
-set(PACKAGE_TAR_NAME   "${PACKAGE_NAME}-${PACKAGE_VERSION}")
+set(PACKAGE_NAME "wasp")
+set(PACKAGE_VERSION "0.0.1-dev")
+set(PACKAGE_STRING "${PACKAGE_NAME} ${PACKAGE_VERSION}")
+set(PACKAGE_TAR_NAME "${PACKAGE_NAME}-${PACKAGE_VERSION}")
 set(PACKAGE_BUG_REPORT "https://github.com/YuriyLisovskiy/wasp/issues")
 
 set(PACKAGE_TESTS "unit-tests-all")

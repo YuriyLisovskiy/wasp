@@ -137,43 +137,5 @@ TEST(FileTestCase, TestWriteBinaryMode)
 	}
 }
 
-TEST(FileTestCase, TestWriteMode)
-{
-	std::string filePath = path::cwd() + "/test.txt";
-	File file(filePath, "w");
-	file.open();
-	if (file.isOpen())
-	{
-		std::vector<byte> byteArray = strToBytes("hello, world");
-		file.write(byteArray);
-		file.close();
-		assertFileContent(filePath, byteArray, false);
-		clear(filePath);
-	}
-	else
-	{
-		print("File is not open");
-	}
-}
-
-TEST(FileTestCase, TestWriteBinaryMode)
-{
-	std::string filePath = path::cwd() + "/test.txt";
-	File file(filePath, "wb");
-	file.open();
-	if (file.isOpen())
-	{
-		std::vector<byte> byteArray = strToBytes("hello, world");
-		file.write(byteArray);
-		file.close();
-		assertFileContent(filePath, byteArray, true);
-		clear(filePath);
-	}
-	else
-	{
-		print("File is not open");
-	}
-}
-
 
 #endif // WASP_FILE_TESTS_H
