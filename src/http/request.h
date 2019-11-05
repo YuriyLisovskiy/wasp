@@ -79,6 +79,11 @@ public:
 			return this->_dict.size();
 		}
 
+		bool empty()
+		{
+			return this->_dict.isEmpty();
+		}
+
 		std::vector<std::string> keys()
 		{
 			return this->_dict.keys();

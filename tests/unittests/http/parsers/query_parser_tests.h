@@ -18,14 +18,20 @@
 #ifndef WASP_UNIT_TESTS_HTTP_PARSERS_QUERY_PARSER_TESTS_H
 #define WASP_UNIT_TESTS_HTTP_PARSERS_QUERY_PARSER_TESTS_H
 
-#include <gtest/gtest.h>
 #include <map>
 #include <vector>
+#include <gtest/gtest.h>
 
 #include "../../globals.h"
 #include "../../../../src/http/parsers/query_parser.h"
 
 __INTERNAL_BEGIN__
+
+template <typename _Container>
+bool containersAreEqual(const _Container& lhs, const _Container& rhs)
+{
+	return lhs.size() == rhs.size() && std::equal(lhs.begin(), lhs.end(), rhs.begin());
+}
 
 TEST(QueryParserTestCase, get)
 {
@@ -64,6 +70,42 @@ TEST(QueryParserTestCase, getList)
 	{
 		ASSERT_EQ(expected[i], actual[i]);
 	}
+}
+
+TEST(QueryParserTestCase, keys)
+{
+	auto expected = std::vector<std::string> {
+		"hello",
+		"hello_key",
+		"world",
+		"world_key",
+	};
+	auto parsed = QueryParser().parse("hello=world&world=hello&hello_key=hello_value&world_key=world_value");
+	auto actual = parsed->keys();
+
+	ASSERT_TRUE(containersAreEqual(expected, actual));
+
+	delete parsed;
+}
+
+TEST(QueryParserTestCase, size)
+{
+	auto expected = 4;
+	auto parsed = QueryParser().parse("hello=world&world=hello&hello_key=hello_value&world_key=world_value");
+	auto actual = parsed->size();
+
+	ASSERT_EQ(expected, actual);
+
+	delete parsed;
+}
+
+TEST(QueryParserTestCase, empty)
+{
+	auto parsed = QueryParser().parse("");
+
+	ASSERT_TRUE(parsed->empty());
+
+	delete parsed;
 }
 
 __INTERNAL_END__
