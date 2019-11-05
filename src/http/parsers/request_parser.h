@@ -34,6 +34,7 @@
 #include "../request.h"
 #include "multipart_parser.h"
 #include "query_parser.h"
+#include "cookie_parser.h"
 
 
 __INTERNAL_BEGIN__
@@ -49,6 +50,7 @@ protected:
 	bool _keepAlive{};
 	std::string _content;
 	std::map<std::string, std::string> _headers;
+	Dict<std::string, std::string>* _cookies = nullptr;
 	HttpRequest::Parameters<std::string, std::string>* _getParameters = nullptr;
 	HttpRequest::Parameters<std::string, std::string>* _postParameters = nullptr;
 	HttpRequest::Parameters<std::string, UploadedFile>* _filesParameters = nullptr;

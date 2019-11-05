@@ -44,6 +44,13 @@ wasp::HttpRequest HttpRequestParser::buildHttpRequest()
 		delete this->_filesParameters;
 	}
 
+	Dict<std::string, std::string> cookies;
+	if (this->_cookies)
+	{
+		cookies = *this->_cookies;
+		delete this->_cookies;
+	}
+
 	wasp::HttpRequest request(
 		this->_method,
 		this->_path,
@@ -53,6 +60,7 @@ wasp::HttpRequest HttpRequestParser::buildHttpRequest()
 		this->_keepAlive,
 		this->_content,
 		this->_headers,
+		cookies,
 		gets,
 		posts,
 		files
@@ -450,6 +458,12 @@ void HttpRequestParser::parseBody(const std::string& data, const std::string& me
 					throw ParseError("Unknown content type", _ERROR_DETAILS_);
 			}
 		}
+	}
+	if (this->_headers.find("Cookie") != this->_headers.end())
+	{
+		std::map<std::string, std::string>* cookies = CookieParser::parseRequestCookies(this->_headers["Cookie"]);
+		this->_cookies = new Dict<std::string, std::string>(*cookies);
+		delete cookies;
 	}
 }
 
