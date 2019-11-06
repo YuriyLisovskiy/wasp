@@ -64,10 +64,12 @@ public:
 	void open();
 	void close();
 	bool isOpen();
-	std::vector<byte> read(size_t n);
+	std::vector<byte> read(size_t n = -1);
+	std::string readStr(size_t n = -1);
 	void write(std::vector<byte> bytes);
+	void writeStr(const std::string& str);
 	size_t size();
-	std::vector<std::vector<byte>> chunks(size_t chunkSize);
+	std::vector<std::vector<byte>> chunks(size_t chunkSize = -1);
 	bool multipleChunks(size_t chunkSize);
 	std::string path() const;
 };

@@ -148,23 +148,33 @@ std::vector<byte> File::read(size_t n)
 		throw FileError("file is open only for writing: " + this->_name, _ERROR_DETAILS_);
 	}
 
-	size_t actualSize = this->size();
-	if (n > actualSize)
+	size_t actualSize = this->size() - this->tell();
+	if (n < 0 || n > actualSize)
 	{
 		n = actualSize;
 	}
 
 	std::vector<byte> bytes;
-	char* buffer = new char[n];
-	this->_file.read(buffer, n);
-
-	for (size_t i = 0; i < n; i++)
+	if (n > 0)
 	{
-		bytes.push_back((byte) *buffer);
+		char* buffer = new char[n];
+		this->_file.read(buffer, n);
+
+		for (size_t i = 0; i < n; i++)
+		{
+			bytes.push_back(buffer[i]);
+		}
+
+		delete[] buffer;
 	}
 
-	delete[] buffer;
 	return bytes;
+}
+
+std::string File::readStr(size_t n)
+{
+	std::vector<byte> bytes = this->read(n);
+	return std::string(bytes.begin(), bytes.end());
 }
 
 void File::write(std::vector<byte> bytes)
@@ -180,6 +190,11 @@ void File::write(std::vector<byte> bytes)
 	}
 
 	this->_file.write((char*) bytes.data(), bytes.size());
+}
+
+void File::writeStr(const std::string& str)
+{
+	this->write(std::vector<byte>(str.cbegin(), str.cend()));
 }
 
 size_t File::size()
@@ -198,7 +213,7 @@ size_t File::size()
 
 std::vector<std::vector<byte>> File::chunks(size_t chunkSize)
 {
-	if (chunkSize == 0)
+	if (chunkSize < 1)
 	{
 		chunkSize = this->_defaultChunkSize;
 	}

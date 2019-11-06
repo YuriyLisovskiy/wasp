@@ -1,5 +1,3 @@
-#include <utility>
-
 /*
  * Copyright (c) 2019 Yuriy Lisovskiy
  *
@@ -15,11 +13,6 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-/*
- * exceptions implementation.
- * TODO: write docs.
  */
 
 #include "exceptions.h"
@@ -124,7 +117,7 @@ MultiPartParserError::MultiPartParserError(const char* message, int line, const 
 }
 
 MultiPartParserError::MultiPartParserError(const char* message, int line, const char* function, const char* file)
-	: MultiPartParserError(message, line, function, file, "ParseError")
+	: MultiPartParserError(message, line, function, file, "MultiPartParserError")
 {
 }
 

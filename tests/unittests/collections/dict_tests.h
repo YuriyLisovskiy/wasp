@@ -180,6 +180,37 @@ TEST(ImmutableDictTestCase, TestREndThrows)
 	ASSERT_THROW(testDict.rend(), wasp::DictError);
 }
 
+TEST(DictTestCase, TestGetKeys)
+{
+	wasp::Dict<int, int> testDict({
+		{1, 2},
+		{2, 3},
+		{3, 4}
+	});
+	std::vector<int> expected = {1, 2, 3};
+	auto actual = testDict.keys();
+
+	ASSERT_EQ(expected.size(), actual.size());
+
+	for (size_t i = 0; i < expected.size(); i++)
+	{
+		ASSERT_EQ(expected[i], actual[i]);
+	}
+}
+
+TEST(DictTestCase, TestGetSize)
+{
+	wasp::Dict<int, int> testDict({
+		{1, 2},
+		{2, 3},
+		{3, 4}
+	});
+	auto expected = 3;
+	auto actual = testDict.size();
+
+	ASSERT_EQ(expected, actual);
+}
+
 __UNIT_TESTS_END__
 
 
