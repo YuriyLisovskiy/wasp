@@ -22,19 +22,25 @@
  *
  * - Server errors:
  *  - HttpError;
- *  - SocketError;
- *  - TcpError.
+ *  - SocketError.
  *
  * - Wasp errors:
  *  - AttributeError;
  *  - DictError;
  *  - DisallowedRedirect;
  *  - EncodingError;
+ *  - FileError
  *  - FileDoesNotExistError;
+ *  - MultiPartParserError
  *  - MultiValueDictError;
  *  - ParseError;
  *  - SuspiciousOperation;
  *  - ValueError.
+ *
+ * - Request errors:
+ *  - EntityTooLargeError
+ *  - DisallowedRedirect
+ *  - SuspiciousOperation
  */
 
 #ifndef WASP_CORE_EXCEPTIONS_H
@@ -97,6 +103,7 @@ public:
 	HttpError(const char* message, int line, const char* function, const char* file);
 	HttpError(const std::string& message, int line, const char* function, const char* file);
 };
+
 
 class ParseError : public BaseException
 {

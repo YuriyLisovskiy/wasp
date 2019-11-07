@@ -29,7 +29,7 @@ __UNIT_TESTS_BEGIN__
 TEST(StrUtilsUrlSplitTypeTestCase, TestSuccess)
 {
 	std::string schemeActual, dataActual;
-	wasp::str::urlSplitType("http://example.com/file.html", schemeActual, dataActual);
+	wasp::str::url_split_type("http://example.com/file.html", schemeActual, dataActual);
 	ASSERT_EQ(schemeActual, "http");
 	ASSERT_EQ(dataActual, "//example.com/file.html");
 }
@@ -37,7 +37,7 @@ TEST(StrUtilsUrlSplitTypeTestCase, TestSuccess)
 TEST(StrUtilsUrlSplitTypeTestCase, TestMissingColon)
 {
 	std::string schemeActual, dataActual;
-	wasp::str::urlSplitType("http//example.com/file.html", schemeActual, dataActual);
+	wasp::str::url_split_type("http//example.com/file.html", schemeActual, dataActual);
 	ASSERT_EQ(schemeActual, "");
 	ASSERT_EQ(dataActual, "http//example.com/file.html");
 }
@@ -45,7 +45,7 @@ TEST(StrUtilsUrlSplitTypeTestCase, TestMissingColon)
 TEST(StrUtilsUrlSplitTypeTestCase, TestSlashBeforeColon)
 {
 	std::string schemeActual, dataActual;
-	wasp::str::urlSplitType("http/://example.com/file.html", schemeActual, dataActual);
+	wasp::str::url_split_type("http/://example.com/file.html", schemeActual, dataActual);
 	ASSERT_EQ(schemeActual, "");
 	ASSERT_EQ(dataActual, "http/://example.com/file.html");
 }
@@ -53,10 +53,11 @@ TEST(StrUtilsUrlSplitTypeTestCase, TestSlashBeforeColon)
 TEST(StrUtilsUrlSplitTypeTestCase, TestEmptyInput)
 {
 	std::string schemeActual, dataActual;
-	wasp::str::urlSplitType("", schemeActual, dataActual);
+	wasp::str::url_split_type("", schemeActual, dataActual);
 	ASSERT_EQ(schemeActual, "");
 	ASSERT_EQ(dataActual, "");
 }
+
 
 TEST(StrUtilsSplitTestCase, TestSplitByDefaultChar)
 {
@@ -82,6 +83,7 @@ TEST(StrUtilsSplitTestCase, TestSplit)
 	}
 }
 
+
 TEST(StrUtilsJoinVectorTestCase, TestJoinStringVectorWithSpace)
 {
 	std::string expected = "Alphanumeric and printable shellcode";
@@ -103,7 +105,7 @@ TEST(StrUtilsJoinVectorTestCase, TestJoinCharVectorWithputSpace)
 	ASSERT_EQ(wasp::str::join("", intVec), expected);
 }
 
-// Dict
+
 TEST(StrUtilsJoinDictTestCase, TestJoinStringVectorWithSpace)
 {
 	std::string expected = "Alphanumeric and printable shellcode";
@@ -133,7 +135,7 @@ TEST(StrUtilsJoinDictTestCase, TestJoinIntDictWithAsJson)
 	ASSERT_EQ("{\n\t" + actual + "\n}", expected);
 }
 
-// Trim functions
+
 TEST(StrUtilsLTrimTestCase, TestLeftTrimmingInPlace)
 {
 	std::string expected = "Hello, World   ";
@@ -198,6 +200,40 @@ TEST(StrUtilsTrimTestCase, TestTrimmingCopy)
 
 	expected = "Hello, World";
 	ASSERT_EQ(wasp::str::trim("------" + expected + "----", '-'), expected);
+}
+
+
+TEST(StrUpperTestCase, TestUpper)
+{
+	std::string expected = "HELLO, WORLD";
+	std::string actual = wasp::str::upper("Hello, world");
+
+	ASSERT_EQ(expected, actual);
+}
+
+
+TEST(StrLowerTestCase, TestLower)
+{
+	std::string expected = "hello, world";
+	std::string actual = wasp::str::lower("HeLlO, WoRlD");
+
+	ASSERT_EQ(expected, actual);
+}
+
+
+TEST(StrStartsWithTestCase, TestStartsWithPrefixIsGreaterThanStr)
+{
+	ASSERT_FALSE(wasp::str::starts_with("Hello", "Hello,"));
+}
+
+TEST(StrStartsWithTestCase, TestStartsWithReturnsFalse)
+{
+	ASSERT_FALSE(wasp::str::starts_with("Hello, World", "hello,"));
+}
+
+TEST(StrStartsWithTestCase, TestStartsWithReturnsTrue)
+{
+	ASSERT_TRUE(wasp::str::starts_with("Hello, World", "Hello,"));
 }
 
 __UNIT_TESTS_END__

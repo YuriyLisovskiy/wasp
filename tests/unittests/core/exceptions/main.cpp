@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WASP_UNIT_TESTS_HTTP_INCLUDE_H
-#define WASP_UNIT_TESTS_HTTP_INCLUDE_H
+#include <gtest/gtest.h>
 
-// parsers
-#include "./parsers/include.h"
+#include "./include.h"
 
-// other
-#include "./cookie_tests.h"
 
-#endif // WASP_UNIT_TESTS_HTTP_INCLUDE_H
+int main(int argc, char *argv[])
+{
+	::testing::InitGoogleTest(&argc, argv);
+	return RUN_ALL_TESTS();
+}

@@ -62,7 +62,7 @@ void MultipartParser::_appendFile(
 // Private static functions.
 std::string MultipartParser::_getBoundary(const std::string& contentType)
 {
-	if (!str::startsWith(contentType, "multipart/"))
+	if (!str::starts_with(contentType, "multipart/"))
 	{
 		throw MultiPartParserError("Invalid Content-Type: " + contentType, _ERROR_DETAILS_);
 	}
@@ -356,9 +356,13 @@ void MultipartParser::parse(const std::string& contentType, const std::string& b
 				}
 				break;
 			case MultipartParser::State::Content:
-				if (contentIxd + 1 == endPos)
+				if (contentIxd + 1 >= endPos)
 				{
-					input = *begin++;
+					if (contentIxd + 1 == endPos)
+					{
+						input = *begin++;
+					}
+
 					if (input != '\r')
 					{
 						throw MultiPartParserError("Unable to parse request body: invalid content structure", _ERROR_DETAILS_);

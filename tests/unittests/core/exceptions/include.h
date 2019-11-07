@@ -21,8 +21,17 @@
 #include "./attribute_error_tests.h"
 #include "./base_exception_tests.h"
 #include "./dict_error_tests.h"
+#include "./disallowed_redirect_tests.h"
+#include "./encoding_error_tests.h"
+#include "./entity_too_large_error_tests.h"
+#include "./file_does_not_exist_error_tests.h"
+#include "./file_error_tests.h"
 #include "./http_error_tests.h"
 #include "./multi_dict_error.h"
+#include "./multipart_parser_error_tests.h"
+#include "./parse_error_tests.h"
+#include "./socket_error_tests.h"
+#include "./suspicious_operation_tests.h"
 #include "./value_error_tests.h"
 
 #endif // WASP_UNIT_TESTS_CORE_EXCEPTIONS_INCLUDE_H

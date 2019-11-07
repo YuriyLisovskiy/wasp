@@ -11,6 +11,7 @@ set(PACKAGE_BUG_REPORT "https://github.com/YuriyLisovskiy/wasp/issues")
 
 set(PACKAGE_TESTS "unit-tests-all")
 set(CORE_FILES_PACKAGE_TESTS "unit-tests-core-files")
+set(HTTP_FILES_PACKAGE_TESTS "unit-tests-http")
 
 set(CMAKE_CXX_FLAGS "-pthread")
 
@@ -45,11 +46,16 @@ file(GLOB TEST_CORE_FILES
 		"tests/unittests/core/files/*.h"
 )
 
+file(GLOB TEST_HTTP_FILES
+		"tests/unittests/http/parsers/*.h"
+		"tests/unittests/http/*.h"
+)
+
 file(GLOB TEST_FILES
 		"tests/unittests/*.h"
-		"tests/unittests/http/*.h"
-		"tests/unittests/http/parsers/*.h"
+		TEST_HTTP_FILES
 		"tests/unittests/utils/*.h"
+		TEST_CORE_FILES
 		"tests/unittests/core/*.h"
 		"tests/unittests/core/exceptions/*.h"
 		"tests/unittests/collections/*.h"
@@ -60,6 +66,7 @@ set(LIB_SRC ${LIB_FILES})
 set(TEST_SRC ${TEST_CORE_FILES} ${TEST_FILES})
 
 set(CORE_FILES_TEST_SRC ${TEST_CORE_FILES})
+set(HTTP_FILES_TEST_SRC ${TEST_HTTP_FILES})
 
 if(EXISTS "${PROJECT_SOURCE_DIR}/examples/http_server.cpp")
 	add_executable(http_server_example ${LIB_SRC} "examples/http_server.cpp")
@@ -72,3 +79,6 @@ target_link_libraries(${PACKAGE_TESTS} gtest gtest_main rt pthread ${TEST_SRC})
 
 add_executable(${CORE_FILES_PACKAGE_TESTS} ${LIB_SRC} ${CORE_FILES_TEST_SRC} "tests/unittests/core/files/main.cpp")
 target_link_libraries(${CORE_FILES_PACKAGE_TESTS} gtest gtest_main rt pthread ${CORE_FILES_TEST_SRC})
+
+add_executable(${HTTP_FILES_PACKAGE_TESTS} ${LIB_SRC} ${HTTP_FILES_TEST_SRC} "tests/unittests/http/main.cpp")
+target_link_libraries(${HTTP_FILES_PACKAGE_TESTS} gtest gtest_main rt pthread ${HTTP_FILES_TEST_SRC})

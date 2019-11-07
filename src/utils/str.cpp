@@ -15,16 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * TODO: write docs.
- */
-
 #include "str.h"
 
 
 __UTILS_STR_INTERNAL_BEGIN__
 
-int normalizeExp(double* val)
+int normalize_exp(double* val)
 {
 	int exponent = 0;
 	double value = *val;
@@ -101,10 +97,10 @@ std::string _format(char const* fmt, va_list args)
 									tempStream.clear();
 									break;
 								case 'f':
-									tempArg = wasp::str::ftoaFixed(va_arg(args, double));
+									tempArg = ftoa_fixed(va_arg(args, double));
 									break;
 								case 'e':
-									tempArg = wasp::str::ftoaSci(va_arg(args, double));
+									tempArg = ftoa_sci(va_arg(args, double));
 									break;
 							}
 							values[lastNumber] = tempArg;
@@ -146,7 +142,7 @@ __UTILS_STR_INTERNAL_END__
 
 __UTILS_STR_BEGIN__
 
-std::string ftoaFixed(double value)
+std::string ftoa_fixed(double value)
 {
 	if (value == 0.0)
 	{
@@ -160,7 +156,7 @@ std::string ftoaFixed(double value)
 		value = -value;
 	}
 
-	int exponent = wasp::str::internal::normalizeExp(&value);
+	int exponent = internal::normalize_exp(&value);
 	int places = 0;
 	static const int width = 4;
 
@@ -193,7 +189,7 @@ std::string ftoaFixed(double value)
 	return result;
 }
 
-std::string ftoaSci(double value)
+std::string ftoa_sci(double value)
 {
 	if (value == 0.0)
 	{
@@ -206,7 +202,7 @@ std::string ftoaSci(double value)
 		value = -value;
 	}
 	static const int width = 4;
-	int exponent = wasp::str::internal::normalizeExp(&value);
+	int exponent = internal::normalize_exp(&value);
 	int digit = value * 10.0;
 	result += std::to_string(digit) + '0';
 	value = value * 10.0 - digit;
@@ -232,7 +228,7 @@ std::string format(const char* fmt, ...)
 	return result;
 }
 
-void urlSplitType(const std::string& url, std::string& scheme, std::string& data)
+void url_split_type(const std::string& url, std::string& scheme, std::string& data)
 {
 	bool _break = false, colonFound = false;
 	auto it = url.begin();
@@ -303,7 +299,7 @@ std::vector<std::string> split(const std::string& str, char delimiter)
 	return result;
 }
 
-bool startsWith(const std::string& src, const std::string& prefix)
+bool starts_with(const std::string& src, const std::string& prefix)
 {
 	if (src.size() < prefix.size())
 	{
