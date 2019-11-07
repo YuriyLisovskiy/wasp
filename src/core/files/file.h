@@ -62,6 +62,7 @@ public:
 	);
 
 	void open();
+	void save();
 	void close();
 	bool isOpen();
 	std::vector<byte> read(size_t n = -1);
@@ -70,7 +71,7 @@ public:
 	void writeStr(const std::string& str);
 	size_t size();
 	std::vector<std::vector<byte>> chunks(size_t chunkSize = -1);
-	bool multipleChunks(size_t chunkSize);
+	bool multipleChunks(size_t chunkSize = -1);
 	std::string path() const;
 };
 

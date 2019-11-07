@@ -57,7 +57,7 @@ std::string extFromPath(const std::string& path)
 void guessContentType(const std::string& _path, std::string& type, std::string& encoding)
 {
 	std::string scheme, url;
-	str::urlSplitType(_path, scheme, url);
+	str::url_split_type(_path, scheme, url);
 	if (scheme == "data")
 	{
 		size_t comma = url.find(',');

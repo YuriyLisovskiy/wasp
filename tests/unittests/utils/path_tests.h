@@ -30,15 +30,15 @@ TEST(PathTestCase, baseName)
 {
 	std::string expected("/bar");
 	std::string fullPath("/foo/bar");
-	ASSERT_EQ(wasp::path::baseName(fullPath), expected);
+	ASSERT_EQ(wasp::path::base(fullPath), expected);
 
 	expected = "bar";
 	fullPath = "bar";
-	ASSERT_EQ(wasp::path::baseName(fullPath), expected);
+	ASSERT_EQ(wasp::path::base(fullPath), expected);
 
 	expected = "/bar";
 	fullPath = "/bar";
-	ASSERT_EQ(wasp::path::baseName(fullPath), expected);
+	ASSERT_EQ(wasp::path::base(fullPath), expected);
 }
 
 __UNIT_TESTS_END__

@@ -49,7 +49,7 @@ __PATH_INTERNAL_BEGIN__
 //
 // Generic implementation of splitext, to be parametrized with
 // the separators.
-extern void _splitText(const std::string& p, char sep, char altsep, char extsep, std::string& rootOut, std::string& extOut);
+extern void _split_text(const std::string& p, char sep, char altsep, char extsep, std::string& rootOut, std::string& extOut);
 
 __PATH_INTERNAL_END__
 
@@ -62,12 +62,16 @@ __PATH_BEGIN__
 // It is always true that root + ext == p.
 extern void splitText(const std::string& fullPath, std::string& rootOut, std::string& extOut);
 
+// Returns true if file exists, otherwise returns false.
 extern bool exists(const std::string& path);
 
-extern std::string baseName(const std::string& path);
+// Returns base from given path.
+extern std::string base(const std::string& path);
 
+// Returns file size in bytes.
 extern size_t getSize(const std::string& path);
 
+// Returns current working directory.
 extern std::string cwd();
 
 __PATH_END__

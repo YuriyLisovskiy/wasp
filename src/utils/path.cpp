@@ -15,17 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * path implementation.
- * TODO: write docs.
- */
-
 #include "path.h"
 
 
 __PATH_INTERNAL_BEGIN__
 
-void _splitText(const std::string& fullPath, char sep, char altsep, char extsep, std::string& rootOut, std::string& extOut)
+void _split_text(const std::string& fullPath, char sep, char altsep, char extsep, std::string& rootOut, std::string& extOut)
 {
 	rootOut = fullPath;
 	extOut = "";
@@ -60,7 +55,7 @@ __PATH_BEGIN__
 
 void splitText(const std::string& fullPath, std::string& rootOut, std::string& extOut)
 {
-	internal::_splitText(fullPath, '/', '\0', '.', rootOut, extOut);
+	internal::_split_text(fullPath, '/', '\0', '.', rootOut, extOut);
 }
 
 bool exists(const std::string& path)
@@ -68,7 +63,7 @@ bool exists(const std::string& path)
 	return access(path.c_str(), 0) == 0;
 }
 
-std::string baseName(const std::string& path)
+std::string base(const std::string& path)
 {
 	size_t pos = path.rfind('/');
 	if (pos == std::string::npos)

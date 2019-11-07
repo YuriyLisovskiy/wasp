@@ -29,7 +29,8 @@
 #include "../../../../src/utils/path.h"
 #include "../../../../src/core/files/file.h"
 
-using namespace wasp;
+using byte = wasp::byte;
+using File = wasp::File;
 
 
 std::vector<byte> strToBytes(const std::string& s)
@@ -37,324 +38,124 @@ std::vector<byte> strToBytes(const std::string& s)
 	return std::vector<byte>(s.cbegin(), s.cend());
 }
 
-std::string bytesToStr(const std::vector<byte>& bytes)
-{
-	return std::string(bytes.begin(), bytes.end());
-}
-
-void clear(const std::string& path)
+void removeFile(const std::string& path)
 {
 	if (std::remove(path.c_str()) != 0)
 	{
-		print("Unable to remove file: \"" + path + "\"");
+		wasp::print("Unable to remove file: \"" + path + "\"");
 		ASSERT_TRUE(false);
 	}
 }
 
-void createTestFile(const std::string& path, const std::vector<byte>& data)
+
+class ReadFileTestCase : public ::testing::Test
 {
-	std::fstream f(path, std::ios::out);
-	if (f.is_open())
-	{
-		f.write((char*) data.data(), data.size());
-		f.close();
-	}
-	else
-	{
-		print("Unable to create file: \"" + path + "\"");
-		ASSERT_TRUE(false);
-	}
-}
+protected:
+	const std::string testReadFilePath = wasp::path::cwd() + "/TestReadFile.txt";
+	File fileToRead = File(this->testReadFilePath, "r");
 
-void assertFileContent(const std::string& fp, const std::vector<byte>& data, bool bin)
-{
-	std::ios_base::openmode mode = std::ios::in;
-	if (bin)
+	void SetUp() override
 	{
-		mode |= std::ios::binary;
+		createFile(this->testReadFilePath, strToBytes("Hello, World"));
+
+		this->fileToRead.open();
+		ASSERT_TRUE(this->fileToRead.isOpen());
 	}
 
-	std::fstream f(fp, mode);
-	if (f.is_open())
+	void TearDown() override
 	{
-		size_t n = data.size();
-		char* buffer = new char[n];
-		f.read(buffer, n);
-		buffer[n] = '\0';
+		this->fileToRead.close();
+		removeFile(this->testReadFilePath);
+	}
 
-		std::string actual(buffer);
-		ASSERT_EQ(actual.size(), n);
+	static std::string bytesToStr(const std::vector<byte>& bytes)
+	{
+		return std::string(bytes.begin(), bytes.end());
+	}
 
-		for (size_t i = 0; i < n; i++)
+	static void createFile(const std::string& path, const std::vector<byte>& data)
+	{
+		std::fstream f(path, std::ios::out);
+		if (f.is_open())
 		{
-			ASSERT_EQ(data[i], buffer[i]);
+			f.write((char*) data.data(), data.size());
+			f.close();
 		}
-
-		delete[] buffer;
+		else
+		{
+			wasp::print("Unable to create file: \"" + path + "\"");
+			ASSERT_TRUE(false);
+		}
 	}
-	else
-	{
-		ASSERT_TRUE(false);
-	}
-}
+};
 
-TEST(FileTestCase, TestReadMode)
+TEST_F(ReadFileTestCase, TestReadMode)
 {
-	std::string filePath = path::cwd() + "/TestReadMode.txt";
 	std::string expected = "Hello, World";
-	createTestFile(filePath, strToBytes(expected));
-	File file(filePath, "r");
-	file.open();
-	if (file.isOpen())
-	{
-		auto actual = bytesToStr(file.read(-1));
-		file.close();
-		clear(filePath);
+	auto actual = bytesToStr(this->fileToRead.read());
 
-		ASSERT_EQ(expected, actual);
-	}
-	else
-	{
-		print("File is not open");
-		ASSERT_TRUE(false);
-	}
+	ASSERT_EQ(expected, actual);
 }
 
-TEST(FileTestCase, TestReadString)
+TEST_F(ReadFileTestCase, TestReadString)
 {
-	std::string filePath = path::cwd() + "/TestReadString.txt";
 	std::string expected = "Hello, World";
-	createTestFile(filePath, strToBytes(expected));
-	File file(filePath, "r");
-	file.open();
-	if (file.isOpen())
-	{
-		auto actual = file.readStr();
-		file.close();
-		clear(filePath);
+	auto actual = this->fileToRead.readStr();
 
-		ASSERT_EQ(expected, actual);
-	}
-	else
-	{
-		print("File is not open");
-		ASSERT_TRUE(false);
-	}
+	ASSERT_EQ(expected, actual);
 }
 
-TEST(FileTestCase, TestReadBinaryMode)
+TEST_F(ReadFileTestCase, TestReadBinaryMode)
 {
-	std::string filePath = path::cwd() + "/TestReadBinaryMode.txt";
+	File f(this->testReadFilePath, "rb");
+	f.open();
+
+	ASSERT_TRUE(f.isOpen());
+
 	std::string expected = "Hello, World";
-	createTestFile(filePath, strToBytes(expected));
-	File file(filePath, "rb");
-	file.open();
-	if (file.isOpen())
-	{
-		auto actual = bytesToStr(file.read(-1));
-		file.close();
-		clear(filePath);
+	std::string actual = bytesToStr(f.read());
+	f.close();
 
-		ASSERT_EQ(expected, actual);
-	}
-	else
-	{
-		print("File is not open");
-		ASSERT_TRUE(false);
-	}
+	ASSERT_EQ(expected, actual);
 }
 
-TEST(FileTestCase, TestWriteMode)
+TEST_F(ReadFileTestCase, TestReadFileIsNotOpenError)
 {
-	std::string filePath = path::cwd() + "/TestWriteMode.txt";
-	File file(filePath, "w");
-	file.open();
-	if (file.isOpen())
-	{
-		std::vector<byte> byteArray = strToBytes("hello, world");
-		file.write(byteArray);
-		file.close();
-		assertFileContent(filePath, byteArray, false);
-		clear(filePath);
-	}
-	else
-	{
-		print("File is not open");
-		ASSERT_TRUE(false);
-	}
+	this->fileToRead.close();
+
+	ASSERT_THROW(this->fileToRead.read(), wasp::FileError);
+
+	this->fileToRead.open();
 }
 
-TEST(FileTestCase, TestWriteString)
+TEST_F(ReadFileTestCase, TestWriteFileIsInReadOnlyModeError)
 {
-	std::string filePath = path::cwd() + "/TestWriteString.txt";
-	std::string expected = "hello, world";
-	File file(filePath, "w");
-	file.open();
-	if (file.isOpen())
-	{
-		file.writeStr(expected);
-		file.close();
-		assertFileContent(filePath, strToBytes(expected), false);
-		clear(filePath);
-	}
-	else
-	{
-		print("File is not open");
-		ASSERT_TRUE(false);
-	}
+	ASSERT_THROW(this->fileToRead.write(strToBytes("Hello, World")), wasp::FileError);
 }
 
-TEST(FileTestCase, TestWriteBinaryMode)
+TEST_F(ReadFileTestCase, TestGetPath)
 {
-	std::string filePath = path::cwd() + "/TestWriteBinaryMode.txt";
-	File file(filePath, "wb");
-	file.open();
-	if (file.isOpen())
-	{
-		std::vector<byte> byteArray = strToBytes("hello, world");
-		file.write(byteArray);
-		file.close();
-		assertFileContent(filePath, byteArray, true);
-		clear(filePath);
-	}
-	else
-	{
-		print("File is not open");
-		ASSERT_TRUE(false);
-	}
+	ASSERT_EQ(this->fileToRead.path(), this->testReadFilePath);
 }
 
-TEST(FileTestCase, TestMultipleChunksFalse)
+TEST_F(ReadFileTestCase, TestReadChunksDefault)
 {
-	std::string filePath = path::cwd() + "/TestMultipleChunksFalse.txt";
-	std::string expected = "Hello, World";
-	createTestFile(filePath, strToBytes(expected));
-	File file(filePath, "r");
-	file.open();
-	if (file.isOpen())
-	{
-		ASSERT_FALSE(file.multipleChunks(-1));
-		file.close();
-		clear(filePath);
-	}
-	else
-	{
-		print("File is not open");
-		ASSERT_TRUE(false);
-	}
-}
-
-TEST(FileTestCase, TestMultipleChunksTrue)
-{
-	std::string filePath = path::cwd() + "/TestMultipleChunksTrue.txt";
-	std::string expected = "Hello, World";
-	createTestFile(filePath, strToBytes(expected));
-	File file(filePath, "r");
-	file.open();
-	if (file.isOpen())
-	{
-		ASSERT_TRUE(file.multipleChunks(4));
-		file.close();
-		clear(filePath);
-	}
-	else
-	{
-		print("File is not open");
-		ASSERT_TRUE(false);
-	}
-}
-
-TEST(FileTestCase, TestReadFileIsNotOpenError)
-{
-	std::string filePath = path::cwd() + "/TestReadFileIsNotOpenError.txt";
-	std::string expected = "Hello, World";
-	createTestFile(filePath, strToBytes(expected));
-	File file(filePath, "r");
-
-	ASSERT_THROW(file.read(-1), FileError);
-
-	clear(filePath);
-}
-
-TEST(FileTestCase, TestReadFileIsInWriteOnlyModeError)
-{
-	std::string filePath = path::cwd() + "/TestReadFileIsInWriteOnlyModeError.txt";
-	std::string expected = "Hello, World";
-	createTestFile(filePath, strToBytes(expected));
-	File file(filePath, "w");
-	file.open();
-
-	ASSERT_TRUE(file.isOpen());
-	ASSERT_THROW(file.read(-1), FileError);
-
-	file.close();
-	clear(filePath);
-}
-
-TEST(FileTestCase, TestWriteFileIsNotOpenError)
-{
-	std::string filePath = path::cwd() + "/TestWriteFileIsNotOpenError.txt";
-	File file(filePath, "r");
-
-	ASSERT_THROW(file.write(strToBytes("Hello, World")), FileError);
-}
-
-TEST(FileTestCase, TestWriteFileIsInReadOnlyModeError)
-{
-	std::string filePath = path::cwd() + "/TestWriteFileIsInReadOnlyModeError.txt";
-	std::string expected = "Hello, World";
-	createTestFile(filePath, strToBytes(expected));
-	File file(filePath, "r");
-	file.open();
-
-	ASSERT_TRUE(file.isOpen());
-	ASSERT_THROW(file.write(strToBytes("Hello, World")), FileError);
-
-	file.close();
-	clear(filePath);
-}
-
-TEST(FileTestCase, TestGetPath)
-{
-	std::string filePath = path::cwd() + "/TestGetPath.txt";
-	File file(filePath, "w");
-
-	ASSERT_EQ(file.path(), filePath);
-}
-
-TEST(FileTestCase, TestReadChunksDefault)
-{
-	std::string filePath = path::cwd() + "/TestReadChunksDefault.txt";
 	std::vector<std::vector<byte>> expected = {
 		strToBytes("Hello, World")
 	};
-	createTestFile(filePath, strToBytes("Hello, World"));
-	File file(filePath, "r");
-	file.open();
-	if (file.isOpen())
-	{
-		auto actual = file.chunks();
-		file.close();
-		clear(filePath);
+	auto actual = this->fileToRead.chunks();
 
-		ASSERT_EQ(expected.size(), actual.size());
-		ASSERT_EQ(actual.size(), 1);
+	ASSERT_EQ(expected.size(), actual.size());
+	ASSERT_EQ(actual.size(), 1);
 
-		for (size_t i = 0; i < expected[0].size(); i++)
-		{
-			ASSERT_EQ(expected[0][i], actual[0][i]);
-		}
-	}
-	else
+	for (size_t i = 0; i < expected[0].size(); i++)
 	{
-		print("File is not open");
-		ASSERT_TRUE(false);
+		ASSERT_EQ(expected[0][i], actual[0][i]);
 	}
 }
 
-TEST(FileTestCase, TestReadChunksCustomized)
+TEST_F(ReadFileTestCase, TestReadChunksCustomized)
 {
-	std::string filePath = path::cwd() + "/TestReadChunksCustomized.txt";
 	std::vector<std::vector<byte>> expected = {
 		strToBytes("He"),
 		strToBytes("ll"),
@@ -363,28 +164,123 @@ TEST(FileTestCase, TestReadChunksCustomized)
 		strToBytes("or"),
 		strToBytes("ld"),
 	};
-	createTestFile(filePath, strToBytes("Hello, World"));
-	File file(filePath, "r");
-	file.open();
-	if (file.isOpen())
+	auto actual = this->fileToRead.chunks(2);
+
+	ASSERT_EQ(expected.size(), actual.size());
+
+	for (size_t i = 0; i < expected.size(); i++)
 	{
-		auto actual = file.chunks(2);
-		file.close();
-		clear(filePath);
+		ASSERT_EQ(actual[i][0], expected[i][0]);
+		ASSERT_EQ(actual[i][1], expected[i][1]);
+	}
+}
 
-		ASSERT_EQ(expected.size(), actual.size());
+TEST_F(ReadFileTestCase, TestMultipleChunksFalse)
+{
+	ASSERT_FALSE(this->fileToRead.multipleChunks());
+}
 
-		for (size_t i = 0; i < expected.size(); i++)
+TEST_F(ReadFileTestCase, TestMultipleChunksTrue)
+{
+	ASSERT_TRUE(this->fileToRead.multipleChunks(4));
+}
+
+
+class WriteFileTestCase : public ::testing::Test
+{
+protected:
+	const std::string testFilePath = wasp::path::cwd() + "/TestWriteFile.txt";
+	File file = File(this->testFilePath, "w");
+
+	void SetUp() override
+	{
+		this->file.open();
+		ASSERT_TRUE(this->file.isOpen());
+	}
+
+	void TearDown() override
+	{
+		this->file.close();
+		removeFile(this->testFilePath);
+	}
+
+	static void assertFile(const std::string& fp, const std::vector<byte>& data, bool bin)
+	{
+		std::ios_base::openmode mode = std::ios::in;
+		if (bin)
 		{
-			ASSERT_EQ(actual[i][0], expected[i][0]);
-			ASSERT_EQ(actual[i][1], expected[i][1]);
+			mode |= std::ios::binary;
+		}
+
+		std::fstream f(fp, mode);
+		if (f.is_open())
+		{
+			size_t n = data.size();
+			char* buffer = new char[n];
+			f.read(buffer, n);
+			buffer[n] = '\0';
+
+			std::string actual(buffer);
+			ASSERT_EQ(actual.size(), n);
+
+			for (size_t i = 0; i < n; i++)
+			{
+				ASSERT_EQ(data[i], buffer[i]);
+			}
+
+			delete[] buffer;
+		}
+		else
+		{
+			ASSERT_TRUE(false);
 		}
 	}
-	else
-	{
-		print("File is not open");
-		ASSERT_TRUE(false);
-	}
+};
+
+TEST_F(WriteFileTestCase, TestWriteMode)
+{
+	std::vector<byte> byteArray = strToBytes("Hello, World");
+	this->file.write(byteArray);
+	this->file.save();
+
+	WriteFileTestCase::assertFile(this->testFilePath, byteArray, false);
+}
+
+TEST_F(WriteFileTestCase, TestWriteString)
+{
+	std::string expected = "Hello, World";
+	this->file.writeStr(expected);
+	this->file.save();
+
+	WriteFileTestCase::assertFile(this->testFilePath, strToBytes(expected), false);
+}
+
+TEST_F(WriteFileTestCase, TestWriteBinaryMode)
+{
+	File f(this->testFilePath, "wb");
+	f.open();
+
+	ASSERT_TRUE(f.isOpen());
+
+	std::vector<byte> byteArray = strToBytes("Hello, World");
+	f.write(byteArray);
+	f.close();
+
+	WriteFileTestCase::assertFile(this->testFilePath, byteArray, true);
+}
+
+TEST_F(WriteFileTestCase, TestWriteFileIsNotOpenError)
+{
+	this->file.close();
+
+	ASSERT_THROW(this->file.write(strToBytes("Hello, World")), wasp::FileError);
+
+	this->file.open();
+}
+
+TEST_F(WriteFileTestCase, TestReadFileIsInWriteOnlyModeError)
+{
+	ASSERT_THROW(file.read(), wasp::FileError);
 }
 
 #endif // WASP_FILE_TESTS_H

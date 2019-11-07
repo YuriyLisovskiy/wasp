@@ -123,6 +123,11 @@ void File::open()
 	}
 }
 
+void File::save()
+{
+	this->_file.flush();
+}
+
 void File::close()
 {
 	if (this->_file.is_open())
@@ -236,7 +241,7 @@ std::vector<std::vector<byte>> File::chunks(size_t chunkSize)
 
 bool File::multipleChunks(size_t chunkSize)
 {
-	if (chunkSize == 0)
+	if (chunkSize < 1)
 	{
 		chunkSize = this->_defaultChunkSize;
 	}

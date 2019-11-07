@@ -15,14 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * HTTP/1.1 response base implementation.
- * TODO: write docs
- */
-
 #include "response.h"
-
-#include <utility>
 
 
 __WASP_BEGIN__
@@ -44,6 +37,7 @@ HttpResponseBase::HttpResponseBase(
 		{
 			throw ValueError("HTTP status code must be an integer from 100 to 599.", _ERROR_DETAILS_);
 		}
+
 		this->_status = status;
 	}
 	else
@@ -57,6 +51,7 @@ HttpResponseBase::HttpResponseBase(
 	{
 		contentType = "text/html; charset=" + this->_charset;
 	}
+
 	this->_headers.set("Content-Type", contentType);
 }
 
@@ -114,6 +109,7 @@ std::string HttpResponseBase::getReasonPhrase()
 	{
 		return this->_reasonPhrase;
 	}
+
 	return internal::HTTP_STATUS.get(this->_status, {"Unknown Status Code", ""}).first;
 }
 
@@ -123,6 +119,7 @@ void HttpResponseBase::setReasonPhrase(std::string value)
 	{
 		value = "Unknown Status Code";
 	}
+
 	this->_reasonPhrase = value;
 }
 
@@ -177,6 +174,7 @@ std::string HttpResponseBase::serializeHeaders()
 			result.append("\r\n");
 		}
 	}
+
 	return result;
 }
 
@@ -307,6 +305,7 @@ std::string FileResponse::getChunk()
 			this->_totalBytesRead += this->_bytesRead;
 		}
 	}
+
 	return chunk.substr(0, this->_bytesRead);
 }
 
@@ -318,16 +317,17 @@ void FileResponse::_setHeaders()
 		{"xz", "application/x-xz"}
 	});
 	this->setHeader("Content-Length", std::to_string(path::getSize(this->_filePath)));
-	if (str::startsWith(this->_headers.get("Content-Type", ""), "text/html"))
+	if (str::starts_with(this->_headers.get("Content-Type", ""), "text/html"))
 	{
 		std::string contentType, encoding;
 		mime::guessContentType(this->_filePath, contentType, encoding);
 		contentType = encodingMap.get(encoding, contentType);
 		this->_headers.set("Content-Type", !contentType.empty() ? contentType : "application/octet-stream");
 	}
+
 	std::string disposition = this->_asAttachment ? "attachment" : "inline";
 	std::string fileExpr;
-	std::string fileName = path::baseName(this->_filePath);
+	std::string fileName = path::base(this->_filePath);
 	try
 	{
 		fileExpr = "filename=\"" + encoding::encode(fileName, encoding::ASCII) + "\"";
@@ -336,6 +336,7 @@ void FileResponse::_setHeaders()
 	{
 		fileExpr = "filename*=utf-8''" + encoding::quote(fileName);
 	}
+
 	this->_headers.set("Content-Disposition", disposition + "; " + fileExpr);
 }
 
@@ -379,6 +380,7 @@ HttpResponseRedirectBase::HttpResponseRedirectBase(
 	{
 		throw ValueError("invalid status", _ERROR_DETAILS_);
 	}
+
 	this->setHeader("Location", encoding::encodeUrl(redirectTo));
 	internal::UrlParser parser;
 	parser.parse(redirectTo);
@@ -432,6 +434,7 @@ void HttpResponseNotModified::setContent(const std::string& content)
 	{
 		throw AttributeError("You cannot set content to a 304 (Not Modified) response", _ERROR_DETAILS_);
 	}
+
 	this->_content = "";
 }
 
@@ -483,6 +486,7 @@ HttpResponseNotAllowed::HttpResponseNotAllowed(
 			methods += ", ";
 		}
 	}
+
 	this->setHeader("Allow", methods);
 }
 

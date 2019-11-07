@@ -62,7 +62,7 @@ void MultipartParser::_appendFile(
 // Private static functions.
 std::string MultipartParser::_getBoundary(const std::string& contentType)
 {
-	if (!str::startsWith(contentType, "multipart/"))
+	if (!str::starts_with(contentType, "multipart/"))
 	{
 		throw MultiPartParserError("Invalid Content-Type: " + contentType, _ERROR_DETAILS_);
 	}

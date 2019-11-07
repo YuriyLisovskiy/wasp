@@ -40,7 +40,7 @@
 __UTILS_STR_INTERNAL_BEGIN__
 
 // Normalizes value to exponent.
-extern int normalizeExp(double* val);
+extern int normalize_exp(double* val);
 
 // Parses string and fill it with arguments list.
 extern std::string _format(char const* fmt, va_list args);
@@ -56,10 +56,10 @@ __UTILS_STR_BEGIN__
 // The largest value we expect is an IEEE 754 double precision real, with maximum magnitude of approximately
 // e+308. The C standard requires an implementation to allow a single conversion to produce up to 512
 // characters, so that's what we really expect as the buffer size.
-extern std::string ftoaFixed(double value);
+extern std::string ftoa_fixed(double value);
 
 // Converts double value to scientific number in string form.
-extern std::string ftoaSci(double value);
+extern std::string ftoa_sci(double value);
 
 // Formats template with given arguments using internal::_format function.
 extern std::string format(const char* fmt, ...);
@@ -119,8 +119,8 @@ std::string join(
 	return oss.str();
 }
 
-// urlSplitType("type:opaqueString", typeOut, opaqueStringOut) --> "type", "opaqueString".
-extern void urlSplitType(const std::string& url, std::string& scheme, std::string& data);
+// url_split_type("type:opaqueString", typeOut, opaqueStringOut) --> "type", "opaqueString".
+extern void url_split_type(const std::string& url, std::string& scheme, std::string& data);
 
 // Checks if string contains char.
 extern bool contains(const std::string& _str, char _char);
@@ -132,7 +132,7 @@ extern std::string upper(const std::string& _str);
 // Splits the string vector of strings relatively for the character.
 extern std::vector<std::string> split(const std::string& str, char delimiter = ' ');
 
-extern bool startsWith(const std::string& src, const std::string& prefix);
+extern bool starts_with(const std::string& src, const std::string& prefix);
 
 // Trims left part of string in-place
 extern void ltrim(std::string& s, char ch = ' ');
