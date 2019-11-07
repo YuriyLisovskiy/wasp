@@ -18,7 +18,7 @@
 #include "logger.h"
 
 
-__LEAF_BEGIN__
+__WASP_BEGIN__
 
 ILogger* Logger::instance = nullptr;
 
@@ -38,32 +38,37 @@ ILogger* Logger::getInstance()
 	return Logger::instance;
 }
 
-void Logger::info(const std::string& msg)
+void Logger::info(const std::string& msg, int line, const char* function, const char* file)
 {
-	this->log(msg, LogLevel::Info);
+	this->log(msg, line, function, file, LogLevel::Info);
 }
 
-void Logger::debug(const std::string& msg)
+void Logger::debug(const std::string& msg, int line, const char* function, const char* file)
 {
-	this->log(msg, LogLevel::Debug);
+	this->log(msg, line, function, file, LogLevel::Debug);
 }
 
-void Logger::warning(const std::string& msg)
+void Logger::warning(const std::string& msg, int line, const char* function, const char* file)
 {
-	this->log(msg, LogLevel::Warning);
+	this->log(msg, line, function, file, LogLevel::Warning);
 }
 
-void Logger::error(const std::string& msg)
+void Logger::error(const std::string& msg, int line, const char* function, const char* file)
 {
-	this->log(msg, LogLevel::Error);
+	this->log(msg, line, function, file, LogLevel::Error);
 }
 
-void Logger::trace(const std::string& msg, const char* file, const char* function, int line)
+void Logger::trace(const std::string& msg, int line, const char* function, const char* file)
 {
-	this->writeToStream("Traceback (exception):\n  File \"" + std::string(file) + "\", line " + std::to_string(line) + ", in " + std::string(function) + "\n" + msg + "\n");
+	this->writeToStream("Traceback (exception):\n  File \"" + std::string(file) + "\", line " + std::to_string(line) + ", in " + std::string(function) + "\n" + msg + "\n", LogLevel::Error);
 }
 
-void Logger::log(const std::string& msg, Logger::LogLevel logLevel)
+void Logger::trace(const char* msg, int line, const char* function, const char* file)
+{
+	this->trace(std::string(msg), line, function, file);
+}
+
+void Logger::log(const std::string& msg, int line, const char* function, const char* file, Logger::LogLevel logLevel)
 {
 	std::string level;
 	switch (logLevel)
@@ -88,14 +93,17 @@ void Logger::log(const std::string& msg, Logger::LogLevel logLevel)
 	std::time_t t = std::time(nullptr);
 	char now[100];
 	std::strftime(now, sizeof(now), "%F %T", std::localtime(&t));
-	this->writeToStream("[" + std::string(now) + "] [" + "thread id" + "] " + level + ":\t" + msg + "\n");
+
+	std::string fullMsg = "\tFile \"" + std::string(file) + "\", line " + std::to_string(line) + ", in " + std::string(function) + "\n" + msg;
+
+	this->writeToStream("[" + std::string(now) + "] [" + "thread id" + "] " + level + ":\n" + fullMsg + "\n", logLevel);
 }
 
-void Logger::writeToStream(const std::string& msg)
+void Logger::writeToStream(const std::string& msg, LogLevel level)
 {
 	// TODO: add multiple streams support
-	std::cout << msg;
+	std::cout << '\n' << msg;
 	std::cout.flush();
 }
 
-__LEAF_END__
+__WASP_END__

@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef LEAF_UTILS_LOGGER_H
-#define LEAF_UTILS_LOGGER_H
+#ifndef WASP_UTILS_LOGGER_H
+#define WASP_UTILS_LOGGER_H
 
 #include <iostream>
 #include <string>
@@ -27,17 +27,18 @@
 #include "../globals.h"
 
 
-__LEAF_BEGIN__
+__WASP_BEGIN__
 
 class ILogger
 {
 public:
 	virtual ~ILogger() = default;
-	virtual void info(const std::string& msg) = 0;
-	virtual void debug(const std::string& msg) = 0;
-	virtual void warning(const std::string& msg) = 0;
-	virtual void error(const std::string& msg) = 0;
-	virtual void trace(const std::string& msg, const char* file, const char* function, int line) = 0;
+	virtual void info(const std::string& msg, int line, const char* function, const char* file) = 0;
+	virtual void debug(const std::string& msg, int line, const char* function, const char* file) = 0;
+	virtual void warning(const std::string& msg, int line, const char* function, const char* file) = 0;
+	virtual void error(const std::string& msg, int line, const char* function, const char* file) = 0;
+	virtual void trace(const std::string& msg, int line, const char* function, const char* file) = 0;
+	virtual void trace(const char* msg, int line, const char* function, const char* file) = 0;
 };
 
 class Logger : public ILogger
@@ -45,11 +46,12 @@ class Logger : public ILogger
 public:
 	static ILogger* getInstance();
 
-	void info(const std::string& msg) override;
-	void debug(const std::string& msg) override;
-	void warning(const std::string& msg) override;
-	void error(const std::string& msg) override;
-	void trace(const std::string& msg, const char* file, const char* function, int line) override;
+	void info(const std::string& msg, int line, const char* function, const char* file) override;
+	void debug(const std::string& msg, int line, const char* function, const char* file) override;
+	void warning(const std::string& msg, int line, const char* function, const char* file) override;
+	void error(const std::string& msg, int line, const char* function, const char* file) override;
+	void trace(const std::string& msg, int line, const char* function, const char* file) override;
+	void trace(const char* msg, int line, const char* function, const char* file) override;
 
 private:
 	enum LogLevel
@@ -61,11 +63,11 @@ private:
 
 	Logger() = default;
 	~Logger() override;
-	void log(const std::string& msg, LogLevel logLevel);
-	void writeToStream(const std::string& msg);
+	void log(const std::string& msg, int line, const char* function, const char* file, LogLevel logLevel);
+	void writeToStream(const std::string& msg, LogLevel level);
 };
 
-__LEAF_END__
+__WASP_END__
 
 
-#endif // LEAF_UTILS_LOGGER_H
+#endif // WASP_UTILS_LOGGER_H

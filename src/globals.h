@@ -19,13 +19,104 @@
  * This header contains global variables, constants and definitions.
  */
 
-#ifndef LEAF_MACRO_H
-#define LEAF_MACRO_H
+#ifndef WASP_GLOBALS_H
+#define WASP_GLOBALS_H
 
-#define __LEAF_BEGIN__ namespace leaf {
-#define __LEAF_END__ }
+#include <iostream>
+#include <string>
 
-#define __INTERNAL_BEGIN__ namespace leaf { namespace internal {
-#define __INTERNAL_END__ } }
 
-#endif //LEAF_MACRO_H
+// Main namespace.
+//
+// Full name: wasp
+#define __WASP_BEGIN__ namespace wasp {
+#define __WASP_END__ }
+
+// Main internal namespace.
+//
+// Full name: wasp::internal
+#define __INTERNAL_BEGIN__ __WASP_BEGIN__ namespace internal {
+#define __INTERNAL_END__ } __WASP_END__
+
+// This namespace is used in datetime module.
+//
+// Full name: wasp::dt
+#define __DATETIME_BEGIN__ __WASP_BEGIN__ namespace dt {
+#define __DATETIME_END__ } __WASP_END__
+
+// Used for string utils library.
+//
+// Full name: wasp::str
+#define __UTILS_STR_BEGIN__ __WASP_BEGIN__ namespace str {
+#define __UTILS_STR_END__ } __WASP_END__
+
+// String utils internals.
+//
+// Full name: wasp::str::internal
+#define __UTILS_STR_INTERNAL_BEGIN__ __UTILS_STR_BEGIN__ namespace internal {
+#define __UTILS_STR_INTERNAL_END__ } __UTILS_STR_END__
+
+// Namespace for media types utility functions.
+//
+// Full name: wasp::mime
+#define __MIME_BEGIN__ __WASP_BEGIN__ namespace mime {
+#define __MIME_END__ } __WASP_END__
+
+// Media types utility internals.
+//
+// Full name: wasp::mime::internal
+#define __MIME_INTERNAL_BEGIN__ __MIME_BEGIN__ namespace internal {
+#define __MIME_INTERNAL_END__ } __MIME_END__
+
+// Path functions namespace.
+//
+// Full name: wasp::path
+#define __PATH_BEGIN__ __WASP_BEGIN__ namespace path {
+#define __PATH_END__ } __WASP_END__
+
+// Path library internals.
+//
+// Full name: wasp::path::internal
+#define __PATH_INTERNAL_BEGIN__ __PATH_BEGIN__ namespace internal {
+#define __PATH_INTERNAL_END__ } __PATH_END__
+
+// Namespace for encoding lib.
+//
+// Full name: wasp::encoding
+#define __WASP_ENCODING_BEGIN__ __WASP_BEGIN__ namespace encoding {
+#define __WASP_ENCODING_END__ } __WASP_END__
+
+// Encoding internals.
+//
+// Full name: wasp::encoding::internal
+#define __WASP_ENCODING_INTERNAL_BEGIN__ __WASP_ENCODING_BEGIN__ namespace internal {
+#define __WASP_ENCODING_INTERNAL_END__ } __WASP_ENCODING_END__
+
+// Required parameters for Wasp's built-in logger.
+#define _ERROR_DETAILS_ __LINE__, __FUNCTION__, __FILE__
+
+__WASP_BEGIN__
+
+typedef unsigned char byte;
+
+template<class... Args>
+void print(Args&&... args)
+{
+	(std::cout << ... << args) << "\n";
+}
+
+template<class... Args>
+bool all(Args&&... args)
+{
+	return (... && args);
+}
+
+template<class... Args>
+bool any(Args&&... args)
+{
+	return (... || args);
+}
+
+__WASP_END__
+
+#endif // WASP_GLOBALS_H
