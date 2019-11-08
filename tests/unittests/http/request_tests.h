@@ -15,51 +15,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * cookie definition.
- * TODO: write docs.
- */
+#ifndef WASP_UNIT_TESTS_HTTP_COOKIE_TESTS_H
+#define WASP_UNIT_TESTS_HTTP_COOKIE_TESTS_H
 
-#ifndef WASP_HTTP_COOKIE_H
-#define WASP_HTTP_COOKIE_H
-
-#include <string>
+#include <gtest/gtest.h>
 
 #include "../globals.h"
-#include "../core/exceptions.h"
+#include "../../../src/http/request.h"
 
 
-__WASP_BEGIN__
+__UNIT_TESTS_BEGIN__
 
-class Cookie
+TEST(RequestTestCase, ConstructRequestTest)
 {
-private:
-	std::string _name;
-	std::string _value;
-	std::string _expires;
-	std::string _domain;
-	std::string _path;
-	bool _isSecure;
-	bool _isHttpOnly;
 
-public:
-	Cookie();
-	Cookie(
-		std::string name,
-		std::string value,
-		std::string expires,
-		std::string domain = "",
-		std::string path = "/",
-		bool isSecure = true,
-		bool isHttpOnly = false
-	);
+}
 
-	std::string toString();
-
-	bool operator==(const Cookie& right);
-};
-
-__WASP_END__
+__UNIT_TESTS_END__
 
 
-#endif // WASP_HTTP_COOKIE_H
+#endif // WASP_UNIT_TESTS_HTTP_COOKIE_TESTS_H

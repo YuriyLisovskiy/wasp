@@ -15,10 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * TODO: write docs.
- */
-
 #include "cookie.h"
 
 
@@ -44,6 +40,7 @@ Cookie::Cookie(
 	{
 		throw HttpError("cookie's name can not be empty", _ERROR_DETAILS_);
 	}
+
 	if (this->_expires.empty())
 	{
 		throw HttpError("cookie's expiration time can not be empty", _ERROR_DETAILS_);
@@ -69,10 +66,12 @@ std::string Cookie::toString()
 	{
 		result += "; Secure";
 	}
+
 	if (this->_isHttpOnly)
 	{
 		result += "; HttpOnly";
 	}
+
 	return result;
 }
 

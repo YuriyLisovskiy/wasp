@@ -23,5 +23,7 @@
 
 // other
 #include "./cookie_tests.h"
+#include "./request_tests.h"
+
 
 #endif // WASP_UNIT_TESTS_HTTP_INCLUDE_H
