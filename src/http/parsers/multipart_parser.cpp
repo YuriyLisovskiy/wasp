@@ -230,6 +230,7 @@ void MultipartParser::parse(const std::string& contentType, const std::string& b
 					if (input == ' ')
 					{
 						this->_state = MultipartParser::State::FileNameBegin;
+						fileName.clear();
 					}
 					else
 					{
@@ -254,7 +255,7 @@ void MultipartParser::parse(const std::string& contentType, const std::string& b
 				}
 				break;
 			case MultipartParser::State::FileNameBegin:
-				fileName.clear();
+			//	fileName.clear();
 				if (input == '=')
 				{
 					input = *begin++;
@@ -385,8 +386,12 @@ void MultipartParser::parse(const std::string& contentType, const std::string& b
 					}
 					else
 					{
-						this->_appendFile(key, fileName, fileContentType, boundary, contentDisposition, file);
-						file.clear();
+						if (!file.empty())
+						{
+							this->_appendFile(key, fileName, fileContentType, boundary, contentDisposition, file);
+							file.clear();
+						}
+
 						contentDisposition.clear();
 					}
 

@@ -382,11 +382,10 @@ HttpResponseRedirectBase::HttpResponseRedirectBase(
 	}
 
 	this->setHeader("Location", encoding::encodeUrl(redirectTo));
-	internal::UrlParser parser;
-	parser.parse(redirectTo);
-	if (!parser.scheme().empty() && this->_allowedHosts.find(parser.scheme()) == this->_allowedHosts.end())
+	Url url(redirectTo);
+	if (!url.scheme().empty() && this->_allowedHosts.find(url.scheme()) == this->_allowedHosts.end())
 	{
-		throw DisallowedRedirect("Unsafe redirect to URL with protocol " + parser.scheme(), _ERROR_DETAILS_);
+		throw DisallowedRedirect("Unsafe redirect to URL with protocol " + url.scheme(), _ERROR_DETAILS_);
 	}
 }
 

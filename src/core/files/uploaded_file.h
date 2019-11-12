@@ -23,6 +23,8 @@
 #ifndef WASP_CORE_FILES_UPLOADED_FILE_H
 #define WASP_CORE_FILES_UPLOADED_FILE_H
 
+#include <string>
+
 #include "../../globals.h"
 
 

@@ -25,6 +25,12 @@
 using wasp::internal::HttpServer;
 
 
+template<class... Args>
+void print(Args&&... args)
+{
+	(std::cout << ... << args) << "\n";
+}
+
 void handler(wasp::HttpRequest& request, const wasp::internal::socket_t& client)
 {
 	wasp::CookieMiddleware().processRequest(request);
@@ -51,7 +57,7 @@ void handler(wasp::HttpRequest& request, const wasp::internal::socket_t& client)
 //	HttpServer::send(response, client);
 //	delete response;
 
-	wasp::print(
+	print(
 		"\nGet: ", request.GET.keys().size(),
 		"\nPost: ", request.POST.keys().size(),
 		"\nFiles: ", request.FILES.keys().size(),

@@ -15,18 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * CookieParser implementation.
- * TODO: write docs.
- */
-
 #include "cookie_parser.h"
 
 
 __INTERNAL_BEGIN__
 
 
-std::map<std::string, std::string>* CookieParser::parseRequestCookies(const std::string& content)
+std::map<std::string, std::string>* cookie_parser::parse_req_cookies(const std::string& content)
 {
 	auto* result = new std::map<std::string, std::string>();
 	if (content.empty())
@@ -36,47 +31,44 @@ std::map<std::string, std::string>* CookieParser::parseRequestCookies(const std:
 
 	auto begin = content.begin();
 	auto end = content.end();
-	std::string cookieKey;
-	std::string cookieValue;
-
-	ReqCookieParserState state = ReqCookieParserState::Key;
-
+	std::string cookie_key, cookie_value;
+	req_state state = req_state::req_key;
 	while (begin != end)
 	{
 		char input = *begin++;
 		switch (state)
 		{
-			case ReqCookieParserState::Key:
+			case req_state::req_key:
 				if (input == '=')
 				{
-					state = ReqCookieParserState::Val;
+					state = req_state::req_val;
 				}
 				else if (input != ' ')
 				{
-					cookieKey.push_back(input);
+					cookie_key.push_back(input);
 				}
 				break;
-			case ReqCookieParserState::Val:
+			case req_state::req_val:
 				if (input == ';')
 				{
-					(*result)[cookieKey] = cookieValue;
-					cookieKey.clear();
-					cookieValue.clear();
-					state = ReqCookieParserState::Key;
+					(*result)[cookie_key] = cookie_value;
+					cookie_key.clear();
+					cookie_value.clear();
+					state = req_state::req_key;
 				}
 				else if (input != ' ')
 				{
-					cookieValue.push_back(input);
+					cookie_value.push_back(input);
 				}
 				break;
 		}
 	}
-	(*result)[cookieKey] = cookieValue;
 
+	(*result)[cookie_key] = cookie_value;
 	return result;
 }
 
-std::map<std::string, std::string>* CookieParser::parseResponseCookies(const std::string& content)
+std::map<std::string, std::string>* cookie_parser::parse_resp_cookies(const std::string& content)
 {
 	auto* result = new std::map<std::string, std::string>();
 	if (content.empty())

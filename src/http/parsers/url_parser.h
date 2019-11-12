@@ -15,11 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * url_parser definition.
- * TODO: write docs.
- */
-
 #ifndef WASP_HTTP_PARSERS_URL_PARSER_H
 #define WASP_HTTP_PARSERS_URL_PARSER_H
 
@@ -35,62 +30,39 @@
 
 __INTERNAL_BEGIN__
 
-struct UrlParser
+struct url_parser
 {
-private:
-	enum State
+	enum state
 	{
-		Scheme,
-		FirstSlashAfterScheme,
-		SecondSlashAfterScheme,
-		UsernameOrHostname,
-		Password,
-		Hostname,
-		IPV6Hostname,
-		PortOrPassword,
-		Port,
-		Path,
-		Query,
-		Fragment
+		s_scheme,
+		s_first_slash,
+		s_second_slash,
+		s_username_or_hostname,
+		s_password,
+		s_hostname,
+		s_ipv6_hostname,
+		s_port_or_password,
+		s_port,
+		s_path,
+		s_query,
+		s_fragment
 	};
 
-protected:
-	[[nodiscard]] bool isUnreserved(char ch) const;
+	bool is_parsed;
+	std::string scheme;
+	std::string username;
+	std::string password;
+	std::string hostname;
+	std::string port;
+	std::string path;
+	std::string query;
+	std::string fragment;
+	uint16_t integer_port;
 
-	bool _isParsed;
-
-	struct Url
-	{
-		Url() : integerPort(0)
-		{}
-
-		std::string scheme;
-		std::string username;
-		std::string password;
-		std::string hostname;
-		std::string port;
-		std::string path;
-		std::string query;
-		std::string fragment;
-		uint16_t integerPort;
-	} _url;
-
-public:
-	UrlParser();
-
+	url_parser();
 	void parse(const std::string& str);
-
-	void checkIfParsed() const;
-
-	[[nodiscard]] std::string scheme() const;
-	[[nodiscard]] std::string username() const;
-	[[nodiscard]] std::string password() const;
-	[[nodiscard]] std::string hostname() const;
-	[[nodiscard]] std::string port() const;
-	[[nodiscard]] std::string path() const;
-	[[nodiscard]] std::string query() const;
-	[[nodiscard]] std::string fragment() const;
-	[[nodiscard]] uint16_t httpPort() const;
+	void parse(const char* str);
+	static bool is_unreserved(char ch);
 };
 
 __INTERNAL_END__
