@@ -420,11 +420,14 @@ void HttpRequestParser::parseHeaders(const std::string& data)
 
 void HttpRequestParser::parseBody(const std::string& data, const std::string& mediaRoot)
 {
-	QueryParser qp;
-	MultipartParser mp(mediaRoot);
+	query_parser qp;
+	multipart_parser mp(mediaRoot);
 	if (data.empty())
 	{
-		this->_setParameters(qp.parse(this->_query));
+		qp.parse(this->_query);
+		this->_setParameters(
+			new HttpRequest::Parameters<std::string, std::string>(*qp.dict, *qp.multi_dict)
+		);
 	}
 	else
 	{
@@ -434,15 +437,18 @@ void HttpRequestParser::parseBody(const std::string& data, const std::string& me
 			switch (this->_contentType)
 			{
 				case ContentType::ApplicationXWwwFormUrlencoded:
-					this->_setParameters(qp.parse(this->_content));
+					qp.parse(this->_content);
+					this->_setParameters(
+						new HttpRequest::Parameters<std::string, std::string>(*qp.dict, *qp.multi_dict)
+					);
 					break;
 				case ContentType::ApplicationJson:
 					// TODO: parse application/json data
 					break;
 				case ContentType::MultipartFormData:
 					mp.parse(this->_headers["Content-Type"], this->_content);
-					this->_postParameters = mp.getPostParams();
-					this->_filesParameters = mp.getFilesParams();
+					this->_postParameters = mp.get_post_params();
+					this->_filesParameters = mp.get_files_params();
 					break;
 				case ContentType::Other:
 					break;
@@ -668,10 +674,25 @@ bool HttpRequestParser::isSpecial(uint c)
 {
 	switch (c)
 	{
-		case '(': case ')': case '<': case '>': case '@':
-		case ',': case ';': case ':': case '\\': case '"':
-		case '/': case '[': case ']': case '?': case '=':
-		case '{': case '}': case ' ': case '\t':
+		case '(':
+		case ')':
+		case '<':
+		case '>':
+		case '@':
+		case ',':
+		case ';':
+		case ':':
+		case '\\':
+		case '"':
+		case '/':
+		case '[':
+		case ']':
+		case '?':
+		case '=':
+		case '{':
+		case '}':
+		case ' ':
+		case '\t':
 			return true;
 		default:
 			return false;

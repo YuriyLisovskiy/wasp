@@ -64,6 +64,8 @@ void handler(wasp::HttpRequest& request, const wasp::internal::socket_t& client)
 		"\nCookies: ", request.COOKIES.keys().size()
 	);
 
+	print("\nCOOKIES: ", request.headers.get("Cookie"));
+
 	std::string body(
 		"<form action=\"/hello\" method=\"post\" enctype=\"multipart/form-data\">\n"
 		"\t<input type=\"file\" name=\"super_file\" />\n"

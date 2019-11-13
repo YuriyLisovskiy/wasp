@@ -74,7 +74,7 @@ void url_parser::parse(const std::string& str)
 				}
 				break;
 			case url_parser::state::s_username_or_hostname:
-				if (this->is_unreserved(ch) || ch == '%')
+				if (url_parser::is_unreserved(ch) || ch == '%')
 				{
 					username_or_hostname += ch;
 				}
@@ -116,7 +116,7 @@ void url_parser::parse(const std::string& str)
 				{
 					st = url_parser::state::s_ipv6_hostname;
 				}
-				else if (this->is_unreserved(ch) || ch == '%')
+				else if (url_parser::is_unreserved(ch) || ch == '%')
 				{
 					this->hostname += ch;
 				}

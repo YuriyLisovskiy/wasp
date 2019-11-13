@@ -39,56 +39,53 @@
 
 __INTERNAL_BEGIN__
 
-class MultipartParser
+struct multipart_parser final
 {
-private:
-	std::string _mediaRoot;
+	std::string media_root;
 
-	Dict<std::string, std::string> _postValues;
-	MultiValueDict<std::string, std::string> _multiPostValue;
+	Dict<std::string, std::string> post_values;
+	MultiValueDict<std::string, std::string> multi_post_value;
 
-	Dict<std::string, UploadedFile> _fileValues;
-	MultiValueDict<std::string, UploadedFile> _multiFileValue;
+	Dict<std::string, UploadedFile> file_values;
+	MultiValueDict<std::string, UploadedFile> multi_file_value;
 
-protected:
-	enum State
+	enum state
 	{
-		BoundaryBegin,
-		Boundary,
-		BoundaryEnd,
-		BodyEnd,
-		ContentDispositionBegin,
-		ContentDisposition,
-		NameBegin,
-		Name,
-		NameEnd,
-		FileNameBegin,
-		FileName,
-		ContentTypeBegin,
-		ContentType,
-		ContentBegin,
-		Content
+		s_boundary_begin,
+		s_boundary,
+		s_boundary_end,
+		s_body_end,
+		s_content_disposition_begin,
+		s_content_disposition,
+		s_name_begin,
+		s_name,
+		s_name_end,
+		s_file_name_begin,
+		s_file_name,
+		s_content_type_begin,
+		s_content_type,
+		s_content_begin,
+		s_content
 
-	} _state;
+	};
 
-	void _appendParameter(const std::string& key, const std::string& value);
-	void _appendFile(
+	void append_parameter(const std::string& key, const std::string& value);
+	void append_file(
 		const std::string& key,
-		const std::string& fileName,
-		const std::string& contentType,
+		const std::string& file_name,
+		const std::string& content_type,
 		const std::string& boundary,
-		const std::string& contentDisposition,
+		const std::string& content_disposition,
 		const std::vector<byte>& data
 	);
 
-	static std::string _getBoundary(const std::string& contentType);
-	static void _assertBoundary(const std::string& actual, const std::string& expected);
+	static std::string get_boundary(const std::string& content_type);
+	static void assert_boundary(const std::string& actual, const std::string& expected);
 
-public:
-	explicit MultipartParser(const std::string& mediaRoot = "");
-	void parse(const std::string& contentType, const std::string& body);
-	HttpRequest::Parameters<std::string, UploadedFile>* getFilesParams();
-	HttpRequest::Parameters<std::string, std::string>* getPostParams();
+	explicit multipart_parser(const std::string& mediaRoot = "");
+	void parse(const std::string& content_type, const std::string& body);
+	HttpRequest::Parameters<std::string, UploadedFile>* get_files_params();
+	HttpRequest::Parameters<std::string, std::string>* get_post_params();
 };
 
 __INTERNAL_END__

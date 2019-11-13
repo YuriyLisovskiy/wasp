@@ -19,10 +19,7 @@
 #define WASP_HTTP_PARSERS_URL_PARSER_H
 
 #include <string>
-#include <cstdlib>
-#include <cstdint>
 #include <cassert>
-#include <cstdlib>
 
 #include "../../globals.h"
 #include "../../core/exceptions.h"
@@ -30,7 +27,7 @@
 
 __INTERNAL_BEGIN__
 
-struct url_parser
+struct url_parser final
 {
 	enum state
 	{

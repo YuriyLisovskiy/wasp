@@ -31,20 +31,21 @@
 
 __INTERNAL_BEGIN__
 
-struct QueryParser
+struct query_parser final
 {
-	enum State
+	enum state
 	{
-		Key,
-		Val
+		s_key,
+		s_val
 	};
 
-	Dict<std::string, std::string> _dict;
-	MultiValueDict<std::string, std::string> _multiDict;
+	Dict<std::string, std::string>* dict;
+	MultiValueDict<std::string, std::string>* multi_dict;
 
-	explicit QueryParser();
-	void appendParameter(const std::string& key, const std::string& value);
-	HttpRequest::Parameters<std::string, std::string>* parse(const std::string& data);
+	explicit query_parser();
+	~query_parser();
+	void append_parameter(const std::string& key, const std::string& value);
+	void parse(const std::string& data);
 };
 
 __INTERNAL_END__

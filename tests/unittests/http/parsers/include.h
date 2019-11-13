@@ -18,8 +18,9 @@
 #ifndef WASP_UNIT_TESTS_HTTP_PARSERS_INCLUDE_H
 #define WASP_UNIT_TESTS_HTTP_PARSERS_INCLUDE_H
 
+#include "./cookie_parser_tests.h"
 #include "./query_parser_tests.h"
 #include "./request_parser_tests.h"
-#include "url_parser_tests.h"
+#include "./url_parser_tests.h"
 
 #endif // WASP_UNIT_TESTS_HTTP_PARSERS_INCLUDE_H

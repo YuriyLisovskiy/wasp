@@ -21,6 +21,7 @@
 #include <gtest/gtest.h>
 
 #include "../../globals.h"
+#include "../../../../src/core/exceptions.h"
 #include "../../../../src/http/parsers/url_parser.h"
 
 
@@ -85,6 +86,38 @@ TEST_F(UrlParserTestCase, FramentTest)
 TEST_F(UrlParserTestCase, QueryTest)
 {
 	ASSERT_EQ(this->parser.query, QUERY_EXPECTED);
+}
+
+
+class UrlParserErrorsTestCase : public ::testing::Test
+{
+protected:
+	wasp::internal::url_parser parser;
+};
+
+TEST_F(UrlParserErrorsTestCase, InvalidSchemeTest)
+{
+	ASSERT_THROW(this->parser.parse("ht~tp://example.com"), wasp::ParseError);
+}
+
+TEST_F(UrlParserErrorsTestCase, InvalidSchemeEndingTest)
+{
+	ASSERT_THROW(this->parser.parse("http//example.com"), wasp::ParseError);
+}
+
+TEST_F(UrlParserErrorsTestCase, AbsentFirstSlashTest)
+{
+	ASSERT_THROW(this->parser.parse("http:#example.com"), wasp::ParseError);
+}
+
+TEST_F(UrlParserErrorsTestCase, AbsentSecondSlashTest)
+{
+	ASSERT_THROW(this->parser.parse("http:/example.com"), wasp::ParseError);
+}
+
+TEST_F(UrlParserErrorsTestCase, UsernameOrHostnameErrorTest)
+{
+	ASSERT_THROW(this->parser.parse("http://$example.com"), wasp::ParseError);
 }
 
 __UNIT_TESTS_END__

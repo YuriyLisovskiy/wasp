@@ -31,7 +31,7 @@
 
 __INTERNAL_BEGIN__
 
-struct cookie_parser
+struct cookie_parser final
 {
 	enum req_state
 	{
