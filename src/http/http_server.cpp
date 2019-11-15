@@ -83,13 +83,13 @@ void HttpServer::_cleanUp(const socket_t& client)
 
 HttpRequest HttpServer::_handleRequest(const socket_t& client)
 {
-	HttpRequestParser parser;
+	request_parser rp;
 	std::string bodyBeginning;
 
 	std::string headers_str = this->_readHeaders(client, bodyBeginning);
 
-	parser.parseHeaders(headers_str);
-	Dict<std::string, std::string> headers = parser.getHeaders();
+	rp.parse_headers(headers_str);
+	Dict<std::string, std::string> headers = rp.get_headers();
 	if (headers.contains("Content-Length"))
 	{
 		size_t bodyLength = strtol(headers.get("Content-Length").c_str(), nullptr, 10);
@@ -103,10 +103,10 @@ HttpRequest HttpServer::_handleRequest(const socket_t& client)
 			body = this->_readBody(client, bodyBeginning, bodyLength);
 		}
 
-		parser.parseBody(body, this->_mediaRoot);
+		rp.parse_body(body, this->_mediaRoot);
 	}
 
-	return parser.buildHttpRequest();
+	return rp.build_request();
 }
 
 std::string HttpServer::_readBody(

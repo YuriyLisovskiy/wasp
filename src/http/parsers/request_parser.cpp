@@ -20,39 +20,42 @@
 
 __INTERNAL_BEGIN__
 
-// Public methods.
-wasp::HttpRequest HttpRequestParser::buildHttpRequest()
+request_parser::~request_parser()
+{
+	delete this->get_parameters;
+	delete this->post_parameters;
+	delete this->files_parameters;
+}
+
+wasp::HttpRequest request_parser::build_request()
 {
 	HttpRequest::Parameters<std::string, std::string> gets;
-	if (this->_getParameters)
+	if (this->get_parameters)
 	{
-		gets = *this->_getParameters;
-		delete this->_getParameters;
+		gets = *this->get_parameters;
 	}
 
 	HttpRequest::Parameters<std::string, std::string> posts;
-	if (this->_postParameters)
+	if (this->post_parameters)
 	{
-		posts = *this->_postParameters;
-		delete this->_postParameters;
+		posts = *this->post_parameters;
 	}
 
 	HttpRequest::Parameters<std::string, UploadedFile> files;
-	if (this->_filesParameters)
+	if (this->files_parameters)
 	{
-		files = *this->_filesParameters;
-		delete this->_filesParameters;
+		files = *this->files_parameters;
 	}
 
 	wasp::HttpRequest request(
-		this->_method,
-		this->_path,
-		this->_majorV,
-		this->_minorV,
-		this->_query,
-		this->_keepAlive,
-		this->_content,
-		this->_headers,
+		this->method,
+		this->path,
+		this->major_v,
+		this->minor_v,
+		this->query,
+		this->keep_alive,
+		this->content,
+		this->headers,
 		gets,
 		posts,
 		files
@@ -60,12 +63,12 @@ wasp::HttpRequest HttpRequestParser::buildHttpRequest()
 	return request;
 }
 
-Dict<std::string, std::string> HttpRequestParser::getHeaders()
+Dict<std::string, std::string> request_parser::get_headers()
 {
-	return Dict<std::string, std::string>(this->_headers);
+	return Dict<std::string, std::string>(this->headers);
 }
 
-void HttpRequestParser::parseHeaders(const std::string& data)
+void request_parser::parse_headers(const std::string& data)
 {
 	std::string newHeaderName;
 	std::string newHeaderValue;
@@ -74,195 +77,194 @@ void HttpRequestParser::parseHeaders(const std::string& data)
 
 	for (const char& input : data)
 	{
-		switch (this->_state)
+		switch (this->state)
 		{
-			case ParserState::MethodBegin:
-				if (!HttpRequestParser::isChar(input) || HttpRequestParser::isControl(input) || HttpRequestParser::isSpecial(input))
+			case request_parser::state_enum::s_method_begin:
+				if (!request_parser::is_char(input) || request_parser::is_control(input) || request_parser::is_special(input))
 				{
 					throw ParseError("unable to parse method type", _ERROR_DETAILS_);
 				}
 				else
 				{
-					this->_state = ParserState::Method;
-					this->_method.push_back(input);
+					this->state = request_parser::state_enum::s_method;
+					this->method.push_back(input);
 				}
 				break;
-			case ParserState::Method:
+			case request_parser::state_enum::s_method:
 				if (input == ' ')
 				{
-					this->_state = PathBegin;
+					this->state = request_parser::state_enum::s_path_begin;
 				}
-				else if (!HttpRequestParser::isChar(input) || HttpRequestParser::isControl(input) || HttpRequestParser::isSpecial(input))
+				else if (!request_parser::is_char(input) || request_parser::is_control(input) || request_parser::is_special(input))
 				{
 					throw ParseError("unable to parse http method type", _ERROR_DETAILS_);
 				}
 				else
 				{
-					this->_method.push_back(input);
+					this->method.push_back(input);
 				}
 				break;
-			case ParserState::PathBegin:
-				if (HttpRequestParser::isControl(input))
+			case request_parser::state_enum::s_path_begin:
+				if (request_parser::is_control(input))
 				{
 					throw ParseError("unable to parse http url path", _ERROR_DETAILS_);
 				}
 				else
 				{
-					this->_state = Path;
-					this->_path.push_back(input);
+					this->state = request_parser::state_enum::s_path;
+					this->path.push_back(input);
 				}
 				break;
-			case ParserState::Path:
+			case request_parser::state_enum::s_path:
 				if (input == ' ')
 				{
-					this->_state = ParserState::HttpVersionH;
+					this->state = request_parser::state_enum::s_http_version_h;
 				}
 				else if (input == '?')
 				{
-					this->_state = ParserState::Query;
+					this->state = request_parser::state_enum::s_query;
 				}
 				else if (input == '\r')
 				{
-					this->_majorV = 0;
-					this->_minorV = 9;
-
+					this->major_v = 0;
+					this->minor_v = 9;
 					return;
 				}
-				else if (HttpRequestParser::isControl(input))
+				else if (request_parser::is_control(input))
 				{
 					throw ParseError("unable to parse http url path", _ERROR_DETAILS_);
 				}
 				else
 				{
-					this->_path.push_back(input);
+					this->path.push_back(input);
 				}
 				break;
-			case ParserState::Query:
+			case request_parser::state_enum::s_query:
 				if (input == ' ')
 				{
-					this->_state = ParserState::HttpVersionH;
+					this->state = request_parser::state_enum::s_http_version_h;
 				}
 				else if (input == '#')
 				{
-					this->_state = ParserState::Fragment;
+					this->state = request_parser::state_enum::s_fragment;
 				}
 				else if (input == '\r')
 				{
-					this->_majorV = 0;
-					this->_minorV = 9;
+					this->major_v = 0;
+					this->minor_v = 9;
 
 					return;
 				}
-				else if (HttpRequestParser::isControl(input))
+				else if (request_parser::is_control(input))
 				{
 					throw ParseError("unable to parse http url query", _ERROR_DETAILS_);
 				}
 				else
 				{
-					this->_query.push_back(input);
+					this->query.push_back(input);
 				}
 				break;
-			case ParserState::Fragment:
+			case request_parser::state_enum::s_fragment:
 				if (input == ' ')
 				{
-					this->_state = ParserState::HttpVersionH;
+					this->state = request_parser::state_enum::s_http_version_h;
 				}
 				// INFO: save fragment maybe.
 				break;
-			case ParserState::HttpVersionH:
-				this->_parseHttpWord(input, 'H', ParserState::HttpVersionHt);
+			case request_parser::state_enum::s_http_version_h:
+				this->parse_http_word(input, 'H', request_parser::state_enum::s_http_version_ht);
 				break;
-			case ParserState::HttpVersionHt:
-				this->_parseHttpWord(input, 'T', ParserState::HttpVersionHtt);
+			case request_parser::state_enum::s_http_version_ht:
+				this->parse_http_word(input, 'T', request_parser::state_enum::s_http_version_htt);
 				break;
-			case ParserState::HttpVersionHtt:
-				this->_parseHttpWord(input, 'T', ParserState::HttpVersionHttp);
+			case request_parser::state_enum::s_http_version_htt:
+				this->parse_http_word(input, 'T', request_parser::state_enum::s_http_version_http);
 				break;
-			case ParserState::HttpVersionHttp:
-				this->_parseHttpWord(input, 'P', ParserState::HttpVersionSlash);
+			case request_parser::state_enum::s_http_version_http:
+				this->parse_http_word(input, 'P', request_parser::state_enum::s_http_version_slash);
 				break;
-			case ParserState::HttpVersionSlash:
+			case request_parser::state_enum::s_http_version_slash:
 				if (input == '/')
 				{
-					this->_majorV = 0;
-					this->_minorV = 0;
-					this->_state = ParserState::HttpVersionMajorBegin;
+					this->major_v = 0;
+					this->minor_v = 0;
+					this->state = request_parser::state_enum::s_http_version_major_begin;
 				}
 				else
 				{
 					throw ParseError("unable to parse http protocol version", _ERROR_DETAILS_);
 				}
 				break;
-			case ParserState::HttpVersionMajorBegin:
-				if (HttpRequestParser::isDigit(input))
+			case request_parser::state_enum::s_http_version_major_begin:
+				if (request_parser::is_digit(input))
 				{
-					this->_majorV = input - '0';
-					this->_state = ParserState::HttpVersionMajor;
+					this->major_v = input - '0';
+					this->state = request_parser::state_enum::s_http_version_major;
 				}
 				else
 				{
 					throw ParseError("unable to parse major part of http protocol version", _ERROR_DETAILS_);
 				}
 				break;
-			case ParserState::HttpVersionMajor:
+			case request_parser::state_enum::s_http_version_major:
 				if (input == '.')
 				{
-					this->_state = ParserState::HttpVersionMinorBegin;
+					this->state = request_parser::state_enum::s_http_version_minor_begin;
 				}
-				else if (HttpRequestParser::isDigit(input))
+				else if (request_parser::is_digit(input))
 				{
-					this->_majorV = this->_majorV * 10 + input - '0';
+					this->major_v = this->major_v * 10 + input - '0';
 				}
 				else
 				{
 					throw ParseError("unable to parse major part of http protocol version", _ERROR_DETAILS_);
 				}
 				break;
-			case ParserState::HttpVersionMinorBegin:
-				if (HttpRequestParser::isDigit(input))
+			case request_parser::state_enum::s_http_version_minor_begin:
+				if (request_parser::is_digit(input))
 				{
-					this->_minorV = input - '0';
-					this->_state = ParserState::HttpVersionMinor;
+					this->minor_v = input - '0';
+					this->state = request_parser::state_enum::s_http_version_minor;
 				}
 				else
 				{
 					throw ParseError("unable to parse minor part of http protocol version", _ERROR_DETAILS_);
 				}
 				break;
-			case ParserState::HttpVersionMinor:
+			case request_parser::state_enum::s_http_version_minor:
 				if (input == '\r')
 				{
-					this->_state = ParserState::HttpVersionNewLine;
+					this->state = request_parser::state_enum::s_http_version_new_line;
 				}
-				else if(HttpRequestParser::isDigit(input))
+				else if(request_parser::is_digit(input))
 				{
-					this->_minorV = this->_minorV * 10 + input - '0';
+					this->minor_v = this->minor_v * 10 + input - '0';
 				}
 				else
 				{
 					throw ParseError("unable to parse minor part of http protocol version", _ERROR_DETAILS_);
 				}
 				break;
-			case ParserState::HttpVersionNewLine:
+			case request_parser::state_enum::s_http_version_new_line:
 				if (input == '\n')
 				{
-					this->_state = ParserState::HeaderLineStart;
+					this->state = request_parser::state_enum::s_header_line_start;
 				}
 				else
 				{
 					throw ParseError("unable to parse http protocol main data", _ERROR_DETAILS_);
 				}
 				break;
-			case ParserState::HeaderLineStart:
+			case request_parser::state_enum::s_header_line_start:
 				if (input == '\r')
 				{
-					this->_state = ParserState::ExpectingNewline_3;
+					this->state = request_parser::state_enum::s_expecting_new_line_3;
 				}
-				else if (!this->_headers.empty() && (input == ' ' || input == '\t'))
+				else if (!this->headers.empty() && (input == ' ' || input == '\t'))
 				{
-					this->_state = ParserState::HeaderLws;
+					this->state = request_parser::state_enum::s_header_lws;
 				}
-				else if(!isChar(input) || isControl(input) || isSpecial(input))
+				else if(!request_parser::is_char(input) || request_parser::is_control(input) || request_parser::is_special(input))
 				{
 					throw ParseError("unable to parse http request header", _ERROR_DETAILS_);
 				}
@@ -271,33 +273,33 @@ void HttpRequestParser::parseHeaders(const std::string& data)
 					newHeaderName.reserve(16);
 					newHeaderValue.reserve(16);
 					newHeaderName.push_back(input);
-					this->_state = ParserState::HeaderName;
+					this->state = request_parser::state_enum::s_header_name;
 				}
 				break;
-			case ParserState::HeaderLws:
+			case request_parser::state_enum::s_header_lws:
 				if(input == '\r')
 				{
-					this->_state = ParserState::ExpectingNewline_2;
+					this->state = request_parser::state_enum::s_expecting_new_line_2;
 				}
 				else if(input == ' ' || input == '\t')
 				{
 				}
-				else if (isControl(input))
+				else if (request_parser::is_control(input))
 				{
 					throw ParseError("unable to parse http request", _ERROR_DETAILS_);
 				}
 				else
 				{
-					this->_state = HeaderValue;
+					this->state = request_parser::state_enum::s_header_value;
 					newHeaderValue.push_back(input);
 				}
 				break;
-			case ParserState::HeaderName:
+			case request_parser::state_enum::s_header_name:
 				if (input == ':')
 				{
-					this->_state = ParserState::HeaderSpaceBeforeValue;
+					this->state = request_parser::state_enum::s_header_space_before_value;
 				}
-				else if (!isChar(input) || isControl(input) || isSpecial(input))
+				else if (!request_parser::is_char(input) || request_parser::is_control(input) || request_parser::is_special(input))
 				{
 					throw ParseError("unable to parse http request header name", _ERROR_DETAILS_);
 				}
@@ -306,38 +308,38 @@ void HttpRequestParser::parseHeaders(const std::string& data)
 					newHeaderName.push_back(input);
 				}
 				break;
-			case ParserState::HeaderSpaceBeforeValue:
+			case request_parser::state_enum::s_header_space_before_value:
 				if (input == ' ')
 				{
-					this->_state = ParserState::HeaderValue;
+					this->state = request_parser::state_enum::s_header_value;
 				}
 				else
 				{
 					throw ParseError("unable to parse http request header", _ERROR_DETAILS_);
 				}
 				break;
-			case ParserState::HeaderValue:
+			case request_parser::state_enum::s_header_value:
 				if (input == '\r')
 				{
 					if (strcasecmp(newHeaderName.c_str(), "Content-Length") == 0)
 					{
-						this->_contentSize = strtol(newHeaderValue.c_str(), nullptr, 0);
-						this->_content.reserve(this->_contentSize);
+						this->content_size = strtol(newHeaderValue.c_str(), nullptr, 0);
+						this->content.reserve(this->content_size);
 					}
 					else if (strcasecmp(newHeaderName.c_str(), "Transfer-Encoding") == 0)
 					{
 						if (strcasecmp(newHeaderValue.c_str(), "chunked") == 0)
 						{
-							this->_chunked = true;
+							this->chunked = true;
 						}
 					}
 
-					this->_headers[newHeaderName] = newHeaderValue;
+					this->headers[newHeaderName] = newHeaderValue;
 					newHeaderName.clear();
 					newHeaderValue.clear();
-					this->_state = ParserState::ExpectingNewline_2;
+					this->state = request_parser::state_enum::s_expecting_new_line_2;
 				}
-				else if (HttpRequestParser::isControl(input))
+				else if (request_parser::is_control(input))
 				{
 					throw ParseError("unable to parse http request header value", _ERROR_DETAILS_);
 				}
@@ -346,42 +348,42 @@ void HttpRequestParser::parseHeaders(const std::string& data)
 					newHeaderValue.push_back(input);
 				}
 				break;
-			case ParserState::ExpectingNewline_2:
+			case request_parser::state_enum::s_expecting_new_line_2:
 				if (input == '\n')
 				{
-					this->_state = ParserState::HeaderLineStart;
+					this->state = request_parser::state_enum::s_header_line_start;
 				}
 				else
 				{
 					throw ParseError("unable to parse http request", _ERROR_DETAILS_);
 				}
 				break;
-			case ParserState::ExpectingNewline_3:
+			case request_parser::state_enum::s_expecting_new_line_3:
 				connectionIt = std::find_if(
-					this->_headers.begin(),
-					this->_headers.end(),
+					this->headers.begin(),
+					this->headers.end(),
 					[](const std::pair<std::string, std::string>& item) -> bool
 					{
 						return strcasecmp(item.first.c_str(), "Connection") == 0;
 					}
 				);
-				if (connectionIt != this->_headers.end())
+				if (connectionIt != this->headers.end())
 				{
-					this->_keepAlive = strcasecmp((*connectionIt).second.c_str(), "Keep-Alive") == 0;
+					this->keep_alive = strcasecmp((*connectionIt).second.c_str(), "Keep-Alive") == 0;
 				}
 				else
 				{
-					if (this->_majorV > 1 || (this->_majorV == 1 && this->_minorV == 1))
+					if (this->major_v > 1 || (this->major_v == 1 && this->minor_v == 1))
 					{
-						this->_keepAlive = true;
+						this->keep_alive = true;
 					}
 				}
 
-				if (this->_chunked)
+				if (this->chunked)
 				{
-					this->_state = ParserState::ChunkSize;
+					this->state = request_parser::state_enum::s_chunk_size;
 				}
-				else if (this->_contentSize == 0)
+				else if (this->content_size == 0)
 				{
 					if (input != '\n')
 					{
@@ -390,24 +392,24 @@ void HttpRequestParser::parseHeaders(const std::string& data)
 				}
 				else
 				{
-					auto contentType = this->_headers["Content-Type"];
+					auto contentType = this->headers["Content-Type"];
 					if (contentType.find("multipart/form-data") != std::string::npos)
 					{
-						this->_contentType = ContentType::MultipartFormData;
+						this->content_type = request_parser::content_type_enum::ct_multipart_form_data;
 					}
 					else if (contentType.find("application/json") != std::string::npos)
 					{
-						this->_contentType = ContentType::ApplicationJson;
+						this->content_type = request_parser::content_type_enum::ct_application_json;
 					}
 					else if (contentType.find("application/x-www-form-urlencoded") != std::string::npos)
 					{
-						this->_contentType = ContentType::ApplicationXWwwFormUrlencoded;
+						this->content_type = request_parser::content_type_enum::ct_application_x_www_form_url_encoded;
 					}
 					else
 					{
-						this->_contentType = ContentType::Other;
+						this->content_type = request_parser::content_type_enum::ct_other;
 					}
-					this->_state = ParserState::RequestBody;
+					this->state = request_parser::state_enum::s_request_body;
 				}
 				return;
 			default:
@@ -418,39 +420,39 @@ void HttpRequestParser::parseHeaders(const std::string& data)
 	throw ParseError("unable to parse http request", _ERROR_DETAILS_);
 }
 
-void HttpRequestParser::parseBody(const std::string& data, const std::string& mediaRoot)
+void request_parser::parse_body(const std::string& data, const std::string& media_root)
 {
 	query_parser qp;
-	multipart_parser mp(mediaRoot);
+	multipart_parser mp(media_root);
 	if (data.empty())
 	{
-		qp.parse(this->_query);
-		this->_setParameters(
+		qp.parse(this->query);
+		this->set_parameters(
 			new HttpRequest::Parameters<std::string, std::string>(*qp.dict, *qp.multi_dict)
 		);
 	}
 	else
 	{
-		this->_parseBody(data);
-		if (!this->_content.empty())
+		this->parse_body(data);
+		if (!this->content.empty())
 		{
-			switch (this->_contentType)
+			switch (this->content_type)
 			{
-				case ContentType::ApplicationXWwwFormUrlencoded:
-					qp.parse(this->_content);
-					this->_setParameters(
+				case request_parser::content_type_enum::ct_application_x_www_form_url_encoded:
+					qp.parse(this->content);
+					this->set_parameters(
 						new HttpRequest::Parameters<std::string, std::string>(*qp.dict, *qp.multi_dict)
 					);
 					break;
-				case ContentType::ApplicationJson:
+				case request_parser::content_type_enum::ct_application_json:
 					// TODO: parse application/json data
 					break;
-				case ContentType::MultipartFormData:
-					mp.parse(this->_headers["Content-Type"], this->_content);
-					this->_postParameters = mp.get_post_params();
-					this->_filesParameters = mp.get_files_params();
+				case request_parser::content_type_enum::ct_multipart_form_data:
+					mp.parse(this->headers["Content-Type"], this->content);
+					this->post_parameters = mp.get_post_params();
+					this->files_parameters = mp.get_files_params();
 					break;
-				case ContentType::Other:
+				case request_parser::content_type_enum::ct_other:
 					break;
 				default:
 					throw ParseError("Unknown content type", _ERROR_DETAILS_);
@@ -459,12 +461,11 @@ void HttpRequestParser::parseBody(const std::string& data, const std::string& me
 	}
 }
 
-// Private methods.
-void HttpRequestParser::_parseHttpWord(char input, char expectedInput, HttpRequestParser::ParserState newState)
+void request_parser::parse_http_word(char input, char expected, request_parser::state_enum new_state)
 {
-	if (input == expectedInput)
+	if (input == expected)
 	{
-		this->_state = newState;
+		this->state = new_state;
 	}
 	else
 	{
@@ -472,26 +473,26 @@ void HttpRequestParser::_parseHttpWord(char input, char expectedInput, HttpReque
 	}
 }
 
-void HttpRequestParser::_setParameters(HttpRequest::Parameters<std::string, std::string>* params)
+void request_parser::set_parameters(HttpRequest::Parameters<std::string, std::string>* params)
 {
-	if (this->_method == "GET")
+	if (this->method == "GET")
 	{
-		this->_getParameters = params;
+		this->get_parameters = params;
 	}
-	else if (this->_method == "POST")
+	else if (this->method == "POST")
 	{
-		this->_postParameters = params;
+		this->post_parameters = params;
 	}
 }
 
-void HttpRequestParser::_parseBody(const std::string& data)
+void request_parser::parse_body(const std::string& data)
 {
-	if (this->_state == ParserState::RequestBody)
+	if (this->state == request_parser::state_enum::s_request_body)
 	{
 		// size of '\r\n'
 		unsigned endingSize = 2;
-		this->_content.append(data.substr(0, data.size() - endingSize));
-		if (this->_content.size() == this->_contentSize - endingSize)
+		this->content.append(data.substr(0, data.size() - endingSize));
+		if (this->content.size() == this->content_size - endingSize)
 		{
 			return;
 		}
@@ -499,72 +500,72 @@ void HttpRequestParser::_parseBody(const std::string& data)
 
 	for (const char& input : data)
 	{
-		switch (this->_state)
+		switch (this->state)
 		{
-			case ParserState::ChunkSize:
+			case request_parser::state_enum::s_chunk_size:
 				if (isalnum(input))
 				{
-					this->_chunkSizeStr.push_back(input);
+					this->chunk_size_str.push_back(input);
 				}
 				else if (input == ';')
 				{
-					this->_state = ParserState::ChunkExtensionName;
+					this->state = request_parser::state_enum::s_chunk_extension_name;
 				}
 				else if (input == '\r')
 				{
-					this->_state = ParserState::ChunkSizeNewLine;
+					this->state = request_parser::state_enum::s_chunk_size_new_line;
 				}
 				else
 				{
 					throw ParseError("unable to parse http request", _ERROR_DETAILS_);
 				}
 				break;
-			case ParserState::ChunkExtensionName:
+			case request_parser::state_enum::s_chunk_extension_name:
 				if (isalnum(input) || input == ' ')
 				{
 					// skip
 				}
 				else if (input == '=')
 				{
-					this->_state = ParserState::ChunkExtensionValue;
+					this->state = request_parser::state_enum::s_chunk_extension_value;
 				}
 				else if (input == '\r')
 				{
-					this->_state = ParserState::ChunkSizeNewLine;
+					this->state = request_parser::state_enum::s_chunk_size_new_line;
 				}
 				else
 				{
 					throw ParseError("unable to parse http request", _ERROR_DETAILS_);
 				}
 				break;
-			case ParserState::ChunkExtensionValue:
-				if (isalnum(input) || input == ' ')
+			case request_parser::state_enum::s_chunk_extension_value:
+				if (std::isalnum(input) || input == ' ')
 				{
 					// skip
 				}
 				else if (input == '\r')
 				{
-					this->_state = ParserState::ChunkSizeNewLine;
+					this->state = request_parser::state_enum::s_chunk_size_new_line;
 				}
 				else
 				{
 					throw ParseError("unable to parse http request", _ERROR_DETAILS_);
 				}
 				break;
-			case ParserState::ChunkSizeNewLine:
+			case request_parser::state_enum::s_chunk_size_new_line:
 				if (input == '\n')
 				{
-					this->_chunkSize = strtol(this->_chunkSizeStr.c_str(), nullptr, 16);
-					this->_chunkSizeStr.clear();
-					this->_content.reserve(this->_content.size() + this->_chunkSize);
+					this->chunk_size = strtol(this->chunk_size_str.c_str(), nullptr, 16);
+					this->chunk_size_str.clear();
+					this->content.reserve(this->content.size() + this->chunk_size);
 
-					if (this->_chunkSize == 0)
+					if (this->chunk_size == 0)
 					{
-						this->_state = ParserState::ChunkSizeNewLine_2;
+						this->state = request_parser::state_enum::s_chunk_size_new_line_2;
 					}
 					else
 					{
-						this->_state = ParserState::ChunkData;
+						this->state = request_parser::state_enum::s_chunk_data;
 					}
 				}
 				else
@@ -572,21 +573,21 @@ void HttpRequestParser::_parseBody(const std::string& data)
 					throw ParseError("unable to parse http request", _ERROR_DETAILS_);
 				}
 				break;
-			case ParserState::ChunkSizeNewLine_2:
+			case request_parser::state_enum::s_chunk_size_new_line_2:
 				if (input == '\r')
 				{
-					this->_state = ParserState::ChunkSizeNewLine_3;
+					this->state = request_parser::state_enum::s_chunk_size_new_line_3;
 				}
 				else if( isalpha(input) )
 				{
-					this->_state = ParserState::ChunkTrailerName;
+					this->state = request_parser::state_enum::s_chunk_trailer_name;
 				}
 				else
 				{
 					throw ParseError("unable to parse http request", _ERROR_DETAILS_);
 				}
 				break;
-			case ParserState::ChunkSizeNewLine_3:
+			case request_parser::state_enum::s_chunk_size_new_line_3:
 				if (input == '\n')
 				{
 					return;
@@ -595,56 +596,55 @@ void HttpRequestParser::_parseBody(const std::string& data)
 				{
 					throw ParseError("unable to parse http request", _ERROR_DETAILS_);
 				}
-			case ParserState::ChunkTrailerName:
-				if (isalnum(input))
+			case request_parser::state_enum::s_chunk_trailer_name:
+				if (std::isalnum(input))
 				{
 					// skip
 				}
 				else if (input == ':')
 				{
-					this->_state = ParserState::ChunkTrailerValue;
+					this->state = request_parser::state_enum::s_chunk_trailer_value;
 				}
 				else
 				{
 					throw ParseError("unable to parse http request", _ERROR_DETAILS_);
 				}
 				break;
-			case ParserState::ChunkTrailerValue:
-				if (isalnum(input) || input == ' ')
+			case request_parser::state_enum::s_chunk_trailer_value:
+				if (std::isalnum(input) || input == ' ')
 				{
 					// skip
 				}
 				else if( input == '\r' )
 				{
-					this->_state = ParserState::ChunkSizeNewLine;
+					this->state = request_parser::state_enum::s_chunk_size_new_line;
 				}
 				else
 				{
 					throw ParseError("unable to parse http request", _ERROR_DETAILS_);
 				}
 				break;
-			case ParserState::ChunkData:
-				this->_content.push_back(input);
-
-				if (--this->_chunkSize == 0)
+			case request_parser::state_enum::s_chunk_data:
+				this->content.push_back(input);
+				if (--this->chunk_size == 0)
 				{
-					this->_state = ParserState::ChunkDataNewLine_1;
+					this->state = request_parser::state_enum::s_chunk_data_new_line_1;
 				}
 				break;
-			case ParserState::ChunkDataNewLine_1:
+			case request_parser::state_enum::s_chunk_data_new_line_1:
 				if (input == '\r')
 				{
-					this->_state = ParserState::ChunkDataNewLine_2;
+					this->state = request_parser::state_enum::s_chunk_data_new_line_2;
 				}
 				else
 				{
 					throw ParseError("unable to parse http request", _ERROR_DETAILS_);
 				}
 				break;
-			case ParserState::ChunkDataNewLine_2:
+			case request_parser::state_enum::s_chunk_data_new_line_2:
 				if (input == '\n')
 				{
-					this->_state = ParserState::ChunkSize;
+					this->state = request_parser::state_enum::s_chunk_size;
 				}
 				else
 				{
@@ -659,18 +659,17 @@ void HttpRequestParser::_parseBody(const std::string& data)
 	throw ParseError("unable to parse http request", _ERROR_DETAILS_);
 }
 
-// Private static functions.
-bool HttpRequestParser::isChar(uint c)
+bool request_parser::is_char(uint c)
 {
 	return c >= 0 && c <= 127;
 }
 
-bool HttpRequestParser::isControl(uint c)
+bool request_parser::is_control(uint c)
 {
 	return (c >= 0 && c <= 31) || (c == 127);
 }
 
-bool HttpRequestParser::isSpecial(uint c)
+bool request_parser::is_special(uint c)
 {
 	switch (c)
 	{
@@ -699,7 +698,7 @@ bool HttpRequestParser::isSpecial(uint c)
 	}
 }
 
-bool HttpRequestParser::isDigit(uint c)
+bool request_parser::is_digit(uint c)
 {
 	return c >= '0' && c <= '9';
 }

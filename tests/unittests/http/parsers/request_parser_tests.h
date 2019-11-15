@@ -27,128 +27,80 @@
 #include "../../../../src/http/parsers/request_parser.h"
 
 
-__INTERNAL_BEGIN__
+__UNIT_TESTS_BEGIN__
 
-class HttpRequestParserTestCase : public ::testing::Test, HttpRequestParser
+TEST(RequestParserTestCase, IsCharTest)
 {
-protected:
-	static void isCharTest()
+	for (size_t i = 0; i < 128; i++)
 	{
-		for (size_t i = 0; i < 128; i++)
-		{
-			ASSERT_TRUE(HttpRequestParser::isChar(i));
-		}
+		ASSERT_TRUE(wasp::internal::request_parser::is_char(i));
+	}
+}
+
+TEST(RequestParserTestCase, IsNotCharTest)
+{
+	ASSERT_FALSE(wasp::internal::request_parser::is_char(-1));
+	ASSERT_FALSE(wasp::internal::request_parser::is_char(128));
+}
+
+TEST(RequestParserTestCase, IsControlTest)
+{
+	for (size_t i = 0; i < 32; i++)
+	{
+		ASSERT_TRUE(wasp::internal::request_parser::is_control(i));
 	}
 
-	static void isNotCharTest()
+	ASSERT_TRUE(wasp::internal::request_parser::is_control(127));
+}
+
+TEST(RequestParserTestCase, IsNotControlTest)
+{
+	ASSERT_FALSE(wasp::internal::request_parser::is_control(-1));
+
+	for (size_t i = 32; i < 127; i++)
 	{
-		ASSERT_FALSE(HttpRequestParser::isChar(-1));
-		ASSERT_FALSE(HttpRequestParser::isChar(128));
+		ASSERT_FALSE(wasp::internal::request_parser::is_control(i));
 	}
 
-	static void isControlTest()
-	{
-		for (size_t i = 0; i < 32; i++)
-		{
-			ASSERT_TRUE(HttpRequestParser::isControl(i));
-		}
-		ASSERT_TRUE(HttpRequestParser::isControl(127));
-	}
+	ASSERT_FALSE(wasp::internal::request_parser::is_control(128));
+}
 
-	static void isNotControlTest()
-	{
-		ASSERT_FALSE(HttpRequestParser::isControl(-1));
-		for (size_t i = 32; i < 127; i++)
-		{
-			ASSERT_FALSE(HttpRequestParser::isControl(i));
-		}
-		ASSERT_FALSE(HttpRequestParser::isControl(128));
-	}
-
-	static void isSpecialTest()
-	{
-		char specials[] = {
+TEST(RequestParserTestCase, IsSpecialTest)
+{
+	char specials[] = {
 			'(', ')', '<', '>', '@', ',', ';', ':', '"', '/', '\\', '[', ']', '?', '=', '{', '}', '\t'
-		};
-		for (auto special : specials)
-		{
-			ASSERT_TRUE(HttpRequestParser::isSpecial(special));
-		}
-	}
-
-	static void isNotSpecialTest()
+	};
+	for (auto special : specials)
 	{
-		ASSERT_FALSE(HttpRequestParser::isSpecial('f'));
-		ASSERT_FALSE(HttpRequestParser::isSpecial('0'));
-		ASSERT_FALSE(HttpRequestParser::isSpecial('\n'));
+		ASSERT_TRUE(wasp::internal::request_parser::is_special(special));
 	}
+}
 
-	static void isDigitTest()
+TEST(RequestParserTestCase, IsNotSpecialTest)
+{
+	ASSERT_FALSE(wasp::internal::request_parser::is_special('f'));
+	ASSERT_FALSE(wasp::internal::request_parser::is_special('0'));
+	ASSERT_FALSE(wasp::internal::request_parser::is_special('\n'));
+}
+
+TEST(RequestParserTestCase, IsDigitTest)
+{
+	for (char i = '0'; i <= '9'; i++)
 	{
-		for (char i = '0'; i <= '9'; i++)
-		{
-			ASSERT_TRUE(HttpRequestParser::isDigit(i));
-		}
+		ASSERT_TRUE(wasp::internal::request_parser::is_digit(i));
 	}
-
-	static void isNotDigitTest()
-	{
-		ASSERT_FALSE(HttpRequestParser::isDigit('h'));
-		ASSERT_FALSE(HttpRequestParser::isDigit('e'));
-		ASSERT_FALSE(HttpRequestParser::isDigit('l'));
-		ASSERT_FALSE(HttpRequestParser::isDigit('l'));
-		ASSERT_FALSE(HttpRequestParser::isDigit('o'));
-	}
-
-private:
-	template <typename _Map>
-	bool mapsAreEqual(const _Map& lhs, const _Map& rhs)
-	{
-		return lhs.size() == rhs.size() && std::equal(lhs.begin(), lhs.end(), rhs.begin());
-	}
-};
-
-TEST_F(HttpRequestParserTestCase, IsCharTest)
-{
-	HttpRequestParserTestCase::isCharTest();
 }
 
-TEST_F(HttpRequestParserTestCase, IsNotCharTest)
+TEST(RequestParserTestCase, IsNotDigitTest)
 {
-	HttpRequestParserTestCase::isNotCharTest();
+	ASSERT_FALSE(wasp::internal::request_parser::is_digit('h'));
+	ASSERT_FALSE(wasp::internal::request_parser::is_digit('e'));
+	ASSERT_FALSE(wasp::internal::request_parser::is_digit('l'));
+	ASSERT_FALSE(wasp::internal::request_parser::is_digit('l'));
+	ASSERT_FALSE(wasp::internal::request_parser::is_digit('o'));
 }
 
-TEST_F(HttpRequestParserTestCase, IsControlTest)
-{
-	HttpRequestParserTestCase::isControlTest();
-}
-
-TEST_F(HttpRequestParserTestCase, IsNotControlTest)
-{
-	HttpRequestParserTestCase::isNotControlTest();
-}
-
-TEST_F(HttpRequestParserTestCase, IsSpecialTest)
-{
-	HttpRequestParserTestCase::isSpecialTest();
-}
-
-TEST_F(HttpRequestParserTestCase, IsNotSpecialTest)
-{
-	HttpRequestParserTestCase::isNotSpecialTest();
-}
-
-TEST_F(HttpRequestParserTestCase, IsDigitTest)
-{
-	HttpRequestParserTestCase::isDigitTest();
-}
-
-TEST_F(HttpRequestParserTestCase, IsNotDigitTest)
-{
-	HttpRequestParserTestCase::isNotDigitTest();
-}
-
-__INTERNAL_END__
+__UNIT_TESTS_END__
 
 
 #endif // WASP_HTTP_PARSERS_REQUEST_PARSER_TESTS_H
