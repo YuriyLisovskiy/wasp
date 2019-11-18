@@ -489,174 +489,177 @@ void request_parser::parse_body(const std::string& data)
 {
 	if (this->state == request_parser::state_enum::s_request_body)
 	{
-		// size of '\r\n'
-		unsigned endingSize = 2;
-		this->content.append(data.substr(0, data.size() - endingSize));
-		if (this->content.size() == this->content_size - endingSize)
-		{
-			return;
-		}
+		this->content = data;
+		size_t i = data.size();
+	//	this->content = str::rtrim(str::rtrim(data, '\n'), '\r');
+	//	size_t line_break_len = 2;
+	//	if (this->content.size() == this->content_size - line_break_len)
+	//	{
+	//		this->content_size -= line_break_len;
+	//	}
 	}
-
-	for (const char& input : data)
+	else
 	{
-		switch (this->state)
+		for (const char& input : data)
 		{
-			case request_parser::state_enum::s_chunk_size:
-				if (isalnum(input))
-				{
-					this->chunk_size_str.push_back(input);
-				}
-				else if (input == ';')
-				{
-					this->state = request_parser::state_enum::s_chunk_extension_name;
-				}
-				else if (input == '\r')
-				{
-					this->state = request_parser::state_enum::s_chunk_size_new_line;
-				}
-				else
-				{
-					throw ParseError("unable to parse http request", _ERROR_DETAILS_);
-				}
-				break;
-			case request_parser::state_enum::s_chunk_extension_name:
-				if (isalnum(input) || input == ' ')
-				{
-					// skip
-				}
-				else if (input == '=')
-				{
-					this->state = request_parser::state_enum::s_chunk_extension_value;
-				}
-				else if (input == '\r')
-				{
-					this->state = request_parser::state_enum::s_chunk_size_new_line;
-				}
-				else
-				{
-					throw ParseError("unable to parse http request", _ERROR_DETAILS_);
-				}
-				break;
-			case request_parser::state_enum::s_chunk_extension_value:
-				if (std::isalnum(input) || input == ' ')
-				{
-					// skip
-				}
-				else if (input == '\r')
-				{
-					this->state = request_parser::state_enum::s_chunk_size_new_line;
-				}
-				else
-				{
-					throw ParseError("unable to parse http request", _ERROR_DETAILS_);
-				}
-				break;
-			case request_parser::state_enum::s_chunk_size_new_line:
-				if (input == '\n')
-				{
-					this->chunk_size = strtol(this->chunk_size_str.c_str(), nullptr, 16);
-					this->chunk_size_str.clear();
-					this->content.reserve(this->content.size() + this->chunk_size);
-
-					if (this->chunk_size == 0)
+			switch (this->state)
+			{
+				case request_parser::state_enum::s_chunk_size:
+					if (isalnum(input))
 					{
-						this->state = request_parser::state_enum::s_chunk_size_new_line_2;
+						this->chunk_size_str.push_back(input);
+					}
+					else if (input == ';')
+					{
+						this->state = request_parser::state_enum::s_chunk_extension_name;
+					}
+					else if (input == '\r')
+					{
+						this->state = request_parser::state_enum::s_chunk_size_new_line;
 					}
 					else
 					{
-						this->state = request_parser::state_enum::s_chunk_data;
+						throw ParseError("unable to parse http request", _ERROR_DETAILS_);
 					}
-				}
-				else
-				{
-					throw ParseError("unable to parse http request", _ERROR_DETAILS_);
-				}
-				break;
-			case request_parser::state_enum::s_chunk_size_new_line_2:
-				if (input == '\r')
-				{
-					this->state = request_parser::state_enum::s_chunk_size_new_line_3;
-				}
-				else if( isalpha(input) )
-				{
-					this->state = request_parser::state_enum::s_chunk_trailer_name;
-				}
-				else
-				{
-					throw ParseError("unable to parse http request", _ERROR_DETAILS_);
-				}
-				break;
-			case request_parser::state_enum::s_chunk_size_new_line_3:
-				if (input == '\n')
-				{
-					return;
-				}
-				else
-				{
-					throw ParseError("unable to parse http request", _ERROR_DETAILS_);
-				}
-			case request_parser::state_enum::s_chunk_trailer_name:
-				if (std::isalnum(input))
-				{
-					// skip
-				}
-				else if (input == ':')
-				{
-					this->state = request_parser::state_enum::s_chunk_trailer_value;
-				}
-				else
-				{
-					throw ParseError("unable to parse http request", _ERROR_DETAILS_);
-				}
-				break;
-			case request_parser::state_enum::s_chunk_trailer_value:
-				if (std::isalnum(input) || input == ' ')
-				{
-					// skip
-				}
-				else if( input == '\r' )
-				{
-					this->state = request_parser::state_enum::s_chunk_size_new_line;
-				}
-				else
-				{
-					throw ParseError("unable to parse http request", _ERROR_DETAILS_);
-				}
-				break;
-			case request_parser::state_enum::s_chunk_data:
-				this->content.push_back(input);
-				if (--this->chunk_size == 0)
-				{
-					this->state = request_parser::state_enum::s_chunk_data_new_line_1;
-				}
-				break;
-			case request_parser::state_enum::s_chunk_data_new_line_1:
-				if (input == '\r')
-				{
-					this->state = request_parser::state_enum::s_chunk_data_new_line_2;
-				}
-				else
-				{
-					throw ParseError("unable to parse http request", _ERROR_DETAILS_);
-				}
-				break;
-			case request_parser::state_enum::s_chunk_data_new_line_2:
-				if (input == '\n')
-				{
-					this->state = request_parser::state_enum::s_chunk_size;
-				}
-				else
-				{
-					throw ParseError("unable to parse http request", _ERROR_DETAILS_);
-				}
-				break;
-			default:
-				throw ParseError("unable to parse http request", _ERROR_DETAILS_);
-		}
-	}
+					break;
+				case request_parser::state_enum::s_chunk_extension_name:
+					if (isalnum(input) || input == ' ')
+					{
+						// skip
+					}
+					else if (input == '=')
+					{
+						this->state = request_parser::state_enum::s_chunk_extension_value;
+					}
+					else if (input == '\r')
+					{
+						this->state = request_parser::state_enum::s_chunk_size_new_line;
+					}
+					else
+					{
+						throw ParseError("unable to parse http request", _ERROR_DETAILS_);
+					}
+					break;
+				case request_parser::state_enum::s_chunk_extension_value:
+					if (std::isalnum(input) || input == ' ')
+					{
+						// skip
+					}
+					else if (input == '\r')
+					{
+						this->state = request_parser::state_enum::s_chunk_size_new_line;
+					}
+					else
+					{
+						throw ParseError("unable to parse http request", _ERROR_DETAILS_);
+					}
+					break;
+				case request_parser::state_enum::s_chunk_size_new_line:
+					if (input == '\n')
+					{
+						this->chunk_size = strtol(this->chunk_size_str.c_str(), nullptr, 16);
+						this->chunk_size_str.clear();
+						this->content.reserve(this->content.size() + this->chunk_size);
 
-	throw ParseError("unable to parse http request", _ERROR_DETAILS_);
+						if (this->chunk_size == 0)
+						{
+							this->state = request_parser::state_enum::s_chunk_size_new_line_2;
+						}
+						else
+						{
+							this->state = request_parser::state_enum::s_chunk_data;
+						}
+					}
+					else
+					{
+						throw ParseError("unable to parse http request", _ERROR_DETAILS_);
+					}
+					break;
+				case request_parser::state_enum::s_chunk_size_new_line_2:
+					if (input == '\r')
+					{
+						this->state = request_parser::state_enum::s_chunk_size_new_line_3;
+					}
+					else if( isalpha(input) )
+					{
+						this->state = request_parser::state_enum::s_chunk_trailer_name;
+					}
+					else
+					{
+						throw ParseError("unable to parse http request", _ERROR_DETAILS_);
+					}
+					break;
+				case request_parser::state_enum::s_chunk_size_new_line_3:
+					if (input == '\n')
+					{
+						return;
+					}
+					else
+					{
+						throw ParseError("unable to parse http request", _ERROR_DETAILS_);
+					}
+				case request_parser::state_enum::s_chunk_trailer_name:
+					if (std::isalnum(input))
+					{
+						// skip
+					}
+					else if (input == ':')
+					{
+						this->state = request_parser::state_enum::s_chunk_trailer_value;
+					}
+					else
+					{
+						throw ParseError("unable to parse http request", _ERROR_DETAILS_);
+					}
+					break;
+				case request_parser::state_enum::s_chunk_trailer_value:
+					if (std::isalnum(input) || input == ' ')
+					{
+						// skip
+					}
+					else if( input == '\r' )
+					{
+						this->state = request_parser::state_enum::s_chunk_size_new_line;
+					}
+					else
+					{
+						throw ParseError("unable to parse http request", _ERROR_DETAILS_);
+					}
+					break;
+				case request_parser::state_enum::s_chunk_data:
+					this->content.push_back(input);
+					if (--this->chunk_size == 0)
+					{
+						this->state = request_parser::state_enum::s_chunk_data_new_line_1;
+					}
+					break;
+				case request_parser::state_enum::s_chunk_data_new_line_1:
+					if (input == '\r')
+					{
+						this->state = request_parser::state_enum::s_chunk_data_new_line_2;
+					}
+					else
+					{
+						throw ParseError("unable to parse http request", _ERROR_DETAILS_);
+					}
+					break;
+				case request_parser::state_enum::s_chunk_data_new_line_2:
+					if (input == '\n')
+					{
+						this->state = request_parser::state_enum::s_chunk_size;
+					}
+					else
+					{
+						throw ParseError("unable to parse http request", _ERROR_DETAILS_);
+					}
+					break;
+				default:
+					throw ParseError("unable to parse http request", _ERROR_DETAILS_);
+			}
+		}
+
+		throw ParseError("unable to parse http request", _ERROR_DETAILS_);
+	}
 }
 
 bool request_parser::is_char(uint c)

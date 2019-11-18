@@ -53,7 +53,7 @@ void handler(wasp::HttpRequest& request, const wasp::internal::socket_t& client)
 //	}
 
 
-//	auto response = new wasp::FileResponse("/home/yuriylisovskiy/Desktop/file.json");
+//	auto response = new wasp::FileResponse("/home/user/Desktop/file.json");
 //	HttpServer::send(response, client);
 //	delete response;
 
@@ -85,9 +85,9 @@ int main()
 	{
 		HttpServer::Context ctx{};
 		ctx.handler = handler;
-		ctx.port = 5000;
+		ctx.port = 8000;
 		ctx.maxBodySize = 33300000;
-		ctx.mediaRoot = "/home/yuriylisovskiy/Desktop/media/";
+		ctx.mediaRoot = "/home/user/Desktop/media/";
 
 		HttpServer server(ctx);
 

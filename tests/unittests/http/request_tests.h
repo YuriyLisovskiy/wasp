@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WASP_UNIT_TESTS_HTTP_COOKIE_TESTS_H
-#define WASP_UNIT_TESTS_HTTP_COOKIE_TESTS_H
+#ifndef WASP_UNIT_TESTS_HTTP_REQUEST_TESTS_H
+#define WASP_UNIT_TESTS_HTTP_REQUEST_TESTS_H
 
 #include <gtest/gtest.h>
 
@@ -34,4 +34,4 @@ TEST(RequestTestCase, ConstructRequestTest)
 __UNIT_TESTS_END__
 
 
-#endif // WASP_UNIT_TESTS_HTTP_COOKIE_TESTS_H
+#endif // WASP_UNIT_TESTS_HTTP_REQUEST_TESTS_H

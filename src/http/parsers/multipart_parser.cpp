@@ -355,13 +355,8 @@ void multipart_parser::parse(const std::string& content_type, const std::string&
 				}
 				break;
 			case multipart_parser::state::s_content:
-				if (content_idx + 1 >= end_pos)
+				if (content_idx + 1 > end_pos)
 				{
-					if (content_idx + 1 == end_pos)
-					{
-						input = *begin++;
-					}
-
 					if (input != '\r')
 					{
 						throw MultiPartParserError("Unable to parse request body: invalid content structure", _ERROR_DETAILS_);

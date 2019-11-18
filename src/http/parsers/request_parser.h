@@ -35,6 +35,7 @@
 #include "multipart_parser.h"
 #include "query_parser.h"
 #include "cookie_parser.h"
+#include "../../utils/str.h"
 
 
 __INTERNAL_BEGIN__
