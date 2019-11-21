@@ -15,13 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WASP_UNIT_TESTS_HTTP_PARSERS_INCLUDE_H
-#define WASP_UNIT_TESTS_HTTP_PARSERS_INCLUDE_H
+#ifndef WASP_UNIT_TESTS_HTTP_PARSERS_MULTIPART_PARSER_TESTS_H
+#define WASP_UNIT_TESTS_HTTP_PARSERS_MULTIPART_PARSER_TESTS_H
 
-#include "./cookie_parser_tests.h"
-#include "./multipart_parser_tests.h"
-#include "./query_parser_tests.h"
-#include "./request_parser_tests.h"
-#include "./url_parser_tests.h"
+#include <gtest/gtest.h>
 
-#endif // WASP_UNIT_TESTS_HTTP_PARSERS_INCLUDE_H
+#include "../../globals.h"
+
+
+__UNIT_TESTS_BEGIN__
+
+// TODO: write tests
+
+__UNIT_TESTS_END__
+
+
+#endif // WASP_UNIT_TESTS_HTTP_PARSERS_MULTIPART_PARSER_TESTS_H

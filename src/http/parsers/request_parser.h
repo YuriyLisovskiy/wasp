@@ -15,9 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * http_parser definition.
- * TODO: write docs.
+/**
+ * request_parser.h
+ * Purpose: Parses an http request from given stream.
+ *
+ * @author Yuriy Lisovskiy
  */
 
 #ifndef WASP_HTTP_PARSERS_REQUEST_PARSER_H
@@ -114,32 +116,73 @@ struct request_parser final
 
 	} state{};
 
+	/// Parses 'HTTP' word from http request's head line.
+	///
+	/// @param input: one of 'HTTP' letters from input stream.
+	/// @param expected: an expected letter of 'HTTP' word.
+	/// @param new_state: new parser's state will be set if 'input' equals 'expected'.
 	void parse_http_word(char input, char expected, request_parser::state_enum new_state);
 
-	// May be overloaded for custom parser which is inherited from HttpRequestParser
-	virtual void set_parameters(HttpRequest::Parameters<std::string, std::string>* params);
+	/// Sets parameters according to http request method.
+	///
+	/// @param params: parsed get/post parameters.
+	void set_parameters(HttpRequest::Parameters<std::string, std::string>* params);
 
-	void parse_body(const std::string& data);
+	/// Parses chunks from http request body if request is chunked.
+	///
+	/// @param data: chunked http request body.
+	void parse_chunks(const std::string& data);
 
-	// Helpers
-	// Check if a byte is an HTTP character.
+	/// Checks if a byte is an HTTP character.
+	///
+	/// @param c: a byte of an input stream of HTTP request.
+	/// @return True if checking is passed, otherwise returns false.
 	static bool is_char(uint c);
 
-	// Check if a byte is an HTTP control character.
+	/// Checks if a byte is an HTTP control character.
+	///
+	/// @param c: a byte of an input stream of HTTP request.
+	/// @return True if checking is passed, otherwise returns false.
 	static bool is_control(uint c);
 
-	// Check if a byte is defined as an HTTP special character.
+	/// Checks if a byte is defined as an HTTP special character.
+	///
+	/// @param c: a byte of an input stream of HTTP request.
+	/// @return True if checking is passed, otherwise returns false.
 	static bool is_special(uint c);
 
-	// Check if a byte is a digit.
+	/// Checks if a byte is a digit.
+	///
+	/// @param c: a byte of an input stream of HTTP request.
+	/// @return True if checking is passed, otherwise returns false.
 	static bool is_digit(uint c);
 
+	/// Default constructor.
 	request_parser() = default;
+
+	/// Deletes struct's fields which are pointers.
 	~request_parser();
 
+	/// Builds an http request from parsed data.
+	///
+	/// @return HttpRequest object built from http stream.
 	wasp::HttpRequest build_request();
+
+	/// Creates Dict object from headers' map.
+	///
+	/// @return Dict which contains http request headers.
 	Dict<std::string, std::string> get_headers();
+
+	/// Parses http request body from given stream.
+	///
+	/// @param data: http request body as std::string.
+	/// @param media_root: path to media folder, where files will be saved;
+	///	if this parameter is empty-string, files will not be saved.
 	void parse_body(const std::string& data, const std::string& media_root);
+
+	/// Parses http request headers from given stream.
+	///
+	/// @param data: http request headers as std::string.
 	void parse_headers(const std::string& data);
 };
 
