@@ -17,7 +17,7 @@
 
 /**
  * request_parser.h
- * Purpose: Parses an http request from given stream.
+ * Purpose: parses an http request from given stream.
  *
  * @author Yuriy Lisovskiy
  */
@@ -26,42 +26,72 @@
 #define WASP_HTTP_PARSERS_REQUEST_PARSER_H
 
 #include <algorithm>
-#include <cstdlib>
-#include <iostream>
+#include <cstring>
 #include <map>
 #include <string>
-#include <strings.h>
 
 #include "../../globals.h"
 #include "../request.h"
 #include "multipart_parser.h"
 #include "query_parser.h"
-#include "cookie_parser.h"
 #include "../../utils/str.h"
 
 
 __INTERNAL_BEGIN__
 
+/// Http request parser structure.
 struct request_parser final
 {
+	/// Major part of http protocol version.
 	size_t major_v{};
+
+	/// Minor part of http protocol version.
 	size_t minor_v{};
+
+	/// Request's path.
 	std::string path;
+
+	/// Contains request's query.
+	/// If field is empty-string, request has not query.
 	std::string query;
+
+	/// Hold http request's method type.
 	std::string method;
+
+	/// Indicates whether request's connection is keep alive or not.
 	bool keep_alive{};
+
+	/// Contains body of http request.
 	std::string content;
+
+	/// Accumulates request's headers.
 	std::map<std::string, std::string> headers;
+
+	/// Contains get request's parameters.
 	HttpRequest::Parameters<std::string, std::string>* get_parameters = nullptr;
+
+	/// Contains post request's parameters.
 	HttpRequest::Parameters<std::string, std::string>* post_parameters = nullptr;
+
+	/// Contains request's files when request was sent as application/form-data.
 	HttpRequest::Parameters<std::string, UploadedFile>* files_parameters = nullptr;
 
+	/// Contains the size of request's content.
 	unsigned long long content_size{};
+
+	/// Contains the size of request's chunk as std::string.
+	/// Used only for chunked requests.
 	std::string chunk_size_str;
+
+	/// Contains the size of request's chunk.
+	/// Used only for chunked requests.
 	unsigned long long chunk_size{};
+
+	/// Indicates whether request is chunked or not.
 	bool chunked{};
 
-	// Used only for POST, PUT or PATCH methods type
+	/// Available content types.
+	/// Used only for POST, PUT or PATCH methods type.
 	enum content_type_enum
 	{
 		ct_application_x_www_form_url_encoded,
@@ -69,8 +99,10 @@ struct request_parser final
 		ct_multipart_form_data,
 		ct_other
 
+	/// Request's content type.
 	} content_type{};
 
+	/// Available parser states.
 	enum state_enum
 	{
 		s_method_begin,
@@ -114,6 +146,7 @@ struct request_parser final
 		s_chunk_data_new_line_2,
 		s_chunk_data
 
+	/// Current parser state.
 	} state{};
 
 	/// Parses 'HTTP' word from http request's head line.

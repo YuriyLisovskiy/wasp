@@ -35,9 +35,9 @@ class UploadedFile
 private:
 	std::string _name;
 	std::string _boundary;
-	std::string _contentDisposition;
+	std::string _content_disposition;
 	std::string _charset;
-	std::string _contentType;
+	std::string _content_type;
 	size_t _size{};
 
 public:
@@ -50,39 +50,14 @@ public:
 		const std::string& contentDisposition = ""
 	);
 	UploadedFile() = default;
-	UploadedFile(const UploadedFile& copy)
-	{
-		if (this != &copy)
-		{
-			this->_name = copy._name;
-			this->_boundary = copy._boundary;
-			this->_contentDisposition = copy._contentDisposition;
-			this->_charset = copy._charset;
-			this->_contentType = copy._contentType;
-			this->_size = copy._size;
-		}
-	}
-
-	UploadedFile& operator=(const UploadedFile& copy)
-	{
-		if (this != &copy)
-		{
-			this->_name = copy._name;
-			this->_boundary = copy._boundary;
-			this->_contentDisposition = copy._contentDisposition;
-			this->_charset = copy._charset;
-			this->_contentType = copy._contentType;
-			this->_size = copy._size;
-		}
-
-		return *this;
-	}
+	UploadedFile(const UploadedFile& copy);
+	UploadedFile& operator=(const UploadedFile& copy);
 
 	std::string name();
 	std::string boundary();
-	std::string contentDisposition();
+	std::string content_disposition();
 	std::string charset();
-	std::string contentType();
+	std::string content_type();
 	size_t size();
 	bool exists();
 };

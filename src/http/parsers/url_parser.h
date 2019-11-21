@@ -15,6 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * url_parser.h
+ * Purpose: parses url from given string.
+ *
+ * @author Yuriy Lisovskiy
+ */
+
 #ifndef WASP_HTTP_PARSERS_URL_PARSER_H
 #define WASP_HTTP_PARSERS_URL_PARSER_H
 

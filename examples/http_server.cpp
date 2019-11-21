@@ -35,6 +35,9 @@ void handler(wasp::HttpRequest& request, const wasp::internal::socket_t& client)
 {
 	wasp::CookieMiddleware().processRequest(request);
 
+	auto b = request.body();
+	std::cout << b << '\n';
+
 //	std::cout << "\n" << request.method() << " " << request.path() << " " << request.version() << "\n";
 //	auto begin = request.headers.cbegin();
 //	auto end = request.headers.cend();
@@ -69,7 +72,9 @@ void handler(wasp::HttpRequest& request, const wasp::internal::socket_t& client)
 	std::string body(
 		"<form action=\"/hello\" method=\"post\" enctype=\"multipart/form-data\">\n"
 		"\t<input type=\"file\" name=\"super_file\" />\n"
-		"\t<input type=\"text\" name=\"first_name\" />\n"
+		"\t<input type=\"email\" name=\"mail\" />\n"
+		"\t<input type=\"text\" name=\"name\" />\n"
+		"\t<input type=\"number\" name=\"birth_year\" />\n"
 		"\t<input type=\"submit\" value=\"send\" />\n"
 		"\t</form>\n"
 	);
@@ -90,7 +95,6 @@ int main()
 		ctx.mediaRoot = "/home/user/Desktop/media/";
 
 		HttpServer server(ctx);
-
 		server.listenAndServe();
 	}
 	catch (const std::exception& exc)

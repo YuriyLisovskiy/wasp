@@ -16,8 +16,7 @@
  */
 
 /**
- * request_parser.h
- * Purpose: Parses an http request from given stream.
+ * An implementation of request_parser.h
  *
  * @author Yuriy Lisovskiy
  */

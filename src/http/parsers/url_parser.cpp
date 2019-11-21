@@ -15,6 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * An implementation of url_parser.h
+ *
+ * @author Yuriy Lisovskiy
+ */
+
 #include "url_parser.h"
 
 

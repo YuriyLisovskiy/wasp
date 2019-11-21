@@ -23,18 +23,46 @@ __WASP_BEGIN__
 UploadedFile::UploadedFile(
 	const std::string& name,
 	size_t size,
-	const std::string& contentType,
+	const std::string& content_type,
 	const std::string& charset,
 	const std::string& boundary,
-	const std::string& contentDisposition
+	const std::string& content_disposition
 )
 {
 	this->_name = name;
 	this->_boundary = boundary;
-	this->_contentDisposition = contentDisposition;
-	this->_contentType = contentType;
+	this->_content_disposition = content_disposition;
+	this->_content_type = content_type;
 	this->_charset = charset;
 	this->_size = size;
+}
+
+UploadedFile::UploadedFile(const UploadedFile& copy)
+{
+	if (this != &copy)
+	{
+		this->_name = copy._name;
+		this->_boundary = copy._boundary;
+		this->_content_disposition = copy._content_disposition;
+		this->_charset = copy._charset;
+		this->_content_type = copy._content_type;
+		this->_size = copy._size;
+	}
+}
+
+UploadedFile& UploadedFile::operator=(const UploadedFile& copy)
+{
+	if (this != &copy)
+	{
+		this->_name = copy._name;
+		this->_boundary = copy._boundary;
+		this->_content_disposition = copy._content_disposition;
+		this->_charset = copy._charset;
+		this->_content_type = copy._content_type;
+		this->_size = copy._size;
+	}
+
+	return *this;
 }
 
 std::string UploadedFile::name()
@@ -47,9 +75,9 @@ std::string UploadedFile::boundary()
 	return this->_boundary;
 }
 
-std::string UploadedFile::contentDisposition()
+std::string UploadedFile::content_disposition()
 {
-	return this->_contentDisposition;
+	return this->_content_disposition;
 }
 
 std::string UploadedFile::charset()
@@ -57,9 +85,9 @@ std::string UploadedFile::charset()
 	return this->_charset;
 }
 
-std::string UploadedFile::contentType()
+std::string UploadedFile::content_type()
 {
-	return this->_contentType;
+	return this->_content_type;
 }
 
 size_t UploadedFile::size()
