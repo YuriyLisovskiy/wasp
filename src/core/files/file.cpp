@@ -199,7 +199,7 @@ void File::write(std::vector<byte> bytes)
 
 void File::writeStr(const std::string& str)
 {
-	this->write(std::vector<byte>(str.cbegin(), str.cend()));
+	this->write(std::vector<byte>(str.begin(), str.end()));
 }
 
 size_t File::size()

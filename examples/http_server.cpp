@@ -25,9 +25,18 @@
 using wasp::internal::HttpServer;
 
 
+template<class... Args>
+void print(Args&&... args)
+{
+	(std::cout << ... << args) << "\n";
+}
+
 void handler(wasp::HttpRequest& request, const wasp::internal::socket_t& client)
 {
 	wasp::CookieMiddleware().processRequest(request);
+
+	auto b = request.body();
+	std::cout << b << '\n';
 
 //	std::cout << "\n" << request.method() << " " << request.path() << " " << request.version() << "\n";
 //	auto begin = request.headers.cbegin();
@@ -47,21 +56,25 @@ void handler(wasp::HttpRequest& request, const wasp::internal::socket_t& client)
 //	}
 
 
-//	auto response = new wasp::FileResponse("/home/yuriylisovskiy/Desktop/file.json");
+//	auto response = new wasp::FileResponse("/home/user/Desktop/file.json");
 //	HttpServer::send(response, client);
 //	delete response;
 
-	wasp::print(
+	print(
 		"\nGet: ", request.GET.keys().size(),
 		"\nPost: ", request.POST.keys().size(),
 		"\nFiles: ", request.FILES.keys().size(),
 		"\nCookies: ", request.COOKIES.keys().size()
 	);
 
+	print("\nCOOKIES: ", request.headers.get("Cookie"));
+
 	std::string body(
 		"<form action=\"/hello\" method=\"post\" enctype=\"multipart/form-data\">\n"
 		"\t<input type=\"file\" name=\"super_file\" />\n"
-		"\t<input type=\"text\" name=\"first_name\" />\n"
+		"\t<input type=\"email\" name=\"mail\" />\n"
+		"\t<input type=\"text\" name=\"name\" />\n"
+		"\t<input type=\"number\" name=\"birth_year\" />\n"
 		"\t<input type=\"submit\" value=\"send\" />\n"
 		"\t</form>\n"
 	);
@@ -77,12 +90,11 @@ int main()
 	{
 		HttpServer::Context ctx{};
 		ctx.handler = handler;
-		ctx.port = 5000;
+		ctx.port = 8000;
 		ctx.maxBodySize = 33300000;
-		ctx.mediaRoot = "/home/yuriylisovskiy/Desktop/media/";
+		ctx.mediaRoot = "/home/user/Desktop/media/";
 
 		HttpServer server(ctx);
-
 		server.listenAndServe();
 	}
 	catch (const std::exception& exc)

@@ -31,23 +31,21 @@
 
 __INTERNAL_BEGIN__
 
-class CookieParser
+struct cookie_parser final
 {
-private:
-	enum ReqCookieParserState
+	enum req_state
 	{
-		Key,
-		Val
+		req_key,
+		req_val
 	};
 
-	enum RespCookieParserState
+	enum resp_state
 	{
 
 	};
 
-public:
-	static std::map<std::string, std::string>* parseRequestCookies(const std::string& content);
-	static std::map<std::string, std::string>* parseResponseCookies(const std::string& content);
+	static std::map<std::string, std::string>* parse_req_cookies(const std::string& content);
+	static std::map<std::string, std::string>* parse_resp_cookies(const std::string& content);
 };
 
 __INTERNAL_END__

@@ -20,65 +20,71 @@
 
 __INTERNAL_BEGIN__
 
-QueryParser::QueryParser() : _dict(true), _multiDict(true)
+query_parser::query_parser()
 {
+	this->dict = new Dict<std::string, std::string>(true);
+	this->multi_dict = new MultiValueDict<std::string, std::string>(true);
 }
 
-HttpRequest::Parameters<std::string, std::string>* QueryParser::parse(const std::string& content)
+query_parser::~query_parser()
+{
+	delete this->dict;
+	delete this->multi_dict;
+}
+
+void query_parser::parse(const std::string& content)
 {
 	if (content.empty())
 	{
-		return new HttpRequest::Parameters<std::string, std::string>();
+		return;
 	}
 
 	auto begin = content.begin();
 	auto end = content.end();
-	std::string itemKey;
-	std::string itemValue;
-	QueryParser::State state = QueryParser::State::Key;
+	std::string item_key, item_value;
+	query_parser::state st = query_parser::state::s_key;
 	while (begin != end)
 	{
 		char input = *begin++;
-		switch (state)
+		switch (st)
 		{
-			case QueryParser::State::Key:
+			case query_parser::state::s_key:
 				if (input == '=')
 				{
-					state = QueryParser::State::Val;
+					st = query_parser::state::s_val;
 				}
 				else
 				{
-					itemKey.push_back(input);
+					item_key.push_back(input);
 				}
 				break;
-			case QueryParser::State::Val:
+			case query_parser::state::s_val:
 				if (input == '&')
 				{
-					this->appendParameter(itemKey, itemValue);
-					itemKey.clear();
-					itemValue.clear();
-					state = QueryParser::State::Key;
+					this->append_parameter(item_key, item_value);
+					item_key.clear();
+					item_value.clear();
+					st = query_parser::state::s_key;
 				}
 				else
 				{
-					itemValue.push_back(input);
+					item_value.push_back(input);
 				}
 				break;
 		}
 	}
 
-	this->appendParameter(itemKey, itemValue);
-	return new HttpRequest::Parameters<std::string, std::string>(this->_dict, this->_multiDict);
+	this->append_parameter(item_key, item_value);
 }
 
-void QueryParser::appendParameter(const std::string& key, const std::string& value)
+void query_parser::append_parameter(const std::string& key, const std::string& value)
 {
-	if (!this->_dict.contains(key))
+	if (!this->dict->contains(key))
 	{
-		this->_dict.set(key, value);
+		this->dict->set(key, value);
 	}
 
-	this->_multiDict.append(key, value);
+	this->multi_dict->append(key, value);
 }
 
 __INTERNAL_END__

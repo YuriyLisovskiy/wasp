@@ -15,132 +15,208 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * http_parser definition.
- * TODO: write docs.
+/**
+ * request_parser.h
+ * Purpose: parses an http request from given stream.
+ *
+ * @author Yuriy Lisovskiy
  */
 
 #ifndef WASP_HTTP_PARSERS_REQUEST_PARSER_H
 #define WASP_HTTP_PARSERS_REQUEST_PARSER_H
 
 #include <algorithm>
-#include <cstdlib>
-#include <iostream>
+#include <cstring>
 #include <map>
 #include <string>
-#include <strings.h>
 
 #include "../../globals.h"
 #include "../request.h"
 #include "multipart_parser.h"
 #include "query_parser.h"
-#include "cookie_parser.h"
+#include "../../utils/str.h"
 
 
 __INTERNAL_BEGIN__
 
-class HttpRequestParser
+/// Http request parser structure.
+struct request_parser final
 {
-protected:
-	size_t _majorV{};
-	size_t _minorV{};
-	std::string _path;
-	std::string _query;
-	std::string _method;
-	bool _keepAlive{};
-	std::string _content;
-	std::map<std::string, std::string> _headers;
-	HttpRequest::Parameters<std::string, std::string>* _getParameters = nullptr;
-	HttpRequest::Parameters<std::string, std::string>* _postParameters = nullptr;
-	HttpRequest::Parameters<std::string, UploadedFile>* _filesParameters = nullptr;
+	/// Major part of http protocol version.
+	size_t major_v{};
 
-	unsigned long long _contentSize{};
-	std::string _chunkSizeStr;
-	unsigned long long _chunkSize{};
-	bool _chunked{};
+	/// Minor part of http protocol version.
+	size_t minor_v{};
 
-	// Used only for POST, PUT or PATCH methods type
-	enum ContentType
+	/// Request's path.
+	std::string path;
+
+	/// Contains request's query.
+	/// If field is empty-string, request has not query.
+	std::string query;
+
+	/// Hold http request's method type.
+	std::string method;
+
+	/// Indicates whether request's connection is keep alive or not.
+	bool keep_alive{};
+
+	/// Contains body of http request.
+	std::string content;
+
+	/// Accumulates request's headers.
+	std::map<std::string, std::string> headers;
+
+	/// Contains get request's parameters.
+	HttpRequest::Parameters<std::string, std::string>* get_parameters = nullptr;
+
+	/// Contains post request's parameters.
+	HttpRequest::Parameters<std::string, std::string>* post_parameters = nullptr;
+
+	/// Contains request's files when request was sent as application/form-data.
+	HttpRequest::Parameters<std::string, UploadedFile>* files_parameters = nullptr;
+
+	/// Contains the size of request's content.
+	unsigned long long content_size{};
+
+	/// Contains the size of request's chunk as std::string.
+	/// Used only for chunked requests.
+	std::string chunk_size_str;
+
+	/// Contains the size of request's chunk.
+	/// Used only for chunked requests.
+	unsigned long long chunk_size{};
+
+	/// Indicates whether request is chunked or not.
+	bool chunked{};
+
+	/// Available content types.
+	/// Used only for POST, PUT or PATCH methods type.
+	enum content_type_enum
 	{
-		ApplicationXWwwFormUrlencoded,
-		ApplicationJson,
-		MultipartFormData,
-		Other
+		ct_application_x_www_form_url_encoded,
+		ct_application_json,
+		ct_multipart_form_data,
+		ct_other
 
-	} _contentType{};
+	/// Request's content type.
+	} content_type{};
 
-	enum ParserState
+	/// Available parser states.
+	enum state_enum
 	{
-		MethodBegin,
-		Method,
-		PathBegin,
-		Path,
-		Query,
-		Fragment,
-		HttpVersionH,
-		HttpVersionHt,
-		HttpVersionHtt,
-		HttpVersionHttp,
-		HttpVersionSlash,
-		HttpVersionMajorBegin,
-		HttpVersionMajor,
-		HttpVersionMinorBegin,
-		HttpVersionMinor,
-		HttpVersionNewLine,
+		s_method_begin,
+		s_method,
+		s_path_begin,
+		s_path,
+		s_query,
+		s_fragment,
+		s_http_version_h,
+		s_http_version_ht,
+		s_http_version_htt,
+		s_http_version_http,
+		s_http_version_slash,
+		s_http_version_major_begin,
+		s_http_version_major,
+		s_http_version_minor_begin,
+		s_http_version_minor,
+		s_http_version_new_line,
 
-		HeaderLineStart,
-		HeaderLws,
-		HeaderName,
-		HeaderSpaceBeforeValue,
-		HeaderValue,
+		s_header_line_start,
+		s_header_lws,
+		s_header_name,
+		s_header_space_before_value,
+		s_header_value,
 
-		ExpectingNewline_2,
-		ExpectingNewline_3,
+		s_expecting_new_line_2,
+		s_expecting_new_line_3,
 
-		RequestBody,
+		s_request_body,
 
-		ChunkSize,
-		ChunkExtensionName,
-		ChunkExtensionValue,
-		ChunkSizeNewLine,
-		ChunkSizeNewLine_2,
-		ChunkSizeNewLine_3,
-		ChunkTrailerName,
-		ChunkTrailerValue,
+		s_chunk_size,
+		s_chunk_extension_name,
+		s_chunk_extension_value,
+		s_chunk_size_new_line,
+		s_chunk_size_new_line_2,
+		s_chunk_size_new_line_3,
+		s_chunk_trailer_name,
+		s_chunk_trailer_value,
 
-		ChunkDataNewLine_1,
-		ChunkDataNewLine_2,
-		ChunkData
+		s_chunk_data_new_line_1,
+		s_chunk_data_new_line_2,
+		s_chunk_data
 
-	} _state{};
+	/// Current parser state.
+	} state{};
 
-	void _parseHttpWord(char input, char expectedInput, HttpRequestParser::ParserState newState);
+	/// Parses 'HTTP' word from http request's head line.
+	///
+	/// @param input: one of 'HTTP' letters from input stream.
+	/// @param expected: an expected letter of 'HTTP' word.
+	/// @param new_state: new parser's state will be set if 'input' equals 'expected'.
+	void parse_http_word(char input, char expected, request_parser::state_enum new_state);
 
-	// May be overloaded for custom parser which is inherited from HttpRequestParser
-	virtual void _setParameters(HttpRequest::Parameters<std::string, std::string>* params);
+	/// Sets parameters according to http request method.
+	///
+	/// @param params: parsed get/post parameters.
+	void set_parameters(HttpRequest::Parameters<std::string, std::string>* params);
 
-	void _parseBody(const std::string& data);
+	/// Parses chunks from http request body if request is chunked.
+	///
+	/// @param data: chunked http request body.
+	void parse_chunks(const std::string& data);
 
-	// Helpers
-	// Check if a byte is an HTTP character.
-	static bool isChar(uint c);
+	/// Checks if a byte is an HTTP character.
+	///
+	/// @param c: a byte of an input stream of HTTP request.
+	/// @return True if checking is passed, otherwise returns false.
+	static bool is_char(uint c);
 
-	// Check if a byte is an HTTP control character.
-	static bool isControl(uint c);
+	/// Checks if a byte is an HTTP control character.
+	///
+	/// @param c: a byte of an input stream of HTTP request.
+	/// @return True if checking is passed, otherwise returns false.
+	static bool is_control(uint c);
 
-	// Check if a byte is defined as an HTTP special character.
-	static bool isSpecial(uint c);
+	/// Checks if a byte is defined as an HTTP special character.
+	///
+	/// @param c: a byte of an input stream of HTTP request.
+	/// @return True if checking is passed, otherwise returns false.
+	static bool is_special(uint c);
 
-	// Check if a byte is a digit.
-	static bool isDigit(uint c);
+	/// Checks if a byte is a digit.
+	///
+	/// @param c: a byte of an input stream of HTTP request.
+	/// @return True if checking is passed, otherwise returns false.
+	static bool is_digit(uint c);
 
-public:
-	HttpRequestParser() = default;
+	/// Default constructor.
+	request_parser() = default;
 
-	wasp::HttpRequest buildHttpRequest();
-	Dict<std::string, std::string> getHeaders();
-	void parseBody(const std::string& data, const std::string& mediaRoot);
-	void parseHeaders(const std::string& data);
+	/// Deletes struct's fields which are pointers.
+	~request_parser();
+
+	/// Builds an http request from parsed data.
+	///
+	/// @return HttpRequest object built from http stream.
+	wasp::HttpRequest build_request();
+
+	/// Creates Dict object from headers' map.
+	///
+	/// @return Dict which contains http request headers.
+	Dict<std::string, std::string> get_headers();
+
+	/// Parses http request body from given stream.
+	///
+	/// @param data: http request body as std::string.
+	/// @param media_root: path to media folder, where files will be saved;
+	///	if this parameter is empty-string, files will not be saved.
+	void parse_body(const std::string& data, const std::string& media_root);
+
+	/// Parses http request headers from given stream.
+	///
+	/// @param data: http request headers as std::string.
+	void parse_headers(const std::string& data);
 };
 
 __INTERNAL_END__

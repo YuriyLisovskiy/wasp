@@ -83,19 +83,30 @@ void HttpServer::_cleanUp(const socket_t& client)
 
 HttpRequest HttpServer::_handleRequest(const socket_t& client)
 {
-	HttpRequestParser parser;
+	request_parser rp;
 	std::string bodyBeginning;
 
-	parser.parseHeaders(this->_readHeaders(client, bodyBeginning));
-	Dict<std::string, std::string> headers = parser.getHeaders();
+	std::string headers_str = this->_readHeaders(client, bodyBeginning);
+
+	rp.parse_headers(headers_str);
+	Dict<std::string, std::string> headers = rp.get_headers();
 	if (headers.contains("Content-Length"))
 	{
 		size_t bodyLength = strtol(headers.get("Content-Length").c_str(), nullptr, 10);
-		std::string body = this->_readBody(client, bodyBeginning, bodyLength);
-		parser.parseBody(body, this->_mediaRoot);
+		std::string body;
+		if (bodyLength == bodyBeginning.size())
+		{
+			body = bodyBeginning;
+		}
+		else
+		{
+			body = this->_readBody(client, bodyBeginning, bodyLength);
+		}
+
+		rp.parse_body(body, this->_mediaRoot);
 	}
 
-	return parser.buildHttpRequest();
+	return rp.build_request();
 }
 
 std::string HttpServer::_readBody(
@@ -117,10 +128,12 @@ std::string HttpServer::_readBody(
 	}
 
 	msg_size_t ret = 0;
-	char* buffer = (char*) calloc(MAX_BUFF_SIZE, sizeof(char));
+	size_t buff_size = MAX_BUFF_SIZE < bodyLength ? MAX_BUFF_SIZE : bodyLength;
+	char* buffer = (char*) calloc(buff_size, sizeof(char));
 	while (size < bodyLength)
 	{
-		ret = read(client, buffer, MAX_BUFF_SIZE);
+	//	ret = read(client, buffer, buff_size);
+		ret = ::recv(client, buffer, buff_size, 0);
 		if (ret > 0)
 		{
 			data.append(buffer, ret);
@@ -165,7 +178,7 @@ std::string HttpServer::_readHeaders(const wasp::internal::socket_t& client, std
 	char* buffer = (char*) calloc(MAX_BUFF_SIZE, sizeof(char));
 	do
 	{
-		ret = read(client, buffer, MAX_BUFF_SIZE);
+		ret = ::recv(client, buffer, MAX_BUFF_SIZE, 0);
 		if (ret > 0)
 		{
 			data.append(buffer, ret);
@@ -188,7 +201,7 @@ std::string HttpServer::_readHeaders(const wasp::internal::socket_t& client, std
 				break;
 			}
 		}
-		headersDelimiterPos = data.rfind(delimiter);
+		headersDelimiterPos = data.find(delimiter);
 	}
 	while (headersDelimiterPos == std::string::npos);
 

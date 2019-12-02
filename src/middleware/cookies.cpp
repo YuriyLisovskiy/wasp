@@ -15,11 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * CookieMiddleware implementation.
- * TODO: write docs.
- */
-
 #include "cookies.h"
 
 
@@ -27,7 +22,7 @@ __WASP_BEGIN__
 
 void CookieMiddleware::processRequest(wasp::HttpRequest& request)
 {
-	auto* cookies = internal::CookieParser::parseRequestCookies(request.headers.get("Cookie", ""));
+	auto* cookies = internal::cookie_parser::parse_req_cookies(request.headers.get("Cookie", ""));
 	request.COOKIES = Dict(*cookies);
 	delete cookies;
 }

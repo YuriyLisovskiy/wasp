@@ -16,50 +16,52 @@
  */
 
 /*
- * cookie definition.
+ * url definition.
  * TODO: write docs.
  */
 
-#ifndef WASP_HTTP_COOKIE_H
-#define WASP_HTTP_COOKIE_H
+#ifndef WASP_HTTP_URL_H
+#define WASP_HTTP_URL_H
 
 #include <string>
 
 #include "../globals.h"
+#include "parsers/url_parser.h"
 #include "../core/exceptions.h"
 
 
 __WASP_BEGIN__
 
-class Cookie
+class Url final
 {
 private:
-	std::string _name;
-	std::string _value;
-	std::string _expires;
-	std::string _domain;
+	std::string _strUrl;
+	std::string _scheme;
+	std::string _username;
+	std::string _password;
+	std::string _hostname;
+	std::string _port;
 	std::string _path;
-	bool _isSecure;
-	bool _isHttpOnly;
+	std::string _query;
+	std::string _fragment;
+	uint16_t _integerPort;
 
 public:
-	Cookie();
-	Cookie(
-		std::string name,
-		std::string value,
-		std::string expires,
-		std::string domain = "",
-		std::string path = "/",
-		bool isSecure = true,
-		bool isHttpOnly = false
-	);
+	explicit Url(const std::string& url);
+	explicit Url(const char* url);
 
-	std::string toString();
-
-	bool operator==(const Cookie& right);
+	[[nodiscard]] std::string scheme() const;
+	[[nodiscard]] std::string username() const;
+	[[nodiscard]] std::string password() const;
+	[[nodiscard]] std::string hostname() const;
+	[[nodiscard]] uint16_t port() const;
+	[[nodiscard]] std::string path() const;
+	[[nodiscard]] std::string query() const;
+	[[nodiscard]] std::string fragment() const;
+	[[nodiscard]] std::string str() const;
 };
 
 __WASP_END__
 
 
-#endif // WASP_HTTP_COOKIE_H
+#endif // WASP_HTTP_URL_H

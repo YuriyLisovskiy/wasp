@@ -42,7 +42,6 @@ void removeFile(const std::string& path)
 {
 	if (std::remove(path.c_str()) != 0)
 	{
-		wasp::print("Unable to remove file: \"" + path + "\"");
 		ASSERT_TRUE(false);
 	}
 }
@@ -83,7 +82,6 @@ protected:
 		}
 		else
 		{
-			wasp::print("Unable to create file: \"" + path + "\"");
 			ASSERT_TRUE(false);
 		}
 	}
