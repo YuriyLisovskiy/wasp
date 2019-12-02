@@ -18,7 +18,7 @@
 #ifndef WASP_UNIT_TESTS_CORE_TESTS_INCLUDE_H
 #define WASP_UNIT_TESTS_CORE_TESTS_INCLUDE_H
 
-#include "./exceptions/include.h"
-#include "./files/include.h"
+#include "./exceptions_tests/include.h"
+#include "./files_tests/include.h"
 
 #endif // WASP_UNIT_TESTS_CORE_TESTS_INCLUDE_H

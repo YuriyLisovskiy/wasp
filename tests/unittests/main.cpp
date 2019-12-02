@@ -18,16 +18,16 @@
 #include <gtest/gtest.h>
 
 // collections_tests tests
-#include "collections/include.h"
+#include "collections_tests/include.h"
 
 // core_tests tests
-#include "core/include.h"
+#include "core_tests/include.h"
 
 // http_tests tests
-#include "http/include.h"
+#include "http_tests/include.h"
 
 // utility tests
-#include "utility/include.h"
+#include "utility_tests/include.h"
 
 
 int main(int argc, char *argv[])
