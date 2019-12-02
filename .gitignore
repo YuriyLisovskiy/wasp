@@ -1,7 +1,7 @@
 # Prerequisites
 *.d
 
-# Compiled Object files
+# Compiled Object files_tests
 *.slo
 *.lo
 *.o
@@ -16,7 +16,7 @@
 *.dylib
 *.dll
 
-# Fortran module files
+# Fortran module files_tests
 *.mod
 *.smod
 

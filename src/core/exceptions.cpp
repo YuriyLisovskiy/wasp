@@ -161,6 +161,23 @@ MultiValueDictError::MultiValueDictError(const std::string& message, int line, c
 }
 
 
+// NullPointerException
+NullPointerException::NullPointerException(const char* message, int line, const char* function, const char* file, const char* type)
+	: BaseException(message, line, function, file, type)
+{
+}
+
+NullPointerException::NullPointerException(const char* message, int line, const char* function, const char* file)
+	: NullPointerException(message, line, function, file, "NullPointerException")
+{
+}
+
+NullPointerException::NullPointerException(const std::string& message, int line, const char *function, const char *file)
+	: NullPointerException(message.c_str(), line, function, file)
+{
+}
+
+
 // ValueError
 ValueError::ValueError(const char* message, int line, const char* function, const char* file, const char* type)
 	: BaseException(message, line, function, file, type)

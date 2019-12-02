@@ -15,35 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * settings
- * TODO: write docs.
+/**
+ * generic.h
+ * Purpose: imports View and RedirectView classes.
  */
 
-#ifndef WASP_CONF_SETTINGS_H
-#define WASP_CONF_SETTINGS_H
+#ifndef WASP_VIEWS_GENERIC_H
+#define WASP_VIEWS_GENERIC_H
 
-#include <string>
+#include "view.h"
 
-#include "../globals.h"
-#include "../utility/logger.h"
-#include "../middleware/middleware_mixin.h"
-
-
-__WASP_BEGIN__
-
-struct Settings
-{
-	// Default constructor
-	Settings();
-
-	// Parameters
-	std::vector<MiddlewareMixin*> MIDDLEWARE;
-	std::string X_FRAME_OPTIONS;
-	uint DATA_UPLOAD_MAX_MEMORY_SIZE;
-};
-
-__WASP_END__
-
-
-#endif // WASP_CONF_SETTINGS_H
+#endif // WASP_VIEWS_GENERIC_H

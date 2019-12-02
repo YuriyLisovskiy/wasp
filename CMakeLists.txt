@@ -20,10 +20,10 @@ project(${PACKAGE_NAME})
 file(GLOB LIB_FILES
 		"src/conf/*.h"
 		"src/conf/*.cpp"
-		"src/utils/*.h"
-		"src/utils/*.cpp"
-		"src/utils/datetime/*.h"
-		"src/utils/datetime/*.cpp"
+		"src/utility/*.h"
+		"src/utility/*.cpp"
+		"src/utility/datetime/*.h"
+		"src/utility/datetime/*.cpp"
 		"src/collections/*.h"
 		"src/collections/*.cpp"
 		"src/core/files/*.h"
@@ -38,27 +38,29 @@ file(GLOB LIB_FILES
 		"src/http/parsers/*.cpp"
 		"src/http/*.h"
 		"src/http/*.cpp"
+		"src/views/*.h"
+		"src/views/*.cpp"
 		"src/*.h"
 		"src/*.cpp"
 	)
 
 file(GLOB TEST_CORE_FILES
-		"tests/unittests/core/files/*.h"
+		"tests/unittests/core_tests/files_tests/*.h"
 )
 
 file(GLOB TEST_HTTP_FILES
-		"tests/unittests/http/parsers/*.h"
-		"tests/unittests/http/*.h"
+		"tests/unittests/http_tests/parsers_tests/*.h"
+		"tests/unittests/http_tests/*.h"
 )
 
 file(GLOB TEST_FILES
 		"tests/unittests/*.h"
 		TEST_HTTP_FILES
-		"tests/unittests/utils/*.h"
+		"tests/unittests/utility_tests/*.h"
 		TEST_CORE_FILES
-		"tests/unittests/core/*.h"
-		"tests/unittests/core/exceptions/*.h"
-		"tests/unittests/collections/*.h"
+		"tests/unittests/core_tests/*.h"
+		"tests/unittests/core_tests/exceptions_tests/*.h"
+		"tests/unittests/collections_tests/*.h"
 		"tests/*.h"
 	)
 
@@ -68,8 +70,13 @@ set(TEST_SRC ${TEST_CORE_FILES} ${TEST_FILES})
 set(CORE_FILES_TEST_SRC ${TEST_CORE_FILES})
 set(HTTP_FILES_TEST_SRC ${TEST_HTTP_FILES})
 
-if(EXISTS "${PROJECT_SOURCE_DIR}/examples/http_server.cpp")
-	add_executable(http_server_example ${LIB_SRC} "examples/http_server.cpp")
+file(GLOB EXAMPLE_FILES
+		"example/*.h"
+	)
+set(EXAMPLE_SRC ${EXAMPLE_FILES})
+
+if(EXISTS "${PROJECT_SOURCE_DIR}/example/http_server.cpp")
+	add_executable(http_server_example ${LIB_SRC} ${EXAMPLE_SRC} "example/http_server.cpp")
 else()
     message("main.cpp does not exist")
 endif()
@@ -77,8 +84,8 @@ endif()
 add_executable(${PACKAGE_TESTS} ${LIB_SRC} ${TEST_SRC} "tests/unittests/main.cpp")
 target_link_libraries(${PACKAGE_TESTS} gtest gtest_main rt pthread ${TEST_SRC})
 
-add_executable(${CORE_FILES_PACKAGE_TESTS} ${LIB_SRC} ${CORE_FILES_TEST_SRC} "tests/unittests/core/files/main.cpp")
+add_executable(${CORE_FILES_PACKAGE_TESTS} ${LIB_SRC} ${CORE_FILES_TEST_SRC} "tests/unittests/core_tests/files_tests/main.cpp")
 target_link_libraries(${CORE_FILES_PACKAGE_TESTS} gtest gtest_main rt pthread ${CORE_FILES_TEST_SRC})
 
-add_executable(${HTTP_FILES_PACKAGE_TESTS} ${LIB_SRC} ${HTTP_FILES_TEST_SRC} "tests/unittests/http/main.cpp")
+add_executable(${HTTP_FILES_PACKAGE_TESTS} ${LIB_SRC} ${HTTP_FILES_TEST_SRC} "tests/unittests/http_tests/main.cpp")
 target_link_libraries(${HTTP_FILES_PACKAGE_TESTS} gtest gtest_main rt pthread ${HTTP_FILES_TEST_SRC})

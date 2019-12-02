@@ -41,13 +41,13 @@
 #define __DATETIME_BEGIN__ __WASP_BEGIN__ namespace dt {
 #define __DATETIME_END__ } __WASP_END__
 
-// Used for string utils library.
+// Used for string utility library.
 //
 // Full name: wasp::str
 #define __UTILS_STR_BEGIN__ __WASP_BEGIN__ namespace str {
 #define __UTILS_STR_END__ } __WASP_END__
 
-// String utils internals.
+// String utility internals.
 //
 // Full name: wasp::str::internal
 #define __UTILS_STR_INTERNAL_BEGIN__ __UTILS_STR_BEGIN__ namespace internal {

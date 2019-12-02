@@ -15,35 +15,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * settings
- * TODO: write docs.
- */
+#ifndef WASP_UNIT_TESTS_UTILITY_TESTS_PATH_TESTS_H
+#define WASP_UNIT_TESTS_UTILITY_TESTS_PATH_TESTS_H
 
-#ifndef WASP_CONF_SETTINGS_H
-#define WASP_CONF_SETTINGS_H
-
-#include <string>
+#include <gtest/gtest.h>
 
 #include "../globals.h"
-#include "../utility/logger.h"
-#include "../middleware/middleware_mixin.h"
+#include "../../../src/utility/path.h"
 
 
-__WASP_BEGIN__
+__UNIT_TESTS_BEGIN__
 
-struct Settings
+TEST(PathTestCase, baseName)
 {
-	// Default constructor
-	Settings();
+	std::string expected("/bar");
+	std::string fullPath("/foo/bar");
+	ASSERT_EQ(wasp::path::base(fullPath), expected);
 
-	// Parameters
-	std::vector<MiddlewareMixin*> MIDDLEWARE;
-	std::string X_FRAME_OPTIONS;
-	uint DATA_UPLOAD_MAX_MEMORY_SIZE;
-};
+	expected = "bar";
+	fullPath = "bar";
+	ASSERT_EQ(wasp::path::base(fullPath), expected);
 
-__WASP_END__
+	expected = "/bar";
+	fullPath = "/bar";
+	ASSERT_EQ(wasp::path::base(fullPath), expected);
+}
+
+__UNIT_TESTS_END__
 
 
-#endif // WASP_CONF_SETTINGS_H
+#endif // WASP_UNIT_TESTS_UTILITY_TESTS_PATH_TESTS_H

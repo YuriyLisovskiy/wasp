@@ -18,8 +18,6 @@
 /**
  * request_parser.h
  * Purpose: parses an http request from given stream.
- *
- * @author Yuriy Lisovskiy
  */
 
 #ifndef WASP_HTTP_PARSERS_REQUEST_PARSER_H
@@ -34,7 +32,7 @@
 #include "../request.h"
 #include "multipart_parser.h"
 #include "query_parser.h"
-#include "../../utils/str.h"
+#include "../../utility/str.h"
 
 
 __INTERNAL_BEGIN__

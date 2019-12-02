@@ -31,8 +31,8 @@ int HttpServer::_init()
 	if (this->_serverSocket.create(this->_host, this->_port) == INVALID_SOCKET)
 	{
 		this->_logger->trace(
-				"Failed to initialize server at port " + std::to_string(this->_port),
-				_ERROR_DETAILS_
+			"Failed to initialize server at port " + std::to_string(this->_port),
+			_ERROR_DETAILS_
 		);
 		HttpServer::_wsaCleanUp();
 		return INVALID_SOCKET;
@@ -41,8 +41,8 @@ int HttpServer::_init()
 	if (this->_serverSocket.bind() == SOCKET_ERROR)
 	{
 		this->_logger->trace(
-				"Failed to bind socket to port " + std::to_string(this->_port),
-				_ERROR_DETAILS_
+			"Failed to bind socket to port " + std::to_string(this->_port),
+			_ERROR_DETAILS_
 		);
 		if (this->_serverSocket.close() == SOCKET_ERROR)
 		{
@@ -55,8 +55,8 @@ int HttpServer::_init()
 	if (this->_serverSocket.listen() == SOCKET_ERROR)
 	{
 		this->_logger->trace(
-				"Failed to listen at port " + std::to_string(this->_port),
-				_ERROR_DETAILS_
+			"Failed to listen at port " + std::to_string(this->_port),
+			_ERROR_DETAILS_
 		);
 		return SOCKET_ERROR;
 	}
@@ -208,7 +208,7 @@ std::string HttpServer::_readHeaders(const wasp::internal::socket_t& client, std
 	free(buffer);
 	if (headersDelimiterPos == std::string::npos)
 	{
-		throw HttpError("Invalid http request has been received", _ERROR_DETAILS_);
+		throw HttpError("Invalid http_tests request has been received", _ERROR_DETAILS_);
 	}
 
 	headersDelimiterPos += delimiter.size();

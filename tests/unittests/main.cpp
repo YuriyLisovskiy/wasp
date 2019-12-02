@@ -17,17 +17,17 @@
 
 #include <gtest/gtest.h>
 
-// collections tests
+// collections_tests tests
 #include "collections/include.h"
 
-// core tests
+// core_tests tests
 #include "core/include.h"
 
-// http tests
+// http_tests tests
 #include "http/include.h"
 
-// utils tests
-#include "utils/include.h"
+// utility tests
+#include "utility/include.h"
 
 
 int main(int argc, char *argv[])

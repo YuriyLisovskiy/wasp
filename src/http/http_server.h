@@ -16,7 +16,7 @@
  */
 
 /*
- * http server definition.
+ * http_tests server definition.
  * TODO: write docs
  */
 
@@ -33,7 +33,7 @@
 #include <poll.h>
 
 #include "../globals.h"
-#include "../utils/logger.h"
+#include "../utility/logger.h"
 #include "../conf/defaults.h"
 #include "../conf/settings.h"
 #include "../core/sockets/server_socket.h"
@@ -43,8 +43,8 @@
 #include "../core/exceptions.h"
 #include "../core/files/uploaded_file.h"
 
-#include "../utils/datetime/time.h"
-#include "../utils/str.h"
+#include "../utility/datetime/time.h"
+#include "../utility/str.h"
 
 
 __INTERNAL_BEGIN__

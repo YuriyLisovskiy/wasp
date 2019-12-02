@@ -37,12 +37,12 @@
 #include "../core/exceptions.h"
 #include "status.h"
 #include "url.h"
-#include "../utils/str.h"
-#include "../utils/encoding.h"
-#include "../utils/path.h"
-#include "../utils/mime_types.h"
+#include "../utility/str.h"
+#include "../utility/encoding.h"
+#include "../utility/path.h"
+#include "../utility/mime_types.h"
 
-#include "../utils/datetime/datetime.h"
+#include "../utility/datetime/datetime.h"
 
 
 __WASP_BEGIN__
@@ -191,7 +191,7 @@ public:
 class HttpResponseRedirectBase : public HttpResponse
 {
 protected:
-	const std::set<std::string> _allowedHosts = {"http", "https", "ftp"};
+	const std::set<std::string> _allowedHosts = {"http_tests", "https", "ftp"};
 
 public:
 	explicit HttpResponseRedirectBase(

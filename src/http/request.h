@@ -16,7 +16,7 @@
  */
 
 /*
- * http request definition.
+ * http_tests request definition.
  * TODO: write docs
  */
 
