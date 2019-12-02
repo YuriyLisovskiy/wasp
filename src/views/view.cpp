@@ -42,6 +42,7 @@ HttpResponse* View::dispatch(HttpRequest& request)
 {
 	if (this->_request == nullptr)
 	{
+		// TODO: add class name
 		throw NullPointerException(
 			" instance has no 'request' attribute. Did you override setup() and forget to call super()?",
 			_ERROR_DETAILS_

@@ -32,10 +32,10 @@ class UrlParserTestCase : public ::testing::Test
 protected:
 	wasp::internal::url_parser parser;
 
-	const char* STR_URL = "http_tests://username:password@example.com/hello/world?hello=world&user=pass#someFragment";
+	const char* STR_URL = "http://username:password@example.com/hello/world?hello=world&user=pass#someFragment";
 	const char* HOST_EXPECTED = "example.com";
 	const char* PORT_EXPECTED = "";
-	const char* SCHEME_EXPECTED = "http_tests";
+	const char* SCHEME_EXPECTED = "http";
 	const char* PATH_EXPECTED = "/hello/world";
 	const char* USERNAME_EXPECTED = "username";
 	const char* PASSWORD_EXPECTED = "password";
@@ -102,22 +102,22 @@ TEST_F(UrlParserErrorsTestCase, InvalidSchemeTest)
 
 TEST_F(UrlParserErrorsTestCase, InvalidSchemeEndingTest)
 {
-	ASSERT_THROW(this->parser.parse("http_tests//example.com"), wasp::ParseError);
+	ASSERT_THROW(this->parser.parse("http//example.com"), wasp::ParseError);
 }
 
 TEST_F(UrlParserErrorsTestCase, AbsentFirstSlashTest)
 {
-	ASSERT_THROW(this->parser.parse("http_tests:#example.com"), wasp::ParseError);
+	ASSERT_THROW(this->parser.parse("http:#example.com"), wasp::ParseError);
 }
 
 TEST_F(UrlParserErrorsTestCase, AbsentSecondSlashTest)
 {
-	ASSERT_THROW(this->parser.parse("http_tests:/example.com"), wasp::ParseError);
+	ASSERT_THROW(this->parser.parse("http:/example.com"), wasp::ParseError);
 }
 
 TEST_F(UrlParserErrorsTestCase, UsernameOrHostnameErrorTest)
 {
-	ASSERT_THROW(this->parser.parse("http_tests://$example.com"), wasp::ParseError);
+	ASSERT_THROW(this->parser.parse("http://$example.com"), wasp::ParseError);
 }
 
 __UNIT_TESTS_END__

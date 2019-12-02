@@ -39,7 +39,7 @@ public:
 
 	explicit NullPointerExceptionTestCase()
 		: ConstCharConstructorError("Test error message from NullPointerExceptionTestCase", this->ErrorLine, this->ErrorFunction, this->ErrorFile),
-			  StringConstructorError(std::string("Test error message from NullPointerExceptionTestCase"), this->ErrorLine, this->ErrorFunction, this->ErrorFile)
+		  StringConstructorError(std::string("Test error message from NullPointerExceptionTestCase"), this->ErrorLine, this->ErrorFunction, this->ErrorFile)
 	{
 	}
 };

@@ -31,12 +31,12 @@ class SimpleUrlTestCase : public ::testing::Test
 protected:
 	wasp::Url* url{};
 
-	const char* SCHEME_EXPECTED = "http_tests";
+	const char* SCHEME_EXPECTED = "http";
 	const char* HOST_EXPECTED = "127.0.0.1";
 	const uint16_t PORT_EXPECTED = 5000;
 	const char* PATH_EXPECTED = "/hello";
 	const char* FRAGMENT_EXPECTED = "world";
-	const char* STR_URL_EXPECTED = "http_tests://127.0.0.1:5000/hello#world";
+	const char* STR_URL_EXPECTED = "http://127.0.0.1:5000/hello#world";
 
 	void SetUp() override
 	{
@@ -85,10 +85,10 @@ class ComplexUrlTestCase : public ::testing::Test
 protected:
 	wasp::Url* url{};
 
-	const char* STR_URL_EXPECTED = "http_tests://username:password@example.com/hello/world?hello=world&user=pass#someFragment";
+	const char* STR_URL_EXPECTED = "http://username:password@example.com/hello/world?hello=world&user=pass#someFragment";
 	const char* HOST_EXPECTED = "example.com";
 	const uint16_t PORT_EXPECTED = 80;
-	const char* SCHEME_EXPECTED = "http_tests";
+	const char* SCHEME_EXPECTED = "http";
 	const char* PATH_EXPECTED = "/hello/world";
 	const char* USERNAME_EXPECTED = "username";
 	const char* PASSWORD_EXPECTED = "password";

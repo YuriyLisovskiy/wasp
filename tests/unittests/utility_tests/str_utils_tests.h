@@ -29,25 +29,25 @@ __UNIT_TESTS_BEGIN__
 TEST(StrUtilsUrlSplitTypeTestCase, TestSuccess)
 {
 	std::string schemeActual, dataActual;
-	wasp::str::url_split_type("http_tests://example.com/file.html", schemeActual, dataActual);
-	ASSERT_EQ(schemeActual, "http_tests");
+	wasp::str::url_split_type("http://example.com/file.html", schemeActual, dataActual);
+	ASSERT_EQ(schemeActual, "http");
 	ASSERT_EQ(dataActual, "//example.com/file.html");
 }
 
 TEST(StrUtilsUrlSplitTypeTestCase, TestMissingColon)
 {
 	std::string schemeActual, dataActual;
-	wasp::str::url_split_type("http_tests//example.com/file.html", schemeActual, dataActual);
+	wasp::str::url_split_type("http//example.com/file.html", schemeActual, dataActual);
 	ASSERT_EQ(schemeActual, "");
-	ASSERT_EQ(dataActual, "http_tests//example.com/file.html");
+	ASSERT_EQ(dataActual, "http//example.com/file.html");
 }
 
 TEST(StrUtilsUrlSplitTypeTestCase, TestSlashBeforeColon)
 {
 	std::string schemeActual, dataActual;
-	wasp::str::url_split_type("http_tests/://example.com/file.html", schemeActual, dataActual);
+	wasp::str::url_split_type("http/://example.com/file.html", schemeActual, dataActual);
 	ASSERT_EQ(schemeActual, "");
-	ASSERT_EQ(dataActual, "http_tests/://example.com/file.html");
+	ASSERT_EQ(dataActual, "http/://example.com/file.html");
 }
 
 TEST(StrUtilsUrlSplitTypeTestCase, TestEmptyInput)

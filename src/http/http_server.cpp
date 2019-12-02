@@ -208,7 +208,7 @@ std::string HttpServer::_readHeaders(const wasp::internal::socket_t& client, std
 	free(buffer);
 	if (headersDelimiterPos == std::string::npos)
 	{
-		throw HttpError("Invalid http_tests request has been received", _ERROR_DETAILS_);
+		throw HttpError("Invalid http request has been received", _ERROR_DETAILS_);
 	}
 
 	headersDelimiterPos += delimiter.size();

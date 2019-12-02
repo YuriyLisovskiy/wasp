@@ -16,7 +16,7 @@
  */
 
 /*
- * http_tests server definition.
+ * http server definition.
  * TODO: write docs
  */
 
