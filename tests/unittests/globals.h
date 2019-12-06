@@ -18,6 +18,10 @@
 #ifndef WASP_TESTS_GLOBALS_H
 #define WASP_TESTS_GLOBALS_H
 
+// Memory leak detection.
+#define DETECT_MEMORY_LEAK
+#include "mem_leak_check.h"
+
 
 #define __TESTS_BEGIN__ namespace wasp { namespace tests {
 #define __TESTS_END__ } }

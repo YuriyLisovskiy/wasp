@@ -17,16 +17,9 @@
 
 #include <gtest/gtest.h>
 
-// collections_tests tests
 #include "collections_tests/include.h"
-
-// core_tests tests
 #include "core_tests/include.h"
-
-// http_tests tests
 #include "http_tests/include.h"
-
-// utility tests
 #include "utility_tests/include.h"
 
 

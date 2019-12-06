@@ -208,7 +208,12 @@ TEST_F(MultipartParserTestCase, ParseSingleParameterTest)
 	ASSERT_EQ(params->size(), 1);
 	ASSERT_TRUE(params->contains("mail"));
 	ASSERT_EQ(params->get("mail"), "some_mail@gmail.com");
-	ASSERT_EQ(this->parser->get_files_params()->size(), 0);
+
+	auto file_params = this->parser->get_files_params();
+	ASSERT_EQ(file_params->size(), 0);
+
+	delete params;
+	delete file_params;
 }
 
 TEST_F(MultipartParserTestCase, ParseMultipleParametersWithoutFilesTest)
@@ -223,7 +228,12 @@ TEST_F(MultipartParserTestCase, ParseMultipleParametersWithoutFilesTest)
 	ASSERT_EQ(params->get("name"), "Xavier");
 	ASSERT_TRUE(params->contains("birth_year"));
 	ASSERT_EQ(params->get("birth_year"), "2000");
-	ASSERT_EQ(this->parser->get_files_params()->size(), 0);
+
+	auto file_params = this->parser->get_files_params();
+	ASSERT_EQ(file_params->size(), 0);
+
+	delete params;
+	delete file_params;
 }
 
 TEST_F(MultipartParserTestCase, ParseMultipleParametersWithFilesTest)
@@ -239,12 +249,16 @@ TEST_F(MultipartParserTestCase, ParseMultipleParametersWithFilesTest)
 	ASSERT_TRUE(post->contains("birth_year"));
 	ASSERT_EQ(post->get("birth_year"), "2000");
 
+	delete post;
+
 	auto files = this->parser->get_files_params();
 
 	ASSERT_EQ(files->size(), 1);
 	ASSERT_TRUE(files->contains("super_file"));
 
 	auto super_file = files->get("super_file");
+
+	delete files;
 
 	ASSERT_EQ(super_file.size(), this->FILE_CONTENT.size());
 	ASSERT_EQ(super_file.name(), this->ROOT + "FamilyTree.pro");
