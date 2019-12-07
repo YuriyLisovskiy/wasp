@@ -117,7 +117,7 @@ file(GLOB EXAMPLE_SRC
 	"example/*.h"
 )
 if(EXISTS "${PROJECT_SOURCE_DIR}/example/main.cpp")
-	add_executable(http_server_example ${LIB_SRC} ${EXAMPLE_SRC} "example/main.cpp")
+	add_executable(example ${LIB_SRC} ${EXAMPLE_SRC} "example/main.cpp")
 else()
     message("main.cpp of example web server does not exist")
 endif()

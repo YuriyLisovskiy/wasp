@@ -101,6 +101,10 @@ public:
 	std::string get_reason_phrase();
 	void set_reason_phrase(std::string value);
 
+	unsigned short int status();
+	std::string content_type();
+	std::string charset();
+
 	// These methods partially implement the file-like object interface.
 	virtual void close();
 	virtual void write(const std::string& content);
@@ -175,7 +179,7 @@ private:
 
 public:
 	explicit FileResponse(
-		const std::string& file_path,
+		std::string file_path,
 		bool as_attachment = false,
 		unsigned short int status = 0,
 		const std::string& content_type = "",

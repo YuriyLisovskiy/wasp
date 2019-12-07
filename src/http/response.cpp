@@ -17,6 +17,8 @@
 
 #include "response.h"
 
+#include <utility>
+
 
 __WASP_BEGIN__
 
@@ -121,6 +123,21 @@ void HttpResponseBase::set_reason_phrase(std::string value)
 	}
 
 	this->_reason_phrase = value;
+}
+
+unsigned short int HttpResponseBase::status()
+{
+	return this->_status;
+}
+
+std::string HttpResponseBase::content_type()
+{
+	return this->_headers.get("Content-Type", "");
+}
+
+std::string HttpResponseBase::charset()
+{
+	return this->_charset;
 }
 
 void HttpResponseBase::close()
@@ -252,7 +269,7 @@ std::string StreamingHttpResponse::serialize()
 
 // FileResponse implementation
 FileResponse::FileResponse(
-	const std::string& file_path,
+	std::string file_path,
 	bool asAttachment,
 	unsigned short status,
 	const std::string& content_type,
@@ -262,7 +279,7 @@ FileResponse::FileResponse(
     _bytes_read(0),
     _total_bytes_read(0),
 	_as_attachment(asAttachment),
-	_file_path(file_path),
+	_file_path(std::move(file_path)),
 	_headers_is_got(false)
 {
 	if (!path::exists(this->_file_path))

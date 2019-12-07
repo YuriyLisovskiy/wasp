@@ -77,12 +77,12 @@ public:
 	///
 	/// @param request: an actual http request from client.
 	/// @return pointer to http response returned from handler.
-	virtual HttpResponse* dispatch(HttpRequest& request);
+	virtual HttpResponse* dispatch();
 	HttpResponse* http_method_not_allowed(HttpRequest& request);
-	std::vector<std::string> _allowed_methods();
+	std::vector<std::string> allowed_methods();
 
 protected:
-	explicit View(const std::vector<std::string>& allowed_methods = {}, ILogger* logger = nullptr);
+	explicit View(const std::vector<std::string>& allowed_methods, ILogger* logger = nullptr);
 };
 
 __WASP_END__

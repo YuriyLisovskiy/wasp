@@ -24,12 +24,17 @@
 
 __WASP_BEGIN__
 
-View::View(ILogger* logger) : _request(nullptr)
+View::View(ILogger* logger) : _request(nullptr), _allowed_methods_list({"options"})
 {
 	this->_logger = logger;
-	if (this->_logger == nullptr)
+}
+
+View::View(const std::vector<std::string>& allowed_methods, ILogger* logger) : View(logger)
+{
+	this->_allowed_methods_list = allowed_methods;
+	if (std::find(allowed_methods.begin(), allowed_methods.end(), "options") == allowed_methods.end())
 	{
-		this->_logger = Logger::get_instance();
+		this->_allowed_methods_list.emplace_back("options");
 	}
 }
 
@@ -38,55 +43,56 @@ void View::setup(HttpRequest& request)
 	this->_request = &request;
 }
 
-HttpResponse* View::dispatch(HttpRequest& request)
+HttpResponse* View::dispatch()
 {
 	if (this->_request == nullptr)
 	{
 		// TODO: add class name
 		throw NullPointerException(
-			" instance has no 'request' attribute. Did you override setup() and forget to call super()?",
+			" instance has not initialized request."
+			" Did you override setup() and forget to call base method?",
 			_ERROR_DETAILS_
 		);
 	}
 
-	std::string method = str::lower(request.method());
+	std::string method = str::lower(this->_request->method());
 	HttpResponse* result = nullptr;
 	if (method == "get")
 	{
-		result = this->get(request);
+		result = this->get(*this->_request);
 	}
 	else if (method == "post")
 	{
-		result = this->post(request);
+		result = this->post(*this->_request);
 	}
 	else if (method == "put")
 	{
-		result = this->put(request);
+		result = this->put(*this->_request);
 	}
 	else if (method == "patch")
 	{
-		result = this->patch(request);
+		result = this->patch(*this->_request);
 	}
 	else if (method == "delete")
 	{
-		result = this->delete_(request);
+		result = this->delete_(*this->_request);
 	}
 	else if (method == "head")
 	{
-		result = this->head(request);
+		result = this->head(*this->_request);
 	}
 	else if (method == "options")
 	{
-		result = this->options(request);
+		result = this->options(*this->_request);
 	}
 	else if (method == "trace")
 	{
-		result = this->trace(request);
+		result = this->trace(*this->_request);
 	}
 
 	if (!result)
 	{
-		result = this->http_method_not_allowed(request);
+		result = this->http_method_not_allowed(*this->_request);
 	}
 
 	return result;
@@ -94,14 +100,18 @@ HttpResponse* View::dispatch(HttpRequest& request)
 
 HttpResponse* View::http_method_not_allowed(HttpRequest& request)
 {
-	this->_logger->warning(
-		"Method Not Allowed (" + request.method() + "): " + request.path(),
-		_ERROR_DETAILS_
-	);
-	return new HttpResponseNotAllowed("", this->_allowed_methods());
+	if (this->_logger != nullptr)
+	{
+		this->_logger->warning(
+			"Method Not Allowed (" + request.method() + "): " + request.path(),
+			_ERROR_DETAILS_
+		);
+	}
+
+	return new HttpResponseNotAllowed("", this->allowed_methods());
 }
 
-std::vector<std::string> View::_allowed_methods()
+std::vector<std::string> View::allowed_methods()
 {
 	std::vector<std::string> result;
 	for (const auto& method : this->_allowed_methods_list)
@@ -153,7 +163,7 @@ HttpResponse* View::head(HttpRequest& request)
 HttpResponse* View::options(HttpRequest& request)
 {
 	auto* response = new HttpResponse("");
-	response->set_header("Allow", str::join(", ", this->_allowed_methods()));
+	response->set_header("Allow", str::join(", ", this->allowed_methods()));
 	response->set_header("Content-Length", "0");
 	return response;
 }
@@ -161,11 +171,6 @@ HttpResponse* View::options(HttpRequest& request)
 HttpResponse* View::trace(HttpRequest& request)
 {
 	return nullptr;
-}
-
-View::View(const std::vector<std::string>& allowed_methods, ILogger* logger) : View(logger)
-{
-	this->_allowed_methods_list = allowed_methods;
 }
 
 __WASP_END__

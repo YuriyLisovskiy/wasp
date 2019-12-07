@@ -28,6 +28,7 @@
 #include <map>
 
 #include "../globals.h"
+#include "../utility/str.h"
 #include "../collections/dict.h"
 #include "../collections/multi_dict.h"
 #include "../core/files/uploaded_file.h"
@@ -92,7 +93,7 @@ public:
 
 	HttpRequest() : _major_version(0), _minor_version(0), _keep_alive(false) {};
 	explicit HttpRequest(
-		std::string method, std::string path, size_t major_v, size_t minor_v,
+		const std::string& method, std::string path, size_t major_v, size_t minor_v,
 		std::string query, bool keep_alive, std::string content,
 		const std::map<std::string, std::string>& headers,
 		const HttpRequest::Parameters<std::string, std::string>& get_params,

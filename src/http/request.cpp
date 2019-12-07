@@ -16,27 +16,26 @@
  */
 
 #include "request.h"
-#include "../core/files/uploaded_file.h"
 
 
 __WASP_BEGIN__
 
 HttpRequest::HttpRequest(
-	std::string method, std::string path, size_t major_v, size_t minor_v,
+	const std::string& method, std::string path, size_t major_v, size_t minor_v,
 	std::string query, bool keep_alive, std::string content,
 	const std::map<std::string, std::string>& headers,
 	const HttpRequest::Parameters<std::string, std::string>& get_params,
 	const HttpRequest::Parameters<std::string, std::string>& post_params,
 	const HttpRequest::Parameters<std::string, UploadedFile>& files_params
 )
-:   _method(std::move(method)),
-	_path(std::move(path)),
+:   _path(std::move(path)),
 	_major_version(major_v),
 	_minor_version(minor_v),
 	_query(std::move(query)),
 	_keep_alive(keep_alive),
 	_body(std::move(content))
 {
+	this->_method = str::upper(method);
 	this->headers = Dict<std::string, std::string>(headers);
 	this->GET = get_params;
 	this->POST = post_params;
