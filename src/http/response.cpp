@@ -22,7 +22,7 @@ __WASP_BEGIN__
 
 HttpResponseBase::HttpResponseBase(
 	unsigned short int status,
-	std::string contentType,
+	std::string content_type,
 	const std::string& reason,
 	const std::string& charset
 )
@@ -47,80 +47,80 @@ HttpResponseBase::HttpResponseBase(
 
 	this->_charset = charset;
 
-	if (contentType.empty())
+	if (content_type.empty())
 	{
-		contentType = "text/html; charset=" + this->_charset;
+		content_type = "text/html; charset=" + this->_charset;
 	}
 
-	this->_headers.set("Content-Type", contentType);
+	this->_headers.set("Content-Type", content_type);
 }
 
-void HttpResponseBase::setHeader(const std::string& key, const std::string& value)
+void HttpResponseBase::set_header(const std::string& key, const std::string& value)
 {
 	this->_headers.set(key, value);
 }
 
-void HttpResponseBase::removeHeader(const std::string& key)
+void HttpResponseBase::remove_header(const std::string& key)
 {
 	this->_headers.remove(key);
 }
 
-bool HttpResponseBase::hasHeader(const std::string& key)
+bool HttpResponseBase::has_header(const std::string& key)
 {
 	return this->_headers.contains(key);
 }
 
-void HttpResponseBase::setCookie(
+void HttpResponseBase::set_cookie(
 	const std::string& name,
 	const std::string& value,
 	const std::string& expires,
 	const std::string& domain,
 	const std::string& path,
-	bool isSecure,
-	bool isHttpOnly
+	bool is_secure,
+	bool is_http_only
 )
 {
-	this->_cookies.set(name, Cookie(name, value, expires, domain, path, isSecure, isHttpOnly));
+	this->_cookies.set(name, Cookie(name, value, expires, domain, path, is_secure, is_http_only));
 }
 
-void HttpResponseBase::setSignedCookie(
+void HttpResponseBase::set_signed_cookie(
 	const std::string& name,
 	const std::string& value,
 	const std::string& salt,
 	const std::string& expires,
 	const std::string& domain,
 	const std::string& path,
-	bool isSecure,
-	bool isHttpOnly
+	bool is_secure,
+	bool is_http_only
 )
 {
 	// TODO:
 }
 
-void HttpResponseBase::deleteCookie(const std::string& name, const std::string& path, const std::string& domain)
+void HttpResponseBase::delete_cookie(const std::string& name, const std::string& path, const std::string& domain)
 {
-	bool isSecure = std::strncmp(name.c_str(), "__Secure-", 9) == 0 || std::strncmp(name.c_str(), "__Host-", 7) == 0;
-	this->_cookies.set(name, Cookie(name, "", "Thu, 01 Jan 1970 00:00:00 GMT", domain, path, isSecure));
+	bool is_secure = std::strncmp(name.c_str(), "__Secure-", 9) == 0 || std::strncmp(name.c_str(), "__Host-", 7) == 0;
+	this->_cookies.set(name, Cookie(name, "", "Thu, 01 Jan 1970 00:00:00 GMT", domain, path, is_secure));
 }
 
-std::string HttpResponseBase::getReasonPhrase()
+std::string HttpResponseBase::get_reason_phrase()
 {
-	if (!this->_reasonPhrase.empty())
+	if (!this->_reason_phrase.empty())
 	{
-		return this->_reasonPhrase;
+		return this->_reason_phrase;
 	}
 
 	return internal::HTTP_STATUS.get(this->_status, {"Unknown Status Code", ""}).first;
 }
 
-void HttpResponseBase::setReasonPhrase(std::string value)
+void HttpResponseBase::set_reason_phrase(std::string value)
 {
 	if (value.empty())
 	{
 		value = "Unknown Status Code";
 	}
 
-	this->_reasonPhrase = value;
+	this->_reason_phrase = value;
 }
 
 void HttpResponseBase::close()
@@ -157,12 +157,12 @@ bool HttpResponseBase::writable()
 	return false;
 }
 
-void HttpResponseBase::writeLines(const std::vector<std::string>& lines)
+void HttpResponseBase::write_lines(const std::vector<std::string>& lines)
 {
 	throw HttpError("This HttpResponseBase instance is not writable", _ERROR_DETAILS_);
 }
 
-std::string HttpResponseBase::serializeHeaders()
+std::string HttpResponseBase::serialize_headers()
 {
 	auto expr = [](const std::pair<std::string, std::string>& _p) -> std::string { return _p.first + ": " + _p.second; };
 	std::string result;
@@ -183,16 +183,16 @@ std::string HttpResponseBase::serializeHeaders()
 HttpResponse::HttpResponse(
 	const std::string& content,
 	unsigned short status,
-	const std::string& contentType,
+	const std::string& content_type,
 	const std::string& reason,
 	const std::string& charset
-) : HttpResponseBase(status, contentType, reason, charset)
+) : HttpResponseBase(status, content_type, reason, charset)
 {
 	this->_content = content;
 	this->_streaming = false;
 }
 
-void HttpResponse::setContent(const std::string& content)
+void HttpResponse::set_content(const std::string& content)
 {
 	this->_content = content;
 }
@@ -212,7 +212,7 @@ bool HttpResponse::writable()
 	return true;
 }
 
-void HttpResponse::writeLines(const std::vector<std::string>& lines)
+void HttpResponse::write_lines(const std::vector<std::string>& lines)
 {
 	for (const auto & line : lines)
 	{
@@ -222,14 +222,14 @@ void HttpResponse::writeLines(const std::vector<std::string>& lines)
 
 std::string HttpResponse::serialize()
 {
-	this->setHeader("Date", dt::gmtnow().strftime("%a, %d %b %Y %T %Z"));
-	this->setHeader("Content-Length", std::to_string(this->_content.size()));
+	this->set_header("Date", dt::gmtnow().strftime("%a, %d %b %Y %T %Z"));
+	this->set_header("Content-Length", std::to_string(this->_content.size()));
 
-	auto reasonPhrase = this->getReasonPhrase();
+	auto reason_phrase = this->get_reason_phrase();
 
-	auto headers = this->serializeHeaders();
+	auto headers = this->serialize_headers();
 
-	return "HTTP/1.1 " + std::to_string(this->_status) + " " + reasonPhrase + "\r\n" +
+	return "HTTP/1.1 " + std::to_string(this->_status) + " " + reason_phrase + "\r\n" +
 		   headers + "\r\n\r\n" + this->_content;
 }
 
@@ -237,10 +237,10 @@ std::string HttpResponse::serialize()
 // StreamingHttpResponse implementation
 StreamingHttpResponse::StreamingHttpResponse(
 	unsigned short int status,
-	const std::string& contentType,
+	const std::string& content_type,
 	const std::string& reason,
 	const std::string& charset
-) : HttpResponseBase(status, contentType, reason, charset)
+) : HttpResponseBase(status, content_type, reason, charset)
 {
 }
 
@@ -252,138 +252,138 @@ std::string StreamingHttpResponse::serialize()
 
 // FileResponse implementation
 FileResponse::FileResponse(
-	std::string filePath,
+	const std::string& file_path,
 	bool asAttachment,
 	unsigned short status,
-	const std::string& contentType,
+	const std::string& content_type,
 	const std::string& reason,
 	const std::string& charset
-) : StreamingHttpResponse(status, contentType, reason, charset),
-	_bytesRead(0),
-	_totalBytesRead(0),
-	_asAttachment(asAttachment),
-	_filePath(std::move(filePath)),
-	_headersIsGot(false)
+) : StreamingHttpResponse(status, content_type, reason, charset),
+    _bytes_read(0),
+    _total_bytes_read(0),
+	_as_attachment(asAttachment),
+	_file_path(file_path),
+	_headers_is_got(false)
 {
-	if (!path::exists(this->_filePath))
+	if (!path::exists(this->_file_path))
 	{
-		throw FileDoesNotExistError("file '" + this->_filePath + "' does not exist", _ERROR_DETAILS_);
+		throw FileDoesNotExistError("file '" + this->_file_path + "' does not exist", _ERROR_DETAILS_);
 	}
 
 	// Initializing file stream.
-	this->_fileStream = std::ifstream(this->_filePath, std::ifstream::binary | std::ios::ate);
-	this->_fileSize = this->_fileStream.tellg();
-	this->_fileStream.seekg(0);
+	this->_file_stream = std::ifstream(this->_file_path, std::ifstream::binary | std::ios::ate);
+	this->_file_size = this->_file_stream.tellg();
+	this->_file_stream.seekg(0);
 }
 
-std::string FileResponse::getChunk()
+std::string FileResponse::get_chunk()
 {
 	std::string chunk;
-	if (!this->_headersIsGot)
+	if (!this->_headers_is_got)
 	{
-		chunk = this->_getHeadersChunk();
-		_headersIsGot = true;
+		chunk = this->_get_headers_chunk();
+		this->_headers_is_got = true;
 	}
 	else
 	{
-		size_t bytesToRead;
-		if ((this->_totalBytesRead + FileResponse::CHUNK_SIZE) > this->_fileSize)
+		size_t bytes_to_read;
+		if ((this->_total_bytes_read + FileResponse::CHUNK_SIZE) > this->_file_size)
 		{
-			bytesToRead = this->_fileSize - this->_totalBytesRead;
+			bytes_to_read = this->_file_size - this->_total_bytes_read;
 		}
 		else
 		{
-			bytesToRead = FileResponse::CHUNK_SIZE;
+			bytes_to_read = FileResponse::CHUNK_SIZE;
 		}
 
-		if (bytesToRead > 0)
+		if (bytes_to_read > 0)
 		{
 			chunk = std::string(FileResponse::CHUNK_SIZE, '\0');
 
-			this->_fileStream.read(chunk.data(), bytesToRead);
-			this->_bytesRead = this->_fileStream.gcount();
-			this->_totalBytesRead += this->_bytesRead;
+			this->_file_stream.read(chunk.data(), bytes_to_read);
+			this->_bytes_read = this->_file_stream.gcount();
+			this->_total_bytes_read += this->_bytes_read;
 		}
 	}
 
-	return chunk.substr(0, this->_bytesRead);
+	return chunk.substr(0, this->_bytes_read);
 }
 
-void FileResponse::_setHeaders()
+void FileResponse::_set_headers()
 {
-	auto encodingMap = Dict<std::string, std::string>({
+	auto encoding_map = Dict<std::string, std::string>({
 		{"bzip2", "application/x-bzip"},
 		{"gzip", "application/gzip"},
 		{"xz", "application/x-xz"}
 	});
-	this->setHeader("Content-Length", std::to_string(path::getSize(this->_filePath)));
+	this->set_header("Content-Length", std::to_string(path::getSize(this->_file_path)));
 	if (str::starts_with(this->_headers.get("Content-Type", ""), "text/html"))
 	{
-		std::string contentType, encoding;
-		mime::guessContentType(this->_filePath, contentType, encoding);
-		contentType = encodingMap.get(encoding, contentType);
-		this->_headers.set("Content-Type", !contentType.empty() ? contentType : "application/octet-stream");
+		std::string content_type, encoding;
+		mime::guessContentType(this->_file_path, content_type, encoding);
+		content_type = encoding_map.get(encoding, content_type);
+		this->_headers.set("Content-Type", !content_type.empty() ? content_type : "application/octet-stream");
 	}
 
-	std::string disposition = this->_asAttachment ? "attachment" : "inline";
-	std::string fileExpr;
-	std::string fileName = path::base(this->_filePath);
+	std::string disposition = this->_as_attachment ? "attachment" : "inline";
+	std::string file_expr;
+	std::string file_name = path::base(this->_file_path);
 	try
 	{
-		fileExpr = "filename=\"" + encoding::encode(fileName, encoding::ASCII) + "\"";
+		file_expr = "filename=\"" + encoding::encode(file_name, encoding::ASCII) + "\"";
 	}
 	catch (const EncodingError& e)
 	{
-		fileExpr = "filename*=utf-8''" + encoding::quote(fileName);
+		file_expr = "filename*=utf-8''" + encoding::quote(file_name);
 	}
 
-	this->_headers.set("Content-Disposition", disposition + "; " + fileExpr);
+	this->_headers.set("Content-Disposition", disposition + "; " + file_expr);
 }
 
-std::string FileResponse::_getHeadersChunk()
+std::string FileResponse::_get_headers_chunk()
 {
-	auto reasonPhrase = this->getReasonPhrase();
-	this->_setHeaders();
-	this->setHeader("Date", dt::gmtnow().strftime("%a, %d %b %Y %T %Z"));
-	auto headers = this->serializeHeaders();
+	auto reason_phrase = this->get_reason_phrase();
+	this->_set_headers();
+	this->set_header("Date", dt::gmtnow().strftime("%a, %d %b %Y %T %Z"));
+	auto headers = this->serialize_headers();
 
-	std::string headersChunk = "HTTP/1.1 " + std::to_string(this->_status) + " " + reasonPhrase + "\r\n"
+	std::string headers_chunk = "HTTP/1.1 " + std::to_string(this->_status) + " " + reason_phrase + "\r\n"
 		+ headers + "\r\n\r\n";
-	this->_bytesRead = headersChunk.size();
+	this->_bytes_read = headers_chunk.size();
 
-	return headersChunk;
+	return headers_chunk;
 }
 
 unsigned long int FileResponse::tell()
 {
-	return this->_bytesRead;
+	return this->_bytes_read;
 }
 
 void FileResponse::close()
 {
 	StreamingHttpResponse::close();
-	this->_fileStream.close();
+	this->_file_stream.close();
 }
 
 
 // HttpResponseRedirectBase implementation
 HttpResponseRedirectBase::HttpResponseRedirectBase(
-	const std::string& redirectTo,
+	const std::string& redirect_to,
 	const std::string& content,
 	unsigned short int status,
-	const std::string& contentType,
+	const std::string& content_type,
 	const std::string& reason,
 	const std::string& charset
-) : HttpResponse(content, status, contentType, reason, charset)
+) : HttpResponse(content, status, content_type, reason, charset)
 {
 	if (status < 300 || status > 399)
 	{
 		throw ValueError("invalid status", _ERROR_DETAILS_);
 	}
 
-	this->setHeader("Location", encoding::encodeUrl(redirectTo));
-	Url url(redirectTo);
-	if (!url.scheme().empty() && this->_allowedHosts.find(url.scheme()) == this->_allowedHosts.end())
+	this->set_header("Location", encoding::encodeUrl(redirect_to));
+	Url url(redirect_to);
+	if (!url.scheme().empty() && this->_allowed_hosts.find(url.scheme()) == this->_allowed_hosts.end())
 	{
 		throw DisallowedRedirect("Unsafe redirect to URL with protocol " + url.scheme(), _ERROR_DETAILS_);
 	}
@@ -397,22 +397,22 @@ std::string HttpResponseRedirectBase::url()
 
 // HttpResponseRedirect implementation
 HttpResponseRedirect::HttpResponseRedirect(
-	const std::string& redirectTo,
+	const std::string& redirect_to,
 	const std::string& content,
-	const std::string& contentType,
+	const std::string& content_type,
 	const std::string& charset
-) : HttpResponseRedirectBase(redirectTo, content, 302, contentType, "", charset)
+) : HttpResponseRedirectBase(redirect_to, content, 302, content_type, "", charset)
 {
 }
 
 
 // HttpResponsePermanentRedirect implementation
 HttpResponsePermanentRedirect::HttpResponsePermanentRedirect(
-	const std::string& redirectTo,
+	const std::string& redirect_to,
 	const std::string& content,
-	const std::string& contentType,
+	const std::string& content_type,
 	const std::string& charset
-) : HttpResponseRedirectBase(redirectTo, content, 301, contentType, "", charset)
+) : HttpResponseRedirectBase(redirect_to, content, 301, content_type, "", charset)
 {
 }
 
@@ -420,14 +420,14 @@ HttpResponsePermanentRedirect::HttpResponsePermanentRedirect(
 // HttpResponseNotModified implementation
 HttpResponseNotModified::HttpResponseNotModified(
 	const std::string& content,
-	const std::string& contentType,
+	const std::string& content_type,
 	const std::string& charset
-) : HttpResponse(content, 304, contentType, "", charset)
+) : HttpResponse(content, 304, content_type, "", charset)
 {
-	this->removeHeader("Content-Type");
+	this->remove_header("Content-Type");
 }
 
-void HttpResponseNotModified::setContent(const std::string& content)
+void HttpResponseNotModified::set_content(const std::string& content)
 {
 	if (!content.empty())
 	{
@@ -441,9 +441,9 @@ void HttpResponseNotModified::setContent(const std::string& content)
 // HttpResponseBadRequest implementation
 HttpResponseBadRequest::HttpResponseBadRequest(
 	const std::string& content,
-	const std::string& contentType,
+	const std::string& content_type,
 	const std::string& charset
-) : HttpResponse(content, 400, contentType, "", charset)
+) : HttpResponse(content, 400, content_type, "", charset)
 {
 }
 
@@ -451,9 +451,9 @@ HttpResponseBadRequest::HttpResponseBadRequest(
 // HttpResponseNotFound implementation
 HttpResponseNotFound::HttpResponseNotFound(
 	const std::string& content,
-	const std::string& contentType,
+	const std::string& content_type,
 	const std::string& charset
-) : HttpResponse(content, 404, contentType, "", charset)
+) : HttpResponse(content, 404, content_type, "", charset)
 {
 }
 
@@ -461,9 +461,9 @@ HttpResponseNotFound::HttpResponseNotFound(
 // HttpResponseForbidden implementation
 HttpResponseForbidden::HttpResponseForbidden(
 	const std::string& content,
-	const std::string& contentType,
+	const std::string& content_type,
 	const std::string& charset
-) : HttpResponse(content, 403, contentType, "", charset)
+) : HttpResponse(content, 403, content_type, "", charset)
 {
 }
 
@@ -471,31 +471,31 @@ HttpResponseForbidden::HttpResponseForbidden(
 // HttpResponseForbidden implementation
 HttpResponseNotAllowed::HttpResponseNotAllowed(
 	const std::string& content,
-	const std::vector<std::string>& permittedMethods,
-	const std::string& contentType,
+	const std::vector<std::string>& permitted_methods,
+	const std::string& content_type,
 	const std::string& charset
-) : HttpResponse(content, 405, contentType, "", charset)
+) : HttpResponse(content, 405, content_type, "", charset)
 {
 	std::string methods;
-	for (size_t i = 0; i < permittedMethods.size(); i++)
+	for (size_t i = 0; i < permitted_methods.size(); i++)
 	{
-		methods += permittedMethods[i];
-		if (i < permittedMethods.size() - 1)
+		methods += permitted_methods[i];
+		if (i < permitted_methods.size() - 1)
 		{
 			methods += ", ";
 		}
 	}
 
-	this->setHeader("Allow", methods);
+	this->set_header("Allow", methods);
 }
 
 
 // HttpResponseGone implementation
 HttpResponseGone::HttpResponseGone(
 	const std::string& content,
-	const std::string& contentType,
+	const std::string& content_type,
 	const std::string& charset
-) : HttpResponse(content, 410, contentType, "", charset)
+) : HttpResponse(content, 410, content_type, "", charset)
 {
 }
 
@@ -503,9 +503,9 @@ HttpResponseGone::HttpResponseGone(
 // HttpResponseEntityTooLarge implementation
 HttpResponseEntityTooLarge::HttpResponseEntityTooLarge(
 		const std::string& content,
-		const std::string& contentType,
+		const std::string& content_type,
 		const std::string& charset
-) : HttpResponse(content, 413, contentType, "", charset)
+) : HttpResponse(content, 413, content_type, "", charset)
 {
 }
 
@@ -513,9 +513,9 @@ HttpResponseEntityTooLarge::HttpResponseEntityTooLarge(
 // HttpResponseServerError implementation
 HttpResponseServerError::HttpResponseServerError(
 	const std::string& content,
-	const std::string& contentType,
+	const std::string& content_type,
 	const std::string& charset
-) : HttpResponse(content, 500, contentType, "", charset)
+) : HttpResponse(content, 500, content_type, "", charset)
 {
 }
 

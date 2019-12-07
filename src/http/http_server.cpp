@@ -504,7 +504,7 @@ void HttpServer::send(HttpResponseBase* response, const socket_t& client)
 void HttpServer::send(StreamingHttpResponse* response, const socket_t& client)
 {
 	std::string chunk;
-	while (!(chunk = response->getChunk()).empty())
+	while (!(chunk = response->get_chunk()).empty())
 	{
 		HttpServer::_write(chunk.c_str(), chunk.size(), client);
 	}

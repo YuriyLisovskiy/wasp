@@ -24,6 +24,10 @@
 #include "../src/http/response.h"
 #include "form_view.h"
 
+// Temporary checks will be removed in release!
+#define DETECT_MEMORY_LEAK
+#include "../tests/unittests/mem_leak_check.h"
+
 using wasp::internal::HttpServer;
 
 void handler(wasp::HttpRequest& request, const wasp::internal::socket_t& client)

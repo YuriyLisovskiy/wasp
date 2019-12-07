@@ -153,8 +153,8 @@ HttpResponse* View::head(HttpRequest& request)
 HttpResponse* View::options(HttpRequest& request)
 {
 	auto* response = new HttpResponse("");
-	response->setHeader("Allow", str::join(", ", this->_allowed_methods()));
-	response->setHeader("Content-Length", "0");
+	response->set_header("Allow", str::join(", ", this->_allowed_methods()));
+	response->set_header("Content-Length", "0");
 	return response;
 }
 
