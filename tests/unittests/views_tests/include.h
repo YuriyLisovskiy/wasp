@@ -15,15 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * generic.h
- * Purpose: imports View and RedirectView classes.
- */
+#ifndef WASP_UNIT_TESTS_VIEWS_TESTS_INCLUDE_H
+#define WASP_UNIT_TESTS_VIEWS_TESTS_INCLUDE_H
 
-#ifndef WASP_VIEWS_GENERIC_H
-#define WASP_VIEWS_GENERIC_H
+#include "./view_tests.h"
 
-#include "view.h"
-#include "redirect_view.h"
-
-#endif // WASP_VIEWS_GENERIC_H
+#endif // WASP_UNIT_TESTS_VIEWS_TESTS_INCLUDE_H

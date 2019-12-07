@@ -23,6 +23,7 @@
 #include <ostream>
 #include <ctime>
 #include <locale>
+#include <cstring>
 
 #include "../globals.h"
 
@@ -37,6 +38,7 @@ public:
 	virtual void debug(const std::string& msg, int line, const char* function, const char* file) = 0;
 	virtual void warning(const std::string& msg, int line, const char* function, const char* file) = 0;
 	virtual void error(const std::string& msg, int line, const char* function, const char* file) = 0;
+	virtual void fatal(const std::string& msg, int line, const char* function, const char* file) = 0;
 	virtual void trace(const std::string& msg, int line, const char* function, const char* file) = 0;
 	virtual void trace(const char* msg, int line, const char* function, const char* file) = 0;
 };
@@ -44,27 +46,28 @@ public:
 class Logger : public ILogger
 {
 public:
-	static ILogger* getInstance();
+	static ILogger* get_instance();
 
 	void info(const std::string& msg, int line, const char* function, const char* file) override;
 	void debug(const std::string& msg, int line, const char* function, const char* file) override;
 	void warning(const std::string& msg, int line, const char* function, const char* file) override;
 	void error(const std::string& msg, int line, const char* function, const char* file) override;
+	void fatal(const std::string& msg, int line, const char* function, const char* file) override;
 	void trace(const std::string& msg, int line, const char* function, const char* file) override;
 	void trace(const char* msg, int line, const char* function, const char* file) override;
 
 private:
-	enum LogLevel
+	enum log_level_enum
 	{
-		Info, Debug, Warning, Error, Fatal
+		ll_info, ll_debug, ll_warning, ll_error, ll_fatal
 	};
 
-	static ILogger* instance;
+	static ILogger* _instance;
 
 	Logger() = default;
 	~Logger() override;
-	void log(const std::string& msg, int line, const char* function, const char* file, LogLevel logLevel);
-	void writeToStream(const std::string& msg, LogLevel level);
+	void log(const std::string& msg, int line, const char* function, const char* file, Logger::log_level_enum level);
+	void write_to_stream(const std::string& msg, Logger::log_level_enum level);
 };
 
 __WASP_END__

@@ -29,7 +29,7 @@ View::View(ILogger* logger) : _request(nullptr)
 	this->_logger = logger;
 	if (this->_logger == nullptr)
 	{
-		this->_logger = Logger::getInstance();
+		this->_logger = Logger::get_instance();
 	}
 }
 

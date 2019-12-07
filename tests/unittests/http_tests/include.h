@@ -18,13 +18,12 @@
 #ifndef WASP_UNIT_TESTS_HTTP_TESTS_INCLUDE_H
 #define WASP_UNIT_TESTS_HTTP_TESTS_INCLUDE_H
 
-// parsers_tests
+// Parsers tests.
 #include "./parsers_tests/include.h"
 
-// other
+// Other.
 #include "./cookie_tests.h"
 #include "./request_tests.h"
 #include "./url_tests.h"
-
 
 #endif // WASP_UNIT_TESTS_HTTP_TESTS_INCLUDE_H

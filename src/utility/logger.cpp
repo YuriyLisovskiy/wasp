@@ -20,47 +20,56 @@
 
 __WASP_BEGIN__
 
-ILogger* Logger::instance = nullptr;
+ILogger* Logger::_instance = nullptr;
 
 Logger::~Logger()
 {
-	delete Logger::instance;
-	Logger::instance = nullptr;
+	delete Logger::_instance;
+	Logger::_instance = nullptr;
 }
 
-ILogger* Logger::getInstance()
+ILogger* Logger::get_instance()
 {
-	if (Logger::instance == nullptr)
+	if (Logger::_instance == nullptr)
 	{
-		Logger::instance = new Logger();
+		Logger::_instance = new Logger();
 	}
 
-	return Logger::instance;
+	return Logger::_instance;
 }
 
 void Logger::info(const std::string& msg, int line, const char* function, const char* file)
 {
-	this->log(msg, line, function, file, LogLevel::Info);
+	this->log(msg, line, function, file, Logger::log_level_enum::ll_info);
 }
 
 void Logger::debug(const std::string& msg, int line, const char* function, const char* file)
 {
-	this->log(msg, line, function, file, LogLevel::Debug);
+	this->log(msg, line, function, file, Logger::log_level_enum::ll_debug);
 }
 
 void Logger::warning(const std::string& msg, int line, const char* function, const char* file)
 {
-	this->log(msg, line, function, file, LogLevel::Warning);
+	this->log(msg, line, function, file, Logger::log_level_enum::ll_warning);
 }
 
 void Logger::error(const std::string& msg, int line, const char* function, const char* file)
 {
-	this->log(msg, line, function, file, LogLevel::Error);
+	this->log(msg, line, function, file, Logger::log_level_enum::ll_error);
+}
+
+void Logger::fatal(const std::string& msg, int line, const char* function, const char* file)
+{
+	this->log(msg, line, function, file, Logger::log_level_enum::ll_fatal);
 }
 
 void Logger::trace(const std::string& msg, int line, const char* function, const char* file)
 {
-	this->writeToStream("Traceback (exception):\n  File \"" + std::string(file) + "\", line " + std::to_string(line) + ", in " + std::string(function) + "\n" + msg + "\n", LogLevel::Error);
+	this->write_to_stream(
+		"Traceback (exception):\n  File \"" + std::string(file) + "\", line " +
+		std::to_string(line) + ", in " + std::string(function) + "\n" + msg + "\n",
+		Logger::log_level_enum::ll_error
+	);
 }
 
 void Logger::trace(const char* msg, int line, const char* function, const char* file)
@@ -68,25 +77,25 @@ void Logger::trace(const char* msg, int line, const char* function, const char* 
 	this->trace(std::string(msg), line, function, file);
 }
 
-void Logger::log(const std::string& msg, int line, const char* function, const char* file, Logger::LogLevel logLevel)
+void Logger::log(const std::string& msg, int line, const char* function, const char* file, Logger::log_level_enum level)
 {
-	std::string level;
-	switch (logLevel)
+	std::string level_name;
+	switch (level)
 	{
-		case LogLevel::Warning:
-			level = "[warning]";
+		case Logger::log_level_enum::ll_warning:
+			level_name = "[warning]";
 			break;
-		case LogLevel::Error:
-			level = "[error]";
+		case Logger::log_level_enum::ll_error:
+			level_name = "[error]";
 			break;
-		case LogLevel::Debug:
-			level = "[debug]";
+		case Logger::log_level_enum::ll_debug:
+			level_name = "[debug]";
 			break;
-		case LogLevel::Fatal:
-			level = "[fatal]";
+		case Logger::log_level_enum::ll_fatal:
+			level_name = "[fatal]";
 			break;
 		default:
-			level = "[info]";
+			level_name = "[info]";
 			break;
 	}
 	std::locale::global(std::locale("uk_UA.utf8"));
@@ -94,12 +103,20 @@ void Logger::log(const std::string& msg, int line, const char* function, const c
 	char now[100];
 	std::strftime(now, sizeof(now), "%F %T", std::localtime(&t));
 
-	std::string fullMsg = "\tFile \"" + std::string(file) + "\", line " + std::to_string(line) + ", in " + std::string(function) + "\n" + msg;
+	std::string full_msg;
+	if (line == 0 && std::strlen(file) > 0 && std::strlen(function) > 0)
+	{
+		full_msg = "\tFile \"" + std::string(file) + "\", line " + std::to_string(line) + ", in " + std::string(function) + "\n" + msg;
+	}
+	else
+	{
+		full_msg = msg;
+	}
 
-	this->writeToStream("[" + std::string(now) + "] [" + "thread id" + "] " + level + ":\n" + fullMsg + "\n", logLevel);
+	this->write_to_stream("[" + std::string(now) + "] [" + "thread id" + "] " + level_name + ":\n" + full_msg + "\n", level);
 }
 
-void Logger::writeToStream(const std::string& msg, LogLevel level)
+void Logger::write_to_stream(const std::string& msg, Logger::log_level_enum level)
 {
 	// TODO: add multiple streams support
 	std::cout << '\n' << msg;

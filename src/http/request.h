@@ -59,7 +59,7 @@ public:
 			return this->_dict.get(key, _default);
 		}
 
-		std::vector<_Val> getList(_Key key, std::vector<_Val> _default = std::vector<_Val>{})
+		std::vector<_Val> get_list(_Key key, std::vector<_Val> _default = std::vector<_Val>{})
 		{
 			return this->_multiDict.get(key, _default);
 		}
@@ -69,7 +69,7 @@ public:
 			return this->_dict.contains(key);
 		}
 
-		bool containsList(_Key key)
+		bool contains_list(_Key key)
 		{
 			return this->_multiDict.contains(key);
 		}
@@ -90,14 +90,14 @@ public:
 		}
 	};
 
-	HttpRequest() : _majorVersion(0), _minorVersion(0), _keepAlive(false) {};
+	HttpRequest() : _major_version(0), _minor_version(0), _keep_alive(false) {};
 	explicit HttpRequest(
-		std::string method, std::string path, size_t majorV, size_t minorV,
-		std::string query, bool keepAlive, std::string content,
+		std::string method, std::string path, size_t major_v, size_t minor_v,
+		std::string query, bool keep_alive, std::string content,
 		const std::map<std::string, std::string>& headers,
-		const HttpRequest::Parameters<std::string, std::string>& getParameters,
-		const HttpRequest::Parameters<std::string, std::string>& postParameters,
-		const HttpRequest::Parameters<std::string, UploadedFile>& filesParameters
+		const HttpRequest::Parameters<std::string, std::string>& get_params,
+		const HttpRequest::Parameters<std::string, std::string>& post_params,
+		const HttpRequest::Parameters<std::string, UploadedFile>& files_params
 	);
 
 	Dict<std::string, std::string> headers;
@@ -108,16 +108,18 @@ public:
 
 	std::string version();
 	std::string path();
+	std::string query();
 	std::string method();
+	bool keep_alive();
 	std::string body();
 
 private:
-	size_t _majorVersion;
-	size_t _minorVersion;
+	size_t _major_version;
+	size_t _minor_version;
 	std::string _path;
 	std::string _query;
 	std::string _method;
-	bool _keepAlive;
+	bool _keep_alive;
 	std::string _body;
 };
 

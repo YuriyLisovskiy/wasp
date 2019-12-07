@@ -29,7 +29,7 @@
 __UNIT_TESTS_BEGIN__
 
 template <typename _Container>
-bool containersAreEqual(const _Container& lhs, const _Container& rhs)
+bool containers_are_equal(const _Container& lhs, const _Container& rhs)
 {
 	return lhs.size() == rhs.size() && std::equal(lhs.begin(), lhs.end(), rhs.begin());
 }
@@ -64,9 +64,9 @@ TEST(QueryParserTestCase, getList)
 	parser.parse("hello=world&hello=hello&hello=hello_value");
 	HttpRequest::Parameters<std::string, std::string> parameters(*parser.dict, *parser.multi_dict);
 
-	ASSERT_TRUE(parameters.containsList(key));
+	ASSERT_TRUE(parameters.contains_list(key));
 
-	auto actual = parameters.getList(key);
+	auto actual = parameters.get_list(key);
 
 	ASSERT_EQ(actual.size(), expected.size());
 
@@ -89,7 +89,7 @@ TEST(QueryParserTestCase, keys)
 	HttpRequest::Parameters<std::string, std::string> parsed(*parser.dict, *parser.multi_dict);
 	auto actual = parsed.keys();
 
-	ASSERT_TRUE(containersAreEqual(expected, actual));
+	ASSERT_TRUE(containers_are_equal(expected, actual));
 }
 
 TEST(QueryParserTestCase, size)

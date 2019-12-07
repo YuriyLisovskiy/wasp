@@ -15,15 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * generic.h
- * Purpose: imports View and RedirectView classes.
- */
+#include <gtest/gtest.h>
 
-#ifndef WASP_VIEWS_GENERIC_H
-#define WASP_VIEWS_GENERIC_H
+#include "./include.h"
 
-#include "view.h"
-#include "redirect_view.h"
 
-#endif // WASP_VIEWS_GENERIC_H
+int main(int argc, char *argv[])
+{
+	::testing::InitGoogleTest(&argc, argv);
+	return RUN_ALL_TESTS();
+}

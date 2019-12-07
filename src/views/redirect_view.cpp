@@ -40,10 +40,9 @@ std::string RedirectView::get_redirect_url()
 		return url;
 	}
 
-	// TODO: get query string from request.
 	if (this->_query_string)
 	{
-		//std::string query = this->_request.
+		url += this->_request->query();
 	}
 
 	return url;

@@ -29,6 +29,7 @@
 #include <cassert>
 
 #include "../../globals.h"
+#include "../../utility/str.h"
 #include "../../core/exceptions.h"
 
 

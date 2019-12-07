@@ -36,6 +36,7 @@ void url_parser::parse(const std::string& str)
 	std::string username_or_hostname, port_or_password;
 	this->path = "/";
 	url_parser::state st = url_parser::state::s_scheme;
+	str::ltrim(str, '/');
 	for (char ch : str)
 	{
 		switch (st)
@@ -49,10 +50,9 @@ void url_parser::parse(const std::string& str)
 				{
 					st = url_parser::state::s_first_slash;
 				}
-				else if (ch == '/')
+				else if (ch == '/' && this->scheme.empty())
 				{
 					st = url_parser::state::s_path;
-					this->scheme = "";
 				}
 				else
 				{

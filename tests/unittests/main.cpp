@@ -21,6 +21,7 @@
 #include "core_tests/include.h"
 #include "http_tests/include.h"
 #include "utility_tests/include.h"
+#include "views_tests/include.h"
 
 
 int main(int argc, char *argv[])

@@ -378,7 +378,7 @@ void HttpServer::_normalizeContext(HttpServer::Context& ctx)
 
 	if (ctx.logger == nullptr)
 	{
-		ctx.logger = Logger::getInstance();
+		ctx.logger = Logger::get_instance();
 	}
 
 	str::rtrim(ctx.mediaRoot, '/');
