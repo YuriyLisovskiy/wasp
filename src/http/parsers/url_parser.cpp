@@ -49,6 +49,11 @@ void url_parser::parse(const std::string& str)
 				{
 					st = url_parser::state::s_first_slash;
 				}
+				else if (ch == '/')
+				{
+					st = url_parser::state::s_path;
+					this->scheme = "";
+				}
 				else
 				{
 					throw ParseError("unable to parse url scheme", _ERROR_DETAILS_);

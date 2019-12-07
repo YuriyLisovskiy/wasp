@@ -47,8 +47,8 @@ struct track_alloc : public std::allocator<T>
 
 	pointer allocate(size_type size, std::allocator<void>::const_pointer = 0)
 	{
-		void * p = std::malloc(size * sizeof(T));
-		if(p == 0)
+		void* p = std::malloc(size * sizeof(T));
+		if (p == nullptr)
 		{
 			throw std::bad_alloc();
 		}
@@ -95,7 +95,7 @@ void* operator new(std::size_t size) noexcept(false)
 {
 	// we are required to return non-null
 	void* mem = std::malloc(size == 0 ? 1 : size);
-	if(mem == 0)
+	if (mem == nullptr)
 	{
 		throw std::bad_alloc();
 	}
@@ -106,7 +106,7 @@ void* operator new(std::size_t size) noexcept(false)
 
 void operator delete(void* mem) throw()
 {
-	if(get_map()->erase(mem) == 0)
+	if (get_map()->erase(mem) == 0)
 	{
 		// this indicates a serious bug
 		std::cerr << "bug: memory at " << mem << " wasn't allocated by us\n";

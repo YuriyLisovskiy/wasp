@@ -17,7 +17,8 @@
 
 /**
  * view.h
- * Purpose: TODO:
+ * Purpose: Intentionally simple parent class for all views. Only
+ * 			implements dispatch-by-method and simple sanity checking.
  */
 
 #ifndef WASP_VIEWS_VIEW_H

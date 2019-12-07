@@ -61,7 +61,7 @@ public:
 
 	wasp::HttpResponse* post(wasp::HttpRequest& request) final
 	{
-		return this->get(request);
+		return new wasp::HttpResponseRedirect("/hello");
 	}
 };
 

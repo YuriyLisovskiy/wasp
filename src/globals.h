@@ -92,6 +92,9 @@
 // Required parameters for Wasp's built-in logger.
 #define _ERROR_DETAILS_ __LINE__, __FUNCTION__, __FILE__
 
+// Pass this when file details is not required.
+#define _DETAILS_NONE_ 0, "", ""
+
 __WASP_BEGIN__
 
 typedef unsigned char byte;
