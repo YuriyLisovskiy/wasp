@@ -39,19 +39,19 @@ wasp::HttpRequest make_request(const std::string& method)
 	);
 	auto empty_map = std::map<std::string, std::string>();
 	return HttpRequest(
-			method,
-			"/hello",
-			1, 1,
-			"",
-			true,
-			"",
-			empty_map,
-			empty_parameters,
-			empty_parameters,
-			HttpRequest::Parameters<std::string, UploadedFile>(
-				Dict<std::string, UploadedFile>(),
-				MultiValueDict<std::string, UploadedFile>()
-			)
+		method,
+		"/hello",
+		1, 1,
+		"",
+		true,
+		"",
+		empty_map,
+		empty_parameters,
+		empty_parameters,
+		HttpRequest::Parameters<std::string, UploadedFile>(
+			Dict<std::string, UploadedFile>(),
+			MultiValueDict<std::string, UploadedFile>()
+		)
 	);
 }
 
