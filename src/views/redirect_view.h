@@ -27,6 +27,7 @@
 
 #include "../globals.h"
 #include "view.h"
+#include "args.h"
 #include "../utility/logger.h"
 #include "../http/request.h"
 #include "../http/response.h"
@@ -52,13 +53,13 @@ public:
 	/// Return the URL redirect to.
 	std::string get_redirect_url();
 
-	HttpResponse* get(HttpRequest& request) override;
-	HttpResponse* post(HttpRequest& request) override;
-	HttpResponse* head(HttpRequest& request) override;
-	HttpResponse* options(HttpRequest& request) override;
-	HttpResponse* put(HttpRequest& request) override;
-	HttpResponse* delete_(HttpRequest& request) override;
-	HttpResponse* patch(HttpRequest& request) override;
+	HttpResponse* get(HttpRequest* request, Args* args) override;
+	HttpResponse* post(HttpRequest* request, Args* args) override;
+	HttpResponse* head(HttpRequest* request, Args* args) override;
+	HttpResponse* options(HttpRequest* request, Args* args) override;
+	HttpResponse* put(HttpRequest* request, Args* args) override;
+	HttpResponse* delete_(HttpRequest* request, Args* args) override;
+	HttpResponse* patch(HttpRequest* request, Args* args) override;
 };
 
 __WASP_END__

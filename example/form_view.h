@@ -33,18 +33,18 @@ class FormView : public wasp::View
 public:
 	FormView() : View({"get", "post"}) {}
 
-	wasp::HttpResponse* get(wasp::HttpRequest& request) final
+	wasp::HttpResponse* get(wasp::HttpRequest* request, wasp::Args* args) final
 	{
-		auto request_body = request.body();
+		auto request_body = request->body();
 		std::cout << request_body << '\n';
 
 		print(
-			"\nGet: ", request.GET.keys().size(),
-			"\nPost: ", request.POST.keys().size(),
-			"\nFiles: ", request.FILES.keys().size(),
-			"\nCookies: ", request.COOKIES.keys().size()
+			"\nGet: ", request->GET.keys().size(),
+			"\nPost: ", request->POST.keys().size(),
+			"\nFiles: ", request->FILES.keys().size(),
+			"\nCookies: ", request->COOKIES.keys().size()
 		);
-		print("\nCOOKIES: ", request.headers.get("Cookie"));
+		print("\nCOOKIES: ", request->headers.get("Cookie"));
 
 		std::string body(
 			"<form action=\"/hello\" method=\"post\" enctype=\"multipart/form-data\">\n"
@@ -59,7 +59,7 @@ public:
 		return new wasp::HttpResponse(body);
 	}
 
-	wasp::HttpResponse* post(wasp::HttpRequest& request) final
+	wasp::HttpResponse* post(wasp::HttpRequest* request, wasp::Args* args) final
 	{
 		return new wasp::HttpResponseRedirect("/hello");
 	}

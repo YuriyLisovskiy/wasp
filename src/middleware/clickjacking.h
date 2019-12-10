@@ -45,7 +45,7 @@ __WASP_BEGIN__
 class XFrameOptionsMiddleware : public MiddlewareMixin
 {
 public:
-	void processResponse(const HttpRequest& request, HttpResponse& response) final;
+	void processResponse(const HttpRequest* request, HttpResponse* response) final;
 };
 
 __WASP_END__

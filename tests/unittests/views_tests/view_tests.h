@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WASP_UNIT_TESTS_VIEWS_TESTS_VIEW_TESTS_INCLUDE_H
-#define WASP_UNIT_TESTS_VIEWS_TESTS_VIEW_TESTS_INCLUDE_H
+#ifndef WASP_UNIT_TESTS_VIEWS_TESTS_VIEW_TESTS_H
+#define WASP_UNIT_TESTS_VIEWS_TESTS_VIEW_TESTS_H
 
 #include <map>
 
@@ -74,7 +74,7 @@ protected:
 TEST_F(ViewTestCase, GetTestReturnsNullptr)
 {
 	auto request = ViewTestCase::make_request("get");
-	auto response = this->view->get(request);
+	auto response = this->view->get(&request, nullptr);
 
 	ASSERT_EQ(response, nullptr);
 
@@ -84,31 +84,31 @@ TEST_F(ViewTestCase, GetTestReturnsNullptr)
 TEST_F(ViewTestCase, PostTestReturnsNullptr)
 {
 	auto request = ViewTestCase::make_request("post");
-	ASSERT_EQ(this->view->post(request), nullptr);
+	ASSERT_EQ(this->view->post(&request, nullptr), nullptr);
 }
 
 TEST_F(ViewTestCase, PutTestReturnsNullptr)
 {
 	auto request = ViewTestCase::make_request("put");
-	ASSERT_EQ(this->view->put(request), nullptr);
+	ASSERT_EQ(this->view->put(&request, nullptr), nullptr);
 }
 
 TEST_F(ViewTestCase, PatchTestReturnsNullptr)
 {
 	auto request = ViewTestCase::make_request("patch");
-	ASSERT_EQ(this->view->patch(request), nullptr);
+	ASSERT_EQ(this->view->patch(&request, nullptr), nullptr);
 }
 
 TEST_F(ViewTestCase, DeleteTestReturnsNullptr)
 {
 	auto request = ViewTestCase::make_request("delete");
-	ASSERT_EQ(this->view->delete_(request), nullptr);
+	ASSERT_EQ(this->view->delete_(&request, nullptr), nullptr);
 }
 
 TEST_F(ViewTestCase, HeadTestReturnsNullptr)
 {
 	auto request = ViewTestCase::make_request("head");
-	ASSERT_EQ(this->view->head(request), nullptr);
+	ASSERT_EQ(this->view->head(&request, nullptr), nullptr);
 }
 
 TEST_F(ViewTestCase, OptionsTest)
@@ -121,7 +121,7 @@ TEST_F(ViewTestCase, OptionsTest)
 	expected_response.set_header("Content-Length", "0");
 
 	auto request = ViewTestCase::make_request("options");
-	auto actual_response = this->view->options(request);
+	auto actual_response = this->view->options(&request, nullptr);
 
 	ASSERT_EQ(actual_response->content_type(), expected_response.content_type());
 	ASSERT_EQ(actual_response->status(), expected_response.status());
@@ -133,7 +133,7 @@ TEST_F(ViewTestCase, OptionsTest)
 TEST_F(ViewTestCase, TraceTestReturnsNullptr)
 {
 	auto request = ViewTestCase::make_request("trace");
-	ASSERT_EQ(this->view->trace(request), nullptr);
+	ASSERT_EQ(this->view->trace(&request, nullptr), nullptr);
 }
 
 TEST_F(ViewTestCase, AllowedMethodsTest)
@@ -153,10 +153,10 @@ TEST_F(ViewTestCase, SetupAndDispatchAllowedTest)
 {
 	auto request = ViewTestCase::make_request("options");
 
-	ASSERT_THROW(this->view->dispatch(), NullPointerException);
+	ASSERT_THROW(this->view->dispatch(nullptr), NullPointerException);
 
-	this->view->setup(request);
-	auto response = this->view->dispatch();
+	this->view->setup(&request);
+	auto response = this->view->dispatch(nullptr);
 
 	ASSERT_EQ(response->status(), 200);
 
@@ -166,9 +166,9 @@ TEST_F(ViewTestCase, SetupAndDispatchAllowedTest)
 TEST_F(ViewTestCase, DispatchNotAllowedTest)
 {
 	auto request = ViewTestCase::make_request("get");
-	this->view->setup(request);
+	this->view->setup(&request);
 
-	auto response = this->view->dispatch();
+	auto response = this->view->dispatch(nullptr);
 
 	ASSERT_EQ(response->status(), 405);
 
@@ -178,4 +178,4 @@ TEST_F(ViewTestCase, DispatchNotAllowedTest)
 __UNIT_TESTS_END__
 
 
-#endif // WASP_UNIT_TESTS_VIEWS_TESTS_VIEW_TESTS_INCLUDE_H
+#endif // WASP_UNIT_TESTS_VIEWS_TESTS_VIEW_TESTS_H

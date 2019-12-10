@@ -42,18 +42,22 @@ std::string RedirectView::get_redirect_url()
 
 	if (this->_query_string)
 	{
-		url += this->_request->query();
+		url += "?" + this->_request->query();
 	}
 
 	return url;
 }
 
-HttpResponse* RedirectView::get(HttpRequest& request)
+HttpResponse* RedirectView::get(HttpRequest* request, Args* args)
 {
 	std::string url = this->get_redirect_url();
 	if (url.empty())
 	{
-		this->_logger->warning("Gone: " + this->_request->path(), _DETAILS_NONE_);
+		if (this->_logger != nullptr)
+		{
+			this->_logger->warning("Gone: " + request->path(), _DETAILS_NONE_);
+		}
+
 		return new HttpResponseGone("");
 	}
 
@@ -65,34 +69,34 @@ HttpResponse* RedirectView::get(HttpRequest& request)
 	return new HttpResponseRedirect(url);
 }
 
-HttpResponse* RedirectView::post(HttpRequest& request)
+HttpResponse* RedirectView::post(HttpRequest* request, Args* args)
 {
-	return this->get(request);
+	return this->get(request, args);
 }
 
-HttpResponse* RedirectView::put(HttpRequest& request)
+HttpResponse* RedirectView::put(HttpRequest* request, Args* args)
 {
-	return this->get(request);
+	return this->get(request, args);
 }
 
-HttpResponse* RedirectView::patch(HttpRequest& request)
+HttpResponse* RedirectView::patch(HttpRequest* request, Args* args)
 {
-	return this->get(request);
+	return this->get(request, args);
 }
 
-HttpResponse* RedirectView::delete_(HttpRequest& request)
+HttpResponse* RedirectView::delete_(HttpRequest* request, Args* args)
 {
-	return this->get(request);
+	return this->get(request, args);
 }
 
-HttpResponse* RedirectView::head(HttpRequest& request)
+HttpResponse* RedirectView::head(HttpRequest* request, Args* args)
 {
-	return this->get(request);
+	return this->get(request, args);
 }
 
-HttpResponse* RedirectView::options(HttpRequest& request)
+HttpResponse* RedirectView::options(HttpRequest* request, Args* args)
 {
-	return this->get(request);
+	return this->get(request, args);
 }
 
 __WASP_END__

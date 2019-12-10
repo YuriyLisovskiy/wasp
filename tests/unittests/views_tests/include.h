@@ -18,6 +18,8 @@
 #ifndef WASP_UNIT_TESTS_VIEWS_TESTS_INCLUDE_H
 #define WASP_UNIT_TESTS_VIEWS_TESTS_INCLUDE_H
 
+#include "./args_tests.h"
+#include "./redirect_view_tests.h"
 #include "./view_tests.h"
 
 #endif // WASP_UNIT_TESTS_VIEWS_TESTS_INCLUDE_H

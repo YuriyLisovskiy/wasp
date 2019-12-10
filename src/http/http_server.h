@@ -51,7 +51,7 @@ __INTERNAL_BEGIN__
 
 #define MAX_BUFF_SIZE 8192 * 8 - 1
 
-typedef std::function<void(HttpRequest&, const socket_t&)> httpHandler;
+typedef std::function<void(HttpRequest*, const socket_t&)> httpHandler;
 
 class HttpServer
 {
@@ -73,7 +73,7 @@ private:
 
 	int _init();
 	void _cleanUp(const socket_t& client);
-	HttpRequest _handleRequest(const socket_t& client);
+	HttpRequest* _handleRequest(const socket_t& client);
 	std::string _readBody(const socket_t& client, const std::string& bodyBeginning, size_t bodyLength);
 	std::string _readHeaders(const socket_t& client, std::string& bodyBeginning);
 	void _startListener();

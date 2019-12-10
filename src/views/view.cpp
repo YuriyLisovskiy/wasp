@@ -38,12 +38,12 @@ View::View(const std::vector<std::string>& allowed_methods, ILogger* logger) : V
 	}
 }
 
-void View::setup(HttpRequest& request)
+void View::setup(HttpRequest* request)
 {
-	this->_request = &request;
+	this->_request = request;
 }
 
-HttpResponse* View::dispatch()
+HttpResponse* View::dispatch(Args* args)
 {
 	if (this->_request == nullptr)
 	{
@@ -59,51 +59,51 @@ HttpResponse* View::dispatch()
 	HttpResponse* result = nullptr;
 	if (method == "get")
 	{
-		result = this->get(*this->_request);
+		result = this->get(this->_request, args);
 	}
 	else if (method == "post")
 	{
-		result = this->post(*this->_request);
+		result = this->post(this->_request, args);
 	}
 	else if (method == "put")
 	{
-		result = this->put(*this->_request);
+		result = this->put(this->_request, args);
 	}
 	else if (method == "patch")
 	{
-		result = this->patch(*this->_request);
+		result = this->patch(this->_request, args);
 	}
 	else if (method == "delete")
 	{
-		result = this->delete_(*this->_request);
+		result = this->delete_(this->_request, args);
 	}
 	else if (method == "head")
 	{
-		result = this->head(*this->_request);
+		result = this->head(this->_request, args);
 	}
 	else if (method == "options")
 	{
-		result = this->options(*this->_request);
+		result = this->options(this->_request, args);
 	}
 	else if (method == "trace")
 	{
-		result = this->trace(*this->_request);
+		result = this->trace(this->_request, args);
 	}
 
 	if (!result)
 	{
-		result = this->http_method_not_allowed(*this->_request);
+		result = this->http_method_not_allowed(this->_request);
 	}
 
 	return result;
 }
 
-HttpResponse* View::http_method_not_allowed(HttpRequest& request)
+HttpResponse* View::http_method_not_allowed(HttpRequest* request)
 {
 	if (this->_logger != nullptr)
 	{
 		this->_logger->warning(
-			"Method Not Allowed (" + request.method() + "): " + request.path(),
+			"Method Not Allowed (" + request->method() + "): " + request->path(),
 			_ERROR_DETAILS_
 		);
 	}
@@ -130,37 +130,37 @@ std::vector<std::string> View::allowed_methods()
 	return result;
 }
 
-HttpResponse* View::get(HttpRequest& request)
+HttpResponse* View::get(HttpRequest* request, Args* args)
 {
 	return nullptr;
 }
 
-HttpResponse* View::post(HttpRequest& request)
+HttpResponse* View::post(HttpRequest* request, Args* args)
 {
 	return nullptr;
 }
 
-HttpResponse* View::put(HttpRequest& request)
+HttpResponse* View::put(HttpRequest* request, Args* args)
 {
 	return nullptr;
 }
 
-HttpResponse* View::patch(HttpRequest& request)
+HttpResponse* View::patch(HttpRequest* request, Args* args)
 {
 	return nullptr;
 }
 
-HttpResponse* View::delete_(HttpRequest& request)
+HttpResponse* View::delete_(HttpRequest* request, Args* args)
 {
 	return nullptr;
 }
 
-HttpResponse* View::head(HttpRequest& request)
+HttpResponse* View::head(HttpRequest* request, Args* args)
 {
-	return this->get(request);
+	return this->get(request, args);
 }
 
-HttpResponse* View::options(HttpRequest& request)
+HttpResponse* View::options(HttpRequest* request, Args* args)
 {
 	auto* response = new HttpResponse("");
 	response->set_header("Allow", str::join(", ", this->allowed_methods()));
@@ -168,7 +168,7 @@ HttpResponse* View::options(HttpRequest& request)
 	return response;
 }
 
-HttpResponse* View::trace(HttpRequest& request)
+HttpResponse* View::trace(HttpRequest* request, Args* args)
 {
 	return nullptr;
 }

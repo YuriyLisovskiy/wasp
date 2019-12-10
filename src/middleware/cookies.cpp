@@ -20,14 +20,14 @@
 
 __WASP_BEGIN__
 
-void CookieMiddleware::processRequest(wasp::HttpRequest& request)
+void CookieMiddleware::processRequest(HttpRequest* request)
 {
-	auto* cookies = internal::cookie_parser::parse_req_cookies(request.headers.get("Cookie", ""));
-	request.COOKIES = Dict(*cookies);
+	auto* cookies = internal::cookie_parser::parse_req_cookies(request->headers.get("Cookie", ""));
+	request->COOKIES = Dict(*cookies);
 	delete cookies;
 }
 
-void CookieMiddleware::processResponse(const wasp::HttpRequest& request, wasp::HttpResponse& response)
+void CookieMiddleware::processResponse(const HttpRequest* request, HttpResponse* response)
 {
 }
 

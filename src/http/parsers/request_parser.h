@@ -197,7 +197,7 @@ struct request_parser final
 	/// Builds an http request from parsed data.
 	///
 	/// @return HttpRequest object built from http stream.
-	wasp::HttpRequest build_request();
+	wasp::HttpRequest* build_request();
 
 	/// Creates Dict object from headers' map.
 	///

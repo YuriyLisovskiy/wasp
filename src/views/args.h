@@ -15,34 +15,44 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * BaseMiddleware
- * TODO: write docs.
+/**
+ * args.h
+ * Purpose: class that contains url arguments based on std::map.
  */
 
-#ifndef WASP_MIDDLEWARE_MIDDLEWARE_MIXIN_H
-#define WASP_MIDDLEWARE_MIDDLEWARE_MIXIN_H
+#ifndef WASP_VIEWS_ARGS_H
+#define WASP_VIEWS_ARGS_H
+
+#include <map>
+#include <string>
+#include <cxxabi.h>
+#include <iostream>
+#include <functional>
 
 #include "../globals.h"
-#include "../http/request.h"
-#include "../http/response.h"
 
 
 __WASP_BEGIN__
 
-class MiddlewareMixin
+class Args
 {
-public:
-	virtual void processRequest(HttpRequest* request)
-	{
-	};
+private:
+	std::map<std::string, std::string> _map;
 
-	virtual void processResponse(const HttpRequest* request, HttpResponse* response)
-	{
-	};
+public:
+	Args() = default;
+	explicit Args(const std::map<std::string, std::string>& src);
+
+	int get_int(const std::string& key, int _default = 0);
+	std::string get_str(const std::string& key, const std::string& _default = "");
+
+	bool contains(const std::string& key);
+
+private:
+	static bool is_number(const std::string& val);
 };
 
 __WASP_END__
 
 
-#endif // WASP_MIDDLEWARE_MIDDLEWARE_MIXIN_H
+#endif // WASP_VIEWS_ARGS_H

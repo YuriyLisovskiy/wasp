@@ -35,6 +35,7 @@
 #include "../utility/logger.h"
 #include "../core/exceptions.h"
 #include "../collections/dict.h"
+#include "args.h"
 
 
 __WASP_BEGIN__
@@ -60,16 +61,76 @@ protected:
 public:
 	explicit View(ILogger* logger = nullptr);
 
-	virtual HttpResponse* get(HttpRequest& request);
-	virtual HttpResponse* post(HttpRequest& request);
-	virtual HttpResponse* put(HttpRequest& request);
-	virtual HttpResponse* patch(HttpRequest& request);
-	virtual HttpResponse* delete_(HttpRequest& request);
-	virtual HttpResponse* head(HttpRequest& request);
-	virtual HttpResponse* options(HttpRequest& request);
-	virtual HttpResponse* trace(HttpRequest& request);
+	/// Processes http GET request.
+	/// Can be overridden in derived class, otherwise returns nullptr.
+	///
+	/// @param request: pointer to http request.
+	/// @param args: pointer to requests's url arguments.
+	/// @return pointer to http response instance.
+	virtual HttpResponse* get(HttpRequest* request, Args* args);
 
-	virtual void setup(HttpRequest& request);
+	/// Processes http POST request.
+	/// Can be overridden in derived class, otherwise returns nullptr.
+	///
+	/// @param request: pointer to http request.
+	/// @param args: pointer to requests's url arguments.
+	/// @return pointer to http response instance.
+	virtual HttpResponse* post(HttpRequest* request, Args* args);
+
+	/// Processes http PUT request.
+	/// Can be overridden in derived class, otherwise returns nullptr.
+	///
+	/// @param request: pointer to http request.
+	/// @param args: pointer to requests's url arguments.
+	/// @return pointer to http response instance.
+	virtual HttpResponse* put(HttpRequest* request, Args* args);
+
+	/// Processes http PATCH request.
+	/// Can be overridden in derived class, otherwise returns nullptr.
+	///
+	/// @param request: pointer to http request.
+	/// @param args: pointer to requests's url arguments.
+	/// @return pointer to http response instance.
+	virtual HttpResponse* patch(HttpRequest* request, Args* args);
+
+	/// Processes http DELETE request.
+	/// Can be overridden in derived class, otherwise returns nullptr.
+	///
+	/// @param request: pointer to http request.
+	/// @param args: pointer to requests's url arguments.
+	/// @return pointer to http response instance.
+	virtual HttpResponse* delete_(HttpRequest* request, Args* args);
+
+	/// Processes http HEAD request.
+	/// Can be overridden in derived class, otherwise returns nullptr.
+	///
+	/// @param request: pointer to http request.
+	/// @param args: pointer to requests's url arguments.
+	/// @return pointer to http response instance.
+	virtual HttpResponse* head(HttpRequest* request, Args* args);
+
+	/// Processes http OPTIONS request.
+	/// Can be overridden in derived class, otherwise returns nullptr.
+	///
+	/// @param request: pointer to http request.
+	/// @param args: pointer to requests's url arguments.
+	/// @return pointer to http response instance.
+	virtual HttpResponse* options(HttpRequest* request, Args* args);
+
+	/// Processes http TRACE request.
+	/// Can be overridden in derived class, otherwise returns nullptr.
+	///
+	/// @param request: pointer to http request.
+	/// @param args: pointer to requests's url arguments.
+	/// @return pointer to http response instance.
+	virtual HttpResponse* trace(HttpRequest* request, Args* args);
+
+	/// Setups request before dispatch call.
+	/// Can be overridden in derived class, but requires
+	///		request initialization.
+	///
+	/// @param request: pointer to http request.
+	virtual void setup(HttpRequest* request);
 
 	/// Try to dispatch to the right method; if a method doesn't exist,
 	/// defer to the error handler. Also defer to the error handler if the
@@ -77,8 +138,21 @@ public:
 	///
 	/// @param request: an actual http request from client.
 	/// @return pointer to http response returned from handler.
-	virtual HttpResponse* dispatch();
-	HttpResponse* http_method_not_allowed(HttpRequest& request);
+	virtual HttpResponse* dispatch(Args* args);
+
+	/// Returns Http 405 (Method Not Allowed) response.
+	///
+	/// @param request: pointer to http request.
+	/// @return pointer to http response returned from handler.
+	HttpResponse* http_method_not_allowed(HttpRequest* request);
+
+	/// Builds vector of allowed methods.
+	/// Used for http OPTIONS response.
+	/// To make this method return correct allowed methods,
+	///		pass a vector of allowed methods names to protected
+	///		constructor in derived class initialization.
+	///
+	/// @return std::vector of strings.
 	std::vector<std::string> allowed_methods();
 
 protected:

@@ -100,7 +100,7 @@ void HttpServer::_cleanUp(const socket_t& client)
 	HttpServer::_wsaCleanUp();
 }
 
-HttpRequest HttpServer::_handleRequest(const socket_t& client)
+HttpRequest* HttpServer::_handleRequest(const socket_t& client)
 {
 	request_parser rp;
 	std::string bodyBeginning;
@@ -301,12 +301,13 @@ void HttpServer::_serveConnection(const socket_t& client)
 		measure.start();
 		// TODO: remove when release ------------------------^
 
-		HttpRequest request = this->_handleRequest(client);
+		HttpRequest* request = this->_handleRequest(client);
 		this->_httpHandler(request, client);
+		delete request;
 
 		// TODO: remove when release -------------------------------------------------------------:
 		measure.end();
-		std::cout << '\n' << request.method() + " request took " << measure.elapsed() << " ms\n";
+		std::cout << '\n' << request->method() + " request took " << measure.elapsed() << " ms\n";
 		// TODO: remove when release -------------------------------------------------------------^
 	}
 	catch (const SuspiciousOperation& exc)

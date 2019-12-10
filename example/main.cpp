@@ -26,14 +26,14 @@
 
 using wasp::internal::HttpServer;
 
-void handler(wasp::HttpRequest& request, const wasp::internal::socket_t& client)
+void handler(wasp::HttpRequest* request, const wasp::internal::socket_t& client)
 {
 	wasp::CookieMiddleware().processRequest(request);
 
 	auto view = FormView();
 	view.setup(request);
 
-	wasp::HttpResponse* response = view.dispatch();
+	wasp::HttpResponse* response = view.dispatch(nullptr);
 
 	if (!response)
 	{
