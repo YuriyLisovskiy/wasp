@@ -26,7 +26,9 @@
 
 #include <vector>
 #include <string>
+#include <cxxabi.h>
 #include <algorithm>
+#include <functional>
 
 #include "../globals.h"
 #include "../http/request.h"
@@ -154,6 +156,26 @@ public:
 	///
 	/// @return std::vector of strings.
 	std::vector<std::string> allowed_methods();
+
+	/// An entry point for a request-response process.
+	///
+	/// @tparam _ViewT: View or it's derived class. Class definition
+	/// 	must contains constructor with the next parameter:
+	/// 	wasp::ILogger* logger = nullptr
+	/// @return std::function which accepts request and url arguments,
+	/// 	and returns pointer to HttpResponse instance.
+	template <typename _ViewT>
+	static std::function<HttpResponse*(HttpRequest*, Args*)> make_view(ILogger* logger = nullptr)
+	{
+		auto func = [logger](HttpRequest* request, Args* args) -> HttpResponse*
+		{
+			_ViewT view(logger);
+			view.setup(request);
+			return view.dispatch(args);
+		};
+
+		return func;
+	}
 
 protected:
 	explicit View(const std::vector<std::string>& allowed_methods, ILogger* logger = nullptr);

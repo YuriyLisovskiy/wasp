@@ -22,18 +22,19 @@
 #include "../src/http/http_server.h"
 #include "../src/middleware/cookies.h"
 #include "../src/http/response.h"
+#include "../src/views/generic.h"
 #include "form_view.h"
 
 using wasp::internal::HttpServer;
+
 
 void handler(wasp::HttpRequest* request, const wasp::internal::socket_t& client)
 {
 	wasp::CookieMiddleware().processRequest(request);
 
-	auto view = FormView();
-	view.setup(request);
+	auto view = wasp::View::make_view<FormView>(wasp::Logger::get_instance());
 
-	wasp::HttpResponse* response = view.dispatch(nullptr);
+	auto* response = view(request, nullptr);
 
 	if (!response)
 	{
@@ -44,15 +45,17 @@ void handler(wasp::HttpRequest* request, const wasp::internal::socket_t& client)
 	delete response;
 }
 
+
 int main()
 {
 	try
 	{
 		HttpServer::Context ctx{};
 		ctx.handler = handler;
-		ctx.port = 3000;
+		ctx.port = 8000;
 		ctx.maxBodySize = 33300000;
 		ctx.mediaRoot = "/home/user/Desktop/media/";
+		ctx.logger = wasp::Logger::get_instance();
 
 		HttpServer server(ctx);
 		server.listenAndServe();

@@ -186,6 +186,7 @@ TEST_F(RedirectViewWithDefaultParamsTestCase, SetupAndDispatchAllowedTest)
 	delete response;
 }
 
+
 TEST_F(RedirectViewWithDefaultParamsTestCase, DispatchTraceNotAllowedTest)
 {
 	auto request = make_request("trace");

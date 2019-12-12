@@ -33,32 +33,33 @@ __UNIT_TESTS_BEGIN__
 
 class ViewTestCase : public ::testing::Test
 {
-protected:
-	View* view = nullptr;
-
+public:
 	static HttpRequest make_request(const std::string& method)
 	{
 		auto empty_parameters = HttpRequest::Parameters<std::string, std::string>(
-			Dict<std::string, std::string>(),
-			MultiValueDict<std::string, std::string>()
+				Dict<std::string, std::string>(),
+				MultiValueDict<std::string, std::string>()
 		);
 		auto empty_map = std::map<std::string, std::string>();
 		return HttpRequest(
-			method,
-			"/hello",
-			1, 1,
-			"",
-			true,
-			"",
-			empty_map,
-			empty_parameters,
-			empty_parameters,
-			HttpRequest::Parameters<std::string, UploadedFile>(
-				Dict<std::string, UploadedFile>(),
-				MultiValueDict<std::string, UploadedFile>()
-			)
+				method,
+				"/hello",
+				1, 1,
+				"",
+				true,
+				"",
+				empty_map,
+				empty_parameters,
+				empty_parameters,
+				HttpRequest::Parameters<std::string, UploadedFile>(
+						Dict<std::string, UploadedFile>(),
+						MultiValueDict<std::string, UploadedFile>()
+				)
 		);
 	}
+
+protected:
+	View* view = nullptr;
 
 	void SetUp() override
 	{
@@ -171,6 +172,18 @@ TEST_F(ViewTestCase, DispatchNotAllowedTest)
 	auto response = this->view->dispatch(nullptr);
 
 	ASSERT_EQ(response->status(), 405);
+
+	delete response;
+}
+
+TEST(ViewTestCaseStatic, MakeViewTest)
+{
+	auto request = ViewTestCase::make_request("options");
+	auto view = View::make_view<View>();
+
+	auto response = view(&request, nullptr);
+
+	ASSERT_EQ(response->status(), 200);
 
 	delete response;
 }

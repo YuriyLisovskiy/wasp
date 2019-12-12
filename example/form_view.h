@@ -19,6 +19,7 @@
 #define WASP_FORM_VIEW_H
 
 #include "../src/views/generic.h"
+#include "../src/utility/logger.h"
 
 
 template<class... Args>
@@ -31,7 +32,7 @@ void print(Args&&... args)
 class FormView : public wasp::View
 {
 public:
-	FormView() : View({"get", "post"}) {}
+	explicit FormView(wasp::ILogger* logger = nullptr) : View({"get", "post"}, logger) {}
 
 	wasp::HttpResponse* get(wasp::HttpRequest* request, wasp::Args* args) final
 	{

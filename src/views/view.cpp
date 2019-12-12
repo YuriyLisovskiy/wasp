@@ -47,9 +47,17 @@ HttpResponse* View::dispatch(Args* args)
 {
 	if (this->_request == nullptr)
 	{
-		// TODO: add class name
+		int status;
+		std::string name = typeid(*this).name();
+		char* fullName = abi::__cxa_demangle(name.c_str(), nullptr, nullptr, &status);
+		if (status == 0)
+		{
+			name = fullName;
+		//	delete fullName;
+		}
+
 		throw NullPointerException(
-			" instance has not initialized request."
+			name + " instance has not initialized request."
 			" Did you override setup() and forget to call base method?",
 			_ERROR_DETAILS_
 		);
