@@ -28,7 +28,7 @@
 #include <fstream>
 
 #include "../../globals.h"
-#include "../../utils/str.h"
+#include "../../utility/str.h"
 #include "../../core/exceptions.h"
 #include "../../collections/dict.h"
 #include "../../collections/multi_dict.h"

@@ -36,8 +36,8 @@ __WASP_BEGIN__
 class CookieMiddleware final: public MiddlewareMixin
 {
 public:
-	void processRequest(HttpRequest& request) final;
-	void processResponse(const HttpRequest& request, HttpResponse& response) final;
+	void processRequest(HttpRequest* request) final;
+	void processResponse(const HttpRequest* request, HttpResponse* response) final;
 };
 
 __WASP_END__

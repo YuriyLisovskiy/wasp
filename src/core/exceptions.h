@@ -33,6 +33,7 @@
  *  - FileDoesNotExistError;
  *  - MultiPartParserError
  *  - MultiValueDictError;
+ *  - NullPointerException;
  *  - ParseError;
  *  - SuspiciousOperation;
  *  - ValueError.
@@ -83,6 +84,17 @@ public:
 };
 
 
+class HttpError : public BaseException
+{
+protected:
+	// Use only when initializing of a derived exception!
+	HttpError(const char* message, int line, const char* function, const char* file, const char* type);
+public:
+	HttpError(const char* message, int line, const char* function, const char* file);
+	HttpError(const std::string& message, int line, const char* function, const char* file);
+};
+
+
 class SocketError : public BaseException
 {
 protected:
@@ -94,14 +106,82 @@ public:
 };
 
 
-class HttpError : public BaseException
+class AttributeError : public BaseException
 {
 protected:
 	// Use only when initializing of a derived exception!
-	HttpError(const char* message, int line, const char* function, const char* file, const char* type);
+	AttributeError(const char* message, int line, const char* function, const char* file, const char* type);
 public:
-	HttpError(const char* message, int line, const char* function, const char* file);
-	HttpError(const std::string& message, int line, const char* function, const char* file);
+	AttributeError(const char* message, int line, const char* function, const char* file);
+	AttributeError(const std::string& message, int line, const char* function, const char* file);
+};
+
+
+class DictError : public BaseException
+{
+protected:
+	// Use only when initializing of a derived exception!
+	DictError(const char* message, int line, const char* function, const char* file, const char* type);
+public:
+	DictError(const char* message, int line, const char* function, const char* file);
+	DictError(const std::string& message, int line, const char* function, const char* file);
+};
+
+
+// The user did something suspicious.
+class SuspiciousOperation : public BaseException
+{
+protected:
+	// Use only when initializing of a derived exception!
+	SuspiciousOperation(const char* message, int line, const char* function, const char* file, const char* type);
+public:
+	SuspiciousOperation(const char* message, int line, const char* function, const char* file);
+	SuspiciousOperation(const std::string& message, int line, const char* function, const char* file);
+};
+
+
+// Redirect to scheme not in allowed list.
+class DisallowedRedirect : public SuspiciousOperation
+{
+protected:
+	// Use only when initializing of a derived exception!
+	DisallowedRedirect(const char* message, int line, const char* function, const char* file, const char* type);
+public:
+	DisallowedRedirect(const char* message, int line, const char* function, const char* file);
+	DisallowedRedirect(const std::string& message, int line, const char* function, const char* file);
+};
+
+
+class EncodingError : public BaseException
+{
+protected:
+	// Use only when initializing of a derived exception!
+	EncodingError(const char* message, int line, const char* function, const char* file, const char* type);
+public:
+	EncodingError(const char* message, int line, const char* function, const char* file);
+	EncodingError(const std::string& message, int line, const char* function, const char* file);
+};
+
+
+class FileError : public BaseException
+{
+protected:
+	// Use only when initializing of a derived exception!
+	FileError(const char* message, int line, const char* function, const char* file, const char* type);
+public:
+	FileError(const char* message, int line, const char* function, const char* file);
+	FileError(const std::string& message, int line, const char* function, const char* file);
+};
+
+
+class FileDoesNotExistError : public BaseException
+{
+protected:
+	// Use only when initializing of a derived exception!
+	FileDoesNotExistError(const char* message, int line, const char* function, const char* file, const char* type);
+public:
+	FileDoesNotExistError(const char* message, int line, const char* function, const char* file);
+	FileDoesNotExistError(const std::string& message, int line, const char* function, const char* file);
 };
 
 
@@ -127,17 +207,6 @@ public:
 };
 
 
-class DictError : public BaseException
-{
-protected:
-	// Use only when initializing of a derived exception!
-	DictError(const char* message, int line, const char* function, const char* file, const char* type);
-public:
-	DictError(const char* message, int line, const char* function, const char* file);
-	DictError(const std::string& message, int line, const char* function, const char* file);
-};
-
-
 class MultiValueDictError : public DictError
 {
 protected:
@@ -146,6 +215,17 @@ protected:
 public:
 	MultiValueDictError(const char* message, int line, const char* function, const char* file);
 	MultiValueDictError(const std::string& message, int line, const char* function, const char* file);
+};
+
+
+class NullPointerException : public BaseException
+{
+protected:
+	// Use only when initializing of a derived exception!
+	NullPointerException(const char* message, int line, const char* function, const char* file, const char* type);
+public:
+	NullPointerException(const char* message, int line, const char* function, const char* file);
+	NullPointerException(const std::string& message, int line, const char* function, const char* file);
 };
 
 
@@ -160,62 +240,6 @@ public:
 };
 
 
-class AttributeError : public BaseException
-{
-protected:
-	// Use only when initializing of a derived exception!
-	AttributeError(const char* message, int line, const char* function, const char* file, const char* type);
-public:
-	AttributeError(const char* message, int line, const char* function, const char* file);
-	AttributeError(const std::string& message, int line, const char* function, const char* file);
-};
-
-
-class FileDoesNotExistError : public BaseException
-{
-protected:
-	// Use only when initializing of a derived exception!
-	FileDoesNotExistError(const char* message, int line, const char* function, const char* file, const char* type);
-public:
-	FileDoesNotExistError(const char* message, int line, const char* function, const char* file);
-	FileDoesNotExistError(const std::string& message, int line, const char* function, const char* file);
-};
-
-
-class FileError : public BaseException
-{
-protected:
-	// Use only when initializing of a derived exception!
-	FileError(const char* message, int line, const char* function, const char* file, const char* type);
-public:
-	FileError(const char* message, int line, const char* function, const char* file);
-	FileError(const std::string& message, int line, const char* function, const char* file);
-};
-
-
-class EncodingError : public BaseException
-{
-protected:
-	// Use only when initializing of a derived exception!
-	EncodingError(const char* message, int line, const char* function, const char* file, const char* type);
-public:
-	EncodingError(const char* message, int line, const char* function, const char* file);
-	EncodingError(const std::string& message, int line, const char* function, const char* file);
-};
-
-
-// The user did something suspicious
-class SuspiciousOperation : public BaseException
-{
-protected:
-	// Use only when initializing of a derived exception!
-	SuspiciousOperation(const char* message, int line, const char* function, const char* file, const char* type);
-public:
-	SuspiciousOperation(const char* message, int line, const char* function, const char* file);
-	SuspiciousOperation(const std::string& message, int line, const char* function, const char* file);
-};
-
-
 // Length of request's header is too large.
 class EntityTooLargeError : public BaseException
 {
@@ -225,18 +249,6 @@ protected:
 public:
 	EntityTooLargeError(const char* message, int line, const char* function, const char* file);
 	EntityTooLargeError(const std::string& message, int line, const char* function, const char* file);
-};
-
-
-// Redirect to scheme not in allowed list
-class DisallowedRedirect : public SuspiciousOperation
-{
-protected:
-	// Use only when initializing of a derived exception!
-	DisallowedRedirect(const char* message, int line, const char* function, const char* file, const char* type);
-public:
-	DisallowedRedirect(const char* message, int line, const char* function, const char* file);
-	DisallowedRedirect(const std::string& message, int line, const char* function, const char* file);
 };
 
 __WASP_END__

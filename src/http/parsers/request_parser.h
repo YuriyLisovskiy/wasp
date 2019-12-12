@@ -18,8 +18,6 @@
 /**
  * request_parser.h
  * Purpose: parses an http request from given stream.
- *
- * @author Yuriy Lisovskiy
  */
 
 #ifndef WASP_HTTP_PARSERS_REQUEST_PARSER_H
@@ -34,7 +32,7 @@
 #include "../request.h"
 #include "multipart_parser.h"
 #include "query_parser.h"
-#include "../../utils/str.h"
+#include "../../utility/str.h"
 
 
 __INTERNAL_BEGIN__
@@ -199,7 +197,7 @@ struct request_parser final
 	/// Builds an http request from parsed data.
 	///
 	/// @return HttpRequest object built from http stream.
-	wasp::HttpRequest build_request();
+	wasp::HttpRequest* build_request();
 
 	/// Creates Dict object from headers' map.
 	///

@@ -16,36 +16,35 @@
  */
 
 #include "request.h"
-#include "../core/files/uploaded_file.h"
 
 
 __WASP_BEGIN__
 
 HttpRequest::HttpRequest(
-	std::string method, std::string path, size_t majorV, size_t minorV,
-	std::string query, bool keepAlive, std::string content,
+	const std::string& method, std::string path, size_t major_v, size_t minor_v,
+	std::string query, bool keep_alive, std::string content,
 	const std::map<std::string, std::string>& headers,
-	const HttpRequest::Parameters<std::string, std::string>& getParameters,
-	const HttpRequest::Parameters<std::string, std::string>& postParameters,
-	const HttpRequest::Parameters<std::string, UploadedFile>& filesParameters
+	const HttpRequest::Parameters<std::string, std::string>& get_params,
+	const HttpRequest::Parameters<std::string, std::string>& post_params,
+	const HttpRequest::Parameters<std::string, UploadedFile>& files_params
 )
-:   _method(std::move(method)),
-	_path(std::move(path)),
-	_majorVersion(majorV),
-	_minorVersion(minorV),
+:   _path(std::move(path)),
+	_major_version(major_v),
+	_minor_version(minor_v),
 	_query(std::move(query)),
-	_keepAlive(keepAlive),
+	_keep_alive(keep_alive),
 	_body(std::move(content))
 {
+	this->_method = str::upper(method);
 	this->headers = Dict<std::string, std::string>(headers);
-	this->GET = getParameters;
-	this->POST = postParameters;
-	this->FILES = filesParameters;
+	this->GET = get_params;
+	this->POST = post_params;
+	this->FILES = files_params;
 }
 
 std::string HttpRequest::version()
 {
-	return std::to_string(this->_majorVersion) + "." + std::to_string(this->_minorVersion);
+	return std::to_string(this->_major_version) + "." + std::to_string(this->_minor_version);
 }
 
 std::string HttpRequest::path()
@@ -53,9 +52,19 @@ std::string HttpRequest::path()
 	return this->_path;
 }
 
+std::string HttpRequest::query()
+{
+	return this->_query;
+}
+
 std::string HttpRequest::method()
 {
 	return this->_method;
+}
+
+bool HttpRequest::keep_alive()
+{
+	return this->_keep_alive;
 }
 
 std::string HttpRequest::body()

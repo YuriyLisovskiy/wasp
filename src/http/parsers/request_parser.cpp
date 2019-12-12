@@ -35,27 +35,10 @@ request_parser::~request_parser()
 }
 
 // Builds an http request from parsed data.
-wasp::HttpRequest request_parser::build_request()
+wasp::HttpRequest* request_parser::build_request()
 {
-	HttpRequest::Parameters<std::string, std::string> gets;
-	if (this->get_parameters)
-	{
-		gets = *this->get_parameters;
-	}
-
-	HttpRequest::Parameters<std::string, std::string> posts;
-	if (this->post_parameters)
-	{
-		posts = *this->post_parameters;
-	}
-
-	HttpRequest::Parameters<std::string, UploadedFile> files;
-	if (this->files_parameters)
-	{
-		files = *this->files_parameters;
-	}
-
-	wasp::HttpRequest request(
+	HttpRequest::Parameters<std::string, std::string> empty;
+	return new wasp::HttpRequest(
 		this->method,
 		this->path,
 		this->major_v,
@@ -64,11 +47,10 @@ wasp::HttpRequest request_parser::build_request()
 		this->keep_alive,
 		this->content,
 		this->headers,
-		gets,
-		posts,
-		files
+		this->get_parameters ? *this->get_parameters : empty,
+		this->post_parameters ? *this->post_parameters : empty,
+		this->files_parameters ? *this->files_parameters : HttpRequest::Parameters<std::string, UploadedFile>()
 	);
-	return request;
 }
 
 // Creates Dict object from headers' map.

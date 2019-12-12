@@ -25,7 +25,7 @@
 
 #include "../../globals.h"
 #include "../exceptions.h"
-#include "../../utils/str.h"
+#include "../../utility/str.h"
 
 
 __WASP_BEGIN__

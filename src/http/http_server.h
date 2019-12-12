@@ -33,7 +33,7 @@
 #include <poll.h>
 
 #include "../globals.h"
-#include "../utils/logger.h"
+#include "../utility/logger.h"
 #include "../conf/defaults.h"
 #include "../conf/settings.h"
 #include "../core/sockets/server_socket.h"
@@ -43,15 +43,15 @@
 #include "../core/exceptions.h"
 #include "../core/files/uploaded_file.h"
 
-#include "../utils/datetime/time.h"
-#include "../utils/str.h"
+#include "../utility/datetime/time.h"
+#include "../utility/str.h"
 
 
 __INTERNAL_BEGIN__
 
 #define MAX_BUFF_SIZE 8192 * 8 - 1
 
-typedef std::function<void(HttpRequest&, const socket_t&)> httpHandler;
+typedef std::function<void(HttpRequest*, const socket_t&)> httpHandler;
 
 class HttpServer
 {
@@ -73,7 +73,7 @@ private:
 
 	int _init();
 	void _cleanUp(const socket_t& client);
-	HttpRequest _handleRequest(const socket_t& client);
+	HttpRequest* _handleRequest(const socket_t& client);
 	std::string _readBody(const socket_t& client, const std::string& bodyBeginning, size_t bodyLength);
 	std::string _readHeaders(const socket_t& client, std::string& bodyBeginning);
 	void _startListener();

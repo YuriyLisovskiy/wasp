@@ -33,11 +33,11 @@ __WASP_BEGIN__
 class MiddlewareMixin
 {
 public:
-	virtual void processRequest(HttpRequest& request)
+	virtual void processRequest(HttpRequest* request)
 	{
 	};
 
-	virtual void processResponse(const HttpRequest& request, HttpResponse& response)
+	virtual void processResponse(const HttpRequest* request, HttpResponse* response)
 	{
 	};
 };
