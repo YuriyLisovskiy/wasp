@@ -53,7 +53,6 @@ HttpResponse* View::dispatch(Args* args)
 		if (status == 0)
 		{
 			name = fullName;
-		//	delete fullName;
 		}
 
 		throw NullPointerException(
