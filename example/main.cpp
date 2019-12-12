@@ -32,9 +32,9 @@ void handler(wasp::HttpRequest* request, const wasp::internal::socket_t& client)
 {
 	wasp::CookieMiddleware().processRequest(request);
 
-	auto view = wasp::View::make_view<FormView>(wasp::Logger::get_instance());
+	auto view = wasp::View::make_view<FormView>();
 
-	auto* response = view(request, nullptr);
+	auto* response = view(request, nullptr, wasp::Logger::get_instance());
 
 	if (!response)
 	{
@@ -50,15 +50,15 @@ int main()
 {
 	try
 	{
-		HttpServer::Context ctx{};
+		HttpServer::context ctx{};
 		ctx.handler = handler;
 		ctx.port = 8000;
-		ctx.maxBodySize = 33300000;
-		ctx.mediaRoot = "/home/user/Desktop/media/";
+		ctx.max_body_size = 33300000;
+		ctx.media_root = "/home/user/Desktop/media/";
 		ctx.logger = wasp::Logger::get_instance();
 
 		HttpServer server(ctx);
-		server.listenAndServe();
+		server.listen_and_serve();
 	}
 	catch (const std::exception& exc)
 	{

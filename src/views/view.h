@@ -165,9 +165,9 @@ public:
 	/// @return std::function which accepts request and url arguments,
 	/// 	and returns pointer to HttpResponse instance.
 	template <typename _ViewT>
-	static std::function<HttpResponse*(HttpRequest*, Args*)> make_view(ILogger* logger = nullptr)
+	static std::function<HttpResponse*(HttpRequest*, Args*, ILogger*)> make_view()
 	{
-		auto func = [logger](HttpRequest* request, Args* args) -> HttpResponse*
+		auto func = [](HttpRequest* request, Args* args, ILogger* logger) -> HttpResponse*
 		{
 			_ViewT view(logger);
 			view.setup(request);

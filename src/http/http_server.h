@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * http server definition.
- * TODO: write docs
+/**
+ * http_server.h
+ * Purpose: http server based on tcp/ip socket.
  */
 
 #ifndef WASP_HTTP_SERVER_H
@@ -36,11 +36,12 @@
 #include "../utility/logger.h"
 #include "../conf/defaults.h"
 #include "../conf/settings.h"
-#include "../core/sockets/server_socket.h"
 #include "response.h"
 #include "request.h"
 #include "parsers/request_parser.h"
+#include "../core/sockets/server_socket.h"
 #include "../core/exceptions.h"
+#include "../core/thread_pool.h"
 #include "../core/files/uploaded_file.h"
 
 #include "../utility/datetime/time.h"
@@ -49,9 +50,15 @@
 
 __INTERNAL_BEGIN__
 
-#define MAX_BUFF_SIZE 8192 * 8 - 1
+#define MAX_BUFF_SIZE 8192 * 8 - 1  // 65535 bytes.
 
-typedef std::function<void(HttpRequest*, const socket_t&)> httpHandler;
+// 4K per header value.
+// 35 main headers and 3 additional.
+// 403 bytes is a length of all headers names.
+#define MAX_HEADERS_SIZE 4096 * 38 + 403    // 156051 bytes.
+
+typedef std::function<void(HttpRequest*, const socket_t&)> http_handler;
+
 
 class HttpServer
 {
@@ -59,53 +66,59 @@ private:
 	const char* _host;
 	uint16_t _port;
 	const char* _schema;
-	size_t _maxBodySize;
-	ServerSocket _serverSocket;
-	httpHandler _httpHandler;
+	size_t _max_body_size;
+	ServerSocket _server_socket;
+	http_handler _http_handler;
 	bool _finished;
 	ILogger* _logger;
-	std::string _mediaRoot;
+	std::string _media_root;
+	size_t _threads_count;
+	ThreadPool* _thread_pool;
 
-	enum ReadResult
+	enum read_result_enum
 	{
-		Continue, Break, None
+		rr_continue, rr_break, rr_none
 	};
 
 	int _init();
-	void _cleanUp(const socket_t& client);
-	HttpRequest* _handleRequest(const socket_t& client);
-	std::string _readBody(const socket_t& client, const std::string& bodyBeginning, size_t bodyLength);
-	std::string _readHeaders(const socket_t& client, std::string& bodyBeginning);
-	void _startListener();
-	void _serveConnection(const socket_t& client);
-	void _threadFunc(const socket_t& client);
+	int _create();
+	int _bind();
+	int _listen();
+	void _clean_up(const socket_t& client);
+	HttpRequest* _handle_request(const socket_t& client);
+	std::string _read_body(const socket_t& client, const std::string& body_beginning, size_t body_length);
+	static std::string _read_headers(const socket_t& client, std::string& body_beginning);
+	void _start_listener();
+	void _serve_connection(const socket_t& client);
+	void _thread_func(const socket_t& client);
 
-	static ReadResult _handleError(char* buffer, int line, const char *function, const char *file);
+	static read_result_enum _handle_error(char* buffer, int line, const char* function, const char* file);
 	static void _send(const char* data, const socket_t& client);
-	static bool _setSocketBlocking(int _sock, bool blocking);
-	static void _write(const char* data, size_t bytesToWrite, const socket_t& client);
-	static void _wsaCleanUp();
+	static bool _set_socket_blocking(int _sock, bool blocking);
+	static void _write(const char* data, size_t bytes_to_write, const socket_t& client);
+	static void _wsa_clean_up();
 
 public:
-	struct Context
+	struct context
 	{
 		const char* host = nullptr;
 		uint16_t port = 0;
-		httpHandler handler = nullptr;
+		http_handler handler = nullptr;
 		ILogger* logger;
-		size_t maxBodySize = 0;
-		std::string mediaRoot;
+		size_t max_body_size = 0;
+		std::string media_root;
+		size_t threads_count = 0;
 	};
 
-	explicit HttpServer(HttpServer::Context& ctx);
+	explicit HttpServer(HttpServer::context& ctx);
 	~HttpServer();
 	void finish();
-	void listenAndServe();
+	void listen_and_serve();
 	static void send(HttpResponseBase* response, const socket_t& client);
 	static void send(StreamingHttpResponse* response, const socket_t& client);
 
 private:
-	static void _normalizeContext(HttpServer::Context& ctx);
+	static void _normalize_context(HttpServer::context& ctx);
 };
 
 __INTERNAL_END__
