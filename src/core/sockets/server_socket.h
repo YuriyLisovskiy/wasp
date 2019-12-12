@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * server_socket definition.
- * TODO: write docs.
+/**
+ * server_socket.h
+ * Purpose: improved and adapted tcp/ip socket.
  */
 
 #ifndef WASP_CORE_TCP_SERVER_SOCKET_H

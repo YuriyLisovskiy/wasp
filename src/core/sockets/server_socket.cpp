@@ -15,9 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * server_socket implementation.
- * TODO: write docs.
+/**
+ * An implementation of server_socket.h.
  */
 
 #include "server_socket.h"

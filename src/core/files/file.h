@@ -15,6 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * file.h
+ * Purpose: file stream wrapper for easier file handling.
+ */
+
 #ifndef WASP_CORE_FILES_FILE_H
 #define WASP_CORE_FILES_FILE_H
 
@@ -33,45 +38,58 @@ __WASP_BEGIN__
 class File
 {
 protected:
-	enum FileMode
+	enum file_mode_enum
 	{
-		ReadOnly, WriteOnly, Both
+		m_read_only, m_write_only, m_both
 	};
 
-	size_t _defaultChunkSize;
+	size_t _default_chunk_size;
 	std::fstream _file;
 	std::string _name;
-	FileMode _fileMode;
-	std::string _strMode;
+	file_mode_enum _file_mode;
+	std::string _str_mode;
 	std::ios_base::openmode _mode;
+	std::vector<byte> _data;
 
-	void _initMode(const std::string& mode);
-	void seek(size_t n, std::ios_base::seekdir seekDir);
+	void _init_mode(const std::string& mode);
+	void seek(size_t n, std::ios_base::seekdir seek_dir);
 	void seek(size_t n);
 	size_t tell();
 
 public:
 	explicit File(
-		const std::string& name,
+		const std::string& name = "",
 		const std::string& mode = "r"
 	);
+
 	File(
 		const std::vector<byte>& data,
 		const std::string& name,
 		const std::string& mode = "wb"
 	);
 
+	File(const File& other);
+
+	File& operator=(const File& other);
+
 	void open();
+
+	// Saves file without closing.
 	void save();
+
+	// Opens file if it is not opened, writes data
+	//  if byte vector is not empty and closes file.
+	void save_file();
+
 	void close();
-	bool isOpen();
+	bool is_open();
 	std::vector<byte> read(size_t n = -1);
-	std::string readStr(size_t n = -1);
+	std::string read_str(size_t n = -1);
 	void write(std::vector<byte> bytes);
-	void writeStr(const std::string& str);
+	void write_str(const std::string& str);
 	size_t size();
-	std::vector<std::vector<byte>> chunks(size_t chunkSize = -1);
-	bool multipleChunks(size_t chunkSize = -1);
+	std::vector<std::vector<byte>> chunks(size_t chunk_size = -1);
+	bool multiple_chunks(size_t chunk_size = -1);
 	std::string path() const;
 };
 

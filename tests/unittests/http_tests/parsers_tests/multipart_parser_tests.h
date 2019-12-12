@@ -257,6 +257,7 @@ TEST_F(MultipartParserTestCase, ParseMultipleParametersWithFilesTest)
 	ASSERT_TRUE(files->contains("super_file"));
 
 	auto super_file = files->get("super_file");
+	super_file.save();
 
 	delete files;
 

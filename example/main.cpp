@@ -52,9 +52,9 @@ int main()
 	{
 		HttpServer::context ctx{};
 		ctx.handler = handler;
-		ctx.port = 8000;
+		ctx.port = 3000;
 		ctx.max_body_size = 33300000;
-		ctx.media_root = "/home/user/Desktop/media/";
+		ctx.media_root = "/home/yuriylisovskiy/Desktop/media/";
 		ctx.logger = wasp::Logger::get_instance();
 
 		HttpServer server(ctx);
