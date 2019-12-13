@@ -46,31 +46,35 @@ private:
 	std::queue<std::function<void(void)>> _queue;
 	std::condition_variable _cond_var;
 	bool _quit = false;
+	bool _is_finished;
 
 public:
 	explicit ThreadPool(size_t threads_count = 1);
 	~ThreadPool();
 
-	// Pushes and copies function to queue.
+	/// Pushes and copies function to queue.
 	void push(const std::function<void(void)>& func);
 
-	// Pushes and moves function to queue.
+	/// Pushes and moves function to queue.
 	void push(std::function<void(void)>&& func);
 
-	// Returns threads count.
+	/// Returns threads count.
 	size_t threads_count();
 
-	// Deleted constructors.
+	/// Waits until all threads finishes.
+	void wait();
+
+	/// Deleted constructors.
 	ThreadPool(const ThreadPool& other) = delete;
 	ThreadPool(ThreadPool&& other) = delete;
 
-	// Deleted operators.
+	/// Deleted operators.
 	ThreadPool& operator=(const ThreadPool& other) = delete;
 	ThreadPool& operator=(ThreadPool&& other) = delete;
 
 private:
 
-	// Dispatches function from queue and executes it.
+	/// Dispatches function from queue and executes it.
 	void _thread_handler();
 };
 

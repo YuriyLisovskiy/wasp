@@ -381,6 +381,10 @@ void HttpServer::_start_listener()
 				}
 			}
 		}
+		catch (const wasp::InterruptException& exc)
+		{
+			throw InterruptException(exc.what(), exc.line(), exc.function(), exc.file());
+		}
 		catch (const std::exception& exc)
 		{
 			if (this->_logger != nullptr)

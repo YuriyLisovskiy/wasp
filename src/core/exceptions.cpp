@@ -313,4 +313,35 @@ EntityTooLargeError::EntityTooLargeError(const std::string& message, int line, c
 {
 }
 
+
+// InterruptException
+InterruptException::InterruptException(const char* message, int line, const char* function, const char* file, const char* type)
+	: BaseException(message, line, function, file, type)
+{
+}
+
+InterruptException::InterruptException(const char* message, int line, const char* function, const char* file)
+	: InterruptException(message, line, function, file, "InterruptException")
+{
+}
+
+InterruptException::InterruptException(const std::string& message, int line, const char *function, const char *file)
+	: InterruptException(message.c_str(), line, function, file)
+{
+}
+
+void InterruptException::handle_signal(int sig)
+{
+	throw InterruptException("execution is interrupted with signal " + std::to_string(sig), _DETAILS_NONE_);
+}
+
+void InterruptException::initialize()
+{
+	struct sigaction sig_int_handler{};
+	sig_int_handler.sa_handler = InterruptException::handle_signal;
+	sigemptyset(&sig_int_handler.sa_mask);
+	sig_int_handler.sa_flags = 0;
+	sigaction(SIGINT, &sig_int_handler, nullptr);
+}
+
 __WASP_END__

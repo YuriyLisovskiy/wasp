@@ -24,6 +24,7 @@
 #include "../src/http/response.h"
 #include "../src/views/generic.h"
 #include "form_view.h"
+#include "../src/core/exceptions.h"
 
 using wasp::internal::HttpServer;
 
@@ -48,17 +49,26 @@ void handler(wasp::HttpRequest* request, const wasp::internal::socket_t& client)
 
 int main()
 {
+	wasp::InterruptException::initialize();
+
+	HttpServer::context ctx{};
+	ctx.handler = handler;
+	ctx.port = 3000;
+	ctx.max_body_size = 33300000;
+	ctx.media_root = "/home/yuriylisovskiy/Desktop/media/";
+	ctx.logger = wasp::Logger::get_instance();
+
+	HttpServer server(ctx);
+
 	try
 	{
-		HttpServer::context ctx{};
-		ctx.handler = handler;
-		ctx.port = 3000;
-		ctx.max_body_size = 33300000;
-		ctx.media_root = "/home/yuriylisovskiy/Desktop/media/";
-		ctx.logger = wasp::Logger::get_instance();
-
-		HttpServer server(ctx);
 		server.listen_and_serve();
+	}
+	catch (const wasp::InterruptException& exc)
+	{
+		std::cout << "\nFinishing server...";
+		server.finish();
+		std::cout << "\nDone.\n";
 	}
 	catch (const std::exception& exc)
 	{

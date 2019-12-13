@@ -27,6 +27,7 @@ __INTERNAL_BEGIN__
 ThreadPool::ThreadPool(size_t threads_count) : _threads(threads_count)
 {
 	this->_threads_count = threads_count;
+	this->_is_finished = false;
 	for (auto& thread : this->_threads)
 	{
 		thread = std::thread(&ThreadPool::_thread_handler, this);
@@ -35,19 +36,9 @@ ThreadPool::ThreadPool(size_t threads_count) : _threads(threads_count)
 
 ThreadPool::~ThreadPool()
 {
-	// Signal to dispatch threads that it's time to wrap up.
-	std::unique_lock<std::mutex> lock(this->_lock);
-	this->_quit = true;
-	lock.unlock();
-	this->_cond_var.notify_all();
-
-	// Wait for threads to finish before we exit.
-	for (auto& thread : this->_threads)
+	if (!this->_is_finished)
 	{
-		if (thread.joinable())
-		{
-			thread.join();
-		}
+		this->wait();
 	}
 }
 
@@ -76,6 +67,31 @@ void ThreadPool::push(std::function<void(void)>&& func)
 size_t ThreadPool::threads_count()
 {
 	return this->_threads_count;
+}
+
+void ThreadPool::wait()
+{
+	if (this->_is_finished)
+	{
+		return;
+	}
+
+	// Signal to dispatch threads that it's time to wrap up.
+	std::unique_lock<std::mutex> lock(this->_lock);
+	this->_quit = true;
+	lock.unlock();
+	this->_cond_var.notify_all();
+
+	// Wait for threads to finish before we exit.
+	for (auto& thread : this->_threads)
+	{
+		if (thread.joinable())
+		{
+			thread.join();
+		}
+	}
+
+	this->_is_finished = true;
 }
 
 void ThreadPool::_thread_handler()
