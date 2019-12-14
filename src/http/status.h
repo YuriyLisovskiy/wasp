@@ -15,9 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * status
- * TODO: write docs.
+/**
+ * status.h
+ * Purpose: hold all available http statuses, which contains status code,
+ * 			reason phrase and brief explanation.
  */
 
 #ifndef WASP_HTTP_STATUS_H

@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * path definition.
- * TODO: write docs.
+/**
+ * path.h
+ * Purpose: utilities for working with path.
  */
 
-#ifndef WASP_UTILS_PATH_H
-#define WASP_UTILS_PATH_H
+#ifndef WASP_UTILITY_PATH_H
+#define WASP_UTILITY_PATH_H
 
 #if defined(_WIN32) || defined(_WIN64)
 #include <io.h>
@@ -42,39 +42,55 @@
 
 __PATH_INTERNAL_BEGIN__
 
-// Split a path in root and extension.
-// The extension is everything starting at the last dot in the last
-// pathname component; the root is everything before that.
-// It is always true that root + ext == p.
-//
-// Generic implementation of splitext, to be parametrized with
-// the separators.
-extern void _split_text(const std::string& p, char sep, char altsep, char extsep, std::string& rootOut, std::string& extOut);
+/// Split a path in root and extension.
+/// The extension is everything starting at the last dot in the last
+/// pathname component; the root is everything before that.
+/// It is always true that root + ext == p.
+///
+/// Generic implementation of splitext, to be parametrized with
+/// the separators.
+extern void _split_text(
+	const std::string& full_path,
+	char sep,
+	char altsep,
+	char extsep,
+	std::string& root_out,
+	std::string& ext_out
+);
 
 __PATH_INTERNAL_END__
 
 
 __PATH_BEGIN__
 
-// Split a path in root and extension.
-// The extension is everything starting at the last dot in the last
-// pathname component; the root is everything before that.
-// It is always true that root + ext == p.
-extern void splitText(const std::string& fullPath, std::string& rootOut, std::string& extOut);
+/// Split a path in root and extension.
+/// The extension is everything starting at the last dot in the last
+/// pathname component; the root is everything before that.
+/// It is always true that root + ext == p.
+extern void split_text(const std::string& full_path, std::string& root_out, std::string& ext_out);
 
-// Returns true if file exists, otherwise returns false.
+/// Checks if path exists.
+///
+/// @param path: path to check.
+/// @return true if path exists, otherwise returns false.
 extern bool exists(const std::string& path);
 
-// Returns base from given path.
+/// Returns base from given path.
+///
+/// @param path: path to analyze.
+/// @return base of given path.
 extern std::string base(const std::string& path);
 
-// Returns file size in bytes.
-extern size_t getSize(const std::string& path);
+/// Returns file size in bytes.
+///
+/// @param path: path to access.
+/// @return size of file located on given path.
+extern size_t get_size(const std::string& path);
 
-// Returns current working directory.
+/// Returns current working directory.
 extern std::string cwd();
 
 __PATH_END__
 
 
-#endif // WASP_UTILS_PATH_H
+#endif // WASP_UTILITY_PATH_H

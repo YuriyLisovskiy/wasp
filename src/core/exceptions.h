@@ -36,7 +36,8 @@
  *  - NullPointerException;
  *  - ParseError;
  *  - SuspiciousOperation;
- *  - ValueError.
+ *  - ValueError;
+ *  - InterruptException.
  *
  * - Request errors:
  *  - EntityTooLargeError
@@ -49,6 +50,8 @@
 
 #include <exception>
 #include <string>
+#include <csignal>
+#include <cstdlib>
 
 #include "../globals.h"
 
@@ -249,6 +252,21 @@ protected:
 public:
 	EntityTooLargeError(const char* message, int line, const char* function, const char* file);
 	EntityTooLargeError(const std::string& message, int line, const char* function, const char* file);
+};
+
+
+// InterruptException
+class InterruptException : public BaseException
+{
+protected:
+	// Use only when initializing of a derived exception!
+	InterruptException(const char* message, int line, const char* function, const char* file, const char* type);
+
+	static void handle_signal(int sig);
+public:
+	InterruptException(const char* message, int line, const char* function, const char* file);
+	InterruptException(const std::string& message, int line, const char* function, const char* file);
+	static void initialize();
 };
 
 __WASP_END__

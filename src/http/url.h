@@ -15,9 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * url definition.
- * TODO: write docs.
+/**
+ * url.h
+ * Purpose: represents url as Url object.
+ * 			Parses url from string using url parser.
  */
 
 #ifndef WASP_HTTP_URL_H
@@ -26,7 +27,7 @@
 #include <string>
 
 #include "../globals.h"
-#include "parsers/url_parser.h"
+#include "../core/parsers/url_parser.h"
 #include "../core/exceptions.h"
 
 
@@ -35,7 +36,7 @@ __WASP_BEGIN__
 class Url final
 {
 private:
-	std::string _strUrl;
+	std::string _str_url;
 	std::string _scheme;
 	std::string _username;
 	std::string _password;
@@ -44,7 +45,7 @@ private:
 	std::string _path;
 	std::string _query;
 	std::string _fragment;
-	uint16_t _integerPort;
+	uint16_t _integer_port;
 
 public:
 	explicit Url(const std::string& url);

@@ -15,20 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * CookieMiddleware definition.
- * TODO: write docs.
+/**
+ * cookies.h
+ * Purpose: enables cookies in http request object.
  */
 
-#ifndef WASP_HTTP_MIDDLEWARE_COOKIE_MIDDLEWARE_H
-#define WASP_HTTP_MIDDLEWARE_COOKIE_MIDDLEWARE_H
+#ifndef WASP_MIDDLEWARE_COOKIE_MIDDLEWARE_H
+#define WASP_MIDDLEWARE_COOKIE_MIDDLEWARE_H
 
 #include "../globals.h"
 #include "middleware_mixin.h"
 #include "../http/request.h"
 #include "../http/response.h"
 #include "../collections/dict.h"
-#include "../http/parsers/cookie_parser.h"
+#include "../core/parsers/cookie_parser.h"
 
 
 __WASP_BEGIN__
@@ -36,11 +36,10 @@ __WASP_BEGIN__
 class CookieMiddleware final: public MiddlewareMixin
 {
 public:
-	void processRequest(HttpRequest* request) final;
-	void processResponse(const HttpRequest* request, HttpResponse* response) final;
+	void process_request(HttpRequest* request) final;
 };
 
 __WASP_END__
 
 
-#endif // WASP_HTTP_MIDDLEWARE_COOKIE_MIDDLEWARE_H
+#endif // WASP_MIDDLEWARE_COOKIE_MIDDLEWARE_H

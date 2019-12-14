@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WASP_UNIT_TESTS_HTTP_TESTS_PARSERS_TESTS_MULTIPART_PARSER_TESTS_H
-#define WASP_UNIT_TESTS_HTTP_TESTS_PARSERS_TESTS_MULTIPART_PARSER_TESTS_H
+#ifndef WASP_UNIT_TESTS_CORE_TESTS_PARSERS_TESTS_MULTIPART_PARSER_TESTS_H
+#define WASP_UNIT_TESTS_CORE_TESTS_PARSERS_TESTS_MULTIPART_PARSER_TESTS_H
 
 #include <fstream>
 
@@ -26,7 +26,7 @@
 #include "../../../../src/utility/str.h"
 #include "../../../../src/utility/path.h"
 #include "../../../../src/core/exceptions.h"
-#include "../../../../src/http/parsers/multipart_parser.h"
+#include "../../../../src/core/parsers/multipart_parser.h"
 
 
 __UNIT_TESTS_BEGIN__
@@ -257,6 +257,7 @@ TEST_F(MultipartParserTestCase, ParseMultipleParametersWithFilesTest)
 	ASSERT_TRUE(files->contains("super_file"));
 
 	auto super_file = files->get("super_file");
+	super_file.save();
 
 	delete files;
 
@@ -286,4 +287,4 @@ TEST_F(MultipartParserTestCase, ParseMultipleParametersWithFilesTest)
 __UNIT_TESTS_END__
 
 
-#endif // WASP_UNIT_TESTS_HTTP_TESTS_PARSERS_TESTS_MULTIPART_PARSER_TESTS_H
+#endif // WASP_UNIT_TESTS_CORE_TESTS_PARSERS_TESTS_MULTIPART_PARSER_TESTS_H

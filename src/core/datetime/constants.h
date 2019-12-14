@@ -15,47 +15,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * Date definition.
- * TODO: write docs.
+/**
+ * constants.h
+ * Purpose: offsets of known time zones.
  */
 
-#ifndef WASP_UTILS_DATETIME_DATE_H
-#define WASP_UTILS_DATETIME_DATE_H
+#ifndef WASP_UTILS_DATETIME_CONSTANTS_H
+#define WASP_UTILS_DATETIME_CONSTANTS_H
 
-#include <string>
+#include <map>
 
 #include "../../globals.h"
-#include "constants.h"
+#include "../../collections/dict.h"
 
 
 __DATETIME_BEGIN__
 
-// An idealized naive date, assuming the current Gregorian calendar
-// always was, and always will be, in effect.
-//
-// Properties: _year, _month, _dayOfYear and _dayOfWeek.
-class Date
-{
-private:
-	int _year;
-	int _month;
-	int _dayOfWeek;
-	int _dayOfMonth;
-	int _dayOfYear;
+/// The smallest year number allowed in a date or datetime object.
+const int MIN_YEAR = 1;
 
-public:
-	Date();
-	Date(int year, int month, int dayOfWeek, int dayOfMonth, int dayOfYear);
-
-	int year();
-	int month();
-	int dayOfWeek();
-	int dayOfMonth();
-	int dayOfYear();
-};
+/// The largest year number allowed in a date or datetime object.
+const int MAX_YEAR = 9999;
 
 __DATETIME_END__
 
 
-#endif // WASP_UTILS_DATETIME_DATE_H
+__INTERNAL_BEGIN__
+
+extern Dict<std::string, int> TZ_TO_OFFSET;
+
+__INTERNAL_END__
+
+
+#endif // WASP_UTILS_DATETIME_CONSTANTS_H

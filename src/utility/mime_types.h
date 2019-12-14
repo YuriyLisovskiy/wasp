@@ -15,7 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* Guess the MIME type of a file.
+/**
+ * mime_types.h
+ *
+ * Purpose: guess the MIME type of a file.
  *
  * Variables:
  *
@@ -26,14 +29,14 @@
  *
  * Functions:
  *
- * std::string extFromPath(const std::string& path) - retrieves an extension from file path.
+ * std::string ext_from_path(const std::string& path) - retrieves an extension from file path.
  *
  * void guessContentType(const std::string& _path, std::string& type, std::string& encoding) -- guess
  *  the MIME type and encoding of a URL.
  */
 
-#ifndef WASP_UTILS_MIME_TYPES_H
-#define WASP_UTILS_MIME_TYPES_H
+#ifndef WASP_UTILITY_MIME_TYPES_H
+#define WASP_UTILITY_MIME_TYPES_H
 
 #include <string>
 
@@ -45,27 +48,41 @@
 
 __MIME_BEGIN__
 
-// Returns extension from file name,
-// i.e. 'foo.bar' - 'bar' will be returned.
-extern std::string extFromFileName(const std::string& fileName);
+/// Returns extension from file name,
+///		i.e. 'foo.bar' - 'bar' will be returned.
+///
+/// @param file_name: name to analyze.
+/// @return extension of given file's name.
+extern std::string ext_from_file_name(const std::string& file_name);
 
-// Returns extension from file path,
-// i.e. 'path/to/foo.bar' - 'bar' will be returned.
-extern std::string extFromPath(const std::string& path);
+/// Returns extension from file path,
+///		i.e. 'path/to/foo.bar' - 'bar' will be returned.
+///
+/// @param path: path to analyze.
+/// @return extension of given file's path.
+extern std::string ext_from_path(const std::string& path);
 
-// Returns content type from file path.
-extern void guessContentType(const std::string& _path, std::string& type, std::string& encoding);
+/// Returns content type from file path.
+///
+/// @param _path: path to analyze.
+/// @param type: guessed file type.
+/// @param encoding: guessed file encoding.
+extern void guess_content_type(const std::string& _path, std::string& type, std::string& encoding);
 
+/// Dictionary which maps reduced archives' extensions to
+/// 	their full variants.
 extern Dict<std::string, std::string> SUFFIX_MAP;
 
+/// Dictionary which maps archives' extensions to
+///		encoding names.
 extern Dict<std::string, std::string> ENCODINGS_MAP;
 
-// Before adding new types, make sure they are either registered with IANA,
-// at http://www.iana.org/assignments/media-types
-// or extensions, i.e. using the x- prefix
+/// Before adding new types, make sure they are either registered with IANA,
+/// at http://www.iana.org/assignments/media-types
+/// or extensions, i.e. using the x- prefix
 extern Dict<std::string, std::string> TYPES_MAP;
 
 __MIME_END__
 
 
-#endif // WASP_UTILS_MIME_TYPES_H
+#endif // WASP_UTILITY_MIME_TYPES_H

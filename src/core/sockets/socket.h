@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * socket definition.
- * TODO: write docs.
+/**
+ * socket.h
+ * Purpose: tcp/ip socket's wrapper.
  */
 
 #ifndef WASP_CORE_TCP_SOCKET_H
@@ -86,7 +86,7 @@ protected:
 public:
 	explicit Socket(socket_t sock);
 	int close();
-	bool setSocketBlocking(bool blocking);
+	bool set_blocking(bool blocking);
 };
 
 __INTERNAL_END__

@@ -15,9 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * socket implementation.
- * TODO: write docs.
+/**
+ * An implementation of socket.h.
  */
 
 #include "socket.h"
@@ -49,7 +48,7 @@ int Socket::close()
 	return -1;
 }
 
-bool Socket::setSocketBlocking(bool blocking)
+bool Socket::set_blocking(bool blocking)
 {
 	if (this->_closed)
 	{

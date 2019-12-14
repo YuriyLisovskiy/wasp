@@ -15,35 +15,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * Offsets of known time zones.
+/**
+ * query_parser.h
+ * Purpose: parses url's query.
  */
 
-#ifndef WASP_UTILS_DATETIME_CONSTANTS_H
-#define WASP_UTILS_DATETIME_CONSTANTS_H
-
-#include <map>
+#ifndef WASP_CORE_PARSERS_QUERY_PARSER_H
+#define WASP_CORE_PARSERS_QUERY_PARSER_H
 
 #include "../../globals.h"
+#include "../../http/request.h"
 #include "../../collections/dict.h"
-
-
-__DATETIME_BEGIN__
-
-// The smallest year number allowed in a date or datetime object.
-const int MIN_YEAR = 1;
-
-// The largest year number allowed in a date or datetime object.
-const int MAX_YEAR = 9999;
-
-__DATETIME_END__
+#include "../../collections/multi_dict.h"
 
 
 __INTERNAL_BEGIN__
 
-extern Dict<std::string, int> TZ_TO_OFFSET;
+struct query_parser final
+{
+	enum state
+	{
+		s_key,
+		s_val
+	};
+
+	Dict<std::string, std::string>* dict;
+	MultiValueDict<std::string, std::string>* multi_dict;
+
+	explicit query_parser();
+	~query_parser();
+	void append_parameter(const std::string& key, const std::string& value);
+	void parse(const std::string& data);
+};
 
 __INTERNAL_END__
 
 
-#endif // WASP_UTILS_DATETIME_CONSTANTS_H
+#endif // WASP_CORE_PARSERS_QUERY_PARSER_H

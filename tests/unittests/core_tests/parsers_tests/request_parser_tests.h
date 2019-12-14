@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WASP_HTTP_TESTS_PARSERS_TESTS_REQUEST_PARSER_TESTS_H
-#define WASP_HTTP_TESTS_PARSERS_TESTS_REQUEST_PARSER_TESTS_H
+#ifndef WASP_UNIT_TESTS_CORE_TESTS_PARSERS_TESTS_REQUEST_PARSER_TESTS_H
+#define WASP_UNIT_TESTS_CORE_TESTS_PARSERS_TESTS_REQUEST_PARSER_TESTS_H
 
 #include <map>
 #include <string>
@@ -25,7 +25,7 @@
 #include <gtest/gtest.h>
 
 #include "../../globals.h"
-#include "../../../../src/http/parsers/request_parser.h"
+#include "../../../../src/core/parsers/request_parser.h"
 
 
 __UNIT_TESTS_BEGIN__
@@ -266,4 +266,4 @@ TEST_F(ParseRequestTestCase, ParseFormDataTest)
 __UNIT_TESTS_END__
 
 
-#endif // WASP_HTTP_TESTS_PARSERS_TESTS_REQUEST_PARSER_TESTS_H
+#endif // WASP_UNIT_TESTS_CORE_TESTS_PARSERS_TESTS_REQUEST_PARSER_TESTS_H

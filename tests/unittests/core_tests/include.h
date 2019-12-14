@@ -20,5 +20,6 @@
 
 #include "./exceptions_tests/include.h"
 #include "./files_tests/include.h"
+#include "./parsers_tests/include.h"
 
 #endif // WASP_UNIT_TESTS_CORE_TESTS_INCLUDE_H

@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * time definition.
- * TODO: write docs.
+/**
+ * time.h
+ * Purpose: utility for working with time.
  */
 
-#ifndef WASP_UTILS_DATETIME_TIME_H
-#define WASP_UTILS_DATETIME_TIME_H
+#ifndef WASP_CORE_DATETIME_TIME_H
+#define WASP_CORE_DATETIME_TIME_H
 
 #include <string>
 #include <chrono>
@@ -31,10 +31,10 @@
 
 __DATETIME_BEGIN__
 
-// An idealized time, independent of any particular day, assuming that
-// every day has exactly 24*60*60 seconds (there is no notion of “leap seconds” here).
-//
-// Properties: _hour, _minute, _second and _microsecond.
+/// An idealized time, independent of any particular day, assuming that
+/// every day has exactly 24*60*60 seconds (there is no notion of “leap seconds” here).
+///
+/// Properties: _hour, _minute, _second and _microsecond.
 class Time
 {
 private:
@@ -52,6 +52,7 @@ public:
 	int second();
 	int microsecond();
 };
+
 
 template <typename _TimeT = std::chrono::milliseconds>
 class Measure
@@ -78,6 +79,7 @@ public:
 		{
 			this->reset();
 		}
+
 		return result;
 	}
 
@@ -91,4 +93,4 @@ public:
 __DATETIME_END__
 
 
-#endif // WASP_UTILS_DATETIME_TIME_H
+#endif // WASP_CORE_DATETIME_TIME_H

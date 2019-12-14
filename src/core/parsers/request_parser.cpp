@@ -17,8 +17,6 @@
 
 /**
  * An implementation of request_parser.h
- *
- * @author Yuriy Lisovskiy
  */
 
 #include "request_parser.h"

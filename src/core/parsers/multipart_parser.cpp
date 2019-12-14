@@ -15,6 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * An implementation of multipart_parser.h
+ */
+
 #include "multipart_parser.h"
 
 
@@ -40,29 +44,28 @@ void multipart_parser::append_file(
 )
 {
 	bool root_is_empty = this->media_root.empty();
+	File file;
 	if (!root_is_empty)
 	{
-		File file(data, this->media_root + "/" + file_name);
-		if (file.isOpen())
-		{
-			file.close();
-		}
+		file = File(data, this->media_root + "/" + file_name);
 	}
 
-	UploadedFile file(
+	UploadedFile uploaded_file(
 		this->media_root + "/" + file_name,
 		root_is_empty ? 0 : data.size(),
+		file,
 		content_type,
 		"",
 		boundary,
 		content_disposition
 	);
+
 	if (!this->file_values.contains(key))
 	{
-		this->file_values.set(key, file);
+		this->file_values.set(key, uploaded_file);
 	}
 
-	this->multi_file_value.append(key, file);
+	this->multi_file_value.append(key, uploaded_file);
 }
 
 std::string multipart_parser::get_boundary(const std::string& content_type)

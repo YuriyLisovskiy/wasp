@@ -36,8 +36,11 @@ public:
 
 	wasp::HttpResponse* get(wasp::HttpRequest* request, wasp::Args* args) final
 	{
-		auto request_body = request->body();
-		std::cout << request_body << '\n';
+		if (request->FILES.contains("super_file"))
+		{
+			auto super_file = request->FILES.get("super_file");
+			super_file.save();
+		}
 
 		print(
 			"\nGet: ", request->GET.keys().size(),
@@ -62,7 +65,7 @@ public:
 
 	wasp::HttpResponse* post(wasp::HttpRequest* request, wasp::Args* args) final
 	{
-		return new wasp::HttpResponseRedirect("/hello");
+		return this->get(request, args);
 	}
 };
 

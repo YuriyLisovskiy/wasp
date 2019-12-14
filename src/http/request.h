@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * http request definition.
- * TODO: write docs
+/**
+ * request.h
+ * Purpose: represents an http request.
  */
 
 #ifndef WASP_HTTP_REQUEST_H
@@ -82,7 +82,7 @@ public:
 
 		bool empty()
 		{
-			return this->_dict.isEmpty();
+			return this->_dict.is_empty();
 		}
 
 		std::vector<std::string> keys()

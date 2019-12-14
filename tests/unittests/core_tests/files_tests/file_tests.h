@@ -58,7 +58,7 @@ protected:
 		createFile(this->testReadFilePath, strToBytes("Hello, World"));
 
 		this->fileToRead.open();
-		ASSERT_TRUE(this->fileToRead.isOpen());
+		ASSERT_TRUE(this->fileToRead.is_open());
 	}
 
 	void TearDown() override
@@ -98,7 +98,7 @@ TEST_F(ReadFileTestCase, TestReadMode)
 TEST_F(ReadFileTestCase, TestReadString)
 {
 	std::string expected = "Hello, World";
-	auto actual = this->fileToRead.readStr();
+	auto actual = this->fileToRead.read_str();
 
 	ASSERT_EQ(expected, actual);
 }
@@ -108,7 +108,7 @@ TEST_F(ReadFileTestCase, TestReadBinaryMode)
 	File f(this->testReadFilePath, "rb");
 	f.open();
 
-	ASSERT_TRUE(f.isOpen());
+	ASSERT_TRUE(f.is_open());
 
 	std::string expected = "Hello, World";
 	std::string actual = bytesToStr(f.read());
@@ -175,12 +175,12 @@ TEST_F(ReadFileTestCase, TestReadChunksCustomized)
 
 TEST_F(ReadFileTestCase, TestMultipleChunksFalse)
 {
-	ASSERT_FALSE(this->fileToRead.multipleChunks());
+	ASSERT_FALSE(this->fileToRead.multiple_chunks());
 }
 
 TEST_F(ReadFileTestCase, TestMultipleChunksTrue)
 {
-	ASSERT_TRUE(this->fileToRead.multipleChunks(4));
+	ASSERT_TRUE(this->fileToRead.multiple_chunks(4));
 }
 
 
@@ -193,7 +193,7 @@ protected:
 	void SetUp() override
 	{
 		this->file.open();
-		ASSERT_TRUE(this->file.isOpen());
+		ASSERT_TRUE(this->file.is_open());
 	}
 
 	void TearDown() override
@@ -247,7 +247,7 @@ TEST_F(WriteFileTestCase, TestWriteMode)
 TEST_F(WriteFileTestCase, TestWriteString)
 {
 	std::string expected = "Hello, World";
-	this->file.writeStr(expected);
+	this->file.write_str(expected);
 	this->file.save();
 
 	WriteFileTestCase::assertFile(this->testFilePath, strToBytes(expected), false);
@@ -258,7 +258,7 @@ TEST_F(WriteFileTestCase, TestWriteBinaryMode)
 	File f(this->testFilePath, "wb");
 	f.open();
 
-	ASSERT_TRUE(f.isOpen());
+	ASSERT_TRUE(f.is_open());
 
 	std::vector<byte> byteArray = strToBytes("Hello, World");
 	f.write(byteArray);

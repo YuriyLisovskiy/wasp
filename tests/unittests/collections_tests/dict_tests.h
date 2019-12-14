@@ -70,9 +70,9 @@ TEST(MutableDictTestCase, TestClear)
 	wasp::Dict<int, int> testDict({
 		{1, 2}, {3, 4}
 	}, true);
-	ASSERT_FALSE(testDict.isEmpty());
+	ASSERT_FALSE(testDict.is_empty());
 	testDict.clear();
-	ASSERT_TRUE(testDict.isEmpty());
+	ASSERT_TRUE(testDict.is_empty());
 }
 
 TEST(MutableDictTestCase, TestSize)
@@ -97,19 +97,19 @@ TEST(MutableDictTestCase, TestContains)
 TEST(MutableDictTestCase, TestIsMutable)
 {
 	wasp::Dict<int, int> testDict(true);
-	ASSERT_TRUE(testDict.isMutable());
+	ASSERT_TRUE(testDict.is_mutable());
 }
 
 TEST(MutableDictTestCase, TestIsEmpty)
 {
 	wasp::Dict<int, int> testDict(true);
-	ASSERT_TRUE(testDict.isEmpty());
+	ASSERT_TRUE(testDict.is_empty());
 }
 
 TEST(MutableDictTestCase, TestIsNotEmpty)
 {
 	wasp::Dict<int, int> testDict({{1, 2}}, true);
-	ASSERT_FALSE(testDict.isEmpty());
+	ASSERT_FALSE(testDict.is_empty());
 }
 
 TEST(MutableDictTestCase, TestBeginNotThrows)
@@ -153,7 +153,7 @@ TEST(ImmutableDictTestCase, TestRemoveThrows)
 TEST(ImmutableDictTestCase, TestIsImmutable)
 {
 	wasp::Dict<int, int> testDict(false);
-	ASSERT_FALSE(testDict.isMutable());
+	ASSERT_FALSE(testDict.is_mutable());
 }
 
 TEST(ImmutableDictTestCase, TestBeginThrows)

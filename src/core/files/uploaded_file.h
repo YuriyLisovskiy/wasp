@@ -15,9 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * An 'UploadedFile' object represents some file data that the user
- *  submitted with a form.
+/**
+ * uploaded_file.h
+ * Purpose: represents some file data that the user
+ * 			submitted with a form.
  */
 
 #ifndef WASP_CORE_FILES_UPLOADED_FILE_H
@@ -26,6 +27,7 @@
 #include <string>
 
 #include "../../globals.h"
+#include "file.h"
 
 
 __WASP_BEGIN__
@@ -39,19 +41,21 @@ private:
 	std::string _charset;
 	std::string _content_type;
 	size_t _size{};
+	wasp::File _file;
 
 public:
+	UploadedFile() = default;
 	UploadedFile(
 		const std::string& name,
 		size_t size,
-		const std::string& contentType = "",
+		wasp::File& file,
+		const std::string& content_type = "",
 		const std::string& charset = "",
 		const std::string& boundary = "",
-		const std::string& contentDisposition = ""
+		const std::string& content_disposition = ""
 	);
-	UploadedFile() = default;
-	UploadedFile(const UploadedFile& copy);
-	UploadedFile& operator=(const UploadedFile& copy);
+	UploadedFile(const UploadedFile& other);
+	UploadedFile& operator=(const UploadedFile& other);
 
 	std::string name();
 	std::string boundary();
@@ -60,6 +64,7 @@ public:
 	std::string content_type();
 	size_t size();
 	bool exists();
+	void save();
 };
 
 __WASP_END__

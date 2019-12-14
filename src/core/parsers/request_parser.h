@@ -20,8 +20,8 @@
  * Purpose: parses an http request from given stream.
  */
 
-#ifndef WASP_HTTP_PARSERS_REQUEST_PARSER_H
-#define WASP_HTTP_PARSERS_REQUEST_PARSER_H
+#ifndef WASP_CORE_PARSERS_REQUEST_PARSER_H
+#define WASP_CORE_PARSERS_REQUEST_PARSER_H
 
 #include <algorithm>
 #include <cstring>
@@ -29,7 +29,7 @@
 #include <string>
 
 #include "../../globals.h"
-#include "../request.h"
+#include "../../http/request.h"
 #include "multipart_parser.h"
 #include "query_parser.h"
 #include "../../utility/str.h"
@@ -220,4 +220,4 @@ struct request_parser final
 __INTERNAL_END__
 
 
-#endif // WASP_HTTP_PARSERS_REQUEST_PARSER_H
+#endif // WASP_CORE_PARSERS_REQUEST_PARSER_H

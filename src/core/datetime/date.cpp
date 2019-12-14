@@ -15,9 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * Date implementation.
- * TODO: write docs.
+/**
+ * An implementation of date.h.
  */
 
 #include "date.h"
@@ -25,11 +24,11 @@
 
 __DATETIME_BEGIN__
 
-Date::Date() : _year(1970), _month(1), _dayOfWeek(1), _dayOfMonth(1), _dayOfYear(1)
+Date::Date() : _year(1970), _month(1), _day_of_week(1), _day_of_month(1), _day_of_year(1)
 {
 }
 
-Date::Date(int year, int month, int dayOfWeek, int dayOfMonth, int dayOfYear)
+Date::Date(int year, int month, int day_of_week, int day_of_month, int day_of_year)
 {
 	if (year < MIN_YEAR)
 	{
@@ -42,9 +41,9 @@ Date::Date(int year, int month, int dayOfWeek, int dayOfMonth, int dayOfYear)
 
 	this->_year = year;
 	this->_month = month;
-	this->_dayOfWeek = dayOfWeek;
-	this->_dayOfMonth = dayOfMonth;
-	this->_dayOfYear = dayOfYear;
+	this->_day_of_week = day_of_week;
+	this->_day_of_month = day_of_month;
+	this->_day_of_year = day_of_year;
 }
 
 int Date::year()
@@ -57,19 +56,19 @@ int Date::month()
 	return this->_month;
 }
 
-int Date::dayOfWeek()
+int Date::day_of_week()
 {
-	return this->_dayOfWeek;
+	return this->_day_of_week;
 }
 
-int Date::dayOfMonth()
+int Date::day_of_month()
 {
-	return this->_dayOfMonth;
+	return this->_day_of_month;
 }
 
-int Date::dayOfYear()
+int Date::day_of_year()
 {
-	return this->_dayOfYear;
+	return this->_day_of_year;
 }
 
 __DATETIME_END__

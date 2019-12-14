@@ -15,46 +15,52 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * An implementation of mime_types.h.
+ */
+
 #include "mime_types.h"
 
 
 __MIME_BEGIN__
 
-std::string extFromFileName(const std::string& fileName)
+std::string ext_from_file_name(const std::string& file_name)
 {
 	std::string result;
-	size_t pos = fileName.find_last_of('.');
+	size_t pos = file_name.find_last_of('.');
 	if (pos != std::string::npos)
 	{
-		result = pos + 1 < fileName.size() ? fileName.substr(pos + 1) : "";
+		result = pos + 1 < file_name.size() ? file_name.substr(pos + 1) : "";
 	}
+
 	return result;
 }
 
-std::string extFromPath(const std::string& path)
+std::string ext_from_path(const std::string& path)
 {
-	std::string fileName;
+	std::string file_name;
 	size_t pos = path.find_last_of('/');
 	if (pos != std::string::npos)
 	{
-		fileName = pos + 1 < path.size() ? path.substr(pos + 1) : "";
+		file_name = pos + 1 < path.size() ? path.substr(pos + 1) : "";
 	}
 	else
 	{
 		pos = path.find_last_of('\\');
 		if (pos != std::string::npos)
 		{
-			fileName = pos + 1 < path.size() ? path.substr(pos + 1) : "";
+			file_name = pos + 1 < path.size() ? path.substr(pos + 1) : "";
 		}
 		else
 		{
-			fileName = path;
+			file_name = path;
 		}
 	}
-	return fileName.empty() ? "" : extFromFileName(fileName);
+
+	return file_name.empty() ? "" : ext_from_file_name(file_name);
 }
 
-void guessContentType(const std::string& _path, std::string& type, std::string& encoding)
+void guess_content_type(const std::string& _path, std::string& type, std::string& encoding)
 {
 	std::string scheme, url;
 	str::url_split_type(_path, scheme, url);
@@ -72,6 +78,7 @@ void guessContentType(const std::string& _path, std::string& type, std::string& 
 			{
 				type = url.substr(0, comma);
 			}
+
 			if (str::contains(type, '=') || !str::contains(type, '/'))
 			{
 				type = "text/plain";
@@ -81,22 +88,23 @@ void guessContentType(const std::string& _path, std::string& type, std::string& 
 	else
 	{
 		std::string base, ext;
-		path::splitText(url, base, ext);
+		path::split_text(url, base, ext);
 		while (SUFFIX_MAP.contains(ext))
 		{
-			path::splitText(base + SUFFIX_MAP.get(ext, ""), base, ext);
+			path::split_text(base + SUFFIX_MAP.get(ext, ""), base, ext);
 		}
-		encoding = ENCODINGS_MAP.get(ext, "");
-		//	path::splitText(base, base, ext);
 
-		std::string lowerExt = str::lower(ext);
+		encoding = ENCODINGS_MAP.get(ext, "");
+		//	path::split_text(base, base, ext);
+
+		std::string lower_ext = str::lower(ext);
 		if (TYPES_MAP.contains(ext))
 		{
 			type = TYPES_MAP.get(ext, "");
 		}
 		else
 		{
-			type = TYPES_MAP.get(lowerExt, "");
+			type = TYPES_MAP.get(lower_ext, "");
 		}
 	}
 }

@@ -19,22 +19,26 @@
 #include <string>
 #include <vector>
 
-#include "../src/http/http_server.h"
+#include "../src/core/http_server.h"
 #include "../src/middleware/cookies.h"
 #include "../src/http/response.h"
 #include "../src/views/generic.h"
 #include "form_view.h"
+#include "../src/core/exceptions.h"
+
+// #define DETECT_MEMORY_LEAK
+// #include "../tests/unittests/mem_leak_check.h"
 
 using wasp::internal::HttpServer;
 
 
 void handler(wasp::HttpRequest* request, const wasp::internal::socket_t& client)
 {
-	wasp::CookieMiddleware().processRequest(request);
+	wasp::CookieMiddleware().process_request(request);
 
-	auto view = wasp::View::make_view<FormView>(wasp::Logger::get_instance());
+	auto view = wasp::View::make_view<FormView>();
 
-	auto* response = view(request, nullptr);
+	auto* response = view(request, nullptr, wasp::Logger::get_instance());
 
 	if (!response)
 	{
@@ -48,17 +52,26 @@ void handler(wasp::HttpRequest* request, const wasp::internal::socket_t& client)
 
 int main()
 {
+	wasp::InterruptException::initialize();
+
+	HttpServer::context ctx{};
+	ctx.handler = handler;
+	ctx.port = 3000;
+	ctx.max_body_size = 33300000;
+	ctx.media_root = "/home/user/Desktop/media/";
+	ctx.logger = wasp::Logger::get_instance();
+
+	HttpServer server(ctx);
+
 	try
 	{
-		HttpServer::Context ctx{};
-		ctx.handler = handler;
-		ctx.port = 8000;
-		ctx.maxBodySize = 33300000;
-		ctx.mediaRoot = "/home/user/Desktop/media/";
-		ctx.logger = wasp::Logger::get_instance();
-
-		HttpServer server(ctx);
-		server.listenAndServe();
+		server.listen_and_serve();
+	}
+	catch (const wasp::InterruptException& exc)
+	{
+		std::cout << "\nFinishing server...";
+		server.finish();
+		std::cout << "\nDone.\n";
 	}
 	catch (const std::exception& exc)
 	{

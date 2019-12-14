@@ -15,40 +15,47 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * CookieParser definition.
- * TODO: write docs.
+/**
+ * date.h
+ * Purpose: utility for working with date.
  */
 
-#ifndef WASP_HTTP_PARSERS_COOKIE_PARSER_H
-#define WASP_HTTP_PARSERS_COOKIE_PARSER_H
+#ifndef WASP_CORE_DATETIME_DATE_H
+#define WASP_CORE_DATETIME_DATE_H
 
-#include <map>
 #include <string>
 
 #include "../../globals.h"
+#include "constants.h"
 
 
-__INTERNAL_BEGIN__
+__DATETIME_BEGIN__
 
-struct cookie_parser final
+/// An idealized naive date, assuming the current Gregorian calendar
+/// always was, and always will be, in effect.
+///
+/// Properties: _year, _month, _day_of_year and _day_of_week.
+class Date
 {
-	enum req_state
-	{
-		req_key,
-		req_val
-	};
+private:
+	int _year;
+	int _month;
+	int _day_of_week;
+	int _day_of_month;
+	int _day_of_year;
 
-	enum resp_state
-	{
+public:
+	Date();
+	Date(int year, int month, int day_of_week, int day_of_month, int day_of_year);
 
-	};
-
-	static std::map<std::string, std::string>* parse_req_cookies(const std::string& content);
-	static std::map<std::string, std::string>* parse_resp_cookies(const std::string& content);
+	int year();
+	int month();
+	int day_of_week();
+	int day_of_month();
+	int day_of_year();
 };
 
-__INTERNAL_END__
+__DATETIME_END__
 
 
-#endif // WASP_HTTP_PARSERS_COOKIE_PARSER_H
+#endif // WASP_CORE_DATETIME_DATE_H

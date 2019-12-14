@@ -15,40 +15,46 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * query_parser definition.
- * TODO: write docs.
+/**
+ * An implementation of time.h.
  */
 
-#ifndef WASP_QUERY_PARSER_H
-#define WASP_QUERY_PARSER_H
-
-#include "../../globals.h"
-#include "../request.h"
-#include "../../collections/dict.h"
-#include "../../collections/multi_dict.h"
+#include "time.h"
 
 
-__INTERNAL_BEGIN__
+__DATETIME_BEGIN__
 
-struct query_parser final
+// 'Time' class implementation.
+Time::Time() : _hour(0), _minute(0), _second(0), _microsecond(0)
 {
-	enum state
-	{
-		s_key,
-		s_val
-	};
+}
 
-	Dict<std::string, std::string>* dict;
-	MultiValueDict<std::string, std::string>* multi_dict;
+Time::Time(int hour, int minute, int second, int microsecond)
+{
+	this->_hour = hour;
+	this->_minute = minute;
+	this->_second = second;
+	this->_microsecond = microsecond;
+}
 
-	explicit query_parser();
-	~query_parser();
-	void append_parameter(const std::string& key, const std::string& value);
-	void parse(const std::string& data);
-};
+int Time::hour()
+{
+	return this->_hour;
+}
 
-__INTERNAL_END__
+int Time::minute()
+{
+	return this->_minute;
+}
 
+int Time::second()
+{
+	return this->_second;
+}
 
-#endif // WASP_QUERY_PARSER_H
+int Time::microsecond()
+{
+	return this->_microsecond;
+}
+
+__DATETIME_END__

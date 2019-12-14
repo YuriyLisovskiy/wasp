@@ -129,9 +129,9 @@ TEST(MutableMultiValueDictTestCase, TestClear)
 	wasp::MultiValueDict<int, int> testDict({
 		{1, {2, 3, 4}}
 	}, true);
-	ASSERT_FALSE(testDict.isEmpty());
+	ASSERT_FALSE(testDict.is_empty());
 	testDict.clear();
-	ASSERT_TRUE(testDict.isEmpty());
+	ASSERT_TRUE(testDict.is_empty());
 }
 
 TEST(MutableMultiValueDictTestCase, TestSize)
@@ -166,19 +166,19 @@ TEST(MutableMultiValueDictTestCase, TestContains)
 TEST(MutableMultiValueDictTestCase, TestIsMutable)
 {
 	wasp::MultiValueDict<int, int> testDict(true);
-	ASSERT_TRUE(testDict.isMutable());
+	ASSERT_TRUE(testDict.is_mutable());
 }
 
 TEST(MutableMultiValueDictTestCase, TestIsEmpty)
 {
 	wasp::MultiValueDict<int, int> testDict(true);
-	ASSERT_TRUE(testDict.isEmpty());
+	ASSERT_TRUE(testDict.is_empty());
 }
 
 TEST(MutableMultiValueDictTestCase, TestIsNotEmpty)
 {
 	wasp::MultiValueDict<int, int> testDict({{1, {2, 3, 4}}}, true);
-	ASSERT_FALSE(testDict.isEmpty());
+	ASSERT_FALSE(testDict.is_empty());
 }
 
 TEST(MutableMultiValueDictTestCase, TestBeginNotThrows)
@@ -240,7 +240,7 @@ TEST(ImmutableMultiValueDictTestCase, TestRemoveThrows)
 TEST(ImmutableMultiValueDictTestCase, TestIsImmutable)
 {
 	wasp::MultiValueDict<int, int> testDict(false);
-	ASSERT_FALSE(testDict.isMutable());
+	ASSERT_FALSE(testDict.is_mutable());
 }
 
 TEST(ImmutableMultiValueDictTestCase, TestBeginThrows)

@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * cookie definition.
- * TODO: write docs.
+/**
+ * cookie.h
+ * Purpose: represents an http cookies as object.
  */
 
 #ifndef WASP_HTTP_COOKIE_H
@@ -39,8 +39,8 @@ private:
 	std::string _expires;
 	std::string _domain;
 	std::string _path;
-	bool _isSecure;
-	bool _isHttpOnly;
+	bool _is_secure;
+	bool _is_http_only;
 
 public:
 	Cookie();
@@ -50,11 +50,11 @@ public:
 		std::string expires,
 		std::string domain = "",
 		std::string path = "/",
-		bool isSecure = true,
-		bool isHttpOnly = false
+		bool is_secure = true,
+		bool is_http_only = false
 	);
 
-	std::string toString();
+	std::string to_string();
 
 	bool operator==(const Cookie& right);
 };

@@ -15,4 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * An implementation of clickjacking.h.
+ */
+
 #include "clickjacking.h"
+
+
+__WASP_BEGIN__
+
+void XFrameOptionsMiddleware::process_response(const HttpRequest* request, HttpResponse* response)
+{
+	// TODO:
+}
+
+__WASP_END__

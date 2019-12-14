@@ -15,6 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * An implementation of uploaded_file.h.
+ */
+
 #include "uploaded_file.h"
 
 
@@ -23,6 +27,7 @@ __WASP_BEGIN__
 UploadedFile::UploadedFile(
 	const std::string& name,
 	size_t size,
+	File& file,
 	const std::string& content_type,
 	const std::string& charset,
 	const std::string& boundary,
@@ -35,6 +40,7 @@ UploadedFile::UploadedFile(
 	this->_content_type = content_type;
 	this->_charset = charset;
 	this->_size = size;
+	this->_file = File(file);
 }
 
 UploadedFile::UploadedFile(const UploadedFile& copy)
@@ -47,6 +53,7 @@ UploadedFile::UploadedFile(const UploadedFile& copy)
 		this->_charset = copy._charset;
 		this->_content_type = copy._content_type;
 		this->_size = copy._size;
+		this->_file = copy._file;
 	}
 }
 
@@ -60,6 +67,7 @@ UploadedFile& UploadedFile::operator=(const UploadedFile& copy)
 		this->_charset = copy._charset;
 		this->_content_type = copy._content_type;
 		this->_size = copy._size;
+		this->_file = copy._file;
 	}
 
 	return *this;
@@ -98,6 +106,14 @@ size_t UploadedFile::size()
 bool UploadedFile::exists()
 {
 	return this->_size != 0;
+}
+
+void UploadedFile::save()
+{
+	if (!this->_file.path().empty())
+	{
+		this->_file.save_file();
+	}
 }
 
 __WASP_END__

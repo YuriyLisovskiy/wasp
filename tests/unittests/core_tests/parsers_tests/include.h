@@ -15,47 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * time implementation.
- * TODO: write docs.
- */
+#ifndef WASP_UNIT_TESTS_CORE_TESTS_PARSERS_TESTS_INCLUDE_H
+#define WASP_UNIT_TESTS_CORE_TESTS_PARSERS_TESTS_INCLUDE_H
 
-#include "time.h"
+#include "./cookie_parser_tests.h"
+#include "./multipart_parser_tests.h"
+#include "./query_parser_tests.h"
+#include "./request_parser_tests.h"
+#include "./url_parser_tests.h"
 
-
-__DATETIME_BEGIN__
-
-// 'Time' class implementation.
-Time::Time() : _hour(0), _minute(0), _second(0), _microsecond(0)
-{
-}
-
-Time::Time(int hour, int minute, int second, int microsecond)
-{
-	this->_hour = hour;
-	this->_minute = minute;
-	this->_second = second;
-	this->_microsecond = microsecond;
-}
-
-int Time::hour()
-{
-	return this->_hour;
-}
-
-int Time::minute()
-{
-	return this->_minute;
-}
-
-int Time::second()
-{
-	return this->_second;
-}
-
-int Time::microsecond()
-{
-	return this->_microsecond;
-}
-
-__DATETIME_END__
+#endif // WASP_UNIT_TESTS_CORE_TESTS_PARSERS_TESTS_INCLUDE_H

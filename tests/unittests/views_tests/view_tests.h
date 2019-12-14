@@ -181,7 +181,7 @@ TEST(ViewTestCaseStatic, MakeViewTest)
 	auto request = ViewTestCase::make_request("options");
 	auto view = View::make_view<View>();
 
-	auto response = view(&request, nullptr);
+	auto response = view(&request, nullptr, nullptr);
 
 	ASSERT_EQ(response->status(), 200);
 

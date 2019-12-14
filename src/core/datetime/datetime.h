@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * datetime
- * TODO: write docs.
+/**
+ * datetime.h
+ * Purpose: combines date, time and timezone in one class.
  */
 
-#ifndef WASP_UTILS_DATETIME_DATETIME_H
-#define WASP_UTILS_DATETIME_DATETIME_H
+#ifndef WASP_CORE_DATETIME_DATETIME_H
+#define WASP_CORE_DATETIME_DATETIME_H
 
 #include <chrono>
 #include <ctime>
@@ -37,9 +37,9 @@
 __DATETIME_BEGIN__
 
 
-// A combination of a Date, Time and a TimeZone.
-//
-// Properties: _date, _time and _tz.
+/// A combination of a Date, Time and a TimeZone.
+///
+/// Properties: _date, _time and _tz.
 class DateTime
 {
 private:
@@ -49,16 +49,16 @@ private:
 
 public:
 	DateTime();
-	DateTime(int year, int month, int dayOfWeek, int dayOfMonth, int dayOfYear, int hour, int minute, int second, int microsecond, TimeZone tz);
-	DateTime(int year, int month, int dayOfWeek, int dayOfMonth, int dayOfYear, int hour, int minute, int second, int microsecond, const std::string& tz);
+	DateTime(int year, int month, int day_of_week, int day_of_month, int day_of_year, int hour, int minute, int second, int microsecond, TimeZone tz);
+	DateTime(int year, int month, int day_of_week, int day_of_month, int day_of_year, int hour, int minute, int second, int microsecond, const std::string& tz);
 	DateTime(Date date, Time time, TimeZone tz);
 	DateTime(Date date, Time time, const std::string& tz);
 	explicit DateTime(time_t timestamp);
 
 	int year();
 	int month();
-	int dayOfWeek();
-	int dayOfYear();
+	int day_of_week();
+	int day_of_year();
 	int hour();
 	int minute();
 	int second();
@@ -72,10 +72,10 @@ public:
 };
 
 
-// Returns current date and time with local time zone.
+/// Returns current date and time with local time zone.
 DateTime now();
 
-// Returns current date and time as utc time.
+/// Returns current date and time as utc time.
 DateTime gmtnow();
 
 __DATETIME_END__
@@ -83,10 +83,10 @@ __DATETIME_END__
 
 __INTERNAL_BEGIN__
 
-// Returns current date and time as time_t
+/// Returns current date and time as time_t
 time_t now();
 
 __INTERNAL_END__
 
 
-#endif // WASP_UTILS_DATETIME_DATETIME_H
+#endif // WASP_CORE_DATETIME_DATETIME_H
