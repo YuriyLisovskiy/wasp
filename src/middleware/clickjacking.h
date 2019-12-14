@@ -15,11 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
+/**
+ * clickjacking.h
+ *
  * Clickjacking Protection Middleware.
  *
- * This module provides a middleware that implements protection against a
- * malicious site loading resources from your site in a hidden frame.
+ * Purpose: this module provides a middleware that implements protection against a
+ * 			malicious site loading resources from your site in a hidden frame.
  */
 
 #ifndef WASP_MIDDLEWARE_CLICKJACKING_H
@@ -31,7 +33,7 @@
 
 __WASP_BEGIN__
 
-/*
+/**
  * Set the X-Frame-Options HTTP header in HTTP responses.
  *
  * Do not set the header if it's already set or if the response contains
@@ -45,7 +47,7 @@ __WASP_BEGIN__
 class XFrameOptionsMiddleware : public MiddlewareMixin
 {
 public:
-	void processResponse(const HttpRequest* request, HttpResponse* response) final;
+	void process_response(const HttpRequest* request, HttpResponse* response) final;
 };
 
 __WASP_END__

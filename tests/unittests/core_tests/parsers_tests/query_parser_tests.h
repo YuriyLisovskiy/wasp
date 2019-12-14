@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WASP_UNIT_TESTS_HTTP_TESTS_PARSERS_TESTS_QUERY_PARSER_TESTS_H
-#define WASP_UNIT_TESTS_HTTP_TESTS_PARSERS_TESTS_QUERY_PARSER_TESTS_H
+#ifndef WASP_UNIT_TESTS_CORE_TESTS_PARSERS_TESTS_QUERY_PARSER_TESTS_H
+#define WASP_UNIT_TESTS_CORE_TESTS_PARSERS_TESTS_QUERY_PARSER_TESTS_H
 
 #include <gtest/gtest.h>
 
@@ -24,7 +24,7 @@
 #include <vector>
 
 #include "../../globals.h"
-#include "../../../../src/http/parsers/query_parser.h"
+#include "../../../../src/core/parsers/query_parser.h"
 
 __UNIT_TESTS_BEGIN__
 
@@ -115,4 +115,4 @@ TEST(QueryParserTestCase, empty)
 __UNIT_TESTS_END__
 
 
-#endif // WASP_UNIT_TESTS_HTTP_TESTS_PARSERS_TESTS_QUERY_PARSER_TESTS_H
+#endif // WASP_UNIT_TESTS_CORE_TESTS_PARSERS_TESTS_QUERY_PARSER_TESTS_H

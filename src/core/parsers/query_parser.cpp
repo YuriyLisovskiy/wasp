@@ -15,6 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * An implementation of query_parser.h
+ */
+
 #include "query_parser.h"
 
 

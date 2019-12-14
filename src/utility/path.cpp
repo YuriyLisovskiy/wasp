@@ -15,35 +15,48 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * An implementation of path.h.
+ */
+
 #include "path.h"
 
 
 __PATH_INTERNAL_BEGIN__
 
-void _split_text(const std::string& fullPath, char sep, char altsep, char extsep, std::string& rootOut, std::string& extOut)
+void _split_text(
+	const std::string& full_path,
+	char sep,
+	char altsep,
+	char extsep,
+	std::string& root_out,
+	std::string& ext_out
+)
 {
-	rootOut = fullPath;
-	extOut = "";
-	size_t sepIdx = fullPath.rfind(sep);
+	root_out = full_path;
+	ext_out = "";
+	size_t sep_idx = full_path.rfind(sep);
 	if (altsep != '\0')
 	{
-		size_t altsepIdx = fullPath.rfind(altsep);
-		sepIdx = std::max(sepIdx, altsepIdx);
+		size_t altsep_idx = full_path.rfind(altsep);
+		sep_idx = std::max(sep_idx, altsep_idx);
 	}
-	size_t dotIdx = fullPath.rfind(extsep);
-	if (dotIdx > sepIdx)
+
+	size_t dot_idx = full_path.rfind(extsep);
+	if (dot_idx > sep_idx)
 	{
 		// skip all leading dots
-		size_t fileNameIdx = sepIdx + 1;
-		while (fileNameIdx < dotIdx)
+		size_t file_name_idx = sep_idx + 1;
+		while (file_name_idx < dot_idx)
 		{
-			if (fullPath.at(fileNameIdx) != extsep)
+			if (full_path.at(file_name_idx) != extsep)
 			{
-				rootOut = fullPath.substr(0, dotIdx);
-				extOut = fullPath.substr(dotIdx);
+				root_out = full_path.substr(0, dot_idx);
+				ext_out = full_path.substr(dot_idx);
 				break;
 			}
-			fileNameIdx++;
+
+			file_name_idx++;
 		}
 	}
 }
@@ -53,9 +66,9 @@ __PATH_INTERNAL_END__
 
 __PATH_BEGIN__
 
-void splitText(const std::string& fullPath, std::string& rootOut, std::string& extOut)
+void split_text(const std::string& full_path, std::string& root_out, std::string& ext_out)
 {
-	internal::_split_text(fullPath, '/', '\0', '.', rootOut, extOut);
+	internal::_split_text(full_path, '/', '\0', '.', root_out, ext_out);
 }
 
 bool exists(const std::string& path)
@@ -70,16 +83,21 @@ std::string base(const std::string& path)
 	{
 		pos = 0;
 	}
+
 	return std::string(path.begin() + pos, path.end());
 }
 
-size_t getSize(const std::string& path)
+size_t get_size(const std::string& path)
 {
 	if (!exists(path))
 	{
 		throw FileDoesNotExistError("file '" + path + "' does not exist", _ERROR_DETAILS_);
 	}
-	return std::ifstream(path, std::ifstream::ate | std::ifstream::binary).tellg();
+
+	std::ifstream ifs(path, std::ifstream::ate | std::ifstream::binary);
+	size_t result = ifs.tellg();
+	ifs.close();
+	return result;
 }
 
 std::string cwd()

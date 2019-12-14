@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * http request definition.
- * TODO: write docs
+/**
+ * request.h
+ * Purpose: represents an http request.
  */
 
 #ifndef WASP_HTTP_REQUEST_H

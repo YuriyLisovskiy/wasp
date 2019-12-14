@@ -15,13 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * MultiValueDict
- * TODO: write docs.
+/**
+ * multi_dict.h
+ * Purpose: template container based on wasp::Dict with additional
+ * 			methods (extended wasp::Dict). Main difference is that
+ * 			MultiValueDict can contain multiple values in one key.
  */
 
-#ifndef WASP_MULTI_VALUE_DICT_H
-#define WASP_MULTI_VALUE_DICT_H
+#ifndef WASP_COLLECTIONS_MULTI_VALUE_DICT_H
+#define WASP_COLLECTIONS_MULTI_VALUE_DICT_H
 
 #include <vector>
 #include <initializer_list>
@@ -37,6 +39,8 @@ template <typename _Key, typename _Val>
 class MultiValueDict : public Dict<_Key, std::vector<_Val>>
 {
 protected:
+
+	/// Wrapper for throwing MultiValueDictError exception.
 	void _throw(const std::string& msg, int line, const char* function, const char* file) override
 	{
 		throw MultiValueDictError(
@@ -46,74 +50,104 @@ protected:
 	}
 
 public:
+
+	/// Constructs immutable empty multi-value dictionary.
 	MultiValueDict() : Dict<_Key, std::vector<_Val>>()
 	{
 	}
 
-	explicit MultiValueDict(bool isMutable) : Dict<_Key, std::vector<_Val>>(isMutable)
+	/// Constructs empty multi-value dictionary with mutability parameter.
+	explicit MultiValueDict(bool is_mutable) : Dict<_Key, std::vector<_Val>>(is_mutable)
 	{
 	}
 
-	explicit MultiValueDict(const std::map<_Key, std::vector<_Val>>& srcMap)
-		: Dict<_Key, std::vector<_Val>>(srcMap, false)
+	/// Constructs MultiValueDict instance from std::map.
+	/// Makes multi-value dictionary immutable by default.
+	explicit MultiValueDict(const std::map<_Key, std::vector<_Val>>& src_map)
+		: Dict<_Key, std::vector<_Val>>(src_map, false)
 	{
 	}
 
-	MultiValueDict(const std::map<_Key, std::vector<_Val>>& srcMap, bool isMutable)
-		: Dict<_Key, std::vector<_Val>>(srcMap, isMutable)
+	/// Constructs MultiValueDict instance from std::map with mutability parameter.
+	MultiValueDict(const std::map<_Key, std::vector<_Val>>& srcMap, bool is_mutable)
+		: Dict<_Key, std::vector<_Val>>(srcMap, is_mutable)
 	{
 	}
 
+	/// Returns first value from vector by key if it exists, otherwise returns _default.
+	///
+	/// @param key: dict key which holds std::vector of values.
+	/// @param _default: a default value to be returned if key does not exist.
+	/// @return first value of std::vector by given key.
 	_Val get(_Key key, _Val _default = _Val())
 	{
 		if (this->contains(key))
 		{
-			auto vec = this->_map[key];
+			std::vector<_Val> vec = this->_map[key];
 			if (vec.size() > 0)
 			{
 				return vec.at(vec.size() - 1);
 			}
 		}
+
 		return _default;
 	}
 
+	/// Returns vector of values by key if it exists, otherwise returns _default vector.
+	///
+	/// @param key: dict key which holds std::vector of values.
+	/// @param _default: a default vector of values to be returned if key does not exist.
+	/// @return std::vector of values by given key.
 	std::vector<_Val> get(_Key key, std::vector<_Val> _default) override
 	{
 		if (this->contains(key))
 		{
-			auto vec = this->_map[key];
-			if (vec.size() > 0)
-			{
-				return vec;
-			}
+			return this->_map[key];
 		}
+
 		return _default;
 	}
 
+	/// Sets new vector of values by given key if instance is mutable.
+	///
+	/// @param key: new key or existing key.
+	/// @param value: new value to construct std::vector.
 	void set(_Key key, _Val value)
 	{
-		if (!this->_isMutable)
+		if (!this->_is_mutable)
 		{
 			this->_throw("set new value", _ERROR_DETAILS_);
 		}
+
 		this->_map[key] = std::vector<_Val>{value};
 	}
 
+	/// Sets new vector of values by given key if instance is mutable.
+	///
+	/// @param key: new key or existing key.
+	/// @param value: new std::vector.
 	void set(_Key key, std::vector<_Val> value) override
 	{
-		if (!this->_isMutable)
+		if (!this->_is_mutable)
 		{
 			this->_throw("set new value", _ERROR_DETAILS_);
 		}
+
 		this->_map[key] = value;
 	}
 
+	/// Appends new value by given key if instance is mutable.
+	///	If key does not exist, creates new key-value pair.
+	///
+	/// @param key: new key or existing key.
+	/// @param value: new value to append to std::vector.
 	void append(_Key key, _Val val)
 	{
-		if (!this->_isMutable)
+		if (!this->_is_mutable)
 		{
 			this->_throw("append new value", _ERROR_DETAILS_);
 		}
+
 		if (this->contains(key))
 		{
 			this->_map[key].push_back(val);
@@ -124,12 +158,18 @@ public:
 		}
 	}
 
+	/// Appends new vector of values by given key if instance is mutable.
+	///	If key does not exist, creates new key-value pair.
+	///
+	/// @param key: new key or existing key.
+	/// @param value: new std::vector of values to append to std::vector.
 	void append(_Key key, std::vector<_Val> vec)
 	{
-		if (!this->_isMutable)
+		if (!this->_is_mutable)
 		{
 			this->_throw("append new value", _ERROR_DETAILS_);
 		}
+
 		if (this->contains(key))
 		{
 			for (const auto& item : vec)
@@ -147,4 +187,4 @@ public:
 __WASP_END__
 
 
-#endif // WASP_MULTI_VALUE_DICT_H
+#endif // WASP_COLLECTIONS_MULTI_VALUE_DICT_H

@@ -20,8 +20,8 @@
  * Purpose: http server based on tcp/ip socket.
  */
 
-#ifndef WASP_HTTP_SERVER_H
-#define WASP_HTTP_SERVER_H
+#ifndef WASP_CORE_HTTP_SERVER_H
+#define WASP_CORE_HTTP_SERVER_H
 
 #include <iostream>
 #include <cstdint>
@@ -36,8 +36,8 @@
 #include "../utility/logger.h"
 #include "../conf/defaults.h"
 #include "../conf/settings.h"
-#include "response.h"
-#include "request.h"
+#include "../http/response.h"
+#include "../http/request.h"
 #include "parsers/request_parser.h"
 #include "../core/sockets/server_socket.h"
 #include "../core/exceptions.h"
@@ -124,4 +124,4 @@ private:
 __INTERNAL_END__
 
 
-#endif // WASP_HTTP_SERVER_H
+#endif // WASP_CORE_HTTP_SERVER_H

@@ -21,9 +21,6 @@
 #include "../src/views/generic.h"
 #include "../src/utility/logger.h"
 
-// #define DETECT_MEMORY_LEAK
-// #include "../tests/unittests/mem_leak_check.h"
-
 
 template<class... Args>
 void print(Args&&... args)

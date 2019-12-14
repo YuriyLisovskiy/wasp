@@ -19,12 +19,15 @@
 #include <string>
 #include <vector>
 
-#include "../src/http/http_server.h"
+#include "../src/core/http_server.h"
 #include "../src/middleware/cookies.h"
 #include "../src/http/response.h"
 #include "../src/views/generic.h"
 #include "form_view.h"
 #include "../src/core/exceptions.h"
+
+// #define DETECT_MEMORY_LEAK
+// #include "../tests/unittests/mem_leak_check.h"
 
 using wasp::internal::HttpServer;
 

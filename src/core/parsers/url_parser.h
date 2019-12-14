@@ -18,12 +18,10 @@
 /**
  * url_parser.h
  * Purpose: parses url from given string.
- *
- * @author Yuriy Lisovskiy
  */
 
-#ifndef WASP_HTTP_PARSERS_URL_PARSER_H
-#define WASP_HTTP_PARSERS_URL_PARSER_H
+#ifndef WASP_CORE_PARSERS_URL_PARSER_H
+#define WASP_CORE_PARSERS_URL_PARSER_H
 
 #include <string>
 #include <cassert>
@@ -73,4 +71,4 @@ struct url_parser final
 __INTERNAL_END__
 
 
-#endif // WASP_HTTP_PARSERS_URL_PARSER_H
+#endif // WASP_CORE_PARSERS_URL_PARSER_H

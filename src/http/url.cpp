@@ -15,6 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * An implementation of url.h.
+ */
+
 #include "url.h"
 
 
@@ -29,7 +33,7 @@ Url::Url(const std::string& url)
 		throw ParseError("url is not parsed", _ERROR_DETAILS_);
 	}
 
-	this->_strUrl = url;
+	this->_str_url = url;
 	this->_scheme = parser.scheme;
 	this->_username = parser.username;
 	this->_password = parser.password;
@@ -38,7 +42,7 @@ Url::Url(const std::string& url)
 	this->_path = parser.path;
 	this->_query = parser.query;
 	this->_fragment = parser.fragment;
-	this->_integerPort = parser.integer_port;
+	this->_integer_port = parser.integer_port;
 }
 
 Url::Url(const char* url) : Url(std::string(url))
@@ -97,7 +101,7 @@ uint16_t Url::port() const
 	}
 	else
 	{
-		port = this->_integerPort;
+		port = this->_integer_port;
 	}
 
 	return port;
@@ -105,7 +109,7 @@ uint16_t Url::port() const
 
 std::string Url::str() const
 {
-	return this->_strUrl;
+	return this->_str_url;
 }
 
 __WASP_END__

@@ -15,9 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * HTTP/1.1 responses definition.
- * TODO: write docs
+/**
+ * response.h
+ * Purpose: contains base http response and most frequently
+ * 			used http response.
  */
 
 #ifndef WASP_HTTP_RESPONSE_H
@@ -30,6 +31,7 @@
 #include <iterator>
 #include <set>
 #include <fstream>
+#include <utility>
 
 #include "../globals.h"
 #include "request.h"

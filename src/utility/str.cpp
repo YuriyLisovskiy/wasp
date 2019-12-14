@@ -15,6 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * An implementation of str.h.
+ */
+
 #include "str.h"
 
 
@@ -29,11 +33,13 @@ int normalize_exp(double* val)
 		value /= 10.0;
 		++exponent;
 	}
+
 	while (value < 0.1)
 	{
 		value *= 10.0;
 		--exponent;
 	}
+
 	*val = value;
 	return exponent;
 }
@@ -42,8 +48,8 @@ std::string _format(char const* fmt, va_list args)
 {
 	std::map<std::string, std::string> values;
 	std::stringstream stream;
-	std::string lastNumber;
-	std::string tempArg;
+	std::string last_number;
+	std::string temp_arg;
 	char ch = *fmt++;
 	while (ch)
 	{
@@ -64,15 +70,16 @@ std::string _format(char const* fmt, va_list args)
 					fmt--;
 					while (std::isdigit(*fmt))
 					{
-						lastNumber += *fmt;
+						last_number += *fmt;
 						fmt++;
 					}
+
 					if (*fmt == '!')
 					{
 						fmt++;
-						if (*fmt != '!' && values.find(lastNumber) != values.end())
+						if (*fmt != '!' && values.find(last_number) != values.end())
 						{
-							stream << values[lastNumber];
+							stream << values[last_number];
 						}
 						else
 						{
@@ -80,34 +87,34 @@ std::string _format(char const* fmt, va_list args)
 							switch (*fmt)
 							{
 								case '!':
-									tempArg = "!";
+									temp_arg = "!";
 									break;
 								case 'c':
-									tempArg = std::to_string(va_arg(args, int));
+									temp_arg = std::to_string(va_arg(args, int));
 									break;
 								case 's':
-									tempArg = std::string(va_arg(args, const char*));
+									temp_arg = std::string(va_arg(args, const char*));
 									break;
 								case 'd':
-									tempArg = std::to_string(va_arg(args, int));
+									temp_arg = std::to_string(va_arg(args, int));
 									break;
 								case 'x':
 									tempStream << std::hex << va_arg(args, int);
-									tempArg = tempStream.str();
+									temp_arg = tempStream.str();
 									tempStream.clear();
 									break;
 								case 'f':
-									tempArg = ftoa_fixed(va_arg(args, double));
+									temp_arg = ftoa_fixed(va_arg(args, double));
 									break;
 								case 'e':
-									tempArg = ftoa_sci(va_arg(args, double));
+									temp_arg = ftoa_sci(va_arg(args, double));
 									break;
 							}
-							values[lastNumber] = tempArg;
-							stream << tempArg;
+							values[last_number] = temp_arg;
+							stream << temp_arg;
 						}
 						fmt++;
-						lastNumber.clear();
+						last_number.clear();
 					}
 					break;
 				case '{':
@@ -131,6 +138,7 @@ std::string _format(char const* fmt, va_list args)
 		{
 			stream << ch;
 		}
+
 		ch = *fmt++;
 	}
 
@@ -168,10 +176,12 @@ std::string ftoa_fixed(double value)
 		++places;
 		--exponent;
 	}
+
 	if (places == 0)
 	{
 		result += '0';
 	}
+
 	result += '.';
 	while (exponent < 0 && places < width)
 	{
@@ -179,6 +189,7 @@ std::string ftoa_fixed(double value)
 		--exponent;
 		++places;
 	}
+
 	while (places < width)
 	{
 		int digit = value * 10.0;
@@ -186,6 +197,7 @@ std::string ftoa_fixed(double value)
 		value = value * 10.0 - digit;
 		++places;
 	}
+
 	return result;
 }
 
@@ -195,12 +207,14 @@ std::string ftoa_sci(double value)
 	{
 		return "0";
 	}
+
 	std::string result;
 	if (value < 0.0)
 	{
 		result += '-';
 		value = -value;
 	}
+
 	static const int width = 4;
 	int exponent = internal::normalize_exp(&value);
 	int digit = value * 10.0;
@@ -230,7 +244,7 @@ std::string format(const char* fmt, ...)
 
 void url_split_type(const std::string& url, std::string& scheme, std::string& data)
 {
-	bool _break = false, colonFound = false;
+	bool _break = false, colon_found = false;
 	auto it = url.begin();
 	while (it != url.end() && !_break)
 	{
@@ -240,16 +254,18 @@ void url_split_type(const std::string& url, std::string& scheme, std::string& da
 				_break = true;
 				break;
 			case ':':
-				colonFound = true;
+				colon_found = true;
 				_break = true;
 				break;
 			default:
 				scheme += *it;
 				break;
 		}
+
 		it++;
 	}
-	if (!scheme.empty() && colonFound)
+
+	if (!scheme.empty() && colon_found)
 	{
 		data = std::string(it, url.end());
 	}
@@ -268,14 +284,24 @@ bool contains(const std::string& _str, char _char)
 std::string lower(const std::string& _str)
 {
 	std::string res(_str);
-	std::transform(res.begin(), res.end(), res.begin(), [](unsigned char c){ return std::tolower(c); });
+	std::transform(
+		res.begin(),
+		res.end(),
+		res.begin(),
+		[](unsigned char c){ return std::tolower(c); }
+	);
 	return res;
 }
 
 std::string upper(const std::string& _str)
 {
 	std::string res(_str);
-	std::transform(res.begin(), res.end(), res.begin(), [](unsigned char c){ return std::toupper(c); });
+	std::transform(
+		res.begin(),
+		res.end(),
+		res.begin(),
+		[](unsigned char c){ return std::toupper(c); }
+	);
 	return res;
 }
 
@@ -295,6 +321,7 @@ std::vector<std::string> split(const std::string& str, char delimiter)
 			current += _char;
 		}
 	}
+
 	result.push_back(current);
 	return result;
 }
@@ -305,6 +332,7 @@ bool starts_with(const std::string& src, const std::string& prefix)
 	{
 		return false;
 	}
+
 	for (size_t i = 0 ; i < prefix.size(); i++)
 	{
 		if (src[i] != prefix[i])
@@ -312,21 +340,24 @@ bool starts_with(const std::string& src, const std::string& prefix)
 			return false;
 		}
 	}
+
 	return true;
 }
 
 void ltrim(std::string& s, char ch)
 {
-	s.erase(s.begin(), std::find_if(s.begin(), s.end(), [ch](char chr) {
-		return ch != chr;
-	}));
+	s.erase(
+		s.begin(),
+		std::find_if(s.begin(), s.end(), [ch](char chr) {return ch != chr;})
+	);
 }
 
 void rtrim(std::string& s, char ch)
 {
-	s.erase(std::find_if(s.rbegin(), s.rend(), [ch](int chr) {
-		return ch != chr;
-	}).base(), s.end());
+	s.erase(
+		std::find_if(s.rbegin(), s.rend(), [ch](int chr) {return ch != chr;}).base(),
+		s.end()
+	);
 }
 
 void trim(std::string& s, char ch)

@@ -15,13 +15,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WASP_UNIT_TESTS_HTTP_TESTS_PARSERS_TESTS_INCLUDE_H
-#define WASP_UNIT_TESTS_HTTP_TESTS_PARSERS_TESTS_INCLUDE_H
+/**
+ * cookie_parser.h
+ * Purpose: parses cookies from http request.
+ */
 
-#include "./cookie_parser_tests.h"
-#include "./multipart_parser_tests.h"
-#include "./query_parser_tests.h"
-#include "./request_parser_tests.h"
-#include "./url_parser_tests.h"
+#ifndef WASP_CORE_PARSERS_COOKIE_PARSER_H
+#define WASP_CORE_PARSERS_COOKIE_PARSER_H
 
-#endif // WASP_UNIT_TESTS_HTTP_TESTS_PARSERS_TESTS_INCLUDE_H
+#include <map>
+#include <string>
+
+#include "../../globals.h"
+
+
+__INTERNAL_BEGIN__
+
+struct cookie_parser final
+{
+	enum req_state
+	{
+		req_key,
+		req_val
+	};
+
+	enum resp_state
+	{
+
+	};
+
+	static std::map<std::string, std::string>* parse_req_cookies(const std::string& content);
+	static std::map<std::string, std::string>* parse_resp_cookies(const std::string& content);
+};
+
+__INTERNAL_END__
+
+
+#endif // WASP_CORE_PARSERS_COOKIE_PARSER_H

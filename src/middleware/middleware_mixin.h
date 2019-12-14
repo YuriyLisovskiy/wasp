@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * BaseMiddleware
- * TODO: write docs.
+/**
+ * cookie.h
+ * Purpose: base middleware class.
  */
 
 #ifndef WASP_MIDDLEWARE_MIDDLEWARE_MIXIN_H
@@ -33,11 +33,14 @@ __WASP_BEGIN__
 class MiddlewareMixin
 {
 public:
-	virtual void processRequest(HttpRequest* request)
+
+	/// An input http request before processing in wasp::View.
+	virtual void process_request(HttpRequest* request)
 	{
 	};
 
-	virtual void processResponse(const HttpRequest* request, HttpResponse* response)
+	/// An output http request and response after processing in wasp::View.
+	virtual void process_response(const HttpRequest* request, HttpResponse* response)
 	{
 	};
 };

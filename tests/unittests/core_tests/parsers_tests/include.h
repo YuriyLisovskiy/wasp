@@ -15,40 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * query_parser definition.
- * TODO: write docs.
- */
+#ifndef WASP_UNIT_TESTS_CORE_TESTS_PARSERS_TESTS_INCLUDE_H
+#define WASP_UNIT_TESTS_CORE_TESTS_PARSERS_TESTS_INCLUDE_H
 
-#ifndef WASP_QUERY_PARSER_H
-#define WASP_QUERY_PARSER_H
+#include "./cookie_parser_tests.h"
+#include "./multipart_parser_tests.h"
+#include "./query_parser_tests.h"
+#include "./request_parser_tests.h"
+#include "./url_parser_tests.h"
 
-#include "../../globals.h"
-#include "../request.h"
-#include "../../collections/dict.h"
-#include "../../collections/multi_dict.h"
-
-
-__INTERNAL_BEGIN__
-
-struct query_parser final
-{
-	enum state
-	{
-		s_key,
-		s_val
-	};
-
-	Dict<std::string, std::string>* dict;
-	MultiValueDict<std::string, std::string>* multi_dict;
-
-	explicit query_parser();
-	~query_parser();
-	void append_parameter(const std::string& key, const std::string& value);
-	void parse(const std::string& data);
-};
-
-__INTERNAL_END__
-
-
-#endif // WASP_QUERY_PARSER_H
+#endif // WASP_UNIT_TESTS_CORE_TESTS_PARSERS_TESTS_INCLUDE_H

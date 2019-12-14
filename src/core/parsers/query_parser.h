@@ -15,40 +15,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * CookieParser definition.
- * TODO: write docs.
+/**
+ * query_parser.h
+ * Purpose: parses url's query.
  */
 
-#ifndef WASP_HTTP_PARSERS_COOKIE_PARSER_H
-#define WASP_HTTP_PARSERS_COOKIE_PARSER_H
-
-#include <map>
-#include <string>
+#ifndef WASP_CORE_PARSERS_QUERY_PARSER_H
+#define WASP_CORE_PARSERS_QUERY_PARSER_H
 
 #include "../../globals.h"
+#include "../../http/request.h"
+#include "../../collections/dict.h"
+#include "../../collections/multi_dict.h"
 
 
 __INTERNAL_BEGIN__
 
-struct cookie_parser final
+struct query_parser final
 {
-	enum req_state
+	enum state
 	{
-		req_key,
-		req_val
+		s_key,
+		s_val
 	};
 
-	enum resp_state
-	{
+	Dict<std::string, std::string>* dict;
+	MultiValueDict<std::string, std::string>* multi_dict;
 
-	};
-
-	static std::map<std::string, std::string>* parse_req_cookies(const std::string& content);
-	static std::map<std::string, std::string>* parse_resp_cookies(const std::string& content);
+	explicit query_parser();
+	~query_parser();
+	void append_parameter(const std::string& key, const std::string& value);
+	void parse(const std::string& data);
 };
 
 __INTERNAL_END__
 
 
-#endif // WASP_HTTP_PARSERS_COOKIE_PARSER_H
+#endif // WASP_CORE_PARSERS_QUERY_PARSER_H

@@ -15,9 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "response.h"
+/**
+ * An implementation of reponse.h.
+ */
 
-#include <utility>
+#include "response.h"
 
 
 __WASP_BEGIN__
@@ -333,11 +335,11 @@ void FileResponse::_set_headers()
 		{"gzip", "application/gzip"},
 		{"xz", "application/x-xz"}
 	});
-	this->set_header("Content-Length", std::to_string(path::getSize(this->_file_path)));
+	this->set_header("Content-Length", std::to_string(path::get_size(this->_file_path)));
 	if (str::starts_with(this->_headers.get("Content-Type", ""), "text/html"))
 	{
 		std::string content_type, encoding;
-		mime::guessContentType(this->_file_path, content_type, encoding);
+		mime::guess_content_type(this->_file_path, content_type, encoding);
 		content_type = encoding_map.get(encoding, content_type);
 		this->_headers.set("Content-Type", !content_type.empty() ? content_type : "application/octet-stream");
 	}

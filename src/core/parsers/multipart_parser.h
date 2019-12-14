@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * MultipartParser definition.
- * TODO: write docs.
+/**
+ * multipart_parser.h
+ * Purpose: parses multipart/form-data http request.
  */
 
-#ifndef WASP_HTTP_PARSERS_MULTIPART_PARSER_H
-#define WASP_HTTP_PARSERS_MULTIPART_PARSER_H
+#ifndef WASP_CORE_PARSERS_MULTIPART_PARSER_H
+#define WASP_CORE_PARSERS_MULTIPART_PARSER_H
 
 #include <string>
 #include <functional>
@@ -34,7 +34,7 @@
 #include "../../collections/multi_dict.h"
 #include "../../core/files/file.h"
 #include "../../core/files/uploaded_file.h"
-#include "../request.h"
+#include "../../http/request.h"
 
 
 __INTERNAL_BEGIN__
@@ -91,4 +91,4 @@ struct multipart_parser final
 __INTERNAL_END__
 
 
-#endif // WASP_HTTP_PARSERS_MULTIPART_PARSER_H
+#endif // WASP_CORE_PARSERS_MULTIPART_PARSER_H

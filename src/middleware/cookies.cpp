@@ -15,20 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * An implementation of cookies.h.
+ */
+
 #include "cookies.h"
 
 
 __WASP_BEGIN__
 
-void CookieMiddleware::processRequest(HttpRequest* request)
+void CookieMiddleware::process_request(HttpRequest* request)
 {
 	auto* cookies = internal::cookie_parser::parse_req_cookies(request->headers.get("Cookie", ""));
 	request->COOKIES = Dict(*cookies);
 	delete cookies;
-}
-
-void CookieMiddleware::processResponse(const HttpRequest* request, HttpResponse* response)
-{
 }
 
 __WASP_END__

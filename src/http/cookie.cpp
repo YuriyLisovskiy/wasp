@@ -15,6 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * An implementation of cookie.h.
+ */
+
 #include "cookie.h"
 
 
@@ -30,11 +34,11 @@ Cookie::Cookie(
 	std::string expires,
 	std::string domain,
 	std::string path,
-	bool isSecure,
-	bool isHttpOnly
+	bool is_secure,
+	bool is_http_only
 ) : _name(std::move(name)), _value(std::move(value)), _expires(std::move(expires)),
 	_domain(std::move(domain)), _path(std::move(path)),
-	_isSecure(isSecure), _isHttpOnly(isHttpOnly)
+	_is_secure(is_secure), _is_http_only(is_http_only)
 {
 	if (this->_name.empty())
 	{
@@ -47,7 +51,7 @@ Cookie::Cookie(
 	}
 }
 
-std::string Cookie::toString()
+std::string Cookie::to_string()
 {
 	// Sets browser's directive 'Set-Cookie' and cookie's name and value.
 	std::string result = "Set-Cookie: " + this->_name + "=" + this->_value;
@@ -62,12 +66,12 @@ std::string Cookie::toString()
 	// for instance, 'Thu, 18 Jul 2019 16:25:19 GMT'.
 	result += "; Expires=" + this->_expires;
 
-	if (this->_isSecure)
+	if (this->_is_secure)
 	{
 		result += "; Secure";
 	}
 
-	if (this->_isHttpOnly)
+	if (this->_is_http_only)
 	{
 		result += "; HttpOnly";
 	}
@@ -78,12 +82,12 @@ std::string Cookie::toString()
 bool Cookie::operator==(const Cookie& right)
 {
 	return this->_name == right._name &&
-			this->_value == right._value &&
-			this->_domain == right._domain &&
-			this->_path == right._path &&
-			this->_expires == right._expires &&
-			this->_isSecure == right._isSecure &&
-			this->_isHttpOnly == right._isHttpOnly;
+		this->_value == right._value &&
+		this->_domain == right._domain &&
+		this->_path == right._path &&
+		this->_expires == right._expires &&
+		this->_is_secure == right._is_secure &&
+		this->_is_http_only == right._is_http_only;
 }
 
 __WASP_END__

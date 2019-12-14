@@ -17,8 +17,6 @@
 
 /**
  * An implementation of url_parser.h
- *
- * @author Yuriy Lisovskiy
  */
 
 #include "url_parser.h"
