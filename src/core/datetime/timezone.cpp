@@ -17,9 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * timezone implementation.
- * TODO: write docs.
+/**
+ * An implementation of timezone.h.
  */
 
 #include "timezone.h"
@@ -52,7 +51,7 @@ TimeZone::TimeZone(const std::string& name) : _name(name)
 	this->_offset = internal::TZ_TO_OFFSET.get(name, 0);
 }
 
-int TimeZone::getOffset(Units units = Units::SECONDS)
+int TimeZone::get_offset(Units units = Units::SECONDS)
 {
 	int result;
 	switch (units)
@@ -73,10 +72,11 @@ int TimeZone::getOffset(Units units = Units::SECONDS)
 			result = this->_offset;
 			break;
 	}
+
 	return result;
 }
 
-std::string TimeZone::getName()
+std::string TimeZone::get_name()
 {
 	return this->_name;
 }

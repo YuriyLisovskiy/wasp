@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * timezone definition.
- * TODO: write docs.
+/**
+ * timezone.h
+ * Purpose: utility for retrieving timezone.
  */
 
-#ifndef WASP_UTILS_DATETIME_TIMEZONE_H
-#define WASP_UTILS_DATETIME_TIMEZONE_H
+#ifndef WASP_CORE_DATETIME_TIMEZONE_H
+#define WASP_CORE_DATETIME_TIMEZONE_H
 
 #include <chrono>
 #include <ctime>
@@ -58,14 +58,14 @@ public:
 	explicit TimeZone(time_t when);
 	explicit TimeZone(const std::string& name);
 
-	// offset parameter is time offset in seconds.
+	/// Offset parameter is time offset in seconds.
 	explicit TimeZone(int offset, std::string  name);
 
-	int getOffset(Units units);
-	std::string getName();
+	int get_offset(Units units);
+	std::string get_name();
 };
 
 __DATETIME_END__
 
 
-#endif // WASP_UTILS_DATETIME_TIMEZONE_H
+#endif // WASP_CORE_DATETIME_TIMEZONE_H

@@ -82,7 +82,7 @@ public:
 
 		bool empty()
 		{
-			return this->_dict.isEmpty();
+			return this->_dict.is_empty();
 		}
 
 		std::vector<std::string> keys()

@@ -15,47 +15,46 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * Date definition.
- * TODO: write docs.
+/**
+ * An implementation of time.h.
  */
 
-#ifndef WASP_UTILS_DATETIME_DATE_H
-#define WASP_UTILS_DATETIME_DATE_H
-
-#include <string>
-
-#include "../../globals.h"
-#include "constants.h"
+#include "time.h"
 
 
 __DATETIME_BEGIN__
 
-// An idealized naive date, assuming the current Gregorian calendar
-// always was, and always will be, in effect.
-//
-// Properties: _year, _month, _dayOfYear and _dayOfWeek.
-class Date
+// 'Time' class implementation.
+Time::Time() : _hour(0), _minute(0), _second(0), _microsecond(0)
 {
-private:
-	int _year;
-	int _month;
-	int _dayOfWeek;
-	int _dayOfMonth;
-	int _dayOfYear;
+}
 
-public:
-	Date();
-	Date(int year, int month, int dayOfWeek, int dayOfMonth, int dayOfYear);
+Time::Time(int hour, int minute, int second, int microsecond)
+{
+	this->_hour = hour;
+	this->_minute = minute;
+	this->_second = second;
+	this->_microsecond = microsecond;
+}
 
-	int year();
-	int month();
-	int dayOfWeek();
-	int dayOfMonth();
-	int dayOfYear();
-};
+int Time::hour()
+{
+	return this->_hour;
+}
+
+int Time::minute()
+{
+	return this->_minute;
+}
+
+int Time::second()
+{
+	return this->_second;
+}
+
+int Time::microsecond()
+{
+	return this->_microsecond;
+}
 
 __DATETIME_END__
-
-
-#endif // WASP_UTILS_DATETIME_DATE_H

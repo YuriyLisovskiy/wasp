@@ -15,47 +15,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * time implementation.
- * TODO: write docs.
+/**
+ * constants.h
+ * Purpose: offsets of known time zones.
  */
 
-#include "time.h"
+#ifndef WASP_UTILS_DATETIME_CONSTANTS_H
+#define WASP_UTILS_DATETIME_CONSTANTS_H
+
+#include <map>
+
+#include "../../globals.h"
+#include "../../collections/dict.h"
 
 
 __DATETIME_BEGIN__
 
-// 'Time' class implementation.
-Time::Time() : _hour(0), _minute(0), _second(0), _microsecond(0)
-{
-}
+/// The smallest year number allowed in a date or datetime object.
+const int MIN_YEAR = 1;
 
-Time::Time(int hour, int minute, int second, int microsecond)
-{
-	this->_hour = hour;
-	this->_minute = minute;
-	this->_second = second;
-	this->_microsecond = microsecond;
-}
-
-int Time::hour()
-{
-	return this->_hour;
-}
-
-int Time::minute()
-{
-	return this->_minute;
-}
-
-int Time::second()
-{
-	return this->_second;
-}
-
-int Time::microsecond()
-{
-	return this->_microsecond;
-}
+/// The largest year number allowed in a date or datetime object.
+const int MAX_YEAR = 9999;
 
 __DATETIME_END__
+
+
+__INTERNAL_BEGIN__
+
+extern Dict<std::string, int> TZ_TO_OFFSET;
+
+__INTERNAL_END__
+
+
+#endif // WASP_UTILS_DATETIME_CONSTANTS_H

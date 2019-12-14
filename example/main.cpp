@@ -34,7 +34,7 @@ using wasp::internal::HttpServer;
 
 void handler(wasp::HttpRequest* request, const wasp::internal::socket_t& client)
 {
-	wasp::CookieMiddleware().processRequest(request);
+	wasp::CookieMiddleware().process_request(request);
 
 	auto view = wasp::View::make_view<FormView>();
 
@@ -58,7 +58,7 @@ int main()
 	ctx.handler = handler;
 	ctx.port = 3000;
 	ctx.max_body_size = 33300000;
-	ctx.media_root = "/home/yuriylisovskiy/Desktop/media/";
+	ctx.media_root = "/home/user/Desktop/media/";
 	ctx.logger = wasp::Logger::get_instance();
 
 	HttpServer server(ctx);
