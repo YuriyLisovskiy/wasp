@@ -38,7 +38,7 @@
 __ENCODING_BEGIN__
 
 /// Encodes url using percent-encoding.
-extern std::string encodeUrl(const std::string& url);
+extern std::string encode_url(const std::string& url);
 
 extern std::string quote(const std::string& _str, const std::string& safe = "");
 
@@ -74,7 +74,7 @@ __ENCODING_INTERNAL_BEGIN__
 /// RFC 3986 section 2.3 Unreserved Characters: ALPHA NUMERIC - _ . ~
 extern void escape(std::ostringstream& stream, char c, const std::string& safe = "");
 
-extern std::string encodeAscii(const std::string& _str, Mode mode);
+extern std::string encode_ascii(const std::string& _str, Mode mode);
 
 __ENCODING_INTERNAL_END__
 

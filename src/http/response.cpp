@@ -400,7 +400,7 @@ HttpResponseRedirectBase::HttpResponseRedirectBase(
 		throw core::ValueError("invalid status", _ERROR_DETAILS_);
 	}
 
-	this->set_header("Location", encoding::encodeUrl(redirect_to));
+	this->set_header("Location", encoding::encode_url(redirect_to));
 	Url url(redirect_to);
 	if (!url.scheme().empty() && this->_allowed_hosts.find(url.scheme()) == this->_allowed_hosts.end())
 	{

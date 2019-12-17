@@ -1,6 +1,3 @@
 Important:
     Test:
-        - src/urls module.
-
-Refactor:
-    - utility
+        - src/urls
