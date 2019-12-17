@@ -210,31 +210,31 @@ TEST(MutableMultiValueDictTestCase, TestREndNotThrows)
 TEST(ImmutableMultiValueDictTestCase, TestSetThrows)
 {
 	wasp::collections::MultiValueDict<int, int> testDict(false);
-	ASSERT_THROW(testDict.set(1, 2), wasp::MultiValueDictError);
+	ASSERT_THROW(testDict.set(1, 2), core::MultiValueDictError);
 }
 
 TEST(ImmutableMultiValueDictTestCase, TestSetVectorThrows)
 {
 	wasp::collections::MultiValueDict<int, int> testDict(false);
-	ASSERT_THROW(testDict.set(1, {2, 3, 4}), wasp::MultiValueDictError);
+	ASSERT_THROW(testDict.set(1, {2, 3, 4}), core::MultiValueDictError);
 }
 
 TEST(ImmutableMultiValueDictTestCase, TestAppendThrows)
 {
 	wasp::collections::MultiValueDict<int, int> testDict(false);
-	ASSERT_THROW(testDict.append(1, 4), wasp::MultiValueDictError);
+	ASSERT_THROW(testDict.append(1, 4), core::MultiValueDictError);
 }
 
 TEST(ImmutableMultiValueDictTestCase, TestAppendVectorThrows)
 {
 	wasp::collections::MultiValueDict<int, int> testDict(false);
-	ASSERT_THROW(testDict.append(1, {2, 3, 4}), wasp::MultiValueDictError);
+	ASSERT_THROW(testDict.append(1, {2, 3, 4}), core::MultiValueDictError);
 }
 
 TEST(ImmutableMultiValueDictTestCase, TestRemoveThrows)
 {
 	wasp::collections::MultiValueDict<int, int> testDict({{1, {2, 3, 4}}}, false);
-	ASSERT_THROW(testDict.remove(1), wasp::MultiValueDictError);
+	ASSERT_THROW(testDict.remove(1), core::MultiValueDictError);
 }
 
 TEST(ImmutableMultiValueDictTestCase, TestIsImmutable)
@@ -246,25 +246,25 @@ TEST(ImmutableMultiValueDictTestCase, TestIsImmutable)
 TEST(ImmutableMultiValueDictTestCase, TestBeginThrows)
 {
 	wasp::collections::MultiValueDict<int, int> testDict(false);
-	ASSERT_THROW(testDict.begin(), wasp::MultiValueDictError);
+	ASSERT_THROW(testDict.begin(), core::MultiValueDictError);
 }
 
 TEST(ImmutableMultiValueDictTestCase, TestEndThrows)
 {
 	wasp::collections::MultiValueDict<int, int> testDict(false);
-	ASSERT_THROW(testDict.end(), wasp::MultiValueDictError);
+	ASSERT_THROW(testDict.end(), core::MultiValueDictError);
 }
 
 TEST(ImmutableMultiValueDictTestCase, TestRBeginThrows)
 {
 	wasp::collections::MultiValueDict<int, int> testDict(false);
-	ASSERT_THROW(testDict.rbegin(), wasp::MultiValueDictError);
+	ASSERT_THROW(testDict.rbegin(), core::MultiValueDictError);
 }
 
 TEST(ImmutableMultiValueDictTestCase, TestREndThrows)
 {
 	wasp::collections::MultiValueDict<int, int> testDict(false);
-	ASSERT_THROW(testDict.rend(), wasp::MultiValueDictError);
+	ASSERT_THROW(testDict.rend(), core::MultiValueDictError);
 }
 
 __UNIT_TESTS_END__

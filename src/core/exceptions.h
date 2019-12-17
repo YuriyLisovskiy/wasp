@@ -55,10 +55,10 @@
 #include <cstdlib>
 
 // Module definitions.
-#include "../_def_.h"
+#include "./_def_.h"
 
 
-__WASP_BEGIN__
+__CORE_BEGIN__
 
 class BaseException : public std::exception
 {
@@ -73,9 +73,9 @@ protected:
 	// Use only when initializing of a derived exception!
 	BaseException(const char* message, int line, const char* function, const char* file, const char* type);
 
-	// Initializes '_fullMessage' member.
-	//
-	// Calls only in constructor.
+	/// Initializes '_fullMessage' member.
+	///
+	/// Calls only in constructor.
 	void init();
 
 public:
@@ -271,7 +271,7 @@ public:
 	static void initialize();
 };
 
-__WASP_END__
+__CORE_END__
 
 
 #endif // WASP_CORE_EXCEPTIONS_H

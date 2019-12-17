@@ -155,7 +155,7 @@ TEST_F(ViewTestCase, SetupAndDispatchAllowedTest)
 {
 	auto request = ViewTestCase::make_request("options");
 
-	ASSERT_THROW(this->view->dispatch(nullptr), NullPointerException);
+	ASSERT_THROW(this->view->dispatch(nullptr), core::NullPointerException);
 
 	this->view->setup(&request);
 	auto response = this->view->dispatch(nullptr);

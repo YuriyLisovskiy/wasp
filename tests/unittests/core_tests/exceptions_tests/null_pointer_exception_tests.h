@@ -34,8 +34,8 @@ public:
 	const char* ErrorFile = "test_file.cpp";
 	const size_t ErrorLine = 1;
 
-	wasp::NullPointerException ConstCharConstructorError;
-	wasp::NullPointerException StringConstructorError;
+	core::NullPointerException ConstCharConstructorError;
+	core::NullPointerException StringConstructorError;
 
 	explicit NullPointerExceptionTestCase()
 		: ConstCharConstructorError("Test error message from NullPointerExceptionTestCase", this->ErrorLine, this->ErrorFunction, this->ErrorFile),

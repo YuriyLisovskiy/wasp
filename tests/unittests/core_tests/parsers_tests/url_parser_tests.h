@@ -97,27 +97,27 @@ protected:
 
 TEST_F(UrlParserErrorsTestCase, InvalidSchemeTest)
 {
-	ASSERT_THROW(this->parser.parse("ht~tp://example.com"), wasp::ParseError);
+	ASSERT_THROW(this->parser.parse("ht~tp://example.com"), core::ParseError);
 }
 
 TEST_F(UrlParserErrorsTestCase, InvalidSchemeEndingTest)
 {
-	ASSERT_THROW(this->parser.parse("http//example.com"), wasp::ParseError);
+	ASSERT_THROW(this->parser.parse("http//example.com"), core::ParseError);
 }
 
 TEST_F(UrlParserErrorsTestCase, AbsentFirstSlashTest)
 {
-	ASSERT_THROW(this->parser.parse("http:#example.com"), wasp::ParseError);
+	ASSERT_THROW(this->parser.parse("http:#example.com"), core::ParseError);
 }
 
 TEST_F(UrlParserErrorsTestCase, AbsentSecondSlashTest)
 {
-	ASSERT_THROW(this->parser.parse("http:/example.com"), wasp::ParseError);
+	ASSERT_THROW(this->parser.parse("http:/example.com"), core::ParseError);
 }
 
 TEST_F(UrlParserErrorsTestCase, UsernameOrHostnameErrorTest)
 {
-	ASSERT_THROW(this->parser.parse("http://$example.com"), wasp::ParseError);
+	ASSERT_THROW(this->parser.parse("http://$example.com"), core::ParseError);
 }
 
 __UNIT_TESTS_END__

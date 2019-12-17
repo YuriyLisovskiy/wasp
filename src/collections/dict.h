@@ -51,7 +51,7 @@ protected:
 	/// Wrapper for throwing DictError exception.
 	virtual void _throw(const std::string& msg, int line, const char* function, const char* file)
 	{
-		throw DictError(
+		throw core::DictError(
 			std::string("unable to ") + msg + std::string(", Dict instance is immutable"),
 			line, function, file
 		);

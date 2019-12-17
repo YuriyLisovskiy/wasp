@@ -34,8 +34,8 @@ public:
 	const char* ErrorFile = "test_file.cpp";
 	const size_t ErrorLine = 1;
 
-	wasp::MultiValueDictError ConstCharConstructorError;
-	wasp::MultiValueDictError StringConstructorError;
+	core::MultiValueDictError ConstCharConstructorError;
+	core::MultiValueDictError StringConstructorError;
 
 	explicit MultiValueDictErrorTestCase()
 		: ConstCharConstructorError("Test error message from MultiValueDictErrorTestCase", this->ErrorLine, this->ErrorFunction, this->ErrorFile),

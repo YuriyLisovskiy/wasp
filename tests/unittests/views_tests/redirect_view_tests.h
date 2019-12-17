@@ -176,7 +176,7 @@ TEST_F(RedirectViewWithDefaultParamsTestCase, SetupAndDispatchAllowedTest)
 {
 	auto request = make_request("get");
 
-	ASSERT_THROW(this->view->dispatch(nullptr), NullPointerException);
+	ASSERT_THROW(this->view->dispatch(nullptr), core::NullPointerException);
 
 	this->view->setup(&request);
 	auto response = this->view->dispatch(nullptr);

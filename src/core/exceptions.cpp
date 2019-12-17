@@ -18,7 +18,7 @@
 #include "./exceptions.h"
 
 
-__WASP_BEGIN__
+__CORE_BEGIN__
 
 
 // BaseException
@@ -345,4 +345,4 @@ void InterruptException::initialize()
 	sigaction(SIGTERM, &sig_int_handler, nullptr);
 }
 
-__WASP_END__
+__CORE_END__

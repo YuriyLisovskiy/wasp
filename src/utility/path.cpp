@@ -49,7 +49,7 @@ size_t get_size(const std::string& path)
 {
 	if (!exists(path))
 	{
-		throw FileDoesNotExistError("file '" + path + "' does not exist", _ERROR_DETAILS_);
+		throw core::FileDoesNotExistError("file '" + path + "' does not exist", _ERROR_DETAILS_);
 	}
 
 	std::ifstream ifs(path, std::ifstream::ate | std::ifstream::binary);

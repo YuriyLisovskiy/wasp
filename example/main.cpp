@@ -66,7 +66,7 @@ void handler(wasp::http::HttpRequest* request, const wasp::core::internal::socke
 
 int main()
 {
-	wasp::InterruptException::initialize();
+	wasp::core::InterruptException::initialize();
 
 	wasp::core::internal::HttpServer::context ctx{};
 	ctx.handler = handler;
@@ -81,7 +81,7 @@ int main()
 	{
 		server.listen_and_serve();
 	}
-	catch (const wasp::InterruptException& exc)
+	catch (const wasp::core::InterruptException& exc)
 	{
 		std::cout << "\nFinishing server...";
 		server.finish();

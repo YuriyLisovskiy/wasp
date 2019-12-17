@@ -34,8 +34,8 @@ public:
 	const char* ErrorFile = "test_file.cpp";
 	const size_t ErrorLine = 1;
 
-	wasp::EntityTooLargeError ConstCharConstructorError;
-	wasp::EntityTooLargeError StringConstructorError;
+	core::EntityTooLargeError ConstCharConstructorError;
+	core::EntityTooLargeError StringConstructorError;
 
 	explicit EntityTooLargeErrorTestCase()
 		: ConstCharConstructorError("Test error message from EntityTooLargeErrorTestCase", this->ErrorLine, this->ErrorFunction, this->ErrorFile),

@@ -29,8 +29,11 @@
 #include "../../../../src/utility/path.h"
 #include "../../../../src/core/files/file.h"
 
-using byte = wasp::core::byte;
-using File = wasp::core::File;
+
+__UNIT_TESTS_BEGIN__
+
+using byte = core::byte;
+using File = core::File;
 
 
 std::vector<byte> strToBytes(const std::string& s)
@@ -50,7 +53,7 @@ void removeFile(const std::string& path)
 class ReadFileTestCase : public ::testing::Test
 {
 protected:
-	const std::string testReadFilePath = wasp::path::cwd() + "/TestReadFile.txt";
+	const std::string testReadFilePath = path::cwd() + "/TestReadFile.txt";
 	File fileToRead = File(this->testReadFilePath, "r");
 
 	void SetUp() override
@@ -121,14 +124,14 @@ TEST_F(ReadFileTestCase, TestReadFileIsNotOpenError)
 {
 	this->fileToRead.close();
 
-	ASSERT_THROW(this->fileToRead.read(), wasp::FileError);
+	ASSERT_THROW(this->fileToRead.read(), core::FileError);
 
 	this->fileToRead.open();
 }
 
 TEST_F(ReadFileTestCase, TestWriteFileIsInReadOnlyModeError)
 {
-	ASSERT_THROW(this->fileToRead.write(strToBytes("Hello, World")), wasp::FileError);
+	ASSERT_THROW(this->fileToRead.write(strToBytes("Hello, World")), core::FileError);
 }
 
 TEST_F(ReadFileTestCase, TestGetPath)
@@ -187,7 +190,7 @@ TEST_F(ReadFileTestCase, TestMultipleChunksTrue)
 class WriteFileTestCase : public ::testing::Test
 {
 protected:
-	const std::string testFilePath = wasp::path::cwd() + "/TestWriteFile.txt";
+	const std::string testFilePath = path::cwd() + "/TestWriteFile.txt";
 	File file = File(this->testFilePath, "w");
 
 	void SetUp() override
@@ -271,14 +274,17 @@ TEST_F(WriteFileTestCase, TestWriteFileIsNotOpenError)
 {
 	this->file.close();
 
-	ASSERT_THROW(this->file.write(strToBytes("Hello, World")), wasp::FileError);
+	ASSERT_THROW(this->file.write(strToBytes("Hello, World")), core::FileError);
 
 	this->file.open();
 }
 
 TEST_F(WriteFileTestCase, TestReadFileIsInWriteOnlyModeError)
 {
-	ASSERT_THROW(file.read(), wasp::FileError);
+	ASSERT_THROW(file.read(), core::FileError);
 }
+
+__UNIT_TESTS_END__
+
 
 #endif // WASP_UNIT_TESTS_CORE_TESTS_FILES_TESTS_FILE_TESTS_H

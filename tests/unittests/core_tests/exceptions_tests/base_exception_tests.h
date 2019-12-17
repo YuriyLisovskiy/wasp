@@ -34,7 +34,7 @@ public:
 	const char* ErrorFunction = "testFunc";
 	const char* ErrorFile = "test_file.cpp";
 
-	wasp::BaseException Error;
+	core::BaseException Error;
 
 	explicit BaseExceptionTestCase()
 		: Error("Test error message from BaseExceptionTestCase", this->ErrorLine, this->ErrorFunction, this->ErrorFile)

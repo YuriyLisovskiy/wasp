@@ -34,8 +34,8 @@ public:
 	const char* ErrorFile = "test_file.cpp";
 	const size_t ErrorLine = 1;
 
-	wasp::SocketError ConstCharConstructorError;
-	wasp::SocketError StringConstructorError;
+	core::SocketError ConstCharConstructorError;
+	core::SocketError StringConstructorError;
 
 	explicit SocketErrorTestCase()
 		: ConstCharConstructorError("Test error message from SocketErrorTestCase", this->ErrorLine, this->ErrorFunction, this->ErrorFile),

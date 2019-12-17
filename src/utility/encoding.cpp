@@ -116,8 +116,9 @@ std::string encode(const std::string& _str, const char* encoding, Mode mode)
 	// TODO: add more encodings here.
 	else
 	{
-		throw EncodingError("unknown encoding: " + std::string(encoding), _ERROR_DETAILS_);
+		throw core::EncodingError("unknown encoding: " + std::string(encoding), _ERROR_DETAILS_);
 	}
+
 	return result;
 }
 
@@ -151,7 +152,7 @@ std::string encodeAscii(const std::string& _str, Mode mode)
 			case Mode::STRICT:
 				if (_char > 127)
 				{
-					throw EncodingError(
+					throw core::EncodingError(
 						"'ascii' codec can't encode character in position " + std::to_string(i) + ": ordinal not in range [0;127]",
 						_ERROR_DETAILS_
 					);

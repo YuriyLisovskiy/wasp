@@ -47,7 +47,7 @@ protected:
 	/// Wrapper for throwing MultiValueDictError exception.
 	void _throw(const std::string& msg, int line, const char* function, const char* file) override
 	{
-		throw MultiValueDictError(
+		throw core::MultiValueDictError(
 			std::string("unable to ") + msg + std::string(", MultiValueDict instance is immutable"),
 			line, function, file
 		);

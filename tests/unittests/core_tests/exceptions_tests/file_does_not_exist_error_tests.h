@@ -34,8 +34,8 @@ public:
 	const char* ErrorFile = "test_file.cpp";
 	const size_t ErrorLine = 1;
 
-	wasp::FileDoesNotExistError ConstCharConstructorError;
-	wasp::FileDoesNotExistError StringConstructorError;
+	core::FileDoesNotExistError ConstCharConstructorError;
+	core::FileDoesNotExistError StringConstructorError;
 
 	explicit FileDoesNotExistErrorTestCase()
 		: ConstCharConstructorError("Test error message from FileDoesNotExistErrorTestCase", this->ErrorLine, this->ErrorFunction, this->ErrorFile),

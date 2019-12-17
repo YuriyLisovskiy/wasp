@@ -90,7 +90,7 @@ std::string UrlPattern::build(const std::vector<std::string>& args)
 		return built_url;
 	}
 
-	throw AttributeError("unable to build url from pattern", _ERROR_DETAILS_);
+	throw core::AttributeError("unable to build url from pattern", _ERROR_DETAILS_);
 }
 
 std::string UrlPattern::_parse(const std::string& pattern)

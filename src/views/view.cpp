@@ -55,7 +55,7 @@ http::HttpResponse* View::dispatch(Args* args)
 			name = fullName;
 		}
 
-		throw NullPointerException(
+		throw core::NullPointerException(
 			name + " instance has not initialized request."
 			" Did you override setup() and forget to call base method?",
 			_ERROR_DETAILS_

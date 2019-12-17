@@ -30,7 +30,7 @@ Url::Url(const std::string& url)
 	parser.parse(url);
 	if (!parser.is_parsed)
 	{
-		throw ParseError("url is not parsed", _ERROR_DETAILS_);
+		throw core::ParseError("url is not parsed", _ERROR_DETAILS_);
 	}
 
 	this->_str_url = url;

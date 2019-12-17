@@ -34,8 +34,8 @@ public:
 	const char* ErrorFile = "test_file.cpp";
 	const size_t ErrorLine = 1;
 
-	wasp::MultiPartParserError ConstCharConstructorError;
-	wasp::MultiPartParserError StringConstructorError;
+	core::MultiPartParserError ConstCharConstructorError;
+	core::MultiPartParserError StringConstructorError;
 
 	explicit MultiPartParserErrorTestCase()
 		: ConstCharConstructorError("Test error message from MultiPartParserErrorTestCase", this->ErrorLine, this->ErrorFunction, this->ErrorFile),

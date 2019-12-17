@@ -34,8 +34,8 @@ public:
 	const char* ErrorFile = "test_file.cpp";
 	const size_t ErrorLine = 1;
 
-	wasp::SuspiciousOperation ConstCharConstructorError;
-	wasp::SuspiciousOperation StringConstructorError;
+	core::SuspiciousOperation ConstCharConstructorError;
+	core::SuspiciousOperation StringConstructorError;
 
 	explicit SuspiciousOperationTestCase()
 		: ConstCharConstructorError("Test error message from SuspiciousOperationTestCase", this->ErrorLine, this->ErrorFunction, this->ErrorFile),
