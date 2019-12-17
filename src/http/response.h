@@ -24,6 +24,7 @@
 #ifndef WASP_HTTP_RESPONSE_H
 #define WASP_HTTP_RESPONSE_H
 
+// C++ libraries.
 #include <string>
 #include <map>
 #include <vector>
@@ -33,26 +34,28 @@
 #include <fstream>
 #include <utility>
 
-#include "../globals.h"
-#include "request.h"
-#include "cookie.h"
+// Module definitions.
+#include "./def.h"
+
+// Wasp libraries.
+#include "./request.h"
+#include "./cookie.h"
 #include "../core/exceptions.h"
-#include "status.h"
-#include "url.h"
+#include "./status.h"
+#include "./url.h"
 #include "../utility/str.h"
 #include "../utility/encoding.h"
 #include "../utility/path.h"
 #include "../utility/mime_types.h"
-
 #include "../core/datetime/datetime.h"
 
 
-__WASP_BEGIN__
+__HTTP_BEGIN__
 
-// An HTTP response base class with dictionary-accessed headers.
-//
-// This class doesn't handle content. It should not be used directly.
-// Use the HttpResponse subclass instead.
+/// An HTTP response base class with dictionary-accessed headers.
+///
+/// This class doesn't handle content. It should not be used directly.
+/// Use the HttpResponse subclass instead.
 class HttpResponseBase
 {
 protected:
@@ -113,7 +116,7 @@ public:
 	virtual void flush();
 	virtual unsigned long int tell();
 
-	// These methods partially implement a stream-like object interface.
+	/// These methods partially implement a stream-like object interface.
 	virtual bool readable();
 	virtual bool seekable();
 	virtual bool writable();
@@ -123,7 +126,7 @@ public:
 };
 
 
-// An HTTP response class with a string as content.
+/// An HTTP response class with a string as content.
 class HttpResponse : public HttpResponseBase
 {
 protected:
@@ -328,7 +331,7 @@ public:
 
 // TODO: implement JsonResponse!
 
-__WASP_END__
+__HTTP_END__
 
 
 #endif // WASP_HTTP_RESPONSE_H

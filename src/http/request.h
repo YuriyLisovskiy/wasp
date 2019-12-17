@@ -23,18 +23,22 @@
 #ifndef WASP_HTTP_REQUEST_H
 #define WASP_HTTP_REQUEST_H
 
+// C++ libraries.
 #include <string>
 #include <vector>
 #include <map>
 
-#include "../globals.h"
+// Module definitions.
+#include "./def.h"
+
+// Wasp libraries.
 #include "../utility/str.h"
 #include "../collections/dict.h"
 #include "../collections/multi_dict.h"
 #include "../core/files/uploaded_file.h"
 
 
-__WASP_BEGIN__
+__HTTP_BEGIN__
 
 class HttpRequest
 {
@@ -124,7 +128,7 @@ private:
 	std::string _body;
 };
 
-__WASP_END__
+__HTTP_END__
 
 
 #endif // WASP_HTTP_REQUEST_H

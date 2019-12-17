@@ -22,7 +22,7 @@
 #include "url.h"
 
 
-__WASP_BEGIN__
+__HTTP_BEGIN__
 
 Url::Url(const std::string& url)
 {
@@ -112,4 +112,4 @@ std::string Url::str() const
 	return this->_str_url;
 }
 
-__WASP_END__
+__HTTP_END__

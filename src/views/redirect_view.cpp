@@ -48,7 +48,7 @@ std::string RedirectView::get_redirect_url()
 	return url;
 }
 
-HttpResponse* RedirectView::get(HttpRequest* request, Args* args)
+wasp::http::HttpResponse* RedirectView::get(wasp::http::HttpRequest* request, Args* args)
 {
 	std::string url = this->get_redirect_url();
 	if (url.empty())
@@ -58,43 +58,43 @@ HttpResponse* RedirectView::get(HttpRequest* request, Args* args)
 			this->_logger->warning("Gone: " + request->path(), _DETAILS_NONE_);
 		}
 
-		return new HttpResponseGone("");
+		return new wasp::http::HttpResponseGone("");
 	}
 
 	if (this->_permanent)
 	{
-		return new HttpResponsePermanentRedirect(url);
+		return new wasp::http::HttpResponsePermanentRedirect(url);
 	}
 
-	return new HttpResponseRedirect(url);
+	return new wasp::http::HttpResponseRedirect(url);
 }
 
-HttpResponse* RedirectView::post(HttpRequest* request, Args* args)
+wasp::http::HttpResponse* RedirectView::post(wasp::http::HttpRequest* request, Args* args)
 {
 	return this->get(request, args);
 }
 
-HttpResponse* RedirectView::put(HttpRequest* request, Args* args)
+wasp::http::HttpResponse* RedirectView::put(wasp::http::HttpRequest* request, Args* args)
 {
 	return this->get(request, args);
 }
 
-HttpResponse* RedirectView::patch(HttpRequest* request, Args* args)
+wasp::http::HttpResponse* RedirectView::patch(wasp::http::HttpRequest* request, Args* args)
 {
 	return this->get(request, args);
 }
 
-HttpResponse* RedirectView::delete_(HttpRequest* request, Args* args)
+wasp::http::HttpResponse* RedirectView::delete_(wasp::http::HttpRequest* request, Args* args)
 {
 	return this->get(request, args);
 }
 
-HttpResponse* RedirectView::head(HttpRequest* request, Args* args)
+wasp::http::HttpResponse* RedirectView::head(wasp::http::HttpRequest* request, Args* args)
 {
 	return this->get(request, args);
 }
 
-HttpResponse* RedirectView::options(HttpRequest* request, Args* args)
+wasp::http::HttpResponse* RedirectView::options(wasp::http::HttpRequest* request, Args* args)
 {
 	return this->get(request, args);
 }

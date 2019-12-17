@@ -24,7 +24,7 @@
 
 __WASP_BEGIN__
 
-void CookieMiddleware::process_request(HttpRequest* request)
+void CookieMiddleware::process_request(wasp::http::HttpRequest* request)
 {
 	auto* cookies = internal::cookie_parser::parse_req_cookies(request->headers.get("Cookie", ""));
 	request->COOKIES = Dict(*cookies);

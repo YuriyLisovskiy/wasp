@@ -16,36 +16,18 @@
  */
 
 /**
- * cookie.h
- * Purpose: base middleware class.
+ * def.h
+ * Purpose: urls module definitions.
  */
 
-#ifndef WASP_MIDDLEWARE_MIDDLEWARE_MIXIN_H
-#define WASP_MIDDLEWARE_MIDDLEWARE_MIXIN_H
+#ifndef WASP_URLS_DEF_H
+#define WASP_URLS_DEF_H
 
-#include "../globals.h"
-#include "../http/request.h"
-#include "../http/response.h"
+#include "../def.h"
 
 
-__WASP_BEGIN__
-
-class MiddlewareMixin
-{
-public:
-
-	/// An input http request before processing in wasp::View.
-	virtual void process_request(wasp::http::HttpRequest* request)
-	{
-	};
-
-	/// An output http request and response after processing in wasp::View.
-	virtual void process_response(const wasp::http::HttpRequest* request, wasp::http::HttpResponse* response)
-	{
-	};
-};
-
-__WASP_END__
+#define __URLS_BEGIN__ __WASP_BEGIN__ namespace urls {
+#define __URLS_END__ } __WASP_END__
 
 
-#endif // WASP_MIDDLEWARE_MIDDLEWARE_MIXIN_H
+#endif // WASP_URLS_DEF_H

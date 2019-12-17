@@ -34,14 +34,14 @@ __UNIT_TESTS_BEGIN__
 class ViewTestCase : public ::testing::Test
 {
 public:
-	static HttpRequest make_request(const std::string& method)
+	static wasp::http::HttpRequest make_request(const std::string& method)
 	{
-		auto empty_parameters = HttpRequest::Parameters<std::string, std::string>(
+		auto empty_parameters = wasp::http::HttpRequest::Parameters<std::string, std::string>(
 				Dict<std::string, std::string>(),
 				MultiValueDict<std::string, std::string>()
 		);
 		auto empty_map = std::map<std::string, std::string>();
-		return HttpRequest(
+		return wasp::http::HttpRequest(
 				method,
 				"/hello",
 				1, 1,
@@ -51,7 +51,7 @@ public:
 				empty_map,
 				empty_parameters,
 				empty_parameters,
-				HttpRequest::Parameters<std::string, UploadedFile>(
+				wasp::http::HttpRequest::Parameters<std::string, UploadedFile>(
 						Dict<std::string, UploadedFile>(),
 						MultiValueDict<std::string, UploadedFile>()
 				)
@@ -114,7 +114,7 @@ TEST_F(ViewTestCase, HeadTestReturnsNullptr)
 
 TEST_F(ViewTestCase, OptionsTest)
 {
-	auto expected_response = HttpResponse("");
+	auto expected_response = wasp::http::HttpResponse("");
 	expected_response.set_header(
 		"Allow",
 		str::join(", ", std::vector<std::string>{"get", "post", "head", "options"})

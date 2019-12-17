@@ -38,12 +38,12 @@ View::View(const std::vector<std::string>& allowed_methods, ILogger* logger) : V
 	}
 }
 
-void View::setup(HttpRequest* request)
+void View::setup(wasp::http::HttpRequest* request)
 {
 	this->_request = request;
 }
 
-HttpResponse* View::dispatch(Args* args)
+wasp::http::HttpResponse* View::dispatch(Args* args)
 {
 	if (this->_request == nullptr)
 	{
@@ -63,7 +63,7 @@ HttpResponse* View::dispatch(Args* args)
 	}
 
 	std::string method = str::lower(this->_request->method());
-	HttpResponse* result = nullptr;
+	wasp::http::HttpResponse* result = nullptr;
 	if (method == "get")
 	{
 		result = this->get(this->_request, args);
@@ -105,7 +105,7 @@ HttpResponse* View::dispatch(Args* args)
 	return result;
 }
 
-HttpResponse* View::http_method_not_allowed(HttpRequest* request)
+wasp::http::HttpResponse* View::http_method_not_allowed(wasp::http::HttpRequest* request)
 {
 	if (this->_logger != nullptr)
 	{
@@ -115,7 +115,7 @@ HttpResponse* View::http_method_not_allowed(HttpRequest* request)
 		);
 	}
 
-	return new HttpResponseNotAllowed("", this->allowed_methods());
+	return new wasp::http::HttpResponseNotAllowed("", this->allowed_methods());
 }
 
 std::vector<std::string> View::allowed_methods()
@@ -137,45 +137,45 @@ std::vector<std::string> View::allowed_methods()
 	return result;
 }
 
-HttpResponse* View::get(HttpRequest* request, Args* args)
+wasp::http::HttpResponse* View::get(wasp::http::HttpRequest* request, Args* args)
 {
 	return nullptr;
 }
 
-HttpResponse* View::post(HttpRequest* request, Args* args)
+wasp::http::HttpResponse* View::post(wasp::http::HttpRequest* request, Args* args)
 {
 	return nullptr;
 }
 
-HttpResponse* View::put(HttpRequest* request, Args* args)
+wasp::http::HttpResponse* View::put(wasp::http::HttpRequest* request, Args* args)
 {
 	return nullptr;
 }
 
-HttpResponse* View::patch(HttpRequest* request, Args* args)
+wasp::http::HttpResponse* View::patch(wasp::http::HttpRequest* request, Args* args)
 {
 	return nullptr;
 }
 
-HttpResponse* View::delete_(HttpRequest* request, Args* args)
+wasp::http::HttpResponse* View::delete_(wasp::http::HttpRequest* request, Args* args)
 {
 	return nullptr;
 }
 
-HttpResponse* View::head(HttpRequest* request, Args* args)
+wasp::http::HttpResponse* View::head(wasp::http::HttpRequest* request, Args* args)
 {
 	return this->get(request, args);
 }
 
-HttpResponse* View::options(HttpRequest* request, Args* args)
+wasp::http::HttpResponse* View::options(wasp::http::HttpRequest* request, Args* args)
 {
-	auto* response = new HttpResponse("");
+	auto* response = new wasp::http::HttpResponse("");
 	response->set_header("Allow", str::join(", ", this->allowed_methods()));
 	response->set_header("Content-Length", "0");
 	return response;
 }
 
-HttpResponse* View::trace(HttpRequest* request, Args* args)
+wasp::http::HttpResponse* View::trace(wasp::http::HttpRequest* request, Args* args)
 {
 	return nullptr;
 }

@@ -66,13 +66,13 @@ struct request_parser final
 	std::map<std::string, std::string> headers;
 
 	/// Contains get request's parameters.
-	HttpRequest::Parameters<std::string, std::string>* get_parameters = nullptr;
+	wasp::http::HttpRequest::Parameters<std::string, std::string>* get_parameters = nullptr;
 
 	/// Contains post request's parameters.
-	HttpRequest::Parameters<std::string, std::string>* post_parameters = nullptr;
+	wasp::http::HttpRequest::Parameters<std::string, std::string>* post_parameters = nullptr;
 
 	/// Contains request's files when request was sent as application/form-data.
-	HttpRequest::Parameters<std::string, UploadedFile>* files_parameters = nullptr;
+	wasp::http::HttpRequest::Parameters<std::string, UploadedFile>* files_parameters = nullptr;
 
 	/// Contains the size of request's content.
 	unsigned long long content_size{};
@@ -157,7 +157,7 @@ struct request_parser final
 	/// Sets parameters according to http request method.
 	///
 	/// @param params: parsed get/post parameters.
-	void set_parameters(HttpRequest::Parameters<std::string, std::string>* params);
+	void set_parameters(wasp::http::HttpRequest::Parameters<std::string, std::string>* params);
 
 	/// Parses chunks from http request body if request is chunked.
 	///
@@ -197,7 +197,7 @@ struct request_parser final
 	/// Builds an http request from parsed data.
 	///
 	/// @return HttpRequest object built from http stream.
-	wasp::HttpRequest* build_request();
+	wasp::http::HttpRequest* build_request();
 
 	/// Creates Dict object from headers' map.
 	///

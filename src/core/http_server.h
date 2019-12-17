@@ -57,7 +57,7 @@ __INTERNAL_BEGIN__
 // 403 bytes is a length of all headers names.
 #define MAX_HEADERS_SIZE 4096 * 38 + 403    // 156051 bytes.
 
-typedef std::function<void(HttpRequest*, const socket_t&)> http_handler;
+typedef std::function<void(wasp::http::HttpRequest*, const socket_t&)> http_handler;
 
 
 class HttpServer
@@ -85,7 +85,7 @@ private:
 	int _bind();
 	int _listen();
 	void _clean_up(const socket_t& client);
-	HttpRequest* _handle_request(const socket_t& client);
+	wasp::http::HttpRequest* _handle_request(const socket_t& client);
 	std::string _read_body(const socket_t& client, const std::string& body_beginning, size_t body_length);
 	static std::string _read_headers(const socket_t& client, std::string& body_beginning);
 	void _start_listener();
@@ -114,8 +114,8 @@ public:
 	~HttpServer();
 	void finish();
 	void listen_and_serve();
-	static void send(HttpResponseBase* response, const socket_t& client);
-	static void send(StreamingHttpResponse* response, const socket_t& client);
+	static void send(wasp::http::HttpResponseBase* response, const socket_t& client);
+	static void send(wasp::http::StreamingHttpResponse* response, const socket_t& client);
 
 private:
 	static void _normalize_context(HttpServer::context& ctx);

@@ -25,27 +25,41 @@
 #include "../src/views/generic.h"
 #include "form_view.h"
 #include "../src/core/exceptions.h"
+#include "../src/urls/url.h"
 
 // #define DETECT_MEMORY_LEAK
 // #include "../tests/unittests/mem_leak_check.h"
 
-using wasp::internal::HttpServer;
 
-
-void handler(wasp::HttpRequest* request, const wasp::internal::socket_t& client)
+void handler(wasp::http::HttpRequest* request, const wasp::internal::socket_t& client)
 {
 	wasp::CookieMiddleware().process_request(request);
 
-	auto view = wasp::View::make_view<FormView>();
+	std::vector<wasp::urls::UrlPattern> patterns{
+		wasp::urls::make_pattern(
+			"/profile/<user_id>([0-9]*)/name/<user_name>([A-Za-z]+)/?",
+			wasp::View::make_view<FormView>(),
+			"profile"
+		)
+	};
 
-	auto* response = view(request, nullptr, wasp::Logger::get_instance());
+	wasp::http::HttpResponse* response = nullptr;
+	for (auto& pattern : patterns)
+	{
+		std::map<std::string, std::string> args_map;
+		if (pattern.match(request->path(), args_map))
+		{
+			response = pattern.apply(request, new wasp::Args(args_map), wasp::Logger::get_instance());
+			break;
+		}
+	}
 
 	if (!response)
 	{
-		response = new wasp::HttpResponseServerError("<h2>500 - Internal Server Error</h2>");
+		response = new wasp::http::HttpResponseNotFound("<h2>404 - Not Found</h2>");
 	}
 
-	HttpServer::send(response, client);
+	wasp::internal::HttpServer::send(response, client);
 	delete response;
 }
 
@@ -54,14 +68,14 @@ int main()
 {
 	wasp::InterruptException::initialize();
 
-	HttpServer::context ctx{};
+	wasp::internal::HttpServer::context ctx{};
 	ctx.handler = handler;
-	ctx.port = 3000;
+	ctx.port = 8080;
 	ctx.max_body_size = 33300000;
 	ctx.media_root = "/home/user/Desktop/media/";
 	ctx.logger = wasp::Logger::get_instance();
 
-	HttpServer server(ctx);
+	wasp::internal::HttpServer server(ctx);
 
 	try
 	{

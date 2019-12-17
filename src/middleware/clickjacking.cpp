@@ -24,7 +24,7 @@
 
 __WASP_BEGIN__
 
-void XFrameOptionsMiddleware::process_response(const HttpRequest* request, HttpResponse* response)
+void XFrameOptionsMiddleware::process_response(const wasp::http::HttpRequest* request, wasp::http::HttpResponse* response)
 {
 	// TODO:
 }

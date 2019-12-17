@@ -344,6 +344,24 @@ bool starts_with(const std::string& src, const std::string& prefix)
 	return true;
 }
 
+bool ends_with(const std::string& src, const std::string& suffix)
+{
+	if (src.size() < suffix.size())
+	{
+		return false;
+	}
+
+	for (size_t i = suffix.size() - 1; i >= 0; i--)
+	{
+		if (src[i] != suffix[i])
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
 void ltrim(std::string& s, char ch)
 {
 	s.erase(

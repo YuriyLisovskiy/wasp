@@ -22,7 +22,7 @@
 #include "response.h"
 
 
-__WASP_BEGIN__
+__HTTP_BEGIN__
 
 HttpResponseBase::HttpResponseBase(
 	unsigned short int status,
@@ -538,4 +538,4 @@ HttpResponseServerError::HttpResponseServerError(
 {
 }
 
-__WASP_END__
+__HTTP_END__

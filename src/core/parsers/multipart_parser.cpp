@@ -414,14 +414,18 @@ void multipart_parser::parse(const std::string& content_type, const std::string&
 	throw MultiPartParserError("Unable to parse request body", _ERROR_DETAILS_);
 }
 
-HttpRequest::Parameters<std::string, UploadedFile>* multipart_parser::get_files_params()
+wasp::http::HttpRequest::Parameters<std::string, UploadedFile>* multipart_parser::get_files_params()
 {
-	return new HttpRequest::Parameters<std::string, UploadedFile>(this->file_values, this->multi_file_value);
+	return new wasp::http::HttpRequest::Parameters<std::string, UploadedFile>(
+		this->file_values, this->multi_file_value
+	);
 }
 
-HttpRequest::Parameters<std::string, std::string>* multipart_parser::get_post_params()
+wasp::http::HttpRequest::Parameters<std::string, std::string>* multipart_parser::get_post_params()
 {
-	return new HttpRequest::Parameters<std::string, std::string>(this->post_values, this->multi_post_value);
+	return new wasp::http::HttpRequest::Parameters<std::string, std::string>(
+		this->post_values, this->multi_post_value
+	);
 }
 
 __INTERNAL_END__

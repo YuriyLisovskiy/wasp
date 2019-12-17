@@ -53,13 +53,13 @@ public:
 	/// Return the URL redirect to.
 	std::string get_redirect_url();
 
-	HttpResponse* get(HttpRequest* request, Args* args) override;
-	HttpResponse* post(HttpRequest* request, Args* args) override;
-	HttpResponse* head(HttpRequest* request, Args* args) override;
-	HttpResponse* options(HttpRequest* request, Args* args) override;
-	HttpResponse* put(HttpRequest* request, Args* args) override;
-	HttpResponse* delete_(HttpRequest* request, Args* args) override;
-	HttpResponse* patch(HttpRequest* request, Args* args) override;
+	wasp::http::HttpResponse* get(wasp::http::HttpRequest* request, Args* args) override;
+	wasp::http::HttpResponse* post(wasp::http::HttpRequest* request, Args* args) override;
+	wasp::http::HttpResponse* head(wasp::http::HttpRequest* request, Args* args) override;
+	wasp::http::HttpResponse* options(wasp::http::HttpRequest* request, Args* args) override;
+	wasp::http::HttpResponse* put(wasp::http::HttpRequest* request, Args* args) override;
+	wasp::http::HttpResponse* delete_(wasp::http::HttpRequest* request, Args* args) override;
+	wasp::http::HttpResponse* patch(wasp::http::HttpRequest* request, Args* args) override;
 };
 
 __WASP_END__

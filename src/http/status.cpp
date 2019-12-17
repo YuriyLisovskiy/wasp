@@ -22,7 +22,7 @@
 #include "status.h"
 
 
-__INTERNAL_BEGIN__
+__HTTP_INTERNAL_BEGIN__
 
 Dict<unsigned short int, std::pair<std::string, std::string>> HTTP_STATUS(
 	std::map<unsigned short int, std::pair<std::string, std::string>>{
@@ -96,4 +96,4 @@ Dict<unsigned short int, std::pair<std::string, std::string>> HTTP_STATUS(
 	}
 );
 
-__INTERNAL_END__
+__HTTP_INTERNAL_END__

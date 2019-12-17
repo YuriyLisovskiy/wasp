@@ -197,6 +197,13 @@ extern std::vector<std::string> split(const std::string& str, char delimiter = '
 /// @return true if string starts with given prefix, otherwise returns false.
 extern bool starts_with(const std::string& src, const std::string& prefix);
 
+/// Checks if string ends with some string suffix.
+///
+/// @param src: string to check.
+/// @param suffix: possible string ending.
+/// @return true if string ends with given suffix, otherwise returns false.
+extern bool ends_with(const std::string& src, const std::string& suffix);
+
 /// Trims left part of string in-place.
 ///
 /// @param s: string to trim.

@@ -16,54 +16,27 @@
  */
 
 /**
- * cookie.h
- * Purpose: represents an http cookies as object.
+ * url.h
+ * Purpose: utility functions for working with url patterns.
  */
 
-#ifndef WASP_HTTP_COOKIE_H
-#define WASP_HTTP_COOKIE_H
-
-// C++ libraries.
-#include <string>
+#ifndef WASP_URLS_URL_H
+#define WASP_URLS_URL_H
 
 // Module definitions.
 #include "./def.h"
 
 // Wasp libraries.
-#include "../core/exceptions.h"
+#include "./pattern.h"
 
 
-__HTTP_BEGIN__
+__URLS_BEGIN__
 
-class Cookie
-{
-private:
-	std::string _name;
-	std::string _value;
-	std::string _expires;
-	std::string _domain;
-	std::string _path;
-	bool _is_secure;
-	bool _is_http_only;
+extern UrlPattern make_pattern(const std::string& rgx, const wasp::ViewHandler& handler, const std::string& name);
 
-public:
-	Cookie();
-	Cookie(
-		std::string name,
-		std::string value,
-		std::string expires,
-		std::string domain = "",
-		std::string path = "/",
-		bool is_secure = true,
-		bool is_http_only = false
-	);
+// TODO: implement include() function!
 
-	std::string to_string();
-
-	bool operator==(const Cookie& right);
-};
-
-__HTTP_END__
+__URLS_END__
 
 
-#endif // WASP_HTTP_COOKIE_H
+#endif // WASP_URLS_URL_H

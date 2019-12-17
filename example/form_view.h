@@ -21,6 +21,9 @@
 #include "../src/views/generic.h"
 #include "../src/utility/logger.h"
 
+using wasp::http::HttpRequest;
+using wasp::http::HttpResponse;
+
 
 template<class... Args>
 void print(Args&&... args)
@@ -34,23 +37,34 @@ class FormView : public wasp::View
 public:
 	explicit FormView(wasp::ILogger* logger = nullptr) : View({"get", "post"}, logger) {}
 
-	wasp::HttpResponse* get(wasp::HttpRequest* request, wasp::Args* args) final
+	HttpResponse* get(HttpRequest* request, wasp::Args* args) final
 	{
+		std::cout << "\n\n" << request->path();
+
 		if (request->FILES.contains("super_file"))
 		{
 			auto super_file = request->FILES.get("super_file");
 			super_file.save();
 		}
 
-		print(
-			"\nGet: ", request->GET.keys().size(),
-			"\nPost: ", request->POST.keys().size(),
-			"\nFiles: ", request->FILES.keys().size(),
-			"\nCookies: ", request->COOKIES.keys().size()
-		);
-		print("\nCOOKIES: ", request->headers.get("Cookie"));
+		std::string user_row;
+		if (args->contains("user_name"))
+		{
+			user_row += "<h3>User: " + args->get_str("user_name");
+		}
+
+		if (args->contains("user_id"))
+		{
+			user_row += ", ID: " + args->get_str("user_id");
+		}
+
+		if (!user_row.empty())
+		{
+			user_row += "</h3>\n";
+		}
 
 		std::string body(
+			user_row +
 			"<form action=\"/hello\" method=\"post\" enctype=\"multipart/form-data\">\n"
 			"\t<input type=\"file\" name=\"super_file\" />\n"
 			"\t<input type=\"email\" name=\"mail\" />\n"
@@ -60,10 +74,10 @@ public:
 			"\t</form>\n"
 		);
 
-		return new wasp::HttpResponse(body);
+		return new HttpResponse(body);
 	}
 
-	wasp::HttpResponse* post(wasp::HttpRequest* request, wasp::Args* args) final
+	HttpResponse* post(HttpRequest* request, wasp::Args* args) final
 	{
 		return this->get(request, args);
 	}

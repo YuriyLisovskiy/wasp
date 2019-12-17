@@ -42,6 +42,8 @@
 
 __WASP_BEGIN__
 
+typedef std::function<wasp::http::HttpResponse*(wasp::http::HttpRequest*, Args*, ILogger*)> ViewHandler;
+
 class View
 {
 protected:
@@ -50,7 +52,7 @@ protected:
 
 	/// Holds pointer to client's request.
 	/// Caution: must be deleted outside!
-	HttpRequest* _request;
+	wasp::http::HttpRequest* _request;
 
 	/// Contains all possible http methods which view can handle.
 	const std::vector<std::string> _http_method_names = {
@@ -69,7 +71,7 @@ public:
 	/// @param request: pointer to http request.
 	/// @param args: pointer to requests's url arguments.
 	/// @return pointer to http response instance.
-	virtual HttpResponse* get(HttpRequest* request, Args* args);
+	virtual wasp::http::HttpResponse* get(wasp::http::HttpRequest* request, Args* args);
 
 	/// Processes http POST request.
 	/// Can be overridden in derived class, otherwise returns nullptr.
@@ -77,7 +79,7 @@ public:
 	/// @param request: pointer to http request.
 	/// @param args: pointer to requests's url arguments.
 	/// @return pointer to http response instance.
-	virtual HttpResponse* post(HttpRequest* request, Args* args);
+	virtual wasp::http::HttpResponse* post(wasp::http::HttpRequest* request, Args* args);
 
 	/// Processes http PUT request.
 	/// Can be overridden in derived class, otherwise returns nullptr.
@@ -85,7 +87,7 @@ public:
 	/// @param request: pointer to http request.
 	/// @param args: pointer to requests's url arguments.
 	/// @return pointer to http response instance.
-	virtual HttpResponse* put(HttpRequest* request, Args* args);
+	virtual wasp::http::HttpResponse* put(wasp::http::HttpRequest* request, Args* args);
 
 	/// Processes http PATCH request.
 	/// Can be overridden in derived class, otherwise returns nullptr.
@@ -93,7 +95,7 @@ public:
 	/// @param request: pointer to http request.
 	/// @param args: pointer to requests's url arguments.
 	/// @return pointer to http response instance.
-	virtual HttpResponse* patch(HttpRequest* request, Args* args);
+	virtual wasp::http::HttpResponse* patch(wasp::http::HttpRequest* request, Args* args);
 
 	/// Processes http DELETE request.
 	/// Can be overridden in derived class, otherwise returns nullptr.
@@ -101,7 +103,7 @@ public:
 	/// @param request: pointer to http request.
 	/// @param args: pointer to requests's url arguments.
 	/// @return pointer to http response instance.
-	virtual HttpResponse* delete_(HttpRequest* request, Args* args);
+	virtual wasp::http::HttpResponse* delete_(wasp::http::HttpRequest* request, Args* args);
 
 	/// Processes http HEAD request.
 	/// Can be overridden in derived class, otherwise returns nullptr.
@@ -109,7 +111,7 @@ public:
 	/// @param request: pointer to http request.
 	/// @param args: pointer to requests's url arguments.
 	/// @return pointer to http response instance.
-	virtual HttpResponse* head(HttpRequest* request, Args* args);
+	virtual wasp::http::HttpResponse* head(wasp::http::HttpRequest* request, Args* args);
 
 	/// Processes http OPTIONS request.
 	/// Can be overridden in derived class, otherwise returns nullptr.
@@ -117,7 +119,7 @@ public:
 	/// @param request: pointer to http request.
 	/// @param args: pointer to requests's url arguments.
 	/// @return pointer to http response instance.
-	virtual HttpResponse* options(HttpRequest* request, Args* args);
+	virtual wasp::http::HttpResponse* options(wasp::http::HttpRequest* request, Args* args);
 
 	/// Processes http TRACE request.
 	/// Can be overridden in derived class, otherwise returns nullptr.
@@ -125,14 +127,14 @@ public:
 	/// @param request: pointer to http request.
 	/// @param args: pointer to requests's url arguments.
 	/// @return pointer to http response instance.
-	virtual HttpResponse* trace(HttpRequest* request, Args* args);
+	virtual wasp::http::HttpResponse* trace(wasp::http::HttpRequest* request, Args* args);
 
 	/// Setups request before dispatch call.
 	/// Can be overridden in derived class, but requires
 	///		request initialization.
 	///
 	/// @param request: pointer to http request.
-	virtual void setup(HttpRequest* request);
+	virtual void setup(wasp::http::HttpRequest* request);
 
 	/// Try to dispatch to the right method; if a method doesn't exist,
 	/// defer to the error handler. Also defer to the error handler if the
@@ -140,13 +142,13 @@ public:
 	///
 	/// @param request: an actual http request from client.
 	/// @return pointer to http response returned from handler.
-	virtual HttpResponse* dispatch(Args* args);
+	virtual wasp::http::HttpResponse* dispatch(Args* args);
 
 	/// Returns Http 405 (Method Not Allowed) response.
 	///
 	/// @param request: pointer to http request.
 	/// @return pointer to http response returned from handler.
-	HttpResponse* http_method_not_allowed(HttpRequest* request);
+	wasp::http::HttpResponse* http_method_not_allowed(wasp::http::HttpRequest* request);
 
 	/// Builds vector of allowed methods.
 	/// Used for http OPTIONS response.
@@ -165,9 +167,11 @@ public:
 	/// @return std::function which accepts request and url arguments,
 	/// 	and returns pointer to HttpResponse instance.
 	template <typename _ViewT>
-	static std::function<HttpResponse*(HttpRequest*, Args*, ILogger*)> make_view()
+	static ViewHandler make_view()
 	{
-		auto func = [](HttpRequest* request, Args* args, ILogger* logger) -> HttpResponse*
+		ViewHandler func = [](
+			wasp::http::HttpRequest* request, Args* args, ILogger* logger
+		) -> wasp::http::HttpResponse*
 		{
 			_ViewT view(logger);
 			view.setup(request);

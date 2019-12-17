@@ -46,6 +46,10 @@ file(GLOB LIB_FILES
 	"src/http/*.cpp"
 	"src/views/*.h"
 	"src/views/*.cpp"
+	"src/urls/resolvers/*.h"
+	"src/urls/resolvers/*.cpp"
+	"src/urls/*.h"
+	"src/urls/*.cpp"
 	"src/*.h"
 	"src/*.cpp"
 )

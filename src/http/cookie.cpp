@@ -22,7 +22,7 @@
 #include "cookie.h"
 
 
-__WASP_BEGIN__
+__HTTP_BEGIN__
 
 Cookie::Cookie() : Cookie("", "", "")
 {
@@ -90,4 +90,4 @@ bool Cookie::operator==(const Cookie& right)
 		this->_is_http_only == right._is_http_only;
 }
 
-__WASP_END__
+__HTTP_END__

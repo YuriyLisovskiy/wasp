@@ -16,36 +16,17 @@
  */
 
 /**
- * cookie.h
- * Purpose: base middleware class.
+ * An implementation of url.h.
  */
 
-#ifndef WASP_MIDDLEWARE_MIDDLEWARE_MIXIN_H
-#define WASP_MIDDLEWARE_MIDDLEWARE_MIXIN_H
-
-#include "../globals.h"
-#include "../http/request.h"
-#include "../http/response.h"
+#include "url.h"
 
 
-__WASP_BEGIN__
+__URLS_BEGIN__
 
-class MiddlewareMixin
+UrlPattern make_pattern(const std::string& rgx, const wasp::ViewHandler& handler, const std::string& name)
 {
-public:
+	return UrlPattern(rgx, handler, name);
+}
 
-	/// An input http request before processing in wasp::View.
-	virtual void process_request(wasp::http::HttpRequest* request)
-	{
-	};
-
-	/// An output http request and response after processing in wasp::View.
-	virtual void process_response(const wasp::http::HttpRequest* request, wasp::http::HttpResponse* response)
-	{
-	};
-};
-
-__WASP_END__
-
-
-#endif // WASP_MIDDLEWARE_MIDDLEWARE_MIXIN_H
+__URLS_END__

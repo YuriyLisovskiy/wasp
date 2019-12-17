@@ -24,14 +24,18 @@
 #ifndef WASP_HTTP_URL_H
 #define WASP_HTTP_URL_H
 
+// C++ libraries.
 #include <string>
 
-#include "../globals.h"
-#include "../core/parsers/url_parser.h"
+// Module definitions.
+#include "./def.h"
+
+// Wasp libraries.
 #include "../core/exceptions.h"
+#include "../core/parsers/url_parser.h"
 
 
-__WASP_BEGIN__
+__HTTP_BEGIN__
 
 class Url final
 {
@@ -62,7 +66,7 @@ public:
 	[[nodiscard]] std::string str() const;
 };
 
-__WASP_END__
+__HTTP_END__
 
 
 #endif // WASP_HTTP_URL_H
