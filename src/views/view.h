@@ -24,23 +24,27 @@
 #ifndef WASP_VIEWS_VIEW_H
 #define WASP_VIEWS_VIEW_H
 
+// C++ libraries.
 #include <vector>
 #include <string>
 #include <cxxabi.h>
 #include <algorithm>
 #include <functional>
 
-#include "../globals.h"
+// Module definitions.
+#include "./_def_.h"
+
+// Wasp libraries.
+#include "./args.h"
 #include "../http/request.h"
 #include "../http/response.h"
 #include "../utility/str.h"
 #include "../utility/logger.h"
 #include "../core/exceptions.h"
 #include "../collections/dict.h"
-#include "args.h"
 
 
-__WASP_BEGIN__
+__VIEWS_BEGIN__
 
 typedef std::function<wasp::http::HttpResponse*(wasp::http::HttpRequest*, Args*, ILogger*)> ViewHandler;
 
@@ -185,7 +189,7 @@ protected:
 	explicit View(const std::vector<std::string>& allowed_methods, ILogger* logger = nullptr);
 };
 
-__WASP_END__
+__VIEWS_END__
 
 
 #endif // WASP_VIEWS_VIEW_H

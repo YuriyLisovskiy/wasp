@@ -22,7 +22,7 @@
 #include "cookies.h"
 
 
-__WASP_BEGIN__
+__MIDDLEWARE_BEGIN__
 
 void CookieMiddleware::process_request(wasp::http::HttpRequest* request)
 {
@@ -31,4 +31,4 @@ void CookieMiddleware::process_request(wasp::http::HttpRequest* request)
 	delete cookies;
 }
 
-__WASP_END__
+__MIDDLEWARE_END__

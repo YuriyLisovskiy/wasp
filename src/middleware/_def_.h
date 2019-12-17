@@ -15,39 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * settings
- * TODO: write docs.
+/**
+ * _def_.h
+ * Purpose: middleware module definitions.
  */
 
-#ifndef WASP_CONF_SETTINGS_H
-#define WASP_CONF_SETTINGS_H
+#ifndef WASP_MIDDLEWARE_DEF_H
+#define WASP_MIDDLEWARE_DEF_H
 
-// C++ libraries.
-#include <string>
-
-// Module definitions.
-#include "_def_.h"
-
-// Wasp libraries.
-#include "../utility/logger.h"
-#include "../middleware/middleware_mixin.h"
+#include "../_def_.h"
 
 
-__CONF_BEGIN__
-
-struct Settings
-{
-	// Default constructor
-	Settings();
-
-	// Parameters
-	std::vector<wasp::middleware::MiddlewareMixin*> MIDDLEWARE;
-	std::string X_FRAME_OPTIONS;
-	uint DATA_UPLOAD_MAX_MEMORY_SIZE;
-};
-
-__CONF_END__
+/// wasp::middleware
+#define __MIDDLEWARE_BEGIN__ __WASP_BEGIN__ namespace middleware {
+#define __MIDDLEWARE_END__ } __WASP_END__
 
 
-#endif // WASP_CONF_SETTINGS_H
+#endif // WASP_MIDDLEWARE_DEF_H

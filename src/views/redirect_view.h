@@ -23,17 +23,21 @@
 #ifndef WASP_VIEWS_REDIRECT_VIEW_H
 #define WASP_VIEWS_REDIRECT_VIEW_H
 
+// C++ libraries.
 #include <string>
 
-#include "../globals.h"
-#include "view.h"
-#include "args.h"
+// Module definitions.
+#include "./_def_.h"
+
+// Wasp libraries.
+#include "./view.h"
+#include "./args.h"
 #include "../utility/logger.h"
 #include "../http/request.h"
 #include "../http/response.h"
 
 
-__WASP_BEGIN__
+__VIEWS_BEGIN__
 
 class RedirectView : public View
 {
@@ -62,7 +66,7 @@ public:
 	wasp::http::HttpResponse* patch(wasp::http::HttpRequest* request, Args* args) override;
 };
 
-__WASP_END__
+__VIEWS_END__
 
 
 #endif // WASP_VIEWS_REDIRECT_VIEW_H

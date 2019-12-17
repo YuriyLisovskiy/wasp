@@ -22,7 +22,7 @@
 #include "view.h"
 
 
-__WASP_BEGIN__
+__VIEWS_BEGIN__
 
 View::View(ILogger* logger) : _request(nullptr), _allowed_methods_list({"options"})
 {
@@ -180,4 +180,4 @@ wasp::http::HttpResponse* View::trace(wasp::http::HttpRequest* request, Args* ar
 	return nullptr;
 }
 
-__WASP_END__
+__VIEWS_END__

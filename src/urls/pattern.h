@@ -31,7 +31,7 @@
 #include <regex>
 
 // Module definitions.
-#include "./def.h"
+#include "_def_.h"
 
 // Wasp libraries.
 #include "../views/args.h"
@@ -57,15 +57,17 @@ private:
 	std::string _s;
 	std::regex _rgx;
 	std::vector<std::string> _pattern_parts;
-	wasp::ViewHandler _handler;
+	wasp::views::ViewHandler _handler;
 	std::string _name;
 	std::vector<std::string> _keys;
 
 public:
-	UrlPattern(const std::string& rgx, const wasp::ViewHandler& handler, const std::string& name);
+	UrlPattern(const std::string& rgx, const wasp::views::ViewHandler& handler, const std::string& name);
 
 	std::string name();
-	wasp::http::HttpResponse* apply(wasp::http::HttpRequest* request, Args* args = nullptr, ILogger* logger = nullptr);
+	wasp::http::HttpResponse* apply(
+		wasp::http::HttpRequest* request, wasp::views::Args* args = nullptr, ILogger* logger = nullptr
+	);
 	bool match(const std::string& url, std::map<std::string, std::string>& args);
 	std::string build(const std::vector<std::string>& args);
 

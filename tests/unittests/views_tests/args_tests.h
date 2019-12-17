@@ -31,11 +31,11 @@ __UNIT_TESTS_BEGIN__
 class ArgsTestCase : public ::testing::Test
 {
 protected:
-	wasp::Args* args = nullptr;
+	wasp::views::Args* args = nullptr;
 
 	void SetUp() override
 	{
-		this->args = new Args(std::map<std::string, std::string>{
+		this->args = new wasp::views::Args(std::map<std::string, std::string>{
 			{"user_id", "12345"},
 			{"account_name", "some_name"}
 		});

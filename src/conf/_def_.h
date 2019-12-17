@@ -16,21 +16,23 @@
  */
 
 /**
- * def.h
- * Purpose: urls module definitions.
+ * _def_.h
+ * Purpose: conf module definitions.
  */
 
-#ifndef WASP_HTTP_DEF_H
-#define WASP_HTTP_DEF_H
+#ifndef WASP_CONF_DEF_H
+#define WASP_CONF_DEF_H
 
-#include "../def.h"
-
-
-#define __HTTP_BEGIN__ __WASP_BEGIN__ namespace http {
-#define __HTTP_END__ } __WASP_END__
-
-#define __HTTP_INTERNAL_BEGIN__ __HTTP_BEGIN__ namespace internal {
-#define __HTTP_INTERNAL_END__ } __HTTP_END__
+#include "../_def_.h"
 
 
-#endif // WASP_HTTP_DEF_H
+/// wasp::conf
+#define __CONF_BEGIN__ __WASP_BEGIN__ namespace conf {
+#define __CONF_END__ } __WASP_END__
+
+/// wasp::conf::internal
+#define __CONF_INTERNAL_BEGIN__ __CONF_BEGIN__ namespace internal {
+#define __CONF_INTERNAL_END__ } __CONF_END__
+
+
+#endif // WASP_CONF_DEF_H

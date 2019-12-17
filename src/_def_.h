@@ -16,7 +16,7 @@
  */
 
 /**
- * def.h
+ * _def_.h
  * Purpose: main module definitions.
  */
 

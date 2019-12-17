@@ -59,11 +59,11 @@ wasp::http::HttpRequest make_request(const std::string& method)
 class RedirectViewWithDefaultParamsTestCase : public ::testing::Test
 {
 protected:
-	wasp::RedirectView* view = nullptr;
+	wasp::views::RedirectView* view = nullptr;
 
 	void SetUp() override
 	{
-		this->view = new wasp::RedirectView("/hello");
+		this->view = new wasp::views::RedirectView("/hello");
 	}
 
 	void TearDown() override
@@ -210,11 +210,11 @@ TEST_F(RedirectViewWithDefaultParamsTestCase, GetRedirectUrlTest)
 class RedirectViewPermanentAndQueryStringTestCase : public ::testing::Test
 {
 protected:
-	wasp::RedirectView* view = nullptr;
+	wasp::views::RedirectView* view = nullptr;
 
 	void SetUp() override
 	{
-		this->view = new wasp::RedirectView("/hello/world", true, true);
+		this->view = new wasp::views::RedirectView("/hello/world", true, true);
 	}
 
 	void TearDown() override
@@ -333,11 +333,11 @@ TEST_F(RedirectViewPermanentAndQueryStringTestCase, GetRedirectUrlTest)
 class RedirectViewEmptyUrlTestCase : public ::testing::Test
 {
 protected:
-	wasp::RedirectView* view = nullptr;
+	wasp::views::RedirectView* view = nullptr;
 
 	void SetUp() override
 	{
-		this->view = new wasp::RedirectView("");
+		this->view = new wasp::views::RedirectView("");
 	}
 
 	void TearDown() override

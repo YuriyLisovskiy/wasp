@@ -24,7 +24,7 @@
 #define WASP_URLS_URL_H
 
 // Module definitions.
-#include "./def.h"
+#include "_def_.h"
 
 // Wasp libraries.
 #include "./pattern.h"
@@ -32,7 +32,9 @@
 
 __URLS_BEGIN__
 
-extern UrlPattern make_pattern(const std::string& rgx, const wasp::ViewHandler& handler, const std::string& name);
+extern UrlPattern make_pattern(
+	const std::string& rgx, const wasp::views::ViewHandler& handler, const std::string& name
+);
 
 // TODO: implement include() function!
 

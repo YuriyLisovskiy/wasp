@@ -35,7 +35,7 @@
 #include <utility>
 
 // Module definitions.
-#include "./def.h"
+#include "_def_.h"
 
 // Wasp libraries.
 #include "./request.h"

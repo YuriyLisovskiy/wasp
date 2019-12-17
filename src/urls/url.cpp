@@ -24,7 +24,7 @@
 
 __URLS_BEGIN__
 
-UrlPattern make_pattern(const std::string& rgx, const wasp::ViewHandler& handler, const std::string& name)
+UrlPattern make_pattern(const std::string& rgx, const wasp::views::ViewHandler& handler, const std::string& name)
 {
 	return UrlPattern(rgx, handler, name);
 }

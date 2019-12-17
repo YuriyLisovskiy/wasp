@@ -22,11 +22,13 @@
 #include "clickjacking.h"
 
 
-__WASP_BEGIN__
+__MIDDLEWARE_BEGIN__
 
-void XFrameOptionsMiddleware::process_response(const wasp::http::HttpRequest* request, wasp::http::HttpResponse* response)
+void XFrameOptionsMiddleware::process_response(
+	const wasp::http::HttpRequest* request, wasp::http::HttpResponse* response
+)
 {
 	// TODO:
 }
 
-__WASP_END__
+__MIDDLEWARE_END__

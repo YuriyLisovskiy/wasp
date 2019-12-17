@@ -33,12 +33,12 @@
 
 void handler(wasp::http::HttpRequest* request, const wasp::internal::socket_t& client)
 {
-	wasp::CookieMiddleware().process_request(request);
+	wasp::middleware::CookieMiddleware().process_request(request);
 
 	std::vector<wasp::urls::UrlPattern> patterns{
 		wasp::urls::make_pattern(
 			"/profile/<user_id>([0-9]*)/name/<user_name>([A-Za-z]+)/?",
-			wasp::View::make_view<FormView>(),
+			wasp::views::View::make_view<FormView>(),
 			"profile"
 		)
 	};
@@ -49,7 +49,7 @@ void handler(wasp::http::HttpRequest* request, const wasp::internal::socket_t& c
 		std::map<std::string, std::string> args_map;
 		if (pattern.match(request->path(), args_map))
 		{
-			response = pattern.apply(request, new wasp::Args(args_map), wasp::Logger::get_instance());
+			response = pattern.apply(request, new wasp::views::Args(args_map), wasp::Logger::get_instance());
 			break;
 		}
 	}

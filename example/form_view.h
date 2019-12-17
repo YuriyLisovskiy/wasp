@@ -32,12 +32,12 @@ void print(Args&&... args)
 }
 
 
-class FormView : public wasp::View
+class FormView : public wasp::views::View
 {
 public:
 	explicit FormView(wasp::ILogger* logger = nullptr) : View({"get", "post"}, logger) {}
 
-	HttpResponse* get(HttpRequest* request, wasp::Args* args) final
+	HttpResponse* get(HttpRequest* request, wasp::views::Args* args) final
 	{
 		std::cout << "\n\n" << request->path();
 
@@ -77,7 +77,7 @@ public:
 		return new HttpResponse(body);
 	}
 
-	HttpResponse* post(HttpRequest* request, wasp::Args* args) final
+	HttpResponse* post(HttpRequest* request, wasp::views::Args* args) final
 	{
 		return this->get(request, args);
 	}

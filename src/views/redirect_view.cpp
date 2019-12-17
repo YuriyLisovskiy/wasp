@@ -22,7 +22,7 @@
 #include "redirect_view.h"
 
 
-__WASP_BEGIN__
+__VIEWS_BEGIN__
 
 RedirectView::RedirectView(const std::string& url, bool permanent, bool query_string, ILogger* logger)
 	: View({"get", "post", "put", "patch", "delete", "head", "options"}, logger)
@@ -99,4 +99,4 @@ wasp::http::HttpResponse* RedirectView::options(wasp::http::HttpRequest* request
 	return this->get(request, args);
 }
 
-__WASP_END__
+__VIEWS_END__

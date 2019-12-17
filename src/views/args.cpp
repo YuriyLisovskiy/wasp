@@ -22,7 +22,7 @@
 #include "args.h"
 
 
-__WASP_BEGIN__
+__VIEWS_BEGIN__
 
 Args::Args(const std::map<std::string, std::string>& src)
 {
@@ -81,4 +81,4 @@ bool Args::is_number(const std::string& val)
 	return true;
 }
 
-__WASP_END__
+__VIEWS_END__

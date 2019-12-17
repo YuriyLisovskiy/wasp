@@ -59,11 +59,11 @@ public:
 	}
 
 protected:
-	View* view = nullptr;
+	wasp::views::View* view = nullptr;
 
 	void SetUp() override
 	{
-		this->view = new View();
+		this->view = new wasp::views::View();
 	}
 
 	void TearDown() override
@@ -179,7 +179,7 @@ TEST_F(ViewTestCase, DispatchNotAllowedTest)
 TEST(ViewTestCaseStatic, MakeViewTest)
 {
 	auto request = ViewTestCase::make_request("options");
-	auto view = View::make_view<View>();
+	auto view = wasp::views::View::make_view<wasp::views::View>();
 
 	auto response = view(&request, nullptr, nullptr);
 

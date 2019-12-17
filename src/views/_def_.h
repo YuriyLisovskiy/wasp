@@ -16,21 +16,19 @@
  */
 
 /**
- * def.h
- * Purpose: conf module definitions.
+ * _def_.h
+ * Purpose: views module's definitions.
  */
 
-#ifndef WASP_CONF_DEF_H
-#define WASP_CONF_DEF_H
+#ifndef WASP_VIEWS_DEF_H
+#define WASP_VIEWS_DEF_H
 
-#include "../def.h"
-
-
-#define __CONF_BEGIN__ __WASP_BEGIN__ namespace conf {
-#define __CONF_END__ } __WASP_END__
-
-#define __CONF_INTERNAL_BEGIN__ __CONF_BEGIN__ namespace internal {
-#define __CONF_INTERNAL_END__ } __CONF_END__
+#include "../_def_.h"
 
 
-#endif // WASP_CONF_DEF_H
+/// wasp::views
+#define __VIEWS_BEGIN__ __WASP_BEGIN__ namespace views {
+#define __VIEWS_END__ } __WASP_END__
+
+
+#endif // WASP_VIEWS_DEF_H

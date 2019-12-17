@@ -15,39 +15,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * settings
- * TODO: write docs.
+/**
+ * _def_.h
+ * Purpose: urls module's definitions.
  */
 
-#ifndef WASP_CONF_SETTINGS_H
-#define WASP_CONF_SETTINGS_H
+#ifndef WASP_HTTP_DEF_H
+#define WASP_HTTP_DEF_H
 
-// C++ libraries.
-#include <string>
-
-// Module definitions.
-#include "_def_.h"
-
-// Wasp libraries.
-#include "../utility/logger.h"
-#include "../middleware/middleware_mixin.h"
+#include "../_def_.h"
 
 
-__CONF_BEGIN__
+/// wasp::http
+#define __HTTP_BEGIN__ __WASP_BEGIN__ namespace http {
+#define __HTTP_END__ } __WASP_END__
 
-struct Settings
-{
-	// Default constructor
-	Settings();
-
-	// Parameters
-	std::vector<wasp::middleware::MiddlewareMixin*> MIDDLEWARE;
-	std::string X_FRAME_OPTIONS;
-	uint DATA_UPLOAD_MAX_MEMORY_SIZE;
-};
-
-__CONF_END__
+/// wasp::http::internal
+#define __HTTP_INTERNAL_BEGIN__ __HTTP_BEGIN__ namespace internal {
+#define __HTTP_INTERNAL_END__ } __HTTP_END__
 
 
-#endif // WASP_CONF_SETTINGS_H
+#endif // WASP_HTTP_DEF_H
