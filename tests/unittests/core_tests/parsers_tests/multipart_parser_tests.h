@@ -22,7 +22,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../../globals.h"
+#include "../../_def_.h"
 #include "../../../../src/utility/path.h"
 #include "../../../../src/core/exceptions.h"
 #include "../../../../src/utility/string/str.h"
@@ -41,7 +41,7 @@ protected:
 
 TEST_F(MultipartParserStaticTestCase, AssertBoundaryTestSuccess)
 {
-	ASSERT_NO_THROW(wasp::core::internal::multipart_parser::assert_boundary(
+	ASSERT_NO_THROW(core::internal::multipart_parser::assert_boundary(
 		this->ORIG_BOUNDARY,
 		this->ORIG_BOUNDARY
 	));
@@ -49,7 +49,7 @@ TEST_F(MultipartParserStaticTestCase, AssertBoundaryTestSuccess)
 
 TEST_F(MultipartParserStaticTestCase, AssertBoundaryTestThrows)
 {
-	ASSERT_THROW(wasp::core::internal::multipart_parser::assert_boundary(
+	ASSERT_THROW(core::internal::multipart_parser::assert_boundary(
 		this->ORIG_BOUNDARY,
 		this->DIFFERENT_BOUNDARY
 	), core::MultiPartParserError);
@@ -58,15 +58,15 @@ TEST_F(MultipartParserStaticTestCase, AssertBoundaryTestThrows)
 TEST_F(MultipartParserStaticTestCase, AssertGetBoundaryTestSuccess)
 {
 	ASSERT_EQ(
-		wasp::core::internal::multipart_parser::get_boundary(this->CONTENT_TYPE),
-		wasp::str::ltrim(this->ORIG_BOUNDARY, '-')
+		core::internal::multipart_parser::get_boundary(this->CONTENT_TYPE),
+		str::ltrim(this->ORIG_BOUNDARY, '-')
 	);
 }
 
 TEST_F(MultipartParserStaticTestCase, AssertGetBoundaryTestThrowsInvalidContentType)
 {
 	ASSERT_THROW(
-		wasp::core::internal::multipart_parser::get_boundary("application/x-www-urlencoded"),
+		core::internal::multipart_parser::get_boundary("application/x-www-urlencoded"),
 		core::MultiPartParserError
 	);
 }
@@ -74,7 +74,7 @@ TEST_F(MultipartParserStaticTestCase, AssertGetBoundaryTestThrowsInvalidContentT
 TEST_F(MultipartParserStaticTestCase, AssertGetBoundaryTestThrowsEmptyBoundary)
 {
 	ASSERT_THROW(
-		wasp::core::internal::multipart_parser::get_boundary("multipart/form-data"),
+		core::internal::multipart_parser::get_boundary("multipart/form-data"),
 		core::MultiPartParserError
 	);
 }
@@ -185,13 +185,13 @@ protected:
 		"2000\r\n"
 		"------WebKitFormBoundaryzY2033Pw5Bz7HHAG--";
 
-	const std::string ROOT = wasp::path::cwd() + "/";
+	const std::string ROOT = path::cwd() + "/";
 
-	wasp::core::internal::multipart_parser* parser = nullptr;
+	core::internal::multipart_parser* parser = nullptr;
 
 	void SetUp() override
 	{
-		this->parser = new wasp::core::internal::multipart_parser(this->ROOT);
+		this->parser = new core::internal::multipart_parser(this->ROOT);
 	}
 
 	void TearDown() override

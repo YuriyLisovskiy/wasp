@@ -24,7 +24,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../../globals.h"
+#include "../../_def_.h"
 #include "../../../../src/core/parsers/request_parser.h"
 
 
@@ -34,36 +34,36 @@ TEST(RequestParserTestCase, IsCharTest)
 {
 	for (size_t i = 0; i < 128; i++)
 	{
-		ASSERT_TRUE(wasp::core::internal::request_parser::is_char(i));
+		ASSERT_TRUE(core::internal::request_parser::is_char(i));
 	}
 }
 
 TEST(RequestParserTestCase, IsNotCharTest)
 {
-	ASSERT_FALSE(wasp::core::internal::request_parser::is_char(-1));
-	ASSERT_FALSE(wasp::core::internal::request_parser::is_char(128));
+	ASSERT_FALSE(core::internal::request_parser::is_char(-1));
+	ASSERT_FALSE(core::internal::request_parser::is_char(128));
 }
 
 TEST(RequestParserTestCase, IsControlTest)
 {
 	for (size_t i = 0; i < 32; i++)
 	{
-		ASSERT_TRUE(wasp::core::internal::request_parser::is_control(i));
+		ASSERT_TRUE(core::internal::request_parser::is_control(i));
 	}
 
-	ASSERT_TRUE(wasp::core::internal::request_parser::is_control(127));
+	ASSERT_TRUE(core::internal::request_parser::is_control(127));
 }
 
 TEST(RequestParserTestCase, IsNotControlTest)
 {
-	ASSERT_FALSE(wasp::core::internal::request_parser::is_control(-1));
+	ASSERT_FALSE(core::internal::request_parser::is_control(-1));
 
 	for (size_t i = 32; i < 127; i++)
 	{
-		ASSERT_FALSE(wasp::core::internal::request_parser::is_control(i));
+		ASSERT_FALSE(core::internal::request_parser::is_control(i));
 	}
 
-	ASSERT_FALSE(wasp::core::internal::request_parser::is_control(128));
+	ASSERT_FALSE(core::internal::request_parser::is_control(128));
 }
 
 TEST(RequestParserTestCase, IsSpecialTest)
@@ -73,39 +73,39 @@ TEST(RequestParserTestCase, IsSpecialTest)
 	};
 	for (auto special : specials)
 	{
-		ASSERT_TRUE(wasp::core::internal::request_parser::is_special(special));
+		ASSERT_TRUE(core::internal::request_parser::is_special(special));
 	}
 }
 
 TEST(RequestParserTestCase, IsNotSpecialTest)
 {
-	ASSERT_FALSE(wasp::core::internal::request_parser::is_special('f'));
-	ASSERT_FALSE(wasp::core::internal::request_parser::is_special('0'));
-	ASSERT_FALSE(wasp::core::internal::request_parser::is_special('\n'));
+	ASSERT_FALSE(core::internal::request_parser::is_special('f'));
+	ASSERT_FALSE(core::internal::request_parser::is_special('0'));
+	ASSERT_FALSE(core::internal::request_parser::is_special('\n'));
 }
 
 TEST(RequestParserTestCase, IsDigitTest)
 {
 	for (char i = '0'; i <= '9'; i++)
 	{
-		ASSERT_TRUE(wasp::core::internal::request_parser::is_digit(i));
+		ASSERT_TRUE(core::internal::request_parser::is_digit(i));
 	}
 }
 
 TEST(RequestParserTestCase, IsNotDigitTest)
 {
-	ASSERT_FALSE(wasp::core::internal::request_parser::is_digit('h'));
-	ASSERT_FALSE(wasp::core::internal::request_parser::is_digit('e'));
-	ASSERT_FALSE(wasp::core::internal::request_parser::is_digit('l'));
-	ASSERT_FALSE(wasp::core::internal::request_parser::is_digit('l'));
-	ASSERT_FALSE(wasp::core::internal::request_parser::is_digit('o'));
+	ASSERT_FALSE(core::internal::request_parser::is_digit('h'));
+	ASSERT_FALSE(core::internal::request_parser::is_digit('e'));
+	ASSERT_FALSE(core::internal::request_parser::is_digit('l'));
+	ASSERT_FALSE(core::internal::request_parser::is_digit('l'));
+	ASSERT_FALSE(core::internal::request_parser::is_digit('o'));
 }
 
 
 class ParseRequestTestCase : public ::testing::Test
 {
 protected:
-	wasp::core::internal::request_parser* parser{};
+	core::internal::request_parser* parser{};
 	const std::string HEADERS = "POST /hello/world HTTP/1.1\r\n"
 								"User-Agent: Mozilla/4.0 (compatible; MSIE5.01; Windows NT)\r\n"
 								"Host: 127.0.0.1:8000\r\n"
@@ -161,7 +161,7 @@ protected:
 
 	void SetUp() override
 	{
-		this->parser = new wasp::core::internal::request_parser();
+		this->parser = new core::internal::request_parser();
 	}
 
 	void TearDown() override

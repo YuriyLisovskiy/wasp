@@ -15,18 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WASP_TESTS_UNITTESTS_GLOBALS_H
-#define WASP_TESTS_UNITTESTS_GLOBALS_H
+#ifndef WASP_UNIT_TESTS_INCLUDE_H
+#define WASP_UNIT_TESTS_INCLUDE_H
 
-// Memory leak detection.
-#define DETECT_MEMORY_LEAK
-#include "mem_leak_check.h"
+#include "./collections_tests/include.h"
+#include "./core_tests/include.h"
+#include "./http_tests/include.h"
+#include "./utility_tests/include.h"
+#include "./views_tests/include.h"
 
-#define __TESTS_BEGIN__ namespace wasp { namespace tests {
-#define __TESTS_END__ } }
-
-#define __UNIT_TESTS_BEGIN__ __TESTS_BEGIN__ namespace unittests {
-#define __UNIT_TESTS_END__ } __TESTS_END__
-
-
-#endif // WASP_TESTS_UNITTESTS_GLOBALS_H
+#endif // WASP_UNIT_TESTS_INCLUDE_H

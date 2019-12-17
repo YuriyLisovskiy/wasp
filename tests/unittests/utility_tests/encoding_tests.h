@@ -20,7 +20,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../globals.h"
+#include "../_def_.h"
 #include "../../../src/utility/encoding.h"
 
 
@@ -30,11 +30,11 @@ TEST(EncodeUrlTestCase, encode)
 {
 	std::string expected("https://hostName/deepLinkAction.do?userName=peter%40nable.com&password=Hello%25There&method=defaultDashboard");
 	std::string toEncode("https://hostName/deepLinkAction.do?userName=peter@nable.com&password=Hello%There&method=defaultDashboard");
-	ASSERT_EQ(wasp::encoding::encodeUrl(toEncode), expected);
+	ASSERT_EQ(encoding::encodeUrl(toEncode), expected);
 
 	expected = "https://www.google.com/?q=%E3%83%95%E3%82%A9%E3%83%BC%E3%83%87%E3%82%A3%E3%83%BC";
 	toEncode = "https://www.google.com/?q=フォーディー";
-	ASSERT_EQ(wasp::encoding::encodeUrl(toEncode), expected);
+	ASSERT_EQ(encoding::encodeUrl(toEncode), expected);
 }
 
 __UNIT_TESTS_END__

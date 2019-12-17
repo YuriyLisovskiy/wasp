@@ -22,7 +22,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../globals.h"
+#include "../_def_.h"
 #include "../../../src/views/redirect_view.h"
 #include "../../../src/http/request.h"
 #include "../../../src/collections/dict.h"
@@ -31,14 +31,14 @@
 
 __UNIT_TESTS_BEGIN__
 
-wasp::http::HttpRequest make_request(const std::string& method)
+http::HttpRequest make_request(const std::string& method)
 {
-	auto empty_parameters = wasp::http::HttpRequest::Parameters<std::string, std::string>(
-		wasp::collections::Dict<std::string, std::string>(),
-		wasp::collections::MultiValueDict<std::string, std::string>()
+	auto empty_parameters = http::HttpRequest::Parameters<std::string, std::string>(
+		collections::Dict<std::string, std::string>(),
+		collections::MultiValueDict<std::string, std::string>()
 	);
 	auto empty_map = std::map<std::string, std::string>();
-	return wasp::http::HttpRequest(
+	return http::HttpRequest(
 		method,
 		"/hello",
 		1, 1,
@@ -59,11 +59,11 @@ wasp::http::HttpRequest make_request(const std::string& method)
 class RedirectViewWithDefaultParamsTestCase : public ::testing::Test
 {
 protected:
-	wasp::views::RedirectView* view = nullptr;
+	views::RedirectView* view = nullptr;
 
 	void SetUp() override
 	{
-		this->view = new wasp::views::RedirectView("/hello");
+		this->view = new views::RedirectView("/hello");
 	}
 
 	void TearDown() override
@@ -78,7 +78,7 @@ TEST_F(RedirectViewWithDefaultParamsTestCase, GetTest)
 	this->view->setup(&request);
 	auto response = this->view->get(&request, nullptr);
 
-	ASSERT_EQ(typeid(wasp::http::HttpResponseRedirect), typeid(*response));
+	ASSERT_EQ(typeid(http::HttpResponseRedirect), typeid(*response));
 
 	delete response;
 }
@@ -89,7 +89,7 @@ TEST_F(RedirectViewWithDefaultParamsTestCase, PostTest)
 	this->view->setup(&request);
 	auto response = this->view->post(&request, nullptr);
 
-	ASSERT_EQ(typeid(wasp::http::HttpResponseRedirect), typeid(*response));
+	ASSERT_EQ(typeid(http::HttpResponseRedirect), typeid(*response));
 
 	delete response;
 }
@@ -100,7 +100,7 @@ TEST_F(RedirectViewWithDefaultParamsTestCase, PutTest)
 	this->view->setup(&request);
 	auto response = this->view->put(&request, nullptr);
 
-	ASSERT_EQ(typeid(wasp::http::HttpResponseRedirect), typeid(*response));
+	ASSERT_EQ(typeid(http::HttpResponseRedirect), typeid(*response));
 
 	delete response;
 }
@@ -111,7 +111,7 @@ TEST_F(RedirectViewWithDefaultParamsTestCase, PatchTest)
 	this->view->setup(&request);
 	auto response = this->view->patch(&request, nullptr);
 
-	ASSERT_EQ(typeid(wasp::http::HttpResponseRedirect), typeid(*response));
+	ASSERT_EQ(typeid(http::HttpResponseRedirect), typeid(*response));
 
 	delete response;
 }
@@ -122,7 +122,7 @@ TEST_F(RedirectViewWithDefaultParamsTestCase, DeleteTest)
 	this->view->setup(&request);
 	auto response = this->view->delete_(&request, nullptr);
 
-	ASSERT_EQ(typeid(wasp::http::HttpResponseRedirect), typeid(*response));
+	ASSERT_EQ(typeid(http::HttpResponseRedirect), typeid(*response));
 
 	delete response;
 }
@@ -133,7 +133,7 @@ TEST_F(RedirectViewWithDefaultParamsTestCase, HeadTest)
 	this->view->setup(&request);
 	auto response = this->view->head(&request, nullptr);
 
-	ASSERT_EQ(typeid(wasp::http::HttpResponseRedirect), typeid(*response));
+	ASSERT_EQ(typeid(http::HttpResponseRedirect), typeid(*response));
 
 	delete response;
 }
@@ -144,7 +144,7 @@ TEST_F(RedirectViewWithDefaultParamsTestCase, OptionsTest)
 	this->view->setup(&request);
 	auto response = this->view->options(&request, nullptr);
 
-	ASSERT_EQ(typeid(wasp::http::HttpResponseRedirect), typeid(*response));
+	ASSERT_EQ(typeid(http::HttpResponseRedirect), typeid(*response));
 
 	delete response;
 }
@@ -210,11 +210,11 @@ TEST_F(RedirectViewWithDefaultParamsTestCase, GetRedirectUrlTest)
 class RedirectViewPermanentAndQueryStringTestCase : public ::testing::Test
 {
 protected:
-	wasp::views::RedirectView* view = nullptr;
+	views::RedirectView* view = nullptr;
 
 	void SetUp() override
 	{
-		this->view = new wasp::views::RedirectView("/hello/world", true, true);
+		this->view = new views::RedirectView("/hello/world", true, true);
 	}
 
 	void TearDown() override
@@ -229,7 +229,7 @@ TEST_F(RedirectViewPermanentAndQueryStringTestCase, GetTest)
 	this->view->setup(&request);
 	auto response = this->view->get(&request, nullptr);
 
-	ASSERT_EQ(typeid(wasp::http::HttpResponsePermanentRedirect), typeid(*response));
+	ASSERT_EQ(typeid(http::HttpResponsePermanentRedirect), typeid(*response));
 
 	delete response;
 }
@@ -240,7 +240,7 @@ TEST_F(RedirectViewPermanentAndQueryStringTestCase, PostTest)
 	this->view->setup(&request);
 	auto response = this->view->post(&request, nullptr);
 
-	ASSERT_EQ(typeid(wasp::http::HttpResponsePermanentRedirect), typeid(*response));
+	ASSERT_EQ(typeid(http::HttpResponsePermanentRedirect), typeid(*response));
 
 	delete response;
 }
@@ -251,7 +251,7 @@ TEST_F(RedirectViewPermanentAndQueryStringTestCase, PutTest)
 	this->view->setup(&request);
 	auto response = this->view->put(&request, nullptr);
 
-	ASSERT_EQ(typeid(wasp::http::HttpResponsePermanentRedirect), typeid(*response));
+	ASSERT_EQ(typeid(http::HttpResponsePermanentRedirect), typeid(*response));
 
 	delete response;
 }
@@ -262,7 +262,7 @@ TEST_F(RedirectViewPermanentAndQueryStringTestCase, PatchTest)
 	this->view->setup(&request);
 	auto response = this->view->patch(&request, nullptr);
 
-	ASSERT_EQ(typeid(wasp::http::HttpResponsePermanentRedirect), typeid(*response));
+	ASSERT_EQ(typeid(http::HttpResponsePermanentRedirect), typeid(*response));
 
 	delete response;
 }
@@ -273,7 +273,7 @@ TEST_F(RedirectViewPermanentAndQueryStringTestCase, DeleteTest)
 	this->view->setup(&request);
 	auto response = this->view->delete_(&request, nullptr);
 
-	ASSERT_EQ(typeid(wasp::http::HttpResponsePermanentRedirect), typeid(*response));
+	ASSERT_EQ(typeid(http::HttpResponsePermanentRedirect), typeid(*response));
 
 	delete response;
 }
@@ -284,7 +284,7 @@ TEST_F(RedirectViewPermanentAndQueryStringTestCase, HeadTest)
 	this->view->setup(&request);
 	auto response = this->view->head(&request, nullptr);
 
-	ASSERT_EQ(typeid(wasp::http::HttpResponsePermanentRedirect), typeid(*response));
+	ASSERT_EQ(typeid(http::HttpResponsePermanentRedirect), typeid(*response));
 
 	delete response;
 }
@@ -295,19 +295,19 @@ TEST_F(RedirectViewPermanentAndQueryStringTestCase, OptionsTest)
 	this->view->setup(&request);
 	auto response = this->view->options(&request, nullptr);
 
-	ASSERT_EQ(typeid(wasp::http::HttpResponsePermanentRedirect), typeid(*response));
+	ASSERT_EQ(typeid(http::HttpResponsePermanentRedirect), typeid(*response));
 
 	delete response;
 }
 
 TEST_F(RedirectViewPermanentAndQueryStringTestCase, GetRedirectUrlTest)
 {
-	auto empty_parameters = wasp::http::HttpRequest::Parameters<std::string, std::string>(
-		wasp::collections::Dict<std::string, std::string>(),
-		wasp::collections::MultiValueDict<std::string, std::string>()
+	auto empty_parameters = http::HttpRequest::Parameters<std::string, std::string>(
+		collections::Dict<std::string, std::string>(),
+		collections::MultiValueDict<std::string, std::string>()
 	);
 	auto empty_map = std::map<std::string, std::string>();
-	auto* request = new wasp::http::HttpRequest(
+	auto* request = new http::HttpRequest(
 		"get",
 		"/hello",
 		1, 1,
@@ -317,9 +317,9 @@ TEST_F(RedirectViewPermanentAndQueryStringTestCase, GetRedirectUrlTest)
 		empty_map,
 		empty_parameters,
 		empty_parameters,
-		wasp::http::HttpRequest::Parameters<std::string, core::UploadedFile>(
-			wasp::collections::Dict<std::string, core::UploadedFile>(),
-			wasp::collections::MultiValueDict<std::string, core::UploadedFile>()
+		http::HttpRequest::Parameters<std::string, core::UploadedFile>(
+			collections::Dict<std::string, core::UploadedFile>(),
+			collections::MultiValueDict<std::string, core::UploadedFile>()
 		)
 	);
 	this->view->setup(request);
@@ -333,11 +333,11 @@ TEST_F(RedirectViewPermanentAndQueryStringTestCase, GetRedirectUrlTest)
 class RedirectViewEmptyUrlTestCase : public ::testing::Test
 {
 protected:
-	wasp::views::RedirectView* view = nullptr;
+	views::RedirectView* view = nullptr;
 
 	void SetUp() override
 	{
-		this->view = new wasp::views::RedirectView("");
+		this->view = new views::RedirectView("");
 	}
 
 	void TearDown() override
@@ -352,7 +352,7 @@ TEST_F(RedirectViewEmptyUrlTestCase, GetTest)
 	this->view->setup(&request);
 	auto response = this->view->get(&request, nullptr);
 
-	ASSERT_EQ(typeid(wasp::http::HttpResponseGone), typeid(*response));
+	ASSERT_EQ(typeid(http::HttpResponseGone), typeid(*response));
 
 	delete response;
 }
@@ -363,7 +363,7 @@ TEST_F(RedirectViewEmptyUrlTestCase, PostTest)
 	this->view->setup(&request);
 	auto response = this->view->post(&request, nullptr);
 
-	ASSERT_EQ(typeid(wasp::http::HttpResponseGone), typeid(*response));
+	ASSERT_EQ(typeid(http::HttpResponseGone), typeid(*response));
 
 	delete response;
 }
@@ -374,7 +374,7 @@ TEST_F(RedirectViewEmptyUrlTestCase, PutTest)
 	this->view->setup(&request);
 	auto response = this->view->put(&request, nullptr);
 
-	ASSERT_EQ(typeid(wasp::http::HttpResponseGone), typeid(*response));
+	ASSERT_EQ(typeid(http::HttpResponseGone), typeid(*response));
 
 	delete response;
 }
@@ -385,7 +385,7 @@ TEST_F(RedirectViewEmptyUrlTestCase, PatchTest)
 	this->view->setup(&request);
 	auto response = this->view->patch(&request, nullptr);
 
-	ASSERT_EQ(typeid(wasp::http::HttpResponseGone), typeid(*response));
+	ASSERT_EQ(typeid(http::HttpResponseGone), typeid(*response));
 
 	delete response;
 }
@@ -396,7 +396,7 @@ TEST_F(RedirectViewEmptyUrlTestCase, DeleteTest)
 	this->view->setup(&request);
 	auto response = this->view->delete_(&request, nullptr);
 
-	ASSERT_EQ(typeid(wasp::http::HttpResponseGone), typeid(*response));
+	ASSERT_EQ(typeid(http::HttpResponseGone), typeid(*response));
 
 	delete response;
 }
@@ -407,7 +407,7 @@ TEST_F(RedirectViewEmptyUrlTestCase, HeadTest)
 	this->view->setup(&request);
 	auto response = this->view->head(&request, nullptr);
 
-	ASSERT_EQ(typeid(wasp::http::HttpResponseGone), typeid(*response));
+	ASSERT_EQ(typeid(http::HttpResponseGone), typeid(*response));
 
 	delete response;
 }
@@ -418,7 +418,7 @@ TEST_F(RedirectViewEmptyUrlTestCase, OptionsTest)
 	this->view->setup(&request);
 	auto response = this->view->options(&request, nullptr);
 
-	ASSERT_EQ(typeid(wasp::http::HttpResponseGone), typeid(*response));
+	ASSERT_EQ(typeid(http::HttpResponseGone), typeid(*response));
 
 	delete response;
 }

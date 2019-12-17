@@ -1,8 +1,6 @@
-Important: test src/urls module.
+Important:
+    Test:
+        - src/urls module.
 
-Add namespaces to:
-    - core/exceptions.h
-    - core/exceptions.cpp
-
-Refactoring:
+Refactor:
     - utility

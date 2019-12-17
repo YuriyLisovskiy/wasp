@@ -22,7 +22,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../globals.h"
+#include "../_def_.h"
 #include "../../../src/views/view.h"
 #include "../../../src/http/request.h"
 #include "../../../src/collections/dict.h"
@@ -34,14 +34,14 @@ __UNIT_TESTS_BEGIN__
 class ViewTestCase : public ::testing::Test
 {
 public:
-	static wasp::http::HttpRequest make_request(const std::string& method)
+	static http::HttpRequest make_request(const std::string& method)
 	{
-		auto empty_parameters = wasp::http::HttpRequest::Parameters<std::string, std::string>(
-			wasp::collections::Dict<std::string, std::string>(),
-			wasp::collections::MultiValueDict<std::string, std::string>()
+		auto empty_parameters = http::HttpRequest::Parameters<std::string, std::string>(
+			collections::Dict<std::string, std::string>(),
+			collections::MultiValueDict<std::string, std::string>()
 		);
 		auto empty_map = std::map<std::string, std::string>();
-		return wasp::http::HttpRequest(
+		return http::HttpRequest(
 			method,
 			"/hello",
 			1, 1,
@@ -59,11 +59,11 @@ public:
 	}
 
 protected:
-	wasp::views::View* view = nullptr;
+	views::View* view = nullptr;
 
 	void SetUp() override
 	{
-		this->view = new wasp::views::View();
+		this->view = new views::View();
 	}
 
 	void TearDown() override
@@ -114,11 +114,11 @@ TEST_F(ViewTestCase, HeadTestReturnsNullptr)
 
 TEST_F(ViewTestCase, OptionsTest)
 {
-	auto expected_response = wasp::http::HttpResponse("");
+	auto expected_response = http::HttpResponse("");
 	auto vec = std::vector<std::string>{"get", "post", "head", "options"};
 	expected_response.set_header(
 		"Allow",
-		wasp::str::join(vec.cbegin(), vec.cend(), ", ")
+		str::join(vec.cbegin(), vec.cend(), ", ")
 	);
 	expected_response.set_header("Content-Length", "0");
 
@@ -180,7 +180,7 @@ TEST_F(ViewTestCase, DispatchNotAllowedTest)
 TEST(ViewTestCaseStatic, MakeViewTest)
 {
 	auto request = ViewTestCase::make_request("options");
-	auto view = wasp::views::View::make_view<wasp::views::View>();
+	auto view = views::View::make_view<views::View>();
 
 	auto response = view(&request, nullptr, nullptr);
 

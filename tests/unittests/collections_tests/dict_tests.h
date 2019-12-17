@@ -20,7 +20,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../globals.h"
+#include "../_def_.h"
 #include "../../../src/collections/dict.h"
 
 
@@ -29,7 +29,7 @@ __UNIT_TESTS_BEGIN__
 // Mutable dict testing.
 TEST(MutableDictTestCase, TestGetItemExists)
 {
-	wasp::collections::Dict<int, int> testDict({
+	collections::Dict<int, int> testDict({
 		{1, 2},
 		{2, 3},
 		{3, 4}
@@ -41,7 +41,7 @@ TEST(MutableDictTestCase, TestGetItemExists)
 
 TEST(MutableDictTestCase, TestGetItemNotExists)
 {
-	wasp::collections::Dict<int, int> testDict({
+	collections::Dict<int, int> testDict({
 		{1, 2}
 	}, true);
 	ASSERT_EQ(testDict.get(3, 0), 0);
@@ -49,7 +49,7 @@ TEST(MutableDictTestCase, TestGetItemNotExists)
 
 TEST(MutableDictTestCase, TestSet)
 {
-	wasp::collections::Dict<int, int> testDict(true);
+	collections::Dict<int, int> testDict(true);
 	ASSERT_EQ(testDict.get(3, 0), 0);
 	testDict.set(3, 5);
 	ASSERT_EQ(testDict.get(3, 0), 5);
@@ -57,7 +57,7 @@ TEST(MutableDictTestCase, TestSet)
 
 TEST(MutableDictTestCase, TestRemove)
 {
-	wasp::collections::Dict<int, int> testDict({
+	collections::Dict<int, int> testDict({
 		{1, 2}
 	}, true);
 	ASSERT_EQ(testDict.get(1, 0), 2);
@@ -67,7 +67,7 @@ TEST(MutableDictTestCase, TestRemove)
 
 TEST(MutableDictTestCase, TestClear)
 {
-	wasp::collections::Dict<int, int> testDict({
+	collections::Dict<int, int> testDict({
 		{1, 2}, {3, 4}
 	}, true);
 	ASSERT_FALSE(testDict.is_empty());
@@ -77,7 +77,7 @@ TEST(MutableDictTestCase, TestClear)
 
 TEST(MutableDictTestCase, TestSize)
 {
-	wasp::collections::Dict<int, int> testDict(true);
+	collections::Dict<int, int> testDict(true);
 	ASSERT_EQ(testDict.size(), 0);
 	testDict.set(1, 2);
 	ASSERT_EQ(testDict.size(), 1);
@@ -87,7 +87,7 @@ TEST(MutableDictTestCase, TestSize)
 
 TEST(MutableDictTestCase, TestContains)
 {
-	wasp::collections::Dict<int, int> testDict({
+	collections::Dict<int, int> testDict({
 		{1, 2}
 	}, true);
 	ASSERT_TRUE(testDict.contains(1));
@@ -96,43 +96,43 @@ TEST(MutableDictTestCase, TestContains)
 
 TEST(MutableDictTestCase, TestIsMutable)
 {
-	wasp::collections::Dict<int, int> testDict(true);
+	collections::Dict<int, int> testDict(true);
 	ASSERT_TRUE(testDict.is_mutable());
 }
 
 TEST(MutableDictTestCase, TestIsEmpty)
 {
-	wasp::collections::Dict<int, int> testDict(true);
+	collections::Dict<int, int> testDict(true);
 	ASSERT_TRUE(testDict.is_empty());
 }
 
 TEST(MutableDictTestCase, TestIsNotEmpty)
 {
-	wasp::collections::Dict<int, int> testDict({{1, 2}}, true);
+	collections::Dict<int, int> testDict({{1, 2}}, true);
 	ASSERT_FALSE(testDict.is_empty());
 }
 
 TEST(MutableDictTestCase, TestBeginNotThrows)
 {
-	wasp::collections::Dict<int, int> testDict(true);
+	collections::Dict<int, int> testDict(true);
 	ASSERT_NO_THROW(testDict.begin());
 }
 
 TEST(MutableDictTestCase, TestEndNotThrows)
 {
-	wasp::collections::Dict<int, int> testDict(true);
+	collections::Dict<int, int> testDict(true);
 	ASSERT_NO_THROW(testDict.end());
 }
 
 TEST(MutableDictTestCase, TestRBeginNotThrows)
 {
-	wasp::collections::Dict<int, int> testDict(true);
+	collections::Dict<int, int> testDict(true);
 	ASSERT_NO_THROW(testDict.rbegin());
 }
 
 TEST(MutableDictTestCase, TestREndNotThrows)
 {
-	wasp::collections::Dict<int, int> testDict(true);
+	collections::Dict<int, int> testDict(true);
 	ASSERT_NO_THROW(testDict.rend());
 }
 
@@ -140,49 +140,49 @@ TEST(MutableDictTestCase, TestREndNotThrows)
 // Immutable dict features testing.
 TEST(ImmutableDictTestCase, TestSetThrows)
 {
-	wasp::collections::Dict<int, int> testDict(false);
+	collections::Dict<int, int> testDict(false);
 	ASSERT_THROW(testDict.set(1, 2), core::DictError);
 }
 
 TEST(ImmutableDictTestCase, TestRemoveThrows)
 {
-	wasp::collections::Dict<int, int> testDict({{1, 2}}, false);
+	collections::Dict<int, int> testDict({{1, 2}}, false);
 	ASSERT_THROW(testDict.remove(1), core::DictError);
 }
 
 TEST(ImmutableDictTestCase, TestIsImmutable)
 {
-	wasp::collections::Dict<int, int> testDict(false);
+	collections::Dict<int, int> testDict(false);
 	ASSERT_FALSE(testDict.is_mutable());
 }
 
 TEST(ImmutableDictTestCase, TestBeginThrows)
 {
-	wasp::collections::Dict<int, int> testDict(false);
+	collections::Dict<int, int> testDict(false);
 	ASSERT_THROW(testDict.begin(), core::DictError);
 }
 
 TEST(ImmutableDictTestCase, TestEndThrows)
 {
-	wasp::collections::Dict<int, int> testDict(false);
+	collections::Dict<int, int> testDict(false);
 	ASSERT_THROW(testDict.end(), core::DictError);
 }
 
 TEST(ImmutableDictTestCase, TestRBeginThrows)
 {
-	wasp::collections::Dict<int, int> testDict(false);
+	collections::Dict<int, int> testDict(false);
 	ASSERT_THROW(testDict.rbegin(), core::DictError);
 }
 
 TEST(ImmutableDictTestCase, TestREndThrows)
 {
-	wasp::collections::Dict<int, int> testDict(false);
+	collections::Dict<int, int> testDict(false);
 	ASSERT_THROW(testDict.rend(), core::DictError);
 }
 
 TEST(DictTestCase, TestGetKeys)
 {
-	wasp::collections::Dict<int, int> testDict({
+	collections::Dict<int, int> testDict({
 		{1, 2},
 		{2, 3},
 		{3, 4}
@@ -200,7 +200,7 @@ TEST(DictTestCase, TestGetKeys)
 
 TEST(DictTestCase, TestGetSize)
 {
-	wasp::collections::Dict<int, int> testDict({
+	collections::Dict<int, int> testDict({
 		{1, 2},
 		{2, 3},
 		{3, 4}

@@ -25,7 +25,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../../globals.h"
+#include "../../_def_.h"
 #include "../../../../src/utility/path.h"
 #include "../../../../src/core/files/file.h"
 
