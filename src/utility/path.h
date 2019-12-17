@@ -23,6 +23,7 @@
 #ifndef WASP_UTILITY_PATH_H
 #define WASP_UTILITY_PATH_H
 
+// C++ libraries.
 #if defined(_WIN32) || defined(_WIN64)
 #include <io.h>
 #include <direct.h>
@@ -36,29 +37,11 @@
 #include <string>
 #include <fstream>
 
-#include "../globals.h"
+// Module definitions.
+#include "./_def_.h"
+
+// Wasp libraries.
 #include "../core/exceptions.h"
-
-
-__PATH_INTERNAL_BEGIN__
-
-/// Split a path in root and extension.
-/// The extension is everything starting at the last dot in the last
-/// pathname component; the root is everything before that.
-/// It is always true that root + ext == p.
-///
-/// Generic implementation of splitext, to be parametrized with
-/// the separators.
-extern void _split_text(
-	const std::string& full_path,
-	char sep,
-	char altsep,
-	char extsep,
-	std::string& root_out,
-	std::string& ext_out
-);
-
-__PATH_INTERNAL_END__
 
 
 __PATH_BEGIN__
@@ -91,6 +74,27 @@ extern size_t get_size(const std::string& path);
 extern std::string cwd();
 
 __PATH_END__
+
+
+__PATH_INTERNAL_BEGIN__
+
+/// Split a path in root and extension.
+/// The extension is everything starting at the last dot in the last
+/// pathname component; the root is everything before that.
+/// It is always true that root + ext == p.
+///
+/// Generic implementation of splitext, to be parametrized with
+/// the separators.
+extern void _split_text(
+	const std::string& full_path,
+	char sep,
+	char altsep,
+	char extsep,
+	std::string& root_out,
+	std::string& ext_out
+);
+
+__PATH_INTERNAL_END__
 
 
 #endif // WASP_UTILITY_PATH_H

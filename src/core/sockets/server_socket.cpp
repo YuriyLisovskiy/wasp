@@ -19,10 +19,10 @@
  * An implementation of server_socket.h.
  */
 
-#include "server_socket.h"
+#include "./server_socket.h"
 
 
-__INTERNAL_BEGIN__
+__CORE_INTERNAL_BEGIN__
 
 ServerSocket::ServerSocket() : Socket(-1)
 {
@@ -63,4 +63,4 @@ socket_t ServerSocket::accept()
 	return conn;
 }
 
-__INTERNAL_END__
+__CORE_INTERNAL_END__

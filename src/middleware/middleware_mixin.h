@@ -37,13 +37,13 @@ class MiddlewareMixin
 {
 public:
 
-	/// An input http request before processing in wasp::View.
-	virtual void process_request(wasp::http::HttpRequest* request)
+	/// An input http request before processing in views::View.
+	virtual void process_request(http::HttpRequest* request)
 	{
 	};
 
-	/// An output http request and response after processing in wasp::View.
-	virtual void process_response(const wasp::http::HttpRequest* request, wasp::http::HttpResponse* response)
+	/// An output http request and response after processing in views::View.
+	virtual void process_response(const http::HttpRequest* request, http::HttpResponse* response)
 	{
 	};
 };

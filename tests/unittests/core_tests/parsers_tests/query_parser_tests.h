@@ -42,7 +42,7 @@ TEST(QueryParserTestCase, get)
 		std::pair<std::string, std::string>("hello_key", "hello_value"),
 		std::pair<std::string, std::string>("world_key", "world_value"),
 	};
-	wasp::internal::query_parser parser;
+	wasp::core::internal::query_parser parser;
 	parser.parse("hello=world&world=hello&hello_key=hello_value&world_key=world_value");
 
 	wasp::http::HttpRequest::Parameters<std::string, std::string> actual(*parser.dict, *parser.multi_dict);
@@ -60,7 +60,7 @@ TEST(QueryParserTestCase, getList)
 	auto expected = std::vector<std::string> {
 		"world", "hello", "hello_value"
 	};
-	wasp::internal::query_parser parser;
+	wasp::core::internal::query_parser parser;
 	parser.parse("hello=world&hello=hello&hello=hello_value");
 	wasp::http::HttpRequest::Parameters<std::string, std::string> parameters(*parser.dict, *parser.multi_dict);
 
@@ -84,7 +84,7 @@ TEST(QueryParserTestCase, keys)
 		"world",
 		"world_key",
 	};
-	wasp::internal::query_parser parser;
+	wasp::core::internal::query_parser parser;
 	parser.parse("hello=world&world=hello&hello_key=hello_value&world_key=world_value");
 	wasp::http::HttpRequest::Parameters<std::string, std::string> parsed(*parser.dict, *parser.multi_dict);
 	auto actual = parsed.keys();
@@ -95,7 +95,7 @@ TEST(QueryParserTestCase, keys)
 TEST(QueryParserTestCase, size)
 {
 	auto expected = 4;
-	wasp::internal::query_parser parser;
+	wasp::core::internal::query_parser parser;
 	parser.parse("hello=world&world=hello&hello_key=hello_value&world_key=world_value");
 	wasp::http::HttpRequest::Parameters<std::string, std::string> parsed(*parser.dict, *parser.multi_dict);
 	auto actual = parsed.size();
@@ -105,7 +105,7 @@ TEST(QueryParserTestCase, size)
 
 TEST(QueryParserTestCase, empty)
 {
-	wasp::internal::query_parser parser;
+	wasp::core::internal::query_parser parser;
 	parser.parse("");
 	wasp::http::HttpRequest::Parameters<std::string, std::string> parsed(*parser.dict, *parser.multi_dict);
 

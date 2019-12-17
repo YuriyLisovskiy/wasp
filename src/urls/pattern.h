@@ -38,8 +38,8 @@
 #include "../views/view.h"
 #include "../http/request.h"
 #include "../http/response.h"
-#include "../utility/str.h"
 #include "../utility/logger.h"
+#include "../utility/string/str.h"
 
 
 __URLS_BEGIN__
@@ -57,16 +57,18 @@ private:
 	std::string _s;
 	std::regex _rgx;
 	std::vector<std::string> _pattern_parts;
-	wasp::views::ViewHandler _handler;
+	views::ViewHandler _handler;
 	std::string _name;
 	std::vector<std::string> _keys;
 
 public:
-	UrlPattern(const std::string& rgx, const wasp::views::ViewHandler& handler, const std::string& name);
+	UrlPattern(const std::string& rgx, const views::ViewHandler& handler, const std::string& name);
 
 	std::string name();
-	wasp::http::HttpResponse* apply(
-		wasp::http::HttpRequest* request, wasp::views::Args* args = nullptr, ILogger* logger = nullptr
+	http::HttpResponse* apply(
+		http::HttpRequest* request,
+		views::Args* args = nullptr,
+		utility::ILogger* logger = nullptr
 	);
 	bool match(const std::string& url, std::map<std::string, std::string>& args);
 	std::string build(const std::vector<std::string>& args);

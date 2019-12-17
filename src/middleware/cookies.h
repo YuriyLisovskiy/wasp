@@ -39,7 +39,7 @@ __MIDDLEWARE_BEGIN__
 class CookieMiddleware final: public MiddlewareMixin
 {
 public:
-	void process_request(wasp::http::HttpRequest* request) final;
+	void process_request(http::HttpRequest* request) final;
 };
 
 __MIDDLEWARE_END__

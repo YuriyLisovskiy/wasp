@@ -33,7 +33,7 @@
 __URLS_BEGIN__
 
 extern UrlPattern make_pattern(
-	const std::string& rgx, const wasp::views::ViewHandler& handler, const std::string& name
+	const std::string& rgx, const views::ViewHandler& handler, const std::string& name
 );
 
 // TODO: implement include() function!

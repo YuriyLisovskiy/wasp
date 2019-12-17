@@ -29,8 +29,8 @@
 #include "../../../../src/utility/path.h"
 #include "../../../../src/core/files/file.h"
 
-using byte = wasp::byte;
-using File = wasp::File;
+using byte = wasp::core::byte;
+using File = wasp::core::File;
 
 
 std::vector<byte> strToBytes(const std::string& s)

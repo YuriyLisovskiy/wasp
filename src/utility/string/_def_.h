@@ -15,13 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <gtest/gtest.h>
+/**
+ * _def_.h
+ * Purpose: utility/string module's definitions.
+ */
 
-#include "./include.h"
+#ifndef WASP_UTILITY_STRING_DEF_H
+#define WASP_UTILITY_STRING_DEF_H
+
+#include "../../_def_.h"
 
 
-int main(int argc, char *argv[])
-{
-	::testing::InitGoogleTest(&argc, argv);
-	return RUN_ALL_TESTS();
-}
+#define __STR_BEGIN__ __WASP_BEGIN__ namespace str {
+#define __STR_END__ } __WASP_END__
+
+#define __STR_INTERNAL_BEGIN__ __STR_BEGIN__ namespace internal {
+#define __STR_INTERNAL_END__ } __STR_END__
+
+
+#endif // WASP_UTILITY_STRING_DEF_H

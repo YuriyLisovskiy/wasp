@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "exceptions.h"
+#include "./exceptions.h"
 
 
 __WASP_BEGIN__

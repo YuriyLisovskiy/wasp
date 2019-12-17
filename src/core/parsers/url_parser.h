@@ -23,15 +23,19 @@
 #ifndef WASP_CORE_PARSERS_URL_PARSER_H
 #define WASP_CORE_PARSERS_URL_PARSER_H
 
+// C++ libraries.
 #include <string>
 #include <cassert>
 
-#include "../../globals.h"
-#include "../../utility/str.h"
+// Module definitions.
+#include "../_def_.h"
+
+// Wasp libraries.
 #include "../../core/exceptions.h"
+#include "../../utility/string/str.h"
 
 
-__INTERNAL_BEGIN__
+__CORE_INTERNAL_BEGIN__
 
 struct url_parser final
 {
@@ -68,7 +72,7 @@ struct url_parser final
 	static bool is_unreserved(char ch);
 };
 
-__INTERNAL_END__
+__CORE_INTERNAL_END__
 
 
 #endif // WASP_CORE_PARSERS_URL_PARSER_H

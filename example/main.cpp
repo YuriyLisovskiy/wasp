@@ -31,7 +31,7 @@
 // #include "../tests/unittests/mem_leak_check.h"
 
 
-void handler(wasp::http::HttpRequest* request, const wasp::internal::socket_t& client)
+void handler(wasp::http::HttpRequest* request, const wasp::core::internal::socket_t& client)
 {
 	wasp::middleware::CookieMiddleware().process_request(request);
 
@@ -49,7 +49,7 @@ void handler(wasp::http::HttpRequest* request, const wasp::internal::socket_t& c
 		std::map<std::string, std::string> args_map;
 		if (pattern.match(request->path(), args_map))
 		{
-			response = pattern.apply(request, new wasp::views::Args(args_map), wasp::Logger::get_instance());
+			response = pattern.apply(request, new wasp::views::Args(args_map), wasp::utility::Logger::get_instance());
 			break;
 		}
 	}
@@ -59,7 +59,7 @@ void handler(wasp::http::HttpRequest* request, const wasp::internal::socket_t& c
 		response = new wasp::http::HttpResponseNotFound("<h2>404 - Not Found</h2>");
 	}
 
-	wasp::internal::HttpServer::send(response, client);
+	wasp::core::internal::HttpServer::send(response, client);
 	delete response;
 }
 
@@ -68,14 +68,14 @@ int main()
 {
 	wasp::InterruptException::initialize();
 
-	wasp::internal::HttpServer::context ctx{};
+	wasp::core::internal::HttpServer::context ctx{};
 	ctx.handler = handler;
 	ctx.port = 8080;
 	ctx.max_body_size = 33300000;
 	ctx.media_root = "/home/user/Desktop/media/";
-	ctx.logger = wasp::Logger::get_instance();
+	ctx.logger = wasp::utility::Logger::get_instance();
 
-	wasp::internal::HttpServer server(ctx);
+	wasp::core::internal::HttpServer server(ctx);
 
 	try
 	{

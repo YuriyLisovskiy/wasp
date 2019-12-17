@@ -33,7 +33,7 @@
 
 __HTTP_INTERNAL_BEGIN__
 
-extern Dict<unsigned short int, std::pair<std::string, std::string>> HTTP_STATUS;
+extern collections::Dict<unsigned short int, std::pair<std::string, std::string>> HTTP_STATUS;
 
 __HTTP_INTERNAL_END__
 

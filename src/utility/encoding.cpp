@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "encoding.h"
+#include "./encoding.h"
 
 
-__WASP_ENCODING_BEGIN__
+__ENCODING_BEGIN__
 
 const char* ASCII = "ascii";
 
@@ -121,10 +121,10 @@ std::string encode(const std::string& _str, const char* encoding, Mode mode)
 	return result;
 }
 
-__WASP_ENCODING_END__
+__ENCODING_END__
 
 
-__WASP_ENCODING_INTERNAL_BEGIN__
+__ENCODING_INTERNAL_BEGIN__
 
 void escape(std::ostringstream& stream, char c, const std::string& safe)
 {
@@ -168,4 +168,4 @@ std::string encodeAscii(const std::string& _str, Mode mode)
 	return res;
 }
 
-__WASP_ENCODING_INTERNAL_END__
+__ENCODING_INTERNAL_END__

@@ -17,7 +17,7 @@
 
 /**
  * _def_.h
- * Purpose: urls module's definitions.
+ * Purpose: http module's definitions.
  */
 
 #ifndef WASP_HTTP_DEF_H

@@ -19,10 +19,10 @@
  * An implementation of cookie_parser.h
  */
 
-#include "cookie_parser.h"
+#include "./cookie_parser.h"
 
 
-__INTERNAL_BEGIN__
+__CORE_INTERNAL_BEGIN__
 
 
 std::map<std::string, std::string>* cookie_parser::parse_req_cookies(const std::string& content)
@@ -85,4 +85,4 @@ std::map<std::string, std::string>* cookie_parser::parse_resp_cookies(const std:
 	return result;
 }
 
-__INTERNAL_END__
+__CORE_INTERNAL_END__

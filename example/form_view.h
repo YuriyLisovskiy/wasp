@@ -35,7 +35,7 @@ void print(Args&&... args)
 class FormView : public wasp::views::View
 {
 public:
-	explicit FormView(wasp::ILogger* logger = nullptr) : View({"get", "post"}, logger) {}
+	explicit FormView(wasp::utility::ILogger* logger = nullptr) : View({"get", "post"}, logger) {}
 
 	HttpResponse* get(HttpRequest* request, wasp::views::Args* args) final
 	{

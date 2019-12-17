@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WASP_UNIT_TESTS_UTILITY_TESTS_STR_TESTS_H
-#define WASP_UNIT_TESTS_UTILITY_TESTS_STR_TESTS_H
+#ifndef WASP_UNIT_TESTS_UTILITY_TESTS_STRING_TESTS_STR_TESTS_H
+#define WASP_UNIT_TESTS_UTILITY_TESTS_STRING_TESTS_STR_TESTS_H
 
 #include <gtest/gtest.h>
 
-#include "../globals.h"
-#include "../../../src/utility/str.h"
+#include "../../globals.h"
+#include "../../../../src/utility/string/str.h"
 
 
 __UNIT_TESTS_BEGIN__
@@ -88,51 +88,21 @@ TEST(StrUtilsJoinVectorTestCase, TestJoinStringVectorWithSpace)
 {
 	std::string expected = "Alphanumeric and printable shellcode";
 	std::vector<std::string> strVec = {"Alphanumeric", "and", "printable", "shellcode"};
-	ASSERT_EQ(wasp::str::join<std::string>(" ", strVec), expected);
+	ASSERT_EQ(wasp::str::join(strVec.cbegin(), strVec.cend(), " "), expected);
 }
 
 TEST(StrUtilsJoinVectorTestCase, TestJoinIntVectorWithComma)
 {
 	std::string expected = "{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}";
 	std::vector<int> intVec = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-	ASSERT_EQ("{" + wasp::str::join<int>(", ", intVec) + "}", expected);
+	ASSERT_EQ("{" + wasp::str::join(intVec.cbegin(), intVec.cend(), ", ") + "}", expected);
 }
 
 TEST(StrUtilsJoinVectorTestCase, TestJoinCharVectorWithputSpace)
 {
 	std::string expected = "Alphanumeric";
 	std::vector<char> intVec = {'A', 'l', 'p', 'h', 'a', 'n', 'u', 'm', 'e', 'r', 'i', 'c'};
-	ASSERT_EQ(wasp::str::join("", intVec), expected);
-}
-
-
-TEST(StrUtilsJoinDictTestCase, TestJoinStringVectorWithSpace)
-{
-	std::string expected = "Alphanumeric and printable shellcode";
-	wasp::Dict<std::string, std::string> strDict = wasp::Dict<std::string, std::string>(
-		std::map<std::string, std::string>{
-			{"Alphanumeric", "and"},
-			{"printable", "shellcode"}
-		}
-	);
-	ASSERT_EQ(wasp::str::join(" ", strDict), expected);
-}
-
-TEST(StrUtilsJoinDictTestCase, TestJoinIntDictWithAsJson)
-{
-	std::string expected = "{\n\t\"key1\": \"some value\",\n\t\"some other key\": \"2019\"\n}";
-	wasp::Dict<std::string, std::string> strDict = wasp::Dict<std::string, std::string>(
-		std::map<std::string, std::string>{
-			{"key1", "some value"},
-			{"some other key", "2019"}
-		}
-	);
-	std::string actual = wasp::str::join<std::string, std::string>(
-		",\n\t",
-		strDict,
-		[](const std::pair<std::string, std::string>& p) -> std::string { return "\"" + p.first + "\": \"" + p.second + "\""; }
-	);
-	ASSERT_EQ("{\n\t" + actual + "\n}", expected);
+	ASSERT_EQ(wasp::str::join(intVec.cbegin(), intVec.cend(), ""), expected);
 }
 
 
@@ -239,4 +209,4 @@ TEST(StrStartsWithTestCase, TestStartsWithReturnsTrue)
 __UNIT_TESTS_END__
 
 
-#endif // WASP_UNIT_TESTS_UTILITY_TESTS_STR_TESTS_H
+#endif // WASP_UNIT_TESTS_UTILITY_TESTS_STRING_TESTS_STR_TESTS_H

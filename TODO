@@ -1,11 +1,8 @@
 Important: test src/urls module.
 
 Add namespaces to:
-    - collections
+    - core/exceptions.h
+    - core/exceptions.cpp
 
-    - core
-    - core/files
-    - core/parsers
-    - core/sockets
-
+Refactoring:
     - utility

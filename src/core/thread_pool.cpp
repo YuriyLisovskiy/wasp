@@ -19,10 +19,10 @@
  * An implementation of thread_pool.h.
  */
 
-#include "thread_pool.h"
+#include "./thread_pool.h"
 
 
-__INTERNAL_BEGIN__
+__CORE_INTERNAL_BEGIN__
 
 ThreadPool::ThreadPool(size_t threads_count) : _threads(threads_count)
 {
@@ -120,4 +120,4 @@ void ThreadPool::_thread_handler()
 	} while (!this->_quit);
 }
 
-__INTERNAL_END__
+__CORE_INTERNAL_END__

@@ -46,7 +46,7 @@ __DATETIME_END__
 
 __DATETIME_INTERNAL_BEGIN__
 
-extern Dict<std::string, int> TZ_TO_OFFSET;
+extern collections::Dict<std::string, int> TZ_TO_OFFSET;
 
 __DATETIME_INTERNAL_END__
 

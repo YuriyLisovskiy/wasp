@@ -19,10 +19,10 @@
  * An implementation of http_server.h.
  */
 
-#include "http_server.h"
+#include "./http_server.h"
 
 
-__INTERNAL_BEGIN__
+__CORE_INTERNAL_BEGIN__
 
 // Public methods.
 HttpServer::HttpServer(HttpServer::context& ctx) : _finished(true)
@@ -43,7 +43,7 @@ HttpServer::HttpServer(HttpServer::context& ctx) : _finished(true)
 
 	this->_media_root = ctx.media_root;
 
-	this->_thread_pool = new ThreadPool(ctx.threads_count);
+	this->_thread_pool = new core::internal::ThreadPool(ctx.threads_count);
 }
 
 HttpServer::~HttpServer()
@@ -93,7 +93,9 @@ void HttpServer::listen_and_serve()
 	}
 #endif
 
-	std::cout << wasp::str::format(conf::internal::STARTUP_MESSAGE, this->_schema, this->_host, this->_port);
+	std::cout << str::format(
+		conf::internal::STARTUP_MESSAGE, this->_schema, this->_host, this->_port
+	);
 	std::cout.flush();
 
 	this->_finished = false;
@@ -101,12 +103,12 @@ void HttpServer::listen_and_serve()
 	this->_start_listener();
 }
 
-void HttpServer::send(wasp::http::HttpResponseBase* response, const socket_t& client)
+void HttpServer::send(http::HttpResponseBase* response, const socket_t& client)
 {
 	HttpServer::_send(response->serialize().c_str(), client);
 }
 
-void HttpServer::send(wasp::http::StreamingHttpResponse* response, const socket_t& client)
+void HttpServer::send(http::StreamingHttpResponse* response, const socket_t& client)
 {
 	std::string chunk;
 	while (!(chunk = response->get_chunk()).empty())
@@ -224,15 +226,15 @@ void HttpServer::_clean_up(const socket_t& client)
 	HttpServer::_wsa_clean_up();
 }
 
-wasp::http::HttpRequest* HttpServer::_handle_request(const socket_t& client)
+http::HttpRequest* HttpServer::_handle_request(const socket_t& client)
 {
 	request_parser rp;
 	std::string body_beginning;
 
-	std::string headers_str = HttpServer::_read_headers(client, body_beginning);
+	auto headers_str = HttpServer::_read_headers(client, body_beginning);
 
 	rp.parse_headers(headers_str);
-	Dict<std::string, std::string> headers = rp.get_headers();
+	auto headers = rp.get_headers();
 	if (headers.contains("Content-Length"))
 	{
 		size_t body_length = std::strtol(headers.get("Content-Length").c_str(), nullptr, 10);
@@ -381,7 +383,7 @@ void HttpServer::_start_listener()
 				}
 			}
 		}
-		catch (const wasp::InterruptException& exc)
+		catch (const InterruptException& exc)
 		{
 			throw InterruptException(exc.what(), exc.line(), exc.function(), exc.file());
 		}
@@ -419,15 +421,15 @@ void HttpServer::_start_listener()
 
 void HttpServer::_serve_connection(const socket_t& client)
 {
-	wasp::http::HttpResponseBase* error_response = nullptr;
+	http::HttpResponseBase* error_response = nullptr;
 	try
 	{
 		// TODO: remove when release ------------------------:
-		wasp::dt::Measure<std::chrono::milliseconds> measure;
+		dt::Measure<std::chrono::milliseconds> measure;
 		measure.start();
 		// TODO: remove when release ------------------------^
 
-		wasp::http::HttpRequest* request = this->_handle_request(client);
+		http::HttpRequest* request = this->_handle_request(client);
 		this->_http_handler(request, client);
 		delete request;
 
@@ -442,7 +444,7 @@ void HttpServer::_serve_connection(const socket_t& client)
 		{
 			this->_logger->trace(exc.what(), exc.line(), exc.function(), exc.file());
 		}
-		error_response = new wasp::http::HttpResponseBadRequest(
+		error_response = new http::HttpResponseBadRequest(
 			"<p style=\"font-size: 24px;\" >Bad Request</p>"
 		);
 	}
@@ -452,18 +454,18 @@ void HttpServer::_serve_connection(const socket_t& client)
 		{
 			this->_logger->trace(exc.what(), exc.line(), exc.function(), exc.file());
 		}
-		error_response = new wasp::http::HttpResponseEntityTooLarge(
+		error_response = new http::HttpResponseEntityTooLarge(
 			"<p style=\"font-size: 24px;\" >Entity Too Large</p>"
 		);
 	}
-	catch (const wasp::BaseException& exc)
+	catch (const BaseException& exc)
 	{
 		if (this->_logger != nullptr)
 		{
 			this->_logger->trace(exc.what(), exc.line(), exc.function(), exc.file());
 		}
 
-		error_response = new wasp::http::HttpResponseServerError(
+		error_response = new http::HttpResponseServerError(
 			"<p style=\"font-size: 24px;\" >Internal Server Error</p>"
 		);
 	}
@@ -474,7 +476,7 @@ void HttpServer::_serve_connection(const socket_t& client)
 			this->_logger->trace(exc.what(), _ERROR_DETAILS_);
 		}
 
-		error_response = new wasp::http::HttpResponseServerError(
+		error_response = new http::HttpResponseServerError(
 			"<p style=\"font-size: 24px;\" >Internal Server Error</p>"
 		);
 	}
@@ -564,7 +566,7 @@ void HttpServer::_normalize_context(HttpServer::context& ctx)
 
 	if (ctx.handler == nullptr)
 	{
-		throw wasp::HttpError("HttpServer::Context::handler can not be nullptr", _ERROR_DETAILS_);
+		throw HttpError("HttpServer::Context::handler can not be nullptr", _ERROR_DETAILS_);
 	}
 
 	str::rtrim(ctx.media_root, '/');
@@ -616,4 +618,4 @@ void HttpServer::_wsa_clean_up()
 #endif
 }
 
-__INTERNAL_END__
+__CORE_INTERNAL_END__

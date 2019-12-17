@@ -24,7 +24,9 @@
 
 __VIEWS_BEGIN__
 
-RedirectView::RedirectView(const std::string& url, bool permanent, bool query_string, ILogger* logger)
+RedirectView::RedirectView(
+	const std::string& url, bool permanent, bool query_string, utility::ILogger* logger
+)
 	: View({"get", "post", "put", "patch", "delete", "head", "options"}, logger)
 {
 	this->_url = url;
@@ -48,7 +50,7 @@ std::string RedirectView::get_redirect_url()
 	return url;
 }
 
-wasp::http::HttpResponse* RedirectView::get(wasp::http::HttpRequest* request, Args* args)
+http::HttpResponse* RedirectView::get(http::HttpRequest* request, Args* args)
 {
 	std::string url = this->get_redirect_url();
 	if (url.empty())
@@ -58,43 +60,43 @@ wasp::http::HttpResponse* RedirectView::get(wasp::http::HttpRequest* request, Ar
 			this->_logger->warning("Gone: " + request->path(), _DETAILS_NONE_);
 		}
 
-		return new wasp::http::HttpResponseGone("");
+		return new http::HttpResponseGone("");
 	}
 
 	if (this->_permanent)
 	{
-		return new wasp::http::HttpResponsePermanentRedirect(url);
+		return new http::HttpResponsePermanentRedirect(url);
 	}
 
-	return new wasp::http::HttpResponseRedirect(url);
+	return new http::HttpResponseRedirect(url);
 }
 
-wasp::http::HttpResponse* RedirectView::post(wasp::http::HttpRequest* request, Args* args)
+http::HttpResponse* RedirectView::post(http::HttpRequest* request, Args* args)
 {
 	return this->get(request, args);
 }
 
-wasp::http::HttpResponse* RedirectView::put(wasp::http::HttpRequest* request, Args* args)
+http::HttpResponse* RedirectView::put(http::HttpRequest* request, Args* args)
 {
 	return this->get(request, args);
 }
 
-wasp::http::HttpResponse* RedirectView::patch(wasp::http::HttpRequest* request, Args* args)
+http::HttpResponse* RedirectView::patch(http::HttpRequest* request, Args* args)
 {
 	return this->get(request, args);
 }
 
-wasp::http::HttpResponse* RedirectView::delete_(wasp::http::HttpRequest* request, Args* args)
+http::HttpResponse* RedirectView::delete_(http::HttpRequest* request, Args* args)
 {
 	return this->get(request, args);
 }
 
-wasp::http::HttpResponse* RedirectView::head(wasp::http::HttpRequest* request, Args* args)
+http::HttpResponse* RedirectView::head(http::HttpRequest* request, Args* args)
 {
 	return this->get(request, args);
 }
 
-wasp::http::HttpResponse* RedirectView::options(wasp::http::HttpRequest* request, Args* args)
+http::HttpResponse* RedirectView::options(http::HttpRequest* request, Args* args)
 {
 	return this->get(request, args);
 }

@@ -51,19 +51,19 @@ public:
 		const std::string& url,
 		bool permanent = false,
 		bool query_string = false,
-		ILogger* logger = nullptr
+		utility::ILogger* logger = nullptr
 	);
 
 	/// Return the URL redirect to.
 	std::string get_redirect_url();
 
-	wasp::http::HttpResponse* get(wasp::http::HttpRequest* request, Args* args) override;
-	wasp::http::HttpResponse* post(wasp::http::HttpRequest* request, Args* args) override;
-	wasp::http::HttpResponse* head(wasp::http::HttpRequest* request, Args* args) override;
-	wasp::http::HttpResponse* options(wasp::http::HttpRequest* request, Args* args) override;
-	wasp::http::HttpResponse* put(wasp::http::HttpRequest* request, Args* args) override;
-	wasp::http::HttpResponse* delete_(wasp::http::HttpRequest* request, Args* args) override;
-	wasp::http::HttpResponse* patch(wasp::http::HttpRequest* request, Args* args) override;
+	http::HttpResponse* get(http::HttpRequest* request, Args* args) override;
+	http::HttpResponse* post(http::HttpRequest* request, Args* args) override;
+	http::HttpResponse* head(http::HttpRequest* request, Args* args) override;
+	http::HttpResponse* options(http::HttpRequest* request, Args* args) override;
+	http::HttpResponse* put(http::HttpRequest* request, Args* args) override;
+	http::HttpResponse* delete_(http::HttpRequest* request, Args* args) override;
+	http::HttpResponse* patch(http::HttpRequest* request, Args* args) override;
 };
 
 __VIEWS_END__

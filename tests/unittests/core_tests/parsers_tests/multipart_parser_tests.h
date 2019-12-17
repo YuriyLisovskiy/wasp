@@ -23,9 +23,9 @@
 #include <gtest/gtest.h>
 
 #include "../../globals.h"
-#include "../../../../src/utility/str.h"
 #include "../../../../src/utility/path.h"
 #include "../../../../src/core/exceptions.h"
+#include "../../../../src/utility/string/str.h"
 #include "../../../../src/core/parsers/multipart_parser.h"
 
 
@@ -41,7 +41,7 @@ protected:
 
 TEST_F(MultipartParserStaticTestCase, AssertBoundaryTestSuccess)
 {
-	ASSERT_NO_THROW(wasp::internal::multipart_parser::assert_boundary(
+	ASSERT_NO_THROW(wasp::core::internal::multipart_parser::assert_boundary(
 		this->ORIG_BOUNDARY,
 		this->ORIG_BOUNDARY
 	));
@@ -49,7 +49,7 @@ TEST_F(MultipartParserStaticTestCase, AssertBoundaryTestSuccess)
 
 TEST_F(MultipartParserStaticTestCase, AssertBoundaryTestThrows)
 {
-	ASSERT_THROW(wasp::internal::multipart_parser::assert_boundary(
+	ASSERT_THROW(wasp::core::internal::multipart_parser::assert_boundary(
 		this->ORIG_BOUNDARY,
 		this->DIFFERENT_BOUNDARY
 	), wasp::MultiPartParserError);
@@ -58,7 +58,7 @@ TEST_F(MultipartParserStaticTestCase, AssertBoundaryTestThrows)
 TEST_F(MultipartParserStaticTestCase, AssertGetBoundaryTestSuccess)
 {
 	ASSERT_EQ(
-		wasp::internal::multipart_parser::get_boundary(this->CONTENT_TYPE),
+		wasp::core::internal::multipart_parser::get_boundary(this->CONTENT_TYPE),
 		wasp::str::ltrim(this->ORIG_BOUNDARY, '-')
 	);
 }
@@ -66,7 +66,7 @@ TEST_F(MultipartParserStaticTestCase, AssertGetBoundaryTestSuccess)
 TEST_F(MultipartParserStaticTestCase, AssertGetBoundaryTestThrowsInvalidContentType)
 {
 	ASSERT_THROW(
-		wasp::internal::multipart_parser::get_boundary("application/x-www-urlencoded"),
+		wasp::core::internal::multipart_parser::get_boundary("application/x-www-urlencoded"),
 		wasp::MultiPartParserError
 	);
 }
@@ -74,7 +74,7 @@ TEST_F(MultipartParserStaticTestCase, AssertGetBoundaryTestThrowsInvalidContentT
 TEST_F(MultipartParserStaticTestCase, AssertGetBoundaryTestThrowsEmptyBoundary)
 {
 	ASSERT_THROW(
-		wasp::internal::multipart_parser::get_boundary("multipart/form-data"),
+		wasp::core::internal::multipart_parser::get_boundary("multipart/form-data"),
 		wasp::MultiPartParserError
 	);
 }
@@ -187,11 +187,11 @@ protected:
 
 	const std::string ROOT = wasp::path::cwd() + "/";
 
-	wasp::internal::multipart_parser* parser = nullptr;
+	wasp::core::internal::multipart_parser* parser = nullptr;
 
 	void SetUp() override
 	{
-		this->parser = new wasp::internal::multipart_parser(this->ROOT);
+		this->parser = new wasp::core::internal::multipart_parser(this->ROOT);
 	}
 
 	void TearDown() override

@@ -30,7 +30,7 @@ __UNIT_TESTS_BEGIN__
 class UrlParserTestCase : public ::testing::Test
 {
 protected:
-	wasp::internal::url_parser parser;
+	wasp::core::internal::url_parser parser;
 
 	const char* STR_URL = "http://username:password@example.com/hello/world?hello=world&user=pass#someFragment";
 	const char* HOST_EXPECTED = "example.com";
@@ -92,7 +92,7 @@ TEST_F(UrlParserTestCase, QueryTest)
 class UrlParserErrorsTestCase : public ::testing::Test
 {
 protected:
-	wasp::internal::url_parser parser;
+	wasp::core::internal::url_parser parser;
 };
 
 TEST_F(UrlParserErrorsTestCase, InvalidSchemeTest)

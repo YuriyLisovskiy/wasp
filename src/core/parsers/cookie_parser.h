@@ -23,13 +23,15 @@
 #ifndef WASP_CORE_PARSERS_COOKIE_PARSER_H
 #define WASP_CORE_PARSERS_COOKIE_PARSER_H
 
+// C++ libraries.
 #include <map>
 #include <string>
 
-#include "../../globals.h"
+// Module definitions.
+#include "../_def_.h"
 
 
-__INTERNAL_BEGIN__
+__CORE_INTERNAL_BEGIN__
 
 struct cookie_parser final
 {
@@ -48,7 +50,7 @@ struct cookie_parser final
 	static std::map<std::string, std::string>* parse_resp_cookies(const std::string& content);
 };
 
-__INTERNAL_END__
+__CORE_INTERNAL_END__
 
 
 #endif // WASP_CORE_PARSERS_COOKIE_PARSER_H

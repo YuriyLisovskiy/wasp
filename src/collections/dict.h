@@ -24,14 +24,18 @@
 #ifndef WASP_COLLECTIONS_DICT_H
 #define WASP_COLLECTIONS_DICT_H
 
+// C++ libraries.
 #include <map>
 #include <vector>
 
-#include "../globals.h"
+// Module definitions.
+#include "./_def_.h"
+
+// Wasp libraries.
 #include "../core/exceptions.h"
 
 
-__WASP_BEGIN__
+__COLLECTIONS_BEGIN__
 
 template <typename _Key, typename _Val>
 class Dict
@@ -255,7 +259,7 @@ public:
 	}
 };
 
-__WASP_END__
+__COLLECTIONS_END__
 
 
 #endif // WASP_COLLECTIONS_DICT_H

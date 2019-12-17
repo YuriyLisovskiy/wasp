@@ -16,42 +16,19 @@
  */
 
 /**
- * query_parser.h
- * Purpose: parses url's query.
+ * _def_.h
+ * Purpose: collections module's definitions.
  */
 
-#ifndef WASP_CORE_PARSERS_QUERY_PARSER_H
-#define WASP_CORE_PARSERS_QUERY_PARSER_H
+#ifndef WASP_COLLECTIONS_DEF_H
+#define WASP_COLLECTIONS_DEF_H
 
-// Module definitions.
 #include "../_def_.h"
 
-// Wasp libraries.
-#include "../../http/request.h"
-#include "../../collections/dict.h"
-#include "../../collections/multi_dict.h"
+
+/// wasp::collections
+#define __COLLECTIONS_BEGIN__ __WASP_BEGIN__ namespace collections {
+#define __COLLECTIONS_END__ } __WASP_END__
 
 
-__CORE_INTERNAL_BEGIN__
-
-struct query_parser final
-{
-	enum state
-	{
-		s_key,
-		s_val
-	};
-
-	collections::Dict<std::string, std::string>* dict;
-	collections::MultiValueDict<std::string, std::string>* multi_dict;
-
-	explicit query_parser();
-	~query_parser();
-	void append_parameter(const std::string& key, const std::string& value);
-	void parse(const std::string& data);
-};
-
-__CORE_INTERNAL_END__
-
-
-#endif // WASP_CORE_PARSERS_QUERY_PARSER_H
+#endif // WASP_COLLECTIONS_DEF_H

@@ -42,7 +42,7 @@ protected:
 
 	void SetUp() override
 	{
-		this->parsedMap = wasp::internal::cookie_parser::parse_req_cookies(COOKIES);
+		this->parsedMap = wasp::core::internal::cookie_parser::parse_req_cookies(COOKIES);
 	}
 
 	void TearDown() override

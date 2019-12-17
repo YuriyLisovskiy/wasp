@@ -17,7 +17,7 @@
 
 /**
  * _def_.h
- * Purpose: conf module definitions.
+ * Purpose: conf module's definitions.
  */
 
 #ifndef WASP_CONF_DEF_H

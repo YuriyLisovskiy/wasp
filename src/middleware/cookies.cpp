@@ -24,10 +24,12 @@
 
 __MIDDLEWARE_BEGIN__
 
-void CookieMiddleware::process_request(wasp::http::HttpRequest* request)
+void CookieMiddleware::process_request(http::HttpRequest* request)
 {
-	auto* cookies = internal::cookie_parser::parse_req_cookies(request->headers.get("Cookie", ""));
-	request->COOKIES = Dict(*cookies);
+	auto* cookies = core::internal::cookie_parser::parse_req_cookies(
+		request->headers.get("Cookie", "")
+	);
+	request->COOKIES = collections::Dict(*cookies);
 	delete cookies;
 }
 

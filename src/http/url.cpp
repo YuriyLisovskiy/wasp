@@ -26,7 +26,7 @@ __HTTP_BEGIN__
 
 Url::Url(const std::string& url)
 {
-	internal::url_parser parser;
+	core::internal::url_parser parser;
 	parser.parse(url);
 	if (!parser.is_parsed)
 	{

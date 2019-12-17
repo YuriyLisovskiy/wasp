@@ -19,10 +19,10 @@
  * An implementation of url_parser.h
  */
 
-#include "url_parser.h"
+#include "./url_parser.h"
 
 
-__INTERNAL_BEGIN__
+__CORE_INTERNAL_BEGIN__
 
 url_parser::url_parser() : is_parsed(false)
 {
@@ -237,4 +237,4 @@ bool url_parser::is_unreserved(char ch)
 	return std::isalnum(ch) || ch == '-' || ch == '.' || ch == '_' || ch == '~';
 }
 
-__INTERNAL_END__
+__CORE_INTERNAL_END__

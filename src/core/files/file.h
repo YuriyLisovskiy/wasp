@@ -23,17 +23,23 @@
 #ifndef WASP_CORE_FILES_FILE_H
 #define WASP_CORE_FILES_FILE_H
 
+// C++ libraries.
 #include <fstream>
 #include <string>
 #include <vector>
 #include <cmath>
 
-#include "../../globals.h"
+// Module definitions.
+#include "../_def_.h"
+
+// Wasp libraries.
 #include "../exceptions.h"
-#include "../../utility/str.h"
+#include "../../utility/string/str.h"
 
 
-__WASP_BEGIN__
+__CORE_BEGIN__
+
+typedef unsigned char byte;
 
 class File
 {
@@ -93,7 +99,7 @@ public:
 	std::string path() const;
 };
 
-__WASP_END__
+__CORE_END__
 
 
 #endif // WASP_CORE_FILES_FILE_H

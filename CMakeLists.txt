@@ -28,6 +28,8 @@ file(GLOB LIB_FILES
 	"src/conf/*.cpp"
 	"src/utility/*.h"
 	"src/utility/*.cpp"
+	"src/utility/string/*.h"
+	"src/utility/string/*.cpp"
 	"src/collections/*.h"
 	"src/collections/*.cpp"
 	"src/core/datetime/*.h"
@@ -86,6 +88,7 @@ target_link_libraries(${PACKAGE_HTTP_TESTS} gtest gtest_main rt pthread ${HTTP_T
 # Utility package tests setup.
 file(GLOB UTILITY_TEST_SRC
 	"tests/unittests/utility_tests/*.h"
+	"tests/unittests/utility_tests/string_tests/*.h"
 )
 add_executable(${PACKAGE_UTILITY_TESTS} ${LIB_SRC} ${UTILITY_TEST_SRC} "tests/unittests/utility_tests/main.cpp")
 target_link_libraries(${PACKAGE_UTILITY_TESTS} gtest gtest_main rt pthread ${UTILITY_TEST_SRC})

@@ -43,7 +43,7 @@
 #include "../core/exceptions.h"
 #include "./status.h"
 #include "./url.h"
-#include "../utility/str.h"
+#include "../utility/string/str.h"
 #include "../utility/encoding.h"
 #include "../utility/path.h"
 #include "../utility/mime_types.h"
@@ -59,8 +59,8 @@ __HTTP_BEGIN__
 class HttpResponseBase
 {
 protected:
-	Dict<std::string, std::string> _headers;
-	Dict<std::string, Cookie> _cookies;
+	collections::Dict<std::string, std::string> _headers;
+	collections::Dict<std::string, Cookie> _cookies;
 	std::string _body;
 	bool _closed;
 	unsigned short int _status;

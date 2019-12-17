@@ -19,10 +19,10 @@
  * An implementation of multipart_parser.h
  */
 
-#include "multipart_parser.h"
+#include "./multipart_parser.h"
 
 
-__INTERNAL_BEGIN__
+__CORE_INTERNAL_BEGIN__
 
 void multipart_parser::append_parameter(const std::string& key, const std::string& value)
 {
@@ -102,10 +102,10 @@ void multipart_parser::assert_boundary(const std::string& actual, const std::str
 multipart_parser::multipart_parser(const std::string& media_root)
 {
 	this->media_root = str::rtrim(media_root, '/');
-	this->multi_post_value = MultiValueDict<std::string, std::string>(true);
-	this->post_values = Dict<std::string, std::string>(true);
-	this->multi_file_value = MultiValueDict<std::string, UploadedFile>(true);
-	this->file_values = Dict<std::string, UploadedFile>(true);
+	this->multi_post_value = collections::MultiValueDict<std::string, std::string>(true);
+	this->post_values = collections::Dict<std::string, std::string>(true);
+	this->multi_file_value = collections::MultiValueDict<std::string, UploadedFile>(true);
+	this->file_values = collections::Dict<std::string, UploadedFile>(true);
 }
 
 void multipart_parser::parse(const std::string& content_type, const std::string& body)
@@ -414,18 +414,18 @@ void multipart_parser::parse(const std::string& content_type, const std::string&
 	throw MultiPartParserError("Unable to parse request body", _ERROR_DETAILS_);
 }
 
-wasp::http::HttpRequest::Parameters<std::string, UploadedFile>* multipart_parser::get_files_params()
+http::HttpRequest::Parameters<std::string, UploadedFile>* multipart_parser::get_files_params()
 {
-	return new wasp::http::HttpRequest::Parameters<std::string, UploadedFile>(
+	return new http::HttpRequest::Parameters<std::string, UploadedFile>(
 		this->file_values, this->multi_file_value
 	);
 }
 
-wasp::http::HttpRequest::Parameters<std::string, std::string>* multipart_parser::get_post_params()
+http::HttpRequest::Parameters<std::string, std::string>* multipart_parser::get_post_params()
 {
-	return new wasp::http::HttpRequest::Parameters<std::string, std::string>(
+	return new http::HttpRequest::Parameters<std::string, std::string>(
 		this->post_values, this->multi_post_value
 	);
 }
 
-__INTERNAL_END__
+__CORE_INTERNAL_END__

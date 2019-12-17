@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "logger.h"
+#include "./logger.h"
 
 
-__WASP_BEGIN__
+__UTILITY_BEGIN__
 
 ILogger* Logger::_instance = nullptr;
 
@@ -123,4 +123,4 @@ void Logger::write_to_stream(const std::string& msg, Logger::log_level_enum leve
 	std::cout.flush();
 }
 
-__WASP_END__
+__UTILITY_END__

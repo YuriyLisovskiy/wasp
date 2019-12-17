@@ -38,12 +38,16 @@
 #ifndef WASP_UTILITY_MIME_TYPES_H
 #define WASP_UTILITY_MIME_TYPES_H
 
+// C++ libraries.
 #include <string>
 
-#include "../globals.h"
-#include "str.h"
+// Module definitions.
+#include "./_def_.h"
+
+// Wasp libraries.
+#include "./path.h"
+#include "./string/str.h"
 #include "../collections/dict.h"
-#include "path.h"
 
 
 __MIME_BEGIN__
@@ -71,16 +75,16 @@ extern void guess_content_type(const std::string& _path, std::string& type, std:
 
 /// Dictionary which maps reduced archives' extensions to
 /// 	their full variants.
-extern Dict<std::string, std::string> SUFFIX_MAP;
+extern collections::Dict<std::string, std::string> SUFFIX_MAP;
 
 /// Dictionary which maps archives' extensions to
 ///		encoding names.
-extern Dict<std::string, std::string> ENCODINGS_MAP;
+extern collections::Dict<std::string, std::string> ENCODINGS_MAP;
 
 /// Before adding new types, make sure they are either registered with IANA,
 /// at http://www.iana.org/assignments/media-types
 /// or extensions, i.e. using the x- prefix
-extern Dict<std::string, std::string> TYPES_MAP;
+extern collections::Dict<std::string, std::string> TYPES_MAP;
 
 __MIME_END__
 

@@ -48,12 +48,14 @@
 #ifndef WASP_CORE_EXCEPTIONS_H
 #define WASP_CORE_EXCEPTIONS_H
 
+// C++ libraries.
 #include <exception>
 #include <string>
 #include <csignal>
 #include <cstdlib>
 
-#include "../globals.h"
+// Module definitions.
+#include "../_def_.h"
 
 
 __WASP_BEGIN__

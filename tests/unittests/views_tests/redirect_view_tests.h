@@ -34,8 +34,8 @@ __UNIT_TESTS_BEGIN__
 wasp::http::HttpRequest make_request(const std::string& method)
 {
 	auto empty_parameters = wasp::http::HttpRequest::Parameters<std::string, std::string>(
-		Dict<std::string, std::string>(),
-		MultiValueDict<std::string, std::string>()
+		wasp::collections::Dict<std::string, std::string>(),
+		wasp::collections::MultiValueDict<std::string, std::string>()
 	);
 	auto empty_map = std::map<std::string, std::string>();
 	return wasp::http::HttpRequest(
@@ -48,9 +48,9 @@ wasp::http::HttpRequest make_request(const std::string& method)
 		empty_map,
 		empty_parameters,
 		empty_parameters,
-		wasp::http::HttpRequest::Parameters<std::string, UploadedFile>(
-			Dict<std::string, UploadedFile>(),
-			MultiValueDict<std::string, UploadedFile>()
+		http::HttpRequest::Parameters<std::string, core::UploadedFile>(
+			collections::Dict<std::string, core::UploadedFile>(),
+			collections::MultiValueDict<std::string, core::UploadedFile>()
 		)
 	);
 }
@@ -303,8 +303,8 @@ TEST_F(RedirectViewPermanentAndQueryStringTestCase, OptionsTest)
 TEST_F(RedirectViewPermanentAndQueryStringTestCase, GetRedirectUrlTest)
 {
 	auto empty_parameters = wasp::http::HttpRequest::Parameters<std::string, std::string>(
-			Dict<std::string, std::string>(),
-			MultiValueDict<std::string, std::string>()
+		wasp::collections::Dict<std::string, std::string>(),
+		wasp::collections::MultiValueDict<std::string, std::string>()
 	);
 	auto empty_map = std::map<std::string, std::string>();
 	auto* request = new wasp::http::HttpRequest(
@@ -317,9 +317,9 @@ TEST_F(RedirectViewPermanentAndQueryStringTestCase, GetRedirectUrlTest)
 		empty_map,
 		empty_parameters,
 		empty_parameters,
-		wasp::http::HttpRequest::Parameters<std::string, UploadedFile>(
-			Dict<std::string, UploadedFile>(),
-			MultiValueDict<std::string, UploadedFile>()
+		wasp::http::HttpRequest::Parameters<std::string, core::UploadedFile>(
+			wasp::collections::Dict<std::string, core::UploadedFile>(),
+			wasp::collections::MultiValueDict<std::string, core::UploadedFile>()
 		)
 	);
 	this->view->setup(request);

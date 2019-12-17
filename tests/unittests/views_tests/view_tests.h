@@ -37,24 +37,24 @@ public:
 	static wasp::http::HttpRequest make_request(const std::string& method)
 	{
 		auto empty_parameters = wasp::http::HttpRequest::Parameters<std::string, std::string>(
-				Dict<std::string, std::string>(),
-				MultiValueDict<std::string, std::string>()
+			wasp::collections::Dict<std::string, std::string>(),
+			wasp::collections::MultiValueDict<std::string, std::string>()
 		);
 		auto empty_map = std::map<std::string, std::string>();
 		return wasp::http::HttpRequest(
-				method,
-				"/hello",
-				1, 1,
-				"",
-				true,
-				"",
-				empty_map,
-				empty_parameters,
-				empty_parameters,
-				wasp::http::HttpRequest::Parameters<std::string, UploadedFile>(
-						Dict<std::string, UploadedFile>(),
-						MultiValueDict<std::string, UploadedFile>()
-				)
+			method,
+			"/hello",
+			1, 1,
+			"",
+			true,
+			"",
+			empty_map,
+			empty_parameters,
+			empty_parameters,
+			http::HttpRequest::Parameters<std::string, core::UploadedFile>(
+				collections::Dict<std::string, core::UploadedFile>(),
+				collections::MultiValueDict<std::string, core::UploadedFile>()
+			)
 		);
 	}
 
@@ -115,9 +115,10 @@ TEST_F(ViewTestCase, HeadTestReturnsNullptr)
 TEST_F(ViewTestCase, OptionsTest)
 {
 	auto expected_response = wasp::http::HttpResponse("");
+	auto vec = std::vector<std::string>{"get", "post", "head", "options"};
 	expected_response.set_header(
 		"Allow",
-		str::join(", ", std::vector<std::string>{"get", "post", "head", "options"})
+		wasp::str::join(vec.cbegin(), vec.cend(), ", ")
 	);
 	expected_response.set_header("Content-Length", "0");
 

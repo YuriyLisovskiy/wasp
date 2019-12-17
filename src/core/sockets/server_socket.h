@@ -17,18 +17,21 @@
 
 /**
  * server_socket.h
- * Purpose: improved and adapted tcp/ip socket.
+ * Purpose: improved and adapted tcp/ip socket for server.
  */
 
-#ifndef WASP_CORE_TCP_SERVER_SOCKET_H
-#define WASP_CORE_TCP_SERVER_SOCKET_H
+#ifndef WASP_CORE_SOCKETS_SERVER_SOCKET_H
+#define WASP_CORE_SOCKETS_SERVER_SOCKET_H
 
-#include "../../globals.h"
-#include "socket.h"
+// Module definitions.
+#include "../_def_.h"
+
+// Wasp libraries.
+#include "./socket.h"
 #include "../exceptions.h"
 
 
-__INTERNAL_BEGIN__
+__CORE_INTERNAL_BEGIN__
 
 class ServerSocket : public Socket
 {
@@ -44,7 +47,7 @@ public:
 	socket_t accept();
 };
 
-__INTERNAL_END__
+__CORE_INTERNAL_END__
 
 
-#endif // WASP_CORE_TCP_SERVER_SOCKET_H
+#endif // WASP_CORE_SOCKETS_SERVER_SOCKET_H

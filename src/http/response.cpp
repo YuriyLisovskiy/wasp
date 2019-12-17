@@ -32,7 +32,7 @@ HttpResponseBase::HttpResponseBase(
 )
 {
 	this->_streaming = false;
-	this->_headers = Dict<std::string, std::string>(true);
+	this->_headers = collections::Dict<std::string, std::string>(true);
 	this->_closed = false;
 
 	if (status != 0)
@@ -330,7 +330,7 @@ std::string FileResponse::get_chunk()
 
 void FileResponse::_set_headers()
 {
-	auto encoding_map = Dict<std::string, std::string>({
+	auto encoding_map = collections::Dict<std::string, std::string>({
 		{"bzip2", "application/x-bzip"},
 		{"gzip", "application/gzip"},
 		{"xz", "application/x-xz"}

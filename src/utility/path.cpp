@@ -19,49 +19,7 @@
  * An implementation of path.h.
  */
 
-#include "path.h"
-
-
-__PATH_INTERNAL_BEGIN__
-
-void _split_text(
-	const std::string& full_path,
-	char sep,
-	char altsep,
-	char extsep,
-	std::string& root_out,
-	std::string& ext_out
-)
-{
-	root_out = full_path;
-	ext_out = "";
-	size_t sep_idx = full_path.rfind(sep);
-	if (altsep != '\0')
-	{
-		size_t altsep_idx = full_path.rfind(altsep);
-		sep_idx = std::max(sep_idx, altsep_idx);
-	}
-
-	size_t dot_idx = full_path.rfind(extsep);
-	if (dot_idx > sep_idx)
-	{
-		// skip all leading dots
-		size_t file_name_idx = sep_idx + 1;
-		while (file_name_idx < dot_idx)
-		{
-			if (full_path.at(file_name_idx) != extsep)
-			{
-				root_out = full_path.substr(0, dot_idx);
-				ext_out = full_path.substr(dot_idx);
-				break;
-			}
-
-			file_name_idx++;
-		}
-	}
-}
-
-__PATH_INTERNAL_END__
+#include "./path.h"
 
 
 __PATH_BEGIN__
@@ -108,3 +66,45 @@ std::string cwd()
 }
 
 __PATH_END__
+
+
+__PATH_INTERNAL_BEGIN__
+
+void _split_text(
+	const std::string& full_path,
+	char sep,
+	char altsep,
+	char extsep,
+	std::string& root_out,
+	std::string& ext_out
+)
+{
+	root_out = full_path;
+	ext_out = "";
+	size_t sep_idx = full_path.rfind(sep);
+	if (altsep != '\0')
+	{
+		size_t altsep_idx = full_path.rfind(altsep);
+		sep_idx = std::max(sep_idx, altsep_idx);
+	}
+
+	size_t dot_idx = full_path.rfind(extsep);
+	if (dot_idx > sep_idx)
+	{
+		// skip all leading dots
+		size_t file_name_idx = sep_idx + 1;
+		while (file_name_idx < dot_idx)
+		{
+			if (full_path.at(file_name_idx) != extsep)
+			{
+				root_out = full_path.substr(0, dot_idx);
+				ext_out = full_path.substr(dot_idx);
+				break;
+			}
+
+			file_name_idx++;
+		}
+	}
+}
+
+__PATH_INTERNAL_END__

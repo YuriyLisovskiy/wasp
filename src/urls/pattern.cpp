@@ -24,7 +24,7 @@
 
 __URLS_BEGIN__
 
-UrlPattern::UrlPattern(const std::string& rgx, const wasp::views::ViewHandler& handler, const std::string& name)
+UrlPattern::UrlPattern(const std::string& rgx, const views::ViewHandler& handler, const std::string& name)
 {
 	this->_s = this->_parse(rgx);
 	this->_rgx = std::regex(this->_s);
@@ -37,8 +37,10 @@ std::string UrlPattern::name()
 	return this->_name;
 }
 
-wasp::http::HttpResponse* UrlPattern::apply(
-	wasp::http::HttpRequest* request, wasp::views::Args* args, ILogger* logger
+http::HttpResponse* UrlPattern::apply(
+	http::HttpRequest* request,
+	views::Args* args,
+	utility::ILogger* logger
 )
 {
 	return this->_handler(request, args, logger);

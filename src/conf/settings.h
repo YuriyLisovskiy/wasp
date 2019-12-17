@@ -42,7 +42,7 @@ struct Settings
 	Settings();
 
 	// Parameters
-	std::vector<wasp::middleware::MiddlewareMixin*> MIDDLEWARE;
+	std::vector<middleware::MiddlewareMixin*> MIDDLEWARE;
 	std::string X_FRAME_OPTIONS;
 	uint DATA_UPLOAD_MAX_MEMORY_SIZE;
 };
