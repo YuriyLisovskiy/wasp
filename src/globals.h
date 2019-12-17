@@ -38,8 +38,8 @@
 // This namespace is used in datetime module.
 //
 // Full name: wasp::dt
-#define __DATETIME_BEGIN__ __WASP_BEGIN__ namespace dt {
-#define __DATETIME_END__ } __WASP_END__
+//#define __DATETIME_BEGIN__ __WASP_BEGIN__ namespace dt {
+//#define __DATETIME_END__ } __WASP_END__
 
 // Used for string utility library.
 //

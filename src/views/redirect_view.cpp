@@ -19,7 +19,7 @@
  * An implementation of redirect_view.h.
  */
 
-#include "redirect_view.h"
+#include "./redirect_view.h"
 
 
 __VIEWS_BEGIN__

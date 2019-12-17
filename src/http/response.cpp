@@ -16,10 +16,10 @@
  */
 
 /**
- * An implementation of reponse.h.
+ * An implementation of response.h.
  */
 
-#include "response.h"
+#include "./response.h"
 
 
 __HTTP_BEGIN__

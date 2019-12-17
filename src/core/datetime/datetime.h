@@ -23,19 +23,22 @@
 #ifndef WASP_CORE_DATETIME_DATETIME_H
 #define WASP_CORE_DATETIME_DATETIME_H
 
-#include <chrono>
-#include <ctime>
-#include <string>
+// C++ libraries.
 #include <map>
+#include <ctime>
+#include <chrono>
+#include <string>
 
-#include "../../globals.h"
-#include "date.h"
-#include "time.h"
-#include "timezone.h"
+// Module definitions.
+#include "./_def_.h"
+
+// Wasp libraries.
+#include "./date.h"
+#include "./time.h"
+#include "./timezone.h"
 
 
 __DATETIME_BEGIN__
-
 
 /// A combination of a Date, Time and a TimeZone.
 ///
@@ -81,12 +84,12 @@ DateTime gmtnow();
 __DATETIME_END__
 
 
-__INTERNAL_BEGIN__
+__DATETIME_INTERNAL_BEGIN__
 
 /// Returns current date and time as time_t
 time_t now();
 
-__INTERNAL_END__
+__DATETIME_INTERNAL_END__
 
 
 #endif // WASP_CORE_DATETIME_DATETIME_H

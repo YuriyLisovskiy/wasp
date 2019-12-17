@@ -24,7 +24,7 @@
 #define WASP_VIEWS_GENERIC_H
 
 // Wasp libraries.
-#include "view.h"
-#include "redirect_view.h"
+#include "./view.h"
+#include "./redirect_view.h"
 
 #endif // WASP_VIEWS_GENERIC_H

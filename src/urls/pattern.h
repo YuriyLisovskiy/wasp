@@ -31,7 +31,7 @@
 #include <regex>
 
 // Module definitions.
-#include "_def_.h"
+#include "./_def_.h"
 
 // Wasp libraries.
 #include "../views/args.h"

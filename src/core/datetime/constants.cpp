@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * TODO: write docs.
+/**
+ * An implementation of constants.h.
  */
 
-#include "constants.h"
+#include "./constants.h"
 
 
-__INTERNAL_BEGIN__
+__DATETIME_INTERNAL_BEGIN__
 
 Dict<std::string, int> TZ_TO_OFFSET(std::map<std::string, int> {
 		{"Etc/GMT+12", -43200},                       // GMT-12:00
@@ -642,4 +642,4 @@ Dict<std::string, int> TZ_TO_OFFSET(std::map<std::string, int> {
 		{"Pacific/Kiritimati", 50400}                 // Line Is. Time
 });
 
-__INTERNAL_END__
+__DATETIME_INTERNAL_END__

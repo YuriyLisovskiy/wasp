@@ -23,9 +23,13 @@
 #ifndef WASP_UTILS_DATETIME_CONSTANTS_H
 #define WASP_UTILS_DATETIME_CONSTANTS_H
 
+// c++ libraries.
 #include <map>
 
-#include "../../globals.h"
+// Module definitions.
+#include "./_def_.h"
+
+// Wasp libraries.
 #include "../../collections/dict.h"
 
 
@@ -40,11 +44,11 @@ const int MAX_YEAR = 9999;
 __DATETIME_END__
 
 
-__INTERNAL_BEGIN__
+__DATETIME_INTERNAL_BEGIN__
 
 extern Dict<std::string, int> TZ_TO_OFFSET;
 
-__INTERNAL_END__
+__DATETIME_INTERNAL_END__
 
 
 #endif // WASP_UTILS_DATETIME_CONSTANTS_H

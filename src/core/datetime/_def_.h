@@ -16,17 +16,23 @@
  */
 
 /**
- * An implementation of settings.h.
+ * _def_.h
+ * Purpose: core/datetime module's definitions.
  */
 
-#include "./settings.h"
+#ifndef WASP_CORE_DATETIME_DEF_H
+#define WASP_CORE_DATETIME_DEF_H
+
+#include "../../_def_.h"
 
 
-__CONF_BEGIN__
+/// wasp::dt
+#define __DATETIME_BEGIN__ __WASP_BEGIN__ namespace dt {
+#define __DATETIME_END__ } __WASP_END__
 
-Settings::Settings()
-{
+/// wasp::dt::internal
+#define __DATETIME_INTERNAL_BEGIN__ __DATETIME_BEGIN__ namespace internal {
+#define __DATETIME_INTERNAL_END__ } __DATETIME_END__
 
-}
 
-__CONF_END__
+#endif // WASP_CORE_DATETIME_DEF_H

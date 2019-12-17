@@ -27,7 +27,7 @@
 #include <string>
 
 // Module definitions.
-#include "_def_.h"
+#include "./_def_.h"
 
 // Wasp libraries.
 #include "../utility/logger.h"

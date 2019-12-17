@@ -19,7 +19,7 @@
  * An implementation of view.h.
  */
 
-#include "view.h"
+#include "./view.h"
 
 
 __VIEWS_BEGIN__

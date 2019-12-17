@@ -1,1 +1,11 @@
 Important: test src/urls module.
+
+Add namespaces to:
+    - collections
+
+    - core
+    - core/files
+    - core/parsers
+    - core/sockets
+
+    - utility

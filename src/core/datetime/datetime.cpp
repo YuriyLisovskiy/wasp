@@ -19,19 +19,17 @@
  * An implementation of datetime.h.
  */
 
-#include <iomanip>
-
-#include "datetime.h"
+#include "./datetime.h"
 
 
-__INTERNAL_BEGIN__
+__DATETIME_INTERNAL_BEGIN__
 
 time_t now()
 {
 	return std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 }
 
-__INTERNAL_END__
+__DATETIME_INTERNAL_END__
 
 
 __DATETIME_BEGIN__

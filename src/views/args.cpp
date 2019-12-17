@@ -19,7 +19,7 @@
  * An implementation of args.h.
  */
 
-#include "args.h"
+#include "./args.h"
 
 
 __VIEWS_BEGIN__

@@ -19,7 +19,7 @@
  * An implementation of pattern.h.
  */
 
-#include "pattern.h"
+#include "./pattern.h"
 
 
 __URLS_BEGIN__

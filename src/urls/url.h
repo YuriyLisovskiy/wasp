@@ -24,7 +24,7 @@
 #define WASP_URLS_URL_H
 
 // Module definitions.
-#include "_def_.h"
+#include "./_def_.h"
 
 // Wasp libraries.
 #include "./pattern.h"

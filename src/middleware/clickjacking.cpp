@@ -19,7 +19,7 @@
  * An implementation of clickjacking.h.
  */
 
-#include "clickjacking.h"
+#include "./clickjacking.h"
 
 
 __MIDDLEWARE_BEGIN__

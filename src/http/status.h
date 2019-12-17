@@ -25,7 +25,7 @@
 #define WASP_HTTP_STATUS_H
 
 // Module definitions.
-#include "_def_.h"
+#include "./_def_.h"
 
 // Wasp libraries.
 #include "../collections/dict.h"

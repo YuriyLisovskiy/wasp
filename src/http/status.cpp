@@ -19,7 +19,7 @@
  * An implementation of status.h.
  */
 
-#include "status.h"
+#include "./status.h"
 
 
 __HTTP_INTERNAL_BEGIN__

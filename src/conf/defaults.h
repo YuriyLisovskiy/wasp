@@ -25,7 +25,7 @@
 #define WASP_CONF_DEFAULTS_H
 
 // Module definitions.
-#include "_def_.h"
+#include "./_def_.h"
 
 
 __CONF_INTERNAL_BEGIN__
