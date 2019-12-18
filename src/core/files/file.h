@@ -29,6 +29,19 @@
 #include <vector>
 #include <cmath>
 
+#if defined(__unix__) || defined(__linux__)
+#include <sys/types.h>
+#include <sys/stat.h>
+#endif
+
+#ifndef _WIN32
+#include <unistd.h>
+#endif
+
+#if defined(_WIN32) || defined(_WIN64)
+#define stat _stat
+#endif
+
 // Module definitions.
 #include "../_def_.h"
 
@@ -97,6 +110,8 @@ public:
 	std::vector<std::vector<byte>> chunks(size_t chunk_size = -1);
 	bool multiple_chunks(size_t chunk_size = -1);
 	std::string path() const;
+
+	static struct stat stat(const std::string& file_path);
 };
 
 __CORE_END__

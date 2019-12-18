@@ -28,6 +28,7 @@
 #include <ctime>
 #include <chrono>
 #include <string>
+#include <sstream>
 
 // Module definitions.
 #include "./_def_.h"
@@ -69,9 +70,13 @@ public:
 	Date date();
 	Time time();
 	TimeZone tz();
+	size_t utc_epoch();
 
 	std::string strftime(const char* _format);
 	static DateTime strptime(const char* _datetime, const char* _format);
+
+private:
+	std::tm* _to_std_tm();
 };
 
 

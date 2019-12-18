@@ -115,6 +115,7 @@ void HttpServer::send(http::StreamingHttpResponse* response, const socket_t& cli
 	{
 		HttpServer::_write(chunk.c_str(), chunk.size(), client);
 	}
+
 	response->close();
 }
 

@@ -229,6 +229,23 @@ FileDoesNotExistError::FileDoesNotExistError(const std::string& message, int lin
 }
 
 
+// ImproperlyConfigured
+ImproperlyConfigured::ImproperlyConfigured(const char* message, int line, const char* function, const char* file, const char* type)
+	: BaseException(message, line, function, file, type)
+{
+}
+
+ImproperlyConfigured::ImproperlyConfigured(const char* message, int line, const char* function, const char* file)
+	: ImproperlyConfigured(message, line, function, file, "ImproperlyConfigured")
+{
+}
+
+ImproperlyConfigured::ImproperlyConfigured(const std::string& message, int line, const char *function, const char *file)
+	: ImproperlyConfigured(message.c_str(), line, function, file)
+{
+}
+
+
 // FileError
 FileError::FileError(const char* message, int line, const char* function, const char* file, const char* type)
 	: BaseException(message, line, function, file, type)

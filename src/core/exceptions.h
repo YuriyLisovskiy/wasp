@@ -31,13 +31,14 @@
  *  - EncodingError;
  *  - FileError
  *  - FileDoesNotExistError;
+ *  - ImproperlyConfigured;
+ *  - InterruptException;
  *  - MultiPartParserError
  *  - MultiValueDictError;
  *  - NullPointerException;
  *  - ParseError;
  *  - SuspiciousOperation;
- *  - ValueError;
- *  - InterruptException.
+ *  - ValueError.
  *
  * - Request errors:
  *  - EntityTooLargeError
@@ -187,6 +188,17 @@ protected:
 public:
 	FileDoesNotExistError(const char* message, int line, const char* function, const char* file);
 	FileDoesNotExistError(const std::string& message, int line, const char* function, const char* file);
+};
+
+
+class ImproperlyConfigured : public BaseException
+{
+protected:
+	// Use only when initializing of a derived exception!
+	ImproperlyConfigured(const char* message, int line, const char* function, const char* file, const char* type);
+public:
+	ImproperlyConfigured(const char* message, int line, const char* function, const char* file);
+	ImproperlyConfigured(const std::string& message, int line, const char* function, const char* file);
 };
 
 

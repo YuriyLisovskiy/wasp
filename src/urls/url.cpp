@@ -24,9 +24,50 @@
 
 __URLS_BEGIN__
 
-UrlPattern make_pattern(const std::string& rgx, const views::ViewHandler& handler, const std::string& name)
+UrlPattern make_url(const std::string& rgx, const views::ViewHandler& handler, const std::string& name)
 {
 	return UrlPattern(rgx, handler, name);
+}
+
+UrlPattern make_static(
+	const std::string& static_url,
+	const std::string& static_root,
+	const std::string& name
+)
+{
+	if (static_url.empty())
+	{
+		throw core::ImproperlyConfigured("Empty static url not permitted", _ERROR_DETAILS_);
+	}
+
+	// TODO: check if not debug mode!
+	//  forbid using default static view in production!
+
+	auto view_func = [static_root](
+		http::HttpRequest* request,
+		views::Args* args,
+		utility::ILogger* logger
+	) -> http::HttpResponseBase*
+	{
+		views::StaticView view(logger);
+		auto* kwargs = new collections::Dict(
+			std::map<std::string, std::string>{
+				{"document_root", static_root}
+			}
+		);
+		view.set_kwargs(kwargs);
+		view.setup(request);
+		auto response = view.dispatch(args);
+		delete kwargs;
+
+		return response;
+	};
+
+	return make_url(
+		str::rtrim(static_url, '/') + "/" + "<path>(.*)",
+		view_func,
+		name.empty() ? "static" : name
+	);
 }
 
 __URLS_END__

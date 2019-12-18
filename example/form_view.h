@@ -23,6 +23,7 @@
 
 using wasp::http::HttpRequest;
 using wasp::http::HttpResponse;
+using wasp::http::HttpResponseBase;
 
 
 template<class... Args>
@@ -37,7 +38,7 @@ class FormView : public wasp::views::View
 public:
 	explicit FormView(wasp::utility::ILogger* logger = nullptr) : View({"get", "post"}, logger) {}
 
-	HttpResponse* get(HttpRequest* request, wasp::views::Args* args) final
+	HttpResponseBase* get(HttpRequest* request, wasp::views::Args* args) final
 	{
 		std::cout << "\n\n" << request->path();
 
@@ -65,6 +66,7 @@ public:
 
 		std::string body(
 			user_row +
+			"<img src=\"/static/pontar.png\" alt=\"Night over Pontar river\" height=\"100\" width=\"100\">"
 			"<form action=\"/hello\" method=\"post\" enctype=\"multipart/form-data\">\n"
 			"\t<input type=\"file\" name=\"super_file\" />\n"
 			"\t<input type=\"email\" name=\"mail\" />\n"
@@ -77,7 +79,7 @@ public:
 		return new HttpResponse(body);
 	}
 
-	HttpResponse* post(HttpRequest* request, wasp::views::Args* args) final
+	HttpResponseBase* post(HttpRequest* request, wasp::views::Args* args) final
 	{
 		return this->get(request, args);
 	}

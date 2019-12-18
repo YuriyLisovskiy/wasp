@@ -111,7 +111,6 @@ DateTime::DateTime(time_t timestamp) : _date(), _time(), _tz()
 		local_time->tm_sec * 1000000
 	);
 	this->_tz = TimeZone(timestamp);
-	delete local_time;
 }
 
 int DateTime::year()
@@ -169,19 +168,17 @@ TimeZone DateTime::tz()
 	return this->_tz;
 }
 
+size_t DateTime::utc_epoch()
+{
+	auto* time_info = this->_to_std_tm();
+	size_t epoch = std::mktime(time_info);
+	delete time_info;
+	return epoch;
+}
+
 std::string DateTime::strftime(const char* _format)
 {
-	auto* time_info = new std::tm();
-	time_info->tm_year = this->_date.year();
-	time_info->tm_mon = this->_date.month();
-	time_info->tm_wday = this->_date.day_of_week();
-	time_info->tm_mday = this->_date.day_of_month();
-	time_info->tm_yday = this->_date.day_of_year();
-	time_info->tm_hour = this->_time.hour();
-	time_info->tm_min = this->_time.minute();
-	time_info->tm_sec = this->_time.second();
-	time_info->tm_zone = this->_tz.get_name().c_str();
-
+	auto* time_info = this->_to_std_tm();
 	char buffer[80];
 	std::strftime(buffer, 80, _format, time_info);
 	delete time_info;
@@ -206,6 +203,21 @@ DateTime DateTime::strptime(const char* _datetime, const char* _format)
 	);
 	delete time_info;
 	return result;
+}
+
+std::tm* DateTime::_to_std_tm()
+{
+	auto* time_info = new std::tm();
+	time_info->tm_year = this->_date.year();
+	time_info->tm_mon = this->_date.month();
+	time_info->tm_wday = this->_date.day_of_week();
+	time_info->tm_mday = this->_date.day_of_month();
+	time_info->tm_yday = this->_date.day_of_year();
+	time_info->tm_hour = this->_time.hour();
+	time_info->tm_min = this->_time.minute();
+	time_info->tm_sec = this->_time.second();
+	time_info->tm_zone = this->_tz.get_name().c_str();
+	return time_info;
 }
 
 __DATETIME_END__

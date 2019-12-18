@@ -27,8 +27,8 @@
 #include "../src/core/exceptions.h"
 #include "../src/urls/url.h"
 
-// #define DETECT_MEMORY_LEAK
-// #include "../tests/unittests/mem_leak_check.h"
+#define DETECT_MEMORY_LEAK
+#include "../tests/mem_leak_check.h"
 
 
 void handler(wasp::http::HttpRequest* request, const wasp::core::internal::socket_t& client)
@@ -36,14 +36,15 @@ void handler(wasp::http::HttpRequest* request, const wasp::core::internal::socke
 	wasp::middleware::CookieMiddleware().process_request(request);
 
 	std::vector<wasp::urls::UrlPattern> patterns{
-		wasp::urls::make_pattern(
+		wasp::urls::make_url(
 			"/profile/<user_id>([0-9]*)/name/<user_name>([A-Za-z]+)/?",
 			wasp::views::View::make_view<FormView>(),
 			"profile"
-		)
+		),
+		wasp::urls::make_static("/static/", wasp::path::join(wasp::path::cwd(), "static"))
 	};
 
-	wasp::http::HttpResponse* response = nullptr;
+	wasp::http::HttpResponseBase* response = nullptr;
 	for (auto& pattern : patterns)
 	{
 		std::map<std::string, std::string> args_map;
@@ -59,7 +60,16 @@ void handler(wasp::http::HttpRequest* request, const wasp::core::internal::socke
 		response = new wasp::http::HttpResponseNotFound("<h2>404 - Not Found</h2>");
 	}
 
-	wasp::core::internal::HttpServer::send(response, client);
+	if (response->is_streaming())
+	{
+		auto* streaming_response = dynamic_cast<wasp::http::StreamingHttpResponse*>(response);
+		wasp::core::internal::HttpServer::send(streaming_response, client);
+	}
+	else
+	{
+		wasp::core::internal::HttpServer::send(response, client);
+	}
+
 	delete response;
 }
 
@@ -70,7 +80,7 @@ int main()
 
 	wasp::core::internal::HttpServer::context ctx{};
 	ctx.handler = handler;
-	ctx.port = 8080;
+	ctx.port = 8000;
 	ctx.max_body_size = 33300000;
 	ctx.media_root = "/home/user/Desktop/media/";
 	ctx.logger = wasp::utility::Logger::get_instance();

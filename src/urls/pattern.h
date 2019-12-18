@@ -62,10 +62,14 @@ private:
 	std::vector<std::string> _keys;
 
 public:
-	UrlPattern(const std::string& rgx, const views::ViewHandler& handler, const std::string& name);
+	UrlPattern(
+		const std::string& rgx,
+		const views::ViewHandler& handler,
+		const std::string& name
+	);
 
 	std::string name();
-	http::HttpResponse* apply(
+	http::HttpResponseBase* apply(
 		http::HttpRequest* request,
 		views::Args* args = nullptr,
 		utility::ILogger* logger = nullptr

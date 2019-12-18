@@ -28,12 +28,20 @@
 
 // Wasp libraries.
 #include "./pattern.h"
+#include "../views/static.h"
+#include "../core/exceptions.h"
 
 
 __URLS_BEGIN__
 
-extern UrlPattern make_pattern(
+extern UrlPattern make_url(
 	const std::string& rgx, const views::ViewHandler& handler, const std::string& name
+);
+
+extern UrlPattern make_static(
+	const std::string& static_url,
+	const std::string& static_root,
+	const std::string& name = ""
 );
 
 // TODO: implement include() function!

@@ -142,6 +142,11 @@ std::string HttpResponseBase::charset()
 	return this->_charset;
 }
 
+bool HttpResponseBase::is_streaming()
+{
+	return this->_streaming;
+}
+
 void HttpResponseBase::close()
 {
 	this->_closed = true;
@@ -261,6 +266,7 @@ StreamingHttpResponse::StreamingHttpResponse(
 	const std::string& charset
 ) : HttpResponseBase(status, content_type, reason, charset)
 {
+	this->_streaming = true;
 }
 
 std::string StreamingHttpResponse::serialize()

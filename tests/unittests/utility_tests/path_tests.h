@@ -41,6 +41,15 @@ TEST(PathTestCase, baseName)
 	ASSERT_EQ(path::base(fullPath), expected);
 }
 
+TEST(PathTestCase, JoinTest)
+{
+	std::string left("/foo/");
+	std::string right("//bar/");
+	std::string expected("/foo/bar/");
+	auto actual = path::join(left, right);
+	ASSERT_EQ(expected, actual);
+}
+
 __UNIT_TESTS_END__
 
 

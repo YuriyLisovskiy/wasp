@@ -16,23 +16,22 @@
  */
 
 /**
- * _def_.h
- * Purpose: views module's definitions.
+ * An implementation of utility.h.
  */
 
-#ifndef WASP_VIEWS_DEF_H
-#define WASP_VIEWS_DEF_H
-
-#include "../_def_.h"
+#include "./utility.h"
 
 
-/// wasp::views
-#define __VIEWS_BEGIN__ __WASP_BEGIN__ namespace views {
-#define __VIEWS_END__ } __WASP_END__
+__HTTP_BEGIN__
 
-/// wasp::views::internal
-#define __VIEWS_INTERNAL_BEGIN__ __VIEWS_BEGIN__ namespace internal {
-#define __VIEWS_INTERNAL_END__ } __VIEWS_END__
+size_t parse_http_datetime(const std::string& http_datetime)
+{
+	return dt::DateTime::strptime(http_datetime.c_str(), "Wdy, DD Mon YYYY HH:MM:SS GMT").utc_epoch();
+}
 
+std::string format_http_datetime(size_t epoch_seconds)
+{
+	return dt::DateTime(epoch_seconds).strftime("Wdy, DD Mon YYYY HH:MM:SS GMT");
+}
 
-#endif // WASP_VIEWS_DEF_H
+__HTTP_END__

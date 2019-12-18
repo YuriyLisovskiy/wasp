@@ -348,4 +348,11 @@ size_t File::tell()
 	}
 }
 
+struct stat File::stat(const std::string& file_path)
+{
+	struct stat result{};
+	::stat(file_path.c_str(), &result);
+	return result;
+}
+
 __CORE_END__

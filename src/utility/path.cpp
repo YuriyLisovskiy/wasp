@@ -58,6 +58,34 @@ size_t get_size(const std::string& path)
 	return result;
 }
 
+std::string join(const std::string& left, const std::string& right)
+{
+	return str::rtrim(left, '/') + "/" + str::ltrim(right, '/');
+}
+
+std::string join(const std::vector<std::string>& paths)
+{
+	size_t size = paths.size();
+	if (size == 0)
+	{
+		return "./";
+	}
+
+	if (size == 1)
+	{
+		return paths[0];
+	}
+
+	std::string result = str::rtrim(paths[0], '/');
+	for (size_t i = 1; i < size - 1; i++)
+	{
+		result += "/" + str::trim(paths[i], '/');
+	}
+
+	result += "/" + str::ltrim(paths[size - 1], '/');
+	return result;
+}
+
 std::string cwd()
 {
 	char buffer[FILENAME_MAX];

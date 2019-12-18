@@ -16,23 +16,29 @@
  */
 
 /**
- * _def_.h
- * Purpose: views module's definitions.
+ * headers.h
+ * Purpose: http headers constants.
  */
 
-#ifndef WASP_VIEWS_DEF_H
-#define WASP_VIEWS_DEF_H
+#ifndef WASP_HTTP_HEADERS_H
+#define WASP_HTTP_HEADERS_H
 
-#include "../_def_.h"
+// C++ libraries.
+#include <string>
 
-
-/// wasp::views
-#define __VIEWS_BEGIN__ __WASP_BEGIN__ namespace views {
-#define __VIEWS_END__ } __WASP_END__
-
-/// wasp::views::internal
-#define __VIEWS_INTERNAL_BEGIN__ __VIEWS_BEGIN__ namespace internal {
-#define __VIEWS_INTERNAL_END__ } __VIEWS_END__
+// Module definitions.
+#include "./_def_.h"
 
 
-#endif // WASP_VIEWS_DEF_H
+__HTTP_BEGIN__
+
+const std::string IF_MODIFIED_SINCE = "If-Modified-Since";
+
+const std::string LAST_MODIFIED = "Last-Modified";
+
+const std::string CONTENT_ENCODING = "Content-Encoding";
+
+__HTTP_END__
+
+
+#endif // WASP_HTTP_HEADERS_H

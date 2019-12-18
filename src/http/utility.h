@@ -16,23 +16,30 @@
  */
 
 /**
- * _def_.h
- * Purpose: views module's definitions.
+ * utility.h
+ * Purpose: TODO:
  */
 
-#ifndef WASP_VIEWS_DEF_H
-#define WASP_VIEWS_DEF_H
+#ifndef WASP_HTTP_UTILITY_H
+#define WASP_HTTP_UTILITY_H
 
-#include "../_def_.h"
+// C++ libraries.
+#include <string>
 
+// Module definitions.
+#include "./_def_.h"
 
-/// wasp::views
-#define __VIEWS_BEGIN__ __WASP_BEGIN__ namespace views {
-#define __VIEWS_END__ } __WASP_END__
-
-/// wasp::views::internal
-#define __VIEWS_INTERNAL_BEGIN__ __VIEWS_BEGIN__ namespace internal {
-#define __VIEWS_INTERNAL_END__ } __VIEWS_END__
+// Wasp libraries.
+#include "../core/datetime/datetime.h"
 
 
-#endif // WASP_VIEWS_DEF_H
+__HTTP_BEGIN__
+
+extern size_t parse_http_datetime(const std::string& http_datetime);
+
+extern std::string format_http_datetime(size_t epoch_seconds);
+
+__HTTP_END__
+
+
+#endif // WASP_HTTP_UTILITY_H

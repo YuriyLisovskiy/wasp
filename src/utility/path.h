@@ -36,11 +36,13 @@
 
 #include <string>
 #include <fstream>
+#include <vector>
 
 // Module definitions.
 #include "./_def_.h"
 
 // Wasp libraries.
+#include "./string/str.h"
 #include "../core/exceptions.h"
 
 
@@ -69,6 +71,19 @@ extern std::string base(const std::string& path);
 /// @param path: path to access.
 /// @return size of file located on given path.
 extern size_t get_size(const std::string& path);
+
+/// Joins two strings to single path.
+///
+/// @param left: left path part.
+/// @param right: right path part.
+/// @return concatenated single path.
+extern std::string join(const std::string& left, const std::string& right);
+
+/// Joins vector of strings to single path.
+///
+/// @param paths: vector of path parts.
+/// @return concatenated single path.
+extern std::string join(const std::vector<std::string>& paths);
 
 /// Returns current working directory.
 extern std::string cwd();

@@ -109,6 +109,7 @@ public:
 	unsigned short int status();
 	std::string content_type();
 	std::string charset();
+	bool is_streaming();
 
 	// These methods partially implement the file-like object interface.
 	virtual void close();

@@ -43,7 +43,7 @@ void View::setup(http::HttpRequest* request)
 	this->_request = request;
 }
 
-http::HttpResponse* View::dispatch(Args* args)
+http::HttpResponseBase* View::dispatch(Args* args)
 {
 	if (this->_request == nullptr)
 	{
@@ -63,7 +63,7 @@ http::HttpResponse* View::dispatch(Args* args)
 	}
 
 	std::string method = str::lower(this->_request->method());
-	http::HttpResponse* result = nullptr;
+	http::HttpResponseBase* result = nullptr;
 	if (method == "get")
 	{
 		result = this->get(this->_request, args);
@@ -105,7 +105,7 @@ http::HttpResponse* View::dispatch(Args* args)
 	return result;
 }
 
-http::HttpResponse* View::http_method_not_allowed(http::HttpRequest* request)
+http::HttpResponseBase* View::http_method_not_allowed(http::HttpRequest* request)
 {
 	if (this->_logger != nullptr)
 	{
@@ -137,37 +137,37 @@ std::vector<std::string> View::allowed_methods()
 	return result;
 }
 
-http::HttpResponse* View::get(http::HttpRequest* request, Args* args)
+http::HttpResponseBase* View::get(http::HttpRequest* request, Args* args)
 {
 	return nullptr;
 }
 
-http::HttpResponse* View::post(http::HttpRequest* request, Args* args)
+http::HttpResponseBase* View::post(http::HttpRequest* request, Args* args)
 {
 	return nullptr;
 }
 
-http::HttpResponse* View::put(http::HttpRequest* request, Args* args)
+http::HttpResponseBase* View::put(http::HttpRequest* request, Args* args)
 {
 	return nullptr;
 }
 
-http::HttpResponse* View::patch(http::HttpRequest* request, Args* args)
+http::HttpResponseBase* View::patch(http::HttpRequest* request, Args* args)
 {
 	return nullptr;
 }
 
-http::HttpResponse* View::delete_(http::HttpRequest* request, Args* args)
+http::HttpResponseBase* View::delete_(http::HttpRequest* request, Args* args)
 {
 	return nullptr;
 }
 
-http::HttpResponse* View::head(http::HttpRequest* request, Args* args)
+http::HttpResponseBase* View::head(http::HttpRequest* request, Args* args)
 {
 	return this->get(request, args);
 }
 
-http::HttpResponse* View::options(http::HttpRequest* request, Args* args)
+http::HttpResponseBase* View::options(http::HttpRequest* request, Args* args)
 {
 	auto* response = new http::HttpResponse("");
 	auto allowed_methods = this->allowed_methods();
@@ -179,7 +179,7 @@ http::HttpResponse* View::options(http::HttpRequest* request, Args* args)
 	return response;
 }
 
-http::HttpResponse* View::trace(http::HttpRequest* request, Args* args)
+http::HttpResponseBase* View::trace(http::HttpRequest* request, Args* args)
 {
 	return nullptr;
 }
