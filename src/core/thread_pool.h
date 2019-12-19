@@ -23,6 +23,7 @@
 #ifndef WASP_CORE_THREAD_POOL_H
 #define WASP_CORE_THREAD_POOL_H
 
+// C++ libraries.
 #include <thread>
 #include <vector>
 #include <queue>
@@ -31,10 +32,11 @@
 #include <functional>
 #include <condition_variable>
 
-#include "../globals.h"
+// Module definitions.
+#include "./_def_.h"
 
 
-__INTERNAL_BEGIN__
+__CORE_INTERNAL_BEGIN__
 
 class ThreadPool
 {
@@ -78,7 +80,7 @@ private:
 	void _thread_handler();
 };
 
-__INTERNAL_END__
+__CORE_INTERNAL_END__
 
 
 #endif // WASP_CORE_THREAD_POOL_H

@@ -19,7 +19,81 @@
  * An implementation of path.h.
  */
 
-#include "path.h"
+#include "./path.h"
+
+
+__PATH_BEGIN__
+
+void split_text(const std::string& full_path, std::string& root_out, std::string& ext_out)
+{
+	internal::_split_text(full_path, '/', '\0', '.', root_out, ext_out);
+}
+
+bool exists(const std::string& path)
+{
+	return access(path.c_str(), 0) == 0;
+}
+
+std::string base(const std::string& path)
+{
+	size_t pos = path.rfind('/');
+	if (pos == std::string::npos)
+	{
+		pos = 0;
+	}
+
+	return std::string(path.begin() + pos, path.end());
+}
+
+size_t get_size(const std::string& path)
+{
+	if (!exists(path))
+	{
+		throw core::FileDoesNotExistError("file '" + path + "' does not exist", _ERROR_DETAILS_);
+	}
+
+	std::ifstream ifs(path, std::ifstream::ate | std::ifstream::binary);
+	size_t result = ifs.tellg();
+	ifs.close();
+	return result;
+}
+
+std::string join(const std::string& left, const std::string& right)
+{
+	return str::rtrim(left, '/') + "/" + str::ltrim(right, '/');
+}
+
+std::string join(const std::vector<std::string>& paths)
+{
+	size_t size = paths.size();
+	if (size == 0)
+	{
+		return "./";
+	}
+
+	if (size == 1)
+	{
+		return paths[0];
+	}
+
+	std::string result = str::rtrim(paths[0], '/');
+	for (size_t i = 1; i < size - 1; i++)
+	{
+		result += "/" + str::trim(paths[i], '/');
+	}
+
+	result += "/" + str::ltrim(paths[size - 1], '/');
+	return result;
+}
+
+std::string cwd()
+{
+	char buffer[FILENAME_MAX];
+	getcwd(buffer, FILENAME_MAX);
+	return std::string(buffer);
+}
+
+__PATH_END__
 
 
 __PATH_INTERNAL_BEGIN__
@@ -62,49 +136,3 @@ void _split_text(
 }
 
 __PATH_INTERNAL_END__
-
-
-__PATH_BEGIN__
-
-void split_text(const std::string& full_path, std::string& root_out, std::string& ext_out)
-{
-	internal::_split_text(full_path, '/', '\0', '.', root_out, ext_out);
-}
-
-bool exists(const std::string& path)
-{
-	return access(path.c_str(), 0) == 0;
-}
-
-std::string base(const std::string& path)
-{
-	size_t pos = path.rfind('/');
-	if (pos == std::string::npos)
-	{
-		pos = 0;
-	}
-
-	return std::string(path.begin() + pos, path.end());
-}
-
-size_t get_size(const std::string& path)
-{
-	if (!exists(path))
-	{
-		throw FileDoesNotExistError("file '" + path + "' does not exist", _ERROR_DETAILS_);
-	}
-
-	std::ifstream ifs(path, std::ifstream::ate | std::ifstream::binary);
-	size_t result = ifs.tellg();
-	ifs.close();
-	return result;
-}
-
-std::string cwd()
-{
-	char buffer[FILENAME_MAX];
-	getcwd(buffer, FILENAME_MAX);
-	return std::string(buffer);
-}
-
-__PATH_END__

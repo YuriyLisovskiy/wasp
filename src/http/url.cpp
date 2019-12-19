@@ -19,18 +19,18 @@
  * An implementation of url.h.
  */
 
-#include "url.h"
+#include "./url.h"
 
 
-__WASP_BEGIN__
+__HTTP_BEGIN__
 
 Url::Url(const std::string& url)
 {
-	internal::url_parser parser;
+	core::internal::url_parser parser;
 	parser.parse(url);
 	if (!parser.is_parsed)
 	{
-		throw ParseError("url is not parsed", _ERROR_DETAILS_);
+		throw core::ParseError("url is not parsed", _ERROR_DETAILS_);
 	}
 
 	this->_str_url = url;
@@ -112,4 +112,4 @@ std::string Url::str() const
 	return this->_str_url;
 }
 
-__WASP_END__
+__HTTP_END__

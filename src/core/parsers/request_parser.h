@@ -23,19 +23,23 @@
 #ifndef WASP_CORE_PARSERS_REQUEST_PARSER_H
 #define WASP_CORE_PARSERS_REQUEST_PARSER_H
 
+// C++ libraries.
 #include <algorithm>
 #include <cstring>
 #include <map>
 #include <string>
 
-#include "../../globals.h"
+// Module definitions.
+#include "../_def_.h"
+
+// Wasp libraries.
 #include "../../http/request.h"
-#include "multipart_parser.h"
-#include "query_parser.h"
-#include "../../utility/str.h"
+#include "./multipart_parser.h"
+#include "./query_parser.h"
+#include "../../utility/string/str.h"
 
 
-__INTERNAL_BEGIN__
+__CORE_INTERNAL_BEGIN__
 
 /// Http request parser structure.
 struct request_parser final
@@ -66,13 +70,13 @@ struct request_parser final
 	std::map<std::string, std::string> headers;
 
 	/// Contains get request's parameters.
-	HttpRequest::Parameters<std::string, std::string>* get_parameters = nullptr;
+	http::HttpRequest::Parameters<std::string, std::string>* get_parameters = nullptr;
 
 	/// Contains post request's parameters.
-	HttpRequest::Parameters<std::string, std::string>* post_parameters = nullptr;
+	http::HttpRequest::Parameters<std::string, std::string>* post_parameters = nullptr;
 
 	/// Contains request's files when request was sent as application/form-data.
-	HttpRequest::Parameters<std::string, UploadedFile>* files_parameters = nullptr;
+	http::HttpRequest::Parameters<std::string, UploadedFile>* files_parameters = nullptr;
 
 	/// Contains the size of request's content.
 	unsigned long long content_size{};
@@ -157,7 +161,7 @@ struct request_parser final
 	/// Sets parameters according to http request method.
 	///
 	/// @param params: parsed get/post parameters.
-	void set_parameters(HttpRequest::Parameters<std::string, std::string>* params);
+	void set_parameters(http::HttpRequest::Parameters<std::string, std::string>* params);
 
 	/// Parses chunks from http request body if request is chunked.
 	///
@@ -197,12 +201,12 @@ struct request_parser final
 	/// Builds an http request from parsed data.
 	///
 	/// @return HttpRequest object built from http stream.
-	wasp::HttpRequest* build_request();
+	http::HttpRequest* build_request();
 
 	/// Creates Dict object from headers' map.
 	///
 	/// @return Dict which contains http request headers.
-	Dict<std::string, std::string> get_headers();
+	collections::Dict<std::string, std::string> get_headers();
 
 	/// Parses http request body from given stream.
 	///
@@ -217,7 +221,7 @@ struct request_parser final
 	void parse_headers(const std::string& data);
 };
 
-__INTERNAL_END__
+__CORE_INTERNAL_END__
 
 
 #endif // WASP_CORE_PARSERS_REQUEST_PARSER_H

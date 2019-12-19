@@ -19,15 +19,15 @@
  * An implementation of query_parser.h
  */
 
-#include "query_parser.h"
+#include "./query_parser.h"
 
 
-__INTERNAL_BEGIN__
+__CORE_INTERNAL_BEGIN__
 
 query_parser::query_parser()
 {
-	this->dict = new Dict<std::string, std::string>(true);
-	this->multi_dict = new MultiValueDict<std::string, std::string>(true);
+	this->dict = new collections::Dict<std::string, std::string>(true);
+	this->multi_dict = new collections::MultiValueDict<std::string, std::string>(true);
 }
 
 query_parser::~query_parser()
@@ -91,4 +91,4 @@ void query_parser::append_parameter(const std::string& key, const std::string& v
 	this->multi_dict->append(key, value);
 }
 
-__INTERNAL_END__
+__CORE_INTERNAL_END__

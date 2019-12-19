@@ -15,13 +15,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <gtest/gtest.h>
+/**
+ * _def_.h
+ * Purpose: http module's definitions.
+ */
 
-#include "./include.h"
+#ifndef WASP_HTTP_DEF_H
+#define WASP_HTTP_DEF_H
+
+#include "../_def_.h"
 
 
-int main(int argc, char *argv[])
-{
-	::testing::InitGoogleTest(&argc, argv);
-	return RUN_ALL_TESTS();
-}
+/// wasp::http
+#define __HTTP_BEGIN__ __WASP_BEGIN__ namespace http {
+#define __HTTP_END__ } __WASP_END__
+
+/// wasp::http::internal
+#define __HTTP_INTERNAL_BEGIN__ __HTTP_BEGIN__ namespace internal {
+#define __HTTP_INTERNAL_END__ } __HTTP_END__
+
+
+#endif // WASP_HTTP_DEF_H

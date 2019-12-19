@@ -20,7 +20,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../../globals.h"
+#include "../../_def_.h"
 #include "../../../../src/core/exceptions.h"
 
 
@@ -34,8 +34,8 @@ public:
 	const char* ErrorFile = "test_file.cpp";
 	const size_t ErrorLine = 1;
 
-	wasp::DictError ConstCharConstructorError;
-	wasp::DictError StringConstructorError;
+	core::DictError ConstCharConstructorError;
+	core::DictError StringConstructorError;
 
 	explicit DictErrorTestCase()
 		: ConstCharConstructorError("Test error message from DictErrorTestCase", this->ErrorLine, this->ErrorFunction, this->ErrorFile),

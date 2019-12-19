@@ -19,7 +19,7 @@
  * An implementation of time.h.
  */
 
-#include "time.h"
+#include "./time.h"
 
 
 __DATETIME_BEGIN__

@@ -20,7 +20,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../globals.h"
+#include "../_def_.h"
 #include "../../../src/utility/path.h"
 
 
@@ -30,15 +30,24 @@ TEST(PathTestCase, baseName)
 {
 	std::string expected("/bar");
 	std::string fullPath("/foo/bar");
-	ASSERT_EQ(wasp::path::base(fullPath), expected);
+	ASSERT_EQ(path::base(fullPath), expected);
 
 	expected = "bar";
 	fullPath = "bar";
-	ASSERT_EQ(wasp::path::base(fullPath), expected);
+	ASSERT_EQ(path::base(fullPath), expected);
 
 	expected = "/bar";
 	fullPath = "/bar";
-	ASSERT_EQ(wasp::path::base(fullPath), expected);
+	ASSERT_EQ(path::base(fullPath), expected);
+}
+
+TEST(PathTestCase, JoinTest)
+{
+	std::string left("/foo/");
+	std::string right("//bar/");
+	std::string expected("/foo/bar/");
+	auto actual = path::join(left, right);
+	ASSERT_EQ(expected, actual);
 }
 
 __UNIT_TESTS_END__

@@ -19,14 +19,16 @@
  * An implementation of clickjacking.h.
  */
 
-#include "clickjacking.h"
+#include "./clickjacking.h"
 
 
-__WASP_BEGIN__
+__MIDDLEWARE_BEGIN__
 
-void XFrameOptionsMiddleware::process_response(const HttpRequest* request, HttpResponse* response)
+void XFrameOptionsMiddleware::process_response(
+	const http::HttpRequest* request, http::HttpResponse* response
+)
 {
 	// TODO:
 }
 
-__WASP_END__
+__MIDDLEWARE_END__

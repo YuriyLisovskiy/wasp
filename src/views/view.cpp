@@ -19,17 +19,17 @@
  * An implementation of view.h.
  */
 
-#include "view.h"
+#include "./view.h"
 
 
-__WASP_BEGIN__
+__VIEWS_BEGIN__
 
-View::View(ILogger* logger) : _request(nullptr), _allowed_methods_list({"options"})
+View::View(utility::ILogger* logger) : _request(nullptr), _allowed_methods_list({"options"})
 {
 	this->_logger = logger;
 }
 
-View::View(const std::vector<std::string>& allowed_methods, ILogger* logger) : View(logger)
+View::View(const std::vector<std::string>& allowed_methods, utility::ILogger* logger) : View(logger)
 {
 	this->_allowed_methods_list = allowed_methods;
 	if (std::find(allowed_methods.begin(), allowed_methods.end(), "options") == allowed_methods.end())
@@ -38,12 +38,12 @@ View::View(const std::vector<std::string>& allowed_methods, ILogger* logger) : V
 	}
 }
 
-void View::setup(HttpRequest* request)
+void View::setup(http::HttpRequest* request)
 {
 	this->_request = request;
 }
 
-HttpResponse* View::dispatch(Args* args)
+http::HttpResponseBase* View::dispatch(Args* args)
 {
 	if (this->_request == nullptr)
 	{
@@ -55,7 +55,7 @@ HttpResponse* View::dispatch(Args* args)
 			name = fullName;
 		}
 
-		throw NullPointerException(
+		throw core::NullPointerException(
 			name + " instance has not initialized request."
 			" Did you override setup() and forget to call base method?",
 			_ERROR_DETAILS_
@@ -63,7 +63,7 @@ HttpResponse* View::dispatch(Args* args)
 	}
 
 	std::string method = str::lower(this->_request->method());
-	HttpResponse* result = nullptr;
+	http::HttpResponseBase* result = nullptr;
 	if (method == "get")
 	{
 		result = this->get(this->_request, args);
@@ -105,7 +105,7 @@ HttpResponse* View::dispatch(Args* args)
 	return result;
 }
 
-HttpResponse* View::http_method_not_allowed(HttpRequest* request)
+http::HttpResponseBase* View::http_method_not_allowed(http::HttpRequest* request)
 {
 	if (this->_logger != nullptr)
 	{
@@ -115,7 +115,7 @@ HttpResponse* View::http_method_not_allowed(HttpRequest* request)
 		);
 	}
 
-	return new HttpResponseNotAllowed("", this->allowed_methods());
+	return new http::HttpResponseNotAllowed("", this->allowed_methods());
 }
 
 std::vector<std::string> View::allowed_methods()
@@ -137,47 +137,51 @@ std::vector<std::string> View::allowed_methods()
 	return result;
 }
 
-HttpResponse* View::get(HttpRequest* request, Args* args)
+http::HttpResponseBase* View::get(http::HttpRequest* request, Args* args)
 {
 	return nullptr;
 }
 
-HttpResponse* View::post(HttpRequest* request, Args* args)
+http::HttpResponseBase* View::post(http::HttpRequest* request, Args* args)
 {
 	return nullptr;
 }
 
-HttpResponse* View::put(HttpRequest* request, Args* args)
+http::HttpResponseBase* View::put(http::HttpRequest* request, Args* args)
 {
 	return nullptr;
 }
 
-HttpResponse* View::patch(HttpRequest* request, Args* args)
+http::HttpResponseBase* View::patch(http::HttpRequest* request, Args* args)
 {
 	return nullptr;
 }
 
-HttpResponse* View::delete_(HttpRequest* request, Args* args)
+http::HttpResponseBase* View::delete_(http::HttpRequest* request, Args* args)
 {
 	return nullptr;
 }
 
-HttpResponse* View::head(HttpRequest* request, Args* args)
+http::HttpResponseBase* View::head(http::HttpRequest* request, Args* args)
 {
 	return this->get(request, args);
 }
 
-HttpResponse* View::options(HttpRequest* request, Args* args)
+http::HttpResponseBase* View::options(http::HttpRequest* request, Args* args)
 {
-	auto* response = new HttpResponse("");
-	response->set_header("Allow", str::join(", ", this->allowed_methods()));
+	auto* response = new http::HttpResponse("");
+	auto allowed_methods = this->allowed_methods();
+	response->set_header(
+		"Allow",
+		str::join(allowed_methods.begin(), allowed_methods.end(), ", ")
+	);
 	response->set_header("Content-Length", "0");
 	return response;
 }
 
-HttpResponse* View::trace(HttpRequest* request, Args* args)
+http::HttpResponseBase* View::trace(http::HttpRequest* request, Args* args)
 {
 	return nullptr;
 }
 
-__WASP_END__
+__VIEWS_END__

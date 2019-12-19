@@ -23,18 +23,22 @@
 #ifndef WASP_HTTP_REQUEST_H
 #define WASP_HTTP_REQUEST_H
 
+// C++ libraries.
 #include <string>
 #include <vector>
 #include <map>
 
-#include "../globals.h"
-#include "../utility/str.h"
+// Module definitions.
+#include "./_def_.h"
+
+// Wasp libraries.
+#include "../utility/string/str.h"
 #include "../collections/dict.h"
 #include "../collections/multi_dict.h"
 #include "../core/files/uploaded_file.h"
 
 
-__WASP_BEGIN__
+__HTTP_BEGIN__
 
 class HttpRequest
 {
@@ -43,13 +47,16 @@ public:
 	class Parameters
 	{
 	private:
-		Dict<_Key, _Val> _dict;
-		MultiValueDict<_Key, _Val> _multiDict;
+		collections::Dict<_Key, _Val> _dict;
+		collections::MultiValueDict<_Key, _Val> _multiDict;
 
 	public:
 		explicit Parameters() = default;
 
-		explicit Parameters(Dict<_Key, _Val> dict, MultiValueDict<_Key, _Val> multiDict)
+		explicit Parameters(
+			collections::Dict<_Key, _Val> dict,
+			collections::MultiValueDict<_Key, _Val> multiDict
+		)
 		{
 			this->_dict = dict;
 			this->_multiDict = multiDict;
@@ -98,14 +105,14 @@ public:
 		const std::map<std::string, std::string>& headers,
 		const HttpRequest::Parameters<std::string, std::string>& get_params,
 		const HttpRequest::Parameters<std::string, std::string>& post_params,
-		const HttpRequest::Parameters<std::string, UploadedFile>& files_params
+		const HttpRequest::Parameters<std::string, core::UploadedFile>& files_params
 	);
 
-	Dict<std::string, std::string> headers;
+	collections::Dict<std::string, std::string> headers;
 	HttpRequest::Parameters<std::string, std::string> GET;
 	HttpRequest::Parameters<std::string, std::string> POST;
-	Dict<std::string, std::string> COOKIES;
-	HttpRequest::Parameters<std::string, UploadedFile> FILES;
+	collections::Dict<std::string, std::string> COOKIES;
+	HttpRequest::Parameters<std::string, core::UploadedFile> FILES;
 
 	std::string version();
 	std::string path();
@@ -124,7 +131,7 @@ private:
 	std::string _body;
 };
 
-__WASP_END__
+__HTTP_END__
 
 
 #endif // WASP_HTTP_REQUEST_H

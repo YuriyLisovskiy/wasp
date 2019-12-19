@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "exceptions.h"
+#include "./exceptions.h"
 
 
-__WASP_BEGIN__
+__CORE_BEGIN__
 
 
 // BaseException
@@ -229,6 +229,23 @@ FileDoesNotExistError::FileDoesNotExistError(const std::string& message, int lin
 }
 
 
+// ImproperlyConfigured
+ImproperlyConfigured::ImproperlyConfigured(const char* message, int line, const char* function, const char* file, const char* type)
+	: BaseException(message, line, function, file, type)
+{
+}
+
+ImproperlyConfigured::ImproperlyConfigured(const char* message, int line, const char* function, const char* file)
+	: ImproperlyConfigured(message, line, function, file, "ImproperlyConfigured")
+{
+}
+
+ImproperlyConfigured::ImproperlyConfigured(const std::string& message, int line, const char *function, const char *file)
+	: ImproperlyConfigured(message.c_str(), line, function, file)
+{
+}
+
+
 // FileError
 FileError::FileError(const char* message, int line, const char* function, const char* file, const char* type)
 	: BaseException(message, line, function, file, type)
@@ -342,6 +359,7 @@ void InterruptException::initialize()
 	sigemptyset(&sig_int_handler.sa_mask);
 	sig_int_handler.sa_flags = 0;
 	sigaction(SIGINT, &sig_int_handler, nullptr);
+	sigaction(SIGTERM, &sig_int_handler, nullptr);
 }
 
-__WASP_END__
+__CORE_END__

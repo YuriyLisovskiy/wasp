@@ -23,13 +23,17 @@
 #ifndef WASP_HTTP_COOKIE_H
 #define WASP_HTTP_COOKIE_H
 
+// C++ libraries.
 #include <string>
 
-#include "../globals.h"
+// Module definitions.
+#include "./_def_.h"
+
+// Wasp libraries.
 #include "../core/exceptions.h"
 
 
-__WASP_BEGIN__
+__HTTP_BEGIN__
 
 class Cookie
 {
@@ -59,7 +63,7 @@ public:
 	bool operator==(const Cookie& right);
 };
 
-__WASP_END__
+__HTTP_END__
 
 
 #endif // WASP_HTTP_COOKIE_H

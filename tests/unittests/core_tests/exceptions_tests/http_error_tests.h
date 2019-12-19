@@ -20,7 +20,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../../globals.h"
+#include "../../_def_.h"
 #include "../../../../src/core/exceptions.h"
 
 
@@ -36,8 +36,8 @@ public:
 
 	const size_t ErrorLine = 1;
 
-	wasp::HttpError ConstCharConstructorError;
-	wasp::HttpError StringConstructorError;
+	core::HttpError ConstCharConstructorError;
+	core::HttpError StringConstructorError;
 
 	explicit HttpErrorTestCase()
 		: ConstCharConstructorError("Test error message from HttpErrorTestCase", this->ErrorLine, this->ErrorFunction, this->ErrorFile),

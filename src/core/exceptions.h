@@ -31,13 +31,14 @@
  *  - EncodingError;
  *  - FileError
  *  - FileDoesNotExistError;
+ *  - ImproperlyConfigured;
+ *  - InterruptException;
  *  - MultiPartParserError
  *  - MultiValueDictError;
  *  - NullPointerException;
  *  - ParseError;
  *  - SuspiciousOperation;
- *  - ValueError;
- *  - InterruptException.
+ *  - ValueError.
  *
  * - Request errors:
  *  - EntityTooLargeError
@@ -48,15 +49,17 @@
 #ifndef WASP_CORE_EXCEPTIONS_H
 #define WASP_CORE_EXCEPTIONS_H
 
+// C++ libraries.
 #include <exception>
 #include <string>
 #include <csignal>
 #include <cstdlib>
 
-#include "../globals.h"
+// Module definitions.
+#include "./_def_.h"
 
 
-__WASP_BEGIN__
+__CORE_BEGIN__
 
 class BaseException : public std::exception
 {
@@ -71,9 +74,9 @@ protected:
 	// Use only when initializing of a derived exception!
 	BaseException(const char* message, int line, const char* function, const char* file, const char* type);
 
-	// Initializes '_fullMessage' member.
-	//
-	// Calls only in constructor.
+	/// Initializes '_fullMessage' member.
+	///
+	/// Calls only in constructor.
 	void init();
 
 public:
@@ -188,6 +191,17 @@ public:
 };
 
 
+class ImproperlyConfigured : public BaseException
+{
+protected:
+	// Use only when initializing of a derived exception!
+	ImproperlyConfigured(const char* message, int line, const char* function, const char* file, const char* type);
+public:
+	ImproperlyConfigured(const char* message, int line, const char* function, const char* file);
+	ImproperlyConfigured(const std::string& message, int line, const char* function, const char* file);
+};
+
+
 class ParseError : public BaseException
 {
 protected:
@@ -269,7 +283,7 @@ public:
 	static void initialize();
 };
 
-__WASP_END__
+__CORE_END__
 
 
 #endif // WASP_CORE_EXCEPTIONS_H

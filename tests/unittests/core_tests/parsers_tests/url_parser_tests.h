@@ -20,7 +20,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../../globals.h"
+#include "../../_def_.h"
 #include "../../../../src/core/exceptions.h"
 #include "../../../../src/core/parsers/url_parser.h"
 
@@ -30,7 +30,7 @@ __UNIT_TESTS_BEGIN__
 class UrlParserTestCase : public ::testing::Test
 {
 protected:
-	wasp::internal::url_parser parser;
+	core::internal::url_parser parser;
 
 	const char* STR_URL = "http://username:password@example.com/hello/world?hello=world&user=pass#someFragment";
 	const char* HOST_EXPECTED = "example.com";
@@ -92,32 +92,32 @@ TEST_F(UrlParserTestCase, QueryTest)
 class UrlParserErrorsTestCase : public ::testing::Test
 {
 protected:
-	wasp::internal::url_parser parser;
+	core::internal::url_parser parser;
 };
 
 TEST_F(UrlParserErrorsTestCase, InvalidSchemeTest)
 {
-	ASSERT_THROW(this->parser.parse("ht~tp://example.com"), wasp::ParseError);
+	ASSERT_THROW(this->parser.parse("ht~tp://example.com"), core::ParseError);
 }
 
 TEST_F(UrlParserErrorsTestCase, InvalidSchemeEndingTest)
 {
-	ASSERT_THROW(this->parser.parse("http//example.com"), wasp::ParseError);
+	ASSERT_THROW(this->parser.parse("http//example.com"), core::ParseError);
 }
 
 TEST_F(UrlParserErrorsTestCase, AbsentFirstSlashTest)
 {
-	ASSERT_THROW(this->parser.parse("http:#example.com"), wasp::ParseError);
+	ASSERT_THROW(this->parser.parse("http:#example.com"), core::ParseError);
 }
 
 TEST_F(UrlParserErrorsTestCase, AbsentSecondSlashTest)
 {
-	ASSERT_THROW(this->parser.parse("http:/example.com"), wasp::ParseError);
+	ASSERT_THROW(this->parser.parse("http:/example.com"), core::ParseError);
 }
 
 TEST_F(UrlParserErrorsTestCase, UsernameOrHostnameErrorTest)
 {
-	ASSERT_THROW(this->parser.parse("http://$example.com"), wasp::ParseError);
+	ASSERT_THROW(this->parser.parse("http://$example.com"), core::ParseError);
 }
 
 __UNIT_TESTS_END__

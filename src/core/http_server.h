@@ -23,6 +23,7 @@
 #ifndef WASP_CORE_HTTP_SERVER_H
 #define WASP_CORE_HTTP_SERVER_H
 
+// C++ libraries.
 #include <iostream>
 #include <cstdint>
 #include <string>
@@ -32,23 +33,26 @@
 #include <thread>
 #include <poll.h>
 
-#include "../globals.h"
+// Module definitions.
+#include "./_def_.h"
+
+// Wasp libraries.
 #include "../utility/logger.h"
 #include "../conf/defaults.h"
 #include "../conf/settings.h"
 #include "../http/response.h"
 #include "../http/request.h"
-#include "parsers/request_parser.h"
+#include "./parsers/request_parser.h"
 #include "../core/sockets/server_socket.h"
 #include "../core/exceptions.h"
 #include "../core/thread_pool.h"
 #include "../core/files/uploaded_file.h"
-
 #include "../core/datetime/time.h"
-#include "../utility/str.h"
+#include "../utility/string/str.h"
+#include "../utility/string/format.h"
 
 
-__INTERNAL_BEGIN__
+__CORE_INTERNAL_BEGIN__
 
 #define MAX_BUFF_SIZE 8192 * 8 - 1  // 65535 bytes.
 
@@ -57,7 +61,7 @@ __INTERNAL_BEGIN__
 // 403 bytes is a length of all headers names.
 #define MAX_HEADERS_SIZE 4096 * 38 + 403    // 156051 bytes.
 
-typedef std::function<void(HttpRequest*, const socket_t&)> http_handler;
+typedef std::function<void(http::HttpRequest*, const socket_t&)> http_handler;
 
 
 class HttpServer
@@ -70,10 +74,10 @@ private:
 	ServerSocket _server_socket;
 	http_handler _http_handler;
 	bool _finished;
-	ILogger* _logger;
+	utility::ILogger* _logger;
 	std::string _media_root;
 	size_t _threads_count;
-	ThreadPool* _thread_pool;
+	core::internal::ThreadPool* _thread_pool;
 
 	enum read_result_enum
 	{
@@ -85,7 +89,7 @@ private:
 	int _bind();
 	int _listen();
 	void _clean_up(const socket_t& client);
-	HttpRequest* _handle_request(const socket_t& client);
+	http::HttpRequest* _handle_request(const socket_t& client);
 	std::string _read_body(const socket_t& client, const std::string& body_beginning, size_t body_length);
 	static std::string _read_headers(const socket_t& client, std::string& body_beginning);
 	void _start_listener();
@@ -104,7 +108,7 @@ public:
 		const char* host = nullptr;
 		uint16_t port = 0;
 		http_handler handler = nullptr;
-		ILogger* logger;
+		utility::ILogger* logger;
 		size_t max_body_size = 0;
 		std::string media_root;
 		size_t threads_count = 0;
@@ -114,14 +118,14 @@ public:
 	~HttpServer();
 	void finish();
 	void listen_and_serve();
-	static void send(HttpResponseBase* response, const socket_t& client);
-	static void send(StreamingHttpResponse* response, const socket_t& client);
+	static void send(http::HttpResponseBase* response, const socket_t& client);
+	static void send(http::StreamingHttpResponse* response, const socket_t& client);
 
 private:
 	static void _normalize_context(HttpServer::context& ctx);
 };
 
-__INTERNAL_END__
+__CORE_INTERNAL_END__
 
 
 #endif // WASP_CORE_HTTP_SERVER_H

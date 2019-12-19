@@ -24,13 +24,17 @@
 #ifndef WASP_CORE_FILES_UPLOADED_FILE_H
 #define WASP_CORE_FILES_UPLOADED_FILE_H
 
+// C++ libraries.
 #include <string>
 
-#include "../../globals.h"
-#include "file.h"
+// Module definitions.
+#include "../_def_.h"
+
+// Wasp libraries.
+#include "./file.h"
 
 
-__WASP_BEGIN__
+__CORE_BEGIN__
 
 class UploadedFile
 {
@@ -41,14 +45,14 @@ private:
 	std::string _charset;
 	std::string _content_type;
 	size_t _size{};
-	wasp::File _file;
+	File _file;
 
 public:
 	UploadedFile() = default;
 	UploadedFile(
 		const std::string& name,
 		size_t size,
-		wasp::File& file,
+		File& file,
 		const std::string& content_type = "",
 		const std::string& charset = "",
 		const std::string& boundary = "",
@@ -67,7 +71,7 @@ public:
 	void save();
 };
 
-__WASP_END__
+__CORE_END__
 
 
 #endif // WASP_CORE_FILES_UPLOADED_FILE_H

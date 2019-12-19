@@ -17,138 +17,46 @@
 
 /**
  * str.h
- * Purpose: contains helpful string's utilities.
+ * Purpose: utility functions to simplify work with string.
  */
 
-#ifndef WASP_UTILITY_STR_H
-#define WASP_UTILITY_STR_H
+#ifndef WASP_UTILITY_STRING_STR_H
+#define WASP_UTILITY_STRING_STR_H
 
+// C++ libraries.
 #include <string>
-#include <cstdarg>
-#include <cctype>
-#include <sstream>
-#include <map>
 #include <vector>
+#include <sstream>
 #include <functional>
-#include <regex>
-#include <algorithm>
 
-#include "../globals.h"
-#include "../collections/dict.h"
+// Module definitions.
+#include "./_def_.h"
 
-
-__UTILS_STR_INTERNAL_BEGIN__
-
-/// Normalizes value to exponent.
-///
-/// @param val: pointer to value to normalize.
-/// @return normalized value as int.
-extern int normalize_exp(double* val);
-
-/// Parses string and fill it with arguments list.
-///
-/// @param fmt: format template.
-/// @param args: any values which can be put into string stream.
-/// @return formatted string with given values.
-extern std::string _format(char const* fmt, va_list args);
-
-__UTILS_STR_INTERNAL_END__
+// Wasp libraries.
+#include "../../collections/dict.h"
 
 
-__UTILS_STR_BEGIN__
-
-/// Carries out a fixed conversion of a double value to a string, with a precision of 5 decimal digits.
-/// Values with absolute values less than 0.000001 are rounded to 0.0
-/// Note: this blindly assumes that the buffer will be large enough to hold the largest possible result.
-/// The largest value we expect is an IEEE 754 double precision real, with maximum magnitude of approximately
-/// e+308. The C standard requires an implementation to allow a single conversion to produce up to 512
-/// characters, so that's what we really expect as the buffer size.
-extern std::string ftoa_fixed(double value);
-
-/// Converts double value to scientific number in string form.
-///
-/// @param value: value to convert
-/// @return	std::string representation of converted value.
-extern std::string ftoa_sci(double value);
-
-/// Formats template with given arguments using internal::_format function.
-///
-/// @param fmt: format template.
-/// @param ...: any values which can be put into string stream.
-/// @return formatted string with given values.
-extern std::string format(const char* fmt, ...);
-
-/// Converts string to type _T.
-///
-/// @tparam _T: type to convert
-/// @param str: value to convert which has overridden std::istringstream operator.
-/// @return	converted std::string value to type _T
-template<typename _T>
-_T convert(const std::string& str)
-{
-	_T value;
-	std::istringstream iss (str);
-	iss >> value;
-	if (iss.fail())
-	{
-		throw std::invalid_argument("can not convert \"" + str + "\"");
-	}
-
-	return value;
-}
+__STR_BEGIN__
 
 /// Joins std::vector of values separated by given delimiter.
 ///
-/// @tparam _T: type of values of given std::vector.
+/// @tparam _Container: type of given container.
+/// @param begin: constant iterator's pointer to the beginning of container.
+/// @param end: constant iterator's pointer to the end of container.
 /// @param delimiter: values' separator.
-/// @param array: std::vector of values of type _T.
 /// @return	joined string.
-template <typename _T>
-std::string join(const std::string& delimiter, std::vector<_T> array)
-{
-	std::ostringstream oss;
-	for (auto it = array.begin(); it != array.end(); it++)
-	{
-		oss << *it;
-		if (std::next(it) != array.end())
-		{
-			oss << delimiter;
-		}
-	}
-
-	return oss.str();
-}
-
-/// Joins wasp::Dict of values separated by given delimiter.
-/// Each key-value pair can be formatted with some lambda expression
-///		before beeing joined.
-///
-/// @tparam _Key: type of wasp::Dict keys.
-/// @tparam _Val: type of wasp::Dict values.
-/// @param delimiter: values' separator.
-/// @param dict: wasp::Dict instance with key-value pairs.
-/// @param expr: some expression which formats wasp::Dict item.
-/// @return joined string.
-template <typename _Key, typename _Val>
+template <typename _Iterator>
 std::string join(
-	const std::string& delimiter,
-	Dict<_Key, _Val> dict,
-	const std::function<std::string(const std::pair<_Key, _Val>&)>& expr = {}
+	_Iterator begin,
+	_Iterator end,
+	const std::string& delimiter
 )
 {
 	std::ostringstream oss;
-	for (auto it = dict.cbegin(); it != dict.cend(); it++)
+	for (auto it = begin; it != end; it++)
 	{
-		if (expr)
-		{
-			oss << expr(*it);
-		}
-		else
-		{
-			oss << (*it).first << delimiter << (*it).second;
-		}
-
-		if (std::next(it) != dict.cend())
+		oss << *it;
+		if (std::next(it) != end)
 		{
 			oss << delimiter;
 		}
@@ -197,6 +105,13 @@ extern std::vector<std::string> split(const std::string& str, char delimiter = '
 /// @return true if string starts with given prefix, otherwise returns false.
 extern bool starts_with(const std::string& src, const std::string& prefix);
 
+/// Checks if string ends with some string suffix.
+///
+/// @param src: string to check.
+/// @param suffix: possible string ending.
+/// @return true if string ends with given suffix, otherwise returns false.
+extern bool ends_with(const std::string& src, const std::string& suffix);
+
 /// Trims left part of string in-place.
 ///
 /// @param s: string to trim.
@@ -233,7 +148,7 @@ extern std::string rtrim(const std::string& s, char ch = ' ');
 /// @param ch: char to be trimmed.
 extern std::string trim(const std::string& s, char ch = ' ');
 
-__UTILS_STR_END__
+__STR_END__
 
 
-#endif // WASP_UTILITY_STR_H
+#endif // WASP_UTILITY_STRING_STR_H

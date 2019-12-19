@@ -22,7 +22,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../globals.h"
+#include "../_def_.h"
 #include "../../../src/views/args.h"
 
 
@@ -31,11 +31,11 @@ __UNIT_TESTS_BEGIN__
 class ArgsTestCase : public ::testing::Test
 {
 protected:
-	wasp::Args* args = nullptr;
+	views::Args* args = nullptr;
 
 	void SetUp() override
 	{
-		this->args = new Args(std::map<std::string, std::string>{
+		this->args = new views::Args(std::map<std::string, std::string>{
 			{"user_id", "12345"},
 			{"account_name", "some_name"}
 		});

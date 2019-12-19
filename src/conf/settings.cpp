@@ -15,18 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * TODO: write docs.
+/**
+ * An implementation of settings.h.
  */
 
-#include "settings.h"
+#include "./settings.h"
 
 
-__WASP_BEGIN__
+__CONF_BEGIN__
 
 Settings::Settings()
 {
-
+	// TODO:
 }
 
-__WASP_END__
+__CONF_END__

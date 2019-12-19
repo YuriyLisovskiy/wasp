@@ -20,7 +20,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../../globals.h"
+#include "../../_def_.h"
 #include "../../../../src/core/exceptions.h"
 
 
@@ -34,8 +34,8 @@ public:
 	const char* ErrorFile = "test_file.cpp";
 	const size_t ErrorLine = 1;
 
-	wasp::FileError ConstCharConstructorError;
-	wasp::FileError StringConstructorError;
+	core::FileError ConstCharConstructorError;
+	core::FileError StringConstructorError;
 
 	explicit FileErrorTestCase()
 		: ConstCharConstructorError("Test error message from FileErrorTestCase", this->ErrorLine, this->ErrorFunction, this->ErrorFile),

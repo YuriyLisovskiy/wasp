@@ -19,7 +19,7 @@
  * An implementation of mime_types.h.
  */
 
-#include "mime_types.h"
+#include "./mime_types.h"
 
 
 __MIME_BEGIN__
@@ -109,7 +109,7 @@ void guess_content_type(const std::string& _path, std::string& type, std::string
 	}
 }
 
-Dict<std::string, std::string> SUFFIX_MAP({
+collections::Dict<std::string, std::string> SUFFIX_MAP({
 	{".svgz", ".svg.gz"},
 	{".tgz", ".tar.gz"},
 	{".taz", ".tar.gz"},
@@ -118,7 +118,7 @@ Dict<std::string, std::string> SUFFIX_MAP({
 	{".txz", ".tar.xz"}
 });
 
-Dict<std::string, std::string> ENCODINGS_MAP({
+collections::Dict<std::string, std::string> ENCODINGS_MAP({
 	{".gz", "gzip"},
 	{".Z", "compress"},
 	{".bz2", "bzip2"},
@@ -126,7 +126,7 @@ Dict<std::string, std::string> ENCODINGS_MAP({
 });
 
 // If you add to these, please keep them sorted!
-Dict<std::string, std::string> TYPES_MAP({
+collections::Dict<std::string, std::string> TYPES_MAP({
 	{".3gp", "video/3gpp"},
 	{".3gpp", "video/3gpp"},
 	{".7z", "application/x-7z-compressed"},

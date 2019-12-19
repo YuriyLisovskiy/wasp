@@ -16,13 +16,13 @@
  */
 
 /**
- * An implementation of reponse.h.
+ * An implementation of response.h.
  */
 
-#include "response.h"
+#include "./response.h"
 
 
-__WASP_BEGIN__
+__HTTP_BEGIN__
 
 HttpResponseBase::HttpResponseBase(
 	unsigned short int status,
@@ -32,14 +32,14 @@ HttpResponseBase::HttpResponseBase(
 )
 {
 	this->_streaming = false;
-	this->_headers = Dict<std::string, std::string>(true);
+	this->_headers = collections::Dict<std::string, std::string>(true);
 	this->_closed = false;
 
 	if (status != 0)
 	{
 		if (status < 100 || status > 599)
 		{
-			throw ValueError("HTTP status code must be an integer from 100 to 599.", _ERROR_DETAILS_);
+			throw core::ValueError("HTTP status code must be an integer from 100 to 599.", _ERROR_DETAILS_);
 		}
 
 		this->_status = status;
@@ -142,6 +142,11 @@ std::string HttpResponseBase::charset()
 	return this->_charset;
 }
 
+bool HttpResponseBase::is_streaming()
+{
+	return this->_streaming;
+}
+
 void HttpResponseBase::close()
 {
 	this->_closed = true;
@@ -149,7 +154,7 @@ void HttpResponseBase::close()
 
 void HttpResponseBase::write(const std::string& content)
 {
-	throw HttpError("This HttpResponseBase instance is not writable", _ERROR_DETAILS_);
+	throw core::HttpError("This HttpResponseBase instance is not writable", _ERROR_DETAILS_);
 }
 
 void HttpResponseBase::flush()
@@ -158,7 +163,7 @@ void HttpResponseBase::flush()
 
 unsigned long int HttpResponseBase::tell()
 {
-	throw HttpError("This HttpResponseBase instance cannot tell its position", _ERROR_DETAILS_);
+	throw core::HttpError("This HttpResponseBase instance cannot tell its position", _ERROR_DETAILS_);
 }
 
 bool HttpResponseBase::readable()
@@ -178,7 +183,7 @@ bool HttpResponseBase::writable()
 
 void HttpResponseBase::write_lines(const std::vector<std::string>& lines)
 {
-	throw HttpError("This HttpResponseBase instance is not writable", _ERROR_DETAILS_);
+	throw core::HttpError("This HttpResponseBase instance is not writable", _ERROR_DETAILS_);
 }
 
 std::string HttpResponseBase::serialize_headers()
@@ -261,11 +266,12 @@ StreamingHttpResponse::StreamingHttpResponse(
 	const std::string& charset
 ) : HttpResponseBase(status, content_type, reason, charset)
 {
+	this->_streaming = true;
 }
 
 std::string StreamingHttpResponse::serialize()
 {
-	throw HttpError("This StreamingHttpResponse or its child instance cannot be serialized", _ERROR_DETAILS_);
+	throw core::HttpError("This StreamingHttpResponse or its child instance cannot be serialized", _ERROR_DETAILS_);
 }
 
 
@@ -286,7 +292,7 @@ FileResponse::FileResponse(
 {
 	if (!path::exists(this->_file_path))
 	{
-		throw FileDoesNotExistError("file '" + this->_file_path + "' does not exist", _ERROR_DETAILS_);
+		throw core::FileDoesNotExistError("file '" + this->_file_path + "' does not exist", _ERROR_DETAILS_);
 	}
 
 	// Initializing file stream.
@@ -330,7 +336,7 @@ std::string FileResponse::get_chunk()
 
 void FileResponse::_set_headers()
 {
-	auto encoding_map = Dict<std::string, std::string>({
+	auto encoding_map = collections::Dict<std::string, std::string>({
 		{"bzip2", "application/x-bzip"},
 		{"gzip", "application/gzip"},
 		{"xz", "application/x-xz"}
@@ -351,7 +357,7 @@ void FileResponse::_set_headers()
 	{
 		file_expr = "filename=\"" + encoding::encode(file_name, encoding::ASCII) + "\"";
 	}
-	catch (const EncodingError& e)
+	catch (const core::EncodingError& e)
 	{
 		file_expr = "filename*=utf-8''" + encoding::quote(file_name);
 	}
@@ -397,14 +403,14 @@ HttpResponseRedirectBase::HttpResponseRedirectBase(
 {
 	if (status < 300 || status > 399)
 	{
-		throw ValueError("invalid status", _ERROR_DETAILS_);
+		throw core::ValueError("invalid status", _ERROR_DETAILS_);
 	}
 
-	this->set_header("Location", encoding::encodeUrl(redirect_to));
+	this->set_header("Location", encoding::encode_url(redirect_to));
 	Url url(redirect_to);
 	if (!url.scheme().empty() && this->_allowed_hosts.find(url.scheme()) == this->_allowed_hosts.end())
 	{
-		throw DisallowedRedirect("Unsafe redirect to URL with protocol " + url.scheme(), _ERROR_DETAILS_);
+		throw core::DisallowedRedirect("Unsafe redirect to URL with protocol " + url.scheme(), _ERROR_DETAILS_);
 	}
 }
 
@@ -450,7 +456,7 @@ void HttpResponseNotModified::set_content(const std::string& content)
 {
 	if (!content.empty())
 	{
-		throw AttributeError("You cannot set content to a 304 (Not Modified) response", _ERROR_DETAILS_);
+		throw core::AttributeError("You cannot set content to a 304 (Not Modified) response", _ERROR_DETAILS_);
 	}
 
 	this->_content = "";
@@ -538,4 +544,4 @@ HttpResponseServerError::HttpResponseServerError(
 {
 }
 
-__WASP_END__
+__HTTP_END__

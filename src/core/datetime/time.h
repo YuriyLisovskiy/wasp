@@ -23,10 +23,12 @@
 #ifndef WASP_CORE_DATETIME_TIME_H
 #define WASP_CORE_DATETIME_TIME_H
 
+// C++ libraries.
 #include <string>
 #include <chrono>
 
-#include "../../globals.h"
+// Module definitions.
+#include "./_def_.h"
 
 
 __DATETIME_BEGIN__

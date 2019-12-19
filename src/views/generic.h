@@ -23,7 +23,8 @@
 #ifndef WASP_VIEWS_GENERIC_H
 #define WASP_VIEWS_GENERIC_H
 
-#include "view.h"
-#include "redirect_view.h"
+// Wasp libraries.
+#include "./view.h"
+#include "./redirect_view.h"
 
 #endif // WASP_VIEWS_GENERIC_H

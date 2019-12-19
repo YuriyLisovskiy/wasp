@@ -15,13 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <gtest/gtest.h>
+#ifndef WASP_UNIT_TESTS_UTILITY_TESTS_STRING_TESTS_INCLUDE_H
+#define WASP_UNIT_TESTS_UTILITY_TESTS_STRING_TESTS_INCLUDE_H
 
-#include "./include.h"
+#include "./str_tests.h"
 
-
-int main(int argc, char *argv[])
-{
-	::testing::InitGoogleTest(&argc, argv);
-	return RUN_ALL_TESTS();
-}
+#endif // WASP_UNIT_TESTS_UTILITY_TESTS_STRING_TESTS_INCLUDE_H

@@ -21,7 +21,7 @@
  * An implementation of timezone.h.
  */
 
-#include "timezone.h"
+#include "./timezone.h"
 
 
 __DATETIME_BEGIN__

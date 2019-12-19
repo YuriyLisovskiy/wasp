@@ -24,15 +24,18 @@
 #ifndef WASP_HTTP_STATUS_H
 #define WASP_HTTP_STATUS_H
 
-#include "../globals.h"
+// Module definitions.
+#include "./_def_.h"
+
+// Wasp libraries.
 #include "../collections/dict.h"
 
 
-__INTERNAL_BEGIN__
+__HTTP_INTERNAL_BEGIN__
 
-extern Dict<unsigned short int, std::pair<std::string, std::string>> HTTP_STATUS;
+extern collections::Dict<unsigned short int, std::pair<std::string, std::string>> HTTP_STATUS;
 
-__INTERNAL_END__
+__HTTP_INTERNAL_END__
 
 
 #endif // WASP_HTTP_STATUS_H

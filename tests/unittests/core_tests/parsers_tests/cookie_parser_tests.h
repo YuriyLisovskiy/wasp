@@ -23,7 +23,7 @@
 #include <map>
 #include <string>
 
-#include "../../globals.h"
+#include "../../_def_.h"
 #include "../../../../src/core/parsers/cookie_parser.h"
 
 
@@ -42,7 +42,7 @@ protected:
 
 	void SetUp() override
 	{
-		this->parsedMap = wasp::internal::cookie_parser::parse_req_cookies(COOKIES);
+		this->parsedMap = core::internal::cookie_parser::parse_req_cookies(COOKIES);
 	}
 
 	void TearDown() override

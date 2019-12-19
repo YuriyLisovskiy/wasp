@@ -19,10 +19,10 @@
  * An implementation of request_parser.h
  */
 
-#include "request_parser.h"
+#include "./request_parser.h"
 
 
-__INTERNAL_BEGIN__
+__CORE_INTERNAL_BEGIN__
 
 // Deletes struct's fields which are pointers.
 request_parser::~request_parser()
@@ -33,10 +33,10 @@ request_parser::~request_parser()
 }
 
 // Builds an http request from parsed data.
-wasp::HttpRequest* request_parser::build_request()
+http::HttpRequest* request_parser::build_request()
 {
-	HttpRequest::Parameters<std::string, std::string> empty;
-	return new wasp::HttpRequest(
+	http::HttpRequest::Parameters<std::string, std::string> empty;
+	return new http::HttpRequest(
 		this->method,
 		this->path,
 		this->major_v,
@@ -47,14 +47,14 @@ wasp::HttpRequest* request_parser::build_request()
 		this->headers,
 		this->get_parameters ? *this->get_parameters : empty,
 		this->post_parameters ? *this->post_parameters : empty,
-		this->files_parameters ? *this->files_parameters : HttpRequest::Parameters<std::string, UploadedFile>()
+		this->files_parameters ? *this->files_parameters : http::HttpRequest::Parameters<std::string, UploadedFile>()
 	);
 }
 
 // Creates Dict object from headers' map.
-Dict<std::string, std::string> request_parser::get_headers()
+collections::Dict<std::string, std::string> request_parser::get_headers()
 {
-	return Dict<std::string, std::string>(this->headers);
+	return collections::Dict<std::string, std::string>(this->headers);
 }
 
 // Parses http request headers from given stream.
@@ -419,7 +419,7 @@ void request_parser::parse_body(const std::string& data, const std::string& medi
 	{
 		qp.parse(this->query);
 		this->set_parameters(
-			new HttpRequest::Parameters<std::string, std::string>(*qp.dict, *qp.multi_dict)
+			new http::HttpRequest::Parameters<std::string, std::string>(*qp.dict, *qp.multi_dict)
 		);
 	}
 	else
@@ -440,11 +440,12 @@ void request_parser::parse_body(const std::string& data, const std::string& medi
 				case request_parser::content_type_enum::ct_application_x_www_form_url_encoded:
 					qp.parse(this->content);
 					this->set_parameters(
-						new HttpRequest::Parameters<std::string, std::string>(*qp.dict, *qp.multi_dict)
+						new http::HttpRequest::Parameters<std::string, std::string>(
+							*qp.dict, *qp.multi_dict
+						)
 					);
 					break;
 				case request_parser::content_type_enum::ct_application_json:
-					// TODO: parse application/json data
 					break;
 				case request_parser::content_type_enum::ct_multipart_form_data:
 					mp.parse(this->headers["Content-Type"], this->content);
@@ -474,7 +475,7 @@ void request_parser::parse_http_word(char input, char expected, request_parser::
 }
 
 // Sets parameters according to http request method.
-void request_parser::set_parameters(HttpRequest::Parameters<std::string, std::string>* params)
+void request_parser::set_parameters(http::HttpRequest::Parameters<std::string, std::string>* params)
 {
 	if (this->method == "GET")
 	{
@@ -698,4 +699,4 @@ bool request_parser::is_digit(uint c)
 	return c >= '0' && c <= '9';
 }
 
-__INTERNAL_END__
+__CORE_INTERNAL_END__

@@ -23,13 +23,16 @@
 #ifndef WASP_CORE_PARSERS_QUERY_PARSER_H
 #define WASP_CORE_PARSERS_QUERY_PARSER_H
 
-#include "../../globals.h"
+// Module definitions.
+#include "../_def_.h"
+
+// Wasp libraries.
 #include "../../http/request.h"
 #include "../../collections/dict.h"
 #include "../../collections/multi_dict.h"
 
 
-__INTERNAL_BEGIN__
+__CORE_INTERNAL_BEGIN__
 
 struct query_parser final
 {
@@ -39,8 +42,8 @@ struct query_parser final
 		s_val
 	};
 
-	Dict<std::string, std::string>* dict;
-	MultiValueDict<std::string, std::string>* multi_dict;
+	collections::Dict<std::string, std::string>* dict;
+	collections::MultiValueDict<std::string, std::string>* multi_dict;
 
 	explicit query_parser();
 	~query_parser();
@@ -48,7 +51,7 @@ struct query_parser final
 	void parse(const std::string& data);
 };
 
-__INTERNAL_END__
+__CORE_INTERNAL_END__
 
 
 #endif // WASP_CORE_PARSERS_QUERY_PARSER_H

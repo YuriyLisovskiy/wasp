@@ -19,16 +19,18 @@
  * An implementation of cookies.h.
  */
 
-#include "cookies.h"
+#include "./cookies.h"
 
 
-__WASP_BEGIN__
+__MIDDLEWARE_BEGIN__
 
-void CookieMiddleware::process_request(HttpRequest* request)
+void CookieMiddleware::process_request(http::HttpRequest* request)
 {
-	auto* cookies = internal::cookie_parser::parse_req_cookies(request->headers.get("Cookie", ""));
-	request->COOKIES = Dict(*cookies);
+	auto* cookies = core::internal::cookie_parser::parse_req_cookies(
+		request->headers.get("Cookie", "")
+	);
+	request->COOKIES = collections::Dict(*cookies);
 	delete cookies;
 }
 
-__WASP_END__
+__MIDDLEWARE_END__

@@ -21,6 +21,7 @@
 #include "./encoding_tests.h"
 #include "./mime_types_tests.h"
 #include "./path_tests.h"
-#include "./str_utils_tests.h"
+
+#include "./string_tests/include.h"
 
 #endif // WASP_UNIT_TESTS_UTILITY_TESTS_INCLUDE_H

@@ -16,13 +16,13 @@
  */
 
 /**
- * An implementation of thread_pool.h.
+ * An implementation of file.h.
  */
 
-#include "file.h"
+#include "./file.h"
 
 
-__WASP_BEGIN__
+__CORE_BEGIN__
 
 // Public members
 File::File(const std::string& name, const std::string& mode)
@@ -348,4 +348,11 @@ size_t File::tell()
 	}
 }
 
-__WASP_END__
+struct stat File::stat(const std::string& file_path)
+{
+	struct stat result{};
+	::stat(file_path.c_str(), &result);
+	return result;
+}
+
+__CORE_END__

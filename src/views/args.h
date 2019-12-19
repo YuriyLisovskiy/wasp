@@ -23,16 +23,18 @@
 #ifndef WASP_VIEWS_ARGS_H
 #define WASP_VIEWS_ARGS_H
 
+// C++ libraries.
 #include <map>
 #include <string>
 #include <cxxabi.h>
 #include <iostream>
 #include <functional>
 
-#include "../globals.h"
+// Module definitions.
+#include "./_def_.h"
 
 
-__WASP_BEGIN__
+__VIEWS_BEGIN__
 
 class Args
 {
@@ -52,7 +54,7 @@ private:
 	static bool is_number(const std::string& val);
 };
 
-__WASP_END__
+__VIEWS_END__
 
 
 #endif // WASP_VIEWS_ARGS_H

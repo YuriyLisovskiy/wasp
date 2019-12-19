@@ -21,6 +21,10 @@
 #include "../src/views/generic.h"
 #include "../src/utility/logger.h"
 
+using wasp::http::HttpRequest;
+using wasp::http::HttpResponse;
+using wasp::http::HttpResponseBase;
+
 
 template<class... Args>
 void print(Args&&... args)
@@ -29,28 +33,40 @@ void print(Args&&... args)
 }
 
 
-class FormView : public wasp::View
+class FormView : public wasp::views::View
 {
 public:
-	explicit FormView(wasp::ILogger* logger = nullptr) : View({"get", "post"}, logger) {}
+	explicit FormView(wasp::utility::ILogger* logger = nullptr) : View({"get", "post"}, logger) {}
 
-	wasp::HttpResponse* get(wasp::HttpRequest* request, wasp::Args* args) final
+	HttpResponseBase* get(HttpRequest* request, wasp::views::Args* args) final
 	{
+		std::cout << "\n\n" << request->path();
+
 		if (request->FILES.contains("super_file"))
 		{
 			auto super_file = request->FILES.get("super_file");
 			super_file.save();
 		}
 
-		print(
-			"\nGet: ", request->GET.keys().size(),
-			"\nPost: ", request->POST.keys().size(),
-			"\nFiles: ", request->FILES.keys().size(),
-			"\nCookies: ", request->COOKIES.keys().size()
-		);
-		print("\nCOOKIES: ", request->headers.get("Cookie"));
+		std::string user_row;
+		if (args->contains("user_name"))
+		{
+			user_row += "<h3>User: " + args->get_str("user_name");
+		}
+
+		if (args->contains("user_id"))
+		{
+			user_row += ", ID: " + args->get_str("user_id");
+		}
+
+		if (!user_row.empty())
+		{
+			user_row += "</h3>\n";
+		}
 
 		std::string body(
+			user_row +
+			"<img src=\"/static/pontar.png\" alt=\"Night over Pontar river\" height=\"100\" width=\"100\">"
 			"<form action=\"/hello\" method=\"post\" enctype=\"multipart/form-data\">\n"
 			"\t<input type=\"file\" name=\"super_file\" />\n"
 			"\t<input type=\"email\" name=\"mail\" />\n"
@@ -60,10 +76,10 @@ public:
 			"\t</form>\n"
 		);
 
-		return new wasp::HttpResponse(body);
+		return new HttpResponse(body);
 	}
 
-	wasp::HttpResponse* post(wasp::HttpRequest* request, wasp::Args* args) final
+	HttpResponseBase* post(HttpRequest* request, wasp::views::Args* args) final
 	{
 		return this->get(request, args);
 	}

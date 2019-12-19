@@ -15,13 +15,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <gtest/gtest.h>
+/**
+ * _def_.h
+ * Purpose: conf module's definitions.
+ */
 
-#include "./include.h"
+#ifndef WASP_CONF_DEF_H
+#define WASP_CONF_DEF_H
+
+#include "../_def_.h"
 
 
-int main(int argc, char *argv[])
-{
-	::testing::InitGoogleTest(&argc, argv);
-	return RUN_ALL_TESTS();
-}
+/// wasp::conf
+#define __CONF_BEGIN__ __WASP_BEGIN__ namespace conf {
+#define __CONF_END__ } __WASP_END__
+
+/// wasp::conf::internal
+#define __CONF_INTERNAL_BEGIN__ __CONF_BEGIN__ namespace internal {
+#define __CONF_INTERNAL_END__ } __CONF_END__
+
+
+#endif // WASP_CONF_DEF_H

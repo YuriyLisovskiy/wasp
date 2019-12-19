@@ -19,10 +19,10 @@
  * An implementation of request.h.
  */
 
-#include "request.h"
+#include "./request.h"
 
 
-__WASP_BEGIN__
+__HTTP_BEGIN__
 
 HttpRequest::HttpRequest(
 	const std::string& method, std::string path, size_t major_v, size_t minor_v,
@@ -30,7 +30,7 @@ HttpRequest::HttpRequest(
 	const std::map<std::string, std::string>& headers,
 	const HttpRequest::Parameters<std::string, std::string>& get_params,
 	const HttpRequest::Parameters<std::string, std::string>& post_params,
-	const HttpRequest::Parameters<std::string, UploadedFile>& files_params
+	const HttpRequest::Parameters<std::string, core::UploadedFile>& files_params
 )
 :   _path(std::move(path)),
 	_major_version(major_v),
@@ -40,7 +40,7 @@ HttpRequest::HttpRequest(
 	_body(std::move(content))
 {
 	this->_method = str::upper(method);
-	this->headers = Dict<std::string, std::string>(headers);
+	this->headers = collections::Dict<std::string, std::string>(headers);
 	this->GET = get_params;
 	this->POST = post_params;
 	this->FILES = files_params;
@@ -76,4 +76,4 @@ std::string HttpRequest::body()
 	return this->_body;
 }
 
-__WASP_END__
+__HTTP_END__

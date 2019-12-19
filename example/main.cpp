@@ -25,49 +25,73 @@
 #include "../src/views/generic.h"
 #include "form_view.h"
 #include "../src/core/exceptions.h"
+#include "../src/urls/url.h"
 
-// #define DETECT_MEMORY_LEAK
-// #include "../tests/unittests/mem_leak_check.h"
-
-using wasp::internal::HttpServer;
+#define DETECT_MEMORY_LEAK
+#include "../tests/mem_leak_check.h"
 
 
-void handler(wasp::HttpRequest* request, const wasp::internal::socket_t& client)
+void handler(wasp::http::HttpRequest* request, const wasp::core::internal::socket_t& client)
 {
-	wasp::CookieMiddleware().process_request(request);
+	wasp::middleware::CookieMiddleware().process_request(request);
 
-	auto view = wasp::View::make_view<FormView>();
+	std::vector<wasp::urls::UrlPattern> patterns{
+		wasp::urls::make_url(
+			"/profile/<user_id>([0-9]*)/name/<user_name>([A-Za-z]+)/?",
+			wasp::views::View::make_view<FormView>(),
+			"profile"
+		),
+		wasp::urls::make_static("/static/", wasp::path::join(wasp::path::cwd(), "static"))
+	};
 
-	auto* response = view(request, nullptr, wasp::Logger::get_instance());
+	wasp::http::HttpResponseBase* response = nullptr;
+	for (auto& pattern : patterns)
+	{
+		std::map<std::string, std::string> args_map;
+		if (pattern.match(request->path(), args_map))
+		{
+			response = pattern.apply(request, new wasp::views::Args(args_map), wasp::utility::Logger::get_instance());
+			break;
+		}
+	}
 
 	if (!response)
 	{
-		response = new wasp::HttpResponseServerError("<h2>500 - Internal Server Error</h2>");
+		response = new wasp::http::HttpResponseNotFound("<h2>404 - Not Found</h2>");
 	}
 
-	HttpServer::send(response, client);
+	if (response->is_streaming())
+	{
+		auto* streaming_response = dynamic_cast<wasp::http::StreamingHttpResponse*>(response);
+		wasp::core::internal::HttpServer::send(streaming_response, client);
+	}
+	else
+	{
+		wasp::core::internal::HttpServer::send(response, client);
+	}
+
 	delete response;
 }
 
 
 int main()
 {
-	wasp::InterruptException::initialize();
+	wasp::core::InterruptException::initialize();
 
-	HttpServer::context ctx{};
+	wasp::core::internal::HttpServer::context ctx{};
 	ctx.handler = handler;
-	ctx.port = 3000;
+	ctx.port = 8000;
 	ctx.max_body_size = 33300000;
 	ctx.media_root = "/home/user/Desktop/media/";
-	ctx.logger = wasp::Logger::get_instance();
+	ctx.logger = wasp::utility::Logger::get_instance();
 
-	HttpServer server(ctx);
+	wasp::core::internal::HttpServer server(ctx);
 
 	try
 	{
 		server.listen_and_serve();
 	}
-	catch (const wasp::InterruptException& exc)
+	catch (const wasp::core::InterruptException& exc)
 	{
 		std::cout << "\nFinishing server...";
 		server.finish();

@@ -17,23 +17,27 @@
 
 /**
  * multi_dict.h
- * Purpose: template container based on wasp::Dict with additional
- * 			methods (extended wasp::Dict). Main difference is that
+ * Purpose: template container based on collections::Dict with additional
+ * 			methods (extended collections::Dict). Main difference is that
  * 			MultiValueDict can contain multiple values in one key.
  */
 
 #ifndef WASP_COLLECTIONS_MULTI_VALUE_DICT_H
 #define WASP_COLLECTIONS_MULTI_VALUE_DICT_H
 
+// C++ libraries.
 #include <vector>
 #include <initializer_list>
 
-#include "../globals.h"
-#include "dict.h"
+// Module definitions.
+#include "./_def_.h"
+
+// Wasp libraries.
+#include "./dict.h"
 #include "../core/exceptions.h"
 
 
-__WASP_BEGIN__
+__COLLECTIONS_BEGIN__
 
 template <typename _Key, typename _Val>
 class MultiValueDict : public Dict<_Key, std::vector<_Val>>
@@ -43,7 +47,7 @@ protected:
 	/// Wrapper for throwing MultiValueDictError exception.
 	void _throw(const std::string& msg, int line, const char* function, const char* file) override
 	{
-		throw MultiValueDictError(
+		throw core::MultiValueDictError(
 			std::string("unable to ") + msg + std::string(", MultiValueDict instance is immutable"),
 			line, function, file
 		);
@@ -184,7 +188,7 @@ public:
 	}
 };
 
-__WASP_END__
+__COLLECTIONS_END__
 
 
 #endif // WASP_COLLECTIONS_MULTI_VALUE_DICT_H

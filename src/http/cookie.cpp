@@ -19,10 +19,10 @@
  * An implementation of cookie.h.
  */
 
-#include "cookie.h"
+#include "./cookie.h"
 
 
-__WASP_BEGIN__
+__HTTP_BEGIN__
 
 Cookie::Cookie() : Cookie("", "", "")
 {
@@ -42,12 +42,12 @@ Cookie::Cookie(
 {
 	if (this->_name.empty())
 	{
-		throw HttpError("cookie's name can not be empty", _ERROR_DETAILS_);
+		throw core::HttpError("cookie's name can not be empty", _ERROR_DETAILS_);
 	}
 
 	if (this->_expires.empty())
 	{
-		throw HttpError("cookie's expiration time can not be empty", _ERROR_DETAILS_);
+		throw core::HttpError("cookie's expiration time can not be empty", _ERROR_DETAILS_);
 	}
 }
 
@@ -90,4 +90,4 @@ bool Cookie::operator==(const Cookie& right)
 		this->_is_http_only == right._is_http_only;
 }
 
-__WASP_END__
+__HTTP_END__

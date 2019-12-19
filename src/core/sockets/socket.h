@@ -20,8 +20,8 @@
  * Purpose: tcp/ip socket's wrapper.
  */
 
-#ifndef WASP_CORE_TCP_SOCKET_H
-#define WASP_CORE_TCP_SOCKET_H
+#ifndef WASP_CORE_SOCKETS_SOCKET_H
+#define WASP_CORE_SOCKETS_SOCKET_H
 
 #include <cstring>
 #include <fcntl.h>
@@ -44,10 +44,13 @@
 
 #endif
 
-#include "../../globals.h"
+// Module definitions.
+#include "../_def_.h"
+
+// Wasp libraries.
 #include "../exceptions.h"
 
-__INTERNAL_BEGIN__
+__CORE_INTERNAL_BEGIN__
 
 #if defined(_WIN32) || defined(_WIN64)
 
@@ -89,7 +92,7 @@ public:
 	bool set_blocking(bool blocking);
 };
 
-__INTERNAL_END__
+__CORE_INTERNAL_END__
 
 
-#endif // WASP_CORE_TCP_SOCKET_H
+#endif // WASP_CORE_SOCKETS_SOCKET_H

@@ -20,7 +20,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../globals.h"
+#include "../_def_.h"
 #include "../../../src/http/url.h"
 
 
@@ -29,7 +29,7 @@ __UNIT_TESTS_BEGIN__
 class SimpleUrlTestCase : public ::testing::Test
 {
 protected:
-	wasp::Url* url{};
+	http::Url* url{};
 
 	const char* SCHEME_EXPECTED = "http";
 	const char* HOST_EXPECTED = "127.0.0.1";
@@ -40,7 +40,7 @@ protected:
 
 	void SetUp() override
 	{
-		this->url = new Url(STR_URL_EXPECTED);
+		this->url = new http::Url(STR_URL_EXPECTED);
 	}
 
 	void TearDown() override
@@ -83,7 +83,7 @@ TEST_F(SimpleUrlTestCase, FragmentTest)
 class ComplexUrlTestCase : public ::testing::Test
 {
 protected:
-	wasp::Url* url{};
+	http::Url* url{};
 
 	const char* STR_URL_EXPECTED = "http://username:password@example.com/hello/world?hello=world&user=pass#someFragment";
 	const char* HOST_EXPECTED = "example.com";
@@ -97,7 +97,7 @@ protected:
 
 	void SetUp() override
 	{
-		this->url = new Url(STR_URL_EXPECTED);
+		this->url = new http::Url(STR_URL_EXPECTED);
 	}
 
 	void TearDown() override

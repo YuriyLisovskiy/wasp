@@ -19,10 +19,10 @@
  * An implementation of uploaded_file.h.
  */
 
-#include "uploaded_file.h"
+#include "./uploaded_file.h"
 
 
-__WASP_BEGIN__
+__CORE_BEGIN__
 
 UploadedFile::UploadedFile(
 	const std::string& name,
@@ -116,4 +116,4 @@ void UploadedFile::save()
 	}
 }
 
-__WASP_END__
+__CORE_END__

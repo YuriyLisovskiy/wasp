@@ -15,18 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * Default constants.
- * TODO: write docs
+/**
+ * defaults.h
+ *
+ * Default configuration constants.
  */
 
 #ifndef WASP_CONF_DEFAULTS_H
 #define WASP_CONF_DEFAULTS_H
 
-#include "../globals.h"
+// Module definitions.
+#include "./_def_.h"
 
 
-__INTERNAL_BEGIN__
+__CONF_INTERNAL_BEGIN__
 
 // Local host.
 const char* const DEFAULT_HOST = "127.0.0.1";
@@ -43,7 +45,7 @@ const size_t MAX_BODY_SIZE = 2621440; // 2.5 MB
 // Threads count in queued thread pool.
 const size_t DEFAULT_THREADS_COUNT = 16;
 
-__INTERNAL_END__
+__CONF_INTERNAL_END__
 
 
 #endif // WASP_CONF_DEFAULTS_H

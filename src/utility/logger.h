@@ -18,6 +18,7 @@
 #ifndef WASP_UTILS_LOGGER_H
 #define WASP_UTILS_LOGGER_H
 
+// C++ libraries.
 #include <iostream>
 #include <string>
 #include <ostream>
@@ -25,10 +26,11 @@
 #include <locale>
 #include <cstring>
 
-#include "../globals.h"
+// Module definitions.
+#include "./_def_.h"
 
 
-__WASP_BEGIN__
+__UTILITY_BEGIN__
 
 class ILogger
 {
@@ -70,7 +72,7 @@ private:
 	void write_to_stream(const std::string& msg, Logger::log_level_enum level);
 };
 
-__WASP_END__
+__UTILITY_END__
 
 
 #endif // WASP_UTILS_LOGGER_H

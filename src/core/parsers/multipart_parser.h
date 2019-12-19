@@ -23,12 +23,16 @@
 #ifndef WASP_CORE_PARSERS_MULTIPART_PARSER_H
 #define WASP_CORE_PARSERS_MULTIPART_PARSER_H
 
+// C++ libraries.
 #include <string>
 #include <functional>
 #include <fstream>
 
-#include "../../globals.h"
-#include "../../utility/str.h"
+// Module definitions.
+#include "../_def_.h"
+
+// Wasp libraries.
+#include "../../utility/string/str.h"
 #include "../../core/exceptions.h"
 #include "../../collections/dict.h"
 #include "../../collections/multi_dict.h"
@@ -37,17 +41,17 @@
 #include "../../http/request.h"
 
 
-__INTERNAL_BEGIN__
+__CORE_INTERNAL_BEGIN__
 
 struct multipart_parser final
 {
 	std::string media_root;
 
-	Dict<std::string, std::string> post_values;
-	MultiValueDict<std::string, std::string> multi_post_value;
+	collections::Dict<std::string, std::string> post_values;
+	collections::MultiValueDict<std::string, std::string> multi_post_value;
 
-	Dict<std::string, UploadedFile> file_values;
-	MultiValueDict<std::string, UploadedFile> multi_file_value;
+	collections::Dict<std::string, UploadedFile> file_values;
+	collections::MultiValueDict<std::string, UploadedFile> multi_file_value;
 
 	enum state
 	{
@@ -84,11 +88,11 @@ struct multipart_parser final
 
 	explicit multipart_parser(const std::string& mediaRoot = "");
 	void parse(const std::string& content_type, const std::string& body);
-	HttpRequest::Parameters<std::string, UploadedFile>* get_files_params();
-	HttpRequest::Parameters<std::string, std::string>* get_post_params();
+	http::HttpRequest::Parameters<std::string, UploadedFile>* get_files_params();
+	http::HttpRequest::Parameters<std::string, std::string>* get_post_params();
 };
 
-__INTERNAL_END__
+__CORE_INTERNAL_END__
 
 
 #endif // WASP_CORE_PARSERS_MULTIPART_PARSER_H

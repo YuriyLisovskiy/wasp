@@ -23,14 +23,18 @@
 #ifndef WASP_CORE_DATETIME_TIMEZONE_H
 #define WASP_CORE_DATETIME_TIMEZONE_H
 
+// C++ libraries.
 #include <chrono>
 #include <ctime>
 #include <sstream>
 #include <iomanip>
 #include <string>
 
-#include "../../globals.h"
-#include "constants.h"
+// Module definitions.
+#include "./_def_.h"
+
+// Wasp libraries.
+#include "./constants.h"
 
 
 __DATETIME_BEGIN__

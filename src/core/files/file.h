@@ -23,17 +23,36 @@
 #ifndef WASP_CORE_FILES_FILE_H
 #define WASP_CORE_FILES_FILE_H
 
+// C++ libraries.
 #include <fstream>
 #include <string>
 #include <vector>
 #include <cmath>
 
-#include "../../globals.h"
+#if defined(__unix__) || defined(__linux__)
+#include <sys/types.h>
+#include <sys/stat.h>
+#endif
+
+#ifndef _WIN32
+#include <unistd.h>
+#endif
+
+#if defined(_WIN32) || defined(_WIN64)
+#define stat _stat
+#endif
+
+// Module definitions.
+#include "../_def_.h"
+
+// Wasp libraries.
 #include "../exceptions.h"
-#include "../../utility/str.h"
+#include "../../utility/string/str.h"
 
 
-__WASP_BEGIN__
+__CORE_BEGIN__
+
+typedef unsigned char byte;
 
 class File
 {
@@ -91,9 +110,11 @@ public:
 	std::vector<std::vector<byte>> chunks(size_t chunk_size = -1);
 	bool multiple_chunks(size_t chunk_size = -1);
 	std::string path() const;
+
+	static struct stat stat(const std::string& file_path);
 };
 
-__WASP_END__
+__CORE_END__
 
 
 #endif // WASP_CORE_FILES_FILE_H

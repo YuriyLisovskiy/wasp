@@ -19,10 +19,10 @@
  * An implementation of socket.h.
  */
 
-#include "socket.h"
+#include "./socket.h"
 
 
-__INTERNAL_BEGIN__
+__CORE_INTERNAL_BEGIN__
 
 Socket::Socket(socket_t sock) : _socket(sock), _closed(true)
 {
@@ -75,4 +75,4 @@ bool Socket::set_blocking(bool blocking)
 #endif
 }
 
-__INTERNAL_END__
+__CORE_INTERNAL_END__

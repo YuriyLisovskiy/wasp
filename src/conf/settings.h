@@ -23,14 +23,18 @@
 #ifndef WASP_CONF_SETTINGS_H
 #define WASP_CONF_SETTINGS_H
 
+// C++ libraries.
 #include <string>
 
-#include "../globals.h"
+// Module definitions.
+#include "./_def_.h"
+
+// Wasp libraries.
 #include "../utility/logger.h"
 #include "../middleware/middleware_mixin.h"
 
 
-__WASP_BEGIN__
+__CONF_BEGIN__
 
 struct Settings
 {
@@ -38,12 +42,12 @@ struct Settings
 	Settings();
 
 	// Parameters
-	std::vector<MiddlewareMixin*> MIDDLEWARE;
+	std::vector<middleware::MiddlewareMixin*> MIDDLEWARE;
 	std::string X_FRAME_OPTIONS;
 	uint DATA_UPLOAD_MAX_MEMORY_SIZE;
 };
 
-__WASP_END__
+__CONF_END__
 
 
 #endif // WASP_CONF_SETTINGS_H

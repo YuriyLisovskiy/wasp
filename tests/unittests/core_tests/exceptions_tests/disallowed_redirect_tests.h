@@ -20,7 +20,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../../globals.h"
+#include "../../_def_.h"
 #include "../../../../src/core/exceptions.h"
 
 
@@ -34,8 +34,8 @@ public:
 	const char* ErrorFile = "test_file.cpp";
 	const size_t ErrorLine = 1;
 
-	wasp::DisallowedRedirect ConstCharConstructorError;
-	wasp::DisallowedRedirect StringConstructorError;
+	core::DisallowedRedirect ConstCharConstructorError;
+	core::DisallowedRedirect StringConstructorError;
 
 	explicit DisallowedRedirectTestCase()
 		: ConstCharConstructorError("Test error message from DisallowedRedirectTestCase", this->ErrorLine, this->ErrorFunction, this->ErrorFile),

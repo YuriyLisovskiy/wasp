@@ -15,77 +15,80 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "encoding.h"
+#include "./encoding.h"
 
 
-__WASP_ENCODING_BEGIN__
+__ENCODING_BEGIN__
 
 const char* ASCII = "ascii";
 
-std::string encodeUrl(const std::string& url)
+std::string encode_url(const std::string& url)
 {
-	enum UrlState
+	enum url_state_enum
 	{
-		Scheme,
-		SlashAfterScheme,
-		Host,
-		Path,
-		Query,
-		Fragment
-	} state = UrlState::Scheme;
+		s_scheme,
+		s_slash_after_scheme,
+		s_host,
+		s_path,
+		s_query,
+		s_fragment
+
+	} state = url_state_enum::s_scheme;
 
 	std::ostringstream oss;
 	oss.fill('0');
 	oss << std::hex;
-
 	for (const char& c : url)
 	{
 		switch (state)
 		{
-			case UrlState::Scheme:
+			case url_state_enum::s_scheme:
 				if (c == '/')
 				{
-					state = UrlState::SlashAfterScheme;
+					state = url_state_enum::s_slash_after_scheme;
 				}
+
 				oss << c;
 				break;
-			case UrlState::SlashAfterScheme:
+			case url_state_enum::s_slash_after_scheme:
 				if (c == '/')
 				{
-					state = UrlState::Host;
+					state = url_state_enum::s_host;
 				}
+
 				oss << c;
 				break;
-			case UrlState::Host:
+			case url_state_enum::s_host:
 				if (c == '/')
 				{
-					state = UrlState::Path;
+					state = url_state_enum::s_path;
 				}
+
 				oss << c;
 				break;
-			case UrlState::Path:
+			case url_state_enum::s_path:
 				if (c == '?')
 				{
 					oss << c;
-					state = UrlState::Query;
+					state = url_state_enum::s_query;
 				}
 				else
 				{
 					internal::escape(oss, c, "/");
 				}
 				break;
-			case UrlState::Query:
+			case url_state_enum::s_query:
 				if (c == '#')
 				{
 					oss << c;
-					state = UrlState::Fragment;
+					state = url_state_enum::s_fragment;
 				}
 				else
 				{
 					internal::escape(oss, c, "&=");
 				}
 				break;
-			case UrlState::Fragment:
+			case url_state_enum::s_fragment:
 				internal::escape(oss, c);
 				break;
 		}
@@ -103,6 +106,7 @@ std::string quote(const std::string& _str, const std::string& safe)
 	{
 		internal::escape(oss, _char, safe);
 	}
+
 	return oss.str();
 }
 
@@ -111,24 +115,25 @@ std::string encode(const std::string& _str, const char* encoding, Mode mode)
 	std::string result;
 	if (encoding == ASCII)
 	{
-		result = internal::encodeAscii(_str, mode);
+		result = internal::encode_ascii(_str, mode);
 	}
 	// TODO: add more encodings here.
 	else
 	{
-		throw EncodingError("unknown encoding: " + std::string(encoding), _ERROR_DETAILS_);
+		throw core::EncodingError("unknown encoding: " + std::string(encoding), _ERROR_DETAILS_);
 	}
+
 	return result;
 }
 
-__WASP_ENCODING_END__
+__ENCODING_END__
 
 
-__WASP_ENCODING_INTERNAL_BEGIN__
+__ENCODING_INTERNAL_BEGIN__
 
 void escape(std::ostringstream& stream, char c, const std::string& safe)
 {
-	if (isalnum((unsigned char) c) || c == '-' || c == '_' || c == '.' || c == '~' || safe.find(c) != -1)
+	if (std::isalnum((unsigned char) c) || c == '-' || c == '_' || c == '.' || c == '~' || safe.find(c) != -1)
 	{
 		stream << c;
 	}
@@ -140,7 +145,7 @@ void escape(std::ostringstream& stream, char c, const std::string& safe)
 	}
 }
 
-std::string encodeAscii(const std::string& _str, Mode mode)
+std::string encode_ascii(const std::string& _str, Mode mode)
 {
 	std::string res;
 	for (size_t i = 0; i < _str.size(); i++)
@@ -151,7 +156,7 @@ std::string encodeAscii(const std::string& _str, Mode mode)
 			case Mode::STRICT:
 				if (_char > 127)
 				{
-					throw EncodingError(
+					throw core::EncodingError(
 						"'ascii' codec can't encode character in position " + std::to_string(i) + ": ordinal not in range [0;127]",
 						_ERROR_DETAILS_
 					);
@@ -163,9 +168,11 @@ std::string encodeAscii(const std::string& _str, Mode mode)
 				res += '?';
 				continue;
 		}
+
 		res += _char;
 	}
+
 	return res;
 }
 
-__WASP_ENCODING_INTERNAL_END__
+__ENCODING_INTERNAL_END__

@@ -23,17 +23,21 @@
 #ifndef WASP_VIEWS_REDIRECT_VIEW_H
 #define WASP_VIEWS_REDIRECT_VIEW_H
 
+// C++ libraries.
 #include <string>
 
-#include "../globals.h"
-#include "view.h"
-#include "args.h"
+// Module definitions.
+#include "./_def_.h"
+
+// Wasp libraries.
+#include "./view.h"
+#include "./args.h"
 #include "../utility/logger.h"
 #include "../http/request.h"
 #include "../http/response.h"
 
 
-__WASP_BEGIN__
+__VIEWS_BEGIN__
 
 class RedirectView : public View
 {
@@ -47,22 +51,22 @@ public:
 		const std::string& url,
 		bool permanent = false,
 		bool query_string = false,
-		ILogger* logger = nullptr
+		utility::ILogger* logger = nullptr
 	);
 
 	/// Return the URL redirect to.
 	std::string get_redirect_url();
 
-	HttpResponse* get(HttpRequest* request, Args* args) override;
-	HttpResponse* post(HttpRequest* request, Args* args) override;
-	HttpResponse* head(HttpRequest* request, Args* args) override;
-	HttpResponse* options(HttpRequest* request, Args* args) override;
-	HttpResponse* put(HttpRequest* request, Args* args) override;
-	HttpResponse* delete_(HttpRequest* request, Args* args) override;
-	HttpResponse* patch(HttpRequest* request, Args* args) override;
+	http::HttpResponse* get(http::HttpRequest* request, Args* args) override;
+	http::HttpResponse* post(http::HttpRequest* request, Args* args) override;
+	http::HttpResponse* head(http::HttpRequest* request, Args* args) override;
+	http::HttpResponse* options(http::HttpRequest* request, Args* args) override;
+	http::HttpResponse* put(http::HttpRequest* request, Args* args) override;
+	http::HttpResponse* delete_(http::HttpRequest* request, Args* args) override;
+	http::HttpResponse* patch(http::HttpRequest* request, Args* args) override;
 };
 
-__WASP_END__
+__VIEWS_END__
 
 
 #endif // WASP_VIEWS_REDIRECT_VIEW_H

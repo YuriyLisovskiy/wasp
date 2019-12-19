@@ -22,7 +22,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../globals.h"
+#include "../_def_.h"
 #include "../../../src/views/view.h"
 #include "../../../src/http/request.h"
 #include "../../../src/collections/dict.h"
@@ -34,36 +34,36 @@ __UNIT_TESTS_BEGIN__
 class ViewTestCase : public ::testing::Test
 {
 public:
-	static HttpRequest make_request(const std::string& method)
+	static http::HttpRequest make_request(const std::string& method)
 	{
-		auto empty_parameters = HttpRequest::Parameters<std::string, std::string>(
-				Dict<std::string, std::string>(),
-				MultiValueDict<std::string, std::string>()
+		auto empty_parameters = http::HttpRequest::Parameters<std::string, std::string>(
+			collections::Dict<std::string, std::string>(),
+			collections::MultiValueDict<std::string, std::string>()
 		);
 		auto empty_map = std::map<std::string, std::string>();
-		return HttpRequest(
-				method,
-				"/hello",
-				1, 1,
-				"",
-				true,
-				"",
-				empty_map,
-				empty_parameters,
-				empty_parameters,
-				HttpRequest::Parameters<std::string, UploadedFile>(
-						Dict<std::string, UploadedFile>(),
-						MultiValueDict<std::string, UploadedFile>()
-				)
+		return http::HttpRequest(
+			method,
+			"/hello",
+			1, 1,
+			"",
+			true,
+			"",
+			empty_map,
+			empty_parameters,
+			empty_parameters,
+			http::HttpRequest::Parameters<std::string, core::UploadedFile>(
+				collections::Dict<std::string, core::UploadedFile>(),
+				collections::MultiValueDict<std::string, core::UploadedFile>()
+			)
 		);
 	}
 
 protected:
-	View* view = nullptr;
+	views::View* view = nullptr;
 
 	void SetUp() override
 	{
-		this->view = new View();
+		this->view = new views::View();
 	}
 
 	void TearDown() override
@@ -114,10 +114,11 @@ TEST_F(ViewTestCase, HeadTestReturnsNullptr)
 
 TEST_F(ViewTestCase, OptionsTest)
 {
-	auto expected_response = HttpResponse("");
+	auto expected_response = http::HttpResponse("");
+	auto vec = std::vector<std::string>{"get", "post", "head", "options"};
 	expected_response.set_header(
 		"Allow",
-		str::join(", ", std::vector<std::string>{"get", "post", "head", "options"})
+		str::join(vec.cbegin(), vec.cend(), ", ")
 	);
 	expected_response.set_header("Content-Length", "0");
 
@@ -154,7 +155,7 @@ TEST_F(ViewTestCase, SetupAndDispatchAllowedTest)
 {
 	auto request = ViewTestCase::make_request("options");
 
-	ASSERT_THROW(this->view->dispatch(nullptr), NullPointerException);
+	ASSERT_THROW(this->view->dispatch(nullptr), core::NullPointerException);
 
 	this->view->setup(&request);
 	auto response = this->view->dispatch(nullptr);
@@ -179,7 +180,7 @@ TEST_F(ViewTestCase, DispatchNotAllowedTest)
 TEST(ViewTestCaseStatic, MakeViewTest)
 {
 	auto request = ViewTestCase::make_request("options");
-	auto view = View::make_view<View>();
+	auto view = views::View::make_view<views::View>();
 
 	auto response = view(&request, nullptr, nullptr);
 

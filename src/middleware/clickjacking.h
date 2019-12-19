@@ -27,11 +27,14 @@
 #ifndef WASP_MIDDLEWARE_CLICKJACKING_H
 #define WASP_MIDDLEWARE_CLICKJACKING_H
 
-#include "../globals.h"
-#include "middleware_mixin.h"
+// Module definitions.
+#include "./_def_.h"
+
+// Wasp libraries.
+#include "./middleware_mixin.h"
 
 
-__WASP_BEGIN__
+__MIDDLEWARE_BEGIN__
 
 /**
  * Set the X-Frame-Options HTTP header in HTTP responses.
@@ -47,10 +50,10 @@ __WASP_BEGIN__
 class XFrameOptionsMiddleware : public MiddlewareMixin
 {
 public:
-	void process_response(const HttpRequest* request, HttpResponse* response) final;
+	void process_response(const http::HttpRequest* request, http::HttpResponse* response) final;
 };
 
-__WASP_END__
+__MIDDLEWARE_END__
 
 
 #endif // WASP_MIDDLEWARE_CLICKJACKING_H
