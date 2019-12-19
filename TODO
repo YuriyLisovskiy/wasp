@@ -1,9 +1,11 @@
-Important:
-    Test:
-        - src/urls
+Test:
+    - src/apps
+    - src/urls
 
 
 Check out TODOs in:
+    - src/apps/wasp.cpp
+
     - src/conf/settings.cpp
 
     - src/core/parsers/cookie_parser.cpp

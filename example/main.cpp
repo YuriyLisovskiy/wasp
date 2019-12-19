@@ -21,11 +21,8 @@
 
 #include "../src/core/http_server.h"
 #include "../src/middleware/cookies.h"
-#include "../src/http/response.h"
 #include "../src/views/generic.h"
-#include "form_view.h"
-#include "../src/core/exceptions.h"
-#include "../src/urls/url.h"
+#include "./example_app/config.h"
 
 #define DETECT_MEMORY_LEAK
 #include "../tests/mem_leak_check.h"
@@ -33,16 +30,15 @@
 
 void handler(wasp::http::HttpRequest* request, const wasp::core::internal::socket_t& client)
 {
+	std::cout << "\n\n" << request->path();
+
 	wasp::middleware::CookieMiddleware().process_request(request);
 
 	std::vector<wasp::urls::UrlPattern> patterns{
-		wasp::urls::make_url(
-			"/profile/<user_id>([0-9]*)/name/<user_name>([A-Za-z]+)/?",
-			wasp::views::View::make_view<FormView>(),
-			"profile"
-		),
 		wasp::urls::make_static("/static/", wasp::path::join(wasp::path::cwd(), "static"))
 	};
+	auto mp = main_app_config->get_urlpatterns();
+	patterns.insert(patterns.end(), mp.begin(), mp.end());
 
 	wasp::http::HttpResponseBase* response = nullptr;
 	for (auto& pattern : patterns)
@@ -82,7 +78,7 @@ int main()
 	ctx.handler = handler;
 	ctx.port = 8000;
 	ctx.max_body_size = 33300000;
-	ctx.media_root = "/home/user/Desktop/media/";
+	ctx.media_root = "/home/yuriylisovskiy/Desktop/media/";
 	ctx.logger = wasp::utility::Logger::get_instance();
 
 	wasp::core::internal::HttpServer server(ctx);
