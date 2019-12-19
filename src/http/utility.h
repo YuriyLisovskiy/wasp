@@ -17,7 +17,7 @@
 
 /**
  * utility.h
- * Purpose: TODO:
+ * Purpose: some http helpers.
  */
 
 #ifndef WASP_HTTP_UTILITY_H
@@ -35,8 +35,10 @@
 
 __HTTP_BEGIN__
 
+/// Converts std::string datetime to utc epoch in seconds.
 extern size_t parse_http_datetime(const std::string& http_datetime);
 
+/// Converts utc epoch seconds to std::string datetime.
 extern std::string format_http_datetime(size_t epoch_seconds);
 
 __HTTP_END__

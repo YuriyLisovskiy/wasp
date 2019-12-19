@@ -446,7 +446,6 @@ void request_parser::parse_body(const std::string& data, const std::string& medi
 					);
 					break;
 				case request_parser::content_type_enum::ct_application_json:
-					// TODO: parse application/json data
 					break;
 				case request_parser::content_type_enum::ct_multipart_form_data:
 					mp.parse(this->headers["Content-Type"], this->content);

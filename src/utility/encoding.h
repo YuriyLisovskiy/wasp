@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * encoding definition.
- * TODO: write docs.
+/**
+ * encoding.h
+ * Purpose: encode/decode strings.
  */
 
 #ifndef WASP_UTILS_ENCODING_H

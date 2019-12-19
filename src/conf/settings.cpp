@@ -26,7 +26,7 @@ __CONF_BEGIN__
 
 Settings::Settings()
 {
-
+	// TODO:
 }
 
 __CONF_END__
