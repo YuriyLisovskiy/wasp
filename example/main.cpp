@@ -18,68 +18,85 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <functional>
 
 #include "../src/core/http_server.h"
-#include "../src/middleware/cookies.h"
-#include "../src/views/generic.h"
-#include "./example_app/config.h"
-
-#define DETECT_MEMORY_LEAK
-#include "../tests/mem_leak_check.h"
+#include "./example_app/settings.h"
 
 
-void handler(wasp::http::HttpRequest* request, const wasp::core::internal::socket_t& client)
+std::function<void(wasp::http::HttpRequest*, const wasp::core::internal::socket_t&)>
+make_handler(wasp::conf::Settings* settings)
 {
-	std::cout << "\n\n" << request->path();
-
-	wasp::middleware::CookieMiddleware().process_request(request);
-
-	std::vector<wasp::urls::UrlPattern> patterns{
-		wasp::urls::make_static("/static/", wasp::path::join(wasp::path::cwd(), "static"))
+	std::vector<wasp::urls::UrlPattern> urlpatterns{
+		wasp::urls::make_static(settings->STATIC_URL, settings->STATIC_ROOT)
 	};
-	auto mp = main_app_config->get_urlpatterns();
-	patterns.insert(patterns.end(), mp.begin(), mp.end());
-
-	wasp::http::HttpResponseBase* response = nullptr;
-	for (auto& pattern : patterns)
+	if (!settings->INSTALLED_APPS.empty())
 	{
-		std::map<std::string, std::string> args_map;
-		if (pattern.match(request->path(), args_map))
+		auto apps_patterns = settings->INSTALLED_APPS[0]->get_urlpatterns();
+		urlpatterns.insert(urlpatterns.end(), apps_patterns.begin(), apps_patterns.end());
+	}
+
+	auto handler = [settings, urlpatterns](
+		wasp::http::HttpRequest* request, const wasp::core::internal::socket_t& client
+	) mutable -> void
+	{
+		std::cout << "\n\n" << request->path();
+
+		for (auto& middleware : settings->MIDDLEWARE)
 		{
-			response = pattern.apply(request, new wasp::views::Args(args_map), wasp::utility::Logger::get_instance());
-			break;
+			middleware->process_request(request);
 		}
-	}
 
-	if (!response)
-	{
-		response = new wasp::http::HttpResponseNotFound("<h2>404 - Not Found</h2>");
-	}
+		wasp::http::HttpResponseBase* response = nullptr;
+		for (auto& url_pattern : urlpatterns)
+		{
+			std::map<std::string, std::string> args_map;
+			if (url_pattern.match(request->path(), args_map))
+			{
+				response = url_pattern.apply(request, new wasp::views::Args(args_map), settings->LOGGER);
+				break;
+			}
+		}
 
-	if (response->is_streaming())
-	{
-		auto* streaming_response = dynamic_cast<wasp::http::StreamingHttpResponse*>(response);
-		wasp::core::internal::HttpServer::send(streaming_response, client);
-	}
-	else
-	{
-		wasp::core::internal::HttpServer::send(response, client);
-	}
+		if (!response)
+		{
+			response = new wasp::http::HttpResponseNotFound("<h2>404 - Not Found</h2>");
+		}
 
-	delete response;
+		for (long int i = (long int) settings->MIDDLEWARE.size() - 1; i >= 0; i--)
+		{
+			settings->MIDDLEWARE[i]->process_response(request, response);
+		}
+
+		if (response->is_streaming())
+		{
+			auto* streaming_response = dynamic_cast<wasp::http::StreamingHttpResponse*>(response);
+			wasp::core::internal::HttpServer::send(streaming_response, client);
+		}
+		else
+		{
+			wasp::core::internal::HttpServer::send(response, client);
+		}
+
+		delete response;
+	};
+
+	return handler;
 }
-
 
 int main()
 {
 	wasp::core::InterruptException::initialize();
 
+	auto* settings = new Settings();
+
 	wasp::core::internal::HttpServer::context ctx{};
-	ctx.handler = handler;
+	ctx.handler = make_handler(settings);
 	ctx.port = 8000;
-	ctx.max_body_size = 33300000;
-	ctx.media_root = "/home/yuriylisovskiy/Desktop/media/";
-	ctx.logger = wasp::utility::Logger::get_instance();
+	ctx.max_body_size = settings->DATA_UPLOAD_MAX_MEMORY_SIZE;
+	ctx.media_root = settings->MEDIA_ROOT;
+	ctx.logger = settings->LOGGER;
+	ctx.threads_count = settings->QUEUE_THREADS_COUNT;
 
 	wasp::core::internal::HttpServer server(ctx);
 
@@ -98,5 +115,6 @@ int main()
 		std::cout << exc.what();
 	}
 
+	delete settings;
 	return 0;
 }

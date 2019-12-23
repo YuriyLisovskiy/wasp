@@ -14,30 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#pragma once
 
-#ifndef WASP_EXAMPLE_PICTURE_APP_CONFIG_H
-#define WASP_EXAMPLE_PICTURE_APP_CONFIG_H
-
-#include "../../src/apps/config.h"
-
-#include "./picture_view.h"
+#include "../../src/conf/settings.h"
 
 
-class PictureAppConfig : public wasp::apps::AppConfig
+void override_settings(wasp::conf::Settings* settings)
 {
-public:
-	PictureAppConfig()
-	{
-		this->url(
-			R"(view/pic/?)",
-			wasp::views::View::make_view<PictureView>(),
-			"view_pic"
-		);
-	}
-};
-
-
-PictureAppConfig* picture_app_config = new PictureAppConfig();
-
-
-#endif // WASP_EXAMPLE_PICTURE_APP_CONFIG_H
+	settings->DEBUG = false;
+}

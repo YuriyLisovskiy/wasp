@@ -14,9 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-#ifndef WASP_EXAMPLE_PICTURE_APP_PICTURE_VIEW_H
-#define WASP_EXAMPLE_PICTURE_APP_PICTURE_VIEW_H
+#pragma once
 
 #include <string>
 
@@ -37,6 +35,3 @@ public:
 		return new wasp::http::HttpResponse(body);
 	}
 };
-
-
-#endif // WASP_EXAMPLE_PICTURE_APP_PICTURE_VIEW_H

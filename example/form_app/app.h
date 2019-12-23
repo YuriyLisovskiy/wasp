@@ -14,32 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#pragma once
 
-/**
- * An implementation of config.h.
- */
+#include "../../src/apps/config.h"
+#include "../../src/views/view.h"
 
-#include "./config.h"
+#include "./form_view.h"
 
 
-__APPS_BEGIN__
-
-std::vector<urls::UrlPattern> AppConfig::get_urlpatterns()
+class FormAppConfig : public wasp::apps::AppConfig
 {
-	return this->_urlpatterns;
-}
-
-void AppConfig::include(const std::string& prefix, AppConfig* app)
-{
-	auto included_urlpatterns = app->get_urlpatterns();
-	app->_urlpatterns.clear();
-	for (const auto& pattern : included_urlpatterns)
+public:
+	FormAppConfig()
 	{
-		this->_urlpatterns.emplace_back(
-			str::rtrim(str::starts_with(prefix, "/") ? prefix : "/" + prefix, '/'),
-			pattern
+		this->url<FormView>(
+			R"(profile/<user_id>([0-9]*)/name/<user_name>([A-Za-z]+)/?)",
+			"profile"
 		);
 	}
-}
-
-__APPS_END__
+};

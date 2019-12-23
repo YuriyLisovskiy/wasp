@@ -43,7 +43,7 @@ public:
 	};
 
 	/// An output http request and response after processing in views::View.
-	virtual void process_response(const http::HttpRequest* request, http::HttpResponse* response)
+	virtual void process_response(const http::HttpRequest* request, http::HttpResponseBase* response)
 	{
 	};
 };

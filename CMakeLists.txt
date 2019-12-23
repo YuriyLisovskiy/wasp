@@ -126,6 +126,7 @@ target_link_libraries(${PACKAGE_MAIN_UNIT_TESTS} gtest gtest_main rt pthread ${T
 file(GLOB EXAMPLE_SRC
 	"example/*.h"
 	"example/*/*.h"
+	"example/*/*.cpp"
 )
 if(EXISTS "${PROJECT_SOURCE_DIR}/example/main.cpp")
 	add_executable(example ${LIB_SRC} ${EXAMPLE_SRC} "example/main.cpp")

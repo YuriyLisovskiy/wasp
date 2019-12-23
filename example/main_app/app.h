@@ -14,30 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-#ifndef WASP_EXAMPLE_CONFIG_H
-#define WASP_EXAMPLE_CONFIG_H
+#pragma once
 
 #include "../../src/apps/config.h"
 #include "../../src/views/view.h"
 
-#include "./form_view.h"
+#include "main_view.h"
+#include "../form_app/app.h"
+#include "../picture_app/app.h"
 
 
-class FormAppConfig : public wasp::apps::AppConfig
+class MainAppConfig : public wasp::apps::AppConfig
 {
 public:
-	FormAppConfig()
+	MainAppConfig()
 	{
-		this->url(
-			R"(profile/<user_id>([0-9]*)/name/<user_name>([A-Za-z]+)/?)",
-			wasp::views::View::make_view<FormView>(),
-			"profile"
-		);
+		this->url<MainView>(R"(index/?)", "index");
+		this->include(R"(picture/)", new PictureAppConfig());
+		this->include(R"(form/)", new FormAppConfig());
+		this->url<RedirectView>(R"(/?)", "root");
 	}
 };
-
-FormAppConfig* form_app_config = new FormAppConfig();
-
-
-#endif // WASP_EXAMPLE_CONFIG_H
