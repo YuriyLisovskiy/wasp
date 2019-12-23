@@ -26,10 +26,6 @@ class PictureAppConfig : public wasp::apps::AppConfig
 public:
 	PictureAppConfig()
 	{
-		this->url(
-			R"(view/pic/?)",
-			wasp::views::View::make_view<PictureView>(),
-			"view_pic"
-		);
+		this->url<PictureView>(R"(view/pic/?)", "view_pic");
 	}
 };

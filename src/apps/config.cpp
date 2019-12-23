@@ -29,15 +29,6 @@ std::vector<urls::UrlPattern> AppConfig::get_urlpatterns()
 	return this->_urlpatterns;
 }
 
-void AppConfig::url(const std::string& pattern, const views::ViewHandler& handler, const std::string& name)
-{
-	this->_urlpatterns.push_back(urls::make_url(
-		str::starts_with(pattern, "/") ? pattern : "/" + pattern,
-		handler,
-		name
-	));
-}
-
 void AppConfig::include(const std::string& prefix, AppConfig* app)
 {
 	auto included_urlpatterns = app->get_urlpatterns();

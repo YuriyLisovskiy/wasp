@@ -30,8 +30,11 @@ make_handler(wasp::conf::Settings* settings)
 	std::vector<wasp::urls::UrlPattern> urlpatterns{
 		wasp::urls::make_static(settings->STATIC_URL, settings->STATIC_ROOT)
 	};
-	auto apps_patterns = settings->ROOT_APP_CONFIG->get_urlpatterns();
-	urlpatterns.insert(urlpatterns.end(), apps_patterns.begin(), apps_patterns.end());
+	if (!settings->INSTALLED_APPS.empty())
+	{
+		auto apps_patterns = settings->INSTALLED_APPS[0]->get_urlpatterns();
+		urlpatterns.insert(urlpatterns.end(), apps_patterns.begin(), apps_patterns.end());
+	}
 
 	auto handler = [settings, urlpatterns](
 		wasp::http::HttpRequest* request, const wasp::core::internal::socket_t& client
@@ -93,6 +96,7 @@ int main()
 	ctx.max_body_size = settings->DATA_UPLOAD_MAX_MEMORY_SIZE;
 	ctx.media_root = settings->MEDIA_ROOT;
 	ctx.logger = settings->LOGGER;
+	ctx.threads_count = settings->QUEUE_THREADS_COUNT;
 
 	wasp::core::internal::HttpServer server(ctx);
 

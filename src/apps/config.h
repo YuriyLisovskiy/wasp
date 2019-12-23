@@ -45,7 +45,16 @@ private:
 	std::vector<urls::UrlPattern> _urlpatterns;
 
 protected:
-	void url(const std::string& pattern, const views::ViewHandler& handler, const std::string& name);
+	template <typename _T, typename = std::enable_if<std::is_base_of<views::View, _T>::value>>
+	void url(const std::string& pattern, const std::string& name = "")
+	{
+		this->_urlpatterns.push_back(urls::make_url(
+			str::starts_with(pattern, "/") ? pattern : "/" + pattern,
+			views::View::make_view<_T>(),
+			name
+		));
+	}
+
 	void include(const std::string& prefix, AppConfig* app);
 
 public:

@@ -46,8 +46,6 @@ struct Settings : public wasp::conf::Settings
 
 		this->ALLOWED_HOSTS = {"127.0.0.1"};
 
-		this->ROOT_APP_CONFIG = this->app<MainAppConfig>();
-
 		this->INSTALLED_APPS = {
 			this->app<MainAppConfig>(),
 			this->app<FormAppConfig>(),

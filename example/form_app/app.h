@@ -27,9 +27,8 @@ class FormAppConfig : public wasp::apps::AppConfig
 public:
 	FormAppConfig()
 	{
-		this->url(
+		this->url<FormView>(
 			R"(profile/<user_id>([0-9]*)/name/<user_name>([A-Za-z]+)/?)",
-			wasp::views::View::make_view<FormView>(),
 			"profile"
 		);
 	}

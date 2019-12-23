@@ -67,10 +67,9 @@ struct Settings
 	// manually specified. It's used to construct the Content-Type header.
 	std::string DEFAULT_CHARSET;
 
-	// Main AppConfig of an application.
-	apps::AppConfig* ROOT_APP_CONFIG;
-
-	// List of AppConfig-derived objects representing installed apps.
+	// List of AppConfig-derived objects representing apps.
+	// Order is required. The first app is interpreted as
+	// main application configuration.
 	std::vector<apps::AppConfig*> INSTALLED_APPS;
 
 	// List of paths where templates can be found.
@@ -200,25 +199,29 @@ struct Settings
 	std::vector<std::string> CSRF_TRUSTED_ORIGINS;
 	bool CSRF_USE_SESSIONS;
 
+	// Additional server settings.
+	// Threads count in queued thread pool.
+	size_t QUEUE_THREADS_COUNT;
+
 	Settings();
 	virtual ~Settings();
 
 	// TODO:
-	template <typename _T>
+	template <typename _T, typename = std::enable_if<std::is_base_of<apps::AppConfig, _T>::value>>
 	apps::AppConfig* app()
 	{
 		return new _T();
 	}
 
 	// TODO:
-	template <typename _T>
+	template <typename _T, typename = std::enable_if<std::is_base_of<middleware::MiddlewareMixin, _T>::value>>
 	middleware::MiddlewareMixin* middleware()
 	{
 		return new _T();
 	}
 
 	// TODO:
-	template <typename _T>
+	template <typename _T, typename = std::enable_if<std::is_base_of<views::View, _T>::value>>
 	views::View* view()
 	{
 		return new _T();

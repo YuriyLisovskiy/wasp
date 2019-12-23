@@ -38,8 +38,6 @@ Settings::Settings()
 
 	this->DEFAULT_CHARSET = "utf-8";
 
-	this->ROOT_APP_CONFIG = nullptr;
-
 	this->APPEND_SLASH = true;
 
 	this->FILE_UPLOAD_MAX_MEMORY_SIZE = 2621440;   // 2.5 MB
@@ -93,6 +91,8 @@ Settings::Settings()
 	this->CSRF_COOKIE_SAME_SITE = "Lax";
 	this->CSRF_HEADER_NAME = "HTTP_X_CSRFTOKEN";
 	this->CSRF_USE_SESSIONS = false;
+
+	this->QUEUE_THREADS_COUNT = 16;
 }
 
 Settings::~Settings()
@@ -108,7 +108,6 @@ Settings::~Settings()
 	}
 
 	delete this->CSRF_FAILURE_VIEW;
-	delete this->ROOT_APP_CONFIG;
 }
 
 __CONF_END__

@@ -29,17 +29,9 @@ class MainAppConfig : public wasp::apps::AppConfig
 public:
 	MainAppConfig()
 	{
-		this->url(
-			R"(index/?)",
-			wasp::views::View::make_view<MainView>(),
-			"index"
-		);
+		this->url<MainView>(R"(index/?)", "index");
 		this->include(R"(picture/)", new PictureAppConfig());
 		this->include(R"(form/)", new FormAppConfig());
-		this->url(
-			R"(/?)",
-			wasp::views::View::make_view<RedirectView>(),
-			"root"
-		);
+		this->url<RedirectView>(R"(/?)", "root");
 	}
 };
