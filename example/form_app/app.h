@@ -14,9 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-#ifndef WASP_EXAMPLE_CONFIG_H
-#define WASP_EXAMPLE_CONFIG_H
+#pragma once
 
 #include "../../src/apps/config.h"
 #include "../../src/views/view.h"
@@ -36,8 +34,3 @@ public:
 		);
 	}
 };
-
-FormAppConfig* form_app_config = new FormAppConfig();
-
-
-#endif // WASP_EXAMPLE_CONFIG_H

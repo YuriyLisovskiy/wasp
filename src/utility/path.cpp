@@ -34,15 +34,38 @@ bool exists(const std::string& path)
 	return access(path.c_str(), 0) == 0;
 }
 
-std::string base(const std::string& path)
+std::string dirname(const std::string& path)
+{
+	size_t pos = path.rfind('/');
+	if (pos == std::string::npos)
+	{
+		return "";
+	}
+
+	auto result = std::string(path.begin(), path.begin() + pos + 1);
+	if (result.size() > 1)
+	{
+		str::rtrim(result, '/');
+		str::rtrim(result, '.');
+		str::rtrim(result, '/');
+	}
+
+	return result;
+}
+
+std::string basename(const std::string& path)
 {
 	size_t pos = path.rfind('/');
 	if (pos == std::string::npos)
 	{
 		pos = 0;
 	}
+	else
+	{
+		pos += 1;
+	}
 
-	return std::string(path.begin() + pos, path.end());
+	return str::rtrim(std::string(path.begin() + pos, path.end()), '/');
 }
 
 size_t get_size(const std::string& path)

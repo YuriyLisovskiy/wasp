@@ -14,9 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-#ifndef WASP_EXAMPLE_FORM_VIEW_H
-#define WASP_EXAMPLE_FORM_VIEW_H
+#pragma once
 
 #include "../../src/views/generic.h"
 #include "../../src/utility/logger.h"
@@ -74,6 +72,3 @@ public:
 		return new wasp::http::HttpResponseRedirect("/index");
 	}
 };
-
-
-#endif // WASP_EXAMPLE_FORM_VIEW_H

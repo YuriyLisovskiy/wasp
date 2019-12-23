@@ -14,41 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#pragma once
 
-/**
- * middleware_mixin.h
- * Purpose: base middleware class.
- */
+#include "../../src/apps/config.h"
 
-#ifndef WASP_MIDDLEWARE_MIDDLEWARE_MIXIN_H
-#define WASP_MIDDLEWARE_MIDDLEWARE_MIXIN_H
-
-// Module definitions.
-#include "./_def_.h"
-
-// Wasp libraries.
-#include "../http/request.h"
-#include "../http/response.h"
+#include "./picture_view.h"
 
 
-__MIDDLEWARE_BEGIN__
-
-class MiddlewareMixin
+class PictureAppConfig : public wasp::apps::AppConfig
 {
 public:
-
-	/// An input http request before processing in views::View.
-	virtual void process_request(http::HttpRequest* request)
+	PictureAppConfig()
 	{
-	};
-
-	/// An output http request and response after processing in views::View.
-	virtual void process_response(const http::HttpRequest* request, http::HttpResponseBase* response)
-	{
-	};
+		this->url(
+			R"(view/pic/?)",
+			wasp::views::View::make_view<PictureView>(),
+			"view_pic"
+		);
+	}
 };
-
-__MIDDLEWARE_END__
-
-
-#endif // WASP_MIDDLEWARE_MIDDLEWARE_MIXIN_H

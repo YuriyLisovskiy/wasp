@@ -14,9 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-#ifndef WASP_EXAMPLE_EXAMPLE_APP_MAIN_VIEW_H
-#define WASP_EXAMPLE_EXAMPLE_APP_MAIN_VIEW_H
+#pragma once
 
 #include <string>
 
@@ -35,7 +33,7 @@ public:
 	{
 		std::string body(
 			"<h2>Hello from main view!</h2>"
-            "<ul>"
+			"<ul>"
 			"   <li><a href=\"form/profile/2048/name/YuriyLisovskiy\">Go to form!</a></li>"
 			"   <li><a href=\"picture/view/pic/\">View picture!</a></li>"
 			"</ul>"
@@ -53,6 +51,3 @@ public:
 	{
 	};
 };
-
-
-#endif // WASP_EXAMPLE_EXAMPLE_APP_MAIN_VIEW_H

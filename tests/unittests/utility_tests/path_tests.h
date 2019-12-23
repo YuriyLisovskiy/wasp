@@ -26,19 +26,34 @@
 
 __UNIT_TESTS_BEGIN__
 
-TEST(PathTestCase, baseName)
+TEST(PathTestCase, DirnameTest)
 {
-	std::string expected("/bar");
+	std::string expected("/foo");
 	std::string fullPath("/foo/bar");
-	ASSERT_EQ(path::base(fullPath), expected);
+	ASSERT_EQ(path::dirname(fullPath), expected);
 
-	expected = "bar";
+	expected = "";
 	fullPath = "bar";
-	ASSERT_EQ(path::base(fullPath), expected);
+	ASSERT_EQ(path::dirname(fullPath), expected);
 
-	expected = "/bar";
+	expected = "/";
 	fullPath = "/bar";
-	ASSERT_EQ(path::base(fullPath), expected);
+	ASSERT_EQ(path::dirname(fullPath), expected);
+}
+
+TEST(PathTestCase, FilenameTest)
+{
+	std::string expected("bar.txt");
+	std::string fullPath("/foo/bar.txt");
+	ASSERT_EQ(path::basename(fullPath), expected);
+
+	expected = "bar.txt";
+	fullPath = "bar.txt";
+	ASSERT_EQ(path::basename(fullPath), expected);
+
+	expected = "bar.txt";
+	fullPath = "/bar.txt";
+	ASSERT_EQ(path::basename(fullPath), expected);
 }
 
 TEST(PathTestCase, JoinTest)

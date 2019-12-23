@@ -60,11 +60,17 @@ extern void split_text(const std::string& full_path, std::string& root_out, std:
 /// @return true if path exists, otherwise returns false.
 extern bool exists(const std::string& path);
 
-/// Returns base from given path.
+/// Returns base directory name from given path.
 ///
 /// @param path: path to analyze.
 /// @return base of given path.
-extern std::string base(const std::string& path);
+extern std::string dirname(const std::string& path);
+
+/// Returns file name from given path.
+///
+/// @param path: path to analyze.
+/// @return file name of given path.
+extern std::string basename(const std::string& path);
 
 /// Returns file size in bytes.
 ///
