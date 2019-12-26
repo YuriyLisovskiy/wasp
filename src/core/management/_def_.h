@@ -16,29 +16,8 @@
  */
 
 /**
- * An implementation of wasp.h.
+ * _def_.h
+ * Purpose: core/management module's definitions.
  */
 
-#include "./wasp.h"
-
-
-__APPS_BEGIN__
-
-WaspApplication::WaspApplication(conf::Settings* settings)
-{
-	this->_settings = settings;
-}
-
-void WaspApplication::execute_from_command_line(int argc, char** argv, bool is_verbose)
-{
-	if (argc > 1)
-	{
-		if (this->_settings->COMMANDS.find(argv[1]) != this->_settings->COMMANDS.end())
-		{
-			auto command = this->_settings->COMMANDS[argv[1]];
-			command->run_from_argv(argc, argv, is_verbose);
-		}
-	}
-}
-
-__APPS_END__
+#include "../_def_.h"

@@ -19,6 +19,7 @@
 #include "../../src/conf/settings.h"
 #include "../../src/utility/path.h"
 #include "../../src/middleware/cookies.h"
+#include "../../src/core/management/commands/runserver.h"
 
 #include "../picture_app/app.h"
 #include "../form_app/app.h"
@@ -54,6 +55,10 @@ struct Settings : public wasp::conf::Settings
 
 		this->MIDDLEWARE = {
 			this->middleware<wasp::middleware::CookieMiddleware>()
+		};
+
+		this->COMMANDS = {
+			this->command<wasp::core::cmd::RunserverCommand>("runserver")
 		};
 
 		this->MEDIA_ROOT = wasp::path::join(this->BASE_DIR, "media");

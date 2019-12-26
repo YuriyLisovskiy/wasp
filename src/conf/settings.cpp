@@ -89,8 +89,6 @@ Settings::Settings()
 	this->CSRF_COOKIE_SAME_SITE = "Lax";
 	this->CSRF_HEADER_NAME = "HTTP_X_CSRFTOKEN";
 	this->CSRF_USE_SESSIONS = false;
-
-	this->QUEUE_THREADS_COUNT = 16;
 }
 
 Settings::~Settings()
@@ -103,6 +101,11 @@ Settings::~Settings()
 	for (auto& middleware : this->MIDDLEWARE)
 	{
 		delete middleware;
+	}
+
+	for (auto& command : this->COMMANDS)
+	{
+		delete command.second;
 	}
 }
 

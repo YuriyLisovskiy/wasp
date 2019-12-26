@@ -16,29 +16,19 @@
  */
 
 /**
- * An implementation of wasp.h.
+ * An implementation of command.h.
  */
 
-#include "./wasp.h"
+#include "./command.h"
 
 
-__APPS_BEGIN__
+__CORE_COMMANDS_BEGIN__
 
-WaspApplication::WaspApplication(conf::Settings* settings)
+Command::Command(
+	conf::Settings* settings, const std::string& cmd_name, const std::string& help
+) : BaseCommand(cmd_name, help)
 {
-	this->_settings = settings;
+	this->settings = settings;
 }
 
-void WaspApplication::execute_from_command_line(int argc, char** argv, bool is_verbose)
-{
-	if (argc > 1)
-	{
-		if (this->_settings->COMMANDS.find(argv[1]) != this->_settings->COMMANDS.end())
-		{
-			auto command = this->_settings->COMMANDS[argv[1]];
-			command->run_from_argv(argc, argv, is_verbose);
-		}
-	}
-}
-
-__APPS_END__
+__CORE_COMMANDS_END__

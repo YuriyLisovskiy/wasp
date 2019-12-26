@@ -46,7 +46,7 @@ protected:
 public:
 	virtual ~Flag() = default;
 	virtual std::string label() = 0;
-	virtual std::string help() = 0;
+	virtual std::string usage() = 0;
 };
 
 
@@ -60,7 +60,7 @@ public:
 		const std::string& label, const std::string& help, long default_val
 	);
 	std::string label() final;
-	std::string help() final;
+	std::string usage() final;
 	long get();
 };
 
@@ -74,7 +74,7 @@ public:
 		const std::string& label, const std::string& help, double default_val
 	);
 	std::string label() final;
-	std::string help() final;
+	std::string usage() final;
 	double get();
 };
 
@@ -88,7 +88,7 @@ public:
 		const std::string& label, const std::string& help, const std::string& default_val
 	);
 	std::string label() final;
-	std::string help() final;
+	std::string usage() final;
 	std::string get();
 };
 
@@ -97,7 +97,7 @@ class BoolFlag final: public Flag
 public:
 	BoolFlag(const std::string& label, const std::string& help);
 	std::string label() final;
-	std::string help() final;
+	std::string usage() final;
 	bool get();
 };
 

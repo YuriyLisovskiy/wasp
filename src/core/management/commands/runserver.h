@@ -16,30 +16,42 @@
  */
 
 /**
- * wasp.h
- * Purpose: an implementation of main Wasp application.
+ * runserver.h
+ * Purpose: runs server from command line.
  */
 
 #pragma once
+
+// C++ libraries.
 
 // Module definitions.
 #include "./_def_.h"
 
 // Wasp libraries.
-#include "./config.h"
-#include "../conf/settings.h"
+#include "./command.h"
+#include "../../../http/request.h"
+#include "../../../core/http_server.h"
+#include "../../../utility/flags/flags.h"
+#include "../../../utility/string/str.h"
 
 
-__APPS_BEGIN__
+__CORE_COMMANDS_BEGIN__
 
-class WaspApplication
+class RunserverCommand final: public Command
 {
 private:
-	conf::Settings* _settings;
+	flags::StringFlag* _host_port_flag;
+	flags::StringFlag* _host_flag;
+	flags::LongIntFlag* _port_flag;
+	flags::LongIntFlag* _threads_flag;
+
+protected:
+	void add_flags() final;
+	void handle() final;
+	std::function<void(http::HttpRequest*, const core::internal::socket_t&)> get_handler();
 
 public:
-	explicit WaspApplication(conf::Settings* settings);
-	void execute_from_command_line(int argc, char** argv, bool is_verbose = false);
+	explicit RunserverCommand(conf::Settings* settings);
 };
 
-__APPS_END__
+__CORE_COMMANDS_END__

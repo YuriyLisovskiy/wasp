@@ -42,7 +42,7 @@ std::string LongIntFlag::label()
 	return this->_label;
 }
 
-std::string LongIntFlag::help()
+std::string LongIntFlag::usage()
 {
 	return this->_help;
 }
@@ -70,7 +70,7 @@ std::string DoubleFlag::label()
 	return this->_label;
 }
 
-std::string DoubleFlag::help()
+std::string DoubleFlag::usage()
 {
 	return this->_help;
 }
@@ -98,7 +98,7 @@ std::string StringFlag::label()
 	return this->_label;
 }
 
-std::string StringFlag::help()
+std::string StringFlag::usage()
 {
 	return this->_help;
 }
@@ -124,7 +124,7 @@ std::string BoolFlag::label()
 	return this->_label;
 }
 
-std::string BoolFlag::help()
+std::string BoolFlag::usage()
 {
 	return this->_help;
 }

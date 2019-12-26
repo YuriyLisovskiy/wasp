@@ -20,10 +20,10 @@
  * TODO: write docs.
  */
 
-#ifndef WASP_CONF_SETTINGS_H
-#define WASP_CONF_SETTINGS_H
+#pragma once
 
 // C++ libraries.
+#include <map>
 #include <string>
 #include <vector>
 #include <regex>
@@ -35,6 +35,7 @@
 #include "../utility/logger.h"
 #include "../apps/config.h"
 #include "../middleware/interface.h"
+#include "../core/management/commands/base.h"
 
 
 __CONF_BEGIN__
@@ -70,6 +71,9 @@ struct Settings
 	// Order is required. The first app is interpreted as
 	// main application configuration.
 	std::vector<apps::AppConfig*> INSTALLED_APPS;
+
+	// List of commands to run from command line.
+	std::map<std::string, core::cmd::BaseCommand*> COMMANDS;
 
 	// List of paths where templates can be found.
 	std::vector<std::string> TEMPLATES;
@@ -195,14 +199,9 @@ struct Settings
 	std::vector<std::string> CSRF_TRUSTED_ORIGINS;
 	bool CSRF_USE_SESSIONS;
 
-	// Additional server settings.
-	// Threads count in queued thread pool.
-	size_t QUEUE_THREADS_COUNT;
-
 	Settings();
 	virtual ~Settings();
 
-	// TODO:
 	template <typename _T, typename = std::enable_if<std::is_base_of<apps::AppConfig, _T>::value>>
 	apps::AppConfig* app()
 	{
@@ -214,9 +213,12 @@ struct Settings
 	{
 		return new _T(this);
 	}
+
+	template <typename _CommandT, typename = std::enable_if<std::is_base_of<core::cmd::BaseCommand, _CommandT>::value>>
+	std::pair<std::string, core::cmd::BaseCommand*> command(const std::string& command_name)
+	{
+		return std::pair{command_name, new _CommandT(this)};
+	}
 };
 
 __CONF_END__
-
-
-#endif // WASP_CONF_SETTINGS_H

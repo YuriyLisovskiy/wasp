@@ -18,8 +18,8 @@
 
 #include <gtest/gtest.h>
 
-#include "../_def_.h"
-#include "../../../src/utility/flags/flag_set.h"
+#include "../../_def_.h"
+#include "../../../../src/utility/flags/flag_set.h"
 
 
 __UNIT_TESTS_BEGIN__
@@ -39,8 +39,7 @@ TEST(FlagsTestCase, ParseTest)
 	}
 
 	argv.push_back(nullptr);
-
-	fs.parse((int)argv.size() - 1, argv.data(), true);
+	fs.parse((int)argv.size() - 1, argv.data());
 
 	ASSERT_EQ(host->get(), "127.0.0.1");
 	ASSERT_EQ(port->get(), 8000);

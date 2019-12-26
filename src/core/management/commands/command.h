@@ -16,29 +16,31 @@
  */
 
 /**
- * An implementation of wasp.h.
+ * command.h
+ * Purpose: base class for all commands
  */
 
-#include "./wasp.h"
+#pragma once
+
+// Module definitions.
+#include "./_def_.h"
+
+// Wasp libraries.
+#include "./base.h"
+#include "../../../conf/settings.h"
 
 
-__APPS_BEGIN__
+__CORE_COMMANDS_BEGIN__
 
-WaspApplication::WaspApplication(conf::Settings* settings)
+class Command : public BaseCommand
 {
-	this->_settings = settings;
-}
+protected:
+	conf::Settings* settings;
 
-void WaspApplication::execute_from_command_line(int argc, char** argv, bool is_verbose)
-{
-	if (argc > 1)
-	{
-		if (this->_settings->COMMANDS.find(argv[1]) != this->_settings->COMMANDS.end())
-		{
-			auto command = this->_settings->COMMANDS[argv[1]];
-			command->run_from_argv(argc, argv, is_verbose);
-		}
-	}
-}
+public:
+	Command(
+		conf::Settings* settings, const std::string& cmd_name, const std::string& help
+	);
+};
 
-__APPS_END__
+__CORE_COMMANDS_END__
