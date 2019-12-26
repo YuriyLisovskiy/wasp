@@ -15,27 +15,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * An implementation of cookies.h.
- */
+#pragma once
 
-#include "./cookies.h"
+// Module definitions.
+#include "./_def_.h"
+
+// Wasp libraries.
+#include "../http/request.h"
+#include "../http/response.h"
 
 
 __MIDDLEWARE_BEGIN__
 
-CookieMiddleware::CookieMiddleware(wasp::conf::Settings* settings)
-	: MiddlewareMixin(settings)
+class IMiddleware
 {
-}
+public:
+	virtual ~IMiddleware() = default;
 
-void CookieMiddleware::process_request(http::HttpRequest* request)
-{
-	auto* cookies = core::internal::cookie_parser::parse_req_cookies(
-		request->headers.get("Cookie", "")
-	);
-	request->COOKIES = collections::Dict(*cookies);
-	delete cookies;
-}
+	/// An input http request before processing in views::View.
+	virtual void process_request(http::HttpRequest* request) = 0;
+
+	/// An output http request and response after processing in views::View.
+	virtual void process_response(const http::HttpRequest* request, http::HttpResponseBase* response) = 0;
+};
 
 __MIDDLEWARE_END__

@@ -16,26 +16,15 @@
  */
 
 /**
- * An implementation of cookies.h.
+ * _def_.h
+ * Purpose: utility/flags module's definitions.
  */
 
-#include "./cookies.h"
+#pragma once
+
+#include "../_def_.h"
 
 
-__MIDDLEWARE_BEGIN__
-
-CookieMiddleware::CookieMiddleware(wasp::conf::Settings* settings)
-	: MiddlewareMixin(settings)
-{
-}
-
-void CookieMiddleware::process_request(http::HttpRequest* request)
-{
-	auto* cookies = core::internal::cookie_parser::parse_req_cookies(
-		request->headers.get("Cookie", "")
-	);
-	request->COOKIES = collections::Dict(*cookies);
-	delete cookies;
-}
-
-__MIDDLEWARE_END__
+/// wasp::flags
+#define __FLAGS_BEGIN__ __WASP_BEGIN__ namespace flags {
+#define __FLAGS_END__ } __WASP_END__

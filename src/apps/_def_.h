@@ -16,26 +16,18 @@
  */
 
 /**
- * An implementation of cookies.h.
+ * _def_.h
+ * Purpose: apps module's definitions.
  */
 
-#include "./cookies.h"
+#ifndef WASP_APPS_DEF_H
+#define WASP_APPS_DEF_H
+
+#include "../_def_.h"
 
 
-__MIDDLEWARE_BEGIN__
+#define __APPS_BEGIN__ __WASP_BEGIN__ namespace apps {
+#define __APPS_END__ } __WASP_END__
 
-CookieMiddleware::CookieMiddleware(wasp::conf::Settings* settings)
-	: MiddlewareMixin(settings)
-{
-}
 
-void CookieMiddleware::process_request(http::HttpRequest* request)
-{
-	auto* cookies = core::internal::cookie_parser::parse_req_cookies(
-		request->headers.get("Cookie", "")
-	);
-	request->COOKIES = collections::Dict(*cookies);
-	delete cookies;
-}
-
-__MIDDLEWARE_END__
+#endif // WASP_APPS_DEF_H

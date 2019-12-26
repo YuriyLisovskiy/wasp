@@ -14,28 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#pragma once
 
-/**
- * An implementation of cookies.h.
- */
+#include "../../src/apps/config.h"
+#include "../../src/views/view.h"
 
-#include "./cookies.h"
+#include "./form_view.h"
 
 
-__MIDDLEWARE_BEGIN__
-
-CookieMiddleware::CookieMiddleware(wasp::conf::Settings* settings)
-	: MiddlewareMixin(settings)
+class FormAppConfig : public wasp::apps::AppConfig
 {
-}
-
-void CookieMiddleware::process_request(http::HttpRequest* request)
-{
-	auto* cookies = core::internal::cookie_parser::parse_req_cookies(
-		request->headers.get("Cookie", "")
-	);
-	request->COOKIES = collections::Dict(*cookies);
-	delete cookies;
-}
-
-__MIDDLEWARE_END__
+public:
+	FormAppConfig()
+	{
+		this->url<FormView>(
+			R"(profile/<user_id>([0-9]*)/name/<user_name>([A-Za-z]+)/?)",
+			"profile"
+		);
+	}
+};

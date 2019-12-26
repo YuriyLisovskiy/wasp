@@ -14,28 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#pragma once
 
-/**
- * An implementation of cookies.h.
- */
-
-#include "./cookies.h"
+#include "../../src/conf/settings.h"
 
 
-__MIDDLEWARE_BEGIN__
-
-CookieMiddleware::CookieMiddleware(wasp::conf::Settings* settings)
-	: MiddlewareMixin(settings)
+void override_settings(wasp::conf::Settings* settings)
 {
+	settings->DEBUG = false;
 }
-
-void CookieMiddleware::process_request(http::HttpRequest* request)
-{
-	auto* cookies = core::internal::cookie_parser::parse_req_cookies(
-		request->headers.get("Cookie", "")
-	);
-	request->COOKIES = collections::Dict(*cookies);
-	delete cookies;
-}
-
-__MIDDLEWARE_END__

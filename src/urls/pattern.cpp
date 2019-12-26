@@ -30,13 +30,21 @@ UrlPattern::UrlPattern(
 	const std::string& name
 )
 {
-	this->_s = this->_parse(rgx);
+	this->_orig = rgx;
+	this->_s = this->_parse(this->_orig);
 	this->_rgx = std::regex(this->_s);
 	this->_handler = handler;
 	this->_name = name;
 }
 
-std::string UrlPattern::name()
+UrlPattern::UrlPattern(const std::string& prefix, const UrlPattern& url_pattern)
+	: UrlPattern(
+		prefix + url_pattern._orig, url_pattern._handler, url_pattern._name
+	)
+{
+}
+
+std::string UrlPattern::get_name()
 {
 	return this->_name;
 }
@@ -52,20 +60,24 @@ http::HttpResponseBase* UrlPattern::apply(
 
 bool UrlPattern::match(const std::string& url, std::map<std::string, std::string>& args)
 {
-	std::smatch matches;
-	bool matched = std::regex_search(url, matches, this->_rgx);
-	if (matched)
+	if (std::regex_match(url, this->_rgx))
 	{
-		for (size_t i = 1; i < matches.size(); i++)
+		std::smatch matches;
+		if (std::regex_search(url, matches, this->_rgx))
 		{
-			if (matches[i].matched)
+			for (size_t i = 1; i < matches.size(); i++)
 			{
-				args[this->_keys[i - 1]] = matches[i].str();
+				if (matches[i].matched)
+				{
+					args[this->_keys[i - 1]] = matches[i].str();
+				}
 			}
 		}
+
+		return true;
 	}
 
-	return matched;
+	return false;
 }
 
 std::string UrlPattern::build(const std::vector<std::string>& args)

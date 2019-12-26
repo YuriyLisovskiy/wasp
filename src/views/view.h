@@ -47,13 +47,13 @@
 __VIEWS_BEGIN__
 
 typedef std::function<http::HttpResponseBase*(
-	http::HttpRequest*, Args*, utility::ILogger*
+	http::HttpRequest*, views::Args*, utility::ILogger*
 )> ViewHandler;
+
 
 class View
 {
 protected:
-	/// View's logger.
 	utility::ILogger* _logger;
 
 	/// Holds pointer to client's request.
@@ -164,30 +164,6 @@ public:
 	///
 	/// @return std::vector of strings.
 	std::vector<std::string> allowed_methods();
-
-	/// An entry point for a request-response process.
-	///
-	/// @tparam _ViewT: View or it's derived class. Class definition
-	/// 	must contains constructor with the next parameter:
-	/// 	utility::ILogger* logger = nullptr
-	/// @return std::function which accepts request and url arguments,
-	/// 	and returns pointer to HttpResponse instance.
-	template <typename _ViewT>
-	static ViewHandler make_view()
-	{
-		ViewHandler func = [](
-			http::HttpRequest* request,
-			Args* args,
-			utility::ILogger* logger
-		) -> http::HttpResponseBase*
-		{
-			_ViewT view(logger);
-			view.setup(request);
-			return view.dispatch(args);
-		};
-
-		return func;
-	}
 
 protected:
 	explicit View(const std::vector<std::string>& allowed_methods, utility::ILogger* logger = nullptr);

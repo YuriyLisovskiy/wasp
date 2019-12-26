@@ -14,28 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#pragma once
 
-/**
- * An implementation of cookies.h.
- */
+#include "../../src/apps/config.h"
+#include "../../src/views/view.h"
 
-#include "./cookies.h"
+#include "main_view.h"
+#include "../form_app/app.h"
+#include "../picture_app/app.h"
 
 
-__MIDDLEWARE_BEGIN__
-
-CookieMiddleware::CookieMiddleware(wasp::conf::Settings* settings)
-	: MiddlewareMixin(settings)
+class MainAppConfig : public wasp::apps::AppConfig
 {
-}
-
-void CookieMiddleware::process_request(http::HttpRequest* request)
-{
-	auto* cookies = core::internal::cookie_parser::parse_req_cookies(
-		request->headers.get("Cookie", "")
-	);
-	request->COOKIES = collections::Dict(*cookies);
-	delete cookies;
-}
-
-__MIDDLEWARE_END__
+public:
+	MainAppConfig()
+	{
+		this->url<MainView>(R"(index/?)", "index");
+		this->include(R"(picture/)", new PictureAppConfig());
+		this->include(R"(form/)", new FormAppConfig());
+		this->url<RedirectView>(R"(/?)", "root");
+	}
+};

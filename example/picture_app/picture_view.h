@@ -14,28 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#pragma once
 
-/**
- * An implementation of cookies.h.
- */
+#include <string>
 
-#include "./cookies.h"
+#include "../../src/views/view.h"
 
 
-__MIDDLEWARE_BEGIN__
-
-CookieMiddleware::CookieMiddleware(wasp::conf::Settings* settings)
-	: MiddlewareMixin(settings)
+class PictureView : public wasp::views::View
 {
-}
+public:
+	explicit PictureView(wasp::utility::ILogger* logger = nullptr)
+		: View({"get"}, logger)
+	{
+	}
 
-void CookieMiddleware::process_request(http::HttpRequest* request)
-{
-	auto* cookies = core::internal::cookie_parser::parse_req_cookies(
-		request->headers.get("Cookie", "")
-	);
-	request->COOKIES = collections::Dict(*cookies);
-	delete cookies;
-}
-
-__MIDDLEWARE_END__
+	wasp::http::HttpResponseBase* get(wasp::http::HttpRequest* request, wasp::views::Args* args) final
+	{
+		std::string body(R"(<img src="/static/pontar.png" alt="Night over Pontar river" width="1000">)");
+		return new wasp::http::HttpResponse(body);
+	}
+};

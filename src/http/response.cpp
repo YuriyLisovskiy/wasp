@@ -352,7 +352,7 @@ void FileResponse::_set_headers()
 
 	std::string disposition = this->_as_attachment ? "attachment" : "inline";
 	std::string file_expr;
-	std::string file_name = path::base(this->_file_path);
+	std::string file_name = path::basename(this->_file_path);
 	try
 	{
 		file_expr = "filename=\"" + encoding::encode(file_name, encoding::ASCII) + "\"";

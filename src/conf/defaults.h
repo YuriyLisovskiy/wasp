@@ -39,12 +39,6 @@ const char* const STARTUP_MESSAGE = "Wasp version 0.0.1-dev, using app settings"
 									"\nStarting development server at {0!s}://{1!s}:{2!d}/"
 		                            "\nQuit the server with CONTROL-C.";
 
-// Max size of request's body which server can handle.
-const size_t MAX_BODY_SIZE = 2621440; // 2.5 MB
-
-// Threads count in queued thread pool.
-const size_t DEFAULT_THREADS_COUNT = 16;
-
 __CONF_INTERNAL_END__
 
 

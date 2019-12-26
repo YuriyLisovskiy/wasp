@@ -1,0 +1,71 @@
+/*
+ * Copyright (c) 2019 Yuriy Lisovskiy
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**
+ * flag_set.h
+ * Purpose: represents set of flags which can be parsed from char** argv
+ */
+
+#pragma once
+
+// C++ libraries.
+#include <map>
+#include <string>
+#include <iostream>
+
+// Module definitions.
+#include "./_def_.h"
+
+// Wasp libraries.
+#include "./flags.h"
+#include "../string/str.h"
+
+
+__FLAGS_BEGIN__
+
+class FlagSet final
+{
+private:
+	std::string _name;
+	std::map<std::string, Flag*> _flags;
+
+	struct flag_parser
+	{
+		std::map<std::string, std::string> flags;
+
+		explicit flag_parser(int argc, char** argv, bool is_verbose = false);
+		bool exists(const std::string& label);
+		std::string get_arg(const std::string& label);
+	};
+
+public:
+	explicit FlagSet(const std::string& name);
+	~FlagSet();
+	void parse(int argc, char** argv, bool is_verbose = false);
+	LongIntFlag* make_long(
+		const std::string& label, long default_val, const std::string& help
+	);
+	DoubleFlag* make_double(
+		const std::string& label, double default_val, const std::string& help
+	);
+	StringFlag* make_string(
+		const std::string& label, const std::string& default_val, const std::string& help
+	);
+	BoolFlag* make_bool(const std::string& label, const std::string& help);
+};
+
+__FLAGS_END__

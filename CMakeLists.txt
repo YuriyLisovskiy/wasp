@@ -25,12 +25,16 @@ set(CMAKE_CXX_FLAGS "-pthread")
 
 
 file(GLOB LIB_FILES
+	"src/apps/*.h"
+	"src/apps/*.cpp"
 	"src/conf/*.h"
 	"src/conf/*.cpp"
 	"src/utility/*.h"
 	"src/utility/*.cpp"
 	"src/utility/string/*.h"
 	"src/utility/string/*.cpp"
+	"src/utility/flags/*.h"
+	"src/utility/flags/*.cpp"
 	"src/collections/*.h"
 	"src/collections/*.cpp"
 	"src/core/datetime/*.h"
@@ -123,6 +127,8 @@ target_link_libraries(${PACKAGE_MAIN_UNIT_TESTS} gtest gtest_main rt pthread ${T
 # Setup example program.
 file(GLOB EXAMPLE_SRC
 	"example/*.h"
+	"example/*/*.h"
+	"example/*/*.cpp"
 )
 if(EXISTS "${PROJECT_SOURCE_DIR}/example/main.cpp")
 	add_executable(example ${LIB_SRC} ${EXAMPLE_SRC} "example/main.cpp")

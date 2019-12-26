@@ -27,25 +27,27 @@
 #include "./_def_.h"
 
 // Wasp libraries.
+#include "./interface.h"
 #include "../http/request.h"
 #include "../http/response.h"
+#include "../conf/settings.h"
 
 
 __MIDDLEWARE_BEGIN__
 
-class MiddlewareMixin
+class MiddlewareMixin : public IMiddleware
 {
+protected:
+	conf::Settings* settings;
+
 public:
+	explicit MiddlewareMixin(conf::Settings* settings);
+	~MiddlewareMixin() override = default;
 
-	/// An input http request before processing in views::View.
-	virtual void process_request(http::HttpRequest* request)
-	{
-	};
-
-	/// An output http request and response after processing in views::View.
-	virtual void process_response(const http::HttpRequest* request, http::HttpResponse* response)
-	{
-	};
+	void process_request(http::HttpRequest* request) override;
+	void process_response(
+		const http::HttpRequest* request, http::HttpResponseBase* response
+	) override;
 };
 
 __MIDDLEWARE_END__

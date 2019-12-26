@@ -14,40 +14,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#pragma once
 
-#ifndef WASP_FORM_VIEW_H
-#define WASP_FORM_VIEW_H
-
-#include "../src/views/generic.h"
-#include "../src/utility/logger.h"
-
-using wasp::http::HttpRequest;
-using wasp::http::HttpResponse;
-using wasp::http::HttpResponseBase;
-
-
-template<class... Args>
-void print(Args&&... args)
-{
-	(std::cout << ... << args) << "\n";
-}
+#include "../../src/views/generic.h"
+#include "../../src/utility/logger.h"
+#include "../../src/apps/config.h"
 
 
 class FormView : public wasp::views::View
 {
 public:
-	explicit FormView(wasp::utility::ILogger* logger = nullptr) : View({"get", "post"}, logger) {}
-
-	HttpResponseBase* get(HttpRequest* request, wasp::views::Args* args) final
+	explicit FormView(wasp::utility::ILogger* logger = nullptr)
+		: wasp::views::View({"get", "post"}, logger)
 	{
-		std::cout << "\n\n" << request->path();
+	}
 
-		if (request->FILES.contains("super_file"))
-		{
-			auto super_file = request->FILES.get("super_file");
-			super_file.save();
-		}
-
+	wasp::http::HttpResponseBase* get(wasp::http::HttpRequest* request, wasp::views::Args* args) final
+	{
 		std::string user_row;
 		if (args->contains("user_name"))
 		{
@@ -66,8 +49,7 @@ public:
 
 		std::string body(
 			user_row +
-			"<img src=\"/static/pontar.png\" alt=\"Night over Pontar river\" height=\"100\" width=\"100\">"
-			"<form action=\"/hello\" method=\"post\" enctype=\"multipart/form-data\">\n"
+			"<form method=\"post\" enctype=\"multipart/form-data\">\n"
 			"\t<input type=\"file\" name=\"super_file\" />\n"
 			"\t<input type=\"email\" name=\"mail\" />\n"
 			"\t<input type=\"text\" name=\"name\" />\n"
@@ -76,14 +58,17 @@ public:
 			"\t</form>\n"
 		);
 
-		return new HttpResponse(body);
+		return new wasp::http::HttpResponse(body);
 	}
 
-	HttpResponseBase* post(HttpRequest* request, wasp::views::Args* args) final
+	wasp::http::HttpResponseBase* post(wasp::http::HttpRequest* request, wasp::views::Args* args) final
 	{
-		return this->get(request, args);
+		if (request->FILES.contains("super_file"))
+		{
+			auto super_file = request->FILES.get("super_file");
+			super_file.save();
+		}
+
+		return new wasp::http::HttpResponseRedirect("/index");
 	}
 };
-
-
-#endif // WASP_FORM_VIEW_H

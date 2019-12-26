@@ -55,6 +55,7 @@ private:
 	};
 
 	std::string _s;
+	std::string _orig;
 	std::regex _rgx;
 	std::vector<std::string> _pattern_parts;
 	views::ViewHandler _handler;
@@ -67,8 +68,12 @@ public:
 		const views::ViewHandler& handler,
 		const std::string& name
 	);
+	UrlPattern(
+		const std::string& prefix,
+		const UrlPattern& url_pattern
+	);
 
-	std::string name();
+	std::string get_name();
 	http::HttpResponseBase* apply(
 		http::HttpRequest* request,
 		views::Args* args = nullptr,

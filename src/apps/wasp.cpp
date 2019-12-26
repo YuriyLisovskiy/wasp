@@ -16,26 +16,17 @@
  */
 
 /**
- * An implementation of cookies.h.
+ * An implementation of wasp.h.
  */
 
-#include "./cookies.h"
+#include "./wasp.h"
 
 
-__MIDDLEWARE_BEGIN__
+__APPS_BEGIN__
 
-CookieMiddleware::CookieMiddleware(wasp::conf::Settings* settings)
-	: MiddlewareMixin(settings)
+WaspApplication::WaspApplication()
 {
+	// TODO:
 }
 
-void CookieMiddleware::process_request(http::HttpRequest* request)
-{
-	auto* cookies = core::internal::cookie_parser::parse_req_cookies(
-		request->headers.get("Cookie", "")
-	);
-	request->COOKIES = collections::Dict(*cookies);
-	delete cookies;
-}
-
-__MIDDLEWARE_END__
+__APPS_END__

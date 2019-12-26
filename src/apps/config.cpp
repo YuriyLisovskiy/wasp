@@ -16,26 +16,30 @@
  */
 
 /**
- * An implementation of cookies.h.
+ * An implementation of config.h.
  */
 
-#include "./cookies.h"
+#include "./config.h"
 
 
-__MIDDLEWARE_BEGIN__
+__APPS_BEGIN__
 
-CookieMiddleware::CookieMiddleware(wasp::conf::Settings* settings)
-	: MiddlewareMixin(settings)
+std::vector<urls::UrlPattern> AppConfig::get_urlpatterns()
 {
+	return this->_urlpatterns;
 }
 
-void CookieMiddleware::process_request(http::HttpRequest* request)
+void AppConfig::include(const std::string& prefix, AppConfig* app)
 {
-	auto* cookies = core::internal::cookie_parser::parse_req_cookies(
-		request->headers.get("Cookie", "")
-	);
-	request->COOKIES = collections::Dict(*cookies);
-	delete cookies;
+	auto included_urlpatterns = app->get_urlpatterns();
+	app->_urlpatterns.clear();
+	for (const auto& pattern : included_urlpatterns)
+	{
+		this->_urlpatterns.emplace_back(
+			str::rtrim(str::starts_with(prefix, "/") ? prefix : "/" + prefix, '/'),
+			pattern
+		);
+	}
 }
 
-__MIDDLEWARE_END__
+__APPS_END__
