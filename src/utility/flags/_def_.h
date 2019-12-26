@@ -15,14 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WASP_UNIT_TESTS_UTILITY_TESTS_INCLUDE_H
-#define WASP_UNIT_TESTS_UTILITY_TESTS_INCLUDE_H
+/**
+ * _def_.h
+ * Purpose: utility/flags module's definitions.
+ */
 
-#include "./string_tests/include.h"
+#pragma once
 
-#include "./flags_tests.h"
-#include "./encoding_tests.h"
-#include "./mime_types_tests.h"
-#include "./path_tests.h"
+#include "../_def_.h"
 
-#endif // WASP_UNIT_TESTS_UTILITY_TESTS_INCLUDE_H
+
+/// wasp::flags
+#define __FLAGS_BEGIN__ __WASP_BEGIN__ namespace flags {
+#define __FLAGS_END__ } __WASP_END__

@@ -187,4 +187,25 @@ std::string trim(const std::string& s, char ch)
 	return copy;
 }
 
+std::string ltrim(std::string&& s, char ch)
+{
+	std::string copy = s;
+	ltrim(copy, ch);
+	return copy;
+}
+
+std::string rtrim(std::string&& s, char ch)
+{
+	std::string copy = s;
+	rtrim(copy, ch);
+	return copy;
+}
+
+std::string trim(std::string&& s, char ch)
+{
+	std::string copy = s;
+	trim(copy, ch);
+	return copy;
+}
+
 __STR_END__

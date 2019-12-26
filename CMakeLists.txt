@@ -33,6 +33,8 @@ file(GLOB LIB_FILES
 	"src/utility/*.cpp"
 	"src/utility/string/*.h"
 	"src/utility/string/*.cpp"
+	"src/utility/flags/*.h"
+	"src/utility/flags/*.cpp"
 	"src/collections/*.h"
 	"src/collections/*.cpp"
 	"src/core/datetime/*.h"
