@@ -555,16 +555,6 @@ void HttpServer::_normalize_context(HttpServer::context& ctx)
 		ctx.port = conf::internal::DEFAULT_PORT;
 	}
 
-	if (ctx.max_body_size == 0)
-	{
-		ctx.max_body_size = conf::internal::MAX_BODY_SIZE;
-	}
-
-	if (ctx.threads_count == 0)
-	{
-		ctx.threads_count = conf::internal::DEFAULT_THREADS_COUNT;
-	}
-
 	if (ctx.handler == nullptr)
 	{
 		throw HttpError("HttpServer::Context::handler can not be nullptr", _ERROR_DETAILS_);

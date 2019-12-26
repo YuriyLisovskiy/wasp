@@ -50,6 +50,8 @@ __MIDDLEWARE_BEGIN__
 class XFrameOptionsMiddleware : public MiddlewareMixin
 {
 public:
+	explicit XFrameOptionsMiddleware(conf::Settings* settings);
+
 	void process_response(const http::HttpRequest* request, http::HttpResponseBase* response) final;
 };
 

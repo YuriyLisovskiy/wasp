@@ -53,7 +53,7 @@ private:
 	collections::Dict<std::string, std::string>* _kwargs = nullptr;
 
 public:
-	explicit StaticView(wasp::utility::ILogger* logger = nullptr) : View({"get"}, logger) {}
+	explicit StaticView(utility::ILogger* logger);
 
 	void set_kwargs(collections::Dict<std::string, std::string>* kwargs);
 

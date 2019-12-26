@@ -34,8 +34,7 @@
 // Wasp libraries.
 #include "../utility/logger.h"
 #include "../apps/config.h"
-#include "../views/view.h"
-#include "../middleware/middleware_mixin.h"
+#include "../middleware/interface.h"
 
 
 __CONF_BEGIN__
@@ -44,7 +43,7 @@ struct Settings
 {
 	bool DEBUG;
 
-	wasp::utility::ILogger* LOGGER;
+	utility::ILogger* LOGGER;
 
 	// Build paths inside the project like this: wasp::path::join(BASE_DIR, ...)
 	std::string BASE_DIR;
@@ -182,10 +181,7 @@ struct Settings
 	//# List of middleware to use. Order is important; in the request phase, these
 	//# middleware will be applied in the order given, and in the response
 	//# phase the middleware will be applied in reverse order.
-	std::vector<middleware::MiddlewareMixin*> MIDDLEWARE;
-
-	// Used as view when a request is rejected by the CSRF middleware.
-	views::View* CSRF_FAILURE_VIEW;
+	std::vector<middleware::IMiddleware*> MIDDLEWARE;
 
 	// Settings for CSRF cookie.
 	std::string CSRF_COOKIE_NAME;
@@ -213,18 +209,10 @@ struct Settings
 		return new _T();
 	}
 
-	// TODO:
-	template <typename _T, typename = std::enable_if<std::is_base_of<middleware::MiddlewareMixin, _T>::value>>
-	middleware::MiddlewareMixin* middleware()
+	template <typename _T, typename = std::enable_if<std::is_base_of<middleware::IMiddleware, _T>::value>>
+	middleware::IMiddleware* middleware()
 	{
-		return new _T();
-	}
-
-	// TODO:
-	template <typename _T, typename = std::enable_if<std::is_base_of<views::View, _T>::value>>
-	views::View* view()
-	{
-		return new _T();
+		return new _T(this);
 	}
 };
 

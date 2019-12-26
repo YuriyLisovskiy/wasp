@@ -45,12 +45,23 @@ private:
 	std::vector<urls::UrlPattern> _urlpatterns;
 
 protected:
-	template <typename _T, typename = std::enable_if<std::is_base_of<views::View, _T>::value>>
+	template <typename _ViewT, typename = std::enable_if<std::is_base_of<views::View, _ViewT>::value>>
 	void url(const std::string& pattern, const std::string& name = "")
 	{
+		views::ViewHandler view_handler = [](
+			http::HttpRequest* request,
+			views::Args* args,
+			utility::ILogger* logger
+		) -> http::HttpResponseBase*
+		{
+			_ViewT view(logger);
+			view.setup(request);
+			return view.dispatch(args);
+		};
+
 		this->_urlpatterns.push_back(urls::make_url(
 			str::starts_with(pattern, "/") ? pattern : "/" + pattern,
-			views::View::make_view<_T>(),
+			view_handler,
 			name
 		));
 	}

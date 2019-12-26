@@ -24,12 +24,17 @@
 
 __VIEWS_BEGIN__
 
+StaticView::StaticView(utility::ILogger* logger)
+	: View({"get"}, logger)
+{
+}
+
 void StaticView::set_kwargs(collections::Dict<std::string, std::string>* kwargs)
 {
 	this->_kwargs = kwargs;
 }
 
-http::HttpResponseBase* StaticView::get(http::HttpRequest* request, wasp::views::Args* args)
+http::HttpResponseBase* StaticView::get(http::HttpRequest* request, Args* args)
 {
 	if (!this->_kwargs)
 	{

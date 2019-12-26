@@ -24,6 +24,11 @@
 
 __MIDDLEWARE_BEGIN__
 
+XFrameOptionsMiddleware::XFrameOptionsMiddleware(conf::Settings* settings)
+	: MiddlewareMixin(settings)
+{
+}
+
 void XFrameOptionsMiddleware::process_response(
 	const http::HttpRequest* request, http::HttpResponseBase* response
 )

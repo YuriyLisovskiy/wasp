@@ -16,26 +16,27 @@
  */
 
 /**
- * An implementation of cookies.h.
+ * An implementation of middleware_mixin.h.
  */
 
-#include "./cookies.h"
+#include "./middleware_mixin.h"
 
 
 __MIDDLEWARE_BEGIN__
 
-CookieMiddleware::CookieMiddleware(wasp::conf::Settings* settings)
-	: MiddlewareMixin(settings)
+MiddlewareMixin::MiddlewareMixin(conf::Settings* settings)
 {
+	this->settings = settings;
 }
 
-void CookieMiddleware::process_request(http::HttpRequest* request)
+void MiddlewareMixin::process_request(http::HttpRequest* request)
 {
-	auto* cookies = core::internal::cookie_parser::parse_req_cookies(
-		request->headers.get("Cookie", "")
-	);
-	request->COOKIES = collections::Dict(*cookies);
-	delete cookies;
-}
+};
+
+void MiddlewareMixin::process_response(
+	const http::HttpRequest* request, http::HttpResponseBase* response
+)
+{
+};
 
 __MIDDLEWARE_END__

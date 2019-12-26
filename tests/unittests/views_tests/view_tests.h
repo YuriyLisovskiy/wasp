@@ -177,18 +177,6 @@ TEST_F(ViewTestCase, DispatchNotAllowedTest)
 	delete response;
 }
 
-TEST(ViewTestCaseStatic, MakeViewTest)
-{
-	auto request = ViewTestCase::make_request("options");
-	auto view = views::View::make_view<views::View>();
-
-	auto response = view(&request, nullptr, nullptr);
-
-	ASSERT_EQ(response->status(), 200);
-
-	delete response;
-}
-
 __UNIT_TESTS_END__
 
 

@@ -28,7 +28,7 @@ Settings::Settings()
 {
 	this->DEBUG = false;
 
-	this->LOGGER = wasp::utility::Logger::get_instance();
+	this->LOGGER = utility::Logger::get_instance();
 
 	this->ALLOWED_HOSTS = {"127.0.0.1", "localhost"};
 
@@ -80,8 +80,6 @@ Settings::Settings()
 	this->USE_X_FORWARDED_HOST = false;
 	this->USE_X_FORWARDED_PORT = false;
 
-	this->CSRF_FAILURE_VIEW = nullptr;
-
 	this->CSRF_COOKIE_NAME = "csrftoken";
 	this->CSRF_COOKIE_AGE = 60 * 60 * 24 * 7 * 52;
 	this->CSRF_COOKIE_DOMAIN = "";
@@ -106,8 +104,6 @@ Settings::~Settings()
 	{
 		delete middleware;
 	}
-
-	delete this->CSRF_FAILURE_VIEW;
 }
 
 __CONF_END__

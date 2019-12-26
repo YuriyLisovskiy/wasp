@@ -30,6 +30,7 @@
 #include "./middleware_mixin.h"
 #include "../http/request.h"
 #include "../http/response.h"
+#include "../conf/settings.h"
 #include "../collections/dict.h"
 #include "../core/parsers/cookie_parser.h"
 
@@ -39,6 +40,7 @@ __MIDDLEWARE_BEGIN__
 class CookieMiddleware final: public MiddlewareMixin
 {
 public:
+	explicit CookieMiddleware(conf::Settings* settings);
 	void process_request(http::HttpRequest* request) final;
 };
 
