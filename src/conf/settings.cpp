@@ -28,7 +28,7 @@ Settings::Settings()
 {
 	this->DEBUG = false;
 
-	this->LOGGER = utility::Logger::get_instance();
+	this->LOGGER = utility::Logger::get_instance({});
 
 	this->TIME_ZONE = "America/Chicago";
 

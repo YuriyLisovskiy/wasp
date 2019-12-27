@@ -22,6 +22,9 @@
 
 #pragma once
 
+// C++ libraries.
+#include <iostream>
+
 // Module definitions.
 #include "./_def_.h"
 
@@ -32,10 +35,11 @@
 
 __APPS_BEGIN__
 
-class WaspApplication
+class WaspApplication final
 {
 private:
 	conf::Settings* _settings;
+	std::string _help_message;
 
 public:
 	explicit WaspApplication(conf::Settings* settings);

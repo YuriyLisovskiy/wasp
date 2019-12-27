@@ -28,14 +28,23 @@ Logger::~Logger()
 	Logger::_instance = nullptr;
 }
 
-ILogger* Logger::get_instance()
+ILogger* Logger::get_instance(const Logger::Config& cfg)
 {
 	if (Logger::_instance == nullptr)
 	{
-		Logger::_instance = new Logger();
+		Logger::_instance = new Logger(cfg);
 	}
 
 	return Logger::_instance;
+}
+
+Logger::Logger(const Logger::Config& cfg)
+{
+	this->_config = cfg;
+	if (cfg.streams.empty())
+	{
+		this->_config.streams.emplace_back(&std::cout);
+	}
 }
 
 void Logger::info(const std::string& msg, int line, const char* function, const char* file)
@@ -65,11 +74,7 @@ void Logger::fatal(const std::string& msg, int line, const char* function, const
 
 void Logger::trace(const std::string& msg, int line, const char* function, const char* file)
 {
-	this->write_to_stream(
-		"Traceback (exception):\n  File \"" + std::string(file) + "\", line " +
-		std::to_string(line) + ", in " + std::string(function) + "\n" + msg + "\n",
-		Logger::log_level_enum::ll_error
-	);
+	this->log(msg, line, function, file, Logger::log_level_enum::ll_trace);
 }
 
 void Logger::trace(const char* msg, int line, const char* function, const char* file)
@@ -80,47 +85,79 @@ void Logger::trace(const char* msg, int line, const char* function, const char* 
 void Logger::log(const std::string& msg, int line, const char* function, const char* file, Logger::log_level_enum level)
 {
 	std::string level_name;
+	bool is_enabled;
+	const char* colour;
 	switch (level)
 	{
 		case Logger::log_level_enum::ll_warning:
 			level_name = "[warning]";
+			is_enabled = this->_config.log_warning;
+			colour = Logger::YELLOW;
 			break;
 		case Logger::log_level_enum::ll_error:
 			level_name = "[error]";
+			is_enabled = this->_config.log_error;
+			colour = Logger::RED;
 			break;
 		case Logger::log_level_enum::ll_debug:
 			level_name = "[debug]";
+			is_enabled = this->_config.log_debug;
+			colour = Logger::MAGENTA;
 			break;
 		case Logger::log_level_enum::ll_fatal:
 			level_name = "[fatal]";
+			is_enabled = this->_config.log_fatal;
+			colour = Logger::BOLD_RED;
+			break;
+		case Logger::log_level_enum::ll_trace:
+			level_name = "[trace]";
+			is_enabled = this->_config.log_trace;
+			colour = Logger::RED;
 			break;
 		default:
 			level_name = "[info]";
+			is_enabled = this->_config.log_info;
+			colour = Logger::CYAN;
 			break;
 	}
-	std::locale::global(std::locale("uk_UA.utf8"));
-	std::time_t t = std::time(nullptr);
-	char now[100];
-	std::strftime(now, sizeof(now), "%F %T", std::localtime(&t));
+	if (!is_enabled)
+	{
+		return;
+	}
 
 	std::string full_msg;
-	if (line == 0 && std::strlen(file) > 0 && std::strlen(function) > 0)
+	if (line != 0 && std::strlen(file) > 0 && std::strlen(function) > 0)
 	{
-		full_msg = "\tFile \"" + std::string(file) + "\", line " + std::to_string(line) + ", in " + std::string(function) + "\n" + msg;
+		full_msg = "\tFile \"" + std::string(file) + "\", line "
+			+ std::to_string(line) + ", in "
+			+ std::string(function) + "\n" + msg;
 	}
 	else
 	{
 		full_msg = msg;
 	}
 
-	this->write_to_stream("[" + std::string(now) + "] [" + "thread id" + "] " + level_name + ":\n" + full_msg + "\n", level);
+	std::string result = "[" + dt::now().strftime("%F %T") +
+		"] " + level_name + ":\n" + full_msg + "\n";
+	this->write_to_stream(result, colour);
 }
 
-void Logger::write_to_stream(const std::string& msg, Logger::log_level_enum level)
+void Logger::write_to_stream(const std::string& msg, const char* colour)
 {
-	// TODO: add multiple streams support
-	std::cout << '\n' << msg;
-	std::cout.flush();
+	for (auto& stream : this->_config.streams)
+	{
+		*stream << '\n' << colour << msg << Logger::DEFAULT << '\n';
+	}
+
+	this->flush();
+}
+
+void Logger::flush()
+{
+	for (auto& stream : this->_config.streams)
+	{
+		stream->flush();
+	}
 }
 
 __UTILITY_END__

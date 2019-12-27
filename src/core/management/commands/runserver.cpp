@@ -161,11 +161,11 @@ void RunserverCommand::handle()
 	catch (const core::InterruptException& exc)
 	{
 		server.finish();
-		this->settings->LOGGER->debug("Finished", _ERROR_DETAILS_);
+		this->settings->LOGGER->debug("Finished");
 	}
 	catch (const std::exception& exc)
 	{
-		std::cout << exc.what();
+		this->settings->LOGGER->debug(exc.what(), _ERROR_DETAILS_);
 	}
 }
 
