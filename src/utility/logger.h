@@ -20,14 +20,15 @@
 
 // C++ libraries.
 #include <iostream>
+#include <vector>
 #include <string>
-#include <ostream>
-#include <ctime>
-#include <locale>
 #include <cstring>
 
 // Module definitions.
 #include "./_def_.h"
+
+// Wasp libraries.
+#include "../core/datetime/datetime.h"
 
 
 __UTILITY_BEGIN__
@@ -36,40 +37,72 @@ class ILogger
 {
 public:
 	virtual ~ILogger() = default;
-	virtual void info(const std::string& msg, int line, const char* function, const char* file) = 0;
-	virtual void debug(const std::string& msg, int line, const char* function, const char* file) = 0;
-	virtual void warning(const std::string& msg, int line, const char* function, const char* file) = 0;
-	virtual void error(const std::string& msg, int line, const char* function, const char* file) = 0;
-	virtual void fatal(const std::string& msg, int line, const char* function, const char* file) = 0;
-	virtual void trace(const std::string& msg, int line, const char* function, const char* file) = 0;
-	virtual void trace(const char* msg, int line, const char* function, const char* file) = 0;
+	virtual void info(const std::string& msg, int line = 0, const char* function = "", const char* file = "") = 0;
+	virtual void debug(const std::string& msg, int line = 0, const char* function = "", const char* file = "") = 0;
+	virtual void warning(const std::string& msg, int line = 0, const char* function = "", const char* file = "") = 0;
+	virtual void error(const std::string& msg, int line = 0, const char* function = "", const char* file = "") = 0;
+	virtual void fatal(const std::string& msg, int line = 0, const char* function = "", const char* file = "") = 0;
+	virtual void trace(const std::string& msg, int line = 0, const char* function = "", const char* file = "") = 0;
+	virtual void trace(const char* msg, int line = 0, const char* function = "", const char* file = "") = 0;
 };
 
 class Logger : public ILogger
 {
 public:
-	static ILogger* get_instance();
+	struct Config
+	{
+		bool log_info = true;
+		bool log_debug = true;
+		bool log_warning = true;
+		bool log_error = true;
+		bool log_fatal = true;
+		bool log_trace = true;
+		std::vector<std::ostream*> streams;
+	};
 
-	void info(const std::string& msg, int line, const char* function, const char* file) override;
-	void debug(const std::string& msg, int line, const char* function, const char* file) override;
-	void warning(const std::string& msg, int line, const char* function, const char* file) override;
-	void error(const std::string& msg, int line, const char* function, const char* file) override;
-	void fatal(const std::string& msg, int line, const char* function, const char* file) override;
-	void trace(const std::string& msg, int line, const char* function, const char* file) override;
-	void trace(const char* msg, int line, const char* function, const char* file) override;
+	static ILogger* get_instance(const Logger::Config& cfg);
+
+	void info(const std::string& msg, int line = 0, const char* function = "", const char* file = "") override;
+	void debug(const std::string& msg, int line = 0, const char* function = "", const char* file = "") override;
+	void warning(const std::string& msg, int line = 0, const char* function = "", const char* file = "") override;
+	void error(const std::string& msg, int line = 0, const char* function = "", const char* file = "") override;
+	void fatal(const std::string& msg, int line = 0, const char* function = "", const char* file = "") override;
+	void trace(const std::string& msg, int line = 0, const char* function = "", const char* file = "") override;
+	void trace(const char* msg, int line = 0, const char* function = "", const char* file = "") override;
 
 private:
 	enum log_level_enum
 	{
-		ll_info, ll_debug, ll_warning, ll_error, ll_fatal
+		ll_info, ll_debug, ll_warning, ll_error, ll_fatal, ll_trace
 	};
+
+	const char* DEFAULT = "\033[0m";
+	const char* BLACK = "\033[30m";                 // Black
+	const char* RED = "\033[31m";                   // Red
+	const char* GREEN = "\033[32m";                 // Green
+	const char* YELLOW = "\033[33m";                // Yellow
+	const char* BLUE = "\033[34m";                  // Blue
+	const char* MAGENTA = "\033[35m";               // Magenta
+	const char* CYAN = "\033[36m";                  // Cyan
+	const char* WHITE = "\033[37m";                 // White
+	const char* BOLD_BLACK = "\033[1m\033[30m";     // Bold Black
+	const char* BOLD_RED = "\033[1m\033[31m";       // Bold Red
+	const char* BOLD_GREEN = "\033[1m\033[32m";     // Bold Green
+	const char* BOLD_YELLOW = "\033[1m\033[33m";    // Bold Yellow
+	const char* BOLD_BLUE = "\033[1m\033[34m";      // Bold Blue
+	const char* BOLD_MAGENTA = "\033[1m\033[35m";   // Bold Magenta
+	const char* BOLD_CYAN = "\033[1m\033[36m";      // Bold Cyan
+	const char* BOLD_WHITE = "\033[1m\033[37m";     // Bold White
+
+	Logger::Config _config;
 
 	static ILogger* _instance;
 
-	Logger() = default;
+	explicit Logger(const Logger::Config& cfg);
 	~Logger() override;
 	void log(const std::string& msg, int line, const char* function, const char* file, Logger::log_level_enum level);
-	void write_to_stream(const std::string& msg, Logger::log_level_enum level);
+	void write_to_stream(const std::string& msg, const char* colour);
+	void flush();
 };
 
 __UTILITY_END__

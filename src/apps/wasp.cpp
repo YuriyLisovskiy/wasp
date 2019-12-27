@@ -29,6 +29,19 @@ WaspApplication::WaspApplication(conf::Settings* settings)
 	this->_settings = settings;
 	this->_settings->init();
 	this->_settings->overwrite();
+	for (auto& command : this->_settings->COMMANDS)
+	{
+		this->_help_message += command.second->usage() + '\n';
+	}
+
+	if (!this->_help_message.empty())
+	{
+		this->_help_message = "Available commands:\n\n" + this->_help_message;
+	}
+	else
+	{
+		this->_help_message = "Application has not commands.\n\n";
+	}
 }
 
 void WaspApplication::execute_from_command_line(int argc, char** argv)
@@ -39,14 +52,25 @@ void WaspApplication::execute_from_command_line(int argc, char** argv)
 		{
 			if (this->_settings->COMMANDS.find(argv[1]) != this->_settings->COMMANDS.end())
 			{
-				auto command = this->_settings->COMMANDS[argv[1]];
-				command->run_from_argv(argc, argv);
+				this->_settings->COMMANDS[argv[1]]->run_from_argv(argc, argv);
+			}
+			else
+			{
+				std::cout << "Command \"" << argv[1] << "\" is not found.\n\n";
 			}
 		}
 		catch (const core::CommandError& exc)
 		{
-			this->_settings->LOGGER->fatal(exc.what(), exc.line(), exc.function(), exc.file());
+			this->_settings->LOGGER->error(exc.what(), exc.line(), exc.function(), exc.file());
 		}
+		catch (const core::InterruptException& exc)
+		{
+			this->_settings->LOGGER->error(exc.what(), exc.line(), exc.function(), exc.file());
+		}
+	}
+	else
+	{
+		std::cout << this->_help_message;
 	}
 }
 

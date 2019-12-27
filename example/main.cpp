@@ -16,7 +16,9 @@
  */
 
 #include "../src/apps/wasp.h"
+
 #include "./example_app/settings.h"
+
 
 int main(int argc, char** argv)
 {
