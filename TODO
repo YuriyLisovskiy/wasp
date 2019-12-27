@@ -1,12 +1,27 @@
-Test:
-    - src/apps
+Not tested:
+    - src/apps/*
+
+    - src/core/datetime/*
+    - src/core/management/*
+    - src/core/sockets/*
+    - src/core/http_server
+    - src/core/thread_pool
+
+    - src/http/response
+    - src/http/utility
+
+    - src/middleware
+
     - src/urls
 
+    - src/utility/flags/parser
+    - src/utility/string/format
+    - src/utility/regex
 
-Check out TODOs in:
-    - src/apps/wasp.cpp
+    - src/views/static
 
-    - src/conf/settings.h
+
+Check out TODOs in (not urgent):
     - src/conf/settings.cpp
 
     - src/core/parsers/cookie_parser.cpp
@@ -18,16 +33,14 @@ Check out TODOs in:
 
     - src/middleware/clickjacking.cpp
 
-    - src/urls/url.h
     - src/urls/url.cpp
 
     - src/utility/encoding.cpp
-    - src/utility/logger.cpp
 
     - src/views/static.cpp
 
 
-Implement next settings:
+Implement next settings (not urgent):
 
 ####################
 # CORE             #

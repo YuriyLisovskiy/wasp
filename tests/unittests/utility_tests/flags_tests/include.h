@@ -15,6 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#ifndef WASP_UNIT_TESTS_UTILITY_TESTS_FLAGS_TESTS_INCLUDE_H
+#define WASP_UNIT_TESTS_UTILITY_TESTS_FLAGS_TESTS_INCLUDE_H
 
 #include "./flags_tests.h"
+
+#endif // WASP_UNIT_TESTS_UTILITY_TESTS_FLAGS_TESTS_INCLUDE_H

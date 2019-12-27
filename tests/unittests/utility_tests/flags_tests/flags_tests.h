@@ -14,7 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#pragma once
+
+#ifndef WASP_UNIT_TESTS_UTILITY_TESTS_FLAGS_TESTS_FLAGS_TESTS_H
+#define WASP_UNIT_TESTS_UTILITY_TESTS_FLAGS_TESTS_FLAGS_TESTS_H
 
 #include <gtest/gtest.h>
 
@@ -47,3 +49,6 @@ TEST(FlagsTestCase, ParseTest)
 }
 
 __UNIT_TESTS_END__
+
+
+#endif // WASP_UNIT_TESTS_UTILITY_TESTS_FLAGS_TESTS_FLAGS_TESTS_H

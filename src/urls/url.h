@@ -44,8 +44,6 @@ extern UrlPattern make_static(
 	const std::string& name = ""
 );
 
-// TODO: implement include() function!
-
 __URLS_END__
 
 
