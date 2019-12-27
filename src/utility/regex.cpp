@@ -16,38 +16,46 @@
  */
 
 /**
- * An implementation of wasp.h.
+ * An implementation of regex.h.
  */
 
-#include "./wasp.h"
+#include "./regex.h"
 
 
-__APPS_BEGIN__
+__RGX_BEGIN__
 
-WaspApplication::WaspApplication(conf::Settings* settings)
+Regex::Regex(const std::string& expr)
 {
-	this->_settings = settings;
-	this->_settings->init();
-	this->_settings->overwrite();
+	this->_expr = std::regex(expr);
+	this->_is_matched = false;
 }
 
-void WaspApplication::execute_from_command_line(int argc, char** argv)
+bool Regex::match(const std::string& to_match)
 {
-	if (argc > 1)
+	this->_to_match = to_match;
+	this->_is_matched = std::regex_match(this->_to_match, this->_expr);
+	return this->_is_matched;
+}
+
+std::vector<std::string> Regex::groups()
+{
+	std::vector<std::string> groups;
+	if (this->_is_matched)
 	{
-		try
+		std::smatch matches;
+		if (std::regex_search(this->_to_match, matches, this->_expr))
 		{
-			if (this->_settings->COMMANDS.find(argv[1]) != this->_settings->COMMANDS.end())
+			for (size_t i = 1; i < matches.size(); i++)
 			{
-				auto command = this->_settings->COMMANDS[argv[1]];
-				command->run_from_argv(argc, argv);
+				if (matches[i].matched)
+				{
+					groups.push_back(matches[i].str());
+				}
 			}
 		}
-		catch (const core::CommandError& exc)
-		{
-			this->_settings->LOGGER->fatal(exc.what(), exc.line(), exc.function(), exc.file());
-		}
 	}
+
+	return groups;
 }
 
-__APPS_END__
+__RGX_END__

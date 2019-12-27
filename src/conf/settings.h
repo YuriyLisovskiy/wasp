@@ -201,6 +201,8 @@ struct Settings
 
 	Settings();
 	virtual ~Settings();
+	virtual void init() = 0;
+	virtual void overwrite();
 
 	template <typename _T, typename = std::enable_if<std::is_base_of<apps::AppConfig, _T>::value>>
 	apps::AppConfig* app()

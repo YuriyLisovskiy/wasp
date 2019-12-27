@@ -112,6 +112,7 @@ public:
 		size_t max_body_size = 0;
 		std::string media_root;
 		size_t threads_count = 0;
+		bool use_ipv6 = false;
 	};
 
 	explicit HttpServer(HttpServer::context& ctx);

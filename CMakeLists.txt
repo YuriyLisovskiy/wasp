@@ -97,6 +97,7 @@ target_link_libraries(${PACKAGE_HTTP_UNIT_TESTS} gtest gtest_main rt pthread ${H
 # Utility package tests setup.
 file(GLOB UTILITY_TEST_SRC
 	"tests/unittests/utility_tests/*.h"
+	"tests/unittests/utility_tests/flags_tests/*.h"
 	"tests/unittests/utility_tests/string_tests/*.h"
 )
 add_executable(${PACKAGE_UTILITY_UNIT_TESTS} ${LIB_SRC} ${UTILITY_TEST_SRC} "tests/unittests/utility_tests/main.cpp")

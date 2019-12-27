@@ -212,6 +212,23 @@ AttributeError::AttributeError(const std::string& message, int line, const char 
 }
 
 
+// CommandError
+CommandError::CommandError(const char* message, int line, const char* function, const char* file, const char* type)
+	: BaseException(message, line, function, file, type)
+{
+}
+
+CommandError::CommandError(const char* message, int line, const char* function, const char* file)
+	: CommandError(message, line, function, file, "CommandError")
+{
+}
+
+CommandError::CommandError(const std::string& message, int line, const char *function, const char *file)
+	: CommandError(message.c_str(), line, function, file)
+{
+}
+
+
 // FileDoesNotExistError
 FileDoesNotExistError::FileDoesNotExistError(const char* message, int line, const char* function, const char* file, const char* type)
 	: BaseException(message, line, function, file, type)

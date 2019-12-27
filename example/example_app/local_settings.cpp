@@ -14,12 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#pragma once
 
-#include "../../src/conf/settings.h"
+#include "./settings.h"
 
 
-void override_settings(wasp::conf::Settings* settings)
+void Settings::overwrite()
 {
-	settings->DEBUG = false;
+	this->DEBUG = false;
 }

@@ -22,8 +22,6 @@
 
 #pragma once
 
-// C++ libraries.
-
 // Module definitions.
 #include "./_def_.h"
 
@@ -31,8 +29,10 @@
 #include "./command.h"
 #include "../../../http/request.h"
 #include "../../../core/http_server.h"
+#include "../../../core/exceptions.h"
 #include "../../../utility/flags/flags.h"
 #include "../../../utility/string/str.h"
+#include "../../../utility/regex.h"
 
 
 __CORE_COMMANDS_BEGIN__
@@ -45,6 +45,16 @@ private:
 	flags::LongIntFlag* _port_flag;
 	flags::LongIntFlag* _threads_flag;
 
+	rgx::Regex* _ipv4_ipv6_port_regex;
+	rgx::Regex* _ipv4_regex;
+	rgx::Regex* _ipv6_regex;
+	rgx::Regex* _port_regex;
+
+	const std::string DEFAULT_IPV4_HOST = "127.0.0.1";
+	const std::string DEFAULT_IPV6_HOST = "::1";
+	const uint16_t DEFAULT_PORT = 8000;
+	const size_t DEFAULT_THREADS = 16;
+
 protected:
 	void add_flags() final;
 	void handle() final;
@@ -52,6 +62,7 @@ protected:
 
 public:
 	explicit RunserverCommand(conf::Settings* settings);
+	~RunserverCommand() final;
 };
 
 __CORE_COMMANDS_END__

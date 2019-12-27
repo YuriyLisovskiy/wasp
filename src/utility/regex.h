@@ -16,30 +16,34 @@
  */
 
 /**
- * wasp.h
- * Purpose: an implementation of main Wasp application.
+ * regex.h
+ * Purpose: C++ regular expression's utilities.
  */
 
 #pragma once
 
+// C++ libraries.
+#include <regex>
+#include <vector>
+#include <string>
+
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
-#include "./config.h"
-#include "../conf/settings.h"
 
+__RGX_BEGIN__
 
-__APPS_BEGIN__
-
-class WaspApplication
+class Regex final
 {
 private:
-	conf::Settings* _settings;
+	bool _is_matched;
+	std::string _to_match;
+	std::regex _expr;
 
 public:
-	explicit WaspApplication(conf::Settings* settings);
-	void execute_from_command_line(int argc, char** argv);
+	explicit Regex(const std::string& expr);
+	bool match(const std::string& to_match);
+	std::vector<std::string> groups();
 };
 
-__APPS_END__
+__RGX_END__

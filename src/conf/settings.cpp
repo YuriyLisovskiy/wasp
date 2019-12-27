@@ -30,8 +30,6 @@ Settings::Settings()
 
 	this->LOGGER = utility::Logger::get_instance();
 
-	this->ALLOWED_HOSTS = {"127.0.0.1", "localhost"};
-
 	this->TIME_ZONE = "America/Chicago";
 
 	this->USE_TZ = false;
@@ -89,6 +87,10 @@ Settings::Settings()
 	this->CSRF_COOKIE_SAME_SITE = "Lax";
 	this->CSRF_HEADER_NAME = "HTTP_X_CSRFTOKEN";
 	this->CSRF_USE_SESSIONS = false;
+}
+
+void Settings::overwrite()
+{
 }
 
 Settings::~Settings()

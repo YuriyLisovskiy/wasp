@@ -47,6 +47,7 @@ public:
 	virtual ~Flag() = default;
 	virtual std::string label() = 0;
 	virtual std::string usage() = 0;
+	virtual std::string get_raw();
 };
 
 

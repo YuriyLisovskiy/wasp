@@ -30,6 +30,11 @@ Flag::Flag(const std::string& label, const std::string& help)
 	this->_label = label;
 }
 
+std::string Flag::get_raw()
+{
+	return this->_data;
+}
+
 
 LongIntFlag::LongIntFlag(const std::string& label, const std::string& help, long default_val)
 	: Flag(label, help)

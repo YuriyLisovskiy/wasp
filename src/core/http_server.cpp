@@ -29,7 +29,7 @@ HttpServer::HttpServer(HttpServer::context& ctx) : _finished(true)
 {
 	HttpServer::_normalize_context(ctx);
 
-	this->_host = ctx.host;
+	this->_host = std::string(ctx.host).c_str();
 	this->_port = ctx.port;
 	this->_logger = ctx.logger;
 
