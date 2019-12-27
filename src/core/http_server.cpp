@@ -29,8 +29,11 @@ HttpServer::HttpServer(HttpServer::context& ctx) : _finished(true)
 {
 	HttpServer::_normalize_context(ctx);
 
-	this->_host = std::string(ctx.host).c_str();
+	this->_verbose = ctx.verbose;
+
+	this->_host = ctx.host.c_str();
 	this->_port = ctx.port;
+	this->_use_ipv6 = ctx.use_ipv6;
 	this->_logger = ctx.logger;
 
 	this->_max_body_size = ctx.max_body_size;
@@ -43,7 +46,7 @@ HttpServer::HttpServer(HttpServer::context& ctx) : _finished(true)
 
 	this->_media_root = ctx.media_root;
 
-	this->_thread_pool = new core::internal::ThreadPool(ctx.threads_count);
+	this->_thread_pool = new core::internal::ThreadPool(this->_threads_count);
 }
 
 HttpServer::~HttpServer()
@@ -93,13 +96,18 @@ void HttpServer::listen_and_serve()
 	}
 #endif
 
+	std::string host(this->_host);
+	if (this->_use_ipv6)
+	{
+		host = "[" + host + "]";
+	}
+
 	std::cout << str::format(
-		conf::internal::STARTUP_MESSAGE, this->_schema, this->_host, this->_port
-	);
+		conf::internal::STARTUP_MESSAGE, this->_schema, host.c_str(), this->_port
+	) << '\n';
 	std::cout.flush();
 
 	this->_finished = false;
-
 	this->_start_listener();
 }
 
@@ -145,7 +153,7 @@ int HttpServer::_init()
 
 int HttpServer::_create()
 {
-	if (this->_server_socket.create(this->_host, this->_port) == INVALID_SOCKET)
+	if (this->_server_socket.create(this->_host, this->_port, this->_use_ipv6) == INVALID_SOCKET)
 	{
 		if (this->_logger != nullptr)
 		{
@@ -427,7 +435,10 @@ void HttpServer::_serve_connection(const socket_t& client)
 	{
 		// TODO: remove when release ------------------------:
 		dt::Measure<std::chrono::milliseconds> measure;
-		measure.start();
+		if (this->_verbose)
+		{
+			measure.start();
+		}
 		// TODO: remove when release ------------------------^
 
 		http::HttpRequest* request = this->_handle_request(client);
@@ -435,8 +446,11 @@ void HttpServer::_serve_connection(const socket_t& client)
 		delete request;
 
 		// TODO: remove when release -------------------------------------------------------------:
-		measure.end();
-		std::cout << '\n' << request->method() + " request took " << measure.elapsed() << " ms\n";
+		if (this->_verbose)
+		{
+			measure.end();
+			std::cout << '\n' << request->method() << " request took " << measure.elapsed() << " ms\n";
+		}
 		// TODO: remove when release -------------------------------------------------------------^
 	}
 	catch (const SuspiciousOperation& exc)
@@ -545,14 +559,14 @@ HttpServer::read_result_enum HttpServer::_handle_error(
 
 void HttpServer::_normalize_context(HttpServer::context& ctx)
 {
-	if (ctx.host == nullptr)
+	if (ctx.host.empty())
 	{
-		ctx.host = conf::internal::DEFAULT_HOST;
+		throw HttpError("host address can not be nullptr", _ERROR_DETAILS_);
 	}
 
 	if (ctx.port == 0)
 	{
-		ctx.port = conf::internal::DEFAULT_PORT;
+		throw HttpError("server port can not be nullptr", _ERROR_DETAILS_);
 	}
 
 	if (ctx.handler == nullptr)

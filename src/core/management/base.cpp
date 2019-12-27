@@ -22,7 +22,7 @@
 #include "./base.h"
 
 
-__CORE_COMMANDS_BEGIN__
+__CORE_BEGIN__
 
 BaseCommand::BaseCommand(const std::string& cmd_name, const std::string& help)
 {
@@ -42,6 +42,11 @@ std::string BaseCommand::usage()
 {
 	this->create_flags();
 	return this->_name + ":\n" + this->_help + "\n" + this->_flag_set->usage("  ");
+}
+
+std::string BaseCommand::name()
+{
+	return this->_name;
 }
 
 void BaseCommand::create_flags()
@@ -68,4 +73,4 @@ void BaseCommand::run_from_argv(int argc, char** argv, bool is_verbose)
 	this->handle();
 }
 
-__CORE_COMMANDS_END__
+__CORE_END__

@@ -81,6 +81,10 @@ void RunserverCommand::handle()
 	}
 
 	core::internal::HttpServer::context ctx{};
+
+	// TODO: remove!
+	ctx.verbose = true;
+
 	auto host_port_str = this->_host_port_flag->get();
 	if (!host_port_str.empty())
 	{
@@ -98,7 +102,7 @@ void RunserverCommand::handle()
 			str::rtrim(address, ']');
 		}
 
-		ctx.host = address.c_str();
+		ctx.host = address;
 		ctx.port = groups[2].empty() ? this->DEFAULT_PORT : (uint16_t) std::stoi(groups[2]);
 	}
 	else
@@ -122,9 +126,9 @@ void RunserverCommand::handle()
 			}
 		}
 
-		ctx.host = (
-			address.empty() ? (ctx.use_ipv6 ? this->DEFAULT_IPV6_HOST : this->DEFAULT_IPV4_HOST) : address
-		).c_str();
+		ctx.host = address.empty() ? (
+			ctx.use_ipv6 ? this->DEFAULT_IPV6_HOST : this->DEFAULT_IPV4_HOST
+		) : address;
 		auto raw_port = this->_port_flag->get_raw();
 		if (raw_port.empty())
 		{
@@ -182,12 +186,35 @@ RunserverCommand::get_handler()
 	}
 
 	auto* settings = this->settings;
-	auto handler = [settings, urlpatterns](
+	auto log_request = [settings](
+		const std::string& info, unsigned short status_code
+	)
+	{
+		if (settings->LOGGER)
+		{
+			utility::Logger::Color color = utility::Logger::Color::GREEN;
+			if (status_code >= 400)
+			{
+				color = utility::Logger::Color::YELLOW;
+			}
+			else if (status_code >= 500)
+			{
+				color = utility::Logger::Color::RED;
+			}
+
+			settings->LOGGER->print(str::format(
+				"[{0!s}] \"{1!s}\" {2!d}",
+				dt::now().strftime("%d/%b/%Y %T").c_str(),
+				info.c_str(),
+				status_code
+			), color);
+		}
+	};
+
+	auto handler = [settings, urlpatterns, log_request](
 		http::HttpRequest* request, const core::internal::socket_t& client
 	) mutable -> void
 	{
-		std::cout << "\n\n" << request->path();
-
 		for (auto& middleware : settings->MIDDLEWARE)
 		{
 			middleware->process_request(request);
@@ -223,6 +250,14 @@ RunserverCommand::get_handler()
 		{
 			core::internal::HttpServer::send(response, client);
 		}
+
+		log_request(
+			request->method() + " " +
+			request->path() + " " +
+			"HTTP" + (settings->USE_SSL ? "S/" : "/") +
+			request->version(),
+			response->status()
+		);
 
 		delete response;
 	};

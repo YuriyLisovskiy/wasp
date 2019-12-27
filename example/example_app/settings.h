@@ -56,7 +56,7 @@ struct Settings final: public wasp::conf::Settings
 		};
 
 		this->COMMANDS = {
-			this->command<wasp::core::cmd::RunserverCommand>("runserver")
+			this->command<wasp::core::cmd::RunserverCommand>()
 		};
 
 		this->MEDIA_ROOT = wasp::path::join(this->BASE_DIR, "media");
@@ -66,5 +66,6 @@ struct Settings final: public wasp::conf::Settings
 		this->STATIC_URL = "/static/";
 	}
 
+	// Override in local_settings.cpp!
 	void overwrite() final;
 };

@@ -26,7 +26,7 @@
 #include "./_def_.h"
 
 // Wasp libraries.
-#include "./base.h"
+#include "../base.h"
 #include "../../../conf/settings.h"
 
 

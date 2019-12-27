@@ -15,9 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * settings
- * TODO: write docs.
+/**
+ * settings.h
+ * Purpose: entire Wasp application's settings.
  */
 
 #pragma once
@@ -35,7 +35,7 @@
 #include "../utility/logger.h"
 #include "../apps/config.h"
 #include "../middleware/interface.h"
-#include "../core/management/commands/base.h"
+#include "../core/management/base.h"
 
 
 __CONF_BEGIN__
@@ -73,7 +73,7 @@ struct Settings
 	std::vector<apps::AppConfig*> INSTALLED_APPS;
 
 	// List of commands to run from command line.
-	std::map<std::string, core::cmd::BaseCommand*> COMMANDS;
+	std::map<std::string, core::BaseCommand*> COMMANDS;
 
 	// List of paths where templates can be found.
 	std::vector<std::string> TEMPLATES;
@@ -182,9 +182,9 @@ struct Settings
 	bool USE_X_FORWARDED_HOST;
 	bool USE_X_FORWARDED_PORT;
 
-	//# List of middleware to use. Order is important; in the request phase, these
-	//# middleware will be applied in the order given, and in the response
-	//# phase the middleware will be applied in reverse order.
+	// List of middleware to use. Order is important; in the request phase, these
+	// middleware will be applied in the order given, and in the response
+	// phase the middleware will be applied in reverse order.
 	std::vector<middleware::IMiddleware*> MIDDLEWARE;
 
 	// Settings for CSRF cookie.
@@ -198,6 +198,9 @@ struct Settings
 	std::string CSRF_HEADER_NAME;
 	std::vector<std::string> CSRF_TRUSTED_ORIGINS;
 	bool CSRF_USE_SESSIONS;
+
+	// SSL settings (will be added in future).
+	bool USE_SSL;
 
 	Settings();
 	virtual ~Settings();
@@ -216,10 +219,11 @@ struct Settings
 		return new _T(this);
 	}
 
-	template <typename _CommandT, typename = std::enable_if<std::is_base_of<core::cmd::BaseCommand, _CommandT>::value>>
-	std::pair<std::string, core::cmd::BaseCommand*> command(const std::string& command_name)
+	template <typename _CommandT, typename = std::enable_if<std::is_base_of<core::BaseCommand, _CommandT>::value>>
+	std::pair<std::string, core::BaseCommand*> command()
 	{
-		return std::pair{command_name, new _CommandT(this)};
+		auto* command = new _CommandT(this);
+		return std::pair{command->name(), command};
 	}
 };
 

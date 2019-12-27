@@ -30,10 +30,10 @@
 #include "./_def_.h"
 
 // Wasp libraries.
-#include "../../../utility/flags/flag_set.h"
+#include "../../utility/flags/flag_set.h"
 
 
-__CORE_COMMANDS_BEGIN__
+__CORE_BEGIN__
 
 /// Use this class if you want access to all of the mechanisms which
 /// parse the command-line arguments and work out what code to call in
@@ -68,9 +68,12 @@ public:
 	/// Returns usage based on flag_set.
 	std::string usage();
 
+	/// Returns full command's name.
+	std::string name();
+
 	/// Creates flags if they are not created yet,
 	/// parses argv and runs handle() method.
 	void run_from_argv(int argc, char** argv, bool is_verbose = false);
 };
 
-__CORE_COMMANDS_END__
+__CORE_END__

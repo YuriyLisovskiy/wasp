@@ -19,6 +19,7 @@
 #define WASP_UTILS_LOGGER_H
 
 // C++ libraries.
+#include <map>
 #include <iostream>
 #include <vector>
 #include <string>
@@ -36,6 +37,27 @@ __UTILITY_BEGIN__
 class ILogger
 {
 public:
+	enum Color
+	{
+		DEFAULT,
+		BLACK,
+		RED,
+		GREEN,
+		YELLOW,
+		BLUE,
+		MAGENTA,
+		CYAN,
+		WHITE,
+		BOLD_BLACK,
+		BOLD_RED,
+		BOLD_GREEN,
+		BOLD_YELLOW,
+		BOLD_BLUE,
+		BOLD_MAGENTA,
+		BOLD_CYAN,
+		BOLD_WHITE,
+	};
+
 	virtual ~ILogger() = default;
 	virtual void info(const std::string& msg, int line = 0, const char* function = "", const char* file = "") = 0;
 	virtual void debug(const std::string& msg, int line = 0, const char* function = "", const char* file = "") = 0;
@@ -44,6 +66,8 @@ public:
 	virtual void fatal(const std::string& msg, int line = 0, const char* function = "", const char* file = "") = 0;
 	virtual void trace(const std::string& msg, int line = 0, const char* function = "", const char* file = "") = 0;
 	virtual void trace(const char* msg, int line = 0, const char* function = "", const char* file = "") = 0;
+	virtual void print(const std::string& msg, Color colour = Color::DEFAULT, char end = '\n') = 0;
+	virtual void print(const char* msg, Color colour = Color::DEFAULT, char end = '\n') = 0;
 };
 
 class Logger : public ILogger
@@ -51,12 +75,13 @@ class Logger : public ILogger
 public:
 	struct Config
 	{
-		bool log_info = true;
-		bool log_debug = true;
-		bool log_warning = true;
-		bool log_error = true;
-		bool log_fatal = true;
-		bool log_trace = true;
+		bool enable_info_log = true;
+		bool enable_debug_log = true;
+		bool enable_warning_log = true;
+		bool enable_error_log = true;
+		bool enable_fatal_log = true;
+		bool enable_trace_log = true;
+		bool enable_print = true;
 		std::vector<std::ostream*> streams;
 	};
 
@@ -69,30 +94,34 @@ public:
 	void fatal(const std::string& msg, int line = 0, const char* function = "", const char* file = "") override;
 	void trace(const std::string& msg, int line = 0, const char* function = "", const char* file = "") override;
 	void trace(const char* msg, int line = 0, const char* function = "", const char* file = "") override;
+	void print(const std::string& msg, Color colour = Color::DEFAULT, char end = '\n') override;
+	void print(const char* msg, Color colour = Color::DEFAULT, char end = '\n') override;
 
 private:
+	std::map<Color, const char*> _colors = {
+		{DEFAULT, "\033[0m"},
+		{BLACK, "\033[30m"},
+		{RED, "\033[31m"},
+		{GREEN, "\033[32m"},
+		{YELLOW, "\033[33m"},
+		{BLUE, "\033[34m"},
+		{MAGENTA, "\033[35m"},
+		{CYAN, "\033[36m"},
+		{WHITE, "\033[37m"},
+		{BOLD_BLACK, "\033[1m\033[30m"},
+		{BOLD_RED, "\033[1m\033[31m"},
+		{BOLD_GREEN, "\033[1m\033[32m"},
+		{BOLD_YELLOW, "\033[1m\033[33m"},
+		{BOLD_BLUE, "\033[1m\033[34m"},
+		{BOLD_MAGENTA, "\033[1m\033[35m"},
+		{BOLD_CYAN, "\033[1m\033[36m"},
+		{BOLD_WHITE, "\033[1m\033[37m"},
+	};
+
 	enum log_level_enum
 	{
 		ll_info, ll_debug, ll_warning, ll_error, ll_fatal, ll_trace
 	};
-
-	const char* DEFAULT = "\033[0m";
-	const char* BLACK = "\033[30m";                 // Black
-	const char* RED = "\033[31m";                   // Red
-	const char* GREEN = "\033[32m";                 // Green
-	const char* YELLOW = "\033[33m";                // Yellow
-	const char* BLUE = "\033[34m";                  // Blue
-	const char* MAGENTA = "\033[35m";               // Magenta
-	const char* CYAN = "\033[36m";                  // Cyan
-	const char* WHITE = "\033[37m";                 // White
-	const char* BOLD_BLACK = "\033[1m\033[30m";     // Bold Black
-	const char* BOLD_RED = "\033[1m\033[31m";       // Bold Red
-	const char* BOLD_GREEN = "\033[1m\033[32m";     // Bold Green
-	const char* BOLD_YELLOW = "\033[1m\033[33m";    // Bold Yellow
-	const char* BOLD_BLUE = "\033[1m\033[34m";      // Bold Blue
-	const char* BOLD_MAGENTA = "\033[1m\033[35m";   // Bold Magenta
-	const char* BOLD_CYAN = "\033[1m\033[36m";      // Bold Cyan
-	const char* BOLD_WHITE = "\033[1m\033[37m";     // Bold White
 
 	Logger::Config _config;
 
@@ -103,6 +132,7 @@ private:
 	void log(const std::string& msg, int line, const char* function, const char* file, Logger::log_level_enum level);
 	void write_to_stream(const std::string& msg, const char* colour);
 	void flush();
+	const char* get_colour(Color colour);
 };
 
 __UTILITY_END__

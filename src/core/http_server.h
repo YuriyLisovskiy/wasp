@@ -70,6 +70,8 @@ private:
 	const char* _host;
 	uint16_t _port;
 	const char* _schema;
+	bool _use_ipv6;
+	bool _verbose;
 	size_t _max_body_size;
 	ServerSocket _server_socket;
 	http_handler _http_handler;
@@ -105,7 +107,7 @@ private:
 public:
 	struct context
 	{
-		const char* host = nullptr;
+		std::string host;
 		uint16_t port = 0;
 		http_handler handler = nullptr;
 		utility::ILogger* logger;
@@ -113,6 +115,7 @@ public:
 		std::string media_root;
 		size_t threads_count = 0;
 		bool use_ipv6 = false;
+		bool verbose = false;
 	};
 
 	explicit HttpServer(HttpServer::context& ctx);

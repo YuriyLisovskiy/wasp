@@ -87,6 +87,8 @@ Settings::Settings()
 	this->CSRF_COOKIE_SAME_SITE = "Lax";
 	this->CSRF_HEADER_NAME = "HTTP_X_CSRFTOKEN";
 	this->CSRF_USE_SESSIONS = false;
+
+	this->USE_SSL = false;
 }
 
 void Settings::overwrite()

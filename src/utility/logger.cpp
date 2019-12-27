@@ -82,44 +82,55 @@ void Logger::trace(const char* msg, int line, const char* function, const char* 
 	this->trace(std::string(msg), line, function, file);
 }
 
+void Logger::print(const std::string& msg, Color colour, char end)
+{
+	std::cout << this->get_colour(colour) << msg << this->_colors[Color::DEFAULT] << end;
+}
+
+void Logger::print(const char* msg, Color colour, char end)
+{
+	this->print(std::string(msg), colour, end);
+}
+
 void Logger::log(const std::string& msg, int line, const char* function, const char* file, Logger::log_level_enum level)
 {
 	std::string level_name;
 	bool is_enabled;
-	const char* colour;
+	Color colour;
 	switch (level)
 	{
 		case Logger::log_level_enum::ll_warning:
 			level_name = "[warning]";
-			is_enabled = this->_config.log_warning;
-			colour = Logger::YELLOW;
+			is_enabled = this->_config.enable_warning_log;
+			colour = Color::YELLOW;
 			break;
 		case Logger::log_level_enum::ll_error:
 			level_name = "[error]";
-			is_enabled = this->_config.log_error;
-			colour = Logger::RED;
+			is_enabled = this->_config.enable_error_log;
+			colour = Color::RED;
 			break;
 		case Logger::log_level_enum::ll_debug:
 			level_name = "[debug]";
-			is_enabled = this->_config.log_debug;
-			colour = Logger::MAGENTA;
+			is_enabled = this->_config.enable_debug_log;
+			colour = Color::MAGENTA;
 			break;
 		case Logger::log_level_enum::ll_fatal:
 			level_name = "[fatal]";
-			is_enabled = this->_config.log_fatal;
-			colour = Logger::BOLD_RED;
+			is_enabled = this->_config.enable_fatal_log;
+			colour = Color::BOLD_RED;
 			break;
 		case Logger::log_level_enum::ll_trace:
 			level_name = "[trace]";
-			is_enabled = this->_config.log_trace;
-			colour = Logger::RED;
+			is_enabled = this->_config.enable_trace_log;
+			colour = Color::RED;
 			break;
 		default:
 			level_name = "[info]";
-			is_enabled = this->_config.log_info;
-			colour = Logger::CYAN;
+			is_enabled = this->_config.enable_info_log;
+			colour = Color::CYAN;
 			break;
 	}
+
 	if (!is_enabled)
 	{
 		return;
@@ -139,14 +150,15 @@ void Logger::log(const std::string& msg, int line, const char* function, const c
 
 	std::string result = "[" + dt::now().strftime("%F %T") +
 		"] " + level_name + ":\n" + full_msg + "\n";
-	this->write_to_stream(result, colour);
+	this->write_to_stream(result, this->get_colour(colour));
 }
 
 void Logger::write_to_stream(const std::string& msg, const char* colour)
 {
+	const char* default_colour = this->_colors[Color::DEFAULT];
 	for (auto& stream : this->_config.streams)
 	{
-		*stream << '\n' << colour << msg << Logger::DEFAULT << '\n';
+		*stream << '\n' << colour << msg << default_colour << '\n';
 	}
 
 	this->flush();
@@ -158,6 +170,16 @@ void Logger::flush()
 	{
 		stream->flush();
 	}
+}
+
+const char* Logger::get_colour(Color colour)
+{
+	if (this->_colors.find(colour) == this->_colors.end())
+	{
+		colour = Color::DEFAULT;
+	}
+
+	return this->_colors[colour];
 }
 
 __UTILITY_END__
