@@ -16,19 +16,33 @@
  */
 
 /**
- * _def_.h
- * Purpose: utility/flags module's definitions.
+ * parser.h
+ * Purpose: parses command line arguments.
  */
 
 #pragma once
 
-#include "../_def_.h"
+// C++ libraries.
+#include <map>
+#include <string>
+#include <iostream>
+
+// Module definitions.
+#include "./_def_.h"
+
+// Wasp libraries.
+#include "../string/str.h"
 
 
-/// wasp::flags
-#define __FLAGS_BEGIN__ __WASP_BEGIN__ namespace flags {
-#define __FLAGS_END__ } __WASP_END__
+__FLAGS_INTERNAL_BEGIN__
 
-/// wasp::flags::internal
-#define __FLAGS_INTERNAL_BEGIN__ __FLAGS_BEGIN__ namespace internal {
-#define __FLAGS_INTERNAL_END__ } __FLAGS_END__
+struct args_parser
+{
+	std::map<std::string, std::string> flags;
+
+	explicit args_parser(int argc, char** argv, size_t parse_from = 1, bool is_verbose = false);
+	bool exists(const std::string& label);
+	std::string get_arg(const std::string& label);
+};
+
+__FLAGS_INTERNAL_END__

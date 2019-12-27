@@ -34,7 +34,6 @@ socket_t ServerSocket::create_ipv4(const char* host, uint16_t port)
 	this->_ipv4_socket.sin_port = ::htons(port);
 	this->_ipv4_socket.sin_addr.s_addr = ::inet_addr(host);
 	::inet_pton(AF_INET, host, (void*) &this->_ipv4_socket.sin_addr.s_addr);
-//	::memset(this->_ipv4_socket.sin_zero, '\0', sizeof this->_ipv4_socket.sin_zero);
 	return ::socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
 }
 
@@ -43,21 +42,11 @@ socket_t ServerSocket::create_ipv6(const char* host, uint16_t port)
 	this->_ipv6_socket.sin6_family = AF_INET6;
 	this->_ipv6_socket.sin6_port = ::htons(port);
 	::inet_pton(AF_INET6, host, (void*) &this->_ipv6_socket.sin6_addr.s6_addr);
-//	::memset(this->_ipv4_socket.sin_zero, '\0', sizeof this->_ipv4_socket.sin_zero);
 	return ::socket(PF_INET6, SOCK_STREAM, IPPROTO_TCP);
 }
 
 socket_t ServerSocket::create(const char* host, uint16_t port, bool use_ipv6)
 {
-	/*
-	this->_ipv4_socket.sin_family = use_ipv6 ? AF_INET6 : AF_INET;
-	this->_ipv4_socket.sin_port = ::htons(port);
-	this->_ipv4_socket.sin_addr.s_addr = ::inet_addr(host);
-
-	::memset(this->_ipv4_socket.sin_zero, '\0', sizeof this->_ipv4_socket.sin_zero);
-
-	this->_socket = ::socket(use_ipv6 ? PF_INET6 : PF_INET, SOCK_STREAM, IPPROTO_TCP);
-	*/
 	this->_use_ipv6 = use_ipv6;
 	if (this->_use_ipv6)
 	{
