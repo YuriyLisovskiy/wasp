@@ -20,5 +20,5 @@
 
 void Settings::overwrite()
 {
-	this->DEBUG = false;
+	this->DEBUG = true;
 }

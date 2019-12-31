@@ -47,8 +47,8 @@ struct Settings final: public wasp::conf::Settings
 
 		this->INSTALLED_APPS = {
 			this->app<MainAppConfig>(),
-			this->app<FormAppConfig>(),
-			this->app<PictureAppConfig>(),
+	//		this->app<FormAppConfig>(),
+	//		this->app<PictureAppConfig>(),
 		};
 
 		this->MIDDLEWARE = {

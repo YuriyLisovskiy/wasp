@@ -273,8 +273,8 @@ bool RunserverCommand::static_is_allowed(const std::string& static_url)
 
 	// Forbid serving local static files if not debug or
 	//  static url is non-local, i.e. is not url.
-	return !(!this->settings->DEBUG || parser.is_parsed);
-
+	// TODO: check if net location is not empty.
+	return this->settings->DEBUG;
 }
 
 void RunserverCommand::build_static_patterns(std::vector<urls::UrlPattern>& patterns)
