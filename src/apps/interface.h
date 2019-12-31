@@ -38,6 +38,8 @@ __APPS_BEGIN__
 class IAppConfig
 {
 public:
+	virtual ~IAppConfig() = default;
+
 	virtual std::vector<urls::UrlPattern> get_urlpatterns() = 0;
 	virtual std::vector<core::BaseCommand*> get_commands() = 0;
 };

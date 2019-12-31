@@ -24,6 +24,11 @@
 
 __APPS_BEGIN__
 
+AppConfig::AppConfig(conf::Settings* settings)
+{
+	this->settings = settings;
+}
+
 std::vector<urls::UrlPattern> AppConfig::get_urlpatterns()
 {
 	if (this->_urlpatterns.empty())
@@ -50,18 +55,6 @@ void AppConfig::urlpatterns()
 
 void AppConfig::commands()
 {
-}
-
-void AppConfig::include(const std::string& prefix, AppConfig* app)
-{
-	auto included_urlpatterns = app->get_urlpatterns();
-	for (const auto& pattern : included_urlpatterns)
-	{
-		this->_urlpatterns.emplace_back(
-			str::rtrim(str::starts_with(prefix, "/") ? prefix : "/" + prefix, '/'),
-			pattern
-		);
-	}
 }
 
 __APPS_END__

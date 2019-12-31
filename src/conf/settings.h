@@ -210,7 +210,7 @@ struct Settings
 	template <typename _T, typename = std::enable_if<std::is_base_of<apps::IAppConfig, _T>::value>>
 	apps::IAppConfig* app()
 	{
-		return new _T();
+		return new _T(this);
 	}
 
 	template <typename _T, typename = std::enable_if<std::is_base_of<middleware::IMiddleware, _T>::value>>
