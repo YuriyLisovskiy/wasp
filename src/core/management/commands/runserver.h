@@ -27,8 +27,10 @@
 
 // Wasp libraries.
 #include "./command.h"
+#include "../../../urls/url.h"
 #include "../../../http/request.h"
 #include "../../../core/http_server.h"
+#include "../../../core/parsers/url_parser.h"
 #include "../../../core/datetime/datetime.h"
 #include "../../../core/exceptions.h"
 #include "../../../utility/flags/flags.h"
@@ -61,6 +63,9 @@ protected:
 	void add_flags() final;
 	void handle() final;
 	std::function<void(http::HttpRequest*, const core::internal::socket_t&)> get_handler();
+	bool static_is_allowed(const std::string& static_url);
+	void build_static_patterns(std::vector<urls::UrlPattern>& patterns);
+	void build_app_patterns(std::vector<urls::UrlPattern>& patterns);
 
 public:
 	explicit RunserverCommand(conf::Settings* settings);

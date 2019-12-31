@@ -1,3 +1,7 @@
+TODO:
+    Implement default middleware
+
+
 Not tested:
     - src/apps/*
 
@@ -22,9 +26,12 @@ Not tested:
 
 
 Check out TODOs in (not urgent):
+    - src/apps/config.h
+
     - src/conf/settings.cpp
 
     - src/core/parsers/cookie_parser.cpp
+    - src/core/parsers/url_parser.cpp
 
     - src/core/http_server.cpp
 
@@ -32,8 +39,6 @@ Check out TODOs in (not urgent):
     - src/http/response.cpp
 
     - src/middleware/clickjacking.cpp
-
-    - src/urls/url.cpp
 
     - src/utility/encoding.cpp
 

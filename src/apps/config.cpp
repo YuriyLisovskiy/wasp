@@ -26,13 +26,35 @@ __APPS_BEGIN__
 
 std::vector<urls::UrlPattern> AppConfig::get_urlpatterns()
 {
+	if (this->_urlpatterns.empty())
+	{
+		this->urlpatterns();
+	}
+
 	return this->_urlpatterns;
+}
+
+std::vector<core::BaseCommand*> AppConfig::get_commands()
+{
+	if (this->_commands.empty())
+	{
+		this->commands();
+	}
+
+	return this->_commands;
+}
+
+void AppConfig::urlpatterns()
+{
+}
+
+void AppConfig::commands()
+{
 }
 
 void AppConfig::include(const std::string& prefix, AppConfig* app)
 {
 	auto included_urlpatterns = app->get_urlpatterns();
-	app->_urlpatterns.clear();
 	for (const auto& pattern : included_urlpatterns)
 	{
 		this->_urlpatterns.emplace_back(

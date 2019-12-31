@@ -14,22 +14,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#pragma once
 
-#include "../../src/apps/config.h"
-#include "../../src/views/view.h"
+/**
+ * An implementation of app_command.h.
+ */
 
-#include "./form_view.h"
+#include "./app_command.h"
 
 
-class FormAppConfig : public wasp::apps::AppConfig
+__CORE_COMMANDS_BEGIN__
+
+AppCommand::AppCommand(
+		conf::Settings* settings, const std::string& cmd_name, const std::string& help
+) : Command(settings, cmd_name, help)
 {
-public:
-	void urlpatterns() override
-	{
-		this->url<FormView>(
-			R"(profile/<user_id>([0-9]*)/name/<user_name>([A-Za-z]+)/?)",
-			"profile"
-		);
-	}
-};
+}
+
+__CORE_COMMANDS_END__

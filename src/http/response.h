@@ -201,7 +201,7 @@ public:
 class HttpResponseRedirectBase : public HttpResponse
 {
 protected:
-	const std::set<std::string> _allowed_hosts = {"http", "https", "ftp"};
+	const std::set<std::string> _allowed_schemes = {"http", "https", "ftp"};
 
 public:
 	explicit HttpResponseRedirectBase(

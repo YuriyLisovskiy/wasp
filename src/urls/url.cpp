@@ -40,9 +40,6 @@ UrlPattern make_static(
 		throw core::ImproperlyConfigured("Empty static url not permitted", _ERROR_DETAILS_);
 	}
 
-	// TODO: check if not debug mode!
-	//  forbid using default static view in production!
-
 	auto view_func = [static_root](
 		http::HttpRequest* request,
 		views::Args* args,

@@ -25,24 +25,30 @@
 #define WASP_APPS_CONFIG_H
 
 // C++ libraries.
+#include <string>
 #include <vector>
 
 // Module definitions.
 #include "./_def_.h"
 
 // Wasp libraries.
+#include "./interface.h"
 #include "../views/view.h"
 #include "../urls/url.h"
 #include "../urls/pattern.h"
 #include "../utility/string/str.h"
+#include "../core/management/base.h"
+#include "../core/management/commands/app_command.h"
 
 
 __APPS_BEGIN__
 
-class AppConfig
+class AppConfig : public IAppConfig
 {
 private:
 	std::vector<urls::UrlPattern> _urlpatterns;
+	std::vector<core::BaseCommand*> _commands;
+	std::string app_name;
 
 protected:
 	template <typename _ViewT, typename = std::enable_if<std::is_base_of<views::View, _ViewT>::value>>
@@ -68,9 +74,20 @@ protected:
 
 	void include(const std::string& prefix, AppConfig* app);
 
+	template <typename _CommandT, typename = std::enable_if<std::is_base_of<core::cmd::AppCommand, _CommandT>::value>>
+	void command()
+	{
+		// TODO: Modify constructor's parameters!
+		auto* cmd = new _CommandT();
+		this->_commands.push_back(cmd);
+	}
+
 public:
 	AppConfig() = default;
-	std::vector<urls::UrlPattern> get_urlpatterns();
+	std::vector<urls::UrlPattern> get_urlpatterns() final;
+	std::vector<core::BaseCommand*> get_commands() final;
+	virtual void urlpatterns();
+	virtual void commands();
 };
 
 __APPS_END__

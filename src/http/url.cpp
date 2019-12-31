@@ -30,7 +30,7 @@ Url::Url(const std::string& url)
 	parser.parse(url);
 	if (!parser.is_parsed)
 	{
-		throw core::ParseError("url is not parsed", _ERROR_DETAILS_);
+		throw core::ParseError(parser.last_err, parser.err_line, parser.err_func, parser.err_file);
 	}
 
 	this->_str_url = url;
@@ -87,16 +87,16 @@ std::string Url::fragment() const
 uint16_t Url::port() const
 {
 	uint16_t port;
-	const uint16_t httpPort = 80, httpsPort = 443;
+	const uint16_t http_port = 80, https_port = 443;
 	if (this->_port.empty())
 	{
 		if (this->scheme() == "https")
 		{
-			port = httpsPort;
+			port = https_port;
 		}
 		else
 		{
-			port = httpPort;
+			port = http_port;
 		}
 	}
 	else

@@ -176,14 +176,15 @@ void RunserverCommand::handle()
 std::function<void(http::HttpRequest*, const core::internal::socket_t&)>
 RunserverCommand::get_handler()
 {
-	std::vector<urls::UrlPattern> urlpatterns{
-		urls::make_static(this->settings->STATIC_URL, this->settings->STATIC_ROOT)
-	};
-	if (!this->settings->INSTALLED_APPS.empty())
-	{
-		auto apps_patterns = this->settings->INSTALLED_APPS[0]->get_urlpatterns();
-		urlpatterns.insert(urlpatterns.end(), apps_patterns.begin(), apps_patterns.end());
-	}
+	std::vector<urls::UrlPattern> urlpatterns;
+
+	// Check if static/media files can be served
+	//  and create necessary urls.
+	this->build_static_patterns(urlpatterns);
+
+	// Retrieve main app patterns and append them
+	//  to result.
+	this->build_app_patterns(urlpatterns);
 
 	auto* settings = this->settings;
 	auto log_request = [settings](
@@ -263,6 +264,39 @@ RunserverCommand::get_handler()
 	};
 
 	return handler;
+}
+
+bool RunserverCommand::static_is_allowed(const std::string& static_url)
+{
+	auto parser = core::internal::url_parser();
+	parser.parse(static_url);
+
+	// Forbid serving local static files if not debug or
+	//  static url is non-local, i.e. is not url.
+	return !(!this->settings->DEBUG || parser.is_parsed);
+
+}
+
+void RunserverCommand::build_static_patterns(std::vector<urls::UrlPattern>& patterns)
+{
+	if (!this->settings->STATIC_ROOT.empty() && this->static_is_allowed(this->settings->STATIC_URL))
+	{
+		patterns.push_back(urls::make_static(this->settings->STATIC_URL, this->settings->STATIC_ROOT));
+	}
+
+	if (!this->settings->MEDIA_ROOT.empty() && this->static_is_allowed(this->settings->MEDIA_URL))
+	{
+		patterns.push_back(urls::make_static(this->settings->MEDIA_URL, this->settings->MEDIA_ROOT));
+	}
+}
+
+void RunserverCommand::build_app_patterns(std::vector<urls::UrlPattern>& patterns)
+{
+	if (!this->settings->INSTALLED_APPS.empty())
+	{
+		auto apps_patterns = this->settings->INSTALLED_APPS[0]->get_urlpatterns();
+		patterns.insert(patterns.end(), apps_patterns.begin(), apps_patterns.end());
+	}
 }
 
 __CORE_COMMANDS_END__

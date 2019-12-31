@@ -24,7 +24,7 @@
 class PictureAppConfig : public wasp::apps::AppConfig
 {
 public:
-	PictureAppConfig()
+	void urlpatterns() override
 	{
 		this->url<PictureView>(R"(view/pic/?)", "view_pic");
 	}

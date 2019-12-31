@@ -14,22 +14,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+/**
+ * app_command.h
+ * Purpose: The base class for AppConfig commands.
+ */
+
 #pragma once
 
-#include "../../src/apps/config.h"
-#include "../../src/views/view.h"
+// Module definitions.
+#include "./_def_.h"
 
-#include "./form_view.h"
+// Wasp libraries.
+#include "./command.h"
 
 
-class FormAppConfig : public wasp::apps::AppConfig
+__CORE_COMMANDS_BEGIN__
+
+class AppCommand : public Command
 {
-public:
-	void urlpatterns() override
-	{
-		this->url<FormView>(
-			R"(profile/<user_id>([0-9]*)/name/<user_name>([A-Za-z]+)/?)",
-			"profile"
-		);
-	}
+protected:
+	AppCommand(
+		conf::Settings* settings, const std::string& cmd_name, const std::string& help
+	);
 };
+
+__CORE_COMMANDS_END__

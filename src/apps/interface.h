@@ -14,22 +14,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+/**
+ * interface.h
+ * Purpose: apps interfaces.
+ */
+
 #pragma once
 
-#include "../../src/apps/config.h"
-#include "../../src/views/view.h"
+// C++ libraries.
+#include <vector>
 
-#include "./form_view.h"
+// Module definitions.
+#include "./_def_.h"
+
+// Wasp libraries.
+#include "../urls/pattern.h"
+#include "../core/management/base.h"
 
 
-class FormAppConfig : public wasp::apps::AppConfig
+__APPS_BEGIN__
+
+class IAppConfig
 {
 public:
-	void urlpatterns() override
-	{
-		this->url<FormView>(
-			R"(profile/<user_id>([0-9]*)/name/<user_name>([A-Za-z]+)/?)",
-			"profile"
-		);
-	}
+	virtual std::vector<urls::UrlPattern> get_urlpatterns() = 0;
+	virtual std::vector<core::BaseCommand*> get_commands() = 0;
 };
+
+__APPS_END__

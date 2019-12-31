@@ -27,7 +27,7 @@
 class MainAppConfig : public wasp::apps::AppConfig
 {
 public:
-	MainAppConfig()
+	void urlpatterns() override
 	{
 		this->url<MainView>(R"(index/?)", "index");
 		this->include(R"(picture/)", new PictureAppConfig());

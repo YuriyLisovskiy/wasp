@@ -24,7 +24,8 @@
 
 __CORE_INTERNAL_BEGIN__
 
-url_parser::url_parser() : is_parsed(false)
+url_parser::url_parser()
+	: is_parsed(false), last_err(""), err_line(-1), err_func(""), err_file("")
 {
 	this->integer_port = 0;
 }
@@ -54,7 +55,8 @@ void url_parser::parse(const std::string& str)
 				}
 				else
 				{
-					throw ParseError("unable to parse url scheme", _ERROR_DETAILS_);
+					this->set_err("unable to parse url scheme", _ERROR_DETAILS_);
+					return;
 				}
 				break;
 			case url_parser::state::s_first_slash:
@@ -69,7 +71,8 @@ void url_parser::parse(const std::string& str)
 				}
 				else
 				{
-					throw ParseError("unable to parse the first slash after scheme", _ERROR_DETAILS_);
+					this->set_err("unable to parse the first slash after scheme", _ERROR_DETAILS_);
+					return;
 				}
 				break;
 			case url_parser::state::s_second_slash:
@@ -79,7 +82,8 @@ void url_parser::parse(const std::string& str)
 				}
 				else
 				{
-					throw ParseError("unable to parse the second slash after scheme", _ERROR_DETAILS_);
+					this->set_err("unable to parse the second slash after scheme", _ERROR_DETAILS_);
+					return;
 				}
 				break;
 			case url_parser::state::s_username_or_hostname:
@@ -103,7 +107,8 @@ void url_parser::parse(const std::string& str)
 				}
 				else
 				{
-					throw ParseError("unable to parse username or hostname", _ERROR_DETAILS_);
+					this->set_err("unable to parse username or hostname", _ERROR_DETAILS_);
+					return;
 				}
 				break;
 			case url_parser::state::s_password:
@@ -117,7 +122,8 @@ void url_parser::parse(const std::string& str)
 				}
 				else
 				{
-					throw ParseError("unable to parse password", _ERROR_DETAILS_);
+					this->set_err("unable to parse password", _ERROR_DETAILS_);
+					return;
 				}
 				break;
 			case url_parser::state::s_hostname:
@@ -139,11 +145,12 @@ void url_parser::parse(const std::string& str)
 				}
 				else
 				{
-					throw ParseError("unable to parse hostname", _ERROR_DETAILS_);
+					this->set_err("unable to parse hostname", _ERROR_DETAILS_);
+					return;
 				}
 				break;
 			case url_parser::state::s_ipv6_hostname:
-				std::abort(); // TODO
+				std::abort(); // TODO: implement ipv6 hostname parsing!
 			case url_parser::state::s_port_or_password:
 				if (std::isdigit(ch))
 				{
@@ -165,7 +172,8 @@ void url_parser::parse(const std::string& str)
 				}
 				else
 				{
-					throw ParseError("unable to parse port or password", _ERROR_DETAILS_);
+					this->set_err("unable to parse port or password", _ERROR_DETAILS_);
+					return;
 				}
 				break;
 			case url_parser::state::s_port:
@@ -181,7 +189,8 @@ void url_parser::parse(const std::string& str)
 				}
 				else
 				{
-					throw ParseError("unable to parse port", _ERROR_DETAILS_);
+					this->set_err("unable to parse port", _ERROR_DETAILS_);
+					return;
 				}
 				break;
 			case url_parser::state::s_path:
@@ -218,7 +227,12 @@ void url_parser::parse(const std::string& str)
 		}
 	}
 
-	assert(port_or_password.empty());
+	if (!port_or_password.empty())
+	{
+		this->set_err("port and password are not empty", _ERROR_DETAILS_);
+		return;
+	}
+
 	if (!username_or_hostname.empty())
 	{
 		this->hostname = username_or_hostname;
@@ -235,6 +249,14 @@ void url_parser::parse(const char* str)
 bool url_parser::is_unreserved(char ch)
 {
 	return std::isalnum(ch) || ch == '-' || ch == '.' || ch == '_' || ch == '~';
+}
+
+void url_parser::set_err(const char* err, int line, const char* func, const char* file)
+{
+	this->last_err = err;
+	this->err_line = line,
+	this->err_func = func;
+	this->err_file = file;
 }
 
 __CORE_INTERNAL_END__
