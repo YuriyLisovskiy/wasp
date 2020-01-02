@@ -408,7 +408,7 @@ HttpResponseRedirectBase::HttpResponseRedirectBase(
 
 	this->set_header("Location", encoding::encode_url(redirect_to));
 	Url url(redirect_to);
-	if (!url.scheme().empty() && this->_allowed_hosts.find(url.scheme()) == this->_allowed_hosts.end())
+	if (!url.scheme().empty() && this->_allowed_schemes.find(url.scheme()) == this->_allowed_schemes.end())
 	{
 		throw core::DisallowedRedirect("Unsafe redirect to URL with protocol " + url.scheme(), _ERROR_DETAILS_);
 	}

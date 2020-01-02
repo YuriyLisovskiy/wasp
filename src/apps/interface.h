@@ -15,36 +15,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * interface.h
+ * Purpose: apps interfaces.
+ */
+
 #pragma once
 
-#include "../../src/apps/config.h"
-#include "../../src/views/view.h"
-#include "../../src/conf/settings.h"
+// C++ libraries.
+#include <string>
+#include <vector>
 
-#include "./main_view.h"
-#include "../form_app/app.h"
-#include "../picture_app/app.h"
-#include "./commands/hello_command.h"
+// Module definitions.
+#include "./_def_.h"
+
+// Wasp libraries.
+#include "../urls/pattern.h"
+#include "../core/management/base.h"
 
 
-class MainAppConfig : public wasp::apps::AppConfig
+__APPS_BEGIN__
+
+class IAppConfig
 {
 public:
-	explicit MainAppConfig(wasp::conf::Settings* settings)
-		: AppConfig(settings)
-	{
-	}
+	virtual ~IAppConfig() = default;
 
-	void urlpatterns() override
-	{
-		this->url<MainView>(R"(index/?)", "index");
-		this->include<PictureAppConfig>(R"(picture/)");
-		this->include<FormAppConfig>(R"(form/)");
-		this->url<RedirectView>(R"(/?)", "root");
-	}
-
-	void commands() override
-	{
-		this->command<HelloCommand>();
-	}
+	virtual std::string get_name() = 0;
+	virtual std::vector<urls::UrlPattern> get_urlpatterns() = 0;
+	virtual std::vector<core::BaseCommand*> get_commands() = 0;
 };
+
+__APPS_END__

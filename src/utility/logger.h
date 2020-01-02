@@ -29,6 +29,7 @@
 #include "./_def_.h"
 
 // Wasp libraries.
+#include "../core/exceptions.h"
 #include "../core/datetime/datetime.h"
 
 
@@ -64,10 +65,14 @@ public:
 	virtual void warning(const std::string& msg, int line = 0, const char* function = "", const char* file = "") = 0;
 	virtual void error(const std::string& msg, int line = 0, const char* function = "", const char* file = "") = 0;
 	virtual void fatal(const std::string& msg, int line = 0, const char* function = "", const char* file = "") = 0;
-	virtual void trace(const std::string& msg, int line = 0, const char* function = "", const char* file = "") = 0;
-	virtual void trace(const char* msg, int line = 0, const char* function = "", const char* file = "") = 0;
 	virtual void print(const std::string& msg, Color colour = Color::DEFAULT, char end = '\n') = 0;
 	virtual void print(const char* msg, Color colour = Color::DEFAULT, char end = '\n') = 0;
+
+	virtual void info(const core::BaseException& exc) = 0;
+	virtual void debug(const core::BaseException& exc) = 0;
+	virtual void warning(const core::BaseException& exc) = 0;
+	virtual void error(const core::BaseException& exc) = 0;
+	virtual void fatal(const core::BaseException& exc) = 0;
 };
 
 class Logger : public ILogger
@@ -80,8 +85,6 @@ public:
 		bool enable_warning_log = true;
 		bool enable_error_log = true;
 		bool enable_fatal_log = true;
-		bool enable_trace_log = true;
-		bool enable_print = true;
 		std::vector<std::ostream*> streams;
 	};
 
@@ -92,10 +95,14 @@ public:
 	void warning(const std::string& msg, int line = 0, const char* function = "", const char* file = "") override;
 	void error(const std::string& msg, int line = 0, const char* function = "", const char* file = "") override;
 	void fatal(const std::string& msg, int line = 0, const char* function = "", const char* file = "") override;
-	void trace(const std::string& msg, int line = 0, const char* function = "", const char* file = "") override;
-	void trace(const char* msg, int line = 0, const char* function = "", const char* file = "") override;
 	void print(const std::string& msg, Color colour = Color::DEFAULT, char end = '\n') override;
 	void print(const char* msg, Color colour = Color::DEFAULT, char end = '\n') override;
+
+	void info(const core::BaseException& exc) override;
+	void debug(const core::BaseException& exc) override;
+	void warning(const core::BaseException& exc) override;
+	void error(const core::BaseException& exc) override;
+	void fatal(const core::BaseException& exc) override;
 
 private:
 	std::map<Color, const char*> _colors = {
@@ -120,7 +127,7 @@ private:
 
 	enum log_level_enum
 	{
-		ll_info, ll_debug, ll_warning, ll_error, ll_fatal, ll_trace
+		ll_info, ll_debug, ll_warning, ll_error, ll_fatal
 	};
 
 	Logger::Config _config;

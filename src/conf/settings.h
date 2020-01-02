@@ -33,7 +33,7 @@
 
 // Wasp libraries.
 #include "../utility/logger.h"
-#include "../apps/config.h"
+#include "../apps/interface.h"
 #include "../middleware/interface.h"
 #include "../core/management/base.h"
 
@@ -70,7 +70,7 @@ struct Settings
 	// List of AppConfig-derived objects representing apps.
 	// Order is required. The first app is interpreted as
 	// main application configuration.
-	std::vector<apps::AppConfig*> INSTALLED_APPS;
+	std::vector<apps::IAppConfig*> INSTALLED_APPS;
 
 	// List of commands to run from command line.
 	std::map<std::string, core::BaseCommand*> COMMANDS;
@@ -207,10 +207,10 @@ struct Settings
 	virtual void init() = 0;
 	virtual void overwrite();
 
-	template <typename _T, typename = std::enable_if<std::is_base_of<apps::AppConfig, _T>::value>>
-	apps::AppConfig* app()
+	template <typename _T, typename = std::enable_if<std::is_base_of<apps::IAppConfig, _T>::value>>
+	apps::IAppConfig* app()
 	{
-		return new _T();
+		return new _T(this);
 	}
 
 	template <typename _T, typename = std::enable_if<std::is_base_of<middleware::IMiddleware, _T>::value>>

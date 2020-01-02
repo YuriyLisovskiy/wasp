@@ -27,8 +27,16 @@ __APPS_BEGIN__
 WaspApplication::WaspApplication(conf::Settings* settings)
 {
 	this->_settings = settings;
+	if (!this->_settings->LOGGER)
+	{
+		throw core::ImproperlyConfigured("logger can not be nullptr", _ERROR_DETAILS_);
+	}
+
 	this->_settings->init();
 	this->_settings->overwrite();
+
+	this->setup_commands();
+
 	for (auto& command : this->_settings->COMMANDS)
 	{
 		this->_help_message += command.second->usage() + '\n';
@@ -71,6 +79,59 @@ void WaspApplication::execute_from_command_line(int argc, char** argv)
 	else
 	{
 		std::cout << this->_help_message;
+	}
+}
+
+void WaspApplication::setup_commands()
+{
+	// Retrieve commands from INSTALLED_APPS and
+	// check if apps' commands do not override
+	// settings commands, if not, then append them
+	// to settings.COMMANDS
+	for (auto& installed_app : this->_settings->INSTALLED_APPS)
+	{
+		this->extend_settings_commands_or_error(
+			installed_app->get_commands(),
+			[installed_app](const std::string& cmd_name) -> std::string {
+				return "App with name '" + installed_app->get_name() +
+					"' overrides settings.COMMANDS with '" + cmd_name + "' command";
+			}
+		);
+	}
+
+	auto default_commands = core::internal::CoreManagementAppConfig(
+		this->_settings
+	).get_commands();
+
+	// Check if user-defined commands do not override
+	// default commands, if not, append them to settings.COMMANDS
+	this->extend_settings_commands_or_error(
+		default_commands,
+		[](const std::string& cmd_name) -> std::string {
+			return "Attempting to override '" + cmd_name + "' command which is forbidden.";
+		}
+	);
+}
+
+void WaspApplication::extend_settings_commands_or_error(
+	const std::vector<core::BaseCommand*>& from,
+	const std::function<std::string(const std::string& cmd_name)>& err_fn
+)
+{
+	for (auto& command : from)
+	{
+		if (std::find_if(
+			this->_settings->COMMANDS.begin(),
+			this->_settings->COMMANDS.end(),
+			[command](const std::pair<std::string, core::BaseCommand*>& pair) -> bool {
+				return command->name() == pair.first;
+			}
+		) != this->_settings->COMMANDS.end())
+		{
+			throw core::ImproperlyConfigured(err_fn(command->name()), _ERROR_DETAILS_);
+		}
+
+		this->_settings->COMMANDS[command->name()] = command;
 	}
 }
 

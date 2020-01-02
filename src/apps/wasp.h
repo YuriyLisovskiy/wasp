@@ -23,7 +23,11 @@
 #pragma once
 
 // C++ libraries.
+#include <map>
+#include <vector>
+#include <string>
 #include <iostream>
+#include <functional>
 
 // Module definitions.
 #include "./_def_.h"
@@ -31,6 +35,9 @@
 // Wasp libraries.
 #include "./config.h"
 #include "../conf/settings.h"
+#include "../core/exceptions.h"
+#include "../core/management/base.h"
+#include "../core/management/app.h"
 
 
 __APPS_BEGIN__
@@ -40,6 +47,12 @@ class WaspApplication final
 private:
 	conf::Settings* _settings;
 	std::string _help_message;
+
+	void setup_commands();
+	void extend_settings_commands_or_error(
+		const std::vector<core::BaseCommand*>& from,
+		const std::function<std::string(const std::string& cmd_name)>& err_fn
+	);
 
 public:
 	explicit WaspApplication(conf::Settings* settings);

@@ -17,34 +17,20 @@
 
 #pragma once
 
-#include "../../src/apps/config.h"
-#include "../../src/views/view.h"
-#include "../../src/conf/settings.h"
-
-#include "./main_view.h"
-#include "../form_app/app.h"
-#include "../picture_app/app.h"
-#include "./commands/hello_command.h"
+#include "../../../src/apps/interface.h"
+#include "../../../src/core/management/commands/app_command.h"
 
 
-class MainAppConfig : public wasp::apps::AppConfig
+class HelloCommand : public wasp::core::cmd::AppCommand
 {
 public:
-	explicit MainAppConfig(wasp::conf::Settings* settings)
-		: AppConfig(settings)
+	HelloCommand(wasp::apps::IAppConfig* config, wasp::conf::Settings* settings)
+		: AppCommand(config, settings, "hello", "Prints hello from MainApp")
 	{
 	}
 
-	void urlpatterns() override
+	void handle() override
 	{
-		this->url<MainView>(R"(index/?)", "index");
-		this->include<PictureAppConfig>(R"(picture/)");
-		this->include<FormAppConfig>(R"(form/)");
-		this->url<RedirectView>(R"(/?)", "root");
-	}
-
-	void commands() override
-	{
-		this->command<HelloCommand>();
+		this->settings->LOGGER->print("Hello from MainApp!");
 	}
 };

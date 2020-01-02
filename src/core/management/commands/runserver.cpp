@@ -24,8 +24,8 @@
 
 __CORE_COMMANDS_BEGIN__
 
-RunserverCommand::RunserverCommand(conf::Settings* settings)
-	: Command(settings, "runserver", "Starts Wasp web server")
+RunserverCommand::RunserverCommand(apps::IAppConfig* config, conf::Settings* settings)
+	: AppCommand(config, settings, "runserver", "Starts Wasp web server")
 {
 	this->_host_port_flag = nullptr;
 	this->_threads_flag = nullptr;
@@ -85,77 +85,7 @@ void RunserverCommand::handle()
 	// TODO: remove!
 	ctx.verbose = true;
 
-	auto host_port_str = this->_host_port_flag->get();
-	if (!host_port_str.empty())
-	{
-		if (!this->_ipv4_ipv6_port_regex->match(host_port_str))
-		{
-			throw CommandError(host_port_str + " is not valid address:port pair");
-		}
-
-		auto groups = this->_ipv4_ipv6_port_regex->groups();
-		auto address = (groups[1].empty() ? this->DEFAULT_IPV4_HOST : groups[1]);
-		if (this->_ipv6_regex->match(address))
-		{
-			ctx.use_ipv6 = true;
-			str::ltrim(address, '[');
-			str::rtrim(address, ']');
-		}
-
-		ctx.host = address;
-		ctx.port = groups[2].empty() ? this->DEFAULT_PORT : (uint16_t) std::stoi(groups[2]);
-	}
-	else
-	{
-		auto address = this->_host_flag->get();
-		if (address.empty())
-		{
-			address = this->DEFAULT_IPV4_HOST;
-		}
-		else
-		{
-			if (this->_ipv6_regex->match(ctx.host))
-			{
-				ctx.use_ipv6 = true;
-				str::ltrim(address, '[');
-				str::rtrim(address, ']');
-			}
-			else if (!this->_ipv4_regex->match(ctx.host))
-			{
-				throw CommandError(this->_host_flag->get_raw() + " is invalid address");
-			}
-		}
-
-		ctx.host = address.empty() ? (
-			ctx.use_ipv6 ? this->DEFAULT_IPV6_HOST : this->DEFAULT_IPV4_HOST
-		) : address;
-		auto raw_port = this->_port_flag->get_raw();
-		if (raw_port.empty())
-		{
-			ctx.port = this->DEFAULT_PORT;
-		}
-		else
-		{
-			if (!this->_port_regex->match(raw_port))
-			{
-				throw CommandError(raw_port + " is invalid port");
-			}
-
-			ctx.port = this->_port_flag->get();
-		}
-	}
-
-	ctx.max_body_size = this->settings->DATA_UPLOAD_MAX_MEMORY_SIZE;
-	ctx.media_root = this->settings->MEDIA_ROOT;
-	ctx.logger = this->settings->LOGGER;
-
-	if (std::regex_match(this->_threads_flag->get_raw(), std::regex(R"(\d+)")))
-	{
-		throw CommandError("threads count is not a number: " + this->_threads_flag->get_raw());
-	}
-
-	ctx.threads_count = this->_threads_flag->get();
-	ctx.handler = this->get_handler();
+	this->setup_server_ctx(ctx);
 
 	core::internal::HttpServer server(ctx);
 	try
@@ -167,23 +97,28 @@ void RunserverCommand::handle()
 		server.finish();
 		this->settings->LOGGER->debug("Finished");
 	}
+	catch (const core::BaseException& exc)
+	{
+		this->settings->LOGGER->error(exc);
+	}
 	catch (const std::exception& exc)
 	{
-		this->settings->LOGGER->debug(exc.what(), _ERROR_DETAILS_);
+		this->settings->LOGGER->error(exc.what(), _ERROR_DETAILS_);
 	}
 }
 
 std::function<void(http::HttpRequest*, const core::internal::socket_t&)>
 RunserverCommand::get_handler()
 {
-	std::vector<urls::UrlPattern> urlpatterns{
-		urls::make_static(this->settings->STATIC_URL, this->settings->STATIC_ROOT)
-	};
-	if (!this->settings->INSTALLED_APPS.empty())
-	{
-		auto apps_patterns = this->settings->INSTALLED_APPS[0]->get_urlpatterns();
-		urlpatterns.insert(urlpatterns.end(), apps_patterns.begin(), apps_patterns.end());
-	}
+	std::vector<urls::UrlPattern> urlpatterns;
+
+	// Check if static/media files can be served
+	//  and create necessary urls.
+	this->build_static_patterns(urlpatterns);
+
+	// Retrieve main app patterns and append them
+	//  to result.
+	this->build_app_patterns(urlpatterns);
 
 	auto* settings = this->settings;
 	auto log_request = [settings](
@@ -263,6 +198,115 @@ RunserverCommand::get_handler()
 	};
 
 	return handler;
+}
+
+bool RunserverCommand::static_is_allowed(const std::string& static_url)
+{
+	auto parser = core::internal::url_parser();
+	parser.parse(static_url);
+
+	// Forbid serving local static files if not debug or
+	//  static url is non-local, i.e. is not url.
+	// TODO: check if net location is not empty.
+	return this->settings->DEBUG;
+}
+
+void RunserverCommand::build_static_patterns(std::vector<urls::UrlPattern>& patterns)
+{
+	if (!this->settings->STATIC_ROOT.empty() && this->static_is_allowed(this->settings->STATIC_URL))
+	{
+		patterns.push_back(urls::make_static(this->settings->STATIC_URL, this->settings->STATIC_ROOT));
+	}
+
+	if (!this->settings->MEDIA_ROOT.empty() && this->static_is_allowed(this->settings->MEDIA_URL))
+	{
+		patterns.push_back(urls::make_static(this->settings->MEDIA_URL, this->settings->MEDIA_ROOT));
+	}
+}
+
+void RunserverCommand::build_app_patterns(std::vector<urls::UrlPattern>& patterns)
+{
+	if (!this->settings->INSTALLED_APPS.empty())
+	{
+		auto apps_patterns = this->settings->INSTALLED_APPS[0]->get_urlpatterns();
+		patterns.insert(patterns.end(), apps_patterns.begin(), apps_patterns.end());
+	}
+}
+
+void RunserverCommand::setup_server_ctx(core::internal::HttpServer::context& ctx)
+{
+	// Setup host and port.
+	auto host_port_str = this->_host_port_flag->get();
+	if (!host_port_str.empty())
+	{
+		if (!this->_ipv4_ipv6_port_regex->match(host_port_str))
+		{
+			throw CommandError(host_port_str + " is not valid address:port pair");
+		}
+
+		auto groups = this->_ipv4_ipv6_port_regex->groups();
+		auto address = (groups[1].empty() ? this->DEFAULT_IPV4_HOST : groups[1]);
+		if (this->_ipv6_regex->match(address))
+		{
+			ctx.use_ipv6 = true;
+			str::ltrim(address, '[');
+			str::rtrim(address, ']');
+		}
+
+		ctx.host = address;
+		ctx.port = groups[2].empty() ? this->DEFAULT_PORT : (uint16_t) std::stoi(groups[2]);
+	}
+	else
+	{
+		auto address = this->_host_flag->get();
+		if (address.empty())
+		{
+			address = this->DEFAULT_IPV4_HOST;
+		}
+		else
+		{
+			if (this->_ipv6_regex->match(address))
+			{
+				ctx.use_ipv6 = true;
+				str::ltrim(address, '[');
+				str::rtrim(address, ']');
+			}
+			else if (!this->_ipv4_regex->match(address))
+			{
+				throw CommandError(this->_host_flag->get_raw() + " is invalid address");
+			}
+		}
+
+		ctx.host = address.empty() ? (
+			ctx.use_ipv6 ? this->DEFAULT_IPV6_HOST : this->DEFAULT_IPV4_HOST
+		) : address;
+		auto raw_port = this->_port_flag->get_raw();
+		if (raw_port.empty())
+		{
+			ctx.port = this->DEFAULT_PORT;
+		}
+		else
+		{
+			if (!this->_port_regex->match(raw_port))
+			{
+				throw CommandError(raw_port + " is invalid port");
+			}
+
+			ctx.port = this->_port_flag->get();
+		}
+	}
+
+	ctx.max_body_size = this->settings->DATA_UPLOAD_MAX_MEMORY_SIZE;
+	ctx.media_root = this->settings->MEDIA_ROOT;
+	ctx.logger = this->settings->LOGGER;
+
+	if (std::regex_match(this->_threads_flag->get_raw(), std::regex(R"(\d+)")))
+	{
+		throw CommandError("threads count is not a number: " + this->_threads_flag->get_raw());
+	}
+
+	ctx.threads_count = this->_threads_flag->get();
+	ctx.handler = this->get_handler();
 }
 
 __CORE_COMMANDS_END__

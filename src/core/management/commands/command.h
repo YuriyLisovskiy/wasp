@@ -37,7 +37,6 @@ class Command : public BaseCommand
 protected:
 	conf::Settings* settings;
 
-public:
 	Command(
 		conf::Settings* settings, const std::string& cmd_name, const std::string& help
 	);

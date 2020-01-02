@@ -14,10 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 #pragma once
 
 #include "../../src/apps/config.h"
 #include "../../src/views/view.h"
+#include "../../src/conf/settings.h"
 
 #include "./form_view.h"
 
@@ -25,7 +27,11 @@
 class FormAppConfig : public wasp::apps::AppConfig
 {
 public:
-	FormAppConfig()
+	explicit FormAppConfig(wasp::conf::Settings* settings) : AppConfig(settings)
+	{
+	}
+
+	void urlpatterns() override
 	{
 		this->url<FormView>(
 			R"(profile/<user_id>([0-9]*)/name/<user_name>([A-Za-z]+)/?)",

@@ -72,16 +72,6 @@ void Logger::fatal(const std::string& msg, int line, const char* function, const
 	this->log(msg, line, function, file, Logger::log_level_enum::ll_fatal);
 }
 
-void Logger::trace(const std::string& msg, int line, const char* function, const char* file)
-{
-	this->log(msg, line, function, file, Logger::log_level_enum::ll_trace);
-}
-
-void Logger::trace(const char* msg, int line, const char* function, const char* file)
-{
-	this->trace(std::string(msg), line, function, file);
-}
-
 void Logger::print(const std::string& msg, Color colour, char end)
 {
 	std::cout << this->get_colour(colour) << msg << this->_colors[Color::DEFAULT] << end;
@@ -90,6 +80,31 @@ void Logger::print(const std::string& msg, Color colour, char end)
 void Logger::print(const char* msg, Color colour, char end)
 {
 	this->print(std::string(msg), colour, end);
+}
+
+void Logger::info(const core::BaseException& exc)
+{
+	this->info(exc.what(), exc.line(), exc.function(), exc.file());
+}
+
+void Logger::debug(const core::BaseException& exc)
+{
+	this->debug(exc.what(), exc.line(), exc.function(), exc.file());
+}
+
+void Logger::warning(const core::BaseException& exc)
+{
+	this->warning(exc.what(), exc.line(), exc.function(), exc.file());
+}
+
+void Logger::error(const core::BaseException& exc)
+{
+	this->error(exc.what(), exc.line(), exc.function(), exc.file());
+}
+
+void Logger::fatal(const core::BaseException& exc)
+{
+	this->fatal(exc.what(), exc.line(), exc.function(), exc.file());
 }
 
 void Logger::log(const std::string& msg, int line, const char* function, const char* file, Logger::log_level_enum level)
@@ -119,11 +134,6 @@ void Logger::log(const std::string& msg, int line, const char* function, const c
 			is_enabled = this->_config.enable_fatal_log;
 			colour = Color::BOLD_RED;
 			break;
-		case Logger::log_level_enum::ll_trace:
-			level_name = "[trace]";
-			is_enabled = this->_config.enable_trace_log;
-			colour = Color::RED;
-			break;
 		default:
 			level_name = "[info]";
 			is_enabled = this->_config.enable_info_log;
@@ -139,17 +149,17 @@ void Logger::log(const std::string& msg, int line, const char* function, const c
 	std::string full_msg;
 	if (line != 0 && std::strlen(file) > 0 && std::strlen(function) > 0)
 	{
-		full_msg = "\tFile \"" + std::string(file) + "\", line "
+		full_msg = "\n\tFile \"" + std::string(file) + "\", line "
 			+ std::to_string(line) + ", in "
 			+ std::string(function) + "\n" + msg;
 	}
 	else
 	{
-		full_msg = msg;
+		full_msg = " " + msg;
 	}
 
 	std::string result = "[" + dt::now().strftime("%F %T") +
-		"] " + level_name + ":\n" + full_msg + "\n";
+		"] " + level_name + ":" + full_msg + "\n";
 	this->write_to_stream(result, this->get_colour(colour));
 }
 

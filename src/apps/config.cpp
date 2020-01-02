@@ -24,22 +24,42 @@
 
 __APPS_BEGIN__
 
+AppConfig::AppConfig(conf::Settings* settings)
+{
+	this->settings = settings;
+}
+
+std::string AppConfig::get_name()
+{
+	return this->app_name;
+}
+
 std::vector<urls::UrlPattern> AppConfig::get_urlpatterns()
 {
+	if (this->_urlpatterns.empty())
+	{
+		this->urlpatterns();
+	}
+
 	return this->_urlpatterns;
 }
 
-void AppConfig::include(const std::string& prefix, AppConfig* app)
+std::vector<core::BaseCommand*> AppConfig::get_commands()
 {
-	auto included_urlpatterns = app->get_urlpatterns();
-	app->_urlpatterns.clear();
-	for (const auto& pattern : included_urlpatterns)
+	if (this->_commands.empty())
 	{
-		this->_urlpatterns.emplace_back(
-			str::rtrim(str::starts_with(prefix, "/") ? prefix : "/" + prefix, '/'),
-			pattern
-		);
+		this->commands();
 	}
+
+	return this->_commands;
+}
+
+void AppConfig::urlpatterns()
+{
+}
+
+void AppConfig::commands()
+{
 }
 
 __APPS_END__

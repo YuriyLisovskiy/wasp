@@ -55,15 +55,13 @@ struct Settings final: public wasp::conf::Settings
 			this->middleware<wasp::middleware::CookieMiddleware>()
 		};
 
-		this->COMMANDS = {
-			this->command<wasp::core::cmd::RunserverCommand>()
-		};
-
 		this->MEDIA_ROOT = wasp::path::join(this->BASE_DIR, "media");
 		this->MEDIA_URL = "/media/";
 
 		this->STATIC_ROOT = wasp::path::join(this->BASE_DIR, "static");
 		this->STATIC_URL = "/static/";
+
+		this->DATA_UPLOAD_MAX_MEMORY_SIZE = 20971520;
 	}
 
 	// Override in local_settings.cpp!
