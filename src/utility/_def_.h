@@ -54,4 +54,9 @@
 #define __ENCODING_INTERNAL_END__ } __ENCODING_END__
 
 
+/// wasp::rgx
+#define __RGX_BEGIN__ __WASP_BEGIN__ namespace rgx {
+#define __RGX_END__ } __WASP_END__
+
+
 #endif // WASP_UTILITY_DEF_H

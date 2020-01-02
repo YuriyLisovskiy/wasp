@@ -14,9 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 #pragma once
 
 #include "../../src/apps/config.h"
+#include "../../src/conf/settings.h"
 
 #include "./picture_view.h"
 
@@ -24,7 +26,11 @@
 class PictureAppConfig : public wasp::apps::AppConfig
 {
 public:
-	PictureAppConfig()
+	explicit PictureAppConfig(wasp::conf::Settings* settings) : AppConfig(settings)
+	{
+	}
+
+	void urlpatterns() override
 	{
 		this->url<PictureView>(R"(view/pic/?)", "view_pic");
 	}

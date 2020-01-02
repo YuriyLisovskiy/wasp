@@ -38,6 +38,8 @@ const std::string LAST_MODIFIED = "Last-Modified";
 
 const std::string CONTENT_ENCODING = "Content-Encoding";
 
+const std::string CONTENT_LENGTH = "Content-Length";
+
 __HTTP_END__
 
 

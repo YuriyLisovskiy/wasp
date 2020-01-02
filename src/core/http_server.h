@@ -42,6 +42,7 @@
 #include "../conf/settings.h"
 #include "../http/response.h"
 #include "../http/request.h"
+#include "../http/headers.h"
 #include "./parsers/request_parser.h"
 #include "../core/sockets/server_socket.h"
 #include "../core/exceptions.h"
@@ -70,6 +71,8 @@ private:
 	const char* _host;
 	uint16_t _port;
 	const char* _schema;
+	bool _use_ipv6;
+	bool _verbose;
 	size_t _max_body_size;
 	ServerSocket _server_socket;
 	http_handler _http_handler;
@@ -105,13 +108,15 @@ private:
 public:
 	struct context
 	{
-		const char* host = nullptr;
+		std::string host;
 		uint16_t port = 0;
 		http_handler handler = nullptr;
 		utility::ILogger* logger;
 		size_t max_body_size = 0;
 		std::string media_root;
 		size_t threads_count = 0;
+		bool use_ipv6 = false;
+		bool verbose = false;
 	};
 
 	explicit HttpServer(HttpServer::context& ctx);
@@ -122,7 +127,7 @@ public:
 	static void send(http::StreamingHttpResponse* response, const socket_t& client);
 
 private:
-	static void _normalize_context(HttpServer::context& ctx);
+	static void _check_context(HttpServer::context& ctx);
 };
 
 __CORE_INTERNAL_END__

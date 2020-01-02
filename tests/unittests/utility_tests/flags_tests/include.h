@@ -15,36 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#ifndef WASP_UNIT_TESTS_UTILITY_TESTS_FLAGS_TESTS_INCLUDE_H
+#define WASP_UNIT_TESTS_UTILITY_TESTS_FLAGS_TESTS_INCLUDE_H
 
-#include "../../src/apps/config.h"
-#include "../../src/views/view.h"
-#include "../../src/conf/settings.h"
+#include "./flags_tests.h"
 
-#include "./main_view.h"
-#include "../form_app/app.h"
-#include "../picture_app/app.h"
-#include "./commands/hello_command.h"
-
-
-class MainAppConfig : public wasp::apps::AppConfig
-{
-public:
-	explicit MainAppConfig(wasp::conf::Settings* settings)
-		: AppConfig(settings)
-	{
-	}
-
-	void urlpatterns() override
-	{
-		this->url<MainView>(R"(index/?)", "index");
-		this->include<PictureAppConfig>(R"(picture/)");
-		this->include<FormAppConfig>(R"(form/)");
-		this->url<RedirectView>(R"(/?)", "root");
-	}
-
-	void commands() override
-	{
-		this->command<HelloCommand>();
-	}
-};
+#endif // WASP_UNIT_TESTS_UTILITY_TESTS_FLAGS_TESTS_INCLUDE_H

@@ -15,36 +15,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * regex.h
+ * Purpose: C++ regular expression's utilities.
+ */
+
 #pragma once
 
-#include "../../src/apps/config.h"
-#include "../../src/views/view.h"
-#include "../../src/conf/settings.h"
+// C++ libraries.
+#include <regex>
+#include <vector>
+#include <string>
 
-#include "./main_view.h"
-#include "../form_app/app.h"
-#include "../picture_app/app.h"
-#include "./commands/hello_command.h"
+// Module definitions.
+#include "./_def_.h"
 
 
-class MainAppConfig : public wasp::apps::AppConfig
+__RGX_BEGIN__
+
+class Regex final
 {
+private:
+	bool _is_matched;
+	std::string _to_match;
+	std::regex _expr;
+
 public:
-	explicit MainAppConfig(wasp::conf::Settings* settings)
-		: AppConfig(settings)
-	{
-	}
-
-	void urlpatterns() override
-	{
-		this->url<MainView>(R"(index/?)", "index");
-		this->include<PictureAppConfig>(R"(picture/)");
-		this->include<FormAppConfig>(R"(form/)");
-		this->url<RedirectView>(R"(/?)", "root");
-	}
-
-	void commands() override
-	{
-		this->command<HelloCommand>();
-	}
+	explicit Regex(const std::string& expr);
+	bool match(const std::string& to_match);
+	std::vector<std::string> groups();
 };
+
+__RGX_END__

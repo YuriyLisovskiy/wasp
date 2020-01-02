@@ -28,9 +28,7 @@ Settings::Settings()
 {
 	this->DEBUG = false;
 
-	this->LOGGER = utility::Logger::get_instance();
-
-	this->ALLOWED_HOSTS = {"127.0.0.1", "localhost"};
+	this->LOGGER = utility::Logger::get_instance({});
 
 	this->TIME_ZONE = "America/Chicago";
 
@@ -90,7 +88,11 @@ Settings::Settings()
 	this->CSRF_HEADER_NAME = "HTTP_X_CSRFTOKEN";
 	this->CSRF_USE_SESSIONS = false;
 
-	this->QUEUE_THREADS_COUNT = 16;
+	this->USE_SSL = false;
+}
+
+void Settings::overwrite()
+{
 }
 
 Settings::~Settings()
@@ -103,6 +105,11 @@ Settings::~Settings()
 	for (auto& middleware : this->MIDDLEWARE)
 	{
 		delete middleware;
+	}
+
+	for (auto& command : this->COMMANDS)
+	{
+		delete command.second;
 	}
 }
 

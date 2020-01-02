@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * settings
- * TODO: write docs.
+/**
+ * settings.h
+ * Purpose: entire Wasp application's settings.
  */
 
-#ifndef WASP_CONF_SETTINGS_H
-#define WASP_CONF_SETTINGS_H
+#pragma once
 
 // C++ libraries.
+#include <map>
 #include <string>
 #include <vector>
 #include <regex>
@@ -33,8 +33,9 @@
 
 // Wasp libraries.
 #include "../utility/logger.h"
-#include "../apps/config.h"
+#include "../apps/interface.h"
 #include "../middleware/interface.h"
+#include "../core/management/base.h"
 
 
 __CONF_BEGIN__
@@ -69,7 +70,10 @@ struct Settings
 	// List of AppConfig-derived objects representing apps.
 	// Order is required. The first app is interpreted as
 	// main application configuration.
-	std::vector<apps::AppConfig*> INSTALLED_APPS;
+	std::vector<apps::IAppConfig*> INSTALLED_APPS;
+
+	// List of commands to run from command line.
+	std::map<std::string, core::BaseCommand*> COMMANDS;
 
 	// List of paths where templates can be found.
 	std::vector<std::string> TEMPLATES;
@@ -178,9 +182,9 @@ struct Settings
 	bool USE_X_FORWARDED_HOST;
 	bool USE_X_FORWARDED_PORT;
 
-	//# List of middleware to use. Order is important; in the request phase, these
-	//# middleware will be applied in the order given, and in the response
-	//# phase the middleware will be applied in reverse order.
+	// List of middleware to use. Order is important; in the request phase, these
+	// middleware will be applied in the order given, and in the response
+	// phase the middleware will be applied in reverse order.
 	std::vector<middleware::IMiddleware*> MIDDLEWARE;
 
 	// Settings for CSRF cookie.
@@ -195,18 +199,18 @@ struct Settings
 	std::vector<std::string> CSRF_TRUSTED_ORIGINS;
 	bool CSRF_USE_SESSIONS;
 
-	// Additional server settings.
-	// Threads count in queued thread pool.
-	size_t QUEUE_THREADS_COUNT;
+	// SSL settings (will be added in future).
+	bool USE_SSL;
 
 	Settings();
 	virtual ~Settings();
+	virtual void init() = 0;
+	virtual void overwrite();
 
-	// TODO:
-	template <typename _T, typename = std::enable_if<std::is_base_of<apps::AppConfig, _T>::value>>
-	apps::AppConfig* app()
+	template <typename _T, typename = std::enable_if<std::is_base_of<apps::IAppConfig, _T>::value>>
+	apps::IAppConfig* app()
 	{
-		return new _T();
+		return new _T(this);
 	}
 
 	template <typename _T, typename = std::enable_if<std::is_base_of<middleware::IMiddleware, _T>::value>>
@@ -214,9 +218,13 @@ struct Settings
 	{
 		return new _T(this);
 	}
+
+	template <typename _CommandT, typename = std::enable_if<std::is_base_of<core::BaseCommand, _CommandT>::value>>
+	std::pair<std::string, core::BaseCommand*> command()
+	{
+		auto* command = new _CommandT(this);
+		return std::pair{command->name(), command};
+	}
 };
 
 __CONF_END__
-
-
-#endif // WASP_CONF_SETTINGS_H

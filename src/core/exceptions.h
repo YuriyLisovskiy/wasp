@@ -26,6 +26,7 @@
  *
  * - Wasp errors:
  *  - AttributeError;
+ *  - CommandError;
  *  - DictError;
  *  - DisallowedRedirect;
  *  - EncodingError;
@@ -120,6 +121,17 @@ protected:
 public:
 	AttributeError(const char* message, int line, const char* function, const char* file);
 	AttributeError(const std::string& message, int line, const char* function, const char* file);
+};
+
+
+class CommandError : public BaseException
+{
+protected:
+	// Use only when initializing of a derived exception!
+	CommandError(const char* message, int line, const char* function, const char* file, const char* type);
+public:
+	explicit CommandError(const char* message, int line = 0, const char* function = "", const char* file = "");
+	explicit CommandError(const std::string& message, int line = 0, const char* function = "", const char* file = "");
 };
 
 

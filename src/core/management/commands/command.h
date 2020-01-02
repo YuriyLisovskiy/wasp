@@ -15,36 +15,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * command.h
+ * Purpose: base class for all commands
+ */
+
 #pragma once
 
-#include "../../src/apps/config.h"
-#include "../../src/views/view.h"
-#include "../../src/conf/settings.h"
+// Module definitions.
+#include "./_def_.h"
 
-#include "./main_view.h"
-#include "../form_app/app.h"
-#include "../picture_app/app.h"
-#include "./commands/hello_command.h"
+// Wasp libraries.
+#include "../base.h"
+#include "../../../conf/settings.h"
 
 
-class MainAppConfig : public wasp::apps::AppConfig
+__CORE_COMMANDS_BEGIN__
+
+class Command : public BaseCommand
 {
-public:
-	explicit MainAppConfig(wasp::conf::Settings* settings)
-		: AppConfig(settings)
-	{
-	}
+protected:
+	conf::Settings* settings;
 
-	void urlpatterns() override
-	{
-		this->url<MainView>(R"(index/?)", "index");
-		this->include<PictureAppConfig>(R"(picture/)");
-		this->include<FormAppConfig>(R"(form/)");
-		this->url<RedirectView>(R"(/?)", "root");
-	}
-
-	void commands() override
-	{
-		this->command<HelloCommand>();
-	}
+	Command(
+		conf::Settings* settings, const std::string& cmd_name, const std::string& help
+	);
 };
+
+__CORE_COMMANDS_END__

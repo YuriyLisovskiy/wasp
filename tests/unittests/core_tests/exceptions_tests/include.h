@@ -20,6 +20,7 @@
 
 #include "./attribute_error_tests.h"
 #include "./base_exception_tests.h"
+#include "./command_error_tests.h"
 #include "./dict_error_tests.h"
 #include "./disallowed_redirect_tests.h"
 #include "./encoding_error_tests.h"

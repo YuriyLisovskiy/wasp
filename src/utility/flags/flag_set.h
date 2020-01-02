@@ -25,14 +25,13 @@
 // C++ libraries.
 #include <map>
 #include <string>
-#include <iostream>
 
 // Module definitions.
 #include "./_def_.h"
 
 // Wasp libraries.
 #include "./flags.h"
-#include "../string/str.h"
+#include "./parser.h"
 
 
 __FLAGS_BEGIN__
@@ -41,21 +40,14 @@ class FlagSet final
 {
 private:
 	std::string _name;
+	std::string _usage;
 	std::map<std::string, Flag*> _flags;
 
-	struct flag_parser
-	{
-		std::map<std::string, std::string> flags;
-
-		explicit flag_parser(int argc, char** argv, bool is_verbose = false);
-		bool exists(const std::string& label);
-		std::string get_arg(const std::string& label);
-	};
-
 public:
-	explicit FlagSet(const std::string& name);
+	explicit FlagSet(const std::string& name, const std::string& usage = "");
 	~FlagSet();
-	void parse(int argc, char** argv, bool is_verbose = false);
+	void parse(int argc, char** argv, size_t parse_from = 1, bool is_verbose = false);
+	std::string usage(const std::string& indent = "");
 	LongIntFlag* make_long(
 		const std::string& label, long default_val, const std::string& help
 	);

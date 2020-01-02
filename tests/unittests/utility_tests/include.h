@@ -18,9 +18,9 @@
 #ifndef WASP_UNIT_TESTS_UTILITY_TESTS_INCLUDE_H
 #define WASP_UNIT_TESTS_UTILITY_TESTS_INCLUDE_H
 
+#include "./flags_tests/include.h"
 #include "./string_tests/include.h"
 
-#include "./flags_tests.h"
 #include "./encoding_tests.h"
 #include "./mime_types_tests.h"
 #include "./path_tests.h"

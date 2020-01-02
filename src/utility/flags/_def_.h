@@ -28,3 +28,7 @@
 /// wasp::flags
 #define __FLAGS_BEGIN__ __WASP_BEGIN__ namespace flags {
 #define __FLAGS_END__ } __WASP_END__
+
+/// wasp::flags::internal
+#define __FLAGS_INTERNAL_BEGIN__ __FLAGS_BEGIN__ namespace internal {
+#define __FLAGS_INTERNAL_END__ } __FLAGS_END__

@@ -24,59 +24,10 @@
 
 __FLAGS_BEGIN__
 
-FlagSet::flag_parser::flag_parser(int argc, char** argv, bool is_verbose)
-{
-	std::string last_arg;
-	bool is_received = true;
-	if (is_verbose)
-	{
-		std::cout << "Parsing the command line arguments..." << std::endl;
-	}
-
-	for (size_t i = 1; i < argc; i++)
-	{
-		std::string token = argv[i];
-		if (str::starts_with(token, "--"))
-		{
-			if (!is_received)
-			{
-				this->flags[last_arg] = "true";
-			}
-
-			last_arg = str::ltrim(std::move(token), '-');
-			is_received = false;
-		}
-		else
-		{
-			is_received = true;
-			this->flags[last_arg] = token;
-		}
-	}
-
-	if (is_verbose){
-		std::cout << "---------------------------" << std::endl;
-		std::cout << "Parsed arguments:" << std::endl;
-		for(auto& a : this->flags)
-		{
-			std::cout << "    " << a.first << ": " << a.second << std::endl;
-		}
-		std::cout << "---------------------------" << std::endl;
-	}
-}
-
-bool FlagSet::flag_parser::exists(const std::string& label)
-{
-	return this->flags.find(label) != this->flags.end();
-}
-
-std::string FlagSet::flag_parser::get_arg(const std::string& label)
-{
-	return this->flags[label];
-}
-
-FlagSet::FlagSet(const std::string& name)
+FlagSet::FlagSet(const std::string& name, const std::string& usage)
 {
 	this->_name = name;
+	this->_usage = usage;
 }
 
 FlagSet::~FlagSet()
@@ -87,16 +38,32 @@ FlagSet::~FlagSet()
 	}
 }
 
-void FlagSet::parse(int argc, char** argv, bool is_verbose)
+void FlagSet::parse(int argc, char** argv, size_t parse_from, bool is_verbose)
 {
-	flag_parser fp(argc, argv, is_verbose);
+	internal::args_parser ap(argc, argv, parse_from, is_verbose);
 	for (auto& flag : this->_flags)
 	{
-		if (fp.exists(flag.first))
+		if (ap.exists(flag.first))
 		{
-			flag.second->_data = fp.get_arg(flag.first);
+			flag.second->_data = ap.get_arg(flag.first);
 		}
 	}
+}
+
+std::string FlagSet::usage(const std::string& indent)
+{
+	if (!this->_usage.empty())
+	{
+		return this->_usage;
+	}
+
+	std::string usage = indent + "Help options:";
+	for (auto& flag : this->_flags)
+	{
+		usage.append("\n" + indent + "  --" + flag.first + "\t" + flag.second->usage());
+	}
+
+	return usage;
 }
 
 LongIntFlag* FlagSet::make_long(

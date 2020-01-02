@@ -27,10 +27,13 @@ __CORE_INTERNAL_BEGIN__
 // Public methods.
 HttpServer::HttpServer(HttpServer::context& ctx) : _finished(true)
 {
-	HttpServer::_normalize_context(ctx);
+	HttpServer::_check_context(ctx);
 
-	this->_host = ctx.host;
+	this->_verbose = ctx.verbose;
+
+	this->_host = ctx.host.c_str();
 	this->_port = ctx.port;
+	this->_use_ipv6 = ctx.use_ipv6;
 	this->_logger = ctx.logger;
 
 	this->_max_body_size = ctx.max_body_size;
@@ -43,7 +46,7 @@ HttpServer::HttpServer(HttpServer::context& ctx) : _finished(true)
 
 	this->_media_root = ctx.media_root;
 
-	this->_thread_pool = new core::internal::ThreadPool(ctx.threads_count);
+	this->_thread_pool = new core::internal::ThreadPool(this->_threads_count);
 }
 
 HttpServer::~HttpServer()
@@ -60,10 +63,7 @@ void HttpServer::finish()
 
 	if (this->_server_socket.close() == SOCKET_ERROR)
 	{
-		if (this->_logger != nullptr)
-		{
-			this->_logger->trace("Failed to close socket connection", _ERROR_DETAILS_);
-		}
+		this->_logger->error("Failed to close socket connection", _ERROR_DETAILS_);
 	}
 
 	HttpServer::_wsa_clean_up();
@@ -93,13 +93,18 @@ void HttpServer::listen_and_serve()
 	}
 #endif
 
+	std::string host(this->_host);
+	if (this->_use_ipv6)
+	{
+		host = "[" + host + "]";
+	}
+
 	std::cout << str::format(
-		conf::internal::STARTUP_MESSAGE, this->_schema, this->_host, this->_port
-	);
+		conf::internal::STARTUP_MESSAGE, this->_schema, host.c_str(), this->_port
+	) << '\n';
 	std::cout.flush();
 
 	this->_finished = false;
-
 	this->_start_listener();
 }
 
@@ -145,15 +150,12 @@ int HttpServer::_init()
 
 int HttpServer::_create()
 {
-	if (this->_server_socket.create(this->_host, this->_port) == INVALID_SOCKET)
+	if (this->_server_socket.create(this->_host, this->_port, this->_use_ipv6) == INVALID_SOCKET)
 	{
-		if (this->_logger != nullptr)
-		{
-			this->_logger->trace(
-				"Failed to initialize server at port " + std::to_string(this->_port),
-				_ERROR_DETAILS_
-			);
-		}
+		this->_logger->error(
+			"Failed to initialize server at port " + std::to_string(this->_port),
+			_ERROR_DETAILS_
+		);
 
 		HttpServer::_wsa_clean_up();
 		return INVALID_SOCKET;
@@ -166,20 +168,14 @@ int HttpServer::_bind()
 {
 	if (this->_server_socket.bind() == SOCKET_ERROR)
 	{
-		if (this->_logger != nullptr)
-		{
-			this->_logger->trace(
-				"Failed to bind socket to port " + std::to_string(this->_port),
-				_ERROR_DETAILS_
-			);
-		}
+		this->_logger->error(
+			"Failed to bind socket to port " + std::to_string(this->_port),
+			_ERROR_DETAILS_
+		);
 
 		if (this->_server_socket.close() == SOCKET_ERROR)
 		{
-			if (this->_logger != nullptr)
-			{
-				this->_logger->trace("Failed to close socket connection", _ERROR_DETAILS_);
-			}
+			this->_logger->trace("Failed to close socket connection", _ERROR_DETAILS_);
 		}
 
 		HttpServer::_wsa_clean_up();
@@ -193,13 +189,10 @@ int HttpServer::_listen()
 {
 	if (this->_server_socket.listen() == SOCKET_ERROR)
 	{
-		if (this->_logger != nullptr)
-		{
-			this->_logger->trace(
-				"Failed to listen at port " + std::to_string(this->_port),
-				_ERROR_DETAILS_
-			);
-		}
+		this->_logger->error(
+			"Failed to listen at port " + std::to_string(this->_port),
+			_ERROR_DETAILS_
+		);
 
 		return SOCKET_ERROR;
 	}
@@ -217,13 +210,12 @@ void HttpServer::_clean_up(const socket_t& client)
 #else
 	ret = SOCKET_ERROR;
 #endif
+
 	if (ret == SOCKET_ERROR)
 	{
-		if (this->_logger != nullptr)
-		{
-			this->_logger->trace("Failed to close socket connection", _ERROR_DETAILS_);
-		}
+		this->_logger->error("Failed to close socket connection", _ERROR_DETAILS_);
 	}
+
 	HttpServer::_wsa_clean_up();
 }
 
@@ -236,9 +228,9 @@ http::HttpRequest* HttpServer::_handle_request(const socket_t& client)
 
 	rp.parse_headers(headers_str);
 	auto headers = rp.get_headers();
-	if (headers.contains("Content-Length"))
+	if (headers.contains(http::CONTENT_LENGTH))
 	{
-		size_t body_length = std::strtol(headers.get("Content-Length").c_str(), nullptr, 10);
+		size_t body_length = std::strtol(headers.get(http::CONTENT_LENGTH).c_str(), nullptr, 10);
 		std::string body;
 		if (body_length == body_beginning.size())
 		{
@@ -364,58 +356,18 @@ std::string HttpServer::_read_headers(const socket_t& client, std::string& body_
 
 void HttpServer::_start_listener()
 {
-	bool listening = true;
-	while (listening)
+	while (true)
 	{
-		try
+		socket_t connection = this->_server_socket.accept();
+		if (connection != INVALID_SOCKET)
 		{
-			socket_t connection = this->_server_socket.accept();
-			if (connection != INVALID_SOCKET)
-			{
-				this->_thread_pool->push(
-					[this, connection] { this->_thread_func(connection); }
-				);
-			}
-			else
-			{
-				if (this->_logger != nullptr)
-				{
-					this->_logger->trace("Invalid socket connection", _ERROR_DETAILS_);
-				}
-			}
+			this->_thread_pool->push(
+				[this, connection] { this->_thread_func(connection); }
+			);
 		}
-		catch (const InterruptException& exc)
+		else
 		{
-			throw InterruptException(exc.what(), exc.line(), exc.function(), exc.file());
-		}
-		catch (const std::exception& exc)
-		{
-			if (this->_logger != nullptr)
-			{
-				this->_logger->trace(exc.what(), _ERROR_DETAILS_);
-			}
-
-			listening = false;
-		}
-		catch (const char* exc)
-		{
-			if (this->_logger != nullptr)
-			{
-				this->_logger->trace(exc, _ERROR_DETAILS_);
-			}
-
-			listening = false;
-		}
-		catch (...)
-		{
-			if (this->_logger != nullptr)
-			{
-				this->_logger->trace(
-					"Error occurred while listening for socket connection", _ERROR_DETAILS_
-				);
-			}
-
-			listening = false;
+			this->_logger->error("Invalid socket connection", _ERROR_DETAILS_);
 		}
 	}
 }
@@ -427,7 +379,10 @@ void HttpServer::_serve_connection(const socket_t& client)
 	{
 		// TODO: remove when release ------------------------:
 		dt::Measure<std::chrono::milliseconds> measure;
-		measure.start();
+		if (this->_verbose)
+		{
+			measure.start();
+		}
 		// TODO: remove when release ------------------------^
 
 		http::HttpRequest* request = this->_handle_request(client);
@@ -435,52 +390,42 @@ void HttpServer::_serve_connection(const socket_t& client)
 		delete request;
 
 		// TODO: remove when release -------------------------------------------------------------:
-		measure.end();
-		std::cout << '\n' << request->method() + " request took " << measure.elapsed() << " ms\n";
+		if (this->_verbose)
+		{
+			measure.end();
+			std::cout << '\n' << request->method() << " request took " << measure.elapsed() << " ms\n";
+		}
 		// TODO: remove when release -------------------------------------------------------------^
 	}
 	catch (const SuspiciousOperation& exc)
 	{
-		if (this->_logger != nullptr)
-		{
-			this->_logger->trace(exc.what(), exc.line(), exc.function(), exc.file());
-		}
+		this->_logger->error(exc.what(), exc.line(), exc.function(), exc.file());
 		error_response = new http::HttpResponseBadRequest(
 			"<p style=\"font-size: 24px;\" >Bad Request</p>"
 		);
 	}
 	catch (const EntityTooLargeError& exc)
 	{
-		if (this->_logger != nullptr)
-		{
-			this->_logger->trace(exc.what(), exc.line(), exc.function(), exc.file());
-		}
+		this->_logger->error(exc.what(), exc.line(), exc.function(), exc.file());
 		error_response = new http::HttpResponseEntityTooLarge(
 			"<p style=\"font-size: 24px;\" >Entity Too Large</p>"
 		);
 	}
 	catch (const BaseException& exc)
 	{
-		if (this->_logger != nullptr)
-		{
-			this->_logger->trace(exc.what(), exc.line(), exc.function(), exc.file());
-		}
-
+		this->_logger->error(exc.what(), exc.line(), exc.function(), exc.file());
 		error_response = new http::HttpResponseServerError(
 			"<p style=\"font-size: 24px;\" >Internal Server Error</p>"
 		);
 	}
 	catch (const std::exception& exc)
 	{
-		if (this->_logger != nullptr)
-		{
-			this->_logger->trace(exc.what(), _ERROR_DETAILS_);
-		}
-
+		this->_logger->error(exc.what(), _ERROR_DETAILS_);
 		error_response = new http::HttpResponseServerError(
 			"<p style=\"font-size: 24px;\" >Internal Server Error</p>"
 		);
 	}
+
 	if (error_response != nullptr)
 	{
 		HttpServer::_send(error_response->serialize().c_str(), client);
@@ -490,18 +435,7 @@ void HttpServer::_serve_connection(const socket_t& client)
 
 void HttpServer::_thread_func(const socket_t& client)
 {
-	try
-	{
-		this->_serve_connection(client);
-	}
-	catch (const std::exception& exc)
-	{
-		if (this->_logger != nullptr)
-		{
-			this->_logger->trace(exc.what(), _ERROR_DETAILS_);
-		}
-	}
-
+	this->_serve_connection(client);
 	HttpServer::_clean_up(client);
 }
 
@@ -543,21 +477,26 @@ HttpServer::read_result_enum HttpServer::_handle_error(
 	}
 }
 
-void HttpServer::_normalize_context(HttpServer::context& ctx)
+void HttpServer::_check_context(HttpServer::context& ctx)
 {
-	if (ctx.host == nullptr)
+	if (ctx.host.empty())
 	{
-		ctx.host = conf::internal::DEFAULT_HOST;
+		throw ValueError("host address can not be nullptr", _ERROR_DETAILS_);
 	}
 
 	if (ctx.port == 0)
 	{
-		ctx.port = conf::internal::DEFAULT_PORT;
+		throw ValueError("server port can not be nullptr", _ERROR_DETAILS_);
 	}
 
 	if (ctx.handler == nullptr)
 	{
-		throw HttpError("HttpServer::Context::handler can not be nullptr", _ERROR_DETAILS_);
+		throw ValueError("HttpServer::Context::handler can not be nullptr", _ERROR_DETAILS_);
+	}
+
+	if (ctx.logger == nullptr)
+	{
+		throw ValueError("logger can not be nullptr", _ERROR_DETAILS_);
 	}
 
 	str::rtrim(ctx.media_root, '/');

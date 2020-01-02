@@ -15,36 +15,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * app_command.h
+ * Purpose: The base class for AppConfig commands.
+ */
+
 #pragma once
 
-#include "../../src/apps/config.h"
-#include "../../src/views/view.h"
-#include "../../src/conf/settings.h"
+// Module definitions.
+#include "./_def_.h"
 
-#include "./main_view.h"
-#include "../form_app/app.h"
-#include "../picture_app/app.h"
-#include "./commands/hello_command.h"
+// Wasp libraries.
+#include "./command.h"
+#include "../../../apps/interface.h"
 
 
-class MainAppConfig : public wasp::apps::AppConfig
+__CORE_COMMANDS_BEGIN__
+
+/// Derived commands must have a constructor
+///	with pointer to apps::IAppConfig and pointer
+/// to conf::Settings parameters.
+class AppCommand : public Command
 {
-public:
-	explicit MainAppConfig(wasp::conf::Settings* settings)
-		: AppConfig(settings)
-	{
-	}
+protected:
+	apps::IAppConfig* app_config;
 
-	void urlpatterns() override
-	{
-		this->url<MainView>(R"(index/?)", "index");
-		this->include<PictureAppConfig>(R"(picture/)");
-		this->include<FormAppConfig>(R"(form/)");
-		this->url<RedirectView>(R"(/?)", "root");
-	}
-
-	void commands() override
-	{
-		this->command<HelloCommand>();
-	}
+	AppCommand(
+		apps::IAppConfig* app_cfg, conf::Settings* settings, const std::string& cmd_name, const std::string& help
+	);
 };
+
+__CORE_COMMANDS_END__

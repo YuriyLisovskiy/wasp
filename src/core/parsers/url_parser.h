@@ -56,6 +56,11 @@ struct url_parser final
 	};
 
 	bool is_parsed;
+	const char* last_err;
+	size_t err_line;
+	const char* err_file;
+	const char* err_func;
+
 	std::string scheme;
 	std::string username;
 	std::string password;
@@ -70,6 +75,8 @@ struct url_parser final
 	void parse(const std::string& str);
 	void parse(const char* str);
 	static bool is_unreserved(char ch);
+
+	void set_err(const char* err, int line, const char* func, const char* file);
 };
 
 __CORE_INTERNAL_END__

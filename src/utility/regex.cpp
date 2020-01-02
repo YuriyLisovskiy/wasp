@@ -16,50 +16,46 @@
  */
 
 /**
- * An implementation of config.h.
+ * An implementation of regex.h.
  */
 
-#include "./config.h"
+#include "./regex.h"
 
 
-__APPS_BEGIN__
+__RGX_BEGIN__
 
-AppConfig::AppConfig(conf::Settings* settings)
+Regex::Regex(const std::string& expr)
 {
-	this->settings = settings;
+	this->_expr = std::regex(expr);
+	this->_is_matched = false;
 }
 
-std::string AppConfig::get_name()
+bool Regex::match(const std::string& to_match)
 {
-	return this->app_name;
+	this->_to_match = to_match;
+	this->_is_matched = std::regex_match(this->_to_match, this->_expr);
+	return this->_is_matched;
 }
 
-std::vector<urls::UrlPattern> AppConfig::get_urlpatterns()
+std::vector<std::string> Regex::groups()
 {
-	if (this->_urlpatterns.empty())
+	std::vector<std::string> groups;
+	if (this->_is_matched)
 	{
-		this->urlpatterns();
+		std::smatch matches;
+		if (std::regex_search(this->_to_match, matches, this->_expr))
+		{
+			for (size_t i = 1; i < matches.size(); i++)
+			{
+				if (matches[i].matched)
+				{
+					groups.push_back(matches[i].str());
+				}
+			}
+		}
 	}
 
-	return this->_urlpatterns;
+	return groups;
 }
 
-std::vector<core::BaseCommand*> AppConfig::get_commands()
-{
-	if (this->_commands.empty())
-	{
-		this->commands();
-	}
-
-	return this->_commands;
-}
-
-void AppConfig::urlpatterns()
-{
-}
-
-void AppConfig::commands()
-{
-}
-
-__APPS_END__
+__RGX_END__

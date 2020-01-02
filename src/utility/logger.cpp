@@ -28,14 +28,23 @@ Logger::~Logger()
 	Logger::_instance = nullptr;
 }
 
-ILogger* Logger::get_instance()
+ILogger* Logger::get_instance(const Logger::Config& cfg)
 {
 	if (Logger::_instance == nullptr)
 	{
-		Logger::_instance = new Logger();
+		Logger::_instance = new Logger(cfg);
 	}
 
 	return Logger::_instance;
+}
+
+Logger::Logger(const Logger::Config& cfg)
+{
+	this->_config = cfg;
+	if (cfg.streams.empty())
+	{
+		this->_config.streams.emplace_back(&std::cout);
+	}
 }
 
 void Logger::info(const std::string& msg, int line, const char* function, const char* file)
@@ -63,64 +72,124 @@ void Logger::fatal(const std::string& msg, int line, const char* function, const
 	this->log(msg, line, function, file, Logger::log_level_enum::ll_fatal);
 }
 
-void Logger::trace(const std::string& msg, int line, const char* function, const char* file)
+void Logger::print(const std::string& msg, Color colour, char end)
 {
-	this->write_to_stream(
-		"Traceback (exception):\n  File \"" + std::string(file) + "\", line " +
-		std::to_string(line) + ", in " + std::string(function) + "\n" + msg + "\n",
-		Logger::log_level_enum::ll_error
-	);
+	std::cout << this->get_colour(colour) << msg << this->_colors[Color::DEFAULT] << end;
 }
 
-void Logger::trace(const char* msg, int line, const char* function, const char* file)
+void Logger::print(const char* msg, Color colour, char end)
 {
-	this->trace(std::string(msg), line, function, file);
+	this->print(std::string(msg), colour, end);
+}
+
+void Logger::info(const core::BaseException& exc)
+{
+	this->info(exc.what(), exc.line(), exc.function(), exc.file());
+}
+
+void Logger::debug(const core::BaseException& exc)
+{
+	this->debug(exc.what(), exc.line(), exc.function(), exc.file());
+}
+
+void Logger::warning(const core::BaseException& exc)
+{
+	this->warning(exc.what(), exc.line(), exc.function(), exc.file());
+}
+
+void Logger::error(const core::BaseException& exc)
+{
+	this->error(exc.what(), exc.line(), exc.function(), exc.file());
+}
+
+void Logger::fatal(const core::BaseException& exc)
+{
+	this->fatal(exc.what(), exc.line(), exc.function(), exc.file());
 }
 
 void Logger::log(const std::string& msg, int line, const char* function, const char* file, Logger::log_level_enum level)
 {
 	std::string level_name;
+	bool is_enabled;
+	Color colour;
 	switch (level)
 	{
 		case Logger::log_level_enum::ll_warning:
 			level_name = "[warning]";
+			is_enabled = this->_config.enable_warning_log;
+			colour = Color::YELLOW;
 			break;
 		case Logger::log_level_enum::ll_error:
 			level_name = "[error]";
+			is_enabled = this->_config.enable_error_log;
+			colour = Color::RED;
 			break;
 		case Logger::log_level_enum::ll_debug:
 			level_name = "[debug]";
+			is_enabled = this->_config.enable_debug_log;
+			colour = Color::MAGENTA;
 			break;
 		case Logger::log_level_enum::ll_fatal:
 			level_name = "[fatal]";
+			is_enabled = this->_config.enable_fatal_log;
+			colour = Color::BOLD_RED;
 			break;
 		default:
 			level_name = "[info]";
+			is_enabled = this->_config.enable_info_log;
+			colour = Color::CYAN;
 			break;
 	}
-	std::locale::global(std::locale("uk_UA.utf8"));
-	std::time_t t = std::time(nullptr);
-	char now[100];
-	std::strftime(now, sizeof(now), "%F %T", std::localtime(&t));
+
+	if (!is_enabled)
+	{
+		return;
+	}
 
 	std::string full_msg;
-	if (line == 0 && std::strlen(file) > 0 && std::strlen(function) > 0)
+	if (line != 0 && std::strlen(file) > 0 && std::strlen(function) > 0)
 	{
-		full_msg = "\tFile \"" + std::string(file) + "\", line " + std::to_string(line) + ", in " + std::string(function) + "\n" + msg;
+		full_msg = "\n\tFile \"" + std::string(file) + "\", line "
+			+ std::to_string(line) + ", in "
+			+ std::string(function) + "\n" + msg;
 	}
 	else
 	{
-		full_msg = msg;
+		full_msg = " " + msg;
 	}
 
-	this->write_to_stream("[" + std::string(now) + "] [" + "thread id" + "] " + level_name + ":\n" + full_msg + "\n", level);
+	std::string result = "[" + dt::now().strftime("%F %T") +
+		"] " + level_name + ":" + full_msg + "\n";
+	this->write_to_stream(result, this->get_colour(colour));
 }
 
-void Logger::write_to_stream(const std::string& msg, Logger::log_level_enum level)
+void Logger::write_to_stream(const std::string& msg, const char* colour)
 {
-	// TODO: add multiple streams support
-	std::cout << '\n' << msg;
-	std::cout.flush();
+	const char* default_colour = this->_colors[Color::DEFAULT];
+	for (auto& stream : this->_config.streams)
+	{
+		*stream << '\n' << colour << msg << default_colour << '\n';
+	}
+
+	this->flush();
+}
+
+void Logger::flush()
+{
+	for (auto& stream : this->_config.streams)
+	{
+		stream->flush();
+	}
+}
+
+const char* Logger::get_colour(Color colour)
+{
+	if (this->_colors.find(colour) == this->_colors.end())
+	{
+		colour = Color::DEFAULT;
+	}
+
+	return this->_colors[colour];
 }
 
 __UTILITY_END__

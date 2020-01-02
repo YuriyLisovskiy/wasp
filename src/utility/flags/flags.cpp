@@ -30,6 +30,11 @@ Flag::Flag(const std::string& label, const std::string& help)
 	this->_label = label;
 }
 
+std::string Flag::get_raw()
+{
+	return this->_data;
+}
+
 
 LongIntFlag::LongIntFlag(const std::string& label, const std::string& help, long default_val)
 	: Flag(label, help)
@@ -42,7 +47,7 @@ std::string LongIntFlag::label()
 	return this->_label;
 }
 
-std::string LongIntFlag::help()
+std::string LongIntFlag::usage()
 {
 	return this->_help;
 }
@@ -70,7 +75,7 @@ std::string DoubleFlag::label()
 	return this->_label;
 }
 
-std::string DoubleFlag::help()
+std::string DoubleFlag::usage()
 {
 	return this->_help;
 }
@@ -98,7 +103,7 @@ std::string StringFlag::label()
 	return this->_label;
 }
 
-std::string StringFlag::help()
+std::string StringFlag::usage()
 {
 	return this->_help;
 }
@@ -124,7 +129,7 @@ std::string BoolFlag::label()
 	return this->_label;
 }
 
-std::string BoolFlag::help()
+std::string BoolFlag::usage()
 {
 	return this->_help;
 }

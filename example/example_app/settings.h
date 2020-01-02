@@ -19,6 +19,7 @@
 #include "../../src/conf/settings.h"
 #include "../../src/utility/path.h"
 #include "../../src/middleware/cookies.h"
+#include "../../src/core/management/commands/runserver.h"
 
 #include "../picture_app/app.h"
 #include "../form_app/app.h"
@@ -27,16 +28,14 @@
 // #define DETECT_MEMORY_LEAK
 #include "../../tests/mem_leak_check.h"
 
-// Uncomment the next if required.
-// #define USE_LOCAL_SETTINGS
-#ifdef USE_LOCAL_SETTINGS
-#include "./local_settings.h"
-#endif
 
-
-struct Settings : public wasp::conf::Settings
+struct Settings final: public wasp::conf::Settings
 {
 	Settings() : wasp::conf::Settings()
+	{
+	}
+
+	void init() final
 	{
 		this->BASE_DIR = wasp::path::dirname(wasp::path::dirname(__FILE__));
 
@@ -62,8 +61,9 @@ struct Settings : public wasp::conf::Settings
 		this->STATIC_ROOT = wasp::path::join(this->BASE_DIR, "static");
 		this->STATIC_URL = "/static/";
 
-		#ifdef USE_LOCAL_SETTINGS
-			override_settings(this);
-		#endif
+		this->DATA_UPLOAD_MAX_MEMORY_SIZE = 20971520;
 	}
+
+	// Override in local_settings.cpp!
+	void overwrite() final;
 };
