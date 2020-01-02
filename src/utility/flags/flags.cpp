@@ -119,9 +119,11 @@ std::string StringFlag::get()
 }
 
 
-BoolFlag::BoolFlag(const std::string& label, const std::string& help)
-	: Flag(label, help)
+BoolFlag::BoolFlag(
+	const std::string& label, const std::string& help, bool default_val
+) : Flag(label, help)
 {
+	this->_default_val = default_val;
 }
 
 std::string BoolFlag::label()
@@ -141,7 +143,7 @@ bool BoolFlag::get()
 		return this->_data == "true";
 	}
 
-	return false;
+	return this->_default_val;
 }
 
 __FLAGS_END__

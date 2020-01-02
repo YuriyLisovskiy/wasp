@@ -329,9 +329,6 @@ public:
 	);
 };
 
-
-// TODO: implement JsonResponse!
-
 __HTTP_END__
 
 

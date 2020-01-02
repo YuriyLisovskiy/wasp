@@ -62,13 +62,16 @@ void RunserverCommand::add_flags()
 		"host-port", "", "Server host and port formatted as ip_addr:port"
 	);
 	this->_host_flag = this->_flag_set->make_string(
-		"host", this->DEFAULT_IPV4_HOST, "Server host"
+		"host", "", "Server host"
 	);
 	this->_port_flag = this->_flag_set->make_long(
 		"port", this->DEFAULT_PORT, "Server port"
 	);
 	this->_threads_flag = this->_flag_set->make_long(
 		"threads", this->DEFAULT_THREADS, "Tells Wasp how many threads to use"
+	);
+	this->_use_ipv6_flag = this->_flag_set->make_bool(
+		"use-ipv6", false, "Detect if use IPv6 or not"
 	);
 }
 
@@ -249,8 +252,6 @@ void RunserverCommand::setup_server_ctx(core::internal::HttpServer::context& ctx
 		if (this->_ipv6_regex->match(address))
 		{
 			ctx.use_ipv6 = true;
-			str::ltrim(address, '[');
-			str::rtrim(address, ']');
 		}
 
 		ctx.host = address;
@@ -261,15 +262,14 @@ void RunserverCommand::setup_server_ctx(core::internal::HttpServer::context& ctx
 		auto address = this->_host_flag->get();
 		if (address.empty())
 		{
-			address = this->DEFAULT_IPV4_HOST;
+			ctx.use_ipv6 = this->_use_ipv6_flag->get();
+			address = ctx.use_ipv6 ? this->DEFAULT_IPV6_HOST : this->DEFAULT_IPV4_HOST;
 		}
 		else
 		{
 			if (this->_ipv6_regex->match(address))
 			{
 				ctx.use_ipv6 = true;
-				str::ltrim(address, '[');
-				str::rtrim(address, ']');
 			}
 			else if (!this->_ipv4_regex->match(address))
 			{
@@ -277,9 +277,7 @@ void RunserverCommand::setup_server_ctx(core::internal::HttpServer::context& ctx
 			}
 		}
 
-		ctx.host = address.empty() ? (
-			ctx.use_ipv6 ? this->DEFAULT_IPV6_HOST : this->DEFAULT_IPV4_HOST
-		) : address;
+		ctx.host = address;
 		auto raw_port = this->_port_flag->get_raw();
 		if (raw_port.empty())
 		{

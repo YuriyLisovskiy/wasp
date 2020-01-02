@@ -49,6 +49,7 @@ private:
 	flags::StringFlag* _host_flag;
 	flags::LongIntFlag* _port_flag;
 	flags::LongIntFlag* _threads_flag;
+	flags::BoolFlag* _use_ipv6_flag;
 
 	rgx::Regex* _ipv4_ipv6_port_regex;
 	rgx::Regex* _ipv4_regex;
@@ -56,7 +57,7 @@ private:
 	rgx::Regex* _port_regex;
 
 	const std::string DEFAULT_IPV4_HOST = "127.0.0.1";
-	const std::string DEFAULT_IPV6_HOST = "::1";
+	const std::string DEFAULT_IPV6_HOST = "[::1]";
 	const uint16_t DEFAULT_PORT = 8000;
 	const size_t DEFAULT_THREADS = 16;
 

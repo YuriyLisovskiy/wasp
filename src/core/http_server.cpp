@@ -93,14 +93,8 @@ void HttpServer::listen_and_serve()
 	}
 #endif
 
-	std::string host(this->_host);
-	if (this->_use_ipv6)
-	{
-		host = "[" + host + "]";
-	}
-
 	std::cout << str::format(
-		conf::internal::STARTUP_MESSAGE, this->_schema, host.c_str(), this->_port
+		conf::internal::STARTUP_MESSAGE, this->_schema, this->_host, this->_port
 	) << '\n';
 	std::cout.flush();
 

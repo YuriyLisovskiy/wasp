@@ -95,8 +95,11 @@ public:
 
 class BoolFlag final: public Flag
 {
+private:
+	bool _default_val;
+
 public:
-	BoolFlag(const std::string& label, const std::string& help);
+	BoolFlag(const std::string& label, const std::string& help, bool default_val);
 	std::string label() final;
 	std::string usage() final;
 	bool get();

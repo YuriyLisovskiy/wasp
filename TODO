@@ -27,11 +27,9 @@ Not tested:
 
 Check out TODOs in (not urgent):
     - src/core/parsers/cookie_parser.cpp
-    - src/core/parsers/url_parser.cpp
 
     - src/core/http_server.cpp
 
-    - src/http/response.h
     - src/http/response.cpp
 
     - src/middleware/clickjacking.cpp

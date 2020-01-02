@@ -93,9 +93,9 @@ StringFlag* FlagSet::make_string(
 	return flag;
 }
 
-BoolFlag* FlagSet::make_bool(const std::string& label, const std::string& help)
+BoolFlag* FlagSet::make_bool(const std::string& label, bool default_val, const std::string& help)
 {
-	auto* flag = new BoolFlag(label, help);
+	auto* flag = new BoolFlag(label, help, default_val);
 	this->_flags[label] = flag;
 	return flag;
 }

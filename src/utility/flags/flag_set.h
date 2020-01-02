@@ -57,7 +57,7 @@ public:
 	StringFlag* make_string(
 		const std::string& label, const std::string& default_val, const std::string& help
 	);
-	BoolFlag* make_bool(const std::string& label, const std::string& help);
+	BoolFlag* make_bool(const std::string& label, bool default_val, const std::string& help);
 };
 
 __FLAGS_END__

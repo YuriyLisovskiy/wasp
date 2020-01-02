@@ -27,7 +27,7 @@
 
 __UNIT_TESTS_BEGIN__
 
-class UrlParserTestCase : public ::testing::Test
+class UrlParserIPv4TestCase : public ::testing::Test
 {
 protected:
 	core::internal::url_parser parser;
@@ -45,45 +45,111 @@ protected:
 	void SetUp() override
 	{
 		this->parser.parse(STR_URL);
+
+		ASSERT_TRUE(this->parser.is_parsed);
 	}
 };
 
-TEST_F(UrlParserTestCase, SchemeTest)
+TEST_F(UrlParserIPv4TestCase, SchemeTest)
 {
 	ASSERT_EQ(this->parser.scheme, SCHEME_EXPECTED);
 }
 
-TEST_F(UrlParserTestCase, HostTest)
+TEST_F(UrlParserIPv4TestCase, HostTest)
 {
 	ASSERT_EQ(this->parser.hostname, HOST_EXPECTED);
 }
 
-TEST_F(UrlParserTestCase, PortTest)
+TEST_F(UrlParserIPv4TestCase, PortTest)
 {
 	ASSERT_EQ(this->parser.port, PORT_EXPECTED);
 }
 
-TEST_F(UrlParserTestCase, PathTest)
+TEST_F(UrlParserIPv4TestCase, PathTest)
 {
 	ASSERT_EQ(this->parser.path, PATH_EXPECTED);
 }
 
-TEST_F(UrlParserTestCase, UsernameTest)
+TEST_F(UrlParserIPv4TestCase, UsernameTest)
 {
 	ASSERT_EQ(this->parser.username, USERNAME_EXPECTED);
 }
 
-TEST_F(UrlParserTestCase, PasswordTest)
+TEST_F(UrlParserIPv4TestCase, PasswordTest)
 {
 	ASSERT_EQ(this->parser.password, PASSWORD_EXPECTED);
 }
 
-TEST_F(UrlParserTestCase, FramentTest)
+TEST_F(UrlParserIPv4TestCase, FramentTest)
 {
 	ASSERT_EQ(this->parser.fragment, FRAGMENT_EXPECTED);
 }
 
-TEST_F(UrlParserTestCase, QueryTest)
+TEST_F(UrlParserIPv4TestCase, QueryTest)
+{
+	ASSERT_EQ(this->parser.query, QUERY_EXPECTED);
+}
+
+
+class UrlParserIPv6TestCase : public ::testing::Test
+{
+protected:
+	core::internal::url_parser parser;
+
+	const char* STR_URL = "https://[2605:2700:0:3::4713:93e3]:8000/hello/world?hello=world&user=pass#someFragment";
+	const char* HOST_EXPECTED = "2605:2700:0:3::4713:93e3";
+	const char* PORT_EXPECTED = "8000";
+	const char* SCHEME_EXPECTED = "https";
+	const char* PATH_EXPECTED = "/hello/world";
+	const char* USERNAME_EXPECTED = "";
+	const char* PASSWORD_EXPECTED = "";
+	const char* QUERY_EXPECTED = "hello=world&user=pass";
+	const char* FRAGMENT_EXPECTED = "someFragment";
+
+	void SetUp() override
+	{
+		this->parser.parse(STR_URL);
+
+		ASSERT_TRUE(this->parser.is_parsed);
+	}
+};
+
+TEST_F(UrlParserIPv6TestCase, SchemeTest)
+{
+	ASSERT_EQ(this->parser.scheme, SCHEME_EXPECTED);
+}
+
+TEST_F(UrlParserIPv6TestCase, HostTest)
+{
+	ASSERT_EQ(this->parser.hostname, HOST_EXPECTED);
+}
+
+TEST_F(UrlParserIPv6TestCase, PortTest)
+{
+	ASSERT_EQ(this->parser.port, PORT_EXPECTED);
+}
+
+TEST_F(UrlParserIPv6TestCase, PathTest)
+{
+	ASSERT_EQ(this->parser.path, PATH_EXPECTED);
+}
+
+TEST_F(UrlParserIPv6TestCase, UsernameTest)
+{
+	ASSERT_EQ(this->parser.username, USERNAME_EXPECTED);
+}
+
+TEST_F(UrlParserIPv6TestCase, PasswordTest)
+{
+	ASSERT_EQ(this->parser.password, PASSWORD_EXPECTED);
+}
+
+TEST_F(UrlParserIPv6TestCase, FramentTest)
+{
+	ASSERT_EQ(this->parser.fragment, FRAGMENT_EXPECTED);
+}
+
+TEST_F(UrlParserIPv6TestCase, QueryTest)
 {
 	ASSERT_EQ(this->parser.query, QUERY_EXPECTED);
 }
@@ -97,27 +163,32 @@ protected:
 
 TEST_F(UrlParserErrorsTestCase, InvalidSchemeTest)
 {
-	ASSERT_THROW(this->parser.parse("ht~tp://example.com"), core::ParseError);
+	this->parser.parse("ht~tp://example.com");
+	ASSERT_FALSE(this->parser.is_parsed);
 }
 
 TEST_F(UrlParserErrorsTestCase, InvalidSchemeEndingTest)
 {
-	ASSERT_THROW(this->parser.parse("http//example.com"), core::ParseError);
+	this->parser.parse("http//example.com");
+	ASSERT_FALSE(this->parser.is_parsed);
 }
 
 TEST_F(UrlParserErrorsTestCase, AbsentFirstSlashTest)
 {
-	ASSERT_THROW(this->parser.parse("http:#example.com"), core::ParseError);
+	this->parser.parse("http:#example.com");
+	ASSERT_FALSE(this->parser.is_parsed);
 }
 
 TEST_F(UrlParserErrorsTestCase, AbsentSecondSlashTest)
 {
-	ASSERT_THROW(this->parser.parse("http:/example.com"), core::ParseError);
+	this->parser.parse("http:/example.com");
+	ASSERT_FALSE(this->parser.is_parsed);
 }
 
 TEST_F(UrlParserErrorsTestCase, UsernameOrHostnameErrorTest)
 {
-	ASSERT_THROW(this->parser.parse("http://$example.com"), core::ParseError);
+	this->parser.parse("http://$example.com");
+	ASSERT_FALSE(this->parser.is_parsed);
 }
 
 __UNIT_TESTS_END__

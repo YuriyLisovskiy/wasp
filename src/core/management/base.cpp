@@ -69,7 +69,7 @@ void BaseCommand::validate()
 void BaseCommand::run_from_argv(int argc, char** argv, bool is_verbose)
 {
 	this->create_flags();
-	this->_flag_set->parse(argc, argv, is_verbose);
+	this->_flag_set->parse(argc, argv, this->_parse_from, is_verbose);
 	this->handle();
 }
 

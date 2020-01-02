@@ -48,6 +48,7 @@ struct url_parser final
 		s_password,
 		s_hostname,
 		s_ipv6_hostname,
+		s_ipv6_hostname_end,
 		s_port_or_password,
 		s_port,
 		s_path,
@@ -75,6 +76,7 @@ struct url_parser final
 	void parse(const std::string& str);
 	void parse(const char* str);
 	static bool is_unreserved(char ch);
+	static bool is_ipv6_symbol(char ch);
 
 	void set_err(const char* err, int line, const char* func, const char* file);
 };
