@@ -133,9 +133,10 @@ bool ends_with(const std::string& src, const std::string& suffix)
 		return false;
 	}
 
-	for (size_t i = suffix.size() - 1; i >= 0; i--)
+	size_t j = src.size() - 1;
+	for (long i = (long)suffix.size() - 1; i >= 0; i--)
 	{
-		if (src[i] != suffix[i])
+		if (src[j--] != suffix[i])
 		{
 			return false;
 		}
@@ -147,16 +148,16 @@ bool ends_with(const std::string& src, const std::string& suffix)
 void ltrim(std::string& s, char ch)
 {
 	s.erase(
-			s.begin(),
-			std::find_if(s.begin(), s.end(), [ch](char chr) {return ch != chr;})
+		s.begin(),
+		std::find_if(s.begin(), s.end(), [ch](char chr) {return ch != chr;})
 	);
 }
 
 void rtrim(std::string& s, char ch)
 {
 	s.erase(
-			std::find_if(s.rbegin(), s.rend(), [ch](int chr) {return ch != chr;}).base(),
-			s.end()
+		std::find_if(s.rbegin(), s.rend(), [ch](int chr) {return ch != chr;}).base(),
+		s.end()
 	);
 }
 

@@ -206,6 +206,22 @@ TEST(StrStartsWithTestCase, TestStartsWithReturnsTrue)
 	ASSERT_TRUE(str::starts_with("Hello, World", "Hello,"));
 }
 
+
+TEST(StrEndsWithTestCase, TestEndsWithPrefixIsGreaterThanStr)
+{
+	ASSERT_FALSE(str::ends_with("Hello", "Hello,"));
+}
+
+TEST(StrEndsWithTestCase, TestEndsWithReturnsFalse)
+{
+	ASSERT_FALSE(str::ends_with("Hello, World", "world"));
+}
+
+TEST(StrEndsWithTestCase, TestEndsWithReturnsTrue)
+{
+	ASSERT_TRUE(str::ends_with("Hello, World", ", World"));
+}
+
 __UNIT_TESTS_END__
 
 

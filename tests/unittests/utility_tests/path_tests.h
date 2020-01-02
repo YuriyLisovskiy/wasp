@@ -41,6 +41,29 @@ TEST(PathTestCase, DirnameTest)
 	ASSERT_EQ(path::dirname(fullPath), expected);
 }
 
+TEST(PathTestCase, DirnameTrimDotsTest)
+{
+	std::string expected("/foo");
+	std::string fullPath("/foo/./");
+	ASSERT_EQ(path::dirname(fullPath), expected);
+
+	expected = "/foo/..";
+	fullPath = "/foo/../";
+	ASSERT_EQ(path::dirname(fullPath), expected);
+
+	expected = "/foo/../..";
+	fullPath = "/foo/../../";
+	ASSERT_EQ(path::dirname(fullPath), expected);
+
+	expected = "/foo/..";
+	fullPath = "/foo/.././";
+	ASSERT_EQ(path::dirname(fullPath), expected);
+
+	expected = "/foo/...";
+	fullPath = "/foo/.../";
+	ASSERT_EQ(path::dirname(fullPath), expected);
+}
+
 TEST(PathTestCase, FilenameTest)
 {
 	std::string expected("bar.txt");
@@ -62,6 +85,16 @@ TEST(PathTestCase, JoinTest)
 	std::string right("//bar/");
 	std::string expected("/foo/bar/");
 	auto actual = path::join(left, right);
+	ASSERT_EQ(expected, actual);
+}
+
+TEST(PathTestCase, JoinVectorTest)
+{
+	std::vector<std::string> paths {
+		"", "/foo/", "//bar/", "", "/"
+	};
+	std::string expected("./foo/bar");
+	auto actual = path::join(paths);
 	ASSERT_EQ(expected, actual);
 }
 
