@@ -15,8 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MEM_LEAK_CHECK_H
-#define MEM_LEAK_CHECK_H
+#pragma once
 
 #include <map>
 #include <memory>
@@ -116,6 +115,3 @@ void operator delete(void* mem) throw()
 }
 
 #endif // DETECT_MEMORY_LEAK
-
-
-#endif // MEM_LEAK_CHECK_H

@@ -16,9 +16,11 @@
  */
 
 #include "../src/apps/wasp.h"
-#include "../src/core/exceptions.h"
 
 #include "./example_app/settings.h"
+
+#define DETECT_MEMORY_LEAK
+#include "../tests/mem_leak_check.h"
 
 
 int main(int argc, char** argv)

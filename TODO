@@ -26,10 +26,6 @@ Not tested:
 
 
 Check out TODOs in (not urgent):
-    - src/apps/config.h
-
-    - src/conf/settings.cpp
-
     - src/core/parsers/cookie_parser.cpp
     - src/core/parsers/url_parser.cpp
 

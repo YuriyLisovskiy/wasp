@@ -22,7 +22,7 @@ __UTILITY_BEGIN__
 
 ILogger* Logger::_instance = nullptr;
 
-Logger::~Logger()
+void Logger::reset_instance()
 {
 	delete Logger::_instance;
 	Logger::_instance = nullptr;

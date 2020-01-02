@@ -175,7 +175,7 @@ int HttpServer::_bind()
 
 		if (this->_server_socket.close() == SOCKET_ERROR)
 		{
-			this->_logger->trace("Failed to close socket connection", _ERROR_DETAILS_);
+			this->_logger->error("Failed to close socket connection", _ERROR_DETAILS_);
 		}
 
 		HttpServer::_wsa_clean_up();

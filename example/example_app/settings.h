@@ -25,9 +25,6 @@
 #include "../form_app/app.h"
 #include "../main_app/app.h"
 
-// #define DETECT_MEMORY_LEAK
-#include "../../tests/mem_leak_check.h"
-
 
 struct Settings final: public wasp::conf::Settings
 {

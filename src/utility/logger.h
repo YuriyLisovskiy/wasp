@@ -89,6 +89,7 @@ public:
 	};
 
 	static ILogger* get_instance(const Logger::Config& cfg);
+	static void reset_instance();
 
 	void info(const std::string& msg, int line = 0, const char* function = "", const char* file = "") override;
 	void debug(const std::string& msg, int line = 0, const char* function = "", const char* file = "") override;
@@ -135,7 +136,7 @@ private:
 	static ILogger* _instance;
 
 	explicit Logger(const Logger::Config& cfg);
-	~Logger() override;
+	~Logger() override = default;
 	void log(const std::string& msg, int line, const char* function, const char* file, Logger::log_level_enum level);
 	void write_to_stream(const std::string& msg, const char* colour);
 	void flush();
