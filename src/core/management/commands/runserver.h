@@ -26,7 +26,8 @@
 #include "./_def_.h"
 
 // Wasp libraries.
-#include "./command.h"
+#include "./app_command.h"
+#include "../../../apps/interface.h"
 #include "../../../urls/url.h"
 #include "../../../http/request.h"
 #include "../../../core/http_server.h"
@@ -41,7 +42,7 @@
 
 __CORE_COMMANDS_BEGIN__
 
-class RunserverCommand final: public Command
+class RunserverCommand final: public AppCommand
 {
 private:
 	flags::StringFlag* _host_port_flag;
@@ -66,9 +67,10 @@ protected:
 	bool static_is_allowed(const std::string& static_url);
 	void build_static_patterns(std::vector<urls::UrlPattern>& patterns);
 	void build_app_patterns(std::vector<urls::UrlPattern>& patterns);
+	void setup_server_ctx(core::internal::HttpServer::context& ctx);
 
 public:
-	explicit RunserverCommand(conf::Settings* settings);
+	explicit RunserverCommand(apps::IAppConfig* config, conf::Settings* settings);
 	~RunserverCommand() final;
 };
 

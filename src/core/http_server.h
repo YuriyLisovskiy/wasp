@@ -42,6 +42,7 @@
 #include "../conf/settings.h"
 #include "../http/response.h"
 #include "../http/request.h"
+#include "../http/headers.h"
 #include "./parsers/request_parser.h"
 #include "../core/sockets/server_socket.h"
 #include "../core/exceptions.h"
@@ -126,7 +127,7 @@ public:
 	static void send(http::StreamingHttpResponse* response, const socket_t& client);
 
 private:
-	static void _normalize_context(HttpServer::context& ctx);
+	static void _check_context(HttpServer::context& ctx);
 };
 
 __CORE_INTERNAL_END__

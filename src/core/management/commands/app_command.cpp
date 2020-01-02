@@ -25,9 +25,10 @@
 __CORE_COMMANDS_BEGIN__
 
 AppCommand::AppCommand(
-		conf::Settings* settings, const std::string& cmd_name, const std::string& help
+	apps::IAppConfig* app_cfg, conf::Settings* settings, const std::string& cmd_name, const std::string& help
 ) : Command(settings, cmd_name, help)
 {
+	this->app_config = app_cfg;
 }
 
 __CORE_COMMANDS_END__

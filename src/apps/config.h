@@ -112,14 +112,14 @@ protected:
 	template <typename _CommandT, typename = std::enable_if<std::is_base_of<core::cmd::AppCommand, _CommandT>::value>>
 	void command()
 	{
-		// TODO: Modify constructor's parameters!
-		auto* cmd = new _CommandT();
+		auto* cmd = new _CommandT(this, this->settings);
 		this->_commands.push_back(cmd);
 	}
 
 	explicit AppConfig(conf::Settings* settings);
 
 public:
+	std::string get_name() final;
 	std::vector<urls::UrlPattern> get_urlpatterns() final;
 	std::vector<core::BaseCommand*> get_commands() final;
 	virtual void urlpatterns();

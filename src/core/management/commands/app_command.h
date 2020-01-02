@@ -27,15 +27,21 @@
 
 // Wasp libraries.
 #include "./command.h"
+#include "../../../apps/interface.h"
 
 
 __CORE_COMMANDS_BEGIN__
 
+/// Derived commands must have a constructor
+///	with pointer to apps::IAppConfig and pointer
+/// to conf::Settings parameters.
 class AppCommand : public Command
 {
 protected:
+	apps::IAppConfig* app_config;
+
 	AppCommand(
-		conf::Settings* settings, const std::string& cmd_name, const std::string& help
+		apps::IAppConfig* app_cfg, conf::Settings* settings, const std::string& cmd_name, const std::string& help
 	);
 };
 

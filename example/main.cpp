@@ -16,6 +16,7 @@
  */
 
 #include "../src/apps/wasp.h"
+#include "../src/core/exceptions.h"
 
 #include "./example_app/settings.h"
 
@@ -23,11 +24,19 @@
 int main(int argc, char** argv)
 {
 	auto* settings = new Settings();
-
-	auto app = wasp::apps::WaspApplication(settings);
-	app.execute_from_command_line(argc, argv);
+	try
+	{
+		auto app = wasp::apps::WaspApplication(settings);
+		app.execute_from_command_line(argc, argv);
+	}
+	catch (const wasp::core::ImproperlyConfigured& exc)
+	{
+		if (settings->LOGGER)
+		{
+			settings->LOGGER->error(exc);
+		}
+	}
 
 	delete settings;
-
 	return 0;
 }

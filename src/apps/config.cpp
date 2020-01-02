@@ -29,6 +29,11 @@ AppConfig::AppConfig(conf::Settings* settings)
 	this->settings = settings;
 }
 
+std::string AppConfig::get_name()
+{
+	return this->app_name;
+}
+
 std::vector<urls::UrlPattern> AppConfig::get_urlpatterns()
 {
 	if (this->_urlpatterns.empty())
