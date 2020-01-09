@@ -15,36 +15,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * Exceptions list:
- * - Base:
- *  - BaseException.
+/**
+ * Available exceptions.
  *
- * - Server errors:
- *  - HttpError;
- *  - SocketError.
- *
- * - Wasp errors:
- *  - AttributeError;
- *  - CommandError;
- *  - DictError;
- *  - DisallowedRedirect;
- *  - EncodingError;
- *  - FileError
- *  - FileDoesNotExistError;
- *  - ImproperlyConfigured;
- *  - InterruptException;
- *  - MultiPartParserError
- *  - MultiValueDictError;
- *  - NullPointerException;
- *  - ParseError;
- *  - SuspiciousOperation;
- *  - ValueError.
- *
- * - Request errors:
- *  - EntityTooLargeError
- *  - DisallowedRedirect
- *  - SuspiciousOperation
+ * - AttributeError;
+ * - BaseException.
+ * - CommandError;
+ * - DictError;
+ * - DisallowedRedirect;
+ * - EncodingError;
+ * - EntityTooLargeError;
+ * - FileError;
+ * - FileDoesNotExistError;
+ * - HttpError;
+ * - ImproperlyConfigured;
+ * - InterruptException;
+ * - MultiPartParserError
+ * - MultiValueDictError;
+ * - NullPointerException;
+ * - ParseError;
+ * - SocketError.
+ * - SuspiciousOperation;
+ * - ValueError.
  */
 
 #pragma once
@@ -90,197 +82,26 @@ public:
 };
 
 
-class HttpError : public BaseException
-{
-protected:
-	// Use only when initializing of a derived exception!
-	HttpError(const char* message, int line, const char* function, const char* file, const char* type);
-public:
-	HttpError(const char* message, int line, const char* function, const char* file);
-	HttpError(const std::string& message, int line, const char* function, const char* file);
-};
-
-
-class SocketError : public BaseException
-{
-protected:
-	// Use only when initializing of a derived exception!
-	SocketError(const char* message, int line, const char* function, const char* file, const char* type);
-public:
-	SocketError(const char* message, int line, const char* function, const char* file);
-	SocketError(const std::string& message, int line, const char* function, const char* file);
-};
-
-
-class AttributeError : public BaseException
-{
-protected:
-	// Use only when initializing of a derived exception!
-	AttributeError(const char* message, int line, const char* function, const char* file, const char* type);
-public:
-	AttributeError(const char* message, int line, const char* function, const char* file);
-	AttributeError(const std::string& message, int line, const char* function, const char* file);
-};
-
-
-class CommandError : public BaseException
-{
-protected:
-	// Use only when initializing of a derived exception!
-	CommandError(const char* message, int line, const char* function, const char* file, const char* type);
-public:
-	explicit CommandError(const char* message, int line = 0, const char* function = "", const char* file = "");
-	explicit CommandError(const std::string& message, int line = 0, const char* function = "", const char* file = "");
-};
-
-
-class DictError : public BaseException
-{
-protected:
-	// Use only when initializing of a derived exception!
-	DictError(const char* message, int line, const char* function, const char* file, const char* type);
-public:
-	DictError(const char* message, int line, const char* function, const char* file);
-	DictError(const std::string& message, int line, const char* function, const char* file);
-};
-
+DEF_WASP_EXCEPTION_WITH_BASE(AttributeError, BaseException);
+DEF_WASP_EXCEPTION_WITH_BASE(CommandError, BaseException);
+DEF_WASP_EXCEPTION_WITH_BASE(DictError, BaseException);
 
 // The user did something suspicious.
-class SuspiciousOperation : public BaseException
-{
-protected:
-	// Use only when initializing of a derived exception!
-	SuspiciousOperation(const char* message, int line, const char* function, const char* file, const char* type);
-public:
-	SuspiciousOperation(const char* message, int line, const char* function, const char* file);
-	SuspiciousOperation(const std::string& message, int line, const char* function, const char* file);
-};
-
+DEF_WASP_EXCEPTION_WITH_BASE(SuspiciousOperation, BaseException);
 
 // Redirect to scheme not in allowed list.
-class DisallowedRedirect : public SuspiciousOperation
-{
-protected:
-	// Use only when initializing of a derived exception!
-	DisallowedRedirect(const char* message, int line, const char* function, const char* file, const char* type);
-public:
-	DisallowedRedirect(const char* message, int line, const char* function, const char* file);
-	DisallowedRedirect(const std::string& message, int line, const char* function, const char* file);
-};
+DEF_WASP_EXCEPTION_WITH_BASE(DisallowedRedirect, SuspiciousOperation);
 
-
-class EncodingError : public BaseException
-{
-protected:
-	// Use only when initializing of a derived exception!
-	EncodingError(const char* message, int line, const char* function, const char* file, const char* type);
-public:
-	EncodingError(const char* message, int line, const char* function, const char* file);
-	EncodingError(const std::string& message, int line, const char* function, const char* file);
-};
-
-
-class FileError : public BaseException
-{
-protected:
-	// Use only when initializing of a derived exception!
-	FileError(const char* message, int line, const char* function, const char* file, const char* type);
-public:
-	FileError(const char* message, int line, const char* function, const char* file);
-	FileError(const std::string& message, int line, const char* function, const char* file);
-};
-
-
-class FileDoesNotExistError : public BaseException
-{
-protected:
-	// Use only when initializing of a derived exception!
-	FileDoesNotExistError(const char* message, int line, const char* function, const char* file, const char* type);
-public:
-	FileDoesNotExistError(const char* message, int line, const char* function, const char* file);
-	FileDoesNotExistError(const std::string& message, int line, const char* function, const char* file);
-};
-
-
-class ImproperlyConfigured : public BaseException
-{
-protected:
-	// Use only when initializing of a derived exception!
-	ImproperlyConfigured(const char* message, int line, const char* function, const char* file, const char* type);
-public:
-	ImproperlyConfigured(const char* message, int line, const char* function, const char* file);
-	ImproperlyConfigured(const std::string& message, int line, const char* function, const char* file);
-};
-
-
-class ParseError : public BaseException
-{
-protected:
-	// Use only when initializing of a derived exception!
-	ParseError(const char* message, int line, const char* function, const char* file, const char* type);
-public:
-	ParseError(const char* message, int line, const char* function, const char* file);
-	ParseError(const std::string& message, int line, const char* function, const char* file);
-};
-
-
-class MultiPartParserError : public ParseError
-{
-protected:
-	// Use only when initializing of a derived exception!
-	MultiPartParserError(const char* message, int line, const char* function, const char* file, const char* type);
-public:
-	MultiPartParserError(const char* message, int line, const char* function, const char* file);
-	MultiPartParserError(const std::string& message, int line, const char* function, const char* file);
-};
-
-
-class MultiValueDictError : public DictError
-{
-protected:
-	// Use only when initializing of a derived exception!
-	MultiValueDictError(const char* message, int line, const char* function, const char* file, const char* type);
-public:
-	MultiValueDictError(const char* message, int line, const char* function, const char* file);
-	MultiValueDictError(const std::string& message, int line, const char* function, const char* file);
-};
-
-
-class NullPointerException : public BaseException
-{
-protected:
-	// Use only when initializing of a derived exception!
-	NullPointerException(const char* message, int line, const char* function, const char* file, const char* type);
-public:
-	NullPointerException(const char* message, int line, const char* function, const char* file);
-	NullPointerException(const std::string& message, int line, const char* function, const char* file);
-};
-
-
-class ValueError : public BaseException
-{
-protected:
-	// Use only when initializing of a derived exception!
-	ValueError(const char* message, int line, const char* function, const char* file, const char* type);
-public:
-	ValueError(const char* message, int line, const char* function, const char* file);
-	ValueError(const std::string& message, int line, const char* function, const char* file);
-};
-
+DEF_WASP_EXCEPTION_WITH_BASE(EncodingError, BaseException);
 
 // Length of request's header is too large.
-class EntityTooLargeError : public BaseException
-{
-protected:
-	// Use only when initializing of a derived exception!
-	EntityTooLargeError(const char* message, int line, const char* function, const char* file, const char* type);
-public:
-	EntityTooLargeError(const char* message, int line, const char* function, const char* file);
-	EntityTooLargeError(const std::string& message, int line, const char* function, const char* file);
-};
+DEF_WASP_EXCEPTION_WITH_BASE(EntityTooLargeError, BaseException);
 
+DEF_WASP_EXCEPTION_WITH_BASE(FileError, BaseException);
+DEF_WASP_EXCEPTION_WITH_BASE(FileDoesNotExistError, BaseException);
+DEF_WASP_EXCEPTION_WITH_BASE(HttpError, BaseException);
+DEF_WASP_EXCEPTION_WITH_BASE(ImproperlyConfigured, BaseException);
 
-// InterruptException
 class InterruptException : public BaseException
 {
 protected:
@@ -293,5 +114,12 @@ public:
 	explicit InterruptException(const std::string& message, int line = 0, const char* function = "", const char* file = "");
 	static void initialize();
 };
+
+DEF_WASP_EXCEPTION_WITH_BASE(ParseError, BaseException);
+DEF_WASP_EXCEPTION_WITH_BASE(MultiPartParserError, ParseError);
+DEF_WASP_EXCEPTION_WITH_BASE(MultiValueDictError, DictError);
+DEF_WASP_EXCEPTION_WITH_BASE(NullPointerException, BaseException);
+DEF_WASP_EXCEPTION_WITH_BASE(SocketError, BaseException);
+DEF_WASP_EXCEPTION_WITH_BASE(ValueError, BaseException);
 
 __CORE_END__
