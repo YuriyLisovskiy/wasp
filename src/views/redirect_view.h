@@ -20,8 +20,7 @@
  * Purpose: provide a redirect on any GET request.
  */
 
-#ifndef WASP_VIEWS_REDIRECT_VIEW_H
-#define WASP_VIEWS_REDIRECT_VIEW_H
+#pragma once
 
 // C++ libraries.
 #include <string>
@@ -67,6 +66,3 @@ public:
 };
 
 __VIEWS_END__
-
-
-#endif // WASP_VIEWS_REDIRECT_VIEW_H

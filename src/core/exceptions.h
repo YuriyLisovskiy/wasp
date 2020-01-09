@@ -47,8 +47,7 @@
  *  - SuspiciousOperation
  */
 
-#ifndef WASP_CORE_EXCEPTIONS_H
-#define WASP_CORE_EXCEPTIONS_H
+#pragma once
 
 // C++ libraries.
 #include <exception>
@@ -290,12 +289,9 @@ protected:
 
 	static void handle_signal(int sig);
 public:
-	InterruptException(const char* message, int line, const char* function, const char* file);
-	InterruptException(const std::string& message, int line, const char* function, const char* file);
+	explicit InterruptException(const char* message, int line = 0, const char* function = "", const char* file = "");
+	explicit InterruptException(const std::string& message, int line = 0, const char* function = "", const char* file = "");
 	static void initialize();
 };
 
 __CORE_END__
-
-
-#endif // WASP_CORE_EXCEPTIONS_H

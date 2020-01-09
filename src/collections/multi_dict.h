@@ -22,8 +22,7 @@
  * 			MultiValueDict can contain multiple values in one key.
  */
 
-#ifndef WASP_COLLECTIONS_MULTI_VALUE_DICT_H
-#define WASP_COLLECTIONS_MULTI_VALUE_DICT_H
+#pragma once
 
 // C++ libraries.
 #include <vector>
@@ -189,6 +188,3 @@ public:
 };
 
 __COLLECTIONS_END__
-
-
-#endif // WASP_COLLECTIONS_MULTI_VALUE_DICT_H

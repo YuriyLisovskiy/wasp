@@ -20,8 +20,7 @@
  * Purpose: urls module's definitions.
  */
 
-#ifndef WASP_URLS_DEF_H
-#define WASP_URLS_DEF_H
+#pragma once
 
 #include "../_def_.h"
 
@@ -29,6 +28,3 @@
 /// wasp::urls
 #define __URLS_BEGIN__ __WASP_BEGIN__ namespace urls {
 #define __URLS_END__ } __WASP_END__
-
-
-#endif // WASP_URLS_DEF_H

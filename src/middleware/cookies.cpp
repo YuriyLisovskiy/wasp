@@ -31,7 +31,7 @@ CookieMiddleware::CookieMiddleware(wasp::conf::Settings* settings)
 
 void CookieMiddleware::process_request(http::HttpRequest* request)
 {
-	auto* cookies = core::internal::cookie_parser::parse_req_cookies(
+	auto* cookies = core::internal::cookie_parser::parse(
 		request->headers.get("Cookie", "")
 	);
 	request->COOKIES = collections::Dict(*cookies);

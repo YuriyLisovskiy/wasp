@@ -24,8 +24,7 @@
  * 			malicious site loading resources from your site in a hidden frame.
  */
 
-#ifndef WASP_MIDDLEWARE_CLICKJACKING_H
-#define WASP_MIDDLEWARE_CLICKJACKING_H
+#pragma once
 
 // Module definitions.
 #include "./_def_.h"
@@ -56,6 +55,3 @@ public:
 };
 
 __MIDDLEWARE_END__
-
-
-#endif // WASP_MIDDLEWARE_CLICKJACKING_H

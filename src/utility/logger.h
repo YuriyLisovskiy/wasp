@@ -15,8 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WASP_UTILS_LOGGER_H
-#define WASP_UTILS_LOGGER_H
+#pragma once
 
 // C++ libraries.
 #include <map>
@@ -80,11 +79,12 @@ class Logger : public ILogger
 public:
 	struct Config
 	{
-		bool enable_info_log = true;
-		bool enable_debug_log = true;
-		bool enable_warning_log = true;
-		bool enable_error_log = true;
-		bool enable_fatal_log = true;
+		bool enable_info = true;
+		bool enable_debug = true;
+		bool enable_warning = true;
+		bool enable_error = true;
+		bool enable_fatal = true;
+		bool enable_print = true;
 		std::vector<std::ostream*> streams;
 	};
 
@@ -144,6 +144,3 @@ private:
 };
 
 __UTILITY_END__
-
-
-#endif // WASP_UTILS_LOGGER_H

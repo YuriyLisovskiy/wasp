@@ -20,8 +20,7 @@
  * Purpose: queued thread pool for executing functions in parallel.
  */
 
-#ifndef WASP_CORE_THREAD_POOL_H
-#define WASP_CORE_THREAD_POOL_H
+#pragma once
 
 // C++ libraries.
 #include <thread>
@@ -81,6 +80,3 @@ private:
 };
 
 __CORE_INTERNAL_END__
-
-
-#endif // WASP_CORE_THREAD_POOL_H

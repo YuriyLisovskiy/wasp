@@ -366,7 +366,7 @@ InterruptException::InterruptException(const std::string& message, int line, con
 
 void InterruptException::handle_signal(int sig)
 {
-	throw InterruptException("execution is interrupted with signal " + std::to_string(sig), _DETAILS_NONE_);
+	throw InterruptException("execution is interrupted with signal " + std::to_string(sig));
 }
 
 void InterruptException::initialize()

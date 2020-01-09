@@ -20,8 +20,7 @@
  * Purpose: utility for string's formatting.
  */
 
-#ifndef WASP_UTILITY_STRING_FORMAT_H
-#define WASP_UTILITY_STRING_FORMAT_H
+#pragma once
 
 // C++ libraries.
 #include <map>
@@ -94,6 +93,3 @@ extern std::string _format(char const* fmt, va_list args);
 extern int normalize_exp(double* val);
 
 __STR_INTERNAL_END__
-
-
-#endif // WASP_UTILITY_STRING_FORMAT_H

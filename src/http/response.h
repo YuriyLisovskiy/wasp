@@ -21,8 +21,7 @@
  * 			used http response.
  */
 
-#ifndef WASP_HTTP_RESPONSE_H
-#define WASP_HTTP_RESPONSE_H
+#pragma once
 
 // C++ libraries.
 #include <string>
@@ -330,6 +329,3 @@ public:
 };
 
 __HTTP_END__
-
-
-#endif // WASP_HTTP_RESPONSE_H

@@ -21,8 +21,7 @@
 			during development, and SHOULD NOT be used in a production setting.
  */
 
-#ifndef WASP_VIEWS_STATIC_H
-#define WASP_VIEWS_STATIC_H
+#pragma once
 
 // C++ libraries.
 #include <regex>
@@ -69,6 +68,3 @@ __VIEWS_INTERNAL_BEGIN__
 extern bool was_modified_since(const std::string& header, size_t time, size_t size);
 
 __VIEWS_INTERNAL_END__
-
-
-#endif // WASP_VIEWS_STATIC_H

@@ -20,4 +20,6 @@
  * Purpose: core/management module's definitions.
  */
 
+#pragma once
+
 #include "../_def_.h"

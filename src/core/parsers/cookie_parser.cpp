@@ -25,7 +25,7 @@
 __CORE_INTERNAL_BEGIN__
 
 
-std::map<std::string, std::string>* cookie_parser::parse_req_cookies(const std::string& content)
+std::map<std::string, std::string>* cookie_parser::parse(const std::string& content)
 {
 	auto* result = new std::map<std::string, std::string>();
 	if (content.empty())
@@ -36,29 +36,29 @@ std::map<std::string, std::string>* cookie_parser::parse_req_cookies(const std::
 	auto begin = content.begin();
 	auto end = content.end();
 	std::string cookie_key, cookie_value;
-	req_state state = req_state::req_key;
+	cookie_parser::state st = cookie_parser::state::req_key;
 	while (begin != end)
 	{
 		char input = *begin++;
-		switch (state)
+		switch (st)
 		{
-			case req_state::req_key:
+			case cookie_parser::state::req_key:
 				if (input == '=')
 				{
-					state = req_state::req_val;
+					st = cookie_parser::state::req_val;
 				}
 				else if (input != ' ')
 				{
 					cookie_key.push_back(input);
 				}
 				break;
-			case req_state::req_val:
+			case cookie_parser::state::req_val:
 				if (input == ';')
 				{
 					(*result)[cookie_key] = cookie_value;
 					cookie_key.clear();
 					cookie_value.clear();
-					state = req_state::req_key;
+					st = cookie_parser::state::req_key;
 				}
 				else if (input != ' ')
 				{
@@ -69,19 +69,6 @@ std::map<std::string, std::string>* cookie_parser::parse_req_cookies(const std::
 	}
 
 	(*result)[cookie_key] = cookie_value;
-	return result;
-}
-
-std::map<std::string, std::string>* cookie_parser::parse_resp_cookies(const std::string& content)
-{
-	auto* result = new std::map<std::string, std::string>();
-	if (content.empty())
-	{
-		return result;
-	}
-
-	// TODO
-
 	return result;
 }
 

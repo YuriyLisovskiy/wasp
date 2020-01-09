@@ -20,7 +20,7 @@
 
 __ENCODING_BEGIN__
 
-const char* ASCII = "ascii";
+const uint ASCII = 0x0;
 
 std::string encode_url(const std::string& url)
 {
@@ -110,39 +110,23 @@ std::string quote(const std::string& _str, const std::string& safe)
 	return oss.str();
 }
 
-std::string encode(const std::string& _str, const char* encoding, Mode mode)
+std::string encode(const std::string& _str, uint encoding, Mode mode)
 {
 	std::string result;
-	if (encoding == ASCII)
+
+	// TODO: add more encodings.
+	switch (encoding)
 	{
-		result = internal::encode_ascii(_str, mode);
-	}
-	// TODO: add more encodings here.
-	else
-	{
-		throw core::EncodingError("unknown encoding: " + std::string(encoding), _ERROR_DETAILS_);
+		case ASCII:
+			result = encode_ascii(_str, mode);
+			break;
+		default:
+			#define wasp_name_of(v) std::string(#v)
+			throw core::EncodingError("unknown encoding: " + wasp_name_of(encoding), _ERROR_DETAILS_);
+			#undef wasp_name_of
 	}
 
 	return result;
-}
-
-__ENCODING_END__
-
-
-__ENCODING_INTERNAL_BEGIN__
-
-void escape(std::ostringstream& stream, char c, const std::string& safe)
-{
-	if (std::isalnum((unsigned char) c) || c == '-' || c == '_' || c == '.' || c == '~' || safe.find(c) != -1)
-	{
-		stream << c;
-	}
-	else
-	{
-		stream << std::uppercase;
-		stream << '%' << std::setw(2) << int((unsigned char) c);
-		stream << std::nouppercase;
-	}
 }
 
 std::string encode_ascii(const std::string& _str, Mode mode)
@@ -173,6 +157,25 @@ std::string encode_ascii(const std::string& _str, Mode mode)
 	}
 
 	return res;
+}
+
+__ENCODING_END__
+
+
+__ENCODING_INTERNAL_BEGIN__
+
+void escape(std::ostringstream& stream, char c, const std::string& safe)
+{
+	if (std::isalnum((unsigned char) c) || c == '-' || c == '_' || c == '.' || c == '~' || safe.find(c) != -1)
+	{
+		stream << c;
+	}
+	else
+	{
+		stream << std::uppercase;
+		stream << '%' << std::setw(2) << int((unsigned char) c);
+		stream << std::nouppercase;
+	}
 }
 
 __ENCODING_INTERNAL_END__

@@ -20,8 +20,7 @@
  * Purpose: http server based on tcp/ip socket.
  */
 
-#ifndef WASP_CORE_HTTP_SERVER_H
-#define WASP_CORE_HTTP_SERVER_H
+#pragma once
 
 // C++ libraries.
 #include <iostream>
@@ -131,6 +130,3 @@ private:
 };
 
 __CORE_INTERNAL_END__
-
-
-#endif // WASP_CORE_HTTP_SERVER_H

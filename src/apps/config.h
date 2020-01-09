@@ -21,8 +21,7 @@
  * 			with urls and models (will be developed in future)
  */
 
-#ifndef WASP_APPS_CONFIG_H
-#define WASP_APPS_CONFIG_H
+#pragma once
 
 // C++ libraries.
 #include <string>
@@ -127,6 +126,3 @@ public:
 };
 
 __APPS_END__
-
-
-#endif // WASP_APPS_CONFIG_H

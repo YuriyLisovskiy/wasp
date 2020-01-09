@@ -21,8 +21,7 @@
  * 			Parses url from string using url parser.
  */
 
-#ifndef WASP_HTTP_URL_H
-#define WASP_HTTP_URL_H
+#pragma once
 
 // C++ libraries.
 #include <string>
@@ -67,6 +66,3 @@ public:
 };
 
 __HTTP_END__
-
-
-#endif // WASP_HTTP_URL_H

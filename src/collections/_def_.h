@@ -20,8 +20,7 @@
  * Purpose: collections module's definitions.
  */
 
-#ifndef WASP_COLLECTIONS_DEF_H
-#define WASP_COLLECTIONS_DEF_H
+#pragma once
 
 #include "../_def_.h"
 
@@ -29,6 +28,3 @@
 /// wasp::collections
 #define __COLLECTIONS_BEGIN__ __WASP_BEGIN__ namespace collections {
 #define __COLLECTIONS_END__ } __WASP_END__
-
-
-#endif // WASP_COLLECTIONS_DEF_H

@@ -20,8 +20,7 @@
  * Purpose: class that contains url arguments based on std::map.
  */
 
-#ifndef WASP_VIEWS_ARGS_H
-#define WASP_VIEWS_ARGS_H
+#pragma once
 
 // C++ libraries.
 #include <map>
@@ -55,6 +54,3 @@ private:
 };
 
 __VIEWS_END__
-
-
-#endif // WASP_VIEWS_ARGS_H

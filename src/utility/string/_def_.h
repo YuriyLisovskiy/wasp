@@ -20,17 +20,15 @@
  * Purpose: utility/string module's definitions.
  */
 
-#ifndef WASP_UTILITY_STRING_DEF_H
-#define WASP_UTILITY_STRING_DEF_H
+#pragma once
 
 #include "../../_def_.h"
 
 
+/// wasp::str
 #define __STR_BEGIN__ __WASP_BEGIN__ namespace str {
 #define __STR_END__ } __WASP_END__
 
+/// wasp::str::internal
 #define __STR_INTERNAL_BEGIN__ __STR_BEGIN__ namespace internal {
 #define __STR_INTERNAL_END__ } __STR_END__
-
-
-#endif // WASP_UTILITY_STRING_DEF_H

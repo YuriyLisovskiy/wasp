@@ -20,8 +20,7 @@
  * Purpose: some http helpers.
  */
 
-#ifndef WASP_HTTP_UTILITY_H
-#define WASP_HTTP_UTILITY_H
+#pragma once
 
 // C++ libraries.
 #include <string>
@@ -42,6 +41,3 @@ extern size_t parse_http_datetime(const std::string& http_datetime);
 extern std::string format_http_datetime(size_t epoch_seconds);
 
 __HTTP_END__
-
-
-#endif // WASP_HTTP_UTILITY_H

@@ -1,5 +1,7 @@
 TODO:
-    Implement default middleware
+    Implement default middleware.
+    Add utf8 strings' support.
+    Implement basic template engine.
 
 
 Not tested:
@@ -26,8 +28,6 @@ Not tested:
 
 
 Check out TODOs in (not urgent):
-    - src/core/parsers/cookie_parser.cpp
-
     - src/core/http_server.cpp
 
     - src/http/response.cpp

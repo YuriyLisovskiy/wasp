@@ -20,14 +20,10 @@
  * Purpose: apps module's definitions.
  */
 
-#ifndef WASP_APPS_DEF_H
-#define WASP_APPS_DEF_H
+#pragma once
 
 #include "../_def_.h"
 
 
 #define __APPS_BEGIN__ __WASP_BEGIN__ namespace apps {
 #define __APPS_END__ } __WASP_END__
-
-
-#endif // WASP_APPS_DEF_H

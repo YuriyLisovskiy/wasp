@@ -57,7 +57,7 @@ http::HttpResponse* RedirectView::get(http::HttpRequest* request, Args* args)
 	{
 		if (this->_logger != nullptr)
 		{
-			this->_logger->warning("Gone: " + request->path(), _DETAILS_NONE_);
+			this->_logger->warning("Gone: " + request->path());
 		}
 
 		return new http::HttpResponseGone("");

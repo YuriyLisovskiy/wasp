@@ -20,8 +20,7 @@
  * Purpose: utility for working with time.
  */
 
-#ifndef WASP_CORE_DATETIME_TIME_H
-#define WASP_CORE_DATETIME_TIME_H
+#pragma once
 
 // C++ libraries.
 #include <string>
@@ -93,6 +92,3 @@ public:
 };
 
 __DATETIME_END__
-
-
-#endif // WASP_CORE_DATETIME_TIME_H

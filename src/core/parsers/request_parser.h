@@ -20,8 +20,7 @@
  * Purpose: parses an http request from given stream.
  */
 
-#ifndef WASP_CORE_PARSERS_REQUEST_PARSER_H
-#define WASP_CORE_PARSERS_REQUEST_PARSER_H
+#pragma once
 
 // C++ libraries.
 #include <algorithm>
@@ -222,6 +221,3 @@ struct request_parser final
 };
 
 __CORE_INTERNAL_END__
-
-
-#endif // WASP_CORE_PARSERS_REQUEST_PARSER_H

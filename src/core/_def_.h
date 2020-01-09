@@ -20,8 +20,7 @@
  * Purpose: core module's definitions.
  */
 
-#ifndef WASP_CORE_DEF_H
-#define WASP_CORE_DEF_H
+#pragma once
 
 #include "../_def_.h"
 
@@ -33,6 +32,3 @@
 /// wasp::core::internal
 #define __CORE_INTERNAL_BEGIN__ __CORE_BEGIN__ namespace internal {
 #define __CORE_INTERNAL_END__ } __CORE_END__
-
-
-#endif // WASP_CORE_DEF_H

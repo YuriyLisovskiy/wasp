@@ -20,8 +20,7 @@
  * Purpose: http headers constants.
  */
 
-#ifndef WASP_HTTP_HEADERS_H
-#define WASP_HTTP_HEADERS_H
+#pragma once
 
 // C++ libraries.
 #include <string>
@@ -41,6 +40,3 @@ const std::string CONTENT_ENCODING = "Content-Encoding";
 const std::string CONTENT_LENGTH = "Content-Length";
 
 __HTTP_END__
-
-
-#endif // WASP_HTTP_HEADERS_H

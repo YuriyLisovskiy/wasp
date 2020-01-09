@@ -18,7 +18,8 @@
 
 #include <string>
 
-#include "../../src/views/generic.h"
+#include "../../src/views/view.h"
+#include "../../src/views/redirect_view.h"
 
 
 class MainView : public wasp::views::View

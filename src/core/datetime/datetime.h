@@ -20,8 +20,7 @@
  * Purpose: combines date, time and timezone in one class.
  */
 
-#ifndef WASP_CORE_DATETIME_DATETIME_H
-#define WASP_CORE_DATETIME_DATETIME_H
+#pragma once
 
 // C++ libraries.
 #include <map>
@@ -95,6 +94,3 @@ __DATETIME_INTERNAL_BEGIN__
 time_t now();
 
 __DATETIME_INTERNAL_END__
-
-
-#endif // WASP_CORE_DATETIME_DATETIME_H

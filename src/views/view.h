@@ -21,8 +21,7 @@
  * 			implements dispatch-by-method and simple sanity checking.
  */
 
-#ifndef WASP_VIEWS_VIEW_H
-#define WASP_VIEWS_VIEW_H
+#pragma once
 
 // C++ libraries.
 #include <vector>
@@ -170,6 +169,3 @@ protected:
 };
 
 __VIEWS_END__
-
-
-#endif // WASP_VIEWS_VIEW_H

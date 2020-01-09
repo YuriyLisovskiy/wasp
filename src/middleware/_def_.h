@@ -20,8 +20,7 @@
  * Purpose: middleware module definitions.
  */
 
-#ifndef WASP_MIDDLEWARE_DEF_H
-#define WASP_MIDDLEWARE_DEF_H
+#pragma once
 
 #include "../_def_.h"
 
@@ -29,6 +28,3 @@
 /// wasp::middleware
 #define __MIDDLEWARE_BEGIN__ __WASP_BEGIN__ namespace middleware {
 #define __MIDDLEWARE_END__ } __WASP_END__
-
-
-#endif // WASP_MIDDLEWARE_DEF_H

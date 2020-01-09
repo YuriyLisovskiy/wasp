@@ -22,8 +22,7 @@
  * Pattern example: /profile/<user_id>(\d+)/?
  */
 
-#ifndef WASP_URLS_PATTERN_H
-#define WASP_URLS_PATTERN_H
+#pragma once
 
 // C++ libraries.
 #include <string>
@@ -87,6 +86,3 @@ private:
 };
 
 __URLS_END__
-
-
-#endif // WASP_URLS_PATTERN_H

@@ -20,22 +20,13 @@
  * Purpose: main module's definitions.
  */
 
-#ifndef WASP_DEF_H
-#define WASP_DEF_H
+#pragma once
 
 
-/// Main namespace.
-///
-/// Full name: wasp
+/// wasp
 #define __WASP_BEGIN__ namespace wasp {
 #define __WASP_END__ }
 
 
 /// Required parameters for Wasp's built-in logger.
 #define _ERROR_DETAILS_ __LINE__, __FUNCTION__, __FILE__
-
-/// Pass this when file details is not required.
-#define _DETAILS_NONE_ 0, "", ""
-
-
-#endif // WASP_DEF_H

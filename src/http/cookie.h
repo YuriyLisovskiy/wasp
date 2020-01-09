@@ -20,8 +20,7 @@
  * Purpose: represents an http cookies as object.
  */
 
-#ifndef WASP_HTTP_COOKIE_H
-#define WASP_HTTP_COOKIE_H
+#pragma once
 
 // C++ libraries.
 #include <string>
@@ -64,6 +63,3 @@ public:
 };
 
 __HTTP_END__
-
-
-#endif // WASP_HTTP_COOKIE_H
