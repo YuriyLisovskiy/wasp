@@ -46,7 +46,7 @@
 
 // Wasp libraries.
 #include "../exceptions.h"
-#include "../../utility/string/str.h"
+#include "../string/str.h"
 
 
 __CORE_BEGIN__

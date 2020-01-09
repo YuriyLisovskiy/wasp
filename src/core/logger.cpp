@@ -18,7 +18,7 @@
 #include "./logger.h"
 
 
-__UTILITY_BEGIN__
+__CORE_BEGIN__
 
 ILogger* Logger::_instance = nullptr;
 
@@ -195,4 +195,4 @@ const char* Logger::get_colour(Color colour)
 	return this->_colors[colour];
 }
 
-__UTILITY_END__
+__CORE_END__

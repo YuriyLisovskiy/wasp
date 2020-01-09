@@ -130,14 +130,14 @@ RunserverCommand::get_handler()
 	{
 		if (settings->LOGGER)
 		{
-			utility::Logger::Color color = utility::Logger::Color::GREEN;
+			core::Logger::Color color = core::Logger::Color::GREEN;
 			if (status_code >= 400)
 			{
-				color = utility::Logger::Color::YELLOW;
+				color = core::Logger::Color::YELLOW;
 			}
 			else if (status_code >= 500)
 			{
-				color = utility::Logger::Color::RED;
+				color = core::Logger::Color::RED;
 			}
 
 			settings->LOGGER->print(str::format(

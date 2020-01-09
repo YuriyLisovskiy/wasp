@@ -34,10 +34,10 @@
 #include "../../../core/parsers/url_parser.h"
 #include "../../../core/datetime/datetime.h"
 #include "../../../core/exceptions.h"
-#include "../../../utility/flags/flags.h"
-#include "../../../utility/string/str.h"
-#include "../../../utility/string/format.h"
-#include "../../../utility/regex.h"
+#include "../../../core/flags/flags.h"
+#include "../../../core/string/str.h"
+#include "../../../core/string/format.h"
+#include "../../../core/regex.h"
 
 
 __CORE_COMMANDS_BEGIN__

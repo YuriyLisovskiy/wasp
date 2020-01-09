@@ -36,20 +36,20 @@
 #include "./_def_.h"
 
 // Wasp libraries.
-#include "../utility/logger.h"
 #include "../conf/defaults.h"
 #include "../conf/settings.h"
 #include "../http/response.h"
 #include "../http/request.h"
 #include "../http/headers.h"
 #include "./parsers/request_parser.h"
+#include "../core/logger.h"
 #include "../core/sockets/server_socket.h"
 #include "../core/exceptions.h"
 #include "../core/thread_pool.h"
 #include "../core/files/uploaded_file.h"
 #include "../core/datetime/time.h"
-#include "../utility/string/str.h"
-#include "../utility/string/format.h"
+#include "../core/string/str.h"
+#include "../core/string/format.h"
 
 
 __CORE_INTERNAL_BEGIN__
@@ -76,7 +76,7 @@ private:
 	ServerSocket _server_socket;
 	http_handler _http_handler;
 	bool _finished;
-	utility::ILogger* _logger;
+	core::ILogger* _logger;
 	std::string _media_root;
 	size_t _threads_count;
 	core::internal::ThreadPool* _thread_pool;
@@ -110,7 +110,7 @@ public:
 		std::string host;
 		uint16_t port = 0;
 		http_handler handler = nullptr;
-		utility::ILogger* logger;
+		core::ILogger* logger;
 		size_t max_body_size = 0;
 		std::string media_root;
 		size_t threads_count = 0;

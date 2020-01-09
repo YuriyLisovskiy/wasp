@@ -28,7 +28,7 @@ Settings::Settings()
 {
 	this->DEBUG = false;
 
-	this->LOGGER = utility::Logger::get_instance({});
+	this->LOGGER = core::Logger::get_instance({});
 
 	this->TIME_ZONE = "America/Chicago";
 
@@ -105,7 +105,7 @@ Settings::~Settings()
 		delete command.second;
 	}
 
-	utility::Logger::reset_instance();
+	core::Logger::reset_instance();
 }
 
 __CONF_END__

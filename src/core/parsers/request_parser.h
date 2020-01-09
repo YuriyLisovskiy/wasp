@@ -35,7 +35,7 @@
 #include "../../http/request.h"
 #include "./multipart_parser.h"
 #include "./query_parser.h"
-#include "../../utility/string/str.h"
+#include "../string/str.h"
 
 
 __CORE_INTERNAL_BEGIN__

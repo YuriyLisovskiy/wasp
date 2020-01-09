@@ -30,8 +30,8 @@
 #include "../_def_.h"
 
 // Wasp libraries.
+#include "../string/str.h"
 #include "../../core/exceptions.h"
-#include "../../utility/string/str.h"
 
 
 __CORE_INTERNAL_BEGIN__

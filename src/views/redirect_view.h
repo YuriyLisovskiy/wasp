@@ -31,7 +31,7 @@
 // Wasp libraries.
 #include "./view.h"
 #include "./args.h"
-#include "../utility/logger.h"
+#include "../core/logger.h"
 #include "../http/request.h"
 #include "../http/response.h"
 
@@ -50,7 +50,7 @@ public:
 		const std::string& url,
 		bool permanent = false,
 		bool query_string = false,
-		utility::ILogger* logger = nullptr
+		core::ILogger* logger = nullptr
 	);
 
 	/// Return the URL redirect to.

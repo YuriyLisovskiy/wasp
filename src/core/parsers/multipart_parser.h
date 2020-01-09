@@ -31,7 +31,7 @@
 #include "../_def_.h"
 
 // Wasp libraries.
-#include "../../utility/string/str.h"
+#include "../../core/string/str.h"
 #include "../../core/exceptions.h"
 #include "../../collections/dict.h"
 #include "../../collections/multi_dict.h"

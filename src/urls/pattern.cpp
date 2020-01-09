@@ -52,7 +52,7 @@ std::string UrlPattern::get_name()
 http::HttpResponseBase* UrlPattern::apply(
 	http::HttpRequest* request,
 	views::Args* args,
-	utility::ILogger* logger
+	core::ILogger* logger
 )
 {
 	return this->_handler(request, args, logger);

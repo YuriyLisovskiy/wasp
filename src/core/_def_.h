@@ -32,3 +32,31 @@
 /// wasp::core::internal
 #define __CORE_INTERNAL_BEGIN__ __CORE_BEGIN__ namespace internal {
 #define __CORE_INTERNAL_END__ } __CORE_END__
+
+
+/// wasp::core::path
+#define __PATH_BEGIN__ __CORE_BEGIN__ namespace path {
+#define __PATH_END__ } __CORE_END__
+
+/// wasp::core::path::internal
+#define __PATH_INTERNAL_BEGIN__ __PATH_BEGIN__ namespace internal {
+#define __PATH_INTERNAL_END__ } __PATH_END__
+
+
+/// wasp::core::mime
+#define __MIME_BEGIN__ __CORE_BEGIN__ namespace mime {
+#define __MIME_END__ } __CORE_END__
+
+
+/// wasp::core::encoding
+#define __ENCODING_BEGIN__ __CORE_BEGIN__ namespace encoding {
+#define __ENCODING_END__ } __CORE_END__
+
+/// wasp::core::encoding::internal
+#define __ENCODING_INTERNAL_BEGIN__ __CORE_BEGIN__ namespace internal {
+#define __ENCODING_INTERNAL_END__ } __CORE_END__
+
+
+/// wasp::core::rgx
+#define __RGX_BEGIN__ __CORE_BEGIN__ namespace rgx {
+#define __RGX_END__ } __CORE_END__

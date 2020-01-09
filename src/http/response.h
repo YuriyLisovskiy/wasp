@@ -42,10 +42,10 @@
 #include "../core/exceptions.h"
 #include "./status.h"
 #include "./url.h"
-#include "../utility/string/str.h"
-#include "../utility/encoding.h"
-#include "../utility/path.h"
-#include "../utility/mime_types.h"
+#include "../core/string/str.h"
+#include "../core/encoding.h"
+#include "../core/path.h"
+#include "../core/mime_types.h"
 #include "../core/datetime/datetime.h"
 
 

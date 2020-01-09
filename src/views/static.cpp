@@ -24,7 +24,7 @@
 
 __VIEWS_BEGIN__
 
-StaticView::StaticView(utility::ILogger* logger)
+StaticView::StaticView(core::ILogger* logger)
 	: View({"get"}, logger)
 {
 }
@@ -64,8 +64,8 @@ http::HttpResponseBase* StaticView::get(http::HttpRequest* request, Args* args)
 		return new http::HttpResponseNotFound(this->_kwargs->get("http_404", "404 Not Found"));
 	}
 
-	auto full_path = path::join(this->_kwargs->get("document_root", ""), args->get_str("path", ""));
-	if (!path::exists(full_path))
+	auto full_path = core::path::join(this->_kwargs->get("document_root", ""), args->get_str("path", ""));
+	if (!core::path::exists(full_path))
 	{
 		// TODO: add default http 404 error content!
 		return new http::HttpResponseNotFound(this->_kwargs->get("http_404", "404 Not Found"));
@@ -80,7 +80,7 @@ http::HttpResponseBase* StaticView::get(http::HttpRequest* request, Args* args)
 	}
 
 	std::string content_type, encoding;
-	mime::guess_content_type(full_path, content_type, encoding);
+	core::mime::guess_content_type(full_path, content_type, encoding);
 	if (content_type.empty())
 	{
 		content_type = "application/octet-stream";

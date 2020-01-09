@@ -32,7 +32,7 @@
 #include "../core/datetime/datetime.h"
 
 
-__UTILITY_BEGIN__
+__CORE_BEGIN__
 
 class ILogger
 {
@@ -143,4 +143,4 @@ private:
 	const char* get_colour(Color colour);
 };
 
-__UTILITY_END__
+__CORE_END__

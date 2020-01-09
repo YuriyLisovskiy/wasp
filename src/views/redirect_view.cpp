@@ -25,7 +25,7 @@
 __VIEWS_BEGIN__
 
 RedirectView::RedirectView(
-	const std::string& url, bool permanent, bool query_string, utility::ILogger* logger
+	const std::string& url, bool permanent, bool query_string, core::ILogger* logger
 )
 	: View({"get", "post", "put", "patch", "delete", "head", "options"}, logger)
 {

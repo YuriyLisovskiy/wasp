@@ -18,14 +18,14 @@
 #pragma once
 
 #include "../../src/views/view.h"
-#include "../../src/utility/logger.h"
+#include "../../src/core/logger.h"
 #include "../../src/apps/config.h"
 
 
 class FormView : public wasp::views::View
 {
 public:
-	explicit FormView(wasp::utility::ILogger* logger = nullptr)
+	explicit FormView(wasp::core::ILogger* logger = nullptr)
 		: wasp::views::View({"get", "post"}, logger)
 	{
 	}

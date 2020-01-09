@@ -36,8 +36,8 @@
 #include "../http/request.h"
 #include "../http/response.h"
 #include "../http/utility.h"
-#include "../utility/logger.h"
-#include "../utility/mime_types.h"
+#include "../core/logger.h"
+#include "../core/mime_types.h"
 #include "../core/files/file.h"
 #include "../core/datetime/datetime.h"
 #include "../core/exceptions.h"
@@ -52,7 +52,7 @@ private:
 	collections::Dict<std::string, std::string>* _kwargs = nullptr;
 
 public:
-	explicit StaticView(utility::ILogger* logger);
+	explicit StaticView(core::ILogger* logger);
 
 	void set_kwargs(collections::Dict<std::string, std::string>* kwargs);
 
