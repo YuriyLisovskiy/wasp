@@ -89,6 +89,8 @@ DEF_WASP_EXCEPTION_WITH_BASE(DictError, BaseException);
 // The user did something suspicious.
 DEF_WASP_EXCEPTION_WITH_BASE(SuspiciousOperation, BaseException);
 
+DEF_WASP_EXCEPTION_WITH_BASE(DisallowedHost, SuspiciousOperation);
+
 // Redirect to scheme not in allowed list.
 DEF_WASP_EXCEPTION_WITH_BASE(DisallowedRedirect, SuspiciousOperation);
 

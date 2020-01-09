@@ -1,7 +1,28 @@
 TODO:
-    Implement default middleware.
+    Implement default middleware:
+        - csrf
+        - cache
+        - gzip
+        - conditional get (http)
+        - locale
+        - security (check todos!)
+
+TODO:
     Add utf8 strings' support.
     Implement basic template engine.
+
+
+Check out TODOs in (not urgent):
+    - src/core/http_server.cpp
+
+    - src/http/request.cpp
+    - src/http/response.cpp
+
+    - src/middleware/security.cpp
+
+    - src/utility/encoding.cpp
+
+    - src/views/static.cpp
 
 
 Not tested:
@@ -25,18 +46,6 @@ Not tested:
     - src/utility/regex
 
     - src/views/static
-
-
-Check out TODOs in (not urgent):
-    - src/core/http_server.cpp
-
-    - src/http/response.cpp
-
-    - src/middleware/clickjacking.cpp
-
-    - src/utility/encoding.cpp
-
-    - src/views/static.cpp
 
 
 Implement next settings (not urgent):
@@ -448,15 +457,3 @@ MIGRATION_MODULES = {}
 # serious issues like errors and criticals does not result in hiding the
 # message, but Django will not stop you from e.g. running server.
 SILENCED_SYSTEM_CHECKS = []
-
-#######################
-# SECURITY MIDDLEWARE #
-#######################
-SECURE_BROWSER_XSS_FILTER = False
-SECURE_CONTENT_TYPE_NOSNIFF = False
-SECURE_HSTS_INCLUDE_SUBDOMAINS = False
-SECURE_HSTS_PRELOAD = False
-SECURE_HSTS_SECONDS = 0
-SECURE_REDIRECT_EXEMPT = []
-SECURE_SSL_HOST = None
-SECURE_SSL_REDIRECT = False

@@ -28,6 +28,7 @@ Regex::Regex(const std::string& expr)
 {
 	this->_expr = std::regex(expr);
 	this->_is_matched = false;
+	this->_is_searched = false;
 }
 
 bool Regex::match(const std::string& to_match)
@@ -37,21 +38,39 @@ bool Regex::match(const std::string& to_match)
 	return this->_is_matched;
 }
 
+bool Regex::search(const std::string& to_search)
+{
+	this->_to_match = to_search;
+	this->_is_searched = std::regex_search(this->_to_match, this->_matches, this->_expr);
+	return this->_is_searched;
+}
+
+std::vector<std::string> Regex::_get_groups()
+{
+	std::vector<std::string> groups;
+	for (size_t i = 1; i < this->_matches.size(); i++)
+	{
+		if (this->_matches[i].matched)
+		{
+			groups.push_back(this->_matches[i].str());
+		}
+	}
+
+	return groups;
+}
+
 std::vector<std::string> Regex::groups()
 {
 	std::vector<std::string> groups;
-	if (this->_is_matched)
+	if (this->_is_searched)
 	{
-		std::smatch matches;
-		if (std::regex_search(this->_to_match, matches, this->_expr))
+		groups = this->_get_groups();
+	}
+	else if (this->_is_matched)
+	{
+		if (std::regex_search(this->_to_match, this->_matches, this->_expr))
 		{
-			for (size_t i = 1; i < matches.size(); i++)
-			{
-				if (matches[i].matched)
-				{
-					groups.push_back(matches[i].str());
-				}
-			}
+			groups = this->_get_groups();
 		}
 	}
 

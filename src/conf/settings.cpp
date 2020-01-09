@@ -82,6 +82,13 @@ Settings::Settings()
 	this->CSRF_USE_SESSIONS = false;
 
 	this->USE_SSL = false;
+
+	this->SECURE_BROWSER_XSS_FILTER = false;
+	this->SECURE_CONTENT_TYPE_NO_SNIFF = true;
+	this->SECURE_HSTS_INCLUDE_SUBDOMAINS = false;
+	this->SECURE_HSTS_PRELOAD = false;
+	this->SECURE_HSTS_SECONDS = 0;
+	this->SECURE_SSL_REDIRECT = false;
 }
 
 void Settings::overwrite()

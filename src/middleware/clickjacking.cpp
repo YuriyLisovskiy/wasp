@@ -29,11 +29,25 @@ XFrameOptionsMiddleware::XFrameOptionsMiddleware(conf::Settings* settings)
 {
 }
 
-void XFrameOptionsMiddleware::process_response(
-	const http::HttpRequest* request, http::HttpResponseBase* response
+http::HttpResponseBase* XFrameOptionsMiddleware::process_response(
+	http::HttpRequest* request, http::HttpResponseBase* response
 )
 {
-	// TODO:
+	// Don't set it if it's already in the response.
+	if (response->has_header(http::X_FRAME_OPTIONS))
+	{
+		return nullptr;
+	}
+
+	response->set_header(http::X_FRAME_OPTIONS, this->get_x_frame_options_value(request, response));
+	return nullptr;
+}
+
+std::string XFrameOptionsMiddleware::get_x_frame_options_value(
+	http::HttpRequest* request, http::HttpResponseBase* response
+)
+{
+	return this->settings->X_FRAME_OPTIONS.empty() ? "DENY" : this->settings->X_FRAME_OPTIONS;
 }
 
 __MIDDLEWARE_END__

@@ -43,9 +43,9 @@ public:
 	explicit MiddlewareMixin(conf::Settings* settings);
 	~MiddlewareMixin() override = default;
 
-	void process_request(http::HttpRequest* request) override;
-	void process_response(
-		const http::HttpRequest* request, http::HttpResponseBase* response
+	http::HttpResponseBase* process_request(http::HttpRequest* request) override;
+	http::HttpResponseBase* process_response(
+		http::HttpRequest* request, http::HttpResponseBase* response
 	) override;
 };
 

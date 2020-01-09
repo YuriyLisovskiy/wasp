@@ -59,7 +59,7 @@ TEST_F(MultipartParserStaticTestCase, AssertGetBoundaryTestSuccess)
 {
 	ASSERT_EQ(
 		core::internal::multipart_parser::get_boundary(this->CONTENT_TYPE),
-		str::ltrim(this->ORIG_BOUNDARY, '-')
+		core::str::ltrim(this->ORIG_BOUNDARY, '-')
 	);
 }
 

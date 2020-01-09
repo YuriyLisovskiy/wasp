@@ -31,10 +31,13 @@
 #include "./_def_.h"
 
 // Wasp libraries.
+#include "./headers.h"
 #include "../core/string/str.h"
 #include "../collections/dict.h"
 #include "../collections/multi_dict.h"
 #include "../core/files/uploaded_file.h"
+#include "../core/exceptions.h"
+#include "../conf/settings.h"
 
 
 __HTTP_BEGIN__
@@ -115,10 +118,45 @@ public:
 
 	std::string version();
 	std::string path();
+	std::string full_path(bool force_append_slash = false);
 	std::string query();
 	std::string method();
 	bool keep_alive();
 	std::string body();
+	bool is_secure();
+	std::string scheme();
+
+	/// Return the HTTP host using the environment or request headers.
+	std::string get_host(conf::Settings* settings);
+
+protected:
+	/// Return the HTTP host using the environment or request headers. Skip
+	/// allowed hosts protection, so may return an insecure host.
+	std::string get_raw_host(bool use_x_forwarded_host);
+
+	/// Writes domain and port from a given host.
+	///
+	/// Returned domain is lower-cased. If the host is invalid,
+	/// the domain will be empty.
+	void split_domain_port(
+		const std::string& host, std::string& domain, std::string& port
+	);
+
+	/// Validate the given host for this site.
+	///
+	/// Check that the host looks valid and matches a host or host pattern in the
+	/// given list of `allowed_hosts`. Any pattern beginning with a period
+	/// matches a domain and all its sub-domains (e.g. `.example.com` matches
+	/// `example.com` and any sub-domain), `*` matches anything, and anything
+	/// else must match exactly.
+	///
+	/// Note: This function assumes that the given host is lower-cased and has
+	/// already had the port, if any, stripped off.
+	///
+	/// Return `true` for a valid host, `false` otherwise.
+	bool validate_host(
+		const std::string& domain, const std::vector<std::string>& allowed_hosts
+	);
 
 private:
 	size_t _major_version;

@@ -166,12 +166,12 @@ std::string UrlPattern::_parse(const std::string& pattern)
 
 	if (!part.empty())
 	{
-		if (str::ends_with(part, "?"))
+		if (core::str::ends_with(part, "?"))
 		{
 			part.pop_back();
 		}
 
-		str::rtrim(part, '/');
+		core::str::rtrim(part, '/');
 		this->_pattern_parts.push_back(part);
 	}
 

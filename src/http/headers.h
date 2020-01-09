@@ -31,6 +31,8 @@
 
 __HTTP_BEGIN__
 
+const std::string HOST = "Host";
+
 const std::string IF_MODIFIED_SINCE = "If-Modified-Since";
 
 const std::string LAST_MODIFIED = "Last-Modified";
@@ -38,5 +40,14 @@ const std::string LAST_MODIFIED = "Last-Modified";
 const std::string CONTENT_ENCODING = "Content-Encoding";
 
 const std::string CONTENT_LENGTH = "Content-Length";
+
+const std::string REFERRER_POLICY = "Referrer-Policy";
+
+const std::string STRICT_TRANSPORT_SECURITY = "Strict-Transport-Security";
+
+const std::string X_FRAME_OPTIONS = "X-Frame-Options";
+const std::string X_FORWARDED_HOST = "X-Forwarded-Host";
+const std::string X_XSS_PROTECTION = "X-XSS-Protection";
+const std::string X_CONTENT_TYPE_OPTIONS = "X-Content-Type-Options";
 
 __HTTP_END__

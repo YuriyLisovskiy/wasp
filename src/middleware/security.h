@@ -15,30 +15,46 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * security.h
+ */
+
 #pragma once
+
+// C++ libraries.
+#include <vector>
+#include <string>
 
 // Module definitions.
 #include "./_def_.h"
 
 // Wasp libraries.
-#include "../http/request.h"
+#include "./middleware_mixin.h"
+#include "../core/regex.h"
+#include "../core/string/str.h"
 #include "../http/response.h"
 
 
 __MIDDLEWARE_BEGIN__
 
-class IMiddleware
+class SecurityMiddleware : public MiddlewareMixin
 {
+protected:
+	size_t sts_seconds;
+	bool sts_include_subdomains;
+	bool sts_preload;
+	bool content_type_no_sniff;
+	bool xss_filter;
+	bool redirect;
+	std::string redirect_host;
+	std::string referrer_policy;
+	std::vector<core::rgx::Regex> redirect_exempt;
+
 public:
-	virtual ~IMiddleware() = default;
+	explicit SecurityMiddleware(conf::Settings* settings);
 
-	/// An input http request before processing in views::View.
-	virtual http::HttpResponseBase* process_request(http::HttpRequest* request) = 0;
-
-	/// An output http request and response after processing in views::View.
-	virtual http::HttpResponseBase* process_response(
-		http::HttpRequest* request, http::HttpResponseBase* response
-	) = 0;
+	http::HttpResponseBase* process_request(http::HttpRequest* request) override;
+	http::HttpResponseBase* process_response(http::HttpRequest* request, http::HttpResponseBase* response) override;
 };
 
 __MIDDLEWARE_END__

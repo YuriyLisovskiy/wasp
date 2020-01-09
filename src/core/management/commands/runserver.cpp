@@ -153,30 +153,42 @@ RunserverCommand::get_handler()
 		http::HttpRequest* request, const core::internal::socket_t& client
 	) mutable -> void
 	{
+		http::HttpResponseBase* response = nullptr;
 		for (auto& middleware : settings->MIDDLEWARE)
 		{
-			middleware->process_request(request);
-		}
-
-		http::HttpResponseBase* response = nullptr;
-		for (auto& url_pattern : urlpatterns)
-		{
-			std::map<std::string, std::string> args_map;
-			if (url_pattern.match(request->path(), args_map))
+			response = middleware->process_request(request);
+			if (response)
 			{
-				response = url_pattern.apply(request, new views::Args(args_map), settings->LOGGER);
 				break;
 			}
 		}
 
 		if (!response)
 		{
-			response = new http::HttpResponseNotFound("<h2>404 - Not Found</h2>");
-		}
+			for (auto& url_pattern : urlpatterns)
+			{
+				std::map<std::string, std::string> args_map;
+				if (url_pattern.match(request->path(), args_map))
+				{
+					response = url_pattern.apply(request, new views::Args(args_map), settings->LOGGER);
+					break;
+				}
+			}
 
-		for (long int i = (long int) settings->MIDDLEWARE.size() - 1; i >= 0; i--)
-		{
-			settings->MIDDLEWARE[i]->process_response(request, response);
+			if (!response)
+			{
+				response = new http::HttpResponseNotFound("<h2>404 - Not Found</h2>");
+			}
+
+			for (long int i = (long int) settings->MIDDLEWARE.size() - 1; i >= 0; i--)
+			{
+				auto curr_response = settings->MIDDLEWARE[i]->process_response(request, response);
+				if (curr_response)
+				{
+					response = curr_response;
+					break;
+				}
+			}
 		}
 
 		if (response->is_streaming())

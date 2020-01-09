@@ -29,13 +29,14 @@ CookieMiddleware::CookieMiddleware(wasp::conf::Settings* settings)
 {
 }
 
-void CookieMiddleware::process_request(http::HttpRequest* request)
+http::HttpResponseBase* CookieMiddleware::process_request(http::HttpRequest* request)
 {
 	auto* cookies = core::internal::cookie_parser::parse(
 		request->headers.get("Cookie", "")
 	);
 	request->COOKIES = collections::Dict(*cookies);
 	delete cookies;
+	return nullptr;
 }
 
 __MIDDLEWARE_END__

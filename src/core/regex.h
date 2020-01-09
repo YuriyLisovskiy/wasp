@@ -37,12 +37,17 @@ class Regex final
 {
 private:
 	bool _is_matched;
+	bool _is_searched;
 	std::string _to_match;
 	std::regex _expr;
+	std::smatch _matches;
+
+	std::vector<std::string> _get_groups();
 
 public:
 	explicit Regex(const std::string& expr);
 	bool match(const std::string& to_match);
+	bool search(const std::string& to_search);
 	std::vector<std::string> groups();
 };
 

@@ -22,12 +22,12 @@
 
 #pragma once
 
-#include "../../_def_.h"
+#include "../_def_.h"
 
 
 /// wasp::str
-#define __STR_BEGIN__ __WASP_BEGIN__ namespace str {
-#define __STR_END__ } __WASP_END__
+#define __STR_BEGIN__ __CORE_BEGIN__ namespace str {
+#define __STR_END__ } __CORE_END__
 
 /// wasp::str::internal
 #define __STR_INTERNAL_BEGIN__ __STR_BEGIN__ namespace internal {

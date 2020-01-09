@@ -118,7 +118,7 @@ TEST_F(ViewTestCase, OptionsTest)
 	auto vec = std::vector<std::string>{"get", "post", "head", "options"};
 	expected_response.set_header(
 		"Allow",
-		str::join(vec.cbegin(), vec.cend(), ", ")
+		core::str::join(vec.cbegin(), vec.cend(), ", ")
 	);
 	expected_response.set_header("Content-Length", "0");
 

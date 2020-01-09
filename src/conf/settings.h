@@ -26,7 +26,7 @@
 #include <map>
 #include <string>
 #include <vector>
-#include <regex>
+//#include <regex>
 
 // Module definitions.
 #include "./_def_.h"
@@ -36,6 +36,7 @@
 #include "../apps/interface.h"
 #include "../middleware/interface.h"
 #include "../core/management/base.h"
+#include "../core/regex.h"
 
 
 __CONF_BEGIN__
@@ -201,6 +202,17 @@ struct Settings
 
 	// SSL settings (will be added in future).
 	bool USE_SSL;
+
+	// Security middleware.
+	bool SECURE_BROWSER_XSS_FILTER;
+	bool SECURE_CONTENT_TYPE_NO_SNIFF;
+	bool SECURE_HSTS_INCLUDE_SUBDOMAINS;
+	bool SECURE_HSTS_PRELOAD;
+	size_t SECURE_HSTS_SECONDS;
+	std::vector<std::string> SECURE_REDIRECT_EXEMPT;
+	std::string SECURE_REFERRER_POLICY;
+	std::string SECURE_SSL_HOST;
+	bool SECURE_SSL_REDIRECT;
 
 	Settings();
 	virtual ~Settings();
