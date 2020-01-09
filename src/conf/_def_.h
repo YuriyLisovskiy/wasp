@@ -20,8 +20,7 @@
  * Purpose: conf module's definitions.
  */
 
-#ifndef WASP_CONF_DEF_H
-#define WASP_CONF_DEF_H
+#pragma once
 
 #include "../_def_.h"
 
@@ -33,6 +32,3 @@
 /// wasp::conf::internal
 #define __CONF_INTERNAL_BEGIN__ __CONF_BEGIN__ namespace internal {
 #define __CONF_INTERNAL_END__ } __CONF_END__
-
-
-#endif // WASP_CONF_DEF_H

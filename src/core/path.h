@@ -20,8 +20,7 @@
  * Purpose: utilities for working with path.
  */
 
-#ifndef WASP_UTILITY_PATH_H
-#define WASP_UTILITY_PATH_H
+#pragma once
 
 // C++ libraries.
 #if defined(_WIN32) || defined(_WIN64)
@@ -116,6 +115,3 @@ extern void _split_text(
 );
 
 __PATH_INTERNAL_END__
-
-
-#endif // WASP_UTILITY_PATH_H

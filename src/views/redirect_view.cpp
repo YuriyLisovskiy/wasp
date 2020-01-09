@@ -25,7 +25,7 @@
 __VIEWS_BEGIN__
 
 RedirectView::RedirectView(
-	const std::string& url, bool permanent, bool query_string, utility::ILogger* logger
+	const std::string& url, bool permanent, bool query_string, core::ILogger* logger
 )
 	: View({"get", "post", "put", "patch", "delete", "head", "options"}, logger)
 {
@@ -57,7 +57,7 @@ http::HttpResponse* RedirectView::get(http::HttpRequest* request, Args* args)
 	{
 		if (this->_logger != nullptr)
 		{
-			this->_logger->warning("Gone: " + request->path(), _DETAILS_NONE_);
+			this->_logger->warning("Gone: " + request->path());
 		}
 
 		return new http::HttpResponseGone("");

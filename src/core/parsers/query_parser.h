@@ -20,8 +20,7 @@
  * Purpose: parses url's query.
  */
 
-#ifndef WASP_CORE_PARSERS_QUERY_PARSER_H
-#define WASP_CORE_PARSERS_QUERY_PARSER_H
+#pragma once
 
 // Module definitions.
 #include "../_def_.h"
@@ -52,6 +51,3 @@ struct query_parser final
 };
 
 __CORE_INTERNAL_END__
-
-
-#endif // WASP_CORE_PARSERS_QUERY_PARSER_H

@@ -18,13 +18,14 @@
 
 #include <string>
 
-#include "../../src/views/generic.h"
+#include "../../src/views/view.h"
+#include "../../src/views/redirect_view.h"
 
 
 class MainView : public wasp::views::View
 {
 public:
-	explicit MainView(wasp::utility::ILogger* logger = nullptr)
+	explicit MainView(wasp::core::ILogger* logger = nullptr)
 		: View({"get"}, logger)
 	{
 	}
@@ -46,7 +47,7 @@ public:
 class RedirectView : public wasp::views::RedirectView
 {
 public:
-	explicit RedirectView(wasp::utility::ILogger* logger = nullptr)
+	explicit RedirectView(wasp::core::ILogger* logger = nullptr)
 		: wasp::views::RedirectView("/index", false, false, logger)
 	{
 	};

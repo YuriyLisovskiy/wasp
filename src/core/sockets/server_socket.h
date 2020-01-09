@@ -20,8 +20,7 @@
  * Purpose: improved and adapted tcp/ip socket for server.
  */
 
-#ifndef WASP_CORE_SOCKETS_SERVER_SOCKET_H
-#define WASP_CORE_SOCKETS_SERVER_SOCKET_H
+#pragma once
 
 // Module definitions.
 #include "../_def_.h"
@@ -54,6 +53,3 @@ private:
 };
 
 __CORE_INTERNAL_END__
-
-
-#endif // WASP_CORE_SOCKETS_SERVER_SOCKET_H

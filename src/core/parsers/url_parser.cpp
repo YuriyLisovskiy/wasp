@@ -105,6 +105,10 @@ void url_parser::parse(const std::string& str)
 					st = url_parser::state::s_path;
 					std::swap(this->hostname, username_or_hostname);
 				}
+				else if (ch == '[' && username_or_hostname.empty())
+				{
+					st = url_parser::state::s_ipv6_hostname;
+				}
 				else
 				{
 					this->set_err("unable to parse username or hostname", _ERROR_DETAILS_);
@@ -150,7 +154,35 @@ void url_parser::parse(const std::string& str)
 				}
 				break;
 			case url_parser::state::s_ipv6_hostname:
-				std::abort(); // TODO: implement ipv6 hostname parsing!
+				if (ch == ']')
+				{
+					st = url_parser::state::s_ipv6_hostname_end;
+				}
+				else if (url_parser::is_ipv6_symbol(ch))
+				{
+					this->hostname += ch;
+				}
+				else
+				{
+					this->set_err("unable to parse IPv6 hostname", _ERROR_DETAILS_);
+					return;
+				}
+				break;
+			case url_parser::state::s_ipv6_hostname_end:
+				if (ch == ':')
+				{
+					st = url_parser::state::s_port;
+				}
+				else if (ch == '/')
+				{
+					st = url_parser::state::s_path;
+				}
+				else
+				{
+					this->set_err("unable to parse IPv6 hostname", _ERROR_DETAILS_);
+					return;
+				}
+				break;
 			case url_parser::state::s_port_or_password:
 				if (std::isdigit(ch))
 				{
@@ -249,6 +281,12 @@ void url_parser::parse(const char* str)
 bool url_parser::is_unreserved(char ch)
 {
 	return std::isalnum(ch) || ch == '-' || ch == '.' || ch == '_' || ch == '~';
+}
+
+bool url_parser::is_ipv6_symbol(char ch)
+{
+	return std::isdigit(ch) || ch == ':' || ch == 'a' || ch == 'b' ||
+		ch == 'c' || ch == 'd' || ch == 'e' || ch == 'f';
 }
 
 void url_parser::set_err(const char* err, int line, const char* func, const char* file)

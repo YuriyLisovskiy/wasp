@@ -20,8 +20,7 @@
  * Purpose: parses url from given string.
  */
 
-#ifndef WASP_CORE_PARSERS_URL_PARSER_H
-#define WASP_CORE_PARSERS_URL_PARSER_H
+#pragma once
 
 // C++ libraries.
 #include <string>
@@ -31,8 +30,8 @@
 #include "../_def_.h"
 
 // Wasp libraries.
+#include "../string/str.h"
 #include "../../core/exceptions.h"
-#include "../../utility/string/str.h"
 
 
 __CORE_INTERNAL_BEGIN__
@@ -48,6 +47,7 @@ struct url_parser final
 		s_password,
 		s_hostname,
 		s_ipv6_hostname,
+		s_ipv6_hostname_end,
 		s_port_or_password,
 		s_port,
 		s_path,
@@ -75,11 +75,9 @@ struct url_parser final
 	void parse(const std::string& str);
 	void parse(const char* str);
 	static bool is_unreserved(char ch);
+	static bool is_ipv6_symbol(char ch);
 
 	void set_err(const char* err, int line, const char* func, const char* file);
 };
 
 __CORE_INTERNAL_END__
-
-
-#endif // WASP_CORE_PARSERS_URL_PARSER_H

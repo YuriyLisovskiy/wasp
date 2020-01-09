@@ -20,8 +20,7 @@
  * Purpose: represents an http request.
  */
 
-#ifndef WASP_HTTP_REQUEST_H
-#define WASP_HTTP_REQUEST_H
+#pragma once
 
 // C++ libraries.
 #include <string>
@@ -32,7 +31,7 @@
 #include "./_def_.h"
 
 // Wasp libraries.
-#include "../utility/string/str.h"
+#include "../core/string/str.h"
 #include "../collections/dict.h"
 #include "../collections/multi_dict.h"
 #include "../core/files/uploaded_file.h"
@@ -132,6 +131,3 @@ private:
 };
 
 __HTTP_END__
-
-
-#endif // WASP_HTTP_REQUEST_H

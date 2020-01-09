@@ -20,8 +20,7 @@
  * Purpose: parses cookies from http request.
  */
 
-#ifndef WASP_CORE_PARSERS_COOKIE_PARSER_H
-#define WASP_CORE_PARSERS_COOKIE_PARSER_H
+#pragma once
 
 // C++ libraries.
 #include <map>
@@ -35,22 +34,13 @@ __CORE_INTERNAL_BEGIN__
 
 struct cookie_parser final
 {
-	enum req_state
+	enum state
 	{
 		req_key,
 		req_val
 	};
 
-	enum resp_state
-	{
-
-	};
-
-	static std::map<std::string, std::string>* parse_req_cookies(const std::string& content);
-	static std::map<std::string, std::string>* parse_resp_cookies(const std::string& content);
+	static std::map<std::string, std::string>* parse(const std::string& content);
 };
 
 __CORE_INTERNAL_END__
-
-
-#endif // WASP_CORE_PARSERS_COOKIE_PARSER_H

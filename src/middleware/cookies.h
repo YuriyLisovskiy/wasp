@@ -20,8 +20,7 @@
  * Purpose: enables cookies in http request object.
  */
 
-#ifndef WASP_MIDDLEWARE_COOKIE_MIDDLEWARE_H
-#define WASP_MIDDLEWARE_COOKIE_MIDDLEWARE_H
+#pragma once
 
 // Module definitions.
 #include "./_def_.h"
@@ -45,6 +44,3 @@ public:
 };
 
 __MIDDLEWARE_END__
-
-
-#endif // WASP_MIDDLEWARE_COOKIE_MIDDLEWARE_H

@@ -20,8 +20,7 @@
  * Purpose: core/datetime module's definitions.
  */
 
-#ifndef WASP_CORE_DATETIME_DEF_H
-#define WASP_CORE_DATETIME_DEF_H
+#pragma once
 
 #include "../../_def_.h"
 
@@ -33,6 +32,3 @@
 /// wasp::dt::internal
 #define __DATETIME_INTERNAL_BEGIN__ __DATETIME_BEGIN__ namespace internal {
 #define __DATETIME_INTERNAL_END__ } __DATETIME_END__
-
-
-#endif // WASP_CORE_DATETIME_DEF_H

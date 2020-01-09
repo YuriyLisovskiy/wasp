@@ -15,8 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WASP_UTILS_LOGGER_H
-#define WASP_UTILS_LOGGER_H
+#pragma once
 
 // C++ libraries.
 #include <map>
@@ -33,7 +32,7 @@
 #include "../core/datetime/datetime.h"
 
 
-__UTILITY_BEGIN__
+__CORE_BEGIN__
 
 class ILogger
 {
@@ -80,15 +79,17 @@ class Logger : public ILogger
 public:
 	struct Config
 	{
-		bool enable_info_log = true;
-		bool enable_debug_log = true;
-		bool enable_warning_log = true;
-		bool enable_error_log = true;
-		bool enable_fatal_log = true;
+		bool enable_info = true;
+		bool enable_debug = true;
+		bool enable_warning = true;
+		bool enable_error = true;
+		bool enable_fatal = true;
+		bool enable_print = true;
 		std::vector<std::ostream*> streams;
 	};
 
 	static ILogger* get_instance(const Logger::Config& cfg);
+	static void reset_instance();
 
 	void info(const std::string& msg, int line = 0, const char* function = "", const char* file = "") override;
 	void debug(const std::string& msg, int line = 0, const char* function = "", const char* file = "") override;
@@ -135,14 +136,11 @@ private:
 	static ILogger* _instance;
 
 	explicit Logger(const Logger::Config& cfg);
-	~Logger() override;
+	~Logger() override = default;
 	void log(const std::string& msg, int line, const char* function, const char* file, Logger::log_level_enum level);
 	void write_to_stream(const std::string& msg, const char* colour);
 	void flush();
 	const char* get_colour(Color colour);
 };
 
-__UTILITY_END__
-
-
-#endif // WASP_UTILS_LOGGER_H
+__CORE_END__

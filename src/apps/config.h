@@ -21,8 +21,7 @@
  * 			with urls and models (will be developed in future)
  */
 
-#ifndef WASP_APPS_CONFIG_H
-#define WASP_APPS_CONFIG_H
+#pragma once
 
 // C++ libraries.
 #include <string>
@@ -37,7 +36,7 @@
 #include "../urls/url.h"
 #include "../urls/pattern.h"
 #include "../conf/settings.h"
-#include "../utility/string/str.h"
+#include "../core/string/str.h"
 #include "../core/management/base.h"
 #include "../core/management/commands/app_command.h"
 
@@ -80,7 +79,7 @@ protected:
 		views::ViewHandler view_handler = [](
 			http::HttpRequest* request,
 			views::Args* args,
-			utility::ILogger* logger
+			core::ILogger* logger
 		) -> http::HttpResponseBase*
 		{
 			_ViewT view(logger);
@@ -127,6 +126,3 @@ public:
 };
 
 __APPS_END__
-
-
-#endif // WASP_APPS_CONFIG_H

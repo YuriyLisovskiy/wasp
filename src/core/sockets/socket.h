@@ -20,10 +20,8 @@
  * Purpose: tcp/ip socket's wrapper.
  */
 
-#ifndef WASP_CORE_SOCKETS_SOCKET_H
-#define WASP_CORE_SOCKETS_SOCKET_H
+#pragma once
 
-#include <cstring>
 #include <fcntl.h>
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -35,7 +33,6 @@
 
 #elif defined(__unix__) || defined(__linux__)
 
-#include <sys/socket.h>
 #include <unistd.h>
 #include <arpa/inet.h>
 
@@ -93,6 +90,3 @@ public:
 };
 
 __CORE_INTERNAL_END__
-
-
-#endif // WASP_CORE_SOCKETS_SOCKET_H

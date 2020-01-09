@@ -43,7 +43,7 @@ UrlPattern make_static(
 	auto view_func = [static_root](
 		http::HttpRequest* request,
 		views::Args* args,
-		utility::ILogger* logger
+		core::ILogger* logger
 	) -> http::HttpResponseBase*
 	{
 		views::StaticView view(logger);

@@ -24,7 +24,7 @@
 class PictureView : public wasp::views::View
 {
 public:
-	explicit PictureView(wasp::utility::ILogger* logger = nullptr)
+	explicit PictureView(wasp::core::ILogger* logger = nullptr)
 		: View({"get"}, logger)
 	{
 	}

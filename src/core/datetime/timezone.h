@@ -20,8 +20,7 @@
  * Purpose: utility for retrieving timezone.
  */
 
-#ifndef WASP_CORE_DATETIME_TIMEZONE_H
-#define WASP_CORE_DATETIME_TIMEZONE_H
+#pragma once
 
 // C++ libraries.
 #include <chrono>
@@ -70,6 +69,3 @@ public:
 };
 
 __DATETIME_END__
-
-
-#endif // WASP_CORE_DATETIME_TIMEZONE_H

@@ -22,8 +22,7 @@
  * Pattern example: /profile/<user_id>(\d+)/?
  */
 
-#ifndef WASP_URLS_PATTERN_H
-#define WASP_URLS_PATTERN_H
+#pragma once
 
 // C++ libraries.
 #include <string>
@@ -38,8 +37,8 @@
 #include "../views/view.h"
 #include "../http/request.h"
 #include "../http/response.h"
-#include "../utility/logger.h"
-#include "../utility/string/str.h"
+#include "../core/logger.h"
+#include "../core/string/str.h"
 
 
 __URLS_BEGIN__
@@ -77,7 +76,7 @@ public:
 	http::HttpResponseBase* apply(
 		http::HttpRequest* request,
 		views::Args* args = nullptr,
-		utility::ILogger* logger = nullptr
+		core::ILogger* logger = nullptr
 	);
 	bool match(const std::string& url, std::map<std::string, std::string>& args);
 	std::string build(const std::vector<std::string>& args);
@@ -87,6 +86,3 @@ private:
 };
 
 __URLS_END__
-
-
-#endif // WASP_URLS_PATTERN_H

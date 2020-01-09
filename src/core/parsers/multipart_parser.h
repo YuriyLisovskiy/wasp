@@ -20,8 +20,7 @@
  * Purpose: parses multipart/form-data http request.
  */
 
-#ifndef WASP_CORE_PARSERS_MULTIPART_PARSER_H
-#define WASP_CORE_PARSERS_MULTIPART_PARSER_H
+#pragma once
 
 // C++ libraries.
 #include <string>
@@ -32,7 +31,7 @@
 #include "../_def_.h"
 
 // Wasp libraries.
-#include "../../utility/string/str.h"
+#include "../../core/string/str.h"
 #include "../../core/exceptions.h"
 #include "../../collections/dict.h"
 #include "../../collections/multi_dict.h"
@@ -93,6 +92,3 @@ struct multipart_parser final
 };
 
 __CORE_INTERNAL_END__
-
-
-#endif // WASP_CORE_PARSERS_MULTIPART_PARSER_H

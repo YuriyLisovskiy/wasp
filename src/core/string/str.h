@@ -20,8 +20,7 @@
  * Purpose: utility functions to simplify work with string.
  */
 
-#ifndef WASP_UTILITY_STRING_STR_H
-#define WASP_UTILITY_STRING_STR_H
+#pragma once
 
 // C++ libraries.
 #include <string>
@@ -167,6 +166,3 @@ extern std::string rtrim(std::string&& s, char ch = ' ');
 extern std::string trim(std::string&& s, char ch = ' ');
 
 __STR_END__
-
-
-#endif // WASP_UTILITY_STRING_STR_H

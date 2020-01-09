@@ -30,7 +30,7 @@
 #include "./_def_.h"
 
 // Wasp libraries.
-#include "../../utility/flags/flag_set.h"
+#include "../../core/flags/flag_set.h"
 
 
 __CORE_BEGIN__

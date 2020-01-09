@@ -20,8 +20,7 @@
  * Purpose: offsets of known time zones.
  */
 
-#ifndef WASP_UTILS_DATETIME_CONSTANTS_H
-#define WASP_UTILS_DATETIME_CONSTANTS_H
+#pragma once
 
 // c++ libraries.
 #include <map>
@@ -49,6 +48,3 @@ __DATETIME_INTERNAL_BEGIN__
 extern collections::Dict<std::string, int> TZ_TO_OFFSET;
 
 __DATETIME_INTERNAL_END__
-
-
-#endif // WASP_UTILS_DATETIME_CONSTANTS_H

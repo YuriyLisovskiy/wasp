@@ -18,11 +18,11 @@
 #include "./logger.h"
 
 
-__UTILITY_BEGIN__
+__CORE_BEGIN__
 
 ILogger* Logger::_instance = nullptr;
 
-Logger::~Logger()
+void Logger::reset_instance()
 {
 	delete Logger::_instance;
 	Logger::_instance = nullptr;
@@ -74,7 +74,10 @@ void Logger::fatal(const std::string& msg, int line, const char* function, const
 
 void Logger::print(const std::string& msg, Color colour, char end)
 {
-	std::cout << this->get_colour(colour) << msg << this->_colors[Color::DEFAULT] << end;
+	if (this->_config.enable_print)
+	{
+		std::cout << this->get_colour(colour) << msg << this->_colors[Color::DEFAULT] << end;
+	}
 }
 
 void Logger::print(const char* msg, Color colour, char end)
@@ -116,27 +119,27 @@ void Logger::log(const std::string& msg, int line, const char* function, const c
 	{
 		case Logger::log_level_enum::ll_warning:
 			level_name = "[warning]";
-			is_enabled = this->_config.enable_warning_log;
+			is_enabled = this->_config.enable_warning;
 			colour = Color::YELLOW;
 			break;
 		case Logger::log_level_enum::ll_error:
 			level_name = "[error]";
-			is_enabled = this->_config.enable_error_log;
+			is_enabled = this->_config.enable_error;
 			colour = Color::RED;
 			break;
 		case Logger::log_level_enum::ll_debug:
 			level_name = "[debug]";
-			is_enabled = this->_config.enable_debug_log;
+			is_enabled = this->_config.enable_debug;
 			colour = Color::MAGENTA;
 			break;
 		case Logger::log_level_enum::ll_fatal:
 			level_name = "[fatal]";
-			is_enabled = this->_config.enable_fatal_log;
+			is_enabled = this->_config.enable_fatal;
 			colour = Color::BOLD_RED;
 			break;
 		default:
 			level_name = "[info]";
-			is_enabled = this->_config.enable_info_log;
+			is_enabled = this->_config.enable_info;
 			colour = Color::CYAN;
 			break;
 	}
@@ -192,4 +195,4 @@ const char* Logger::get_colour(Color colour)
 	return this->_colors[colour];
 }
 
-__UTILITY_END__
+__CORE_END__

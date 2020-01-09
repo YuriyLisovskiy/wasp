@@ -21,7 +21,7 @@
 #include <gtest/gtest.h>
 
 #include "../../_def_.h"
-#include "../../../../src/utility/string/str.h"
+#include "../../../../src/core/string/str.h"
 
 
 __UNIT_TESTS_BEGIN__
@@ -204,6 +204,22 @@ TEST(StrStartsWithTestCase, TestStartsWithReturnsFalse)
 TEST(StrStartsWithTestCase, TestStartsWithReturnsTrue)
 {
 	ASSERT_TRUE(str::starts_with("Hello, World", "Hello,"));
+}
+
+
+TEST(StrEndsWithTestCase, TestEndsWithPrefixIsGreaterThanStr)
+{
+	ASSERT_FALSE(str::ends_with("Hello", "Hello,"));
+}
+
+TEST(StrEndsWithTestCase, TestEndsWithReturnsFalse)
+{
+	ASSERT_FALSE(str::ends_with("Hello, World", "world"));
+}
+
+TEST(StrEndsWithTestCase, TestEndsWithReturnsTrue)
+{
+	ASSERT_TRUE(str::ends_with("Hello, World", ", World"));
 }
 
 __UNIT_TESTS_END__

@@ -20,8 +20,7 @@
  * Purpose: base middleware class.
  */
 
-#ifndef WASP_MIDDLEWARE_MIDDLEWARE_MIXIN_H
-#define WASP_MIDDLEWARE_MIDDLEWARE_MIXIN_H
+#pragma once
 
 // Module definitions.
 #include "./_def_.h"
@@ -51,6 +50,3 @@ public:
 };
 
 __MIDDLEWARE_END__
-
-
-#endif // WASP_MIDDLEWARE_MIDDLEWARE_MIXIN_H

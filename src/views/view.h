@@ -21,8 +21,7 @@
  * 			implements dispatch-by-method and simple sanity checking.
  */
 
-#ifndef WASP_VIEWS_VIEW_H
-#define WASP_VIEWS_VIEW_H
+#pragma once
 
 // C++ libraries.
 #include <vector>
@@ -38,23 +37,23 @@
 #include "./args.h"
 #include "../http/request.h"
 #include "../http/response.h"
-#include "../utility/logger.h"
+#include "../core/logger.h"
+#include "../core/string/str.h"
 #include "../core/exceptions.h"
 #include "../collections/dict.h"
-#include "../utility/string/str.h"
 
 
 __VIEWS_BEGIN__
 
 typedef std::function<http::HttpResponseBase*(
-	http::HttpRequest*, views::Args*, utility::ILogger*
+	http::HttpRequest*, views::Args*, core::ILogger*
 )> ViewHandler;
 
 
 class View
 {
 protected:
-	utility::ILogger* _logger;
+	core::ILogger* _logger;
 
 	/// Holds pointer to client's request.
 	/// Caution: must be deleted outside!
@@ -69,7 +68,7 @@ protected:
 	std::vector<std::string> _allowed_methods_list;
 
 public:
-	explicit View(utility::ILogger* logger = nullptr);
+	explicit View(core::ILogger* logger = nullptr);
 
 	/// Processes http GET request.
 	/// Can be overridden in derived class, otherwise returns nullptr.
@@ -166,10 +165,7 @@ public:
 	std::vector<std::string> allowed_methods();
 
 protected:
-	explicit View(const std::vector<std::string>& allowed_methods, utility::ILogger* logger = nullptr);
+	explicit View(const std::vector<std::string>& allowed_methods, core::ILogger* logger = nullptr);
 };
 
 __VIEWS_END__
-
-
-#endif // WASP_VIEWS_VIEW_H

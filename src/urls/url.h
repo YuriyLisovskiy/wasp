@@ -20,8 +20,7 @@
  * Purpose: utility functions for working with url patterns.
  */
 
-#ifndef WASP_URLS_URL_H
-#define WASP_URLS_URL_H
+#pragma once
 
 // Module definitions.
 #include "./_def_.h"
@@ -45,6 +44,3 @@ extern UrlPattern make_static(
 );
 
 __URLS_END__
-
-
-#endif // WASP_URLS_URL_H

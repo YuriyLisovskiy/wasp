@@ -93,14 +93,8 @@ void HttpServer::listen_and_serve()
 	}
 #endif
 
-	std::string host(this->_host);
-	if (this->_use_ipv6)
-	{
-		host = "[" + host + "]";
-	}
-
 	std::cout << str::format(
-		conf::internal::STARTUP_MESSAGE, this->_schema, host.c_str(), this->_port
+		conf::internal::STARTUP_MESSAGE, this->_schema, this->_host, this->_port
 	) << '\n';
 	std::cout.flush();
 
@@ -175,7 +169,7 @@ int HttpServer::_bind()
 
 		if (this->_server_socket.close() == SOCKET_ERROR)
 		{
-			this->_logger->trace("Failed to close socket connection", _ERROR_DETAILS_);
+			this->_logger->error("Failed to close socket connection", _ERROR_DETAILS_);
 		}
 
 		HttpServer::_wsa_clean_up();

@@ -21,8 +21,7 @@
  * Default configuration constants.
  */
 
-#ifndef WASP_CONF_DEFAULTS_H
-#define WASP_CONF_DEFAULTS_H
+#pragma once
 
 // Module definitions.
 #include "./_def_.h"
@@ -30,16 +29,8 @@
 
 __CONF_INTERNAL_BEGIN__
 
-// Local host.
-const char* const DEFAULT_HOST = "127.0.0.1";
-
-const uint16_t DEFAULT_PORT = 8000;
-
 const char* const STARTUP_MESSAGE = "Wasp version 0.0.1-dev, using app settings"
 									"\nStarting development server at {0!s}://{1!s}:{2!d}/"
 		                            "\nQuit the server with CONTROL-C.";
 
 __CONF_INTERNAL_END__
-
-
-#endif // WASP_CONF_DEFAULTS_H

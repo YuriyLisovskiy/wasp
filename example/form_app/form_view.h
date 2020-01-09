@@ -14,17 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 #pragma once
 
-#include "../../src/views/generic.h"
-#include "../../src/utility/logger.h"
+#include "../../src/views/view.h"
+#include "../../src/core/logger.h"
 #include "../../src/apps/config.h"
 
 
 class FormView : public wasp::views::View
 {
 public:
-	explicit FormView(wasp::utility::ILogger* logger = nullptr)
+	explicit FormView(wasp::core::ILogger* logger = nullptr)
 		: wasp::views::View({"get", "post"}, logger)
 	{
 	}

@@ -35,8 +35,7 @@
  *  the MIME type and encoding of a URL.
  */
 
-#ifndef WASP_UTILITY_MIME_TYPES_H
-#define WASP_UTILITY_MIME_TYPES_H
+#pragma once
 
 // C++ libraries.
 #include <string>
@@ -87,6 +86,3 @@ extern collections::Dict<std::string, std::string> ENCODINGS_MAP;
 extern collections::Dict<std::string, std::string> TYPES_MAP;
 
 __MIME_END__
-
-
-#endif // WASP_UTILITY_MIME_TYPES_H

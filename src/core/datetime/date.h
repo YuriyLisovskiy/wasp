@@ -20,8 +20,7 @@
  * Purpose: utility for working with date.
  */
 
-#ifndef WASP_CORE_DATETIME_DATE_H
-#define WASP_CORE_DATETIME_DATE_H
+#pragma once
 
 // C++ libraries.
 #include <string>
@@ -60,6 +59,3 @@ public:
 };
 
 __DATETIME_END__
-
-
-#endif // WASP_CORE_DATETIME_DATE_H

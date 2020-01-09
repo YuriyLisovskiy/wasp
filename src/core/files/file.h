@@ -20,8 +20,7 @@
  * Purpose: file stream wrapper for easier file handling.
  */
 
-#ifndef WASP_CORE_FILES_FILE_H
-#define WASP_CORE_FILES_FILE_H
+#pragma once
 
 // C++ libraries.
 #include <fstream>
@@ -47,7 +46,7 @@
 
 // Wasp libraries.
 #include "../exceptions.h"
-#include "../../utility/string/str.h"
+#include "../string/str.h"
 
 
 __CORE_BEGIN__
@@ -115,6 +114,3 @@ public:
 };
 
 __CORE_END__
-
-
-#endif // WASP_CORE_FILES_FILE_H

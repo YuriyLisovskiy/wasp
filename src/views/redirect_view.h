@@ -20,8 +20,7 @@
  * Purpose: provide a redirect on any GET request.
  */
 
-#ifndef WASP_VIEWS_REDIRECT_VIEW_H
-#define WASP_VIEWS_REDIRECT_VIEW_H
+#pragma once
 
 // C++ libraries.
 #include <string>
@@ -32,7 +31,7 @@
 // Wasp libraries.
 #include "./view.h"
 #include "./args.h"
-#include "../utility/logger.h"
+#include "../core/logger.h"
 #include "../http/request.h"
 #include "../http/response.h"
 
@@ -51,7 +50,7 @@ public:
 		const std::string& url,
 		bool permanent = false,
 		bool query_string = false,
-		utility::ILogger* logger = nullptr
+		core::ILogger* logger = nullptr
 	);
 
 	/// Return the URL redirect to.
@@ -67,6 +66,3 @@ public:
 };
 
 __VIEWS_END__
-
-
-#endif // WASP_VIEWS_REDIRECT_VIEW_H

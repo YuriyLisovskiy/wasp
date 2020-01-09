@@ -21,8 +21,7 @@
 			during development, and SHOULD NOT be used in a production setting.
  */
 
-#ifndef WASP_VIEWS_STATIC_H
-#define WASP_VIEWS_STATIC_H
+#pragma once
 
 // C++ libraries.
 #include <regex>
@@ -37,8 +36,8 @@
 #include "../http/request.h"
 #include "../http/response.h"
 #include "../http/utility.h"
-#include "../utility/logger.h"
-#include "../utility/mime_types.h"
+#include "../core/logger.h"
+#include "../core/mime_types.h"
 #include "../core/files/file.h"
 #include "../core/datetime/datetime.h"
 #include "../core/exceptions.h"
@@ -53,7 +52,7 @@ private:
 	collections::Dict<std::string, std::string>* _kwargs = nullptr;
 
 public:
-	explicit StaticView(utility::ILogger* logger);
+	explicit StaticView(core::ILogger* logger);
 
 	void set_kwargs(collections::Dict<std::string, std::string>* kwargs);
 
@@ -69,6 +68,3 @@ __VIEWS_INTERNAL_BEGIN__
 extern bool was_modified_since(const std::string& header, size_t time, size_t size);
 
 __VIEWS_INTERNAL_END__
-
-
-#endif // WASP_VIEWS_STATIC_H

@@ -20,8 +20,7 @@
  * Purpose: encode/decode strings.
  */
 
-#ifndef WASP_UTILS_ENCODING_H
-#define WASP_UTILS_ENCODING_H
+#pragma once
 
 // C++ libraries.
 #include <string>
@@ -42,7 +41,7 @@ extern std::string encode_url(const std::string& url);
 
 extern std::string quote(const std::string& _str, const std::string& safe = "");
 
-extern const char* ASCII;
+extern const uint ASCII;
 
 enum Mode
 {
@@ -58,7 +57,9 @@ enum Mode
 ///  - strict: throws EncodingError if string violates encoding rules;
 ///  - ignore: removes offending symbols from string;
 ///  - replace: replaces offending symbols by question mark ('?').
-extern std::string encode(const std::string& _str, const char* encoding, Mode mode = Mode::STRICT);
+extern std::string encode(const std::string& _str, uint encoding, Mode mode = Mode::STRICT);
+
+extern std::string encode_ascii(const std::string& _str, Mode mode);
 
 __ENCODING_END__
 
@@ -74,9 +75,4 @@ __ENCODING_INTERNAL_BEGIN__
 /// RFC 3986 section 2.3 Unreserved Characters: ALPHA NUMERIC - _ . ~
 extern void escape(std::ostringstream& stream, char c, const std::string& safe = "");
 
-extern std::string encode_ascii(const std::string& _str, Mode mode);
-
 __ENCODING_INTERNAL_END__
-
-
-#endif // WASP_UTILS_ENCODING_H

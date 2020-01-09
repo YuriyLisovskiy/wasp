@@ -21,8 +21,7 @@
  * 			methods (extended std::map).
  */
 
-#ifndef WASP_COLLECTIONS_DICT_H
-#define WASP_COLLECTIONS_DICT_H
+#pragma once
 
 // C++ libraries.
 #include <map>
@@ -260,6 +259,3 @@ public:
 };
 
 __COLLECTIONS_END__
-
-
-#endif // WASP_COLLECTIONS_DICT_H

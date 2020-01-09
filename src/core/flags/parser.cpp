@@ -43,8 +43,18 @@ args_parser::args_parser(int argc, char** argv, size_t parse_from, bool is_verbo
 				this->flags[last_arg] = "true";
 			}
 
-			last_arg = str::ltrim(std::move(token), '-');
-			is_received = false;
+			auto param = str::split(token, '=');
+			if (param.size() > 1)
+			{
+				auto key = str::ltrim(std::move(param[0]), '-');
+				auto val = str::join(param.begin() + 1, param.end(), "");
+				this->flags[key] = val;
+			}
+			else
+			{
+				last_arg = str::ltrim(std::move(token), '-');
+				is_received = false;
+			}
 		}
 		else
 		{
@@ -53,13 +63,20 @@ args_parser::args_parser(int argc, char** argv, size_t parse_from, bool is_verbo
 		}
 	}
 
-	if (is_verbose){
+	if (!is_received)
+	{
+		this->flags[last_arg] = "true";
+	}
+
+	if (is_verbose)
+	{
 		std::cout << "---------------------------" << std::endl;
 		std::cout << "Parsed arguments:" << std::endl;
 		for(auto& a : this->flags)
 		{
 			std::cout << "    " << a.first << ": " << a.second << std::endl;
 		}
+
 		std::cout << "---------------------------" << std::endl;
 	}
 }

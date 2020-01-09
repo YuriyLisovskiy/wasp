@@ -20,8 +20,7 @@
  * Purpose: views module's definitions.
  */
 
-#ifndef WASP_VIEWS_DEF_H
-#define WASP_VIEWS_DEF_H
+#pragma once
 
 #include "../_def_.h"
 
@@ -33,6 +32,3 @@
 /// wasp::views::internal
 #define __VIEWS_INTERNAL_BEGIN__ __VIEWS_BEGIN__ namespace internal {
 #define __VIEWS_INTERNAL_END__ } __VIEWS_END__
-
-
-#endif // WASP_VIEWS_DEF_H

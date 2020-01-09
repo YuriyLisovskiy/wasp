@@ -290,7 +290,7 @@ FileResponse::FileResponse(
 	_file_path(std::move(file_path)),
 	_headers_is_got(false)
 {
-	if (!path::exists(this->_file_path))
+	if (!core::path::exists(this->_file_path))
 	{
 		throw core::FileDoesNotExistError("file '" + this->_file_path + "' does not exist", _ERROR_DETAILS_);
 	}
@@ -341,25 +341,25 @@ void FileResponse::_set_headers()
 		{"gzip", "application/gzip"},
 		{"xz", "application/x-xz"}
 	});
-	this->set_header("Content-Length", std::to_string(path::get_size(this->_file_path)));
+	this->set_header("Content-Length", std::to_string(core::path::get_size(this->_file_path)));
 	if (str::starts_with(this->_headers.get("Content-Type", ""), "text/html"))
 	{
 		std::string content_type, encoding;
-		mime::guess_content_type(this->_file_path, content_type, encoding);
+		core::mime::guess_content_type(this->_file_path, content_type, encoding);
 		content_type = encoding_map.get(encoding, content_type);
 		this->_headers.set("Content-Type", !content_type.empty() ? content_type : "application/octet-stream");
 	}
 
 	std::string disposition = this->_as_attachment ? "attachment" : "inline";
 	std::string file_expr;
-	std::string file_name = path::basename(this->_file_path);
+	std::string file_name = core::path::basename(this->_file_path);
 	try
 	{
-		file_expr = "filename=\"" + encoding::encode(file_name, encoding::ASCII) + "\"";
+		file_expr = "filename=\"" + core::encoding::encode(file_name, core::encoding::ASCII) + "\"";
 	}
 	catch (const core::EncodingError& e)
 	{
-		file_expr = "filename*=utf-8''" + encoding::quote(file_name);
+		file_expr = "filename*=utf-8''" + core::encoding::quote(file_name);
 	}
 
 	this->_headers.set("Content-Disposition", disposition + "; " + file_expr);
@@ -406,7 +406,7 @@ HttpResponseRedirectBase::HttpResponseRedirectBase(
 		throw core::ValueError("invalid status", _ERROR_DETAILS_);
 	}
 
-	this->set_header("Location", encoding::encode_url(redirect_to));
+	this->set_header("Location", core::encoding::encode_url(redirect_to));
 	Url url(redirect_to);
 	if (!url.scheme().empty() && this->_allowed_schemes.find(url.scheme()) == this->_allowed_schemes.end())
 	{

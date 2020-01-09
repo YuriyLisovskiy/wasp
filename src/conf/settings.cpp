@@ -28,7 +28,7 @@ Settings::Settings()
 {
 	this->DEBUG = false;
 
-	this->LOGGER = utility::Logger::get_instance({});
+	this->LOGGER = core::Logger::get_instance({});
 
 	this->TIME_ZONE = "America/Chicago";
 
@@ -44,26 +44,19 @@ Settings::Settings()
 
 	this->DATA_UPLOAD_MAX_NUMBER_FIELDS = 1000;
 
-	// TODO: check format.
-	this->DATE_FORMAT = "N j, Y";
+	this->DATE_FORMAT = "%b %d, %Y";
 
-	// TODO: check format.
-	this->DATETIME_FORMAT = "N j, Y, P";
+	this->DATETIME_FORMAT = "%b %d, %Y, %T";
 
-	// TODO: check format.
-	this->TIME_FORMAT = "P";
+	this->TIME_FORMAT = "%T";
 
-	// TODO: check format.
-	this->YEAR_MONTH_FORMAT = "F Y";
+	this->YEAR_MONTH_FORMAT = "%B %Y";
 
-	// TODO: check format.
-	this->MONTH_DAY_FORMAT = "F j";
+	this->MONTH_DAY_FORMAT = "%B %d";
 
-	// TODO: check format.
-	this->SHORT_DATE_FORMAT = "m/d/Y";
+	this->SHORT_DATE_FORMAT = "%m/%d/%Y";
 
-	// TODO: check format.
-	this->SHORT_DATETIME_FORMAT = "m/d/Y P";
+	this->SHORT_DATETIME_FORMAT = "%m/%d/%Y %T";
 
 	this->FIRST_DAY_OF_WEEK = 0;
 
@@ -111,6 +104,8 @@ Settings::~Settings()
 	{
 		delete command.second;
 	}
+
+	core::Logger::reset_instance();
 }
 
 __CONF_END__

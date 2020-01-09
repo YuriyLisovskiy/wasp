@@ -24,12 +24,12 @@
 
 __VIEWS_BEGIN__
 
-View::View(utility::ILogger* logger) : _request(nullptr), _allowed_methods_list({"options"})
+View::View(core::ILogger* logger) : _request(nullptr), _allowed_methods_list({"options"})
 {
 	this->_logger = logger;
 }
 
-View::View(const std::vector<std::string>& allowed_methods, utility::ILogger* logger) : View(logger)
+View::View(const std::vector<std::string>& allowed_methods, core::ILogger* logger) : View(logger)
 {
 	this->_allowed_methods_list = allowed_methods;
 	if (std::find(allowed_methods.begin(), allowed_methods.end(), "options") == allowed_methods.end())

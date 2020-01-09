@@ -20,8 +20,7 @@
  * Purpose: core module's definitions.
  */
 
-#ifndef WASP_CORE_DEF_H
-#define WASP_CORE_DEF_H
+#pragma once
 
 #include "../_def_.h"
 
@@ -35,4 +34,52 @@
 #define __CORE_INTERNAL_END__ } __CORE_END__
 
 
-#endif // WASP_CORE_DEF_H
+/// wasp::core::path
+#define __PATH_BEGIN__ __CORE_BEGIN__ namespace path {
+#define __PATH_END__ } __CORE_END__
+
+/// wasp::core::path::internal
+#define __PATH_INTERNAL_BEGIN__ __PATH_BEGIN__ namespace internal {
+#define __PATH_INTERNAL_END__ } __PATH_END__
+
+
+/// wasp::core::mime
+#define __MIME_BEGIN__ __CORE_BEGIN__ namespace mime {
+#define __MIME_END__ } __CORE_END__
+
+
+/// wasp::core::encoding
+#define __ENCODING_BEGIN__ __CORE_BEGIN__ namespace encoding {
+#define __ENCODING_END__ } __CORE_END__
+
+/// wasp::core::encoding::internal
+#define __ENCODING_INTERNAL_BEGIN__ __CORE_BEGIN__ namespace internal {
+#define __ENCODING_INTERNAL_END__ } __CORE_END__
+
+
+/// wasp::core::rgx
+#define __RGX_BEGIN__ __CORE_BEGIN__ namespace rgx {
+#define __RGX_END__ } __CORE_END__
+
+
+/// Declares exception's class with given base.
+#define DEF_WASP_EXCEPTION_WITH_BASE(name, base)\
+class name : public base\
+{\
+protected:\
+	name(const char* message, int line, const char* function, const char* file, const char* type)\
+		: base(message, line, function, file, type)\
+	{\
+	}\
+\
+public:\
+	explicit name(const char* message, int line = 0, const char* function = "", const char* file = "")\
+		: name(message, line, function, file, #name)\
+	{\
+	}\
+\
+	explicit name(const std::string& message, int line = 0, const char* function = "", const char* file = "")\
+		: name(message.c_str(), line, function, file)\
+	{\
+	}\
+}

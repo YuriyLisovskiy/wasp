@@ -32,7 +32,7 @@
 #include "./_def_.h"
 
 // Wasp libraries.
-#include "../utility/logger.h"
+#include "../core/logger.h"
 #include "../apps/interface.h"
 #include "../middleware/interface.h"
 #include "../core/management/base.h"
@@ -44,7 +44,7 @@ struct Settings
 {
 	bool DEBUG;
 
-	utility::ILogger* LOGGER;
+	core::ILogger* LOGGER;
 
 	// Build paths inside the project like this: wasp::path::join(BASE_DIR, ...)
 	std::string BASE_DIR;
