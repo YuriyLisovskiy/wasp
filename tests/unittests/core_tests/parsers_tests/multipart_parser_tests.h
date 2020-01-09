@@ -23,9 +23,9 @@
 #include <gtest/gtest.h>
 
 #include "../../_def_.h"
-#include "../../../../src/utility/path.h"
+#include "../../../../src/core/path.h"
 #include "../../../../src/core/exceptions.h"
-#include "../../../../src/utility/string/str.h"
+#include "../../../../src/core/string/str.h"
 #include "../../../../src/core/parsers/multipart_parser.h"
 
 
@@ -185,7 +185,7 @@ protected:
 		"2000\r\n"
 		"------WebKitFormBoundaryzY2033Pw5Bz7HHAG--";
 
-	const std::string ROOT = path::cwd() + "/";
+	const std::string ROOT = core::path::cwd() + "/";
 
 	core::internal::multipart_parser* parser = nullptr;
 

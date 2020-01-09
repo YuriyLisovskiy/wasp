@@ -21,7 +21,7 @@
 #include <gtest/gtest.h>
 
 #include "../_def_.h"
-#include "../../../src/utility/path.h"
+#include "../../../src/core/path.h"
 
 
 __UNIT_TESTS_BEGIN__
@@ -30,53 +30,53 @@ TEST(PathTestCase, DirnameTest)
 {
 	std::string expected("/foo");
 	std::string fullPath("/foo/bar");
-	ASSERT_EQ(path::dirname(fullPath), expected);
+	ASSERT_EQ(core::path::dirname(fullPath), expected);
 
 	expected = "";
 	fullPath = "bar";
-	ASSERT_EQ(path::dirname(fullPath), expected);
+	ASSERT_EQ(core::path::dirname(fullPath), expected);
 
 	expected = "/";
 	fullPath = "/bar";
-	ASSERT_EQ(path::dirname(fullPath), expected);
+	ASSERT_EQ(core::path::dirname(fullPath), expected);
 }
 
 TEST(PathTestCase, DirnameTrimDotsTest)
 {
 	std::string expected("/foo");
 	std::string fullPath("/foo/./");
-	ASSERT_EQ(path::dirname(fullPath), expected);
+	ASSERT_EQ(core::path::dirname(fullPath), expected);
 
 	expected = "/foo/..";
 	fullPath = "/foo/../";
-	ASSERT_EQ(path::dirname(fullPath), expected);
+	ASSERT_EQ(core::path::dirname(fullPath), expected);
 
 	expected = "/foo/../..";
 	fullPath = "/foo/../../";
-	ASSERT_EQ(path::dirname(fullPath), expected);
+	ASSERT_EQ(core::path::dirname(fullPath), expected);
 
 	expected = "/foo/..";
 	fullPath = "/foo/.././";
-	ASSERT_EQ(path::dirname(fullPath), expected);
+	ASSERT_EQ(core::path::dirname(fullPath), expected);
 
 	expected = "/foo/...";
 	fullPath = "/foo/.../";
-	ASSERT_EQ(path::dirname(fullPath), expected);
+	ASSERT_EQ(core::path::dirname(fullPath), expected);
 }
 
 TEST(PathTestCase, FilenameTest)
 {
 	std::string expected("bar.txt");
 	std::string fullPath("/foo/bar.txt");
-	ASSERT_EQ(path::basename(fullPath), expected);
+	ASSERT_EQ(core::path::basename(fullPath), expected);
 
 	expected = "bar.txt";
 	fullPath = "bar.txt";
-	ASSERT_EQ(path::basename(fullPath), expected);
+	ASSERT_EQ(core::path::basename(fullPath), expected);
 
 	expected = "bar.txt";
 	fullPath = "/bar.txt";
-	ASSERT_EQ(path::basename(fullPath), expected);
+	ASSERT_EQ(core::path::basename(fullPath), expected);
 }
 
 TEST(PathTestCase, JoinTest)
@@ -84,7 +84,7 @@ TEST(PathTestCase, JoinTest)
 	std::string left("/foo/");
 	std::string right("//bar/");
 	std::string expected("/foo/bar/");
-	auto actual = path::join(left, right);
+	auto actual = core::path::join(left, right);
 	ASSERT_EQ(expected, actual);
 }
 
@@ -94,7 +94,7 @@ TEST(PathTestCase, JoinVectorTest)
 		"", "/foo/", "//bar/", "", "/"
 	};
 	std::string expected("./foo/bar");
-	auto actual = path::join(paths);
+	auto actual = core::path::join(paths);
 	ASSERT_EQ(expected, actual);
 }
 

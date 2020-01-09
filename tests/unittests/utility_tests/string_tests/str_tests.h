@@ -21,7 +21,7 @@
 #include <gtest/gtest.h>
 
 #include "../../_def_.h"
-#include "../../../../src/utility/string/str.h"
+#include "../../../../src/core/string/str.h"
 
 
 __UNIT_TESTS_BEGIN__

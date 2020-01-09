@@ -21,7 +21,7 @@
 #include <gtest/gtest.h>
 
 #include "../../_def_.h"
-#include "../../../../src/utility/flags/flag_set.h"
+#include "../../../../src/core/flags/flag_set.h"
 
 
 __UNIT_TESTS_BEGIN__
