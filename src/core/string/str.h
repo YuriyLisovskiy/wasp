@@ -90,12 +90,19 @@ extern std::string lower(const std::string& _str);
 /// @return converted string.
 extern std::string upper(const std::string& _str);
 
-/// Splits the string vector of strings relatively for the character.
+/// Splits the string to a vector of strings relatively for the character.
 ///
 /// @param str: string to split.
 /// @param delimiter: delimiter where to split string.
 /// @return std::vector of strings.
 extern std::vector<std::string> split(const std::string& str, char delimiter = ' ');
+
+/// Splits the string to a vector of strings with n length starting from right.
+///
+/// @param str: string to split.
+/// @param delimiter: delimiter where to split string.
+/// @return std::vector of strings.
+extern std::vector<std::string> rsplit(const std::string& str, size_t n, char delimiter = ' ');
 
 /// Checks if string starts with some string prefix.
 ///

@@ -57,7 +57,11 @@ http::HttpResponseBase* SecurityMiddleware::process_request(http::HttpRequest* r
 	if (this->redirect && !request->is_secure() && !matched)
 	{
 		auto host = this->redirect_host.empty() ?
-			request->get_host(this->settings) : this->redirect_host;
+			request->get_host(
+				this->settings->USE_X_FORWARDED_HOST,
+				this->settings->DEBUG,
+				this->settings->ALLOWED_HOSTS
+			) : this->redirect_host;
 		return new http::HttpResponsePermanentRedirect(
 			"https://" + host + request->full_path()
 		);
@@ -101,7 +105,17 @@ http::HttpResponseBase* SecurityMiddleware::process_response(
 
 	if (!this->referrer_policy.empty())
 	{
-		// TODO: set referrer policy!
+		// Support a comma-separated string or iterable of
+		// values to allow fallback.
+		auto split = core::str::split(this->referrer_policy, ',');
+		for (auto& item : split)
+		{
+			core::str::trim(item);
+		}
+
+		response->set_header(
+			http::REFERRER_POLICY, core::str::join(split.begin(), split.end(), ",")
+		);
 	}
 
 	return nullptr;

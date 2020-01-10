@@ -96,13 +96,14 @@ std::string HttpRequest::scheme()
 	return "http";
 }
 
-std::string HttpRequest::get_host(conf::Settings* settings)
+std::string HttpRequest::get_host(
+	bool use_x_forwarded_host, bool debug, std::vector<std::string> allowed_hosts
+)
 {
-	auto host = this->get_raw_host(settings->USE_X_FORWARDED_HOST);
-	auto allowed_hosts = settings->ALLOWED_HOSTS;
-	if (settings->DEBUG && allowed_hosts.empty())
+	auto host = this->get_raw_host(use_x_forwarded_host);
+	if (debug && allowed_hosts.empty())
 	{
-		allowed_hosts = {"localhost", "127.0.0.1", "[::1]"};
+		allowed_hosts = {".localhost", "127.0.0.1", "[::1]"};
 	}
 
 	std::string domain, port;
@@ -140,21 +141,6 @@ std::string HttpRequest::get_raw_host(bool use_x_forwarded_host)
 	}
 
 	return host;
-}
-
-void HttpRequest::split_domain_port(
-	const std::string& host, std::string& domain, std::string& port
-)
-{
-	// TODO: implement!
-}
-
-bool HttpRequest::validate_host(
-	const std::string& domain, const std::vector<std::string>& allowed_hosts
-)
-{
-	// TODO: implement!
-	return false;
 }
 
 __HTTP_END__

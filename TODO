@@ -1,11 +1,12 @@
 TODO:
     Implement default middleware:
+        - common
+        - broken link emails
         - csrf
+        - conditional get (http)
         - cache
         - gzip
-        - conditional get (http)
         - locale
-        - security (check todos!)
 
 TODO:
     Add utf8 strings' support.
@@ -17,8 +18,6 @@ Check out TODOs in (not urgent):
 
     - src/http/request.cpp
     - src/http/response.cpp
-
-    - src/middleware/security.cpp
 
     - src/utility/encoding.cpp
 
@@ -34,6 +33,7 @@ Not tested:
     - src/core/http_server
     - src/core/thread_pool
 
+    - src/http/request
     - src/http/response
     - src/http/utility
 

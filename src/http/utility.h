@@ -29,6 +29,8 @@
 #include "./_def_.h"
 
 // Wasp libraries.
+#include "../core/regex.h"
+#include "../core/string/str.h"
 #include "../core/datetime/datetime.h"
 
 
@@ -39,5 +41,37 @@ extern size_t parse_http_datetime(const std::string& http_datetime);
 
 /// Converts utc epoch seconds to std::string datetime.
 extern std::string format_http_datetime(size_t epoch_seconds);
+
+/// Writes domain and port from a given host.
+///
+/// Returned domain is lower-cased. If the host is invalid,
+/// the domain will be empty.
+void split_domain_port(
+	const std::string& host, std::string& domain, std::string& port
+);
+
+/// Validate the given host for this site.
+///
+/// Check that the host looks valid and matches a host or host pattern in the
+/// given list of `allowed_hosts`. Any pattern beginning with a period
+/// matches a domain and all its sub-domains (e.g. `.example.com` matches
+/// `example.com` and any sub-domain), `*` matches anything, and anything
+/// else must match exactly.
+///
+/// Note: This function assumes that the given host is lower-cased and has
+/// already had the port, if any, stripped off.
+///
+/// Return `true` for a valid host, `false` otherwise.
+bool validate_host(
+	const std::string& domain, const std::vector<std::string>& allowed_hosts
+);
+
+/// Return `true` if the host is either an exact match or a match
+/// to the wildcard pattern.
+///
+/// Any pattern beginning with a period matches a domain and all of its
+/// subdomains. (e.g. `.example.com` matches `example.com` and
+/// `foo.example.com`). Anything else is an exact string match.
+extern bool is_same_domain(const std::string& host, const std::string& pattern);
 
 __HTTP_END__
