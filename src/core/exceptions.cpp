@@ -61,7 +61,7 @@ const char* BaseException::file() const noexcept
 
 // ErrorResponseException
 ErrorResponseException::ErrorResponseException(
-	unsigned short int status_code,
+	short int status_code,
 	const char* message,
 	int line,
 	const char* function,
@@ -74,7 +74,7 @@ ErrorResponseException::ErrorResponseException(
 }
 
 ErrorResponseException::ErrorResponseException(
-	unsigned short int status_code,
+	short int status_code,
 	const char* message,
 	int line,
 	const char* function,
@@ -85,7 +85,7 @@ ErrorResponseException::ErrorResponseException(
 }
 
 ErrorResponseException::ErrorResponseException(
-	unsigned short int status_code,
+	short int status_code,
 	const std::string& message,
 	int line,
 	const char *function,
@@ -95,15 +95,16 @@ ErrorResponseException::ErrorResponseException(
 {
 }
 
-[[nodiscard]] unsigned short int ErrorResponseException::status_code() const
+short int ErrorResponseException::status_code() const
 {
 	return this->_status_code;
 }
 
 
 // InterruptException
-InterruptException::InterruptException(const char* message, int line, const char* function, const char* file, const char* type)
-	: BaseException(message, line, function, file, type)
+InterruptException::InterruptException(
+	const char* message, int line, const char* function, const char* file, const char* type
+) : BaseException(message, line, function, file, type)
 {
 }
 
@@ -112,8 +113,9 @@ InterruptException::InterruptException(const char* message, int line, const char
 {
 }
 
-InterruptException::InterruptException(const std::string& message, int line, const char *function, const char *file)
-	: InterruptException(message.c_str(), line, function, file)
+InterruptException::InterruptException(
+	const std::string& message, int line, const char *function, const char *file
+) : InterruptException(message.c_str(), line, function, file)
 {
 }
 

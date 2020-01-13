@@ -74,6 +74,10 @@ bool HttpResponseBase::has_header(const std::string& key)
 	return this->_headers.contains(key);
 }
 
+void HttpResponseBase::set_content(const std::string& content)
+{
+}
+
 void HttpResponseBase::set_cookie(
 	const std::string& name,
 	const std::string& value,

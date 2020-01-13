@@ -91,11 +91,11 @@ DEF_WASP_EXCEPTION_WITH_BASE(HttpError, BaseException, "Http error");
 class ErrorResponseException : public HttpError
 {
 protected:
-	unsigned short int _status_code;
+	short int _status_code;
 
 	// Use only when initializing of a derived exception!
 	ErrorResponseException(
-		unsigned short int status_code,
+		short int status_code,
 		const char* message,
 		int line,
 		const char* function,
@@ -105,20 +105,20 @@ protected:
 
 public:
 	explicit ErrorResponseException(
-		unsigned short int status_code = -1,
+		short int status_code = -1,
 		const char* message = "Error response exception",
 		int line = 0,
 		const char* function = "",
 		const char* file = ""
 	);
 	explicit ErrorResponseException(
-		unsigned short int status_code = -1,
+		short int status_code = -1,
 		const std::string& message = "Error response exception",
 		int line = 0,
 		const char* function = "",
 		const char* file = ""
 	);
-	[[nodiscard]] unsigned short int status_code() const;
+	[[nodiscard]] short int status_code() const;
 };
 
 // The user did something suspicious.

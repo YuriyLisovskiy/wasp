@@ -151,12 +151,10 @@ RunserverCommand::get_handler()
 		catch (const core::ErrorResponseException& exc)
 		{
 			this->settings->LOGGER->error(exc);
-
-			// TODO: get response according to http error status code.
-			error_response = new http::HttpResponseServerError(
-				"<p style=\"font-size: 24px;\" >" + std::to_string(exc.status_code()) + "</p>"
-				"<p>" + std::string(exc.what()) + "</p>"
-			);
+			auto status_code = exc.status_code() < 400 ? 500 : exc.status_code();
+			auto err_msg = "<p style=\"font-size: 24px;\" >" + std::to_string(status_code) + "</p>"
+						   "<p>" + std::string(exc.what()) + "</p>";
+			error_response = new http::HttpResponse(err_msg, status_code);
 		}
 		catch (const core::BaseException& exc)
 		{

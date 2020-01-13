@@ -80,6 +80,7 @@ public:
 	void set_header(const std::string& key, const std::string& value);
 	void remove_header(const std::string& key);
 	bool has_header(const std::string& key);
+	virtual void set_content(const std::string& content);
 
 	void set_cookie(
 		const std::string& name,
@@ -142,7 +143,7 @@ public:
 		const std::string& charset = "utf-8"
 	);
 	size_t content_length() override;
-	virtual void set_content(const std::string& content);
+	void set_content(const std::string& content) override;
 	void write(const std::string& content) override;
 	unsigned long int tell() override;
 	bool writable() override;
