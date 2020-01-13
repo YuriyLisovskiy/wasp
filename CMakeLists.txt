@@ -16,6 +16,7 @@ project(${PACKAGE_NAME})
 set(PACKAGE_MAIN_TESTS "unit-tests")
 set(PACKAGE_MAIN_UNIT_TESTS "unit-tests")
 set(PACKAGE_COLLECTIONS_UNIT_TESTS "unit-tests-collections")
+set(PACKAGE_CONF_UNIT_TESTS "unit-tests-conf")
 set(PACKAGE_CORE_UNIT_TESTS "unit-tests-core")
 set(PACKAGE_HTTP_UNIT_TESTS "unit-tests-http")
 set(PACKAGE_VIEWS_UNIT_TESTS "unit-tests-views")
@@ -70,6 +71,14 @@ file(GLOB COLLECTIONS_TEST_SRC
 )
 add_executable(${PACKAGE_COLLECTIONS_UNIT_TESTS} ${LIB_SRC} ${COLLECTIONS_TEST_SRC} "tests/unittests/collections_tests/main.cpp")
 target_link_libraries(${PACKAGE_COLLECTIONS_UNIT_TESTS} gtest gtest_main rt pthread ${COLLECTIONS_TEST_SRC})
+
+
+# Conf packages tests setup.
+file(GLOB CONF_TEST_SRC
+	"tests/unittests/conf_tests/*.h"
+)
+add_executable(${PACKAGE_CONF_UNIT_TESTS} ${LIB_SRC} ${CONF_TEST_SRC} "tests/unittests/conf_tests/main.cpp")
+target_link_libraries(${PACKAGE_CONF_UNIT_TESTS} gtest gtest_main rt pthread ${CONF_TEST_SRC})
 
 
 # Core packages tests setup.
