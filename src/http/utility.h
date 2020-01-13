@@ -74,4 +74,9 @@ bool validate_host(
 /// `foo.example.com`). Anything else is an exact string match.
 extern bool is_same_domain(const std::string& host, const std::string& pattern);
 
+/// If redirecting to an absolute path (two leading slashes), a slash must be
+/// escaped to prevent browsers from handling the path as schemaless and
+/// redirecting to another host.
+extern void escape_leading_slashes(std::string& url);
+
 __HTTP_END__

@@ -33,6 +33,7 @@
 #include "../core/regex.h"
 #include "../core/string/str.h"
 #include "../http/response.h"
+#include "../conf/settings.h"
 
 
 __MIDDLEWARE_BEGIN__

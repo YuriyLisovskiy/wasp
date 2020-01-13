@@ -26,6 +26,7 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <algorithm>
 #include <functional>
 
 // Module definitions.
@@ -102,7 +103,7 @@ extern std::vector<std::string> split(const std::string& str, char delimiter = '
 /// @param str: string to split.
 /// @param delimiter: delimiter where to split string.
 /// @return std::vector of strings.
-extern std::vector<std::string> rsplit(const std::string& str, size_t n, char delimiter = ' ');
+extern std::vector<std::string> rsplit(const std::string& str, char delimiter = ' ', size_t n = -1);
 
 /// Checks if string starts with some string prefix.
 ///

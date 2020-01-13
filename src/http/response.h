@@ -107,6 +107,7 @@ public:
 
 	unsigned short int status();
 	std::string content_type();
+	virtual size_t content_length();
 	std::string charset();
 	bool is_streaming();
 
@@ -140,6 +141,7 @@ public:
 		const std::string& reason = "",
 		const std::string& charset = "utf-8"
 	);
+	size_t content_length() override;
 	virtual void set_content(const std::string& content);
 	void write(const std::string& content) override;
 	unsigned long int tell() override;
@@ -205,7 +207,6 @@ protected:
 public:
 	explicit HttpResponseRedirectBase(
 		const std::string& redirect_to,
-		const std::string& content,
 		unsigned short int status,
 		const std::string& content_type = "",
 		const std::string& reason = "",
@@ -220,7 +221,6 @@ class HttpResponseRedirect : public HttpResponseRedirectBase
 public:
 	explicit HttpResponseRedirect(
 		const std::string& redirect_to,
-		const std::string& content = "",
 		const std::string& content_type = "",
 		const std::string& charset = "utf-8"
 	);
@@ -232,7 +232,6 @@ class HttpResponsePermanentRedirect : public HttpResponseRedirectBase
 public:
 	explicit HttpResponsePermanentRedirect(
 		const std::string& redirect_to,
-		const std::string& content = "",
 		const std::string& content_type = "",
 		const std::string& charset = "utf-8"
 	);

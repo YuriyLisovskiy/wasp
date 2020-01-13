@@ -108,16 +108,23 @@ std::vector<std::string> split(const std::string& str, char delimiter)
 	return result;
 }
 
-std::vector<std::string> rsplit(const std::string& str, size_t n, char delimiter)
+std::vector<std::string> rsplit(const std::string& str, char delimiter, size_t n)
 {
+	if (n < 0)
+	{
+		return split(str, delimiter);
+	}
+
 	std::vector<std::string> result;
 	std::string current;
 	size_t split_count = 0;
 	long str_last_pos = (long)str.size() - 1;
-	for (long int i = str_last_pos; i >= 0 && split_count != n; i--)
+	long int i;
+	for (i = str_last_pos; i >= 0 && split_count < n; i--)
 	{
 		if (str[i] == delimiter)
 		{
+			std::reverse(current.begin(), current.end());
 			result.insert(result.begin(), current);
 			current.clear();
 			split_count++;
@@ -128,7 +135,7 @@ std::vector<std::string> rsplit(const std::string& str, size_t n, char delimiter
 		}
 	}
 
-	result.insert(result.begin(), current);
+	result.insert(result.begin(), str.substr(0, i + 1));
 	return result;
 }
 

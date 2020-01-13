@@ -368,63 +368,25 @@ void HttpServer::_start_listener()
 
 void HttpServer::_serve_connection(const socket_t& client)
 {
-	http::HttpResponseBase* error_response = nullptr;
-	try
+	// TODO: remove when release ------------------------:
+	dt::Measure<std::chrono::milliseconds> measure;
+	if (this->_verbose)
 	{
-		// TODO: remove when release ------------------------:
-		dt::Measure<std::chrono::milliseconds> measure;
-		if (this->_verbose)
-		{
-			measure.start();
-		}
-		// TODO: remove when release ------------------------^
+		measure.start();
+	}
+	// TODO: remove when release ------------------------^
 
-		http::HttpRequest* request = this->_handle_request(client);
-		this->_http_handler(request, client);
-		delete request;
+	http::HttpRequest* request = this->_handle_request(client);
+	this->_http_handler(request, client);
+	delete request;
 
-		// TODO: remove when release -------------------------------------------------------------:
-		if (this->_verbose)
-		{
-			measure.end();
-			std::cout << '\n' << request->method() << " request took " << measure.elapsed() << " ms\n";
-		}
-		// TODO: remove when release -------------------------------------------------------------^
-	}
-	catch (const SuspiciousOperation& exc)
+	// TODO: remove when release -------------------------------------------------------------:
+	if (this->_verbose)
 	{
-		this->_logger->error(exc.what(), exc.line(), exc.function(), exc.file());
-		error_response = new http::HttpResponseBadRequest(
-			"<p style=\"font-size: 24px;\" >Bad Request</p>"
-		);
+		measure.end();
+		std::cout << '\n' << request->method() << " request took " << measure.elapsed() << " ms\n";
 	}
-	catch (const EntityTooLargeError& exc)
-	{
-		this->_logger->error(exc.what(), exc.line(), exc.function(), exc.file());
-		error_response = new http::HttpResponseEntityTooLarge(
-			"<p style=\"font-size: 24px;\" >Entity Too Large</p>"
-		);
-	}
-	catch (const BaseException& exc)
-	{
-		this->_logger->error(exc.what(), exc.line(), exc.function(), exc.file());
-		error_response = new http::HttpResponseServerError(
-			"<p style=\"font-size: 24px;\" >Internal Server Error</p>"
-		);
-	}
-	catch (const std::exception& exc)
-	{
-		this->_logger->error(exc.what(), _ERROR_DETAILS_);
-		error_response = new http::HttpResponseServerError(
-			"<p style=\"font-size: 24px;\" >Internal Server Error</p>"
-		);
-	}
-
-	if (error_response != nullptr)
-	{
-		HttpServer::_send(error_response->serialize().c_str(), client);
-		delete error_response;
-	}
+	// TODO: remove when release -------------------------------------------------------------^
 }
 
 void HttpServer::_thread_func(const socket_t& client)

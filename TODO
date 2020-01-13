@@ -1,7 +1,5 @@
 TODO:
     Implement default middleware:
-        - common
-        - broken link emails
         - csrf
         - conditional get (http)
         - cache
@@ -15,6 +13,7 @@ TODO:
 
 Check out TODOs in (not urgent):
     - src/core/http_server.cpp
+    - src/core/management/runserver.cpp
 
     - src/http/request.cpp
     - src/http/response.cpp
@@ -238,9 +237,6 @@ DEFAULT_FROM_EMAIL = 'webmaster@localhost'
 # Subject-line prefix for email messages send with mail managers.
 Make sure to include the trailing space.
 EMAIL_SUBJECT_PREFIX = '[Wasp] '
-
-# Whether to prepend the "www." subdomain to URLs that don't have it.
-PREPEND_WWW = False
 
 # Override the server-derived value of SCRIPT_NAME
 FORCE_SCRIPT_NAME = None

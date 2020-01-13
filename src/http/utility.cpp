@@ -59,7 +59,7 @@ void split_domain_port(
 	}
 	else
 	{
-		auto split = core::str::rsplit(host_lower, 1, ':');
+		auto split = core::str::rsplit(host_lower, ':', 1);
 		domain = split[0];
 		if (split.size() == 2)
 		{
@@ -102,6 +102,14 @@ bool is_same_domain(const std::string& host, const std::string& pattern)
 	return (lc_pattern[0] == '.' && (
 		core::str::ends_with(host, lc_pattern) || host == lc_pattern.substr(1, lc_pattern.size() - 1)
 	)) || lc_pattern == host;
+}
+
+void escape_leading_slashes(std::string& url)
+{
+	if (core::str::starts_with(url, "//"))
+	{
+		url = "/%2F" + url.substr(2);
+	}
 }
 
 __HTTP_END__

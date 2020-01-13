@@ -70,6 +70,32 @@ protected:
 	void build_app_patterns(std::vector<urls::UrlPattern>& patterns);
 	void setup_server_ctx(core::internal::HttpServer::context& ctx);
 
+	static http::HttpResponseBase* process_request_middleware(
+		http::HttpRequest* request, conf::Settings* settings
+	);
+	static http::HttpResponseBase* process_response_middleware(
+		http::HttpRequest* request,
+		http::HttpResponseBase* response,
+		conf::Settings* settings
+	);
+	static http::HttpResponseBase* process_urlpatterns(
+		http::HttpRequest* request,
+		std::vector<urls::UrlPattern>& urlpatterns,
+		conf::Settings* settings,
+		bool& view_is_found
+	);
+	static void send_response(
+		http::HttpRequest* request,
+		http::HttpResponseBase* response,
+		const core::internal::socket_t& client,
+		conf::Settings* settings
+	);
+	static void log_request(
+		const std::string& info,
+		unsigned short status_code,
+		conf::Settings* settings
+	);
+
 public:
 	explicit RunserverCommand(apps::IAppConfig* config, conf::Settings* settings);
 	~RunserverCommand() final;

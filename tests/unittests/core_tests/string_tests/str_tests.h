@@ -83,6 +83,18 @@ TEST(StrUtilsSplitTestCase, TestSplit)
 	}
 }
 
+TEST(StrRSplitTestCase, TestRSplit)
+{
+	std::string to_split("Alphanumeric:and: printable : shellcode");
+	std::vector<std::string> expected = {"Alphanumeric:and: printable ", " shellcode"};
+	auto actual = core::str::rsplit(to_split, ':', 1);
+	ASSERT_EQ(expected.size(), actual.size());
+	for (size_t i = 0; i < expected.size(); i++)
+	{
+		ASSERT_EQ(expected[i], actual[i]);
+	}
+}
+
 
 TEST(StrUtilsJoinVectorTestCase, TestJoinStringVectorWithSpace)
 {

@@ -88,25 +88,25 @@ struct Settings
 	//
 	// Here are a few examples:
 	//     DISALLOWED_USER_AGENTS = {
-	//         std::regex(R"(NaverBot.*)"),
-	//         std::regex(R"(EmailSiphon.*)"),
-	//         std::regex(R"(SiteSucker.*)"),
-	//         std::regex(R"(sohu-search.*)")
+	//         wasp::core::rgx::Regex(R"(NaverBot.*)"),
+	//         wasp::core::rgx::Regex(R"(EmailSiphon.*)"),
+	//         wasp::core::rgx::Regex(R"(SiteSucker.*)"),
+	//         wasp::core::rgx::Regex(R"(sohu-search.*)")
 	//     };
-	std::vector<std::regex> DISALLOWED_USER_AGENTS;
+	std::vector<core::rgx::Regex> DISALLOWED_USER_AGENTS;
 
 	// List of compiled regular expression objects representing URLs that need not
 	// be reported by BrokenLinkEmailsMiddleware.
 	//
 	// Here are a few examples:
 	//    IGNORABLE_404_URLS = {
-	//        std::regex(R"(/apple-touch-icon.*\.png)"),
-	//        std::regex(R"(/favicon.ico)"),
-	//        std::regex(R"(/robots.txt)"),
-	//        std::regex(R"(/phpmyadmin/)"),
-	//        std::regex(R"(/apple-touch-icon.*\.png)")
+	//        wasp::core::rgx::Regex(R"(/apple-touch-icon.*\.png)"),
+	//        wasp::core::rgx::Regex(R"(/favicon.ico)"),
+	//        wasp::core::rgx::Regex(R"(/robots.txt)"),
+	//        wasp::core::rgx::Regex(R"(/phpmyadmin/)"),
+	//        wasp::core::rgx::Regex(R"(/apple-touch-icon.*\.png)")
 	//    };
-	std::vector<std::regex> IGNORABLE_404_URLS;
+	std::vector<core::rgx::Regex> IGNORABLE_404_URLS;
 
 	// A secret key for this particular installation. Used in secret-key
 	// hashing algorithms. Set this in your settings.
@@ -138,6 +138,9 @@ struct Settings
 	// Maximum size in bytes of request data (excluding file uploads) that will be
 	// read before a SuspiciousOperation (RequestDataTooBig) is raised.
 	size_t DATA_UPLOAD_MAX_MEMORY_SIZE;
+
+	// Whether to prepend the "www." subdomain to URLs that don't have it.
+	bool PREPEND_WWW;
 
 	// Maximum number of GET/POST parameters that will be read before a
 	// SuspiciousOperation (TooManyFieldsSent) is thrown.

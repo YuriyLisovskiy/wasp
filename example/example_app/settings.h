@@ -19,6 +19,7 @@
 #include "../../src/conf/settings.h"
 #include "../../src/core/path.h"
 
+#include "../../src/middleware/common.h"
 #include "../../src/middleware/cookies.h"
 #include "../../src/middleware/security.h"
 #include "../../src/middleware/clickjacking.h"
@@ -54,6 +55,7 @@ struct Settings final: public wasp::conf::Settings
 
 		this->MIDDLEWARE = {
 			this->middleware<wasp::middleware::SecurityMiddleware>(),
+			this->middleware<wasp::middleware::CommonMiddleware>(),
 			this->middleware<wasp::middleware::XFrameOptionsMiddleware>(),
 			this->middleware<wasp::middleware::CookieMiddleware>()
 		};
@@ -65,6 +67,8 @@ struct Settings final: public wasp::conf::Settings
 		this->STATIC_URL = "/static/";
 
 		this->DATA_UPLOAD_MAX_MEMORY_SIZE = 20971520;
+
+	//	this->APPEND_SLASH = false;
 	}
 
 	// Override in local_settings.cpp!

@@ -137,6 +137,11 @@ std::string HttpResponseBase::content_type()
 	return this->_headers.get("Content-Type", "");
 }
 
+size_t HttpResponseBase::content_length()
+{
+	return 0;
+}
+
 std::string HttpResponseBase::charset()
 {
 	return this->_charset;
@@ -214,6 +219,11 @@ HttpResponse::HttpResponse(
 {
 	this->_content = content;
 	this->_streaming = false;
+}
+
+size_t HttpResponse::content_length()
+{
+	return this->_content.size();
 }
 
 void HttpResponse::set_content(const std::string& content)
@@ -394,12 +404,11 @@ void FileResponse::close()
 // HttpResponseRedirectBase implementation
 HttpResponseRedirectBase::HttpResponseRedirectBase(
 	const std::string& redirect_to,
-	const std::string& content,
 	unsigned short int status,
 	const std::string& content_type,
 	const std::string& reason,
 	const std::string& charset
-) : HttpResponse(content, status, content_type, reason, charset)
+) : HttpResponse("", status, content_type, reason, charset)
 {
 	if (status < 300 || status > 399)
 	{
@@ -423,10 +432,9 @@ std::string HttpResponseRedirectBase::url()
 // HttpResponseRedirect implementation
 HttpResponseRedirect::HttpResponseRedirect(
 	const std::string& redirect_to,
-	const std::string& content,
 	const std::string& content_type,
 	const std::string& charset
-) : HttpResponseRedirectBase(redirect_to, content, 302, content_type, "", charset)
+) : HttpResponseRedirectBase(redirect_to, 302, content_type, "", charset)
 {
 }
 
@@ -434,10 +442,9 @@ HttpResponseRedirect::HttpResponseRedirect(
 // HttpResponsePermanentRedirect implementation
 HttpResponsePermanentRedirect::HttpResponsePermanentRedirect(
 	const std::string& redirect_to,
-	const std::string& content,
 	const std::string& content_type,
 	const std::string& charset
-) : HttpResponseRedirectBase(redirect_to, content, 301, content_type, "", charset)
+) : HttpResponseRedirectBase(redirect_to, 301, content_type, "", charset)
 {
 }
 
