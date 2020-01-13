@@ -36,6 +36,8 @@ Settings::Settings()
 
 	this->DEFAULT_CHARSET = "utf-8";
 
+	this->ROOT_APP = nullptr;
+
 	this->APPEND_SLASH = true;
 
 	this->FILE_UPLOAD_MAX_MEMORY_SIZE = 2621440;   // 2.5 MB
@@ -95,6 +97,14 @@ Settings::Settings()
 
 void Settings::overwrite()
 {
+}
+
+void Settings::prepare()
+{
+	if (!this->ROOT_APP)
+	{
+		this->ROOT_APP = this->INSTALLED_APPS.front();
+	}
 }
 
 Settings::~Settings()

@@ -34,6 +34,7 @@ WaspApplication::WaspApplication(conf::Settings* settings)
 
 	this->_settings->init();
 	this->_settings->overwrite();
+	this->_settings->prepare();
 
 	this->setup_commands();
 

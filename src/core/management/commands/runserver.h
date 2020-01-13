@@ -29,6 +29,7 @@
 #include "./app_command.h"
 #include "../../../apps/interface.h"
 #include "../../../urls/url.h"
+#include "../../../urls/resolver.h"
 #include "../../../http/request.h"
 #include "../../../core/http_server.h"
 #include "../../../core/parsers/url_parser.h"
@@ -81,8 +82,7 @@ protected:
 	static http::HttpResponseBase* process_urlpatterns(
 		http::HttpRequest* request,
 		std::vector<urls::UrlPattern>& urlpatterns,
-		conf::Settings* settings,
-		bool& view_is_found
+		conf::Settings* settings
 	);
 	static void send_response(
 		http::HttpRequest* request,

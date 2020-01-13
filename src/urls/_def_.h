@@ -28,3 +28,7 @@
 /// wasp::urls
 #define __URLS_BEGIN__ __WASP_BEGIN__ namespace urls {
 #define __URLS_END__ } __WASP_END__
+
+/// wasp::urls::internal
+#define __URLS_INTERNAL_BEGIN__ __URLS_BEGIN__ namespace internal {
+#define __URLS_INTERNAL_END__ } __URLS_END__

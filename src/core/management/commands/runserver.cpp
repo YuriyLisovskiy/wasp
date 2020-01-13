@@ -114,18 +114,15 @@ void RunserverCommand::handle()
 std::function<void(http::HttpRequest*, const core::internal::socket_t&)>
 RunserverCommand::get_handler()
 {
-	std::vector<urls::UrlPattern> urlpatterns;
-
 	// Check if static files can be served
 	// and create necessary urls.
-	this->build_static_patterns(urlpatterns);
+	this->build_static_patterns(this->settings->ROOT_URLCONF);
 
 	// Retrieve main app patterns and append them
 	// to result.
-	this->build_app_patterns(urlpatterns);
+	this->build_app_patterns(this->settings->ROOT_URLCONF);
 
-	auto* settings = this->settings;
-	auto handler = [settings, urlpatterns](
+	auto handler = [this](
 		http::HttpRequest* request, const core::internal::socket_t& client
 	) mutable -> void
 	{
@@ -134,59 +131,26 @@ RunserverCommand::get_handler()
 		try
 		{
 			response = RunserverCommand::process_request_middleware(
-				request, settings
+				request, this->settings
 			);
-
-			/*for (auto& middleware : settings->MIDDLEWARE)
-			{
-				response = middleware->process_request(request);
-				if (response)
-				{
-					break;
-				}
-			}*/
-
 			if (!response)
 			{
-				bool view_is_found = false;
 				response = RunserverCommand::process_urlpatterns(
-					request, urlpatterns, settings, view_is_found
+					request, this->settings->ROOT_URLCONF, this->settings
 				);
-
-				/*for (auto& url_pattern : urlpatterns)
-				{
-					std::map<std::string, std::string> args_map;
-					if (url_pattern.match(request->path(), args_map))
-					{
-						response = url_pattern.apply(request, new views::Args(args_map), settings->LOGGER);
-						view_is_found = true;
-						break;
-					}
-				}*/
-
-				if (!view_is_found)
+				if (!response)
 				{
 					response = new http::HttpResponseNotFound("<h2>404 - Not Found</h2>");
 				}
 
 				response = RunserverCommand::process_response_middleware(
-					request, response, settings
+					request, response, this->settings
 				);
-
-				/*for (long int i = (long int) settings->MIDDLEWARE.size() - 1; i >= 0; i--)
-				{
-					auto curr_response = settings->MIDDLEWARE[i]->process_response(request, response);
-					if (curr_response)
-					{
-						response = curr_response;
-						break;
-					}
-				}*/
 			}
 		}
 		catch (const core::ErrorResponseException& exc)
 		{
-			settings->LOGGER->error(exc);
+			this->settings->LOGGER->error(exc);
 
 			// TODO: get response according to http error status code.
 			error_response = new http::HttpResponseServerError(
@@ -196,14 +160,14 @@ RunserverCommand::get_handler()
 		}
 		catch (const core::BaseException& exc)
 		{
-			settings->LOGGER->error(exc);
+			this->settings->LOGGER->error(exc);
 			error_response = new http::HttpResponseServerError(
 				"<p style=\"font-size: 24px;\" >Internal Server Error</p><p>" + std::string(exc.what()) + "</p>"
 			);
 		}
 		catch (const std::exception& exc)
 		{
-			settings->LOGGER->error(exc.what(), __LINE__, "request handler function", __FILE__);
+			this->settings->LOGGER->error(exc.what(), __LINE__, "request handler function", __FILE__);
 			error_response = new http::HttpResponseServerError(
 				"<p style=\"font-size: 24px;\" >Internal Server Error</p>"
 			);
@@ -225,7 +189,7 @@ RunserverCommand::get_handler()
 			response = error_response;
 		}
 
-		send_response(request, response, client, settings);
+		send_response(request, response, client, this->settings);
 		delete response;
 	};
 
@@ -356,20 +320,14 @@ http::HttpResponseBase* RunserverCommand::process_request_middleware(
 http::HttpResponseBase* RunserverCommand::process_urlpatterns(
 	http::HttpRequest* request,
 	std::vector<urls::UrlPattern>& urlpatterns,
-	conf::Settings* settings,
-	bool& view_is_found
+	conf::Settings* settings
 )
 {
 	http::HttpResponseBase* response = nullptr;
-	for (auto& url_pattern : urlpatterns)
+	auto apply = urls::resolve(request->path(), settings->ROOT_URLCONF);
+	if (apply)
 	{
-		std::map<std::string, std::string> args_map;
-		if (url_pattern.match(request->path(), args_map))
-		{
-			response = url_pattern.apply(request, new views::Args(args_map), settings->LOGGER);
-			view_is_found = true;
-			break;
-		}
+		response = apply(request, settings->LOGGER);
 	}
 
 	return response;

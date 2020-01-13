@@ -68,6 +68,17 @@ struct Settings
 	// manually specified. It's used to construct the Content-Type header.
 	std::string DEFAULT_CHARSET;
 
+	// Root application where Wasp will load urlpatterns.
+	//
+	// ROOT_APP is the first installed app by default, it can
+	// be overridden in project settings.
+	apps::IAppConfig* ROOT_APP;
+
+	// Vector of patterns which will be loaded from ROOT_APP.
+	// To change this setting, setup ROOT_APP in your project
+	// settings.
+	std::vector<urls::UrlPattern> ROOT_URLCONF;
+
 	// List of AppConfig-derived objects representing apps.
 	// Order is required. The first app is interpreted as
 	// main application configuration.
@@ -221,6 +232,7 @@ struct Settings
 	virtual ~Settings();
 	virtual void init() = 0;
 	virtual void overwrite();
+	void prepare();
 
 	template <typename _T, typename = std::enable_if<std::is_base_of<apps::IAppConfig, _T>::value>>
 	apps::IAppConfig* app()
