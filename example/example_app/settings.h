@@ -67,8 +67,6 @@ struct Settings final: public wasp::conf::Settings
 		this->STATIC_URL = "/static/";
 
 		this->DATA_UPLOAD_MAX_MEMORY_SIZE = 20971520;
-
-	//	this->APPEND_SLASH = false;
 	}
 
 	// Override in local_settings.cpp!

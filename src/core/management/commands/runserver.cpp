@@ -84,22 +84,21 @@ void RunserverCommand::handle()
 		throw CommandError("You must set settings.ALLOWED_HOSTS if settings.DEBUG is false.");
 	}
 
-	core::internal::HttpServer::context ctx{};
+	core::net::internal::HttpServer::context ctx{};
 
 	// TODO: remove!
 	ctx.verbose = true;
 
 	this->setup_server_ctx(ctx);
 
-	core::internal::HttpServer server(ctx);
+	core::net::internal::HttpServer server(ctx);
 	try
 	{
 		server.listen_and_serve();
 	}
 	catch (const core::InterruptException& exc)
 	{
-		server.finish();
-		this->settings->LOGGER->debug("Finished");
+		this->settings->LOGGER->debug("Interrupted");
 	}
 	catch (const core::BaseException& exc)
 	{
@@ -111,7 +110,7 @@ void RunserverCommand::handle()
 	}
 }
 
-std::function<void(http::HttpRequest*, const core::internal::socket_t&)>
+std::function<void(http::HttpRequest*, const core::net::internal::socket_t&)>
 RunserverCommand::get_handler()
 {
 	// Check if static files can be served
@@ -123,7 +122,7 @@ RunserverCommand::get_handler()
 	this->build_app_patterns(this->settings->ROOT_URLCONF);
 
 	auto handler = [this](
-		http::HttpRequest* request, const core::internal::socket_t& client
+		http::HttpRequest* request, const core::net::internal::socket_t& client
 	) mutable -> void
 	{
 		http::HttpResponseBase* error_response = nullptr;
@@ -227,7 +226,7 @@ void RunserverCommand::build_app_patterns(std::vector<urls::UrlPattern>& pattern
 	}
 }
 
-void RunserverCommand::setup_server_ctx(core::internal::HttpServer::context& ctx)
+void RunserverCommand::setup_server_ctx(core::net::internal::HttpServer::context& ctx)
 {
 	// Setup host and port.
 	auto host_port_str = this->_host_port_flag->get();
@@ -354,18 +353,18 @@ http::HttpResponseBase* RunserverCommand::process_response_middleware(
 void RunserverCommand::send_response(
 	http::HttpRequest* request,
 	http::HttpResponseBase* response,
-	const core::internal::socket_t& client,
+	const core::net::internal::socket_t& client,
 	conf::Settings* settings
 )
 {
 	if (response->is_streaming())
 	{
 		auto* streaming_response = dynamic_cast<http::StreamingHttpResponse*>(response);
-		core::internal::HttpServer::send(streaming_response, client);
+		core::net::internal::HttpServer::send(streaming_response, client);
 	}
 	else
 	{
-		core::internal::HttpServer::send(response, client);
+		core::net::internal::HttpServer::send(response, client);
 	}
 
 	log_request(
