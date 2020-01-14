@@ -101,7 +101,7 @@ void Settings::overwrite()
 
 void Settings::prepare()
 {
-	if (!this->ROOT_APP)
+	if (!this->ROOT_APP && !this->INSTALLED_APPS.empty())
 	{
 		this->ROOT_APP = this->INSTALLED_APPS.front();
 	}

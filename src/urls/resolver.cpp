@@ -45,7 +45,10 @@ std::function<http::HttpResponseBase*(
 				core::ILogger* logger
 			) mutable -> http::HttpResponseBase*
 			{
-				return url_pattern.apply(request, new views::Args(args_map), logger);
+				auto* args = new views::Args(args_map);
+				auto result = url_pattern.apply(request, args, logger);
+				delete args;
+				return result;
 			};
 			break;
 		}

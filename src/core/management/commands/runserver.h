@@ -31,7 +31,7 @@
 #include "../../../urls/url.h"
 #include "../../../urls/resolver.h"
 #include "../../../http/request.h"
-#include "../../../core/http_server.h"
+#include "../../../core/net/http_server.h"
 #include "../../../core/parsers/url_parser.h"
 #include "../../../core/datetime/datetime.h"
 #include "../../../core/exceptions.h"
@@ -65,11 +65,11 @@ private:
 protected:
 	void add_flags() final;
 	void handle() final;
-	std::function<void(http::HttpRequest*, const core::internal::socket_t&)> get_handler();
+	std::function<void(http::HttpRequest*, const core::net::internal::socket_t&)> get_handler();
 	bool static_is_allowed(const std::string& static_url);
 	void build_static_patterns(std::vector<urls::UrlPattern>& patterns);
 	void build_app_patterns(std::vector<urls::UrlPattern>& patterns);
-	void setup_server_ctx(core::internal::HttpServer::context& ctx);
+	void setup_server_ctx(core::net::internal::HttpServer::context& ctx);
 
 	static http::HttpResponseBase* process_request_middleware(
 		http::HttpRequest* request, conf::Settings* settings
@@ -87,7 +87,7 @@ protected:
 	static void send_response(
 		http::HttpRequest* request,
 		http::HttpResponseBase* response,
-		const core::internal::socket_t& client,
+		const core::net::internal::socket_t& client,
 		conf::Settings* settings
 	);
 	static void log_request(

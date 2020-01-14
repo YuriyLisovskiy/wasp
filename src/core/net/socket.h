@@ -16,40 +16,49 @@
  */
 
 /**
- * server_socket.h
- * Purpose: improved and adapted tcp/ip socket for server.
+ * socket.h
+ * Purpose: tcp/ip socket's wrapper.
  */
 
 #pragma once
 
+#include <fcntl.h>
+
+#include <iostream>
+
 // Module definitions.
-#include "../_def_.h"
+#include "./_def_.h"
 
 // Wasp libraries.
-#include "./socket.h"
 #include "../exceptions.h"
 
 
-__CORE_INTERNAL_BEGIN__
+__NET_INTERNAL_BEGIN__
 
-class ServerSocket : public Socket
+class Socket final
 {
 private:
+	bool _closed;
+	socket_t _socket;
 	bool _use_ipv6;
 	sockaddr_in _ipv4_socket{};
 	sockaddr_in6 _ipv6_socket{};
 
 public:
-	ServerSocket();
+	Socket();
 
 	socket_t create(const char* host, uint16_t port, bool use_ipv6 = false);
 	int bind();
 	int listen();
 	socket_t accept();
+	int close();
+	int set_reuse_addr();
+	int set_reuse_port();
+	bool set_blocking(bool blocking);
 
 private:
 	socket_t create_ipv4(const char* host, uint16_t port);
 	socket_t create_ipv6(const char* host, uint16_t port);
 };
 
-__CORE_INTERNAL_END__
+__NET_INTERNAL_END__

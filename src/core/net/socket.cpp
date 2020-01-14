@@ -16,19 +16,19 @@
  */
 
 /**
- * An implementation of server_socket.h.
+ * An implementation of socket.h.
  */
 
-#include "./server_socket.h"
+#include "./socket.h"
 
 
-__CORE_INTERNAL_BEGIN__
+__NET_INTERNAL_BEGIN__
 
-ServerSocket::ServerSocket() : Socket(-1), _use_ipv6(false)
+Socket::Socket() : _socket(-1), _closed(true), _use_ipv6(false)
 {
 }
 
-socket_t ServerSocket::create_ipv4(const char* host, uint16_t port)
+socket_t Socket::create_ipv4(const char* host, uint16_t port)
 {
 	this->_ipv4_socket.sin_family = AF_INET;
 	this->_ipv4_socket.sin_port = ::htons(port);
@@ -37,7 +37,7 @@ socket_t ServerSocket::create_ipv4(const char* host, uint16_t port)
 	return ::socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
 }
 
-socket_t ServerSocket::create_ipv6(const char* host, uint16_t port)
+socket_t Socket::create_ipv6(const char* host, uint16_t port)
 {
 	this->_ipv6_socket.sin6_family = AF_INET6;
 	this->_ipv6_socket.sin6_port = ::htons(port);
@@ -45,8 +45,9 @@ socket_t ServerSocket::create_ipv6(const char* host, uint16_t port)
 	return ::socket(PF_INET6, SOCK_STREAM, IPPROTO_TCP);
 }
 
-socket_t ServerSocket::create(const char* host, uint16_t port, bool use_ipv6)
+socket_t Socket::create(const char* host, uint16_t port, bool use_ipv6)
 {
+	this->_closed = false;
 	this->_use_ipv6 = use_ipv6;
 	if (this->_use_ipv6)
 	{
@@ -60,7 +61,7 @@ socket_t ServerSocket::create(const char* host, uint16_t port, bool use_ipv6)
 	return this->_socket;
 }
 
-int ServerSocket::bind()
+int Socket::bind()
 {
 	if (this->_use_ipv6)
 	{
@@ -70,12 +71,12 @@ int ServerSocket::bind()
 	return ::bind(this->_socket, (sockaddr*) &this->_ipv4_socket, sizeof(this->_ipv4_socket));
 }
 
-int ServerSocket::listen()
+int Socket::listen()
 {
 	return ::listen(this->_socket, SOMAXCONN);
 }
 
-socket_t ServerSocket::accept()
+socket_t Socket::accept()
 {
 	socket_t conn;
 	if (this->_use_ipv6)
@@ -97,4 +98,63 @@ socket_t ServerSocket::accept()
 	return conn;
 }
 
-__CORE_INTERNAL_END__
+int Socket::close()
+{
+	if (this->_closed)
+	{
+		return 0;
+	}
+
+	if (this->_socket != -1)
+	{
+#if defined(_WIN32) || defined(_WIN64)
+		return ::closesocket(this->_socket);
+#elif defined(__unix__) || defined(__linux__)
+		return ::close(this->_socket);
+#else
+#error Library is not supported on this platform
+#endif
+	}
+	return -1;
+}
+
+int Socket::set_reuse_addr()
+{
+	const int true_flag = 1;
+	return ::setsockopt(this->_socket, SOL_SOCKET, SO_REUSEADDR, &true_flag, sizeof(true_flag));
+}
+
+int Socket::set_reuse_port()
+{
+	const int true_flag = 1;
+	return ::setsockopt(this->_socket, SOL_SOCKET, SO_REUSEPORT, &true_flag, sizeof(true_flag));
+}
+
+bool Socket::set_blocking(bool blocking)
+{
+	if (this->_closed)
+	{
+		throw SocketError("unable to set socket blocking, open socket first", _ERROR_DETAILS_);
+	}
+
+	if (this->_socket < 0)
+	{
+		return false;
+	}
+
+#if defined(_WIN32) || defined(_WIN64)
+	unsigned long mode = blocking ? 0 : 1;
+	return ioctlsocket(fd, FIONBIO, &mode) == 0;
+#else
+	int flags = fcntl(this->_socket, F_GETFL, 0);
+	if (flags == -1)
+	{
+		return false;
+	}
+
+	flags = blocking ? (flags & ~O_NONBLOCK) : (flags | O_NONBLOCK);
+	return fcntl(this->_socket, F_SETFL, flags) == 0;
+#endif
+}
+
+__NET_INTERNAL_END__
