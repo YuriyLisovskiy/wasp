@@ -77,6 +77,9 @@ public:
 		const std::string& charset = "utf-8"
 	);
 	virtual ~HttpResponseBase() = default;
+	std::string get_header(
+		const std::string& key, const std::string& default_value
+	);
 	void set_header(const std::string& key, const std::string& value);
 	void remove_header(const std::string& key);
 	bool has_header(const std::string& key);

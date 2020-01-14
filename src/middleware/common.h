@@ -18,7 +18,7 @@
 /**
  * common.h
  * Purpose:
- * "Common" middleware takes care of some basic operations:
+ *  "Common" middleware takes care of some basic operations:
  * 		- Forbid access to User-Agents in settings.DISALLOWED_USER_AGENTS
  *  	- URL rewriting: Based on the APPEND_SLASH and PREPEND_WWW settings,
  * 		append missing slashes and/or prepends missing "www."s.

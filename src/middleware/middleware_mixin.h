@@ -17,7 +17,8 @@
 
 /**
  * middleware_mixin.h
- * Purpose: base middleware class.
+ * Purpose:
+ * 	Base middleware class.
  */
 
 #pragma once

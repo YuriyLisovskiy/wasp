@@ -16,35 +16,40 @@
  */
 
 /**
- * interface.h
+ * http.h
  * Purpose:
- * 	Provides interfaces for middleware module.
+ * 	Handle conditional GET operations. If the response has an ETag or
+ * 	Last-Modified header and the request has If-None-Match or If-Modified-Since,
+ * 	replace the response with HttpNotModified. Add an ETag header if needed.
  */
 
 #pragma once
 
-// Module definitions.
+// Module definitions
 #include "./_def_.h"
 
 // Wasp libraries.
-#include "../http/request.h"
-#include "../http/response.h"
+#include "./middleware_mixin.h"
+#include "../core/string/str.h"
+#include "../http/headers.h"
+#include "../utils/cache.h"
 
 
 __MIDDLEWARE_BEGIN__
 
-class IMiddleware
+class ConditionalGetMiddleware : public MiddlewareMixin
 {
+protected:
+
+	/// Return true if an ETag header should be added to response.
+	static bool needs_etag(http::HttpResponseBase* response);
+
 public:
-	virtual ~IMiddleware() = default;
+	explicit ConditionalGetMiddleware(conf::Settings* settings);
 
-	/// An input http request before processing in views::View.
-	virtual http::HttpResponseBase* process_request(http::HttpRequest* request) = 0;
-
-	/// An output http request and response after processing in views::View.
-	virtual http::HttpResponseBase* process_response(
+	http::HttpResponseBase* process_response(
 		http::HttpRequest* request, http::HttpResponseBase* response
-	) = 0;
+	) override;
 };
 
 __MIDDLEWARE_END__

@@ -16,35 +16,20 @@
  */
 
 /**
- * interface.h
- * Purpose:
- * 	Provides interfaces for middleware module.
+ * _def_.h
+ * Purpose: utility module definitions.
  */
 
 #pragma once
 
-// Module definitions.
-#include "./_def_.h"
-
-// Wasp libraries.
-#include "../http/request.h"
-#include "../http/response.h"
+#include "../_def_.h"
 
 
-__MIDDLEWARE_BEGIN__
+/// wasp::utils
+#define __UTILS_BEGIN__ __WASP_BEGIN__ namespace utils {
+#define __UTILS_END__ } __WASP_END__
 
-class IMiddleware
-{
-public:
-	virtual ~IMiddleware() = default;
 
-	/// An input http request before processing in views::View.
-	virtual http::HttpResponseBase* process_request(http::HttpRequest* request) = 0;
-
-	/// An output http request and response after processing in views::View.
-	virtual http::HttpResponseBase* process_response(
-		http::HttpRequest* request, http::HttpResponseBase* response
-	) = 0;
-};
-
-__MIDDLEWARE_END__
+/// wasp::utils::cache
+#define __CACHE_BEGIN__ __UTILS_BEGIN__ namespace cache {
+#define __CACHE_END__ } __UTILS_END__

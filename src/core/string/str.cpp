@@ -90,6 +90,11 @@ std::string upper(const std::string& _str)
 std::vector<std::string> split(const std::string& str, char delimiter)
 {
 	std::vector<std::string> result;
+	if (str.empty())
+	{
+		return result;
+	}
+
 	std::string current;
 	for (const char& _char : str)
 	{

@@ -59,6 +59,8 @@ file(GLOB LIB_FILES
 	"src/urls/resolvers/*.cpp"
 	"src/urls/*.h"
 	"src/urls/*.cpp"
+	"src/utils/*.h"
+	"src/utils/*.cpp"
 	"src/*.h"
 	"src/*.cpp"
 )

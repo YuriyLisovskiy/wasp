@@ -1,7 +1,6 @@
 TODO:
     Implement default middleware:
         - csrf
-        - conditional get (http)
         - cache
         - gzip
         - locale
@@ -12,13 +11,17 @@ TODO:
 
 
 Check out TODOs in (not urgent):
+    - src/core/encoding.cpp
     - src/core/http_server.cpp
     - src/core/management/runserver.cpp
 
     - src/http/request.cpp
     - src/http/response.cpp
 
-    - src/utility/encoding.cpp
+    - src/middleware/http.cpp
+
+    - src/utils/cache.cpp
+    - src/utils/http.cpp
 
     - src/views/static.cpp
 
@@ -28,21 +31,21 @@ Not tested:
 
     - src/core/datetime/*
     - src/core/management/*
-    - src/core/sockets/*
-    - src/core/http_server
+    - src/core/net/*
     - src/core/thread_pool
+    - src/core/flags/parser
+    - src/core/string/format
+    - src/core/regex
 
     - src/http/request
     - src/http/response
     - src/http/utility
 
-    - src/middleware
+    - src/middleware/*
 
-    - src/urls
+    - src/urls/*
 
-    - src/utility/flags/parser
-    - src/utility/string/format
-    - src/utility/regex
+    - src/utils/*
 
     - src/views/static
 

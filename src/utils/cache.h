@@ -16,9 +16,9 @@
  */
 
 /**
- * interface.h
+ * cache.h
  * Purpose:
- * 	Provides interfaces for middleware module.
+ * 	Provides utils for developing middleware.
  */
 
 #pragma once
@@ -27,24 +27,19 @@
 #include "./_def_.h"
 
 // Wasp libraries.
-#include "../http/request.h"
+#include "../http/headers.h"
 #include "../http/response.h"
 
 
-__MIDDLEWARE_BEGIN__
+__CACHE_BEGIN__
 
-class IMiddleware
-{
-public:
-	virtual ~IMiddleware() = default;
+extern void set_response_etag(http::HttpResponseBase* response);
 
-	/// An input http request before processing in views::View.
-	virtual http::HttpResponseBase* process_request(http::HttpRequest* request) = 0;
+extern http::HttpResponseBase* get_conditional_response(
+	http::HttpRequest* request,
+	const std::string& etag,
+	const std::string& last_modified,
+	http::HttpResponseBase* response
+);
 
-	/// An output http request and response after processing in views::View.
-	virtual http::HttpResponseBase* process_response(
-		http::HttpRequest* request, http::HttpResponseBase* response
-	) = 0;
-};
-
-__MIDDLEWARE_END__
+__CACHE_END__

@@ -18,10 +18,9 @@
 /**
  * clickjacking.h
  *
- * Clickjacking Protection Middleware.
- *
- * Purpose: this module provides a middleware that implements protection against a
- * 			malicious site loading resources from your site in a hidden frame.
+ * Purpose:
+ * 	Provides a middleware that implements protection against a
+ * 	malicious site loading resources from your site in a hidden frame.
  */
 
 #pragma once

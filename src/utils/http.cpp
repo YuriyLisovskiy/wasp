@@ -16,35 +16,7 @@
  */
 
 /**
- * interface.h
- * Purpose:
- * 	Provides interfaces for middleware module.
+ * An implementation of http.h.
  */
 
-#pragma once
-
-// Module definitions.
-#include "./_def_.h"
-
-// Wasp libraries.
-#include "../http/request.h"
-#include "../http/response.h"
-
-
-__MIDDLEWARE_BEGIN__
-
-class IMiddleware
-{
-public:
-	virtual ~IMiddleware() = default;
-
-	/// An input http request before processing in views::View.
-	virtual http::HttpResponseBase* process_request(http::HttpRequest* request) = 0;
-
-	/// An output http request and response after processing in views::View.
-	virtual http::HttpResponseBase* process_response(
-		http::HttpRequest* request, http::HttpResponseBase* response
-	) = 0;
-};
-
-__MIDDLEWARE_END__
+#include "./http.h"

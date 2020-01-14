@@ -17,7 +17,8 @@
 
 /**
  * cookies.h
- * Purpose: enables cookies in http request object.
+ * Purpose:
+ * 	Enables cookies in http request object.
  */
 
 #pragma once

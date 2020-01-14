@@ -59,6 +59,13 @@ HttpResponseBase::HttpResponseBase(
 	this->_headers.set("Content-Type", content_type);
 }
 
+std::string HttpResponseBase::get_header(
+	const std::string& key, const std::string& default_value
+)
+{
+	return this->_headers.get(key, default_value);
+}
+
 void HttpResponseBase::set_header(const std::string& key, const std::string& value)
 {
 	this->_headers.set(key, value);

@@ -16,35 +16,32 @@
  */
 
 /**
- * interface.h
- * Purpose:
- * 	Provides interfaces for middleware module.
+ * An implementation of cache.h.
  */
 
-#pragma once
-
-// Module definitions.
-#include "./_def_.h"
-
-// Wasp libraries.
-#include "../http/request.h"
-#include "../http/response.h"
+#include "./cache.h"
 
 
-__MIDDLEWARE_BEGIN__
+__CACHE_BEGIN__
 
-class IMiddleware
+void set_response_etag(http::HttpResponseBase* response)
 {
-public:
-	virtual ~IMiddleware() = default;
+	if (!response->is_streaming() && response->content_length() > 0)
+	{
+		// TODO:
+		response->set_header(http::E_TAG, "quoted ETag hash");
+	}
+}
 
-	/// An input http request before processing in views::View.
-	virtual http::HttpResponseBase* process_request(http::HttpRequest* request) = 0;
+http::HttpResponseBase* get_conditional_response(
+	http::HttpRequest* request,
+	const std::string& etag,
+	const std::string& last_modified,
+	http::HttpResponseBase* response
+)
+{
+	// TODO:
+	return nullptr;
+}
 
-	/// An output http request and response after processing in views::View.
-	virtual http::HttpResponseBase* process_response(
-		http::HttpRequest* request, http::HttpResponseBase* response
-	) = 0;
-};
-
-__MIDDLEWARE_END__
+__CACHE_END__
