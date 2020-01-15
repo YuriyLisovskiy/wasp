@@ -16,32 +16,16 @@
  */
 
 /**
- * An implementation of cache.h.
+ * _def_.h
+ * Purpose: utils/crypto module definitions.
  */
 
-#include "./cache.h"
+#pragma once
 
 
-__CACHE_BEGIN__
+#include "../_def_.h"
 
-void set_response_etag(http::HttpResponseBase* response)
-{
-	if (!response->is_streaming() && response->content_length() > 0)
-	{
-		// TODO: utils::http::quote_etag(crypto::md5(response->get_content()).digest())
-		response->set_header(http::E_TAG, "quoted ETag hash");
-	}
-}
 
-http::HttpResponseBase* get_conditional_response(
-	http::HttpRequest* request,
-	const std::string& etag,
-	const std::string& last_modified,
-	http::HttpResponseBase* response
-)
-{
-	// TODO:
-	return nullptr;
-}
-
-__CACHE_END__
+/// wasp::utils::crypto
+#define __CRYPTO_BEGIN__ __UTILS_BEGIN__ namespace crypto {
+#define __CRYPTO_END__ } __UTILS_END__

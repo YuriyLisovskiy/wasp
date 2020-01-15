@@ -24,3 +24,5 @@
 #pragma once
 
 // TODO: implement parse_http_date function.
+
+// TODO: implement quote_etag function.

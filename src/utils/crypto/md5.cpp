@@ -16,32 +16,23 @@
  */
 
 /**
- * An implementation of cache.h.
+ * An implementation of md_5.h.
  */
 
-#include "./cache.h"
+#include "./md5.h"
 
 
-__CACHE_BEGIN__
+__CRYPTO_BEGIN__
 
-void set_response_etag(http::HttpResponseBase* response)
+md5::md5(const std::string& src)
 {
-	if (!response->is_streaming() && response->content_length() > 0)
-	{
-		// TODO: utils::http::quote_etag(crypto::md5(response->get_content()).digest())
-		response->set_header(http::E_TAG, "quoted ETag hash");
-	}
+	this->_src = src;
 }
 
-http::HttpResponseBase* get_conditional_response(
-	http::HttpRequest* request,
-	const std::string& etag,
-	const std::string& last_modified,
-	http::HttpResponseBase* response
-)
+std::string md5::digest()
 {
 	// TODO:
-	return nullptr;
+	return this->_src;
 }
 
-__CACHE_END__
+__CRYPTO_END__

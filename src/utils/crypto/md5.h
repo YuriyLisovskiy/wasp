@@ -16,32 +16,30 @@
  */
 
 /**
- * An implementation of cache.h.
+ * md5.h
+ * Purpose:
+ * 	Provides md5 hash function algorithm.
  */
 
-#include "./cache.h"
+#pragma once
+
+// C++ libraries.
+#include <string>
+
+// Module definitions.
+#include "./_def_.h"
 
 
-__CACHE_BEGIN__
+__CRYPTO_BEGIN__
 
-void set_response_etag(http::HttpResponseBase* response)
+class md5 final
 {
-	if (!response->is_streaming() && response->content_length() > 0)
-	{
-		// TODO: utils::http::quote_etag(crypto::md5(response->get_content()).digest())
-		response->set_header(http::E_TAG, "quoted ETag hash");
-	}
-}
+private:
+	std::string _src;
 
-http::HttpResponseBase* get_conditional_response(
-	http::HttpRequest* request,
-	const std::string& etag,
-	const std::string& last_modified,
-	http::HttpResponseBase* response
-)
-{
-	// TODO:
-	return nullptr;
-}
+public:
+	explicit md5(const std::string& src);
+	std::string digest();
+};
 
-__CACHE_END__
+__CRYPTO_END__
