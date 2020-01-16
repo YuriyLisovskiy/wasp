@@ -77,4 +77,141 @@ std::vector<std::string> Regex::groups()
 	return groups;
 }
 
+
+ArgRegex::ArgRegex(const std::string& rgx)
+{
+	this->_orig = rgx;
+	this->_s = this->_parse(this->_orig);
+	this->_rgx = std::regex(this->_s);
+	this->_is_matched = false;
+	this->_is_searched = false;
+	this->_groups_are_made = false;
+}
+
+bool ArgRegex::match(const std::string& to_match)
+{
+	this->_to_match = to_match;
+	this->_is_matched = std::regex_match(this->_to_match, this->_rgx);
+	return this->_is_matched;
+}
+
+bool ArgRegex::search(const std::string& to_search)
+{
+	this->_to_match = to_search;
+	this->_is_searched = std::regex_search(this->_to_match, this->_matches, this->_rgx);
+	return this->_is_searched;
+}
+
+std::map<std::string, std::string> ArgRegex::groups()
+{
+	if (!this->_groups_are_made)
+	{
+		if (this->_is_searched)
+		{
+			this->_make_groups();
+		}
+		else if (this->_is_matched)
+		{
+			if (this->search(this->_to_match))
+			{
+				this->_make_groups();
+			}
+		}
+	}
+
+	return this->_groups;
+}
+
+std::string ArgRegex::group(const std::string& key, const std::string& default_val)
+{
+	this->groups();
+	if (this->_groups_are_made)
+	{
+		return this->_groups[key];
+	}
+
+	return default_val;
+}
+
+std::vector<std::string> ArgRegex::parts()
+{
+	return this->_pattern_parts;
+}
+
+void ArgRegex::_make_groups()
+{
+	for (size_t i = 1; i < this->_matches.size(); i++)
+	{
+		if (this->_matches[i].matched)
+		{
+			this->_groups[this->_keys[i - 1]] = this->_matches[i].str();
+		}
+	}
+
+	this->_groups_are_made = true;
+}
+
+std::string ArgRegex::_parse(const std::string& pattern)
+{
+	std::string new_pattern, part, arg_name;
+	ArgRegex::state_enum st = ArgRegex::state_enum::s_str;
+	for (char ch : pattern)
+	{
+		switch (st)
+		{
+			case ArgRegex::state_enum::s_str:
+				if (ch == '<')
+				{
+					st = ArgRegex::state_enum::s_arg_name;
+					this->_pattern_parts.push_back(part);
+					part.clear();
+					continue;
+				}
+				else if (ch == '(')
+				{
+					st = ArgRegex::state_enum::s_regex;
+				}
+				else if (ch == '/')
+				{
+					new_pattern += "\\";
+					part += ch;
+				}
+				else
+				{
+					part += ch;
+				}
+
+				new_pattern += ch;
+				break;
+			case ArgRegex::state_enum::s_arg_name:
+				if (ch == '>')
+				{
+					st = ArgRegex::state_enum::s_str;
+					this->_keys.push_back(arg_name);
+					arg_name.clear();
+				}
+				else
+				{
+					arg_name += ch;
+				}
+				break;
+			case ArgRegex::state_enum::s_regex:
+				if (ch == ')')
+				{
+					st = ArgRegex::state_enum::s_str;
+				}
+
+				new_pattern += ch;
+				break;
+		}
+	}
+
+	if (!part.empty())
+	{
+		this->_pattern_parts.push_back(part);
+	}
+
+	return new_pattern;
+}
+
 __RGX_END__

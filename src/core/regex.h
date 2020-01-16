@@ -23,12 +23,16 @@
 #pragma once
 
 // C++ libraries.
+#include <map>
 #include <regex>
 #include <vector>
 #include <string>
 
 // Module definitions.
 #include "./_def_.h"
+
+// Wasp libraries.
+#include "./string/str.h"
 
 
 __RGX_BEGIN__
@@ -49,6 +53,46 @@ public:
 	bool match(const std::string& to_match);
 	bool search(const std::string& to_search);
 	std::vector<std::string> groups();
+};
+
+
+class ArgRegex final
+{
+private:
+	enum state_enum
+	{
+		s_str,
+		s_arg_name,
+		s_regex
+	};
+
+	std::smatch _matches;
+
+	bool _is_matched;
+	bool _is_searched;
+	bool _groups_are_made;
+	std::string _to_match;
+
+	std::string _s;
+	std::string _orig;
+	std::regex _rgx;
+
+	std::vector<std::string> _pattern_parts;
+	std::vector<std::string> _keys;
+
+	std::map<std::string, std::string> _groups;
+
+public:
+	explicit ArgRegex(const std::string& rgx);
+	bool match(const std::string& to_match);
+	bool search(const std::string& to_search);
+	std::map<std::string, std::string> groups();
+	std::string group(const std::string& key, const std::string& default_val = "");
+	std::vector<std::string> parts();
+
+private:
+	void _make_groups();
+	virtual std::string _parse(const std::string& pattern);
 };
 
 __RGX_END__
