@@ -28,11 +28,20 @@ UrlPattern::UrlPattern(
 	const std::string& rgx,
 	const views::ViewHandler& handler,
 	const std::string& name
-)
+) : _regex(rgx)
 {
-	this->_orig = rgx;
-	this->_s = this->_parse(this->_orig);
-	this->_rgx = std::regex(this->_s);
+	this->_orig = this->_regex.original();
+	this->_pattern_parts = this->_regex.parts();
+	if (!this->_pattern_parts.empty())
+	{
+		if (core::str::ends_with(this->_pattern_parts.back(), "?"))
+		{
+			this->_pattern_parts.back().pop_back();
+		}
+
+		core::str::rtrim(this->_pattern_parts.back(), '/');
+	}
+
 	this->_handler = handler;
 	this->_name = name;
 }
@@ -60,20 +69,9 @@ http::HttpResponseBase* UrlPattern::apply(
 
 bool UrlPattern::match(const std::string& url, std::map<std::string, std::string>& args)
 {
-	if (std::regex_match(url, this->_rgx))
+	if (this->_regex.match(url))
 	{
-		std::smatch matches;
-		if (std::regex_search(url, matches, this->_rgx))
-		{
-			for (size_t i = 1; i < matches.size(); i++)
-			{
-				if (matches[i].matched)
-				{
-					args[this->_keys[i - 1]] = matches[i].str();
-				}
-			}
-		}
-
+		args = this->_regex.groups();
 		return true;
 	}
 
@@ -107,75 +105,6 @@ std::string UrlPattern::build(const std::vector<std::string>& args)
 	}
 
 	throw core::AttributeError("unable to build url from pattern", _ERROR_DETAILS_);
-}
-
-std::string UrlPattern::_parse(const std::string& pattern)
-{
-	std::string new_pattern, part, arg_name;
-	UrlPattern::state_enum st = UrlPattern::state_enum::s_url;
-	for (char ch : pattern)
-	{
-		switch (st)
-		{
-			case UrlPattern::state_enum::s_url:
-				if (ch == '<')
-				{
-					st = UrlPattern::state_enum::s_arg_name;
-					this->_pattern_parts.push_back(part);
-					part.clear();
-					continue;
-				}
-				else if (ch == '(')
-				{
-					st = UrlPattern::state_enum::s_regex;
-				}
-				else if (ch == '/')
-				{
-					new_pattern += "\\";
-					part += ch;
-				}
-				else
-				{
-					part += ch;
-				}
-
-				new_pattern += ch;
-				break;
-			case UrlPattern::state_enum::s_arg_name:
-				if (ch == '>')
-				{
-					st = UrlPattern::state_enum::s_url;
-					this->_keys.push_back(arg_name);
-					arg_name.clear();
-				}
-				else
-				{
-					arg_name += ch;
-				}
-				break;
-			case UrlPattern::state_enum::s_regex:
-				if (ch == ')')
-				{
-					st = UrlPattern::state_enum::s_url;
-				}
-
-				new_pattern += ch;
-				break;
-		}
-	}
-
-	if (!part.empty())
-	{
-		if (core::str::ends_with(part, "?"))
-		{
-			part.pop_back();
-		}
-
-		core::str::rtrim(part, '/');
-		this->_pattern_parts.push_back(part);
-	}
-
-	return new_pattern;
 }
 
 __URLS_END__

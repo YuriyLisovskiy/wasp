@@ -65,6 +65,7 @@ UrlPattern make_static(
 		view_func,
 		name.empty() ? "static" : name
 	);
+
 }
 
 __URLS_END__

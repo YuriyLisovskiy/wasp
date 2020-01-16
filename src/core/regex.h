@@ -89,6 +89,7 @@ public:
 	std::map<std::string, std::string> groups();
 	std::string group(const std::string& key, const std::string& default_val = "");
 	std::vector<std::string> parts();
+	std::string original();
 
 private:
 	void _make_groups();

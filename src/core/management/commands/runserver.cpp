@@ -78,7 +78,6 @@ void RunserverCommand::add_flags()
 
 void RunserverCommand::handle()
 {
-	core::InterruptException::initialize();
 	if (!this->settings->DEBUG && this->settings->ALLOWED_HOSTS.empty())
 	{
 		throw CommandError("You must set settings.ALLOWED_HOSTS if settings.DEBUG is false.");
@@ -108,6 +107,8 @@ void RunserverCommand::handle()
 	{
 		this->settings->LOGGER->error(exc.what(), _ERROR_DETAILS_);
 	}
+
+	this->settings->LOGGER->debug("Interrupted 2");
 }
 
 std::function<void(http::HttpRequest*, const core::net::internal::socket_t&)>
@@ -115,6 +116,7 @@ RunserverCommand::get_handler()
 {
 	// Check if static files can be served
 	// and create necessary urls.
+	// TODO: mem bug!
 	this->build_static_patterns(this->settings->ROOT_URLCONF);
 
 	// Retrieve main app patterns and append them
@@ -213,15 +215,17 @@ void RunserverCommand::build_static_patterns(std::vector<urls::UrlPattern>& patt
 
 	if (!this->settings->MEDIA_ROOT.empty() && this->static_is_allowed(this->settings->MEDIA_URL))
 	{
-		patterns.push_back(urls::make_static(this->settings->MEDIA_URL, this->settings->MEDIA_ROOT));
+		patterns.push_back(
+			urls::make_static(this->settings->MEDIA_URL, this->settings->MEDIA_ROOT, "media")
+		);
 	}
 }
 
 void RunserverCommand::build_app_patterns(std::vector<urls::UrlPattern>& patterns)
 {
-	if (!this->settings->INSTALLED_APPS.empty())
+	if (this->settings->ROOT_APP)
 	{
-		auto apps_patterns = this->settings->INSTALLED_APPS[0]->get_urlpatterns();
+		auto apps_patterns = this->settings->ROOT_APP->get_urlpatterns();
 		patterns.insert(patterns.end(), apps_patterns.begin(), apps_patterns.end());
 	}
 }

@@ -61,8 +61,8 @@ file(GLOB LIB_FILES
 	"src/urls/*.cpp"
 	"src/utils/*.h"
 	"src/utils/*.cpp"
-	"src/utils/hashlib/*.h"
-	"src/utils/hashlib/*.cpp"
+	"src/utils/crypto/*.h"
+	"src/utils/crypto/*.cpp"
 	"src/*.h"
 	"src/*.cpp"
 )

@@ -138,6 +138,11 @@ std::vector<std::string> ArgRegex::parts()
 	return this->_pattern_parts;
 }
 
+std::string ArgRegex::original()
+{
+	return this->_orig;
+}
+
 void ArgRegex::_make_groups()
 {
 	for (size_t i = 1; i < this->_matches.size(); i++)
