@@ -84,6 +84,7 @@ public:
 	void remove_header(const std::string& key);
 	bool has_header(const std::string& key);
 	virtual void set_content(const std::string& content);
+	virtual std::string get_content();
 
 	void set_cookie(
 		const std::string& name,
@@ -147,6 +148,7 @@ public:
 	);
 	size_t content_length() override;
 	void set_content(const std::string& content) override;
+	std::string get_content() override;
 	void write(const std::string& content) override;
 	unsigned long int tell() override;
 	bool writable() override;

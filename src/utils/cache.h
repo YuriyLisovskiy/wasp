@@ -27,7 +27,9 @@
 #include "./_def_.h"
 
 // Wasp libraries.
-#include "../http/headers.h"
+#include "./http.h"
+#include "./crypto/md5.h"
+#include "../http/response.h"
 #include "../http/response.h"
 
 

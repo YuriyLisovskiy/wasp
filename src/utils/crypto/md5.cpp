@@ -16,7 +16,7 @@
  */
 
 /**
- * An implementation of md_5.h.
+ * An implementation of md5.h.
  */
 
 #include "./md5.h"

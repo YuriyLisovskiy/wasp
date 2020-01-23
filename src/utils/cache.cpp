@@ -28,8 +28,10 @@ void set_response_etag(http::HttpResponseBase* response)
 {
 	if (!response->is_streaming() && response->content_length() > 0)
 	{
-		// TODO: utils::http::quote_etag(crypto::md5(response->get_content()).digest())
-		response->set_header(http::E_TAG, "quoted ETag hash");
+		response->set_header(
+			http::E_TAG,
+			utils_http::quote_etag(crypto::md5(response->get_content()).digest())
+		);
 	}
 }
 

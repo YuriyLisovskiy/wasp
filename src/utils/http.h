@@ -23,6 +23,29 @@
 
 #pragma once
 
+// C++ libraries.
+#include <string>
+
+// Module definitions.
+#include "./_def_.h"
+
+// Wasp libraries.
+#include "../core/regex.h"
+
+
+__UTILS_HTTP_BEGIN__
+
 // TODO: implement parse_http_date function.
 
-// TODO: implement quote_etag function.
+/// If the provided string is already a quoted ETag, return it.
+/// Otherwise, wrap the string in quotes, making it a strong ETag.
+extern std::string quote_etag(const std::string& e_tag);
+
+__UTILS_HTTP_END__
+
+
+__UTILS_HTTP_INTERNAL_BEGIN__
+
+extern core::rgx::Regex ETAG_REGEX;
+
+__UTILS_HTTP_INTERNAL_END__

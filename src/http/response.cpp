@@ -85,6 +85,11 @@ void HttpResponseBase::set_content(const std::string& content)
 {
 }
 
+std::string HttpResponseBase::get_content()
+{
+	return "";
+}
+
 void HttpResponseBase::set_cookie(
 	const std::string& name,
 	const std::string& value,
@@ -240,6 +245,11 @@ size_t HttpResponse::content_length()
 void HttpResponse::set_content(const std::string& content)
 {
 	this->_content = content;
+}
+
+std::string HttpResponse::get_content()
+{
+	return this->_content;
 }
 
 void HttpResponse::write(const std::string& content)

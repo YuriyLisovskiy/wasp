@@ -20,3 +20,25 @@
  */
 
 #include "./http.h"
+
+
+__UTILS_HTTP_INTERNAL_BEGIN__
+
+core::rgx::Regex ETAG_REGEX = core::rgx::Regex(R"(\A((?:W\/)?"[^"]*")\Z)");
+
+__UTILS_HTTP_INTERNAL_END__
+
+
+__UTILS_HTTP_BEGIN__
+
+std::string quote_etag(const std::string& e_tag)
+{
+	if (internal::ETAG_REGEX.match(e_tag))
+	{
+		return e_tag;
+	}
+
+	return "\"" + e_tag + "\"";
+}
+
+__UTILS_HTTP_END__
