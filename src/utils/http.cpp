@@ -26,10 +26,81 @@ __UTILS_HTTP_INTERNAL_BEGIN__
 
 core::rgx::Regex ETAG_REGEX = core::rgx::Regex(R"(\A((?:W\/)?"[^"]*")\Z)");
 
+const std::string _D = R"(<day>(\d{2}))";
+const std::string _D2 = R"(<day>([ \d]\d))";
+const std::string _M = R"(<mon>(\w{3}))";
+const std::string _Y = R"(<year>(\d{4}))";
+const std::string _Y2 = R"(<year>(\d{2}))";
+const std::string _T = R"(<hour>(\d{2}):<min>(\d{2}):<sec>(\d{2}))";
+
+core::rgx::ArgRegex RFC1123_DATE = core::rgx::ArgRegex(
+	R"(\w{3}, )" + _D + R"( )" + _M + R"( )" + _Y + R"( )" + _T + R"( GMT)"
+);
+core::rgx::ArgRegex RFC850_DATE = core::rgx::ArgRegex(
+	R"(w{6,9}, )" + _D + R"(-)" + _M + R"(-)" + _Y2 + R"( )" + _T + R"( GMT)"
+);
+core::rgx::ArgRegex ASCTIME_DATE = core::rgx::ArgRegex(
+	R"(w{3} )" + _M + R"( )" + _D2 + R"( )" + _T + R"( )" + _Y + R"()"
+);
+
+const std::vector<std::string> MONTHS = {
+	"jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"
+};
+
 __UTILS_HTTP_INTERNAL_END__
 
 
 __UTILS_HTTP_BEGIN__
+
+long parse_http_date(const std::string& date)
+{
+	std::map<std::string, std::string> match;
+	if (internal::RFC1123_DATE.search(date))
+	{
+		match = internal::RFC1123_DATE.groups();
+	}
+	else if (internal::RFC850_DATE.search(date))
+	{
+		match = internal::RFC850_DATE.groups();
+	}
+	else if (internal::ASCTIME_DATE.search(date))
+	{
+		match = internal::ASCTIME_DATE.groups();
+	}
+	else
+	{
+		return -1;
+	}
+
+	int year = std::stoi(match["year"]);
+	if (year < 100)
+	{
+		int current_year = core::dt::gmtnow().year();
+		int current_century = current_year - (current_year % 100);
+		if (year - (current_year % 100) > 50)
+		{
+			// year that appears to be more than 50 years in the future are
+			// interpreted as representing the past.
+			year += current_century - 100;
+		}
+		else
+		{
+			year += current_century;
+		}
+	}
+
+	int month = (int) core::utility::index_of(
+		internal::MONTHS.begin(),
+		internal::MONTHS.end(),
+		core::str::lower(match["mon"])
+	) + 1;
+	int day = std::stoi(match["day"]);
+	int hour = std::stoi(match["hour"]);
+	int min = std::stoi(match["min"]);
+	int sec = std::stoi(match["sec"]);
+
+	return core::dt::DateTime(year, month, day, hour, min, sec).utc_epoch();
+}
 
 std::string quote_etag(const std::string& e_tag)
 {

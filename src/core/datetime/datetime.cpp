@@ -76,13 +76,29 @@ DateTime::DateTime() : _date(), _time(), _tz()
 {
 }
 
-DateTime::DateTime(int year, int month, int day_of_week, int day_of_month, int day_of_year, int hour, int minute, int second, int microsecond, TimeZone tz)
-	: _date(Date(year, month, day_of_week, day_of_month, day_of_year)), _time(Time(hour, minute, second, microsecond)), _tz(std::move(tz))
+DateTime::DateTime(int year, int month, int day, int hour, int minute, int second)
+	: _date(year, month, day), _time(hour, minute, second, 0), _tz("GMT")
 {
 }
 
-DateTime::DateTime(int year, int month, int day_of_week, int day_of_month, int day_of_year, int hour, int minute, int second, int microsecond, const std::string& tz)
-	: DateTime(year, month, day_of_week, day_of_month, day_of_year, hour, minute, second, microsecond, TimeZone(tz))
+DateTime::DateTime(
+	int year, int month, int day_of_week, int day_of_month, int day_of_year,
+	int hour, int minute, int second, int microsecond,
+	TimeZone tz
+) :
+	_date(year, month, day_of_week, day_of_month, day_of_year),
+	_time(hour, minute, second, microsecond),
+	_tz(std::move(tz))
+{
+}
+
+DateTime::DateTime(
+	int year, int month, int day_of_week, int day_of_month, int day_of_year,
+	int hour, int minute, int second, int microsecond,
+	const std::string& tz
+) : DateTime(
+	year, month, day_of_week, day_of_month, day_of_year, hour, minute, second, microsecond, TimeZone(tz)
+)
 {
 }
 

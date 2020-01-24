@@ -24,18 +24,30 @@
 #pragma once
 
 // C++ libraries.
+#include <map>
 #include <string>
+#include <vector>
 
 // Module definitions.
 #include "./_def_.h"
 
 // Wasp libraries.
 #include "../core/regex.h"
+#include "../core/utility.h"
+#include "../core/string/str.h"
+#include "../core/exceptions.h"
+#include "../core/datetime/datetime.h"
 
 
 __UTILS_HTTP_BEGIN__
 
-// TODO: implement parse_http_date function.
+/// Parse a date format as specified by HTTP RFC7231 section 7.1.1.1.
+///
+/// The three formats allowed by the RFC are accepted, even if only the first
+/// one is still in widespread use.
+///
+/// Return an integer expressed in seconds since the epoch, in UTC.
+extern long parse_http_date(const std::string& date);
 
 /// If the provided string is already a quoted ETag, return it.
 /// Otherwise, wrap the string in quotes, making it a strong ETag.
@@ -47,5 +59,18 @@ __UTILS_HTTP_END__
 __UTILS_HTTP_INTERNAL_BEGIN__
 
 extern core::rgx::Regex ETAG_REGEX;
+
+extern const std::string _D;
+extern const std::string _D2;
+extern const std::string _M;
+extern const std::string _Y;
+extern const std::string _Y2;
+extern const std::string _T;
+
+extern core::rgx::ArgRegex RFC1123_DATE;
+extern core::rgx::ArgRegex RFC850_DATE;
+extern core::rgx::ArgRegex ASCTIME_DATE;
+
+extern const std::vector<std::string> MONTHS;
 
 __UTILS_HTTP_INTERNAL_END__

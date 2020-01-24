@@ -21,7 +21,6 @@ Check out TODOs in (not urgent):
     - src/middleware/http.cpp
 
     - src/utils/cache.cpp
-    - src/utils/http.cpp
 
     - src/views/static.cpp
 

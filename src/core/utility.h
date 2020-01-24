@@ -23,6 +23,7 @@
 #pragma once
 
 // C++ libraries.
+#include <algorithm>
 #include <vector>
 
 // Module definitions.
@@ -32,7 +33,7 @@
 __UTILITY_BEGIN__
 
 template <typename _ItemT>
-extern bool contains(const _ItemT& to_check, const std::vector<_ItemT>& items)
+bool contains(const _ItemT& to_check, const std::vector<_ItemT>& items)
 {
 	for (const auto& item : items)
 	{
@@ -43,6 +44,18 @@ extern bool contains(const _ItemT& to_check, const std::vector<_ItemT>& items)
 	}
 
 	return false;
+}
+
+template <typename _ItemT, typename _IteratorT>
+long index_of(_IteratorT begin, _IteratorT end, const _ItemT& item)
+{
+	auto it = std::find(begin, end, item);
+	if (it == end)
+	{
+		return -1;
+	}
+
+	return std::distance(begin, it);
 }
 
 __UTILITY_END__

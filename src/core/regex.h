@@ -62,6 +62,7 @@ private:
 	enum state_enum
 	{
 		s_str,
+		s_check_if_arg,
 		s_arg_name,
 		s_regex
 	};

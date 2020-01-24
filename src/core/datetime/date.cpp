@@ -24,11 +24,7 @@
 
 __DATETIME_BEGIN__
 
-Date::Date() : _year(1970), _month(1), _day_of_week(1), _day_of_month(1), _day_of_year(1)
-{
-}
-
-Date::Date(int year, int month, int day_of_week, int day_of_month, int day_of_year)
+void Date::_init(int year, int month, int day_of_week, int day_of_month, int day_of_year)
 {
 	if (year < MIN_YEAR)
 	{
@@ -44,6 +40,24 @@ Date::Date(int year, int month, int day_of_week, int day_of_month, int day_of_ye
 	this->_day_of_week = day_of_week;
 	this->_day_of_month = day_of_month;
 	this->_day_of_year = day_of_year;
+}
+
+Date::Date() : _year(1970), _month(1), _day_of_week(1), _day_of_month(1), _day_of_year(1)
+{
+}
+
+Date::Date(int year, int month, int day)
+{
+	std::tm time_info {0, 0, 0, day, month, year - 1900};
+	time_info.tm_zone = "GMT";
+	std::time_t c_time = std::mktime(&time_info);
+	const std::tm* time_out = std::localtime(&c_time);
+	this->_init(year, month, time_out->tm_wday, day, time_out->tm_yday);
+}
+
+Date::Date(int year, int month, int day_of_week, int day_of_month, int day_of_year)
+{
+	this->_init(year, month, day_of_week, day_of_month, day_of_year);
 }
 
 int Date::year()

@@ -167,9 +167,7 @@ std::string ArgRegex::_parse(const std::string& pattern)
 			case ArgRegex::state_enum::s_str:
 				if (ch == '<')
 				{
-					st = ArgRegex::state_enum::s_arg_name;
-					this->_pattern_parts.push_back(part);
-					part.clear();
+					st = ArgRegex::state_enum::s_check_if_arg;
 					continue;
 				}
 				else if (ch == '(')
@@ -187,6 +185,21 @@ std::string ArgRegex::_parse(const std::string& pattern)
 				}
 
 				new_pattern += ch;
+				break;
+			case ArgRegex::state_enum::s_check_if_arg:
+				if (ch == '<')
+				{
+					part += "<<";
+					new_pattern += "<<";
+					st = ArgRegex::state_enum::s_str;
+				}
+				else
+				{
+					st = ArgRegex::state_enum::s_arg_name;
+					this->_pattern_parts.push_back(part);
+					part.clear();
+					arg_name += ch;
+				}
 				break;
 			case ArgRegex::state_enum::s_arg_name:
 				if (ch == '>')
