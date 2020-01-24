@@ -277,7 +277,7 @@ void HttpResponse::write_lines(const std::vector<std::string>& lines)
 
 std::string HttpResponse::serialize()
 {
-	this->set_header("Date", dt::gmtnow().strftime("%a, %d %b %Y %T %Z"));
+	this->set_header("Date", core::dt::gmtnow().strftime("%a, %d %b %Y %T %Z"));
 	this->set_header("Content-Length", std::to_string(this->_content.size()));
 
 	auto reason_phrase = this->get_reason_phrase();
@@ -400,7 +400,7 @@ std::string FileResponse::_get_headers_chunk()
 {
 	auto reason_phrase = this->get_reason_phrase();
 	this->_set_headers();
-	this->set_header("Date", dt::gmtnow().strftime("%a, %d %b %Y %T %Z"));
+	this->set_header("Date", core::dt::gmtnow().strftime("%a, %d %b %Y %T %Z"));
 	auto headers = this->serialize_headers();
 
 	std::string headers_chunk = "HTTP/1.1 " + std::to_string(this->_status) + " " + reason_phrase + "\r\n"

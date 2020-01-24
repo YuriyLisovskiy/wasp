@@ -48,11 +48,13 @@ Date::Date() : _year(1970), _month(1), _day_of_week(1), _day_of_month(1), _day_o
 
 Date::Date(int year, int month, int day)
 {
-	std::tm time_info {0, 0, 0, day, month, year - 1900};
+	std::tm time_info {0, 0, 0, day, month - 1, year};
 	time_info.tm_zone = "GMT";
 	std::time_t c_time = std::mktime(&time_info);
 	const std::tm* time_out = std::localtime(&c_time);
-	this->_init(year, month, time_out->tm_wday, day, time_out->tm_yday);
+	this->_init(
+		year, month, time_out->tm_wday, day, time_out->tm_yday + 1
+	);
 }
 
 Date::Date(int year, int month, int day_of_week, int day_of_month, int day_of_year)
