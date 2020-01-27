@@ -24,6 +24,7 @@
 
 __CACHE_INTERNAL_BEGIN__
 
+// TESTME: test _if_match_passes
 bool _if_match_passes(
 	const std::string& target_etag, std::vector<std::string>& etags
 )
@@ -32,6 +33,7 @@ bool _if_match_passes(
 	return false;
 }
 
+// TESTME: test _if_none_match_passes
 bool _if_none_match_passes(
 	const std::string& target_etag, std::vector<std::string>& etags
 )
@@ -40,6 +42,7 @@ bool _if_none_match_passes(
 	return false;
 }
 
+// TESTME: test _if_modified_since_passes
 bool _if_modified_since_passes(
 	long last_modified, long if_modified_since
 )
@@ -47,6 +50,7 @@ bool _if_modified_since_passes(
 	return last_modified == -1 || last_modified > if_modified_since;
 }
 
+// TESTME: test _if_unmodified_since_passes
 bool _if_unmodified_since_passes(
 	long last_modified, long if_unmodified_since
 )
@@ -54,12 +58,14 @@ bool _if_unmodified_since_passes(
 	return last_modified != -1 && last_modified <= if_unmodified_since;
 }
 
+// TESTME: test _precondition_failed
 http::HttpResponseBase* _precondition_failed(http::HttpRequest* request)
 {
 	// TODO: implement _precondition_failed
 	return nullptr;
 }
 
+// TESTME: test _not_modified
 http::HttpResponseBase* _not_modified(
 	http::HttpRequest* request, http::HttpResponseBase* response
 )
@@ -73,6 +79,7 @@ __CACHE_INTERNAL_END__
 
 __CACHE_BEGIN__
 
+// TESTME: test set_response_etag
 void set_response_etag(http::HttpResponseBase* response)
 {
 	if (!response->is_streaming() && response->content_length() > 0)
@@ -84,6 +91,7 @@ void set_response_etag(http::HttpResponseBase* response)
 	}
 }
 
+// TESTME: test get_conditional_response
 http::HttpResponseBase* get_conditional_response(
 	http::HttpRequest* request,
 	const std::string& etag,
@@ -98,15 +106,18 @@ http::HttpResponseBase* get_conditional_response(
 	}
 
 	// Get HTTP request headers.
-	auto if_match_etags = utils_http::parse_etags(request->headers.get(http::IF_MATCH, ""));
-	auto if_unmodified_since_header = request->headers.get(http::IF_UNMODIFIED_SINCE);
-
-	long if_unmodified_since = utils_http::parse_http_date(if_unmodified_since_header);
-
-	auto if_none_match_etags = utils_http::parse_etags(request->headers.get(http::IF_NONE_MATCH, ""));
-	auto if_modified_since_header = request->headers.get(http::IF_MODIFIED_SINCE);
-
-	long if_modified_since = utils_http::parse_http_date(if_modified_since_header);
+	auto if_match_etags = utils_http::parse_etags(
+		request->headers.get(http::IF_MATCH, "")
+	);
+	long if_unmodified_since = utils_http::parse_http_date(
+		request->headers.get(http::IF_UNMODIFIED_SINCE, "")
+	);
+	auto if_none_match_etags = utils_http::parse_etags(
+		request->headers.get(http::IF_NONE_MATCH, "")
+	);
+	long if_modified_since = utils_http::parse_http_date(
+		request->headers.get(http::IF_MODIFIED_SINCE)
+	);
 
 	// Step 1 of section 6 of RFC 7232: Test the If-Match precondition.
 	if (!if_match_etags.empty() && !internal::_if_match_passes(etag, if_match_etags))
