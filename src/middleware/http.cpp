@@ -48,11 +48,10 @@ http::HttpResponseBase* ConditionalGetMiddleware::process_response(
 	}
 
 	auto etag = response->get_header(http::E_TAG, "");
-	auto last_modified = response->get_header(http::LAST_MODIFIED, "");
-	// TODO: parse date safe;
-	//  write it to last_modified (create new variable).
-
-	if (!etag.empty() || !last_modified.empty())
+	long last_modified = utils_http::parse_http_date(
+		response->get_header(http::LAST_MODIFIED, "")
+	);
+	if (!etag.empty() || last_modified != -1)
 	{
 		auto conditional_response = utils::cache::get_conditional_response(
 			request, etag, last_modified, response

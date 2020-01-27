@@ -39,7 +39,10 @@ const std::string CACHE_CONTROL = "Cache-Control";
 
 const std::string E_TAG = "ETag";
 
+const std::string IF_MATCH = "If-Match";
 const std::string IF_MODIFIED_SINCE = "If-Modified-Since";
+const std::string IF_UNMODIFIED_SINCE = "If-Unmodified-Since";
+const std::string IF_NONE_MATCH = "If-None-Match";
 
 const std::string LAST_MODIFIED = "Last-Modified";
 

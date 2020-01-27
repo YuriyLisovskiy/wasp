@@ -53,6 +53,11 @@ extern long parse_http_date(const std::string& date);
 /// Otherwise, wrap the string in quotes, making it a strong ETag.
 extern std::string quote_etag(const std::string& e_tag);
 
+/// Parse a string of ETags given in an If-None-Match or If-Match header as
+/// defined by RFC 7232. Return a std::vector<std::string> of quoted ETags,
+/// or {"*"} if all ETags should be matched.
+extern std::vector<std::string> parse_etags(const std::string& etag_str);
+
 __UTILS_HTTP_END__
 
 

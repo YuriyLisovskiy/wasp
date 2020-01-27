@@ -18,8 +18,6 @@ Check out TODOs in (not urgent):
     - src/http/request.cpp
     - src/http/response.cpp
 
-    - src/middleware/http.cpp
-
     - src/utils/cache.cpp
 
     - src/views/static.cpp

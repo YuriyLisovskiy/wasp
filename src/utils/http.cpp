@@ -24,7 +24,7 @@
 
 __UTILS_HTTP_INTERNAL_BEGIN__
 
-core::rgx::Regex ETAG_REGEX = core::rgx::Regex(R"(\A((?:W\/)?"[^"]*")\Z)");
+core::rgx::Regex ETAG_REGEX = core::rgx::Regex(R"(((?:W\/)?"[^"]*"))");
 
 const std::string _D = R"(<day>(\d{2}))";
 const std::string _D2 = R"(<day>([ \d]\d))";
@@ -54,18 +54,26 @@ __UTILS_HTTP_BEGIN__
 
 long parse_http_date(const std::string& date)
 {
+	if (date.empty())
+	{
+		return -1;
+	}
+
+	auto rfc_1123_date = internal::RFC1123_DATE;
+	auto rfc_850_date = internal::RFC850_DATE;
+	auto asc_time_date = internal::ASCTIME_DATE;
 	std::map<std::string, std::string> match;
-	if (internal::RFC1123_DATE.search(date))
+	if (rfc_1123_date.search(date))
 	{
 		match = internal::RFC1123_DATE.groups();
 	}
-	else if (internal::RFC850_DATE.search(date))
+	else if (rfc_850_date.search(date))
 	{
-		match = internal::RFC850_DATE.groups();
+		match = rfc_850_date.groups();
 	}
-	else if (internal::ASCTIME_DATE.search(date))
+	else if (asc_time_date.search(date))
 	{
-		match = internal::ASCTIME_DATE.groups();
+		match = asc_time_date.groups();
 	}
 	else
 	{
@@ -104,12 +112,35 @@ long parse_http_date(const std::string& date)
 
 std::string quote_etag(const std::string& e_tag)
 {
-	if (internal::ETAG_REGEX.match(e_tag))
+	auto e_tag_regex = internal::ETAG_REGEX;
+	if (e_tag_regex.match(e_tag))
 	{
 		return e_tag;
 	}
 
 	return "\"" + e_tag + "\"";
+}
+
+std::vector<std::string> parse_etags(const std::string& etag_str)
+{
+	if (core::str::trim(etag_str) == "*")
+	{
+		return {"*"};
+	}
+
+	// Parse each ETag individually, and return any that are valid.
+	auto etags = core::str::split(etag_str, ',');
+	std::vector<std::string> result;
+	auto e_tag_regex = internal::ETAG_REGEX;
+	for (const auto& etag : etags)
+	{
+		if (e_tag_regex.search(core::str::trim(etag)))
+		{
+			result.push_back(e_tag_regex.group(0));
+		}
+	}
+
+	return result;
 }
 
 __UTILS_HTTP_END__

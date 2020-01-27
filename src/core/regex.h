@@ -42,17 +42,20 @@ class Regex final
 private:
 	bool _is_matched;
 	bool _is_searched;
+	bool _groups_are_made;
 	std::string _to_match;
 	std::regex _expr;
 	std::smatch _matches;
+	std::vector<std::string> _groups;
 
-	std::vector<std::string> _get_groups();
+	void _make_groups();
 
 public:
 	explicit Regex(const std::string& expr);
 	bool match(const std::string& to_match);
 	bool search(const std::string& to_search);
 	std::vector<std::string> groups();
+	std::string group(size_t pos);
 };
 
 

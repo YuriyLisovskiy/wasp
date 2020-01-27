@@ -26,5 +26,8 @@
 #define __TESTS_BEGIN__ namespace wasp { namespace tests {
 #define __TESTS_END__ } }
 
+#define __TEST_UTILS_BEGIN__ __TESTS_BEGIN__ namespace utils {
+#define __TEST_UTILS_END__ } __TESTS_END__
+
 
 #endif // WASP_TESTS_DEF_H

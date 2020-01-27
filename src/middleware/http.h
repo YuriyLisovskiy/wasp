@@ -33,6 +33,7 @@
 #include "../core/string/str.h"
 #include "../http/headers.h"
 #include "../utils/cache.h"
+#include "../utils/http.h"
 
 
 __MIDDLEWARE_BEGIN__

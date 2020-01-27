@@ -116,7 +116,6 @@ RunserverCommand::get_handler()
 {
 	// Check if static files can be served
 	// and create necessary urls.
-	// TODO: mem bug!
 	this->build_static_patterns(this->settings->ROOT_URLCONF);
 
 	// Retrieve main app patterns and append them

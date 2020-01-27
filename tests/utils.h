@@ -15,10 +15,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WASP_UNIT_TESTS_UTILS_TESTS_INCLUDE_H
-#define WASP_UNIT_TESTS_UTILS_TESTS_INCLUDE_H
+#ifndef WASP_UNIT_TESTS_UTILS_H
+#define WASP_UNIT_TESTS_UTILS_H
 
-#include "./crypto_tests/include.h"
-#include "./http_tests.h"
+#include <vector>
 
-#endif // WASP_UNIT_TESTS_UTILS_TESTS_INCLUDE_H
+#include "./_def_.h"
+
+
+__TEST_UTILS_BEGIN__
+
+template <typename _T>
+bool assert_vector(const std::vector<_T>& actual, const std::vector<_T>& expected)
+{
+	if (actual.size() != expected.size())
+	{
+		return false;
+	}
+
+	for (size_t i = 0; i < actual.size(); i++)
+	{
+		if (actual[i] != expected[i])
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+__TEST_UTILS_END__
+
+
+#endif // WASP_UNIT_TESTS_UTILS_H

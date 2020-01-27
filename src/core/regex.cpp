@@ -29,12 +29,15 @@ Regex::Regex(const std::string& expr)
 	this->_expr = std::regex(expr);
 	this->_is_matched = false;
 	this->_is_searched = false;
+	this->_groups_are_made = false;
 }
 
 bool Regex::match(const std::string& to_match)
 {
 	this->_to_match = to_match;
 	this->_is_matched = std::regex_match(this->_to_match, this->_expr);
+	this->_is_searched = false;
+	this->_groups_are_made = false;
 	return this->_is_matched;
 }
 
@@ -42,39 +45,51 @@ bool Regex::search(const std::string& to_search)
 {
 	this->_to_match = to_search;
 	this->_is_searched = std::regex_search(this->_to_match, this->_matches, this->_expr);
+	this->_groups_are_made = false;
 	return this->_is_searched;
 }
 
-std::vector<std::string> Regex::_get_groups()
+void Regex::_make_groups()
 {
-	std::vector<std::string> groups;
+	this->_groups.clear();
 	for (size_t i = 1; i < this->_matches.size(); i++)
 	{
 		if (this->_matches[i].matched)
 		{
-			groups.push_back(this->_matches[i].str());
+			this->_groups.push_back(this->_matches[i].str());
 		}
 	}
-
-	return groups;
 }
 
 std::vector<std::string> Regex::groups()
 {
-	std::vector<std::string> groups;
-	if (this->_is_searched)
+	if (!this->_groups_are_made)
 	{
-		groups = this->_get_groups();
-	}
-	else if (this->_is_matched)
-	{
-		if (std::regex_search(this->_to_match, this->_matches, this->_expr))
+		if (this->_is_searched)
 		{
-			groups = this->_get_groups();
+			this->_make_groups();
+		}
+		else if (this->_is_matched)
+		{
+			if (std::regex_search(this->_to_match, this->_matches, this->_expr))
+			{
+				this->_make_groups();
+			}
 		}
 	}
 
-	return groups;
+	return this->_groups;
+}
+
+std::string Regex::group(size_t pos)
+{
+	this->groups();
+	if (pos >= 0 && pos < this->_groups.size())
+	{
+		return this->_groups[pos];
+	}
+
+	return "";
 }
 
 
@@ -92,6 +107,8 @@ bool ArgRegex::match(const std::string& to_match)
 {
 	this->_to_match = to_match;
 	this->_is_matched = std::regex_match(this->_to_match, this->_rgx);
+	this->_groups_are_made = false;
+	this->_is_searched = false;
 	return this->_is_matched;
 }
 
@@ -99,6 +116,7 @@ bool ArgRegex::search(const std::string& to_search)
 {
 	this->_to_match = to_search;
 	this->_is_searched = std::regex_search(this->_to_match, this->_matches, this->_rgx);
+	this->_groups_are_made = false;
 	return this->_is_searched;
 }
 
@@ -145,6 +163,7 @@ std::string ArgRegex::original()
 
 void ArgRegex::_make_groups()
 {
+	this->_groups.clear();
 	for (size_t i = 1; i < this->_matches.size(); i++)
 	{
 		if (this->_matches[i].matched)
