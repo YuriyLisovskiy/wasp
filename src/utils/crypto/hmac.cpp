@@ -32,7 +32,7 @@ std::string salted_hmac(
 )
 {
 	// TODO: implement salted_hmac
-	return "";
+	return value;
 }
 
 __CRYPTO_END__
