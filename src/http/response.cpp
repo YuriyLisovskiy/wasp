@@ -104,6 +104,20 @@ void HttpResponseBase::set_cookie(
 	this->_cookies.set(name, Cookie(name, value, expires, domain, path, is_secure, is_http_only));
 }
 
+void HttpResponseBase::set_signed_cookie(
+		const std::string& name,
+		const std::string& value,
+		const std::string& salt,
+		const std::string& expires,
+		const std::string& domain,
+		const std::string& path,
+		bool is_secure,
+		bool is_http_only
+)
+{
+	// TODO:
+}
+
 void HttpResponseBase::set_cookies(
 	const collections::Dict<std::string, Cookie>& cookies
 )
@@ -114,20 +128,6 @@ void HttpResponseBase::set_cookies(
 const collections::Dict<std::string, Cookie>& HttpResponseBase::get_cookies()
 {
 	return this->_cookies;
-}
-
-void HttpResponseBase::set_signed_cookie(
-	const std::string& name,
-	const std::string& value,
-	const std::string& salt,
-	const std::string& expires,
-	const std::string& domain,
-	const std::string& path,
-	bool is_secure,
-	bool is_http_only
-)
-{
-	// TODO:
 }
 
 void HttpResponseBase::delete_cookie(const std::string& name, const std::string& path, const std::string& domain)

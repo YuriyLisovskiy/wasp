@@ -85,7 +85,7 @@ void RunserverCommand::handle()
 
 	core::net::internal::HttpServer::context ctx{};
 
-	// TODO: remove!
+	// TODO: remove http server's verbose setting
 	ctx.verbose = true;
 
 	this->setup_server_ctx(ctx);
