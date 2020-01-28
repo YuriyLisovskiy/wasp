@@ -23,13 +23,13 @@ __CORE_BEGIN__
 
 // BaseException
 BaseException::BaseException(const char *message, int line, const char *function, const char *file, const char* exceptionType)
-		: _message(message), _line(line), _function(function), _file(file), _exceptionType(exceptionType)
+	: _message(message), _line(line), _function(function), _file(file), _exceptionType(exceptionType)
 {
 	this->init();
 }
 
 BaseException::BaseException(const char* message, int line, const char* function, const char* file)
-		: BaseException(message, line, function, file, "BaseException")
+	: BaseException(message, line, function, file, "BaseException")
 {
 }
 
@@ -59,19 +59,63 @@ const char* BaseException::file() const noexcept
 }
 
 
+// ErrorResponseException
+ErrorResponseException::ErrorResponseException(
+	short int status_code,
+	const char* message,
+	int line,
+	const char* function,
+	const char* file,
+	const char* type
+)
+	: HttpError(message, line, function, file, type)
+{
+	this->_status_code = status_code;
+}
+
+ErrorResponseException::ErrorResponseException(
+	short int status_code,
+	const char* message,
+	int line,
+	const char* function,
+	const char* file
+)
+	: ErrorResponseException(status_code, message, line, function, file, "ErrorResponseException")
+{
+}
+
+ErrorResponseException::ErrorResponseException(
+	short int status_code,
+	const std::string& message,
+	int line,
+	const char *function,
+	const char *file
+)
+	: ErrorResponseException(status_code, message.c_str(), line, function, file)
+{
+}
+
+short int ErrorResponseException::status_code() const
+{
+	return this->_status_code;
+}
+
+
 // InterruptException
-InterruptException::InterruptException(const char* message, int line, const char* function, const char* file, const char* type)
-		: BaseException(message, line, function, file, type)
+InterruptException::InterruptException(
+	const char* message, int line, const char* function, const char* file, const char* type
+) : BaseException(message, line, function, file, type)
 {
 }
 
 InterruptException::InterruptException(const char* message, int line, const char* function, const char* file)
-		: InterruptException(message, line, function, file, "InterruptException")
+	: InterruptException(message, line, function, file, "InterruptException")
 {
 }
 
-InterruptException::InterruptException(const std::string& message, int line, const char *function, const char *file)
-		: InterruptException(message.c_str(), line, function, file)
+InterruptException::InterruptException(
+	const std::string& message, int line, const char *function, const char *file
+) : InterruptException(message.c_str(), line, function, file)
 {
 }
 

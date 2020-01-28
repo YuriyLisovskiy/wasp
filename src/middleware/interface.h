@@ -15,6 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * interface.h
+ * Purpose:
+ * 	Provides interfaces for middleware module.
+ */
+
 #pragma once
 
 // Module definitions.
@@ -33,10 +39,12 @@ public:
 	virtual ~IMiddleware() = default;
 
 	/// An input http request before processing in views::View.
-	virtual void process_request(http::HttpRequest* request) = 0;
+	virtual http::HttpResponseBase* process_request(http::HttpRequest* request) = 0;
 
 	/// An output http request and response after processing in views::View.
-	virtual void process_response(const http::HttpRequest* request, http::HttpResponseBase* response) = 0;
+	virtual http::HttpResponseBase* process_response(
+		http::HttpRequest* request, http::HttpResponseBase* response
+	) = 0;
 };
 
 __MIDDLEWARE_END__

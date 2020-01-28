@@ -36,23 +36,23 @@
 #include "./_def_.h"
 
 // Wasp libraries.
-#include "../conf/defaults.h"
-#include "../conf/settings.h"
-#include "../http/response.h"
-#include "../http/request.h"
-#include "../http/headers.h"
-#include "./parsers/request_parser.h"
-#include "../core/logger.h"
-#include "../core/sockets/server_socket.h"
-#include "../core/exceptions.h"
-#include "../core/thread_pool.h"
-#include "../core/files/uploaded_file.h"
-#include "../core/datetime/time.h"
-#include "../core/string/str.h"
-#include "../core/string/format.h"
+#include "./socket.h"
+#include "../logger.h"
+#include "../exceptions.h"
+#include "../thread_pool.h"
+#include "../files/uploaded_file.h"
+#include "../datetime/time.h"
+#include "../string/str.h"
+#include "../string/format.h"
+#include "../parsers/request_parser.h"
+#include "../../conf/defaults.h"
+#include "../../conf/settings.h"
+#include "../../http/response.h"
+#include "../../http/request.h"
+#include "../../http/headers.h"
 
 
-__CORE_INTERNAL_BEGIN__
+__NET_INTERNAL_BEGIN__
 
 #define MAX_BUFF_SIZE 8192 * 8 - 1  // 65535 bytes.
 
@@ -73,7 +73,7 @@ private:
 	bool _use_ipv6;
 	bool _verbose;
 	size_t _max_body_size;
-	ServerSocket _server_socket;
+	Socket _socket;
 	http_handler _http_handler;
 	bool _finished;
 	core::ILogger* _logger;
@@ -90,6 +90,8 @@ private:
 	int _create();
 	int _bind();
 	int _listen();
+	int _set_reuse_socket();
+	void _close_server_socket();
 	void _clean_up(const socket_t& client);
 	http::HttpRequest* _handle_request(const socket_t& client);
 	std::string _read_body(const socket_t& client, const std::string& body_beginning, size_t body_length);
@@ -100,7 +102,6 @@ private:
 
 	static read_result_enum _handle_error(char* buffer, int line, const char* function, const char* file);
 	static void _send(const char* data, const socket_t& client);
-	static bool _set_socket_blocking(int _sock, bool blocking);
 	static void _write(const char* data, size_t bytes_to_write, const socket_t& client);
 	static void _wsa_clean_up();
 
@@ -129,4 +130,4 @@ private:
 	static void _check_context(HttpServer::context& ctx);
 };
 
-__CORE_INTERNAL_END__
+__NET_INTERNAL_END__

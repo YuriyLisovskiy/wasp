@@ -26,6 +26,7 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <algorithm>
 #include <functional>
 
 // Module definitions.
@@ -90,12 +91,19 @@ extern std::string lower(const std::string& _str);
 /// @return converted string.
 extern std::string upper(const std::string& _str);
 
-/// Splits the string vector of strings relatively for the character.
+/// Splits the string to a vector of strings relatively for the character.
 ///
 /// @param str: string to split.
 /// @param delimiter: delimiter where to split string.
 /// @return std::vector of strings.
 extern std::vector<std::string> split(const std::string& str, char delimiter = ' ');
+
+/// Splits the string to a vector of strings with n length starting from right.
+///
+/// @param str: string to split.
+/// @param delimiter: delimiter where to split string.
+/// @return std::vector of strings.
+extern std::vector<std::string> rsplit(const std::string& str, char delimiter = ' ', size_t n = -1);
 
 /// Checks if string starts with some string prefix.
 ///
@@ -114,55 +122,37 @@ extern bool ends_with(const std::string& src, const std::string& suffix);
 /// Trims left part of string in-place.
 ///
 /// @param s: string to trim.
-/// @param ch: char to be trimmed.
-extern void ltrim(std::string& s, char ch = ' ');
+/// @param to_trim: string to be trimmed.
+extern void ltrim(std::string& s, const std::string& to_trim = " ");
+
+/// Trims left part of string and returns a copy of trimmed string.
+///
+/// @param s: string to trim.
+/// @param to_trim: string to be trimmed.
+extern std::string ltrim(const std::string& s, const std::string& to_trim = " ");
 
 /// Trims right part of string in-place.
 ///
 /// @param s: string to trim.
-/// @param ch: char to be trimmed.
-extern void rtrim(std::string& s, char ch = ' ');
+/// @param to_trim: string to be trimmed.
+extern void rtrim(std::string& s, const std::string& to_trim = " ");
+
+/// Trims right part of string and returns a copy of trimmed string.
+///
+/// @param s: string to trim.
+/// @param to_trim: string to be trimmed.
+extern std::string rtrim(const std::string& s, const std::string& to_trim = " ");
 
 /// Trims both left and right parts of string in-place.
 ///
 /// @param s: string to trim.
-/// @param ch: char to be trimmed.
-extern void trim(std::string& s, char ch = ' ');
-
-/// Trims left part of string and returns a copy of trimmed string.
-///
-/// @param s: string to trim.
-/// @param ch: char to be trimmed.
-extern std::string ltrim(const std::string& s, char ch = ' ');
-
-/// Trims right part of string and returns a copy of trimmed string.
-///
-/// @param s: string to trim.
-/// @param ch: char to be trimmed.
-extern std::string rtrim(const std::string& s, char ch = ' ');
+/// @param to_trim: string to be trimmed.
+extern void trim(std::string& s, const std::string& to_trim = " ");
 
 /// Trims both left and right parts of string and returns a copy of trimmed string.
 ///
 /// @param s: string to trim.
-/// @param ch: char to be trimmed.
-extern std::string trim(const std::string& s, char ch = ' ');
-
-/// Trims left part of string and returns a copy of trimmed string.
-///
-/// @param s: string to trim.
-/// @param ch: char to be trimmed.
-extern std::string ltrim(std::string&& s, char ch = ' ');
-
-/// Trims right part of string and returns a copy of trimmed string.
-///
-/// @param s: string to trim.
-/// @param ch: char to be trimmed.
-extern std::string rtrim(std::string&& s, char ch = ' ');
-
-/// Trims both left and right parts of string and returns a copy of trimmed string.
-///
-/// @param s: string to trim.
-/// @param ch: char to be trimmed.
-extern std::string trim(std::string&& s, char ch = ' ');
+/// @param to_trim: string to be trimmed.
+extern std::string trim(const std::string& s, const std::string& to_trim = " ");
 
 __STR_END__

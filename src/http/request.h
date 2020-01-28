@@ -31,10 +31,13 @@
 #include "./_def_.h"
 
 // Wasp libraries.
-#include "../core/string/str.h"
+#include "./headers.h"
+#include "./utility.h"
 #include "../collections/dict.h"
 #include "../collections/multi_dict.h"
 #include "../core/files/uploaded_file.h"
+#include "../core/exceptions.h"
+#include "../conf/settings.h"
 
 
 __HTTP_BEGIN__
@@ -47,18 +50,18 @@ public:
 	{
 	private:
 		collections::Dict<_Key, _Val> _dict;
-		collections::MultiValueDict<_Key, _Val> _multiDict;
+		collections::MultiValueDict<_Key, _Val> _multi_dict;
 
 	public:
 		explicit Parameters() = default;
 
 		explicit Parameters(
 			collections::Dict<_Key, _Val> dict,
-			collections::MultiValueDict<_Key, _Val> multiDict
+			collections::MultiValueDict<_Key, _Val> multi_dict
 		)
 		{
 			this->_dict = dict;
-			this->_multiDict = multiDict;
+			this->_multi_dict = multi_dict;
 		}
 
 		_Val get(_Key key, _Val _default = _Val{})
@@ -68,7 +71,7 @@ public:
 
 		std::vector<_Val> get_list(_Key key, std::vector<_Val> _default = std::vector<_Val>{})
 		{
-			return this->_multiDict.get(key, _default);
+			return this->_multi_dict.get(key, _default);
 		}
 
 		bool contains(_Key key)
@@ -78,7 +81,7 @@ public:
 
 		bool contains_list(_Key key)
 		{
-			return this->_multiDict.contains(key);
+			return this->_multi_dict.contains(key);
 		}
 
 		size_t size()
@@ -115,10 +118,23 @@ public:
 
 	std::string version();
 	std::string path();
+	std::string full_path(bool force_append_slash = false);
 	std::string query();
 	std::string method();
 	bool keep_alive();
 	std::string body();
+	bool is_secure(conf::Settings* settings);
+	std::string scheme(conf::Settings* settings);
+
+	/// Return the HTTP host using the environment or request headers.
+	std::string get_host(
+		bool use_x_forwarded_host, bool debug, std::vector<std::string> allowed_hosts
+	);
+
+protected:
+	/// Return the HTTP host using the environment or request headers. Skip
+	/// allowed hosts protection, so may return an insecure host.
+	std::string get_raw_host(bool use_x_forwarded_host);
 
 private:
 	size_t _major_version;

@@ -17,7 +17,8 @@
 
 /**
  * cookies.h
- * Purpose: enables cookies in http request object.
+ * Purpose:
+ * 	Enables cookies in http request object.
  */
 
 #pragma once
@@ -40,7 +41,7 @@ class CookieMiddleware final: public MiddlewareMixin
 {
 public:
 	explicit CookieMiddleware(conf::Settings* settings);
-	void process_request(http::HttpRequest* request) final;
+	http::HttpResponseBase* process_request(http::HttpRequest* request) final;
 };
 
 __MIDDLEWARE_END__

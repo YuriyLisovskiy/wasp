@@ -77,9 +77,14 @@ public:
 		const std::string& charset = "utf-8"
 	);
 	virtual ~HttpResponseBase() = default;
+	std::string get_header(
+		const std::string& key, const std::string& default_value
+	);
 	void set_header(const std::string& key, const std::string& value);
 	void remove_header(const std::string& key);
 	bool has_header(const std::string& key);
+	virtual void set_content(const std::string& content);
+	virtual std::string get_content();
 
 	void set_cookie(
 		const std::string& name,
@@ -89,6 +94,10 @@ public:
 		const std::string& path = "/",
 		bool is_secure = false,
 		bool is_http_only = false
+	);
+	const collections::Dict<std::string, Cookie>& get_cookies();
+	void set_cookies(
+		const collections::Dict<std::string, Cookie>& cookies
 	);
 	void set_signed_cookie(
 		const std::string& name,
@@ -107,6 +116,7 @@ public:
 
 	unsigned short int status();
 	std::string content_type();
+	virtual size_t content_length();
 	std::string charset();
 	bool is_streaming();
 
@@ -123,6 +133,8 @@ public:
 	virtual void write_lines(const std::vector<std::string>& lines);
 
 	virtual std::string serialize() = 0;
+
+	std::string& operator[] (const std::string& key);
 };
 
 
@@ -140,7 +152,9 @@ public:
 		const std::string& reason = "",
 		const std::string& charset = "utf-8"
 	);
-	virtual void set_content(const std::string& content);
+	size_t content_length() override;
+	void set_content(const std::string& content) override;
+	std::string get_content() override;
 	void write(const std::string& content) override;
 	unsigned long int tell() override;
 	bool writable() override;
@@ -205,7 +219,6 @@ protected:
 public:
 	explicit HttpResponseRedirectBase(
 		const std::string& redirect_to,
-		const std::string& content,
 		unsigned short int status,
 		const std::string& content_type = "",
 		const std::string& reason = "",
@@ -220,7 +233,6 @@ class HttpResponseRedirect : public HttpResponseRedirectBase
 public:
 	explicit HttpResponseRedirect(
 		const std::string& redirect_to,
-		const std::string& content = "",
 		const std::string& content_type = "",
 		const std::string& charset = "utf-8"
 	);
@@ -232,7 +244,6 @@ class HttpResponsePermanentRedirect : public HttpResponseRedirectBase
 public:
 	explicit HttpResponsePermanentRedirect(
 		const std::string& redirect_to,
-		const std::string& content = "",
 		const std::string& content_type = "",
 		const std::string& charset = "utf-8"
 	);

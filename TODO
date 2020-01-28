@@ -1,42 +1,53 @@
 TODO:
-    Implement default middleware.
+    Implement default middleware:
+        - csrf
+        - cache
+        - gzip
+        - locale
+
+TODO:
     Add utf8 strings' support.
     Implement basic template engine.
 
 
-Not tested:
-    - src/apps/*
-
-    - src/core/datetime/*
-    - src/core/management/*
-    - src/core/sockets/*
-    - src/core/http_server
-    - src/core/thread_pool
-
-    - src/http/response
-    - src/http/utility
-
-    - src/middleware
-
-    - src/urls
-
-    - src/utility/flags/parser
-    - src/utility/string/format
-    - src/utility/regex
-
-    - src/views/static
-
-
 Check out TODOs in (not urgent):
+    - src/core/encoding.cpp
     - src/core/http_server.cpp
+    - src/core/management/runserver.cpp
 
     - src/http/response.cpp
 
-    - src/middleware/clickjacking.cpp
-
-    - src/utility/encoding.cpp
-
     - src/views/static.cpp
+
+
+// TESTME:
+    - src/apps/*
+
+// TESTME:
+    - src/core/datetime/*
+    - src/core/management/*
+    - src/core/net/*
+    - src/core/thread_pool
+    - src/core/flags/parser
+    - src/core/string/format
+    - src/core/regex
+
+// TESTME:
+    - src/http/request
+    - src/http/response
+    - src/http/utility
+
+// TESTME:
+    - src/middleware/*
+
+// TESTME:
+    - src/urls/*
+
+// TESTME:
+    - src/utils/*
+
+// TESTME:
+    - src/views/static
 
 
 Implement next settings (not urgent):
@@ -230,9 +241,6 @@ DEFAULT_FROM_EMAIL = 'webmaster@localhost'
 Make sure to include the trailing space.
 EMAIL_SUBJECT_PREFIX = '[Wasp] '
 
-# Whether to prepend the "www." subdomain to URLs that don't have it.
-PREPEND_WWW = False
-
 # Override the server-derived value of SCRIPT_NAME
 FORCE_SCRIPT_NAME = None
 
@@ -312,15 +320,6 @@ NUMBER_GROUPING = 0
 # The tablespaces to use for each model when not specified otherwise.
 DEFAULT_TABLESPACE = ''
 DEFAULT_INDEX_TABLESPACE = ''
-
-# If your Django app is behind a proxy that sets a header to specify secure
-# connections, AND that proxy ensures that user-submitted headers with the
-# same name are ignored (so that people can't spoof it), set this value to
-# a tuple of (header_name, header_value). For any requests that come in with
-# that header/value, request.is_secure() will return True.
-# WARNING! Only set this if you fully understand what you're doing. Otherwise,
-# you may be opening yourself up to a security risk.
-SECURE_PROXY_SSL_HEADER = None
 
 ############
 # SESSIONS #
@@ -448,15 +447,3 @@ MIGRATION_MODULES = {}
 # serious issues like errors and criticals does not result in hiding the
 # message, but Django will not stop you from e.g. running server.
 SILENCED_SYSTEM_CHECKS = []
-
-#######################
-# SECURITY MIDDLEWARE #
-#######################
-SECURE_BROWSER_XSS_FILTER = False
-SECURE_CONTENT_TYPE_NOSNIFF = False
-SECURE_HSTS_INCLUDE_SUBDOMAINS = False
-SECURE_HSTS_PRELOAD = False
-SECURE_HSTS_SECONDS = 0
-SECURE_REDIRECT_EXEMPT = []
-SECURE_SSL_HOST = None
-SECURE_SSL_REDIRECT = False

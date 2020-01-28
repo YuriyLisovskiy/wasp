@@ -26,6 +26,7 @@ __APPS_BEGIN__
 
 WaspApplication::WaspApplication(conf::Settings* settings)
 {
+	core::InterruptException::initialize();
 	this->_settings = settings;
 	if (!this->_settings->LOGGER)
 	{
@@ -34,6 +35,7 @@ WaspApplication::WaspApplication(conf::Settings* settings)
 
 	this->_settings->init();
 	this->_settings->overwrite();
+	this->_settings->prepare();
 
 	this->setup_commands();
 
@@ -61,6 +63,7 @@ void WaspApplication::execute_from_command_line(int argc, char** argv)
 			if (this->_settings->COMMANDS.find(argv[1]) != this->_settings->COMMANDS.end())
 			{
 				this->_settings->COMMANDS[argv[1]]->run_from_argv(argc, argv);
+				this->_settings->LOGGER->debug("Interrupted 3");
 			}
 			else
 			{

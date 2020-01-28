@@ -26,7 +26,7 @@
 #include <map>
 #include <string>
 #include <vector>
-#include <regex>
+//#include <regex>
 
 // Module definitions.
 #include "./_def_.h"
@@ -36,6 +36,7 @@
 #include "../apps/interface.h"
 #include "../middleware/interface.h"
 #include "../core/management/base.h"
+#include "../core/regex.h"
 
 
 __CONF_BEGIN__
@@ -67,6 +68,17 @@ struct Settings
 	// manually specified. It's used to construct the Content-Type header.
 	std::string DEFAULT_CHARSET;
 
+	// Root application where Wasp will load urlpatterns.
+	//
+	// ROOT_APP is the first installed app by default, it can
+	// be overridden in project settings.
+	apps::IAppConfig* ROOT_APP;
+
+	// Vector of patterns which will be loaded from ROOT_APP.
+	// To change this setting, setup ROOT_APP in your project
+	// settings.
+	std::vector<urls::UrlPattern> ROOT_URLCONF;
+
 	// List of AppConfig-derived objects representing apps.
 	// Order is required. The first app is interpreted as
 	// main application configuration.
@@ -87,25 +99,25 @@ struct Settings
 	//
 	// Here are a few examples:
 	//     DISALLOWED_USER_AGENTS = {
-	//         std::regex(R"(NaverBot.*)"),
-	//         std::regex(R"(EmailSiphon.*)"),
-	//         std::regex(R"(SiteSucker.*)"),
-	//         std::regex(R"(sohu-search.*)")
+	//         wasp::core::rgx::Regex(R"(NaverBot.*)"),
+	//         wasp::core::rgx::Regex(R"(EmailSiphon.*)"),
+	//         wasp::core::rgx::Regex(R"(SiteSucker.*)"),
+	//         wasp::core::rgx::Regex(R"(sohu-search.*)")
 	//     };
-	std::vector<std::regex> DISALLOWED_USER_AGENTS;
+	std::vector<core::rgx::Regex> DISALLOWED_USER_AGENTS;
 
 	// List of compiled regular expression objects representing URLs that need not
 	// be reported by BrokenLinkEmailsMiddleware.
 	//
 	// Here are a few examples:
 	//    IGNORABLE_404_URLS = {
-	//        std::regex(R"(/apple-touch-icon.*\.png)"),
-	//        std::regex(R"(/favicon.ico)"),
-	//        std::regex(R"(/robots.txt)"),
-	//        std::regex(R"(/phpmyadmin/)"),
-	//        std::regex(R"(/apple-touch-icon.*\.png)")
+	//        wasp::core::rgx::Regex(R"(/apple-touch-icon.*\.png)"),
+	//        wasp::core::rgx::Regex(R"(/favicon.ico)"),
+	//        wasp::core::rgx::Regex(R"(/robots.txt)"),
+	//        wasp::core::rgx::Regex(R"(/phpmyadmin/)"),
+	//        wasp::core::rgx::Regex(R"(/apple-touch-icon.*\.png)")
 	//    };
-	std::vector<std::regex> IGNORABLE_404_URLS;
+	std::vector<core::rgx::Regex> IGNORABLE_404_URLS;
 
 	// A secret key for this particular installation. Used in secret-key
 	// hashing algorithms. Set this in your settings.
@@ -137,6 +149,9 @@ struct Settings
 	// Maximum size in bytes of request data (excluding file uploads) that will be
 	// read before a SuspiciousOperation (RequestDataTooBig) is raised.
 	size_t DATA_UPLOAD_MAX_MEMORY_SIZE;
+
+	// Whether to prepend the "www." subdomain to URLs that don't have it.
+	bool PREPEND_WWW;
 
 	// Maximum number of GET/POST parameters that will be read before a
 	// SuspiciousOperation (TooManyFieldsSent) is thrown.
@@ -182,6 +197,15 @@ struct Settings
 	bool USE_X_FORWARDED_HOST;
 	bool USE_X_FORWARDED_PORT;
 
+	// If your app is behind a proxy that sets a header to specify secure
+	// connections, AND that proxy ensures that user-submitted headers with the
+	// same name are ignored (so that people can't spoof it), set this value to
+	// a std::pair of (header_name, header_value). For any requests that come in with
+	// that header/value, request.is_secure() will return true.
+	// WARNING! Only set this if you fully understand what you're doing. Otherwise,
+	// you may be opening yourself up to a security risk.
+	std::pair<std::string, std::string>* SECURE_PROXY_SSL_HEADER;
+
 	// List of middleware to use. Order is important; in the request phase, these
 	// middleware will be applied in the order given, and in the response
 	// phase the middleware will be applied in reverse order.
@@ -202,10 +226,22 @@ struct Settings
 	// SSL settings (will be added in future).
 	bool USE_SSL;
 
+	// Security middleware.
+	bool SECURE_BROWSER_XSS_FILTER;
+	bool SECURE_CONTENT_TYPE_NO_SNIFF;
+	bool SECURE_HSTS_INCLUDE_SUBDOMAINS;
+	bool SECURE_HSTS_PRELOAD;
+	size_t SECURE_HSTS_SECONDS;
+	std::vector<std::string> SECURE_REDIRECT_EXEMPT;
+	std::string SECURE_REFERRER_POLICY;
+	std::string SECURE_SSL_HOST;
+	bool SECURE_SSL_REDIRECT;
+
 	Settings();
 	virtual ~Settings();
 	virtual void init() = 0;
 	virtual void overwrite();
+	void prepare();
 
 	template <typename _T, typename = std::enable_if<std::is_base_of<apps::IAppConfig, _T>::value>>
 	apps::IAppConfig* app()

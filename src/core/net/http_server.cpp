@@ -22,7 +22,7 @@
 #include "./http_server.h"
 
 
-__CORE_INTERNAL_BEGIN__
+__NET_INTERNAL_BEGIN__
 
 // Public methods.
 HttpServer::HttpServer(HttpServer::context& ctx) : _finished(true)
@@ -56,19 +56,18 @@ HttpServer::~HttpServer()
 
 void HttpServer::finish()
 {
+	delete this->_thread_pool;
 	if (this->_finished)
 	{
 		return;
 	}
 
-	if (this->_server_socket.close() == SOCKET_ERROR)
+	if (this->_socket.close() == SOCKET_ERROR)
 	{
 		this->_logger->error("Failed to close socket connection", _ERROR_DETAILS_);
 	}
 
 	HttpServer::_wsa_clean_up();
-
-	delete this->_thread_pool;
 	this->_finished = true;
 }
 
@@ -127,6 +126,12 @@ int HttpServer::_init()
 		return init_status;
 	}
 
+	init_status = this->_set_reuse_socket();
+	if (init_status == SOCKET_ERROR)
+	{
+		return init_status;
+	}
+
 	init_status = this->_bind();
 	if (init_status == SOCKET_ERROR)
 	{
@@ -144,7 +149,7 @@ int HttpServer::_init()
 
 int HttpServer::_create()
 {
-	if (this->_server_socket.create(this->_host, this->_port, this->_use_ipv6) == INVALID_SOCKET)
+	if (this->_socket.create(this->_host, this->_port, this->_use_ipv6) == INVALID_SOCKET)
 	{
 		this->_logger->error(
 			"Failed to initialize server at port " + std::to_string(this->_port),
@@ -160,19 +165,14 @@ int HttpServer::_create()
 
 int HttpServer::_bind()
 {
-	if (this->_server_socket.bind() == SOCKET_ERROR)
+	if (this->_socket.bind() == SOCKET_ERROR)
 	{
 		this->_logger->error(
 			"Failed to bind socket to port " + std::to_string(this->_port),
 			_ERROR_DETAILS_
 		);
 
-		if (this->_server_socket.close() == SOCKET_ERROR)
-		{
-			this->_logger->error("Failed to close socket connection", _ERROR_DETAILS_);
-		}
-
-		HttpServer::_wsa_clean_up();
+		this->_close_server_socket();
 		return SOCKET_ERROR;
 	}
 
@@ -181,17 +181,44 @@ int HttpServer::_bind()
 
 int HttpServer::_listen()
 {
-	if (this->_server_socket.listen() == SOCKET_ERROR)
+	if (this->_socket.listen() == SOCKET_ERROR)
 	{
 		this->_logger->error(
 			"Failed to listen at port " + std::to_string(this->_port),
 			_ERROR_DETAILS_
 		);
 
+		this->_close_server_socket();
 		return SOCKET_ERROR;
 	}
 
 	return 0;
+}
+
+int HttpServer::_set_reuse_socket()
+{
+	if (this->_socket.set_reuse_addr() == SOCKET_ERROR)
+	{
+		this->_logger->error(
+			"Failed to set reuse address mode to socket",
+			_ERROR_DETAILS_
+		);
+
+		this->_close_server_socket();
+		return SOCKET_ERROR;
+	}
+
+	return 0;
+}
+
+void HttpServer::_close_server_socket()
+{
+	if (this->_socket.close() == SOCKET_ERROR)
+	{
+		this->_logger->error("Failed to close socket connection", _ERROR_DETAILS_);
+	}
+
+	HttpServer::_wsa_clean_up();
 }
 
 void HttpServer::_clean_up(const socket_t& client)
@@ -215,7 +242,7 @@ void HttpServer::_clean_up(const socket_t& client)
 
 http::HttpRequest* HttpServer::_handle_request(const socket_t& client)
 {
-	request_parser rp;
+	core::internal::request_parser rp;
 	std::string body_beginning;
 
 	auto headers_str = HttpServer::_read_headers(client, body_beginning);
@@ -352,7 +379,7 @@ void HttpServer::_start_listener()
 {
 	while (true)
 	{
-		socket_t connection = this->_server_socket.accept();
+		socket_t connection = this->_socket.accept();
 		if (connection != INVALID_SOCKET)
 		{
 			this->_thread_pool->push(
@@ -368,62 +395,20 @@ void HttpServer::_start_listener()
 
 void HttpServer::_serve_connection(const socket_t& client)
 {
-	http::HttpResponseBase* error_response = nullptr;
-	try
+	dt::Measure<std::chrono::milliseconds> measure;
+	if (this->_verbose)
 	{
-		// TODO: remove when release ------------------------:
-		dt::Measure<std::chrono::milliseconds> measure;
-		if (this->_verbose)
-		{
-			measure.start();
-		}
-		// TODO: remove when release ------------------------^
-
-		http::HttpRequest* request = this->_handle_request(client);
-		this->_http_handler(request, client);
-		delete request;
-
-		// TODO: remove when release -------------------------------------------------------------:
-		if (this->_verbose)
-		{
-			measure.end();
-			std::cout << '\n' << request->method() << " request took " << measure.elapsed() << " ms\n";
-		}
-		// TODO: remove when release -------------------------------------------------------------^
-	}
-	catch (const SuspiciousOperation& exc)
-	{
-		this->_logger->error(exc.what(), exc.line(), exc.function(), exc.file());
-		error_response = new http::HttpResponseBadRequest(
-			"<p style=\"font-size: 24px;\" >Bad Request</p>"
-		);
-	}
-	catch (const EntityTooLargeError& exc)
-	{
-		this->_logger->error(exc.what(), exc.line(), exc.function(), exc.file());
-		error_response = new http::HttpResponseEntityTooLarge(
-			"<p style=\"font-size: 24px;\" >Entity Too Large</p>"
-		);
-	}
-	catch (const BaseException& exc)
-	{
-		this->_logger->error(exc.what(), exc.line(), exc.function(), exc.file());
-		error_response = new http::HttpResponseServerError(
-			"<p style=\"font-size: 24px;\" >Internal Server Error</p>"
-		);
-	}
-	catch (const std::exception& exc)
-	{
-		this->_logger->error(exc.what(), _ERROR_DETAILS_);
-		error_response = new http::HttpResponseServerError(
-			"<p style=\"font-size: 24px;\" >Internal Server Error</p>"
-		);
+		measure.start();
 	}
 
-	if (error_response != nullptr)
+	http::HttpRequest* request = this->_handle_request(client);
+	this->_http_handler(request, client);
+	delete request;
+
+	if (this->_verbose)
 	{
-		HttpServer::_send(error_response->serialize().c_str(), client);
-		delete error_response;
+		measure.end();
+		std::cout << '\n' << request->method() << " request took " << measure.elapsed() << " ms\n";
 	}
 }
 
@@ -493,8 +478,8 @@ void HttpServer::_check_context(HttpServer::context& ctx)
 		throw ValueError("logger can not be nullptr", _ERROR_DETAILS_);
 	}
 
-	str::rtrim(ctx.media_root, '/');
-	str::rtrim(ctx.media_root, '\\');
+	str::rtrim(ctx.media_root, "/");
+	str::rtrim(ctx.media_root, "\\");
 }
 
 void HttpServer::_send(const char* data, const socket_t& client)
@@ -503,28 +488,6 @@ void HttpServer::_send(const char* data, const socket_t& client)
 	{
 		throw HttpError("Failed to send bytes to socket connection", _ERROR_DETAILS_);
 	}
-}
-
-bool HttpServer::_set_socket_blocking(int _sock, bool blocking)
-{
-	if (_sock < 0)
-	{
-		return false;
-	}
-
-#if defined(_WIN32) || defined(_WIN64)
-	unsigned long mode = blocking ? 0 : 1;
-	return ioctlsocket(_sock, FIONBIO, &mode) == 0;
-#else
-	int flags = fcntl(_sock, F_GETFL, 0);
-	if (flags == -1)
-	{
-		return false;
-	}
-
-	flags = blocking ? (flags & ~O_NONBLOCK) : (flags | O_NONBLOCK);
-	return fcntl(_sock, F_SETFL, flags) == 0;
-#endif
 }
 
 void HttpServer::_write(const char* data, size_t bytesToWrite, const socket_t& client)
@@ -542,4 +505,4 @@ void HttpServer::_wsa_clean_up()
 #endif
 }
 
-__CORE_INTERNAL_END__
+__NET_INTERNAL_END__

@@ -36,6 +36,8 @@ Settings::Settings()
 
 	this->DEFAULT_CHARSET = "utf-8";
 
+	this->ROOT_APP = nullptr;
+
 	this->APPEND_SLASH = true;
 
 	this->FILE_UPLOAD_MAX_MEMORY_SIZE = 2621440;   // 2.5 MB
@@ -43,6 +45,8 @@ Settings::Settings()
 	this->DATA_UPLOAD_MAX_MEMORY_SIZE = 2621440;   // 2.5 MB
 
 	this->DATA_UPLOAD_MAX_NUMBER_FIELDS = 1000;
+
+	this->PREPEND_WWW = false;
 
 	this->DATE_FORMAT = "%b %d, %Y";
 
@@ -71,6 +75,8 @@ Settings::Settings()
 	this->USE_X_FORWARDED_HOST = false;
 	this->USE_X_FORWARDED_PORT = false;
 
+	this->SECURE_PROXY_SSL_HEADER = nullptr;
+
 	this->CSRF_COOKIE_NAME = "csrftoken";
 	this->CSRF_COOKIE_AGE = 60 * 60 * 24 * 7 * 52;
 	this->CSRF_COOKIE_DOMAIN = "";
@@ -82,14 +88,30 @@ Settings::Settings()
 	this->CSRF_USE_SESSIONS = false;
 
 	this->USE_SSL = false;
+
+	this->SECURE_BROWSER_XSS_FILTER = false;
+	this->SECURE_CONTENT_TYPE_NO_SNIFF = true;
+	this->SECURE_HSTS_INCLUDE_SUBDOMAINS = false;
+	this->SECURE_HSTS_PRELOAD = false;
+	this->SECURE_HSTS_SECONDS = 0;
+	this->SECURE_SSL_REDIRECT = false;
 }
 
 void Settings::overwrite()
 {
 }
 
+void Settings::prepare()
+{
+	if (!this->ROOT_APP && !this->INSTALLED_APPS.empty())
+	{
+		this->ROOT_APP = this->INSTALLED_APPS.front();
+	}
+}
+
 Settings::~Settings()
 {
+	delete this->SECURE_PROXY_SSL_HEADER;
 	for (auto& installed_app : this->INSTALLED_APPS)
 	{
 		delete installed_app;

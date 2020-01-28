@@ -18,19 +18,22 @@
 /**
  * clickjacking.h
  *
- * Clickjacking Protection Middleware.
- *
- * Purpose: this module provides a middleware that implements protection against a
- * 			malicious site loading resources from your site in a hidden frame.
+ * Purpose:
+ * 	Provides a middleware that implements protection against a
+ * 	malicious site loading resources from your site in a hidden frame.
  */
 
 #pragma once
+
+// C++ libraries.
+#include <string>
 
 // Module definitions.
 #include "./_def_.h"
 
 // Wasp libraries.
 #include "./middleware_mixin.h"
+#include "../http/headers.h"
 
 
 __MIDDLEWARE_BEGIN__
@@ -51,7 +54,16 @@ class XFrameOptionsMiddleware : public MiddlewareMixin
 public:
 	explicit XFrameOptionsMiddleware(conf::Settings* settings);
 
-	void process_response(const http::HttpRequest* request, http::HttpResponseBase* response) final;
+	http::HttpResponseBase* process_response(http::HttpRequest* request, http::HttpResponseBase* response) override;
+
+	/// Get the value to set for the X_FRAME_OPTIONS header. Use the value from
+	/// the X_FRAME_OPTIONS setting, or 'DENY' if not set.
+	///
+	/// This method can be overridden if needed, allowing it to vary based on
+	/// the request or response.
+	virtual std::string get_x_frame_options_value(
+		http::HttpRequest* request, http::HttpResponseBase* response
+	);
 };
 
 __MIDDLEWARE_END__

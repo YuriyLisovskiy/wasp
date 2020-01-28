@@ -39,7 +39,7 @@ HttpRequest::HttpRequest(
 	_keep_alive(keep_alive),
 	_body(std::move(content))
 {
-	this->_method = str::upper(method);
+	this->_method = core::str::upper(method);
 	this->headers = collections::Dict<std::string, std::string>(headers);
 	this->GET = get_params;
 	this->POST = post_params;
@@ -54,6 +54,13 @@ std::string HttpRequest::version()
 std::string HttpRequest::path()
 {
 	return this->_path;
+}
+
+std::string HttpRequest::full_path(bool force_append_slash)
+{
+	return this->_path +
+		(force_append_slash && !core::str::ends_with(this->_path, "/") ? "/" : "") +
+		(this->_query.empty() ? "" : "?" + this->_query);
 }
 
 std::string HttpRequest::query()
@@ -74,6 +81,75 @@ bool HttpRequest::keep_alive()
 std::string HttpRequest::body()
 {
 	return this->_body;
+}
+
+bool HttpRequest::is_secure(conf::Settings* settings)
+{
+	return this->scheme(settings) == "https";
+}
+
+std::string HttpRequest::scheme(conf::Settings* settings)
+{
+	if (settings->SECURE_PROXY_SSL_HEADER)
+	{
+		auto header_val = this->headers.get(
+			settings->SECURE_PROXY_SSL_HEADER->first, ""
+		);
+		if (!header_val.empty())
+		{
+			return header_val == settings->SECURE_PROXY_SSL_HEADER->second ? "https" : "http";
+		}
+	}
+
+	// Default scheme.
+	return "http";
+}
+
+std::string HttpRequest::get_host(
+	bool use_x_forwarded_host, bool debug, std::vector<std::string> allowed_hosts
+)
+{
+	auto host = this->get_raw_host(use_x_forwarded_host);
+	if (debug && allowed_hosts.empty())
+	{
+		allowed_hosts = {".localhost", "127.0.0.1", "[::1]"};
+	}
+
+	std::string domain, port;
+	split_domain_port(host, domain, port);
+	if (!domain.empty() && validate_host(domain, allowed_hosts))
+	{
+		return host;
+	}
+	else
+	{
+		auto msg = "Invalid HTTP_HOST header: ." + host + ".";
+		if (!domain.empty())
+		{
+			msg += " You may need to add " + domain + " to ALLOWED_HOSTS.";
+		}
+		else
+		{
+			msg += " The domain name provided is not valid according to RFC 1034/1035.";
+		}
+
+		throw core::DisallowedHost(msg);
+	}
+}
+
+std::string HttpRequest::get_raw_host(bool use_x_forwarded_host)
+{
+	std::string host;
+	if (use_x_forwarded_host && this->headers.contains(http::X_FORWARDED_HOST))
+	{
+		host = this->headers.get(http::X_FORWARDED_HOST);
+	}
+	else
+	{
+		host = this->headers.get(http::HOST);
+	}
+
+	return host;
 }
 
 __HTTP_END__

@@ -34,6 +34,7 @@
  * - MultiValueDictError;
  * - NullPointerException;
  * - ParseError;
+ * - RuntimeError;
  * - SocketError.
  * - SuspiciousOperation;
  * - ValueError.
@@ -82,44 +83,85 @@ public:
 };
 
 
-DEF_WASP_EXCEPTION_WITH_BASE(AttributeError, BaseException);
-DEF_WASP_EXCEPTION_WITH_BASE(CommandError, BaseException);
-DEF_WASP_EXCEPTION_WITH_BASE(DictError, BaseException);
+DEF_WASP_EXCEPTION_WITH_BASE(AttributeError, BaseException, "Attribute error");
+DEF_WASP_EXCEPTION_WITH_BASE(CommandError, BaseException, "Command error");
+DEF_WASP_EXCEPTION_WITH_BASE(DictError, BaseException, "Dict error");
+DEF_WASP_EXCEPTION_WITH_BASE(HttpError, BaseException, "Http error");
+
+class ErrorResponseException : public HttpError
+{
+protected:
+	short int _status_code;
+
+	// Use only when initializing of a derived exception!
+	ErrorResponseException(
+		short int status_code,
+		const char* message,
+		int line,
+		const char* function,
+		const char* file,
+		const char* type
+	);
+
+public:
+	explicit ErrorResponseException(
+		short int status_code = -1,
+		const char* message = "Error response exception",
+		int line = 0,
+		const char* function = "",
+		const char* file = ""
+	);
+	explicit ErrorResponseException(
+		short int status_code = -1,
+		const std::string& message = "Error response exception",
+		int line = 0,
+		const char* function = "",
+		const char* file = ""
+	);
+	[[nodiscard]] short int status_code() const;
+};
 
 // The user did something suspicious.
-DEF_WASP_EXCEPTION_WITH_BASE(SuspiciousOperation, BaseException);
-
-// Redirect to scheme not in allowed list.
-DEF_WASP_EXCEPTION_WITH_BASE(DisallowedRedirect, SuspiciousOperation);
-
-DEF_WASP_EXCEPTION_WITH_BASE(EncodingError, BaseException);
+DEF_WASP_HTTP_EXCEPTION(SuspiciousOperation, 400, "Suspicious operation");
 
 // Length of request's header is too large.
-DEF_WASP_EXCEPTION_WITH_BASE(EntityTooLargeError, BaseException);
+DEF_WASP_HTTP_EXCEPTION(EntityTooLargeError, 413, "Entity Too Large");
+DEF_WASP_HTTP_EXCEPTION(FileDoesNotExistError, 404, "File does not exist");
+DEF_WASP_HTTP_EXCEPTION(PermissionDenied, 403, "Permission denied");
 
-DEF_WASP_EXCEPTION_WITH_BASE(FileError, BaseException);
-DEF_WASP_EXCEPTION_WITH_BASE(FileDoesNotExistError, BaseException);
-DEF_WASP_EXCEPTION_WITH_BASE(HttpError, BaseException);
-DEF_WASP_EXCEPTION_WITH_BASE(ImproperlyConfigured, BaseException);
+DEF_WASP_EXCEPTION_WITH_BASE(DisallowedHost, SuspiciousOperation, "Disallowed host");
+
+// Redirect to scheme not in allowed list.
+DEF_WASP_EXCEPTION_WITH_BASE(DisallowedRedirect, SuspiciousOperation, "Disallowed redirect");
+DEF_WASP_EXCEPTION_WITH_BASE(EncodingError, BaseException, "Encoding error");
+DEF_WASP_EXCEPTION_WITH_BASE(FileError, BaseException, "File error");
+DEF_WASP_EXCEPTION_WITH_BASE(ImproperlyConfigured, BaseException, "Improperly configured");
 
 class InterruptException : public BaseException
 {
 protected:
 	// Use only when initializing of a derived exception!
-	InterruptException(const char* message, int line, const char* function, const char* file, const char* type);
+	InterruptException(
+		const char* message, int line, const char* function, const char* file, const char* type
+	);
 
 	static void handle_signal(int sig);
 public:
-	explicit InterruptException(const char* message, int line = 0, const char* function = "", const char* file = "");
-	explicit InterruptException(const std::string& message, int line = 0, const char* function = "", const char* file = "");
+	explicit InterruptException(
+		const char* message, int line = 0, const char* function = "", const char* file = ""
+	);
+	explicit InterruptException(
+		const std::string& message, int line = 0, const char* function = "", const char* file = ""
+	);
 	static void initialize();
 };
 
-DEF_WASP_EXCEPTION_WITH_BASE(ParseError, BaseException);
-DEF_WASP_EXCEPTION_WITH_BASE(MultiPartParserError, ParseError);
-DEF_WASP_EXCEPTION_WITH_BASE(MultiValueDictError, DictError);
-DEF_WASP_EXCEPTION_WITH_BASE(NullPointerException, BaseException);
-DEF_WASP_EXCEPTION_WITH_BASE(SocketError, BaseException);
-DEF_WASP_EXCEPTION_WITH_BASE(ValueError, BaseException);
+DEF_WASP_EXCEPTION_WITH_BASE(ParseError, BaseException, "Parse error");
+DEF_WASP_EXCEPTION_WITH_BASE(RuntimeError, BaseException, "Runtime error");
+DEF_WASP_EXCEPTION_WITH_BASE(MultiPartParserError, ParseError, "Multipart parser error");
+DEF_WASP_EXCEPTION_WITH_BASE(MultiValueDictError, DictError, "Multi-value dict error");
+DEF_WASP_EXCEPTION_WITH_BASE(NullPointerException, BaseException, "Null pinter exception");
+DEF_WASP_EXCEPTION_WITH_BASE(SocketError, BaseException, "Socket error");
+DEF_WASP_EXCEPTION_WITH_BASE(ValueError, BaseException, "Value error");
 
 __CORE_END__

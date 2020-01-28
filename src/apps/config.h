@@ -88,7 +88,7 @@ protected:
 		};
 
 		this->_urlpatterns.push_back(urls::make_url(
-			str::starts_with(pattern, "/") ? pattern : "/" + pattern,
+			core::str::starts_with(pattern, "/") ? pattern : "/" + pattern,
 			view_handler,
 			name
 		));
@@ -102,7 +102,7 @@ protected:
 		for (const auto& pattern : included_urlpatterns)
 		{
 			this->_urlpatterns.emplace_back(
-				str::rtrim(str::starts_with(prefix, "/") ? prefix : "/" + prefix, '/'),
+				core::str::rtrim(core::str::starts_with(prefix, "/") ? prefix : "/" + prefix, "/"),
 				pattern
 			);
 		}

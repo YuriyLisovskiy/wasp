@@ -31,6 +31,7 @@ RunserverCommand::RunserverCommand(apps::IAppConfig* config, conf::Settings* set
 	this->_threads_flag = nullptr;
 	this->_host_flag = nullptr;
 	this->_port_flag = nullptr;
+	this->_use_ipv6_flag = nullptr;
 
 	std::string port = R"(\d+)";
 	this->_port_regex = new rgx::Regex(port);
@@ -77,28 +78,26 @@ void RunserverCommand::add_flags()
 
 void RunserverCommand::handle()
 {
-	core::InterruptException::initialize();
 	if (!this->settings->DEBUG && this->settings->ALLOWED_HOSTS.empty())
 	{
 		throw CommandError("You must set settings.ALLOWED_HOSTS if settings.DEBUG is false.");
 	}
 
-	core::internal::HttpServer::context ctx{};
+	core::net::internal::HttpServer::context ctx{};
 
-	// TODO: remove!
+	// TODO: remove http server's verbose setting
 	ctx.verbose = true;
 
 	this->setup_server_ctx(ctx);
 
-	core::internal::HttpServer server(ctx);
+	core::net::internal::HttpServer server(ctx);
 	try
 	{
 		server.listen_and_serve();
 	}
 	catch (const core::InterruptException& exc)
 	{
-		server.finish();
-		this->settings->LOGGER->debug("Finished");
+		this->settings->LOGGER->debug("Interrupted");
 	}
 	catch (const core::BaseException& exc)
 	{
@@ -108,95 +107,87 @@ void RunserverCommand::handle()
 	{
 		this->settings->LOGGER->error(exc.what(), _ERROR_DETAILS_);
 	}
+
+	this->settings->LOGGER->debug("Interrupted 2");
 }
 
-std::function<void(http::HttpRequest*, const core::internal::socket_t&)>
+std::function<void(http::HttpRequest*, const core::net::internal::socket_t&)>
 RunserverCommand::get_handler()
 {
-	std::vector<urls::UrlPattern> urlpatterns;
-
-	// Check if static/media files can be served
-	//  and create necessary urls.
-	this->build_static_patterns(urlpatterns);
+	// Check if static files can be served
+	// and create necessary urls.
+	this->build_static_patterns(this->settings->ROOT_URLCONF);
 
 	// Retrieve main app patterns and append them
-	//  to result.
-	this->build_app_patterns(urlpatterns);
+	// to result.
+	this->build_app_patterns(this->settings->ROOT_URLCONF);
 
-	auto* settings = this->settings;
-	auto log_request = [settings](
-		const std::string& info, unsigned short status_code
-	)
-	{
-		if (settings->LOGGER)
-		{
-			core::Logger::Color color = core::Logger::Color::GREEN;
-			if (status_code >= 400)
-			{
-				color = core::Logger::Color::YELLOW;
-			}
-			else if (status_code >= 500)
-			{
-				color = core::Logger::Color::RED;
-			}
-
-			settings->LOGGER->print(str::format(
-				"[{0!s}] \"{1!s}\" {2!d}",
-				dt::now().strftime("%d/%b/%Y %T").c_str(),
-				info.c_str(),
-				status_code
-			), color);
-		}
-	};
-
-	auto handler = [settings, urlpatterns, log_request](
-		http::HttpRequest* request, const core::internal::socket_t& client
+	auto handler = [this](
+		http::HttpRequest* request, const core::net::internal::socket_t& client
 	) mutable -> void
 	{
-		for (auto& middleware : settings->MIDDLEWARE)
-		{
-			middleware->process_request(request);
-		}
-
+		http::HttpResponseBase* error_response = nullptr;
 		http::HttpResponseBase* response = nullptr;
-		for (auto& url_pattern : urlpatterns)
+		try
 		{
-			std::map<std::string, std::string> args_map;
-			if (url_pattern.match(request->path(), args_map))
+			response = RunserverCommand::process_request_middleware(
+				request, this->settings
+			);
+			if (!response)
 			{
-				response = url_pattern.apply(request, new views::Args(args_map), settings->LOGGER);
-				break;
+				response = RunserverCommand::process_urlpatterns(
+					request, this->settings->ROOT_URLCONF, this->settings
+				);
+				if (!response)
+				{
+					response = new http::HttpResponseNotFound("<h2>404 - Not Found</h2>");
+				}
+
+				response = RunserverCommand::process_response_middleware(
+					request, response, this->settings
+				);
 			}
+		}
+		catch (const core::ErrorResponseException& exc)
+		{
+			this->settings->LOGGER->error(exc);
+			auto status_code = exc.status_code() < 400 ? 500 : exc.status_code();
+			auto err_msg = "<p style=\"font-size: 24px;\" >" + std::to_string(status_code) + "</p>"
+						   "<p>" + std::string(exc.what()) + "</p>";
+			error_response = new http::HttpResponse(err_msg, status_code);
+		}
+		catch (const core::BaseException& exc)
+		{
+			this->settings->LOGGER->error(exc);
+			error_response = new http::HttpResponseServerError(
+				"<p style=\"font-size: 24px;\" >Internal Server Error</p><p>" + std::string(exc.what()) + "</p>"
+			);
+		}
+		catch (const std::exception& exc)
+		{
+			this->settings->LOGGER->error(exc.what(), __LINE__, "request handler function", __FILE__);
+			error_response = new http::HttpResponseServerError(
+				"<p style=\"font-size: 24px;\" >Internal Server Error</p>"
+			);
 		}
 
 		if (!response)
 		{
-			response = new http::HttpResponseNotFound("<h2>404 - Not Found</h2>");
+			// Response was not instantiated.
+			error_response = new http::HttpResponseServerError("<h2>500 - Internal Server Error</h2>");
 		}
 
-		for (long int i = (long int) settings->MIDDLEWARE.size() - 1; i >= 0; i--)
+		if (error_response)
 		{
-			settings->MIDDLEWARE[i]->process_response(request, response);
+			delete response;
+
+			// TODO: render error response;
+			//  if setting.DEBUG is true render detailed error,
+			//  otherwise render status code and reason phrase.
+			response = error_response;
 		}
 
-		if (response->is_streaming())
-		{
-			auto* streaming_response = dynamic_cast<http::StreamingHttpResponse*>(response);
-			core::internal::HttpServer::send(streaming_response, client);
-		}
-		else
-		{
-			core::internal::HttpServer::send(response, client);
-		}
-
-		log_request(
-			request->method() + " " +
-			request->path() + " " +
-			"HTTP" + (settings->USE_SSL ? "S/" : "/") +
-			request->version(),
-			response->status()
-		);
-
+		send_response(request, response, client, this->settings);
 		delete response;
 	};
 
@@ -223,20 +214,22 @@ void RunserverCommand::build_static_patterns(std::vector<urls::UrlPattern>& patt
 
 	if (!this->settings->MEDIA_ROOT.empty() && this->static_is_allowed(this->settings->MEDIA_URL))
 	{
-		patterns.push_back(urls::make_static(this->settings->MEDIA_URL, this->settings->MEDIA_ROOT));
+		patterns.push_back(
+			urls::make_static(this->settings->MEDIA_URL, this->settings->MEDIA_ROOT, "media")
+		);
 	}
 }
 
 void RunserverCommand::build_app_patterns(std::vector<urls::UrlPattern>& patterns)
 {
-	if (!this->settings->INSTALLED_APPS.empty())
+	if (this->settings->ROOT_APP)
 	{
-		auto apps_patterns = this->settings->INSTALLED_APPS[0]->get_urlpatterns();
+		auto apps_patterns = this->settings->ROOT_APP->get_urlpatterns();
 		patterns.insert(patterns.end(), apps_patterns.begin(), apps_patterns.end());
 	}
 }
 
-void RunserverCommand::setup_server_ctx(core::internal::HttpServer::context& ctx)
+void RunserverCommand::setup_server_ctx(core::net::internal::HttpServer::context& ctx)
 {
 	// Setup host and port.
 	auto host_port_str = this->_host_port_flag->get();
@@ -305,6 +298,113 @@ void RunserverCommand::setup_server_ctx(core::internal::HttpServer::context& ctx
 
 	ctx.threads_count = this->_threads_flag->get();
 	ctx.handler = this->get_handler();
+}
+
+http::HttpResponseBase* RunserverCommand::process_request_middleware(
+	http::HttpRequest* request, conf::Settings* settings
+)
+{
+	http::HttpResponseBase* response = nullptr;
+	for (auto& middleware : settings->MIDDLEWARE)
+	{
+		response = middleware->process_request(request);
+		if (response)
+		{
+			break;
+		}
+	}
+
+	return response;
+}
+
+http::HttpResponseBase* RunserverCommand::process_urlpatterns(
+	http::HttpRequest* request,
+	std::vector<urls::UrlPattern>& urlpatterns,
+	conf::Settings* settings
+)
+{
+	http::HttpResponseBase* response = nullptr;
+	auto apply = urls::resolve(request->path(), settings->ROOT_URLCONF);
+	if (apply)
+	{
+		response = apply(request, settings->LOGGER);
+	}
+
+	return response;
+}
+
+http::HttpResponseBase* RunserverCommand::process_response_middleware(
+	http::HttpRequest* request,
+	http::HttpResponseBase* response,
+	conf::Settings* settings
+)
+{
+	for (long int i = (long int) settings->MIDDLEWARE.size() - 1; i >= 0; i--)
+	{
+		auto curr_response = settings->MIDDLEWARE[i]->process_response(request, response);
+		if (curr_response)
+		{
+			delete response;
+			response = curr_response;
+			break;
+		}
+	}
+
+	return response;
+}
+
+void RunserverCommand::send_response(
+	http::HttpRequest* request,
+	http::HttpResponseBase* response,
+	const core::net::internal::socket_t& client,
+	conf::Settings* settings
+)
+{
+	if (response->is_streaming())
+	{
+		auto* streaming_response = dynamic_cast<http::StreamingHttpResponse*>(response);
+		core::net::internal::HttpServer::send(streaming_response, client);
+	}
+	else
+	{
+		core::net::internal::HttpServer::send(response, client);
+	}
+
+	log_request(
+		request->method() + " " +
+		request->path() + " " +
+		"HTTP" + (settings->USE_SSL ? "S/" : "/") +
+		request->version(),
+		response->status(),
+		settings
+	);
+}
+
+void RunserverCommand::log_request(
+	const std::string& info,
+	unsigned short status_code,
+	conf::Settings* settings
+)
+{
+	if (settings->LOGGER)
+	{
+		core::Logger::Color color = core::Logger::Color::GREEN;
+		if (status_code >= 400)
+		{
+			color = core::Logger::Color::YELLOW;
+		}
+		else if (status_code >= 500)
+		{
+			color = core::Logger::Color::RED;
+		}
+
+		settings->LOGGER->print(str::format(
+			"[{0!s}] \"{1!s}\" {2!d}",
+			dt::now().strftime("%d/%b/%Y %T").c_str(),
+			info.c_str(),
+			status_code
+		), color);
+	}
 }
 
 __CORE_COMMANDS_END__

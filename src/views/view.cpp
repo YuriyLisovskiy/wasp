@@ -62,7 +62,7 @@ http::HttpResponseBase* View::dispatch(Args* args)
 		);
 	}
 
-	std::string method = str::lower(this->_request->method());
+	std::string method = core::str::lower(this->_request->method());
 	http::HttpResponseBase* result = nullptr;
 	if (method == "get")
 	{
@@ -126,11 +126,11 @@ std::vector<std::string> View::allowed_methods()
 		bool found = std::find(
 			this->_http_method_names.begin(),
 			this->_http_method_names.end(),
-			str::lower(method)
+			core::str::lower(method)
 		) != this->_http_method_names.end();
 		if (found)
 		{
-			result.push_back(str::upper(method));
+			result.push_back(core::str::upper(method));
 		}
 	}
 
@@ -173,7 +173,7 @@ http::HttpResponseBase* View::options(http::HttpRequest* request, Args* args)
 	auto allowed_methods = this->allowed_methods();
 	response->set_header(
 		"Allow",
-		str::join(allowed_methods.begin(), allowed_methods.end(), ", ")
+		core::str::join(allowed_methods.begin(), allowed_methods.end(), ", ")
 	);
 	response->set_header("Content-Length", "0");
 	return response;

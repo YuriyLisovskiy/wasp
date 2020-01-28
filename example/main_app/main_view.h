@@ -35,8 +35,8 @@ public:
 		std::string body(
 			"<h2>Hello from main view!</h2>"
 			"<ul>"
-			"   <li><a href=\"form/profile/2048/name/YuriyLisovskiy\">Go to form!</a></li>"
-			"   <li><a href=\"picture/view/pic/\">View picture!</a></li>"
+			"   <li><a href=\"/form/profile/2048/name/YuriyLisovskiy\">Go to form!</a></li>"
+			"   <li><a href=\"/picture/view/pic\">View picture!</a></li>"
 			"</ul>"
 		);
 		return new wasp::http::HttpResponse(body);

@@ -18,7 +18,12 @@
 
 #include "../../src/conf/settings.h"
 #include "../../src/core/path.h"
+
+#include "../../src/middleware/common.h"
 #include "../../src/middleware/cookies.h"
+#include "../../src/middleware/security.h"
+#include "../../src/middleware/clickjacking.h"
+
 #include "../../src/core/management/commands/runserver.h"
 
 #include "../picture_app/app.h"
@@ -49,6 +54,9 @@ struct Settings final: public wasp::conf::Settings
 		};
 
 		this->MIDDLEWARE = {
+			this->middleware<wasp::middleware::SecurityMiddleware>(),
+			this->middleware<wasp::middleware::CommonMiddleware>(),
+			this->middleware<wasp::middleware::XFrameOptionsMiddleware>(),
 			this->middleware<wasp::middleware::CookieMiddleware>()
 		};
 

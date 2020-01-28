@@ -29,14 +29,16 @@ MiddlewareMixin::MiddlewareMixin(conf::Settings* settings)
 	this->settings = settings;
 }
 
-void MiddlewareMixin::process_request(http::HttpRequest* request)
+http::HttpResponseBase* MiddlewareMixin::process_request(http::HttpRequest* request)
 {
-};
+	return nullptr;
+}
 
-void MiddlewareMixin::process_response(
-	const http::HttpRequest* request, http::HttpResponseBase* response
+http::HttpResponseBase* MiddlewareMixin::process_response(
+	http::HttpRequest* request, http::HttpResponseBase* response
 )
 {
-};
+	return nullptr;
+}
 
 __MIDDLEWARE_END__

@@ -62,23 +62,66 @@
 #define __RGX_END__ } __CORE_END__
 
 
+/// wasp::core::utility
+#define __UTILITY_BEGIN__ __CORE_BEGIN__ namespace utility {
+#define __UTILITY_END__ } __CORE_END__
+
+
 /// Declares exception's class with given base.
-#define DEF_WASP_EXCEPTION_WITH_BASE(name, base)\
+#define DEF_WASP_EXCEPTION_WITH_BASE(name, base, default_message)\
 class name : public base\
 {\
 protected:\
-	name(const char* message, int line, const char* function, const char* file, const char* type)\
+	name(\
+		const char* message, int line, const char* function, const char* file, const char* type\
+	)\
 		: base(message, line, function, file, type)\
 	{\
 	}\
 \
 public:\
-	explicit name(const char* message, int line = 0, const char* function = "", const char* file = "")\
+	explicit name(\
+		const char* message = default_message,\
+		int line = 0, const char* function = "", const char* file = ""\
+	)\
 		: name(message, line, function, file, #name)\
 	{\
 	}\
 \
-	explicit name(const std::string& message, int line = 0, const char* function = "", const char* file = "")\
+	explicit name(\
+		const std::string& message = default_message,\
+		int line = 0, const char* function = "", const char* file = ""\
+	)\
+		: name(message.c_str(), line, function, file)\
+	{\
+	}\
+}
+
+
+#define DEF_WASP_HTTP_EXCEPTION(name, status_code, default_message)\
+class name : public ErrorResponseException\
+{\
+protected:\
+	name(\
+		const char* message, int line, const char* function, const char* file, const char* type\
+	)\
+		: ErrorResponseException(status_code, message, line, function, file, type)\
+	{\
+	}\
+\
+public:\
+	explicit name(\
+		const char* message = default_message,\
+		int line = 0, const char* function = "", const char* file = ""\
+	)\
+		: name(message, line, function, file, #name)\
+	{\
+	}\
+\
+	explicit name(\
+		const std::string& message = default_message,\
+		int line = 0, const char* function = "", const char* file = ""\
+	)\
 		: name(message.c_str(), line, function, file)\
 	{\
 	}\

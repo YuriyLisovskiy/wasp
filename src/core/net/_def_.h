@@ -16,13 +16,23 @@
  */
 
 /**
- * socket.h
- * Purpose: tcp/ip socket's wrapper.
+ * _def_.h
+ * Purpose: core/net module's definitions.
  */
 
 #pragma once
 
-#include <fcntl.h>
+#include "../_def_.h"
+
+
+/// wasp::core::net
+#define __NET_BEGIN__ __CORE_BEGIN__ namespace net {
+#define __NET_END__ } __CORE_END__
+
+/// wasp::core::net::internal
+#define __NET_INTERNAL_BEGIN__ __NET_BEGIN__ namespace internal {
+#define __NET_INTERNAL_END__ } __NET_END__
+
 
 #if defined(_WIN32) || defined(_WIN64)
 
@@ -30,26 +40,6 @@
 #include <ws2tcpip.h>
 
 #pragma comment (lib, "Ws2_32.lib")
-
-#elif defined(__unix__) || defined(__linux__)
-
-#include <unistd.h>
-#include <arpa/inet.h>
-
-#else
-#error Library is not supported on this platform
-
-#endif
-
-// Module definitions.
-#include "../_def_.h"
-
-// Wasp libraries.
-#include "../exceptions.h"
-
-__CORE_INTERNAL_BEGIN__
-
-#if defined(_WIN32) || defined(_WIN64)
 
 typedef SOCKET socket_t;
 typedef int msg_size_t;
@@ -62,8 +52,15 @@ static inline int poll(struct pollfd *pfd, int nfds, int timeout) { return WSAPo
 
 #elif defined(__unix__) || defined(__linux__)
 
+#include <unistd.h>
+#include <arpa/inet.h>
+
+__NET_INTERNAL_BEGIN__
+
 typedef int socket_t;
 typedef ssize_t msg_size_t;
+
+__NET_INTERNAL_END__
 
 #define INVALID_SOCKET (socket_t)(-1)
 #define SOCKET_ERROR (-1)
@@ -75,18 +72,3 @@ typedef ssize_t msg_size_t;
 #error Library is not supported on this platform
 
 #endif
-
-
-class Socket
-{
-protected:
-	bool _closed;
-	socket_t _socket;
-
-public:
-	explicit Socket(socket_t sock);
-	int close();
-	bool set_blocking(bool blocking);
-};
-
-__CORE_INTERNAL_END__

@@ -15,41 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * server_socket.h
- * Purpose: improved and adapted tcp/ip socket for server.
- */
+#ifndef WASP_UNIT_TESTS_UTILS_TESTS_CRYPTO_TESTS_INCLUDE_H
+#define WASP_UNIT_TESTS_UTILS_TESTS_CRYPTO_TESTS_INCLUDE_H
 
-#pragma once
+#include "./md5_tests.h"
 
-// Module definitions.
-#include "../_def_.h"
-
-// Wasp libraries.
-#include "./socket.h"
-#include "../exceptions.h"
-
-
-__CORE_INTERNAL_BEGIN__
-
-class ServerSocket : public Socket
-{
-private:
-	bool _use_ipv6;
-	sockaddr_in _ipv4_socket{};
-	sockaddr_in6 _ipv6_socket{};
-
-public:
-	ServerSocket();
-
-	socket_t create(const char* host, uint16_t port, bool use_ipv6 = false);
-	int bind();
-	int listen();
-	socket_t accept();
-
-private:
-	socket_t create_ipv4(const char* host, uint16_t port);
-	socket_t create_ipv6(const char* host, uint16_t port);
-};
-
-__CORE_INTERNAL_END__
+#endif // WASP_UNIT_TESTS_UTILS_TESTS_CRYPTO_TESTS_INCLUDE_H

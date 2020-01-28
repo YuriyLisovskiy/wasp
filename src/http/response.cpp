@@ -49,6 +49,7 @@ HttpResponseBase::HttpResponseBase(
 		this->_status = 200;
 	}
 
+	this->_reason_phrase = reason;
 	this->_charset = charset;
 
 	if (content_type.empty())
@@ -57,6 +58,13 @@ HttpResponseBase::HttpResponseBase(
 	}
 
 	this->_headers.set("Content-Type", content_type);
+}
+
+std::string HttpResponseBase::get_header(
+	const std::string& key, const std::string& default_value
+)
+{
+	return this->_headers.get(key, default_value);
 }
 
 void HttpResponseBase::set_header(const std::string& key, const std::string& value)
@@ -74,6 +82,15 @@ bool HttpResponseBase::has_header(const std::string& key)
 	return this->_headers.contains(key);
 }
 
+void HttpResponseBase::set_content(const std::string& content)
+{
+}
+
+std::string HttpResponseBase::get_content()
+{
+	return "";
+}
+
 void HttpResponseBase::set_cookie(
 	const std::string& name,
 	const std::string& value,
@@ -88,17 +105,29 @@ void HttpResponseBase::set_cookie(
 }
 
 void HttpResponseBase::set_signed_cookie(
-	const std::string& name,
-	const std::string& value,
-	const std::string& salt,
-	const std::string& expires,
-	const std::string& domain,
-	const std::string& path,
-	bool is_secure,
-	bool is_http_only
+		const std::string& name,
+		const std::string& value,
+		const std::string& salt,
+		const std::string& expires,
+		const std::string& domain,
+		const std::string& path,
+		bool is_secure,
+		bool is_http_only
 )
 {
 	// TODO:
+}
+
+void HttpResponseBase::set_cookies(
+	const collections::Dict<std::string, Cookie>& cookies
+)
+{
+	this->_cookies = cookies;
+}
+
+const collections::Dict<std::string, Cookie>& HttpResponseBase::get_cookies()
+{
+	return this->_cookies;
 }
 
 void HttpResponseBase::delete_cookie(const std::string& name, const std::string& path, const std::string& domain)
@@ -135,6 +164,11 @@ unsigned short int HttpResponseBase::status()
 std::string HttpResponseBase::content_type()
 {
 	return this->_headers.get("Content-Type", "");
+}
+
+size_t HttpResponseBase::content_length()
+{
+	return 0;
 }
 
 std::string HttpResponseBase::charset()
@@ -188,7 +222,9 @@ void HttpResponseBase::write_lines(const std::vector<std::string>& lines)
 
 std::string HttpResponseBase::serialize_headers()
 {
-	auto expr = [](const std::pair<std::string, std::string>& _p) -> std::string { return _p.first + ": " + _p.second; };
+	auto expr = [](const std::pair<std::string, std::string>& _p) -> std::string {
+		return _p.first + ": " + _p.second;
+	};
 	std::string result;
 	for (auto it = this->_headers.cbegin(); it != this->_headers.cend(); it++)
 	{
@@ -199,7 +235,21 @@ std::string HttpResponseBase::serialize_headers()
 		}
 	}
 
+	for (auto it = this->_cookies.cbegin(); it != this->_cookies.cend(); it++)
+	{
+		result.append(it->second.to_string());
+		if (std::next(it) != this->_cookies.cend())
+		{
+			result.append("\r\n");
+		}
+	}
+
 	return result;
+}
+
+std::string& HttpResponseBase::operator[] (const std::string& key)
+{
+	return this->_headers[key];
 }
 
 
@@ -216,9 +266,19 @@ HttpResponse::HttpResponse(
 	this->_streaming = false;
 }
 
+size_t HttpResponse::content_length()
+{
+	return this->_content.size();
+}
+
 void HttpResponse::set_content(const std::string& content)
 {
 	this->_content = content;
+}
+
+std::string HttpResponse::get_content()
+{
+	return this->_content;
 }
 
 void HttpResponse::write(const std::string& content)
@@ -246,7 +306,7 @@ void HttpResponse::write_lines(const std::vector<std::string>& lines)
 
 std::string HttpResponse::serialize()
 {
-	this->set_header("Date", dt::gmtnow().strftime("%a, %d %b %Y %T %Z"));
+	this->set_header("Date", core::dt::gmtnow().strftime("%a, %d %b %Y %T %Z"));
 	this->set_header("Content-Length", std::to_string(this->_content.size()));
 
 	auto reason_phrase = this->get_reason_phrase();
@@ -342,7 +402,7 @@ void FileResponse::_set_headers()
 		{"xz", "application/x-xz"}
 	});
 	this->set_header("Content-Length", std::to_string(core::path::get_size(this->_file_path)));
-	if (str::starts_with(this->_headers.get("Content-Type", ""), "text/html"))
+	if (core::str::starts_with(this->_headers.get("Content-Type", ""), "text/html"))
 	{
 		std::string content_type, encoding;
 		core::mime::guess_content_type(this->_file_path, content_type, encoding);
@@ -369,7 +429,7 @@ std::string FileResponse::_get_headers_chunk()
 {
 	auto reason_phrase = this->get_reason_phrase();
 	this->_set_headers();
-	this->set_header("Date", dt::gmtnow().strftime("%a, %d %b %Y %T %Z"));
+	this->set_header("Date", core::dt::gmtnow().strftime("%a, %d %b %Y %T %Z"));
 	auto headers = this->serialize_headers();
 
 	std::string headers_chunk = "HTTP/1.1 " + std::to_string(this->_status) + " " + reason_phrase + "\r\n"
@@ -394,12 +454,11 @@ void FileResponse::close()
 // HttpResponseRedirectBase implementation
 HttpResponseRedirectBase::HttpResponseRedirectBase(
 	const std::string& redirect_to,
-	const std::string& content,
 	unsigned short int status,
 	const std::string& content_type,
 	const std::string& reason,
 	const std::string& charset
-) : HttpResponse(content, status, content_type, reason, charset)
+) : HttpResponse("", status, content_type, reason, charset)
 {
 	if (status < 300 || status > 399)
 	{
@@ -423,10 +482,9 @@ std::string HttpResponseRedirectBase::url()
 // HttpResponseRedirect implementation
 HttpResponseRedirect::HttpResponseRedirect(
 	const std::string& redirect_to,
-	const std::string& content,
 	const std::string& content_type,
 	const std::string& charset
-) : HttpResponseRedirectBase(redirect_to, content, 302, content_type, "", charset)
+) : HttpResponseRedirectBase(redirect_to, 302, content_type, "", charset)
 {
 }
 
@@ -434,10 +492,9 @@ HttpResponseRedirect::HttpResponseRedirect(
 // HttpResponsePermanentRedirect implementation
 HttpResponsePermanentRedirect::HttpResponsePermanentRedirect(
 	const std::string& redirect_to,
-	const std::string& content,
 	const std::string& content_type,
 	const std::string& charset
-) : HttpResponseRedirectBase(redirect_to, content, 301, content_type, "", charset)
+) : HttpResponseRedirectBase(redirect_to, 301, content_type, "", charset)
 {
 }
 
