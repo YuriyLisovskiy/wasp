@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,34 +29,45 @@
 #include "./_def_.h"
 
 // Wasp libraries.
+#include "../core/utility.h"
+#include "../core/string/str.h"
 #include "../core/exceptions.h"
+#include "../core/datetime/datetime.h"
 
 
 __HTTP_BEGIN__
 
-class Cookie
+class Cookie final
 {
 private:
+	const char* DATE_TIME_FORMAT = "%a, %e %b %Y %T %Z";
+
 	std::string _name;
 	std::string _value;
+	long _max_age;
 	std::string _expires;
 	std::string _domain;
 	std::string _path;
 	bool _is_secure;
 	bool _is_http_only;
+	std::string _same_site;
 
 	void _copy(const Cookie& other);
+	[[nodiscard]] std::string _get_expires(long max_age) const;
+	[[nodiscard]] long _get_max_age(const std::string& expires) const;
 
 public:
 	Cookie();
 	Cookie(
 		std::string name,
 		std::string value,
-		std::string expires,
+		long max_age,
+		std::string expires = "",
 		std::string domain = "",
 		std::string path = "/",
 		bool is_secure = true,
-		bool is_http_only = false
+		bool is_http_only = false,
+		std::string same_site = ""
 	);
 
 	// Copy constructor.
