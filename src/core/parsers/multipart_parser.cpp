@@ -87,13 +87,13 @@ std::string multipart_parser::get_boundary(const std::string& content_type)
 		throw MultiPartParserError("Unable to parse request body: boundary is empty", _ERROR_DETAILS_);
 	}
 
-	str::ltrim(boundary, '-');
+	str::ltrim(boundary, "-");
 	return boundary;
 }
 
 void multipart_parser::assert_boundary(const std::string& actual, const std::string& expected)
 {
-	if (str::trim(actual, '-') != str::trim(expected, '-'))
+	if (str::trim(actual, "-") != str::trim(expected, "-"))
 	{
 		throw MultiPartParserError("Unable to parse request body: invalid boundary", _ERROR_DETAILS_);
 	}
@@ -101,7 +101,7 @@ void multipart_parser::assert_boundary(const std::string& actual, const std::str
 
 multipart_parser::multipart_parser(const std::string& media_root)
 {
-	this->media_root = str::rtrim(media_root, '/');
+	this->media_root = str::rtrim(media_root, "/");
 	this->multi_post_value = collections::MultiValueDict<std::string, std::string>(true);
 	this->post_values = collections::Dict<std::string, std::string>(true);
 	this->multi_file_value = collections::MultiValueDict<std::string, UploadedFile>(true);

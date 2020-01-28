@@ -45,11 +45,11 @@ std::string dirname(const std::string& path)
 	auto result = std::string(path.begin(), path.begin() + pos + 1);
 	if (result.size() > 1)
 	{
-		str::rtrim(result, '/');
+		str::rtrim(result, "/");
 		while (str::ends_with(result, "/."))
 		{
-			str::rtrim(result, '.');
-			str::rtrim(result, '/');
+			str::rtrim(result, ".");
+			str::rtrim(result, "/");
 		}
 	}
 
@@ -68,7 +68,7 @@ std::string basename(const std::string& path)
 		pos += 1;
 	}
 
-	return str::rtrim(std::string(path.begin() + pos, path.end()), '/');
+	return str::rtrim(std::string(path.begin() + pos, path.end()), "/");
 }
 
 size_t get_size(const std::string& path)
@@ -86,8 +86,8 @@ size_t get_size(const std::string& path)
 
 std::string join(const std::string& left, const std::string& right)
 {
-	auto new_left = str::rtrim(left, '/');
-	return (new_left.empty() ? "." : new_left) + "/" + str::ltrim(right, '/');
+	auto new_left = str::rtrim(left, "/");
+	return (new_left.empty() ? "." : new_left) + "/" + str::ltrim(right, "/");
 }
 
 std::string join(const std::vector<std::string>& paths)
@@ -103,7 +103,7 @@ std::string join(const std::vector<std::string>& paths)
 		return paths[0];
 	}
 
-	std::string result = str::rtrim(paths[0], '/');
+	std::string result = str::rtrim(paths[0], "/");
 	if (result.empty())
 	{
 		result = ".";
@@ -111,11 +111,11 @@ std::string join(const std::vector<std::string>& paths)
 
 	for (size_t i = 1; i < size - 1; i++)
 	{
-		auto part = str::trim(paths[i], '/');
+		auto part = str::trim(paths[i], "/");
 		result += part.empty() ? "" : "/" + part;
 	}
 
-	auto part = str::ltrim(paths[size - 1], '/');
+	auto part = str::ltrim(paths[size - 1], "/");
 	result += part.empty() ? "" : "/" + part;
 
 	return result == "." ? "./" : result;

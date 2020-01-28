@@ -40,10 +40,10 @@ DateTime now()
 	auto local_time = std::localtime(&time_now);
 	return DateTime(
 		local_time->tm_year,
-		local_time->tm_mon,
+		local_time->tm_mon + 1,
 		local_time->tm_wday,
 		local_time->tm_mday,
-		local_time->tm_yday,
+		local_time->tm_yday + 1,
 		local_time->tm_hour,
 		local_time->tm_min,
 		local_time->tm_sec,
@@ -58,10 +58,10 @@ DateTime gmtnow()
 	auto gm_time = std::gmtime(&time_now);
 	return DateTime(
 		gm_time->tm_year,
-		gm_time->tm_mon,
+		gm_time->tm_mon + 1,
 		gm_time->tm_wday,
 		gm_time->tm_mday,
-		gm_time->tm_yday,
+		gm_time->tm_yday + 1,
 		gm_time->tm_hour,
 		gm_time->tm_min,
 		gm_time->tm_sec,
@@ -76,13 +76,29 @@ DateTime::DateTime() : _date(), _time(), _tz()
 {
 }
 
-DateTime::DateTime(int year, int month, int day_of_week, int day_of_month, int day_of_year, int hour, int minute, int second, int microsecond, TimeZone tz)
-	: _date(Date(year, month, day_of_week, day_of_month, day_of_year)), _time(Time(hour, minute, second, microsecond)), _tz(std::move(tz))
+DateTime::DateTime(int year, int month, int day, int hour, int minute, int second)
+	: _date(year, month, day), _time(hour, minute, second, 0), _tz("GMT")
 {
 }
 
-DateTime::DateTime(int year, int month, int day_of_week, int day_of_month, int day_of_year, int hour, int minute, int second, int microsecond, const std::string& tz)
-	: DateTime(year, month, day_of_week, day_of_month, day_of_year, hour, minute, second, microsecond, TimeZone(tz))
+DateTime::DateTime(
+	int year, int month, int day_of_week, int day_of_month, int day_of_year,
+	int hour, int minute, int second, int microsecond,
+	TimeZone tz
+) :
+	_date(year, month, day_of_week, day_of_month, day_of_year),
+	_time(hour, minute, second, microsecond),
+	_tz(std::move(tz))
+{
+}
+
+DateTime::DateTime(
+	int year, int month, int day_of_week, int day_of_month, int day_of_year,
+	int hour, int minute, int second, int microsecond,
+	const std::string& tz
+) : DateTime(
+	year, month, day_of_week, day_of_month, day_of_year, hour, minute, second, microsecond, TimeZone(tz)
+)
 {
 }
 
@@ -99,10 +115,10 @@ DateTime::DateTime(time_t timestamp) : _date(), _time(), _tz()
 	auto local_time = std::localtime(&timestamp);
 	this->_date = Date(
 		local_time->tm_year,
-		local_time->tm_mon,
+		local_time->tm_mon + 1,
 		local_time->tm_wday,
 		local_time->tm_mday,
-		local_time->tm_yday
+		local_time->tm_yday + 1
 	);
 	this->_time = Time(
 		local_time->tm_hour,
@@ -191,10 +207,10 @@ DateTime DateTime::strptime(const char* _datetime, const char* _format)
 	::strptime(_datetime, _format, time_info);
 	auto result = DateTime(
 		time_info->tm_year,
-		time_info->tm_mon,
+		time_info->tm_mon + 1,
 		time_info->tm_wday,
 		time_info->tm_mday,
-		time_info->tm_yday,
+		time_info->tm_yday + 1,
 		time_info->tm_hour,
 		time_info->tm_min,
 		time_info->tm_sec,

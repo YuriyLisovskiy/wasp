@@ -83,14 +83,23 @@ std::string HttpRequest::body()
 	return this->_body;
 }
 
-bool HttpRequest::is_secure()
+bool HttpRequest::is_secure(conf::Settings* settings)
 {
-	return this->scheme() == "https";
+	return this->scheme(settings) == "https";
 }
 
-std::string HttpRequest::scheme()
+std::string HttpRequest::scheme(conf::Settings* settings)
 {
-	// TODO: make checks if scheme is https.
+	if (settings->SECURE_PROXY_SSL_HEADER)
+	{
+		auto header_val = this->headers.get(
+			settings->SECURE_PROXY_SSL_HEADER->first, ""
+		);
+		if (!header_val.empty())
+		{
+			return header_val == settings->SECURE_PROXY_SSL_HEADER->second ? "https" : "http";
+		}
+	}
 
 	// Default scheme.
 	return "http";

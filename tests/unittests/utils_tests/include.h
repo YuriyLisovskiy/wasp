@@ -15,47 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * utils.h
- * Purpose: core utilities.
- */
+#ifndef WASP_UNIT_TESTS_UTILS_TESTS_INCLUDE_H
+#define WASP_UNIT_TESTS_UTILS_TESTS_INCLUDE_H
 
-#pragma once
+#include "./crypto_tests/include.h"
+#include "./http_tests.h"
 
-// C++ libraries.
-#include <algorithm>
-#include <vector>
-
-// Module definitions.
-#include "./_def_.h"
-
-
-__UTILITY_BEGIN__
-
-template <typename _ItemT>
-bool contains(const _ItemT& to_check, const std::vector<_ItemT>& items)
-{
-	for (const auto& item : items)
-	{
-		if (item == to_check)
-		{
-			return true;
-		}
-	}
-
-	return false;
-}
-
-template <typename _ItemT, typename _IteratorT>
-long index_of(_IteratorT begin, _IteratorT end, const _ItemT& item)
-{
-	auto it = std::find(begin, end, item);
-	if (it == end)
-	{
-		return -1;
-	}
-
-	return std::distance(begin, it);
-}
-
-__UTILITY_END__
+#endif // WASP_UNIT_TESTS_UTILS_TESTS_INCLUDE_H

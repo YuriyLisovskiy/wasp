@@ -38,6 +38,7 @@
 #include "../http/request.h"
 #include "../http/response.h"
 #include "../core/logger.h"
+#include "../core/regex.h"
 #include "../core/string/str.h"
 
 
@@ -46,6 +47,7 @@ __URLS_BEGIN__
 class UrlPattern final
 {
 private:
+/*
 	enum state_enum
 	{
 		s_url,
@@ -54,12 +56,14 @@ private:
 	};
 
 	std::string _s;
-	std::string _orig;
 	std::regex _rgx;
+	std::vector<std::string> _keys;
+*/
+	std::string _orig;
 	std::vector<std::string> _pattern_parts;
 	views::ViewHandler _handler;
 	std::string _name;
-	std::vector<std::string> _keys;
+	core::rgx::ArgRegex _regex;
 
 public:
 	UrlPattern(
@@ -81,8 +85,8 @@ public:
 	bool match(const std::string& url, std::map<std::string, std::string>& args);
 	std::string build(const std::vector<std::string>& args);
 
-private:
-	std::string _parse(const std::string& pattern);
+//private:
+//	std::string _parse(const std::string& pattern);
 };
 
 __URLS_END__

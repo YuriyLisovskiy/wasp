@@ -46,13 +46,13 @@ args_parser::args_parser(int argc, char** argv, size_t parse_from, bool is_verbo
 			auto param = core::str::split(token, '=');
 			if (param.size() > 1)
 			{
-				auto key = core::str::ltrim(std::move(param[0]), '-');
+				auto key = core::str::ltrim(std::move(param[0]), "-");
 				auto val = core::str::join(param.begin() + 1, param.end(), "");
 				this->flags[key] = val;
 			}
 			else
 			{
-				last_arg = core::str::ltrim(std::move(token), '-');
+				last_arg = core::str::ltrim(std::move(token), "-");
 				is_received = false;
 			}
 		}

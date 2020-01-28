@@ -15,47 +15,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * utils.h
- * Purpose: core utilities.
- */
+#ifndef WASP_UNIT_TESTS_UTILS_H
+#define WASP_UNIT_TESTS_UTILS_H
 
-#pragma once
-
-// C++ libraries.
-#include <algorithm>
 #include <vector>
 
-// Module definitions.
 #include "./_def_.h"
 
 
-__UTILITY_BEGIN__
+__TEST_UTILS_BEGIN__
 
-template <typename _ItemT>
-bool contains(const _ItemT& to_check, const std::vector<_ItemT>& items)
+template <typename _T>
+bool assert_vector(const std::vector<_T>& actual, const std::vector<_T>& expected)
 {
-	for (const auto& item : items)
+	if (actual.size() != expected.size())
 	{
-		if (item == to_check)
+		return false;
+	}
+
+	for (size_t i = 0; i < actual.size(); i++)
+	{
+		if (actual[i] != expected[i])
 		{
-			return true;
+			return false;
 		}
 	}
 
-	return false;
+	return true;
 }
 
-template <typename _ItemT, typename _IteratorT>
-long index_of(_IteratorT begin, _IteratorT end, const _ItemT& item)
-{
-	auto it = std::find(begin, end, item);
-	if (it == end)
-	{
-		return -1;
-	}
+__TEST_UTILS_END__
 
-	return std::distance(begin, it);
-}
 
-__UTILITY_END__
+#endif // WASP_UNIT_TESTS_UTILS_H

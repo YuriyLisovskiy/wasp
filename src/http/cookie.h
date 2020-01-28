@@ -45,6 +45,8 @@ private:
 	bool _is_secure;
 	bool _is_http_only;
 
+	void _copy(const Cookie& other);
+
 public:
 	Cookie();
 	Cookie(
@@ -57,7 +59,19 @@ public:
 		bool is_http_only = false
 	);
 
-	std::string to_string();
+	// Copy constructor.
+	Cookie(const Cookie& other);
+
+	// Move constructor.
+	Cookie(Cookie&& other) noexcept;
+
+	// Copy assignment operator.
+	Cookie& operator=(const Cookie& other);
+
+	// Move assignment operator.
+	Cookie& operator=(Cookie&& other) noexcept;
+
+	[[nodiscard]] std::string to_string() const;
 
 	bool operator==(const Cookie& right);
 };

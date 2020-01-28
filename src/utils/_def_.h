@@ -33,3 +33,16 @@
 /// wasp::utils::cache
 #define __CACHE_BEGIN__ __UTILS_BEGIN__ namespace cache {
 #define __CACHE_END__ } __UTILS_END__
+
+/// wasp::utils::cache::internal
+#define __CACHE_INTERNAL_BEGIN__ __CACHE_BEGIN__ namespace internal {
+#define __CACHE_INTERNAL_END__ } __CACHE_END__
+
+
+/// wasp::utils_http
+#define __UTILS_HTTP_BEGIN__ __WASP_BEGIN__ namespace utils_http {
+#define __UTILS_HTTP_END__ } __WASP_END__
+
+/// wasp::utils_http::internal
+#define __UTILS_HTTP_INTERNAL_BEGIN__ __UTILS_HTTP_BEGIN__ namespace internal {
+#define __UTILS_HTTP_INTERNAL_END__ } __UTILS_HTTP_END__

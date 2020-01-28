@@ -15,47 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * utils.h
- * Purpose: core utilities.
- */
+#include <gtest/gtest.h>
 
-#pragma once
-
-// C++ libraries.
-#include <algorithm>
-#include <vector>
-
-// Module definitions.
-#include "./_def_.h"
+#include "./include.h"
 
 
-__UTILITY_BEGIN__
-
-template <typename _ItemT>
-bool contains(const _ItemT& to_check, const std::vector<_ItemT>& items)
+int main(int argc, char *argv[])
 {
-	for (const auto& item : items)
-	{
-		if (item == to_check)
-		{
-			return true;
-		}
-	}
-
-	return false;
+	::testing::InitGoogleTest(&argc, argv);
+	return RUN_ALL_TESTS();
 }
-
-template <typename _ItemT, typename _IteratorT>
-long index_of(_IteratorT begin, _IteratorT end, const _ItemT& item)
-{
-	auto it = std::find(begin, end, item);
-	if (it == end)
-	{
-		return -1;
-	}
-
-	return std::distance(begin, it);
-}
-
-__UTILITY_END__

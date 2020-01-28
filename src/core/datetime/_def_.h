@@ -22,12 +22,12 @@
 
 #pragma once
 
-#include "../../_def_.h"
+#include "../_def_.h"
 
 
 /// wasp::dt
-#define __DATETIME_BEGIN__ __WASP_BEGIN__ namespace dt {
-#define __DATETIME_END__ } __WASP_END__
+#define __DATETIME_BEGIN__ __CORE_BEGIN__ namespace dt {
+#define __DATETIME_END__ } __CORE_END__
 
 /// wasp::dt::internal
 #define __DATETIME_INTERNAL_BEGIN__ __DATETIME_BEGIN__ namespace internal {

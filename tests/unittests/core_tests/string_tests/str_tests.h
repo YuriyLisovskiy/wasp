@@ -127,7 +127,7 @@ TEST(StrUtilsLTrimTestCase, TestLeftTrimmingInPlace)
 
 	expected = "Hello, World  - ---";
 	actual = "------" + expected;
-	core::str::ltrim(actual, '-');
+	core::str::ltrim(actual, "-");
 	ASSERT_EQ(actual, expected);
 }
 
@@ -140,7 +140,7 @@ TEST(StrUtilsRTrimTestCase, TestRightTrimmingInPlace)
 
 	expected = "--------Hello, World";
 	actual = expected + "------";
-	core::str::rtrim(actual, '-');
+	core::str::rtrim(actual, "-");
 	ASSERT_EQ(actual, expected);
 }
 
@@ -153,7 +153,7 @@ TEST(StrUtilsTrimTestCase, TestTrimmingInPlace)
 
 	expected = "Hello, World";
 	actual = "------" + expected + "----";
-	core::str::trim(actual, '-');
+	core::str::trim(actual, "-");
 	ASSERT_EQ(actual, expected);
 }
 
@@ -163,7 +163,7 @@ TEST(StrUtilsLTrimTestCase, TestLeftTrimmingCopy)
 	ASSERT_EQ(core::str::ltrim("       " + expected), expected);
 
 	expected = "Hello, World  - ---";
-	ASSERT_EQ(core::str::ltrim("------" + expected, '-'), expected);
+	ASSERT_EQ(core::str::ltrim("------" + expected, "-"), expected);
 }
 
 TEST(StrUtilsRTrimTestCase, TestRightTrimmingCopy)
@@ -172,7 +172,7 @@ TEST(StrUtilsRTrimTestCase, TestRightTrimmingCopy)
 	ASSERT_EQ(core::str::rtrim(expected + "       "), expected);
 
 	expected = "--------Hello, World";
-	ASSERT_EQ(core::str::rtrim(expected + "------", '-'), expected);
+	ASSERT_EQ(core::str::rtrim(expected + "------", "-"), expected);
 }
 
 TEST(StrUtilsTrimTestCase, TestTrimmingCopy)
@@ -181,7 +181,7 @@ TEST(StrUtilsTrimTestCase, TestTrimmingCopy)
 	ASSERT_EQ(core::str::trim("       " + expected + "      "), expected);
 
 	expected = "Hello, World";
-	ASSERT_EQ(core::str::trim("------" + expected + "----", '-'), expected);
+	ASSERT_EQ(core::str::trim("------" + expected + "----", "-"), expected);
 }
 
 

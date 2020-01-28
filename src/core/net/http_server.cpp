@@ -395,25 +395,21 @@ void HttpServer::_start_listener()
 
 void HttpServer::_serve_connection(const socket_t& client)
 {
-	// TODO: remove when release ------------------------:
 	dt::Measure<std::chrono::milliseconds> measure;
 	if (this->_verbose)
 	{
 		measure.start();
 	}
-	// TODO: remove when release ------------------------^
 
 	http::HttpRequest* request = this->_handle_request(client);
 	this->_http_handler(request, client);
 	delete request;
 
-	// TODO: remove when release -------------------------------------------------------------:
 	if (this->_verbose)
 	{
 		measure.end();
 		std::cout << '\n' << request->method() << " request took " << measure.elapsed() << " ms\n";
 	}
-	// TODO: remove when release -------------------------------------------------------------^
 }
 
 void HttpServer::_thread_func(const socket_t& client)
@@ -482,8 +478,8 @@ void HttpServer::_check_context(HttpServer::context& ctx)
 		throw ValueError("logger can not be nullptr", _ERROR_DETAILS_);
 	}
 
-	str::rtrim(ctx.media_root, '/');
-	str::rtrim(ctx.media_root, '\\');
+	str::rtrim(ctx.media_root, "/");
+	str::rtrim(ctx.media_root, "\\");
 }
 
 void HttpServer::_send(const char* data, const socket_t& client)

@@ -52,6 +52,7 @@ private:
 
 public:
 	DateTime();
+	DateTime(int year, int month, int day, int hour, int minute, int second);
 	DateTime(int year, int month, int day_of_week, int day_of_month, int day_of_year, int hour, int minute, int second, int microsecond, TimeZone tz);
 	DateTime(int year, int month, int day_of_week, int day_of_month, int day_of_year, int hour, int minute, int second, int microsecond, const std::string& tz);
 	DateTime(Date date, Time time, TimeZone tz);

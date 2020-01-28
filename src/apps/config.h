@@ -102,7 +102,7 @@ protected:
 		for (const auto& pattern : included_urlpatterns)
 		{
 			this->_urlpatterns.emplace_back(
-				core::str::rtrim(core::str::starts_with(prefix, "/") ? prefix : "/" + prefix, '/'),
+				core::str::rtrim(core::str::starts_with(prefix, "/") ? prefix : "/" + prefix, "/"),
 				pattern
 			);
 		}

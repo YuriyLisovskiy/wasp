@@ -43,7 +43,7 @@ SecurityMiddleware::SecurityMiddleware(conf::Settings* settings)
 
 http::HttpResponseBase* SecurityMiddleware::process_request(http::HttpRequest* request)
 {
-	auto path = core::str::ltrim(request->path(), '/');
+	auto path = core::str::ltrim(request->path(), "/");
 	bool matched = false;
 	for (auto& pattern : this->redirect_exempt)
 	{
@@ -54,7 +54,7 @@ http::HttpResponseBase* SecurityMiddleware::process_request(http::HttpRequest* r
 		}
 	}
 
-	if (this->redirect && !request->is_secure() && !matched)
+	if (this->redirect && !request->is_secure(this->settings) && !matched)
 	{
 		auto host = this->redirect_host.empty() ?
 			request->get_host(
@@ -75,7 +75,7 @@ http::HttpResponseBase* SecurityMiddleware::process_response(
 )
 {
 	if (
-		this->sts_seconds && request->is_secure() &&
+		this->sts_seconds && request->is_secure(this->settings) &&
 		!response->has_header(http::STRICT_TRANSPORT_SECURITY)
 	)
 	{

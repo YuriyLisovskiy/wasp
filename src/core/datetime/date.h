@@ -23,6 +23,7 @@
 #pragma once
 
 // C++ libraries.
+#include <ctime>
 #include <string>
 
 // Module definitions.
@@ -47,8 +48,13 @@ private:
 	int _day_of_month;
 	int _day_of_year;
 
+	void _init(
+		int year, int month, int day_of_week, int day_of_month, int day_of_year
+	);
+
 public:
 	Date();
+	Date(int year, int month, int day);
 	Date(int year, int month, int day_of_week, int day_of_month, int day_of_year);
 
 	int year();

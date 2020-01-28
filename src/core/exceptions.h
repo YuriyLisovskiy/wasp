@@ -141,12 +141,18 @@ class InterruptException : public BaseException
 {
 protected:
 	// Use only when initializing of a derived exception!
-	InterruptException(const char* message, int line, const char* function, const char* file, const char* type);
+	InterruptException(
+		const char* message, int line, const char* function, const char* file, const char* type
+	);
 
 	static void handle_signal(int sig);
 public:
-	explicit InterruptException(const char* message, int line = 0, const char* function = "", const char* file = "");
-	explicit InterruptException(const std::string& message, int line = 0, const char* function = "", const char* file = "");
+	explicit InterruptException(
+		const char* message, int line = 0, const char* function = "", const char* file = ""
+	);
+	explicit InterruptException(
+		const std::string& message, int line = 0, const char* function = "", const char* file = ""
+	);
 	static void initialize();
 };
 

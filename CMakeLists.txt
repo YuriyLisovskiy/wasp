@@ -19,6 +19,7 @@ set(PACKAGE_COLLECTIONS_UNIT_TESTS "unit-tests-collections")
 set(PACKAGE_CONF_UNIT_TESTS "unit-tests-conf")
 set(PACKAGE_CORE_UNIT_TESTS "unit-tests-core")
 set(PACKAGE_HTTP_UNIT_TESTS "unit-tests-http")
+set(PACKAGE_UTILS_UNIT_TESTS "unit-tests-utils")
 set(PACKAGE_VIEWS_UNIT_TESTS "unit-tests-views")
 
 set(CMAKE_CXX_FLAGS "-pthread")
@@ -61,8 +62,8 @@ file(GLOB LIB_FILES
 	"src/urls/*.cpp"
 	"src/utils/*.h"
 	"src/utils/*.cpp"
-	"src/utils/hashlib/*.h"
-	"src/utils/hashlib/*.cpp"
+	"src/utils/crypto/*.h"
+	"src/utils/crypto/*.cpp"
 	"src/*.h"
 	"src/*.cpp"
 )
@@ -104,6 +105,15 @@ file(GLOB HTTP_TEST_SRC
 )
 add_executable(${PACKAGE_HTTP_UNIT_TESTS} ${LIB_SRC} ${HTTP_TEST_SRC} "tests/unittests/http_tests/main.cpp")
 target_link_libraries(${PACKAGE_HTTP_UNIT_TESTS} gtest gtest_main rt pthread ${HTTP_TEST_SRC})
+
+
+# Utils package tests setup.
+file(GLOB UTILS_TEST_SRC
+	"tests/unittests/utils_tests/crypto_tests/*.h"
+	"tests/unittests/utils_tests/*.h"
+)
+add_executable(${PACKAGE_UTILS_UNIT_TESTS} ${LIB_SRC} ${UTILS_TEST_SRC} "tests/unittests/utils_tests/main.cpp")
+target_link_libraries(${PACKAGE_UTILS_UNIT_TESTS} gtest gtest_main rt pthread ${UTILS_TEST_SRC})
 
 
 # Views package tests setup.

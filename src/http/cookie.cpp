@@ -24,6 +24,20 @@
 
 __HTTP_BEGIN__
 
+void Cookie::_copy(const Cookie& other)
+{
+	if (this != &other)
+	{
+		this->_name = other._name;
+		this->_value = other._value;
+		this->_expires = other._expires;
+		this->_domain = other._domain;
+		this->_path = other._path;
+		this->_is_secure = other._is_secure;
+		this->_is_http_only = other._is_http_only;
+	}
+}
+
 Cookie::Cookie() : Cookie("", "", "")
 {
 }
@@ -51,7 +65,29 @@ Cookie::Cookie(
 	}
 }
 
-std::string Cookie::to_string()
+Cookie::Cookie(const Cookie& other)
+{
+	this->_copy(other);
+}
+
+Cookie::Cookie(Cookie&& other) noexcept
+{
+	this->_copy(other);
+}
+
+Cookie& Cookie::operator=(const Cookie& other)
+{
+	this->_copy(other);
+	return *this;
+}
+
+Cookie& Cookie::operator=(Cookie&& other) noexcept
+{
+	this->_copy(other);
+	return *this;
+}
+
+std::string Cookie::to_string() const
 {
 	// Sets browser's directive 'Set-Cookie' and cookie's name and value.
 	std::string result = "Set-Cookie: " + this->_name + "=" + this->_value;

@@ -183,25 +183,25 @@ public:
 	}
 
 	/// Returns constant begin iterator.
-	const_iterator cbegin()
+	const_iterator cbegin() const
 	{
 		return this->_map.cbegin();
 	}
 
 	/// Returns constant end iterator.
-	const_iterator cend()
+	const_iterator cend() const
 	{
 		return this->_map.cend();
 	}
 
 	/// Returns constant reversed begin iterator.
-	const_reverse_iterator crbegin()
+	const_reverse_iterator crbegin() const
 	{
 		return this->_map.crbegin();
 	}
 
 	/// Returns constant reversed end iterator.
-	const_reverse_iterator crend()
+	const_reverse_iterator crend() const
 	{
 		return this->_map.crend();
 	}
@@ -255,6 +255,11 @@ public:
 		}
 
 		return this->_map.rend();
+	}
+
+	_Val& operator[] (const _Key& key)
+	{
+		return this->_map[key];
 	}
 };
 

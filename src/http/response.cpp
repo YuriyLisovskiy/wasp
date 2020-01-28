@@ -49,6 +49,7 @@ HttpResponseBase::HttpResponseBase(
 		this->_status = 200;
 	}
 
+	this->_reason_phrase = reason;
 	this->_charset = charset;
 
 	if (content_type.empty())
@@ -85,6 +86,11 @@ void HttpResponseBase::set_content(const std::string& content)
 {
 }
 
+std::string HttpResponseBase::get_content()
+{
+	return "";
+}
+
 void HttpResponseBase::set_cookie(
 	const std::string& name,
 	const std::string& value,
@@ -99,17 +105,29 @@ void HttpResponseBase::set_cookie(
 }
 
 void HttpResponseBase::set_signed_cookie(
-	const std::string& name,
-	const std::string& value,
-	const std::string& salt,
-	const std::string& expires,
-	const std::string& domain,
-	const std::string& path,
-	bool is_secure,
-	bool is_http_only
+		const std::string& name,
+		const std::string& value,
+		const std::string& salt,
+		const std::string& expires,
+		const std::string& domain,
+		const std::string& path,
+		bool is_secure,
+		bool is_http_only
 )
 {
 	// TODO:
+}
+
+void HttpResponseBase::set_cookies(
+	const collections::Dict<std::string, Cookie>& cookies
+)
+{
+	this->_cookies = cookies;
+}
+
+const collections::Dict<std::string, Cookie>& HttpResponseBase::get_cookies()
+{
+	return this->_cookies;
 }
 
 void HttpResponseBase::delete_cookie(const std::string& name, const std::string& path, const std::string& domain)
@@ -204,7 +222,9 @@ void HttpResponseBase::write_lines(const std::vector<std::string>& lines)
 
 std::string HttpResponseBase::serialize_headers()
 {
-	auto expr = [](const std::pair<std::string, std::string>& _p) -> std::string { return _p.first + ": " + _p.second; };
+	auto expr = [](const std::pair<std::string, std::string>& _p) -> std::string {
+		return _p.first + ": " + _p.second;
+	};
 	std::string result;
 	for (auto it = this->_headers.cbegin(); it != this->_headers.cend(); it++)
 	{
@@ -215,7 +235,21 @@ std::string HttpResponseBase::serialize_headers()
 		}
 	}
 
+	for (auto it = this->_cookies.cbegin(); it != this->_cookies.cend(); it++)
+	{
+		result.append(it->second.to_string());
+		if (std::next(it) != this->_cookies.cend())
+		{
+			result.append("\r\n");
+		}
+	}
+
 	return result;
+}
+
+std::string& HttpResponseBase::operator[] (const std::string& key)
+{
+	return this->_headers[key];
 }
 
 
@@ -240,6 +274,11 @@ size_t HttpResponse::content_length()
 void HttpResponse::set_content(const std::string& content)
 {
 	this->_content = content;
+}
+
+std::string HttpResponse::get_content()
+{
+	return this->_content;
 }
 
 void HttpResponse::write(const std::string& content)
@@ -267,7 +306,7 @@ void HttpResponse::write_lines(const std::vector<std::string>& lines)
 
 std::string HttpResponse::serialize()
 {
-	this->set_header("Date", dt::gmtnow().strftime("%a, %d %b %Y %T %Z"));
+	this->set_header("Date", core::dt::gmtnow().strftime("%a, %d %b %Y %T %Z"));
 	this->set_header("Content-Length", std::to_string(this->_content.size()));
 
 	auto reason_phrase = this->get_reason_phrase();
@@ -390,7 +429,7 @@ std::string FileResponse::_get_headers_chunk()
 {
 	auto reason_phrase = this->get_reason_phrase();
 	this->_set_headers();
-	this->set_header("Date", dt::gmtnow().strftime("%a, %d %b %Y %T %Z"));
+	this->set_header("Date", core::dt::gmtnow().strftime("%a, %d %b %Y %T %Z"));
 	auto headers = this->serialize_headers();
 
 	std::string headers_chunk = "HTTP/1.1 " + std::to_string(this->_status) + " " + reason_phrase + "\r\n"

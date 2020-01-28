@@ -84,6 +84,7 @@ public:
 	void remove_header(const std::string& key);
 	bool has_header(const std::string& key);
 	virtual void set_content(const std::string& content);
+	virtual std::string get_content();
 
 	void set_cookie(
 		const std::string& name,
@@ -93,6 +94,10 @@ public:
 		const std::string& path = "/",
 		bool is_secure = false,
 		bool is_http_only = false
+	);
+	const collections::Dict<std::string, Cookie>& get_cookies();
+	void set_cookies(
+		const collections::Dict<std::string, Cookie>& cookies
 	);
 	void set_signed_cookie(
 		const std::string& name,
@@ -128,6 +133,8 @@ public:
 	virtual void write_lines(const std::vector<std::string>& lines);
 
 	virtual std::string serialize() = 0;
+
+	std::string& operator[] (const std::string& key);
 };
 
 
@@ -147,6 +154,7 @@ public:
 	);
 	size_t content_length() override;
 	void set_content(const std::string& content) override;
+	std::string get_content() override;
 	void write(const std::string& content) override;
 	unsigned long int tell() override;
 	bool writable() override;

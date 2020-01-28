@@ -75,6 +75,8 @@ Settings::Settings()
 	this->USE_X_FORWARDED_HOST = false;
 	this->USE_X_FORWARDED_PORT = false;
 
+	this->SECURE_PROXY_SSL_HEADER = nullptr;
+
 	this->CSRF_COOKIE_NAME = "csrftoken";
 	this->CSRF_COOKIE_AGE = 60 * 60 * 24 * 7 * 52;
 	this->CSRF_COOKIE_DOMAIN = "";
@@ -109,6 +111,7 @@ void Settings::prepare()
 
 Settings::~Settings()
 {
+	delete this->SECURE_PROXY_SSL_HEADER;
 	for (auto& installed_app : this->INSTALLED_APPS)
 	{
 		delete installed_app;
