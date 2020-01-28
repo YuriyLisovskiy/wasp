@@ -61,11 +61,10 @@ UrlPattern make_static(
 	};
 
 	return make_url(
-		core::str::rtrim(static_url, '/') + "/" + "<path>(.*)",
+		core::str::rtrim(static_url, "/") + "/" + "<path>(.*)",
 		view_func,
 		name.empty() ? "static" : name
 	);
-
 }
 
 __URLS_END__

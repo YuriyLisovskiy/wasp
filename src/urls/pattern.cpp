@@ -39,7 +39,7 @@ UrlPattern::UrlPattern(
 			this->_pattern_parts.back().pop_back();
 		}
 
-		core::str::rtrim(this->_pattern_parts.back(), '/');
+		core::str::rtrim(this->_pattern_parts.back(), "/");
 	}
 
 	this->_handler = handler;

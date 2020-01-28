@@ -101,7 +101,7 @@ http::HttpResponseBase* CommonMiddleware::process_request(
 	bool must_prepend = this->settings->PREPEND_WWW &&
 		!host.empty() &&
 		!core::str::starts_with(host, "www.");
-	auto redirect_url = must_prepend ? (request->scheme() + "://www." + host) : "";
+	auto redirect_url = must_prepend ? (request->scheme(this->settings) + "://www." + host) : "";
 
 	// Check if a slash should be appended.
 	std::string path;

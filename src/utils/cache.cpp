@@ -24,25 +24,67 @@
 
 __CACHE_INTERNAL_BEGIN__
 
-// TESTME: test _if_match_passes
 bool _if_match_passes(
 	const std::string& target_etag, std::vector<std::string>& etags
 )
 {
-	// TODO: implement _if_match_passes
-	return false;
+	if (target_etag.empty())
+	{
+		// If there isn't an ETag, then there can't be a match.
+		return false;
+	}
+	else if (etags.size() == 1 && etags.front() == "*")
+	{
+		// The existence of an ETag means that there is "a current
+		// representation for the target resource", even if the ETag is weak,
+		// so there is a match to '*'.
+		return true;
+	}
+	else if (core::str::starts_with(target_etag, "W/"))
+	{
+		// A weak ETag can never strongly match another ETag.
+		return false;
+	}
+	else
+	{
+		// Since the ETag is strong, this will only return True
+		// if there's a strong match.
+		return core::utility::contains(target_etag, etags);
+	}
 }
 
-// TESTME: test _if_none_match_passes
 bool _if_none_match_passes(
 	const std::string& target_etag, std::vector<std::string>& etags
 )
 {
-	// TODO: implement _if_none_match_passes
-	return false;
+	if (target_etag.empty())
+	{
+		// If there isn't an ETag, then there isn't a match.
+		return true;
+	}
+	else if (etags.size() == 1 && etags.front() == "*")
+	{
+		// The existence of an ETag means that there is "a current
+		// representation for the target resource", so there is a match to '*'.
+		return false;
+	}
+	else
+	{
+		// The comparison should be weak, so look for a match after stripping
+		// off any weak indicators.
+		auto target_etag_copy = core::str::trim(target_etag, "W/");
+		for (const auto& etag : etags)
+		{
+			if (core::str::trim(etag, "W/") == target_etag_copy)
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
 }
 
-// TESTME: test _if_modified_since_passes
 bool _if_modified_since_passes(
 	long last_modified, long if_modified_since
 )
@@ -50,7 +92,6 @@ bool _if_modified_since_passes(
 	return last_modified == -1 || last_modified > if_modified_since;
 }
 
-// TESTME: test _if_unmodified_since_passes
 bool _if_unmodified_since_passes(
 	long last_modified, long if_unmodified_since
 )
@@ -58,19 +99,46 @@ bool _if_unmodified_since_passes(
 	return last_modified != -1 && last_modified <= if_unmodified_since;
 }
 
-// TESTME: test _precondition_failed
 http::HttpResponseBase* _precondition_failed(http::HttpRequest* request)
 {
-	// TODO: implement _precondition_failed
-	return nullptr;
+	return new http::HttpResponse("", 412);
 }
 
-// TESTME: test _not_modified
 http::HttpResponseBase* _not_modified(
 	http::HttpRequest* request, http::HttpResponseBase* response
 )
 {
-	// TODO: implement _not_modified
+	auto* new_response = new http::HttpResponseNotModified("");
+	if (response)
+	{
+		auto headers = {
+			http::CACHE_CONTROL,
+			http::CONTENT_LOCATION,
+			http::DATE,
+			http::E_TAG,
+			http::EXPIRES,
+			http::LAST_MODIFIED,
+			http::VARY
+		};
+
+		// Preserve the headers required by Section 4.1 of RFC 7232,
+		// as well as Last-Modified.
+		for (const auto& header : headers)
+		{
+			if (response->has_header(header))
+			{
+				(*new_response)[header] = (*response)[header];
+			}
+		}
+
+		// Preserve cookies as per the cookie specification: "If a proxy server
+		// receives a response which contains a Set-cookie header, it should
+		// propagate the Set-cookie header to the client, regardless of whether
+		// the response was 304 (Not Modified) or 200 (OK).
+		// https://curl.haxx.se/rfc/cookie_spec.html
+		new_response->set_cookies(response->get_cookies());
+	}
+
 	return nullptr;
 }
 
@@ -79,7 +147,6 @@ __CACHE_INTERNAL_END__
 
 __CACHE_BEGIN__
 
-// TESTME: test set_response_etag
 void set_response_etag(http::HttpResponseBase* response)
 {
 	if (!response->is_streaming() && response->content_length() > 0)
@@ -91,7 +158,6 @@ void set_response_etag(http::HttpResponseBase* response)
 	}
 }
 
-// TESTME: test get_conditional_response
 http::HttpResponseBase* get_conditional_response(
 	http::HttpRequest* request,
 	const std::string& etag,

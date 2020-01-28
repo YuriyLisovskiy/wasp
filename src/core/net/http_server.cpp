@@ -482,8 +482,8 @@ void HttpServer::_check_context(HttpServer::context& ctx)
 		throw ValueError("logger can not be nullptr", _ERROR_DETAILS_);
 	}
 
-	str::rtrim(ctx.media_root, '/');
-	str::rtrim(ctx.media_root, '\\');
+	str::rtrim(ctx.media_root, "/");
+	str::rtrim(ctx.media_root, "\\");
 }
 
 void HttpServer::_send(const char* data, const socket_t& client)

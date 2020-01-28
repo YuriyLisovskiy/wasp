@@ -181,67 +181,49 @@ bool ends_with(const std::string& src, const std::string& suffix)
 	return true;
 }
 
-void ltrim(std::string& s, char ch)
+void ltrim(std::string& s, const std::string& to_trim)
 {
-	s.erase(
-		s.begin(),
-		std::find_if(s.begin(), s.end(), [ch](char chr) {return ch != chr;})
-	);
+	while (starts_with(s, to_trim))
+	{
+		s.erase(s.begin(), s.begin() + to_trim.size());
+	}
 }
 
-void rtrim(std::string& s, char ch)
-{
-	s.erase(
-		std::find_if(s.rbegin(), s.rend(), [ch](int chr) {return ch != chr;}).base(),
-		s.end()
-	);
-}
-
-void trim(std::string& s, char ch)
-{
-	ltrim(s, ch);
-	rtrim(s, ch);
-}
-
-std::string ltrim(const std::string& s, char ch)
+std::string ltrim(const std::string& s, const std::string& to_trim)
 {
 	std::string copy = s;
-	ltrim(copy, ch);
+	ltrim(copy, to_trim);
 	return copy;
 }
 
-std::string rtrim(const std::string& s, char ch)
+void rtrim(std::string& s, const std::string& to_trim)
+{
+	while (ends_with(s, to_trim))
+	{
+		s.erase(
+			s.end() - to_trim.size(),
+			s.end()
+		);
+	}
+}
+
+std::string rtrim(const std::string& s, const std::string& to_trim)
 {
 	std::string copy = s;
-	rtrim(copy, ch);
+	rtrim(copy, to_trim);
 	return copy;
 }
 
-std::string trim(const std::string& s, char ch)
+void trim(std::string& s, const std::string& to_trim)
 {
-	std::string copy = s;
-	trim(copy, ch);
-	return copy;
+	ltrim(s, to_trim);
+	rtrim(s, to_trim);
 }
 
-std::string ltrim(std::string&& s, char ch)
+std::string trim(const std::string& s, const std::string& to_trim)
 {
 	std::string copy = s;
-	ltrim(copy, ch);
-	return copy;
-}
-
-std::string rtrim(std::string&& s, char ch)
-{
-	std::string copy = s;
-	rtrim(copy, ch);
-	return copy;
-}
-
-std::string trim(std::string&& s, char ch)
-{
-	std::string copy = s;
-	trim(copy, ch);
+	trim(copy, to_trim);
 	return copy;
 }
 

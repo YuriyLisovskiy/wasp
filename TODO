@@ -15,17 +15,15 @@ Check out TODOs in (not urgent):
     - src/core/http_server.cpp
     - src/core/management/runserver.cpp
 
-    - src/http/request.cpp
     - src/http/response.cpp
-
-    - src/utils/cache.cpp
 
     - src/views/static.cpp
 
 
-Not tested:
+// TESTME:
     - src/apps/*
 
+// TESTME:
     - src/core/datetime/*
     - src/core/management/*
     - src/core/net/*
@@ -34,16 +32,21 @@ Not tested:
     - src/core/string/format
     - src/core/regex
 
+// TESTME:
     - src/http/request
     - src/http/response
     - src/http/utility
 
+// TESTME:
     - src/middleware/*
 
+// TESTME:
     - src/urls/*
 
+// TESTME:
     - src/utils/*
 
+// TESTME:
     - src/views/static
 
 
@@ -317,15 +320,6 @@ NUMBER_GROUPING = 0
 # The tablespaces to use for each model when not specified otherwise.
 DEFAULT_TABLESPACE = ''
 DEFAULT_INDEX_TABLESPACE = ''
-
-# If your Django app is behind a proxy that sets a header to specify secure
-# connections, AND that proxy ensures that user-submitted headers with the
-# same name are ignored (so that people can't spoof it), set this value to
-# a tuple of (header_name, header_value). For any requests that come in with
-# that header/value, request.is_secure() will return True.
-# WARNING! Only set this if you fully understand what you're doing. Otherwise,
-# you may be opening yourself up to a security risk.
-SECURE_PROXY_SSL_HEADER = None
 
 ############
 # SESSIONS #

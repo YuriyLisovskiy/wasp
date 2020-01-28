@@ -95,6 +95,10 @@ public:
 		bool is_secure = false,
 		bool is_http_only = false
 	);
+	const collections::Dict<std::string, Cookie>& get_cookies();
+	void set_cookies(
+		const collections::Dict<std::string, Cookie>& cookies
+	);
 	void set_signed_cookie(
 		const std::string& name,
 	    const std::string& value,
@@ -129,6 +133,8 @@ public:
 	virtual void write_lines(const std::vector<std::string>& lines);
 
 	virtual std::string serialize() = 0;
+
+	std::string& operator[] (const std::string& key);
 };
 
 

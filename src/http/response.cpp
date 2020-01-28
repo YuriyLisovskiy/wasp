@@ -49,6 +49,7 @@ HttpResponseBase::HttpResponseBase(
 		this->_status = 200;
 	}
 
+	this->_reason_phrase = reason;
 	this->_charset = charset;
 
 	if (content_type.empty())
@@ -101,6 +102,18 @@ void HttpResponseBase::set_cookie(
 )
 {
 	this->_cookies.set(name, Cookie(name, value, expires, domain, path, is_secure, is_http_only));
+}
+
+void HttpResponseBase::set_cookies(
+	const collections::Dict<std::string, Cookie>& cookies
+)
+{
+	this->_cookies = cookies;
+}
+
+const collections::Dict<std::string, Cookie>& HttpResponseBase::get_cookies()
+{
+	return this->_cookies;
 }
 
 void HttpResponseBase::set_signed_cookie(
@@ -209,7 +222,9 @@ void HttpResponseBase::write_lines(const std::vector<std::string>& lines)
 
 std::string HttpResponseBase::serialize_headers()
 {
-	auto expr = [](const std::pair<std::string, std::string>& _p) -> std::string { return _p.first + ": " + _p.second; };
+	auto expr = [](const std::pair<std::string, std::string>& _p) -> std::string {
+		return _p.first + ": " + _p.second;
+	};
 	std::string result;
 	for (auto it = this->_headers.cbegin(); it != this->_headers.cend(); it++)
 	{
@@ -220,7 +235,21 @@ std::string HttpResponseBase::serialize_headers()
 		}
 	}
 
+	for (auto it = this->_cookies.cbegin(); it != this->_cookies.cend(); it++)
+	{
+		result.append(it->second.to_string());
+		if (std::next(it) != this->_cookies.cend())
+		{
+			result.append("\r\n");
+		}
+	}
+
 	return result;
+}
+
+std::string& HttpResponseBase::operator[] (const std::string& key)
+{
+	return this->_headers[key];
 }
 
 

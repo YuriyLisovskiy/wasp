@@ -33,8 +33,9 @@
 // Wasp libraries.
 #include "./http.h"
 #include "./crypto/md5.h"
+#include "../core/utility.h"
 #include "../http/headers.h"
-#include "../http/response.h"
+#include "../http/request.h"
 #include "../http/response.h"
 
 
