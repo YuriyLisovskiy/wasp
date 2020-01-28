@@ -36,7 +36,7 @@ extern std::string salted_hmac(
 	const std::string& salt,
 	const std::string& value,
 	const std::string& key,
-	std::function<std::string(const std::string&)> algorithm_fn = nullptr
+	const std::function<std::string(const std::string&)>& algorithm_fn = nullptr
 );
 
 __CRYPTO_END__
