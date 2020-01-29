@@ -72,7 +72,7 @@ DateTime gmtnow()
 
 
 /// DateTime class implementation.
-DateTime::DateTime() : _date(), _time(), _tz()
+DateTime::DateTime() : DateTime(internal::now())
 {
 }
 
@@ -188,6 +188,7 @@ size_t DateTime::utc_epoch()
 {
 	auto* time_info = this->_to_std_tm();
 	time_t epoch = std::mktime(time_info);
+	epoch += time_info->tm_gmtoff;
 	delete time_info;
 	return epoch;
 }
@@ -203,35 +204,35 @@ std::string DateTime::strftime(const char* _format)
 
 DateTime DateTime::strptime(const char* _datetime, const char* _format)
 {
-	auto* time_info = new tm();
-	::strptime(_datetime, _format, time_info);
+	struct tm time_info{};
+	::strptime(_datetime, _format, &time_info);
 	auto result = DateTime(
-		time_info->tm_year,
-		time_info->tm_mon + 1,
-		time_info->tm_wday,
-		time_info->tm_mday,
-		time_info->tm_yday + 1,
-		time_info->tm_hour,
-		time_info->tm_min,
-		time_info->tm_sec,
-		time_info->tm_sec * 1000000,
-		TimeZone(std::mktime(time_info))
+		time_info.tm_year + 1900,
+		time_info.tm_mon + 1,
+		time_info.tm_wday,
+		time_info.tm_mday,
+		time_info.tm_yday + 1,
+		time_info.tm_hour,
+		time_info.tm_min,
+		time_info.tm_sec,
+		0,
+		TimeZone(std::string(time_info.tm_zone))
 	);
-	delete time_info;
 	return result;
 }
 
 std::tm* DateTime::_to_std_tm()
 {
 	auto* time_info = new std::tm();
-	time_info->tm_year = this->_date.year();
+	time_info->tm_year = this->_date.year() - 1900;
 	time_info->tm_mon = this->_date.month() - 1;
 	time_info->tm_wday = this->_date.day_of_week();
 	time_info->tm_mday = this->_date.day_of_month();
 	time_info->tm_yday = this->_date.day_of_year() - 1;
 	time_info->tm_hour = this->_time.hour();
 	time_info->tm_min = this->_time.minute();
-	time_info->tm_sec = this->_time.second() / 1000000;
+	time_info->tm_sec = this->_time.second();
+	time_info->tm_gmtoff = internal::TZ_TO_OFFSET.get(this->_tz.get_name(), 0);
 	time_info->tm_zone = this->_tz.get_name().c_str();
 	return time_info;
 }
