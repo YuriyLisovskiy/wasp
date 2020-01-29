@@ -29,6 +29,7 @@
 
 __UNIT_TESTS_BEGIN__
 
+// FIXME: fix TEST(ParseHttpDateTestCase, ParseGMTDate)
 TEST(ParseHttpDateTestCase, ParseGMTDate)
 {
 	auto actual = utils_http::parse_http_date("Tue, 15 Nov 2019 12:45:26 GMT");

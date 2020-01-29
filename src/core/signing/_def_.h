@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,18 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WASP_UNIT_TESTS_CORE_TESTS_INCLUDE_H
-#define WASP_UNIT_TESTS_CORE_TESTS_INCLUDE_H
+/**
+ * _def_.h
+ * Purpose: core/signing module's definitions.
+ */
 
-#include "./datetime_tests/include.h"
-#include "./exceptions_tests/include.h"
-#include "./files_tests/include.h"
-#include "./flags_tests/include.h"
-#include "./parsers_tests/include.h"
-#include "./string_tests/include.h"
-#include "./encoding_tests.h"
-#include "./mime_types_tests.h"
-#include "./path_tests.h"
-#include "./regex_tests.h"
+#pragma once
 
-#endif // WASP_UNIT_TESTS_CORE_TESTS_INCLUDE_H
+#include "../_def_.h"
+
+
+// wasp::core::signing
+#define __SIGNING_BEGIN__ __CORE_BEGIN__ namespace signing {
+#define __SIGNING_END__ } __CORE_END__
+
+// wasp::core::signing::internal
+#define __SIGNING_INTERNAL_BEGIN__ __SIGNING_BEGIN__ namespace internal {
+#define __SIGNING_INTERNAL_END__ } __SIGNING_END__

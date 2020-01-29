@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@
 
 // Wasp libraries.
 #include "../core/regex.h"
+#include "../core/signing/signer.h"
 #include "../core/string/str.h"
 #include "../core/datetime/datetime.h"
 
@@ -78,5 +79,10 @@ extern bool is_same_domain(const std::string& host, const std::string& pattern);
 /// escaped to prevent browsers from handling the path as schemaless and
 /// redirecting to another host.
 extern void escape_leading_slashes(std::string& url);
+
+extern core::signing::Signer get_cookie_signer(
+	const std::string& secret_key,
+	const std::string& salt = "wasp.core.signing.get_cookie_signer"
+);
 
 __HTTP_END__

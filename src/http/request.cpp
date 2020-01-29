@@ -83,21 +83,25 @@ std::string HttpRequest::body()
 	return this->_body;
 }
 
-bool HttpRequest::is_secure(conf::Settings* settings)
+bool HttpRequest::is_secure(
+	std::pair<std::string, std::string>* secure_proxy_ssl_header
+)
 {
-	return this->scheme(settings) == "https";
+	return this->scheme(secure_proxy_ssl_header) == "https";
 }
 
-std::string HttpRequest::scheme(conf::Settings* settings)
+std::string HttpRequest::scheme(
+	std::pair<std::string, std::string>* secure_proxy_ssl_header
+)
 {
-	if (settings->SECURE_PROXY_SSL_HEADER)
+	if (secure_proxy_ssl_header)
 	{
 		auto header_val = this->headers.get(
-			settings->SECURE_PROXY_SSL_HEADER->first, ""
+			secure_proxy_ssl_header->first, ""
 		);
 		if (!header_val.empty())
 		{
-			return header_val == settings->SECURE_PROXY_SSL_HEADER->second ? "https" : "http";
+			return header_val == secure_proxy_ssl_header->second ? "https" : "http";
 		}
 	}
 

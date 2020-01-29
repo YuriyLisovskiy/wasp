@@ -15,33 +15,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WASP_UNIT_TESTS_UTILS_TESTS_CRYPTO_TESTS_MD5_TESTS_H
-#define WASP_UNIT_TESTS_UTILS_TESTS_CRYPTO_TESTS_MD5_TESTS_H
+#ifndef WASP_UNIT_TESTS_CORE_TESTS_DATETIME_TESTS_DATETIME_TESTS_INCLUDE_H
+#define WASP_UNIT_TESTS_CORE_TESTS_DATETIME_TESTS_DATETIME_TESTS_INCLUDE_H
 
+#include <iostream>
 #include <gtest/gtest.h>
 
 #include "../../_def_.h"
-#include "../../../../src/utils/crypto/md5.h"
+#include "../../../../src/core/datetime/datetime.h"
 
 
 __UNIT_TESTS_BEGIN__
 
-TEST(Md5TestCase, TestDigest)
+// FIXME: TEST(DateTimeTestCase, StrptimeTest)
+TEST(DateTimeTestCase, StrptimeTest)
 {
-	auto expected = "9e107d9d372bb6826bd81d3542a419d6";
-	auto actual = utils::crypto::MD5("The quick brown fox jumps over the lazy dog").hex_digest();
-	ASSERT_EQ(actual, expected);
+	const char* str_dt = "Tue, 15 Nov 2019 12:45:26 EET";
+	auto dt = core::dt::DateTime::strptime(str_dt, "%a, %e %b %Y %T %Z");
+//	auto dt = core::dt::DateTime();
+	auto strf_time = dt.strftime("%a, %e %b %Y %T %Z");
 
-	expected = "e4d909c290d0fb1ca068ffaddf22cbd0";
-	actual = utils::crypto::MD5("The quick brown fox jumps over the lazy dog.").hex_digest();
-	ASSERT_EQ(actual, expected);
-
-	expected = "d41d8cd98f00b204e9800998ecf8427e";
-	actual = utils::crypto::MD5("").hex_digest();
-	ASSERT_EQ(actual, expected);
+	std::cout << "Original: " << str_dt << '\n';
+	std::cout << "Strftime: " << strf_time << '\n';
+//	auto e = dt.utc_epoch();
 }
 
 __UNIT_TESTS_END__
 
 
-#endif // WASP_UNIT_TESTS_UTILS_TESTS_CRYPTO_TESTS_MD5_TESTS_H
+#endif // WASP_UNIT_TESTS_CORE_TESTS_DATETIME_TESTS_DATETIME_TESTS_INCLUDE_H

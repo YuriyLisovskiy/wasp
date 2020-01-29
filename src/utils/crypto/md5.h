@@ -45,6 +45,9 @@ documentation and/or software.
 // Module definitions.
 #include "./_def_.h"
 
+// Waps libraries.
+#include "./interface.h"
+
 
 __CRYPTO_BEGIN__
 
@@ -66,13 +69,15 @@ __CRYPTO_BEGIN__
 #define S43 15
 #define S44 21
 
-class md5 final
+class MD5 final : public IHash
 {
 private:
 	typedef unsigned char uint8;
 	typedef unsigned int uint32;
 
-	const static int BLOCK_SIZE = 64;
+	const static size_t BLOCK_SIZE = 64;
+
+	const static size_t SIZE = 16;
 
 	// For excluding multiple finalization.
 	bool _finalized;
@@ -87,24 +92,31 @@ private:
 	uint32 _state[4];
 
 	// The result.
-	uint8 _digest[16];
+	uint8 _digest[SIZE];
 
 public:
-	md5();
-	explicit md5(const std::string& input);
+	MD5();
+	explicit MD5(const std::string& input);
 
 	// Continues an MD5 message-digest operation,
 	// processing another message block.
-	void update(const unsigned char input[], unsigned int n);
+	void update(const unsigned char input[], unsigned int n) final;
 
 	// For convenience provide a version with signed char.
-	void update(const char input[], unsigned int n);
+	void update(const char input[], unsigned int n) final;
 
 	// For convenience provide a version with std::string.
-	void update(const std::string& input);
+	void update(const std::string& input) final;
 
 	// Hex representation of digest as string.
-	std::string digest();
+	std::string hex_digest() final;
+
+	// Hex representation of digest as unsigned char array.
+	unsigned char* digest() final;
+
+	void reset() final;
+	size_t size() final;
+	size_t block_size() final;
 
 private:
 	void _init();

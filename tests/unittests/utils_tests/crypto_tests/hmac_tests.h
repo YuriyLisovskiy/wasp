@@ -15,33 +15,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WASP_UNIT_TESTS_UTILS_TESTS_CRYPTO_TESTS_MD5_TESTS_H
-#define WASP_UNIT_TESTS_UTILS_TESTS_CRYPTO_TESTS_MD5_TESTS_H
+#ifndef WASP_UNIT_TESTS_UTILS_TESTS_CRYPTO_TESTS_HMAC_TESTS_H
+#define WASP_UNIT_TESTS_UTILS_TESTS_CRYPTO_TESTS_HMAC_TESTS_H
+
+#include <string>
 
 #include <gtest/gtest.h>
 
 #include "../../_def_.h"
-#include "../../../../src/utils/crypto/md5.h"
+#include "../../../../src/core/logger.h"
+#include "../../../../src/utils/crypto/hmac.h"
 
 
 __UNIT_TESTS_BEGIN__
 
-TEST(Md5TestCase, TestDigest)
+TEST(HmacTestCase, Md5HasherTest)
 {
-	auto expected = "9e107d9d372bb6826bd81d3542a419d6";
-	auto actual = utils::crypto::MD5("The quick brown fox jumps over the lazy dog").hex_digest();
-	ASSERT_EQ(actual, expected);
+	std::string key = "+s6cv712&nw4gsk)1dmgpje+f#%^4lhp@!up+=p3ts+hxz(fr2";
+	auto hmac = utils::crypto::Hmac(key);
 
-	expected = "e4d909c290d0fb1ca068ffaddf22cbd0";
-	actual = utils::crypto::MD5("The quick brown fox jumps over the lazy dog.").hex_digest();
-	ASSERT_EQ(actual, expected);
+	ASSERT_EQ(hmac.size(), 16);
+	ASSERT_EQ(hmac.block_size(), 64);
 
-	expected = "d41d8cd98f00b204e9800998ecf8427e";
-	actual = utils::crypto::MD5("").hex_digest();
-	ASSERT_EQ(actual, expected);
+	hmac.update("The quick brown fox jumps over the lazy dog");
+	ASSERT_EQ("811a406877bbee0e26be8ec53c6bcdf4", hmac.hex_digest());
 }
 
 __UNIT_TESTS_END__
 
 
-#endif // WASP_UNIT_TESTS_UTILS_TESTS_CRYPTO_TESTS_MD5_TESTS_H
+#endif // WASP_UNIT_TESTS_UTILS_TESTS_CRYPTO_TESTS_HMAC_TESTS_H

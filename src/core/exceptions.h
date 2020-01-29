@@ -19,6 +19,7 @@
  * Available exceptions.
  *
  * - AttributeError;
+ * - BadSignature;
  * - BaseException.
  * - CommandError;
  * - DictError;
@@ -84,6 +85,7 @@ public:
 
 
 DEF_WASP_EXCEPTION_WITH_BASE(AttributeError, BaseException, "Attribute error");
+DEF_WASP_EXCEPTION_WITH_BASE(BadSignature, BaseException, "Bad signature error");
 DEF_WASP_EXCEPTION_WITH_BASE(CommandError, BaseException, "Command error");
 DEF_WASP_EXCEPTION_WITH_BASE(DictError, BaseException, "Dict error");
 DEF_WASP_EXCEPTION_WITH_BASE(HttpError, BaseException, "Http error");

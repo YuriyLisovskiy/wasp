@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,6 +42,7 @@
 #include "../core/exceptions.h"
 #include "./status.h"
 #include "./url.h"
+#include "./utility.h"
 #include "../core/string/str.h"
 #include "../core/encoding.h"
 #include "../core/path.h"
@@ -89,27 +90,34 @@ public:
 	void set_cookie(
 		const std::string& name,
 		const std::string& value,
+		long max_age = -1,
 		const std::string& expires = "",
 		const std::string& domain = "",
 		const std::string& path = "/",
 		bool is_secure = false,
-		bool is_http_only = false
+		bool is_http_only = false,
+		const std::string& same_site = ""
+	);
+	void set_signed_cookie(
+		const std::string& secret_key,
+		const std::string& name,
+	    const std::string& value,
+		const std::string& salt = "",
+		long max_age = -1,
+	    const std::string& expires = "",
+	    const std::string& domain = "",
+	    const std::string& path = "/",
+	    bool is_secure = false,
+	    bool is_http_only = false,
+		const std::string& same_site = ""
 	);
 	const collections::Dict<std::string, Cookie>& get_cookies();
 	void set_cookies(
 		const collections::Dict<std::string, Cookie>& cookies
 	);
-	void set_signed_cookie(
-		const std::string& name,
-	    const std::string& value,
-		const std::string& salt = "",
-	    const std::string& expires = "",
-	    const std::string& domain = "",
-	    const std::string& path = "/",
-	    bool is_secure = false,
-	    bool is_http_only = false
+	void delete_cookie(
+		const std::string& name, const std::string& path, const std::string& domain
 	);
-	void delete_cookie(const std::string& name, const std::string& path, const std::string& domain);
 
 	std::string get_reason_phrase();
 	void set_reason_phrase(std::string value);

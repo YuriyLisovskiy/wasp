@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,18 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WASP_UNIT_TESTS_CORE_TESTS_INCLUDE_H
-#define WASP_UNIT_TESTS_CORE_TESTS_INCLUDE_H
+#ifndef WASP_UNIT_TESTS_CORE_TESTS_DATETIME_TESTS_INCLUDE_H
+#define WASP_UNIT_TESTS_CORE_TESTS_DATETIME_TESTS_INCLUDE_H
 
-#include "./datetime_tests/include.h"
-#include "./exceptions_tests/include.h"
-#include "./files_tests/include.h"
-#include "./flags_tests/include.h"
-#include "./parsers_tests/include.h"
-#include "./string_tests/include.h"
-#include "./encoding_tests.h"
-#include "./mime_types_tests.h"
-#include "./path_tests.h"
-#include "./regex_tests.h"
+#include "./datetime_tests.h"
 
-#endif // WASP_UNIT_TESTS_CORE_TESTS_INCLUDE_H
+#endif // WASP_UNIT_TESTS_CORE_TESTS_DATETIME_TESTS_INCLUDE_H

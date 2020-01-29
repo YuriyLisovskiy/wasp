@@ -34,6 +34,7 @@
 #include "../http/headers.h"
 #include "../utils/cache.h"
 #include "../utils/http.h"
+#include "../conf/settings.h"
 
 
 __MIDDLEWARE_BEGIN__

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -110,6 +110,11 @@ void escape_leading_slashes(std::string& url)
 	{
 		url = "/%2F" + url.substr(2);
 	}
+}
+
+core::signing::Signer get_cookie_signer(const std::string& secret_key, const std::string& salt)
+{
+	return core::signing::Signer("" + secret_key, ':', salt);
 }
 
 __HTTP_END__

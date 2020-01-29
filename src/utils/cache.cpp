@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -153,7 +153,7 @@ void set_response_etag(http::HttpResponseBase* response)
 	{
 		response->set_header(
 			http::E_TAG,
-			utils_http::quote_etag(crypto::md5(response->get_content()).digest())
+			utils_http::quote_etag(crypto::MD5(response->get_content()).hex_digest())
 		);
 	}
 }
