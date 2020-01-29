@@ -153,7 +153,7 @@ void set_response_etag(http::HttpResponseBase* response)
 	{
 		response->set_header(
 			http::E_TAG,
-			utils_http::quote_etag(crypto::md5(response->get_content()).digest())
+			utils_http::quote_etag(crypto::MD5(response->get_content()).hex_digest())
 		);
 	}
 }

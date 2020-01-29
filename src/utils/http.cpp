@@ -65,7 +65,7 @@ long parse_http_date(const std::string& date)
 	std::map<std::string, std::string> match;
 	if (rfc_1123_date.search(date))
 	{
-		match = internal::RFC1123_DATE.groups();
+		match = rfc_1123_date.groups();
 	}
 	else if (rfc_850_date.search(date))
 	{
@@ -107,7 +107,8 @@ long parse_http_date(const std::string& date)
 	int min = std::stoi(match["min"]);
 	int sec = std::stoi(match["sec"]);
 
-	return core::dt::DateTime(year, month, day, hour, min, sec).utc_epoch();
+	auto date_time = core::dt::DateTime(year, month, day, hour, min, sec);
+	return date_time.utc_epoch();
 }
 
 std::string quote_etag(const std::string& e_tag)

@@ -37,7 +37,6 @@
 #include "../collections/multi_dict.h"
 #include "../core/files/uploaded_file.h"
 #include "../core/exceptions.h"
-#include "../conf/settings.h"
 
 
 __HTTP_BEGIN__
@@ -123,8 +122,8 @@ public:
 	std::string method();
 	bool keep_alive();
 	std::string body();
-	bool is_secure(conf::Settings* settings);
-	std::string scheme(conf::Settings* settings);
+	bool is_secure(std::pair<std::string, std::string>* secure_proxy_ssl_header);
+	std::string scheme(std::pair<std::string, std::string>* secure_proxy_ssl_header);
 
 	/// Return the HTTP host using the environment or request headers.
 	std::string get_host(

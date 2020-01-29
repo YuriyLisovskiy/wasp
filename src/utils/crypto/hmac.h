@@ -24,19 +24,53 @@
 
 // C++ libraries.
 #include <string>
+#include <vector>
 #include <functional>
 
 // Module definitions.
 #include "./_def_.h"
 
+// Wasp libraries.
+#include "./interface.h"
+#include "./md5.h"
+
 
 __CRYPTO_BEGIN__
 
+class Hmac
+{
+private:
+	size_t _size;
+	size_t _block_size;
+	unsigned char* _o_pad;
+	unsigned char* _i_pad;
+	IHash* _outer;
+	IHash* _inner;
+
+	void _prepare_outer();
+
+public:
+	Hmac(
+		std::string key,
+		std::function<IHash*()> make_hash_func = nullptr
+	);
+	virtual ~Hmac();
+	void update(const unsigned char input[], unsigned int n);
+	void update(const char input[], unsigned int n);
+	void update(const std::string& input);
+	size_t size();
+	size_t block_size();
+	unsigned char* digest();
+	std::string hex_digest();
+};
+
+
+/// Wraps Hmac using salt.
 extern std::string salted_hmac(
 	const std::string& salt,
 	const std::string& value,
 	const std::string& key,
-	const std::function<std::string(const std::string&)>& algorithm_fn = nullptr
+	IHash* hash_func = nullptr
 );
 
 __CRYPTO_END__

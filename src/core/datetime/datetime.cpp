@@ -187,7 +187,7 @@ TimeZone DateTime::tz()
 size_t DateTime::utc_epoch()
 {
 	auto* time_info = this->_to_std_tm();
-	size_t epoch = std::mktime(time_info);
+	time_t epoch = std::mktime(time_info);
 	delete time_info;
 	return epoch;
 }
@@ -225,13 +225,13 @@ std::tm* DateTime::_to_std_tm()
 {
 	auto* time_info = new std::tm();
 	time_info->tm_year = this->_date.year();
-	time_info->tm_mon = this->_date.month();
+	time_info->tm_mon = this->_date.month() - 1;
 	time_info->tm_wday = this->_date.day_of_week();
 	time_info->tm_mday = this->_date.day_of_month();
-	time_info->tm_yday = this->_date.day_of_year();
+	time_info->tm_yday = this->_date.day_of_year() - 1;
 	time_info->tm_hour = this->_time.hour();
 	time_info->tm_min = this->_time.minute();
-	time_info->tm_sec = this->_time.second();
+	time_info->tm_sec = this->_time.second() / 1000000;
 	time_info->tm_zone = this->_tz.get_name().c_str();
 	return time_info;
 }

@@ -54,7 +54,11 @@ http::HttpResponseBase* SecurityMiddleware::process_request(http::HttpRequest* r
 		}
 	}
 
-	if (this->redirect && !request->is_secure(this->settings) && !matched)
+	if (
+		this->redirect &&
+		!request->is_secure(this->settings->SECURE_PROXY_SSL_HEADER) &&
+		!matched
+	)
 	{
 		auto host = this->redirect_host.empty() ?
 			request->get_host(
@@ -75,7 +79,8 @@ http::HttpResponseBase* SecurityMiddleware::process_response(
 )
 {
 	if (
-		this->sts_seconds && request->is_secure(this->settings) &&
+		this->sts_seconds &&
+		request->is_secure(this->settings->SECURE_PROXY_SSL_HEADER) &&
 		!response->has_header(http::STRICT_TRANSPORT_SECURITY)
 	)
 	{
