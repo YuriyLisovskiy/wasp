@@ -35,7 +35,7 @@ __HTTP_BEGIN__
 
 size_t parse_http_datetime(const std::string& http_datetime)
 {
-	return core::dt::DateTime::strptime(http_datetime.c_str(), "Wdy, DD Mon YYYY HH:MM:SS GMT").utc_epoch();
+	return core::dt::DateTime::strptime(http_datetime.c_str(), "Wdy, DD Mon YYYY HH:MM:SS GMT").timestamp();
 }
 
 std::string format_http_datetime(size_t epoch_seconds)

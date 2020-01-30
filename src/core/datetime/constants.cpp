@@ -645,16 +645,24 @@ collections::Dict<std::string, int> TZ_TO_OFFSET(std::map<std::string, int> {
 collections::Dict<int, std::string> OFFSET_TO_TZ_ABBR(std::map<int, std::string>
 {
 	{0, "GMT"},
-	{7200, "EET"},
-	{10800, "EEDT"},
+	{2*3600, "EET"},
+	{3*3600, "EEDT"},
+	{7*3600, "G"},
+	{4*3600, "GST"},
+	{11*3600, "KOST"},
+	{-(9*3600 + 30*60), "MART"},
 	// TODO: add data to OFFSET_TO_TZ_ABBR
 });
 
 collections::Dict<std::string, int> TZ_ABBR_TO_OFFSET(std::map<std::string, int>
 {
 	{"GMT", 0},
-	{"EET", 7200},
-	{"EEDT", 10800},
+	{"EET", 2*3600},
+	{"EEDT", 3*3600},
+	{"G", 7*3600},
+	{"GST", 4*3600},
+	{"KOST", 11*3600},
+	{"MART", -(9*3600 + 30*60)},
 	// TODO: add data to TZ_ABBR_TO_OFFSET
 });
 

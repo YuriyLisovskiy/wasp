@@ -29,11 +29,12 @@ __UNIT_TESTS_BEGIN__
 TEST(RegexTestCase, TestETagPattern)
 {
 	auto expr = core::rgx::Regex(R"(((?:W\/)?"[^"]*"))");
+
 	ASSERT_TRUE(expr.search(R"("bfc13a64729c4290ef5b2c2730249c88ca92d82d")"));
-	ASSERT_EQ(expr.groups().size(), 1);
+	ASSERT_EQ(expr.groups().size(), 2);
 
 	ASSERT_TRUE(expr.search(R"(W/"0815")"));
-	ASSERT_EQ(expr.groups().size(), 1);
+	ASSERT_EQ(expr.groups().size(), 2);
 }
 
 TEST(ArgRegexTestCase, TestDoubleSquareBracketsInPattern)

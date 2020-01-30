@@ -108,7 +108,7 @@ long parse_http_date(const std::string& date)
 	int sec = std::stoi(match["sec"]);
 
 	auto date_time = core::dt::DateTime(year, month, day, hour, min, sec);
-	return date_time.utc_epoch();
+	return date_time.timestamp();
 }
 
 std::string quote_etag(const std::string& e_tag)
@@ -137,7 +137,7 @@ std::vector<std::string> parse_etags(const std::string& etag_str)
 	{
 		if (e_tag_regex.search(core::str::trim(etag)))
 		{
-			result.push_back(e_tag_regex.group(0));
+			result.push_back(e_tag_regex.group(1));
 		}
 	}
 

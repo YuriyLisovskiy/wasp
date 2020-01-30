@@ -44,7 +44,7 @@ std::string Cookie::_get_expires(long max_age) const
 {
 	auto now = core::dt::gmtnow();
 	return core::dt::DateTime(
-		now.utc_epoch() + max_age
+		now.timestamp() + max_age
 	).strftime(this->DATE_TIME_FORMAT);
 }
 
@@ -52,8 +52,8 @@ long Cookie::_get_max_age(const std::string& expires) const
 {
 	auto expires_gmt = core::dt::DateTime::strptime(
 		expires.c_str(), this->DATE_TIME_FORMAT
-	).utc_epoch();
-	long max_age = (long)expires_gmt - (long)core::dt::gmtnow().utc_epoch();
+	).timestamp();
+	long max_age = (long)expires_gmt - (long)core::dt::gmtnow().timestamp();
 	return max_age > 0 ? max_age : 0;
 }
 

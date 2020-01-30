@@ -24,9 +24,7 @@
 
 // C++ libraries.
 #include <map>
-//#include <ctime>
-//#include <chrono>
-#include <sys/time.h>
+#include <ctime>
 #include <string>
 #include <sstream>
 
@@ -65,7 +63,7 @@ public:
 	Date date();
 	Time time();
 	TimeZone tz();
-	size_t utc_epoch();
+	size_t timestamp();
 
 	std::string strftime(const char* _format);
 	static DateTime strptime(const char* _datetime, const char* _format);
