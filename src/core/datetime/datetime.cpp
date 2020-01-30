@@ -150,10 +150,10 @@ TimeZone DateTime::tz()
 size_t DateTime::utc_epoch()
 {
 	auto* time_info = this->_to_std_tm();
+	time_info->tm_isdst = 1;
 	time_t epoch = std::mktime(time_info);
-	//epoch += this->_tz.get_offset() - time_info->tm_gmtoff;
 	delete time_info;
-	return epoch;
+	return epoch + this->_tz.get_offset();
 }
 
 std::string DateTime::strftime(const char* _format)
@@ -161,6 +161,7 @@ std::string DateTime::strftime(const char* _format)
 	auto* time_info = this->_to_std_tm();
 	char buffer[80];
 	std::strftime(buffer, 80, this->strf_tz(_format).c_str(), time_info);
+//	std::strftime(buffer, 80, _format, time_info);
 	delete time_info;
 	return buffer;
 }
@@ -210,6 +211,8 @@ std::tm* DateTime::_to_std_tm()
 	time_info->tm_hour = this->_time.hour();
 	time_info->tm_min = this->_time.minute();
 	time_info->tm_sec = this->_time.second();
+	time_info->tm_zone = this->_tz.get_name().c_str();
+	time_info->tm_gmtoff = internal::TZ_ABBR_TO_OFFSET.get(this->_tz.get_name());
 	return time_info;
 }
 

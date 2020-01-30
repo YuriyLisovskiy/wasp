@@ -55,7 +55,7 @@ TEST(DateTimeTestCase, UtcEpochTest)
 	const char* str_dt = "Fri, 15 Nov 2019 12:45:26 GMT";
 	auto dt = core::dt::DateTime::strptime(str_dt, "%a, %e %b %Y %T %Z");
 	size_t expected = 1573821926;
-//	ASSERT_EQ(expected, dt.utc_epoch());
+	ASSERT_EQ(expected, dt.utc_epoch());
 
 	str_dt = "Fri, 15 Nov 2019 12:45:26 EEDT";
 	dt = core::dt::DateTime::strptime(str_dt, "%a, %e %b %Y %T %Z");
