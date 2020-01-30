@@ -35,6 +35,8 @@ file(GLOB LIB_FILES
 	"src/collections/*.cpp"
 	"src/core/datetime/*.h"
 	"src/core/datetime/*.cpp"
+	"src/core/datetime/predefined/*.h"
+	"src/core/datetime/predefined/*.cpp"
 	"src/core/files/*.h"
 	"src/core/files/*.cpp"
 	"src/core/flags/*.h"

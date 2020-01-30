@@ -16,22 +16,24 @@
  */
 
 /**
- * constants.h
- * Purpose: datetime constants.
+ * An implementation of offset_to_tz_abbr.h.
  */
 
-#pragma once
-
-// Module definitions.
-#include "./_def_.h"
+#include "./offset_to_tz_abbr.h"
 
 
-__DATETIME_BEGIN__
+__DATETIME_INTERNAL_BEGIN__
 
-/// The smallest year number allowed in a date or datetime object.
-const int MIN_YEAR = 1;
+collections::Dict<int, std::string> OFFSET_TO_TZ_ABBR(std::map<int, std::string>
+{
+	{0, "GMT"},
+	{2*3600, "EET"},
+	{3*3600, "EEDT"},
+	{7*3600, "G"},
+	{4*3600, "GST"},
+	{11*3600, "KOST"},
+	{-(9*3600 + 30*60), "MART"},
+	// TODO: add data to OFFSET_TO_TZ_ABBR
+});
 
-/// The largest year number allowed in a date or datetime object.
-const int MAX_YEAR = 9999;
-
-__DATETIME_END__
+__DATETIME_INTERNAL_END__

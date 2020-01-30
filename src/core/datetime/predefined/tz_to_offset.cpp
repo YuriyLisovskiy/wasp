@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,10 +16,10 @@
  */
 
 /**
- * An implementation of constants.h.
+ * An implementation of tz_to_offset.h.
  */
 
-#include "./constants.h"
+#include "./tz_to_offset.h"
 
 
 __DATETIME_INTERNAL_BEGIN__
@@ -640,30 +640,6 @@ collections::Dict<std::string, int> TZ_TO_OFFSET(std::map<std::string, int> {
 	{"Pacific/Tongatapu", 46800},                 // Tonga Time
 	{"Etc/GMT-14", 50400},                        // GMT+14:00
 	{"Pacific/Kiritimati", 50400}                 // Line Is. Time
-});
-
-collections::Dict<int, std::string> OFFSET_TO_TZ_ABBR(std::map<int, std::string>
-{
-	{0, "GMT"},
-	{2*3600, "EET"},
-	{3*3600, "EEDT"},
-	{7*3600, "G"},
-	{4*3600, "GST"},
-	{11*3600, "KOST"},
-	{-(9*3600 + 30*60), "MART"},
-	// TODO: add data to OFFSET_TO_TZ_ABBR
-});
-
-collections::Dict<std::string, int> TZ_ABBR_TO_OFFSET(std::map<std::string, int>
-{
-	{"GMT", 0},
-	{"EET", 2*3600},
-	{"EEDT", 3*3600},
-	{"G", 7*3600},
-	{"GST", 4*3600},
-	{"KOST", 11*3600},
-	{"MART", -(9*3600 + 30*60)},
-	// TODO: add data to TZ_ABBR_TO_OFFSET
 });
 
 __DATETIME_INTERNAL_END__

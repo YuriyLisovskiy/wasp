@@ -33,7 +33,9 @@
 #include "./_def_.h"
 
 // Wasp libraries.
-#include "./constants.h"
+#include "./predefined/tz_to_offset.h"
+#include "./predefined/tz_abbr_to_offset.h"
+#include "./predefined/offset_to_tz_abbr.h"
 
 
 __DATETIME_BEGIN__

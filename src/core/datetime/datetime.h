@@ -35,7 +35,7 @@
 #include "./date.h"
 #include "./time.h"
 #include "./timezone.h"
-#include "./constants.h"
+#include "./predefined/tz_abbr_to_offset.h"
 #include "../regex.h"
 
 

@@ -42,6 +42,11 @@ void Cookie::_copy(const Cookie& other)
 
 std::string Cookie::_get_expires(long max_age) const
 {
+	if (max_age == 0)
+	{
+		return "Thu, 01 Jan 1970 00:00:00 GMT";
+	}
+
 	auto now = core::dt::gmtnow();
 	return core::dt::DateTime(
 		now.timestamp() + max_age
@@ -84,6 +89,24 @@ Cookie::Cookie(
 	{
 		throw core::HttpError("cookie's Max-age can not be less than zero", _ERROR_DETAILS_);
 	}
+
+	if (!this->_expires.empty())
+	{
+		this->_max_age = this->_get_max_age(this->_expires);
+		if (this->_max_age == 0)
+		{
+			this->_expires = "Thu, 01 Jan 1970 00:00:00 GMT";
+		}
+	}
+	else
+	{
+		if (this->_max_age < 0)
+		{
+			this->_max_age = 0;
+		}
+
+		this->_expires = this->_get_expires(this->_max_age);
+	}
 }
 
 Cookie::Cookie(const Cookie& other)
@@ -119,18 +142,10 @@ std::string Cookie::to_string() const
 	// Sets path if it is not an empty string.
 	result += !this->_path.empty() ? "; Path=" + this->_path : "";
 
-	if (!this->_expires.empty())
-	{
-		// Sets expiration time in '%a, %e %b %Y %T %Z' format,
-		// for instance, 'Thu, 18 Jul 2019 16:25:19 GMT'.
-		result += "; Expires=" + this->_expires;
-		result += "; Max-Age=" + std::to_string(this->_get_max_age(this->_expires));
-	}
-	else
-	{
-		result += "; Max-Age=" + std::to_string(this->_max_age);
-		result += "; Expires=" + this->_get_expires(this->_max_age);
-	}
+	// Sets expiration time in '%a, %e %b %Y %T %Z' format,
+	// for instance, 'Thu, 18 Jul 2019 16:25:19 GMT'.
+	result += "; Max-Age=" + std::to_string(this->_max_age);
+	result += "; Expires=" + this->_expires;
 
 	if (!this->_same_site.empty())
 	{
@@ -139,7 +154,7 @@ std::string Cookie::to_string() const
 			core::str::lower(this->_same_site), allowed_same_site_values
 		))
 		{
-			throw core::ValueError("samesite must be \"lax\", \"none\", or \"strict\".");
+			throw core::ValueError(R"(samesite must be "lax", "none", or "strict".)");
 		}
 
 		result += "; SameSite=" + this->_same_site;
