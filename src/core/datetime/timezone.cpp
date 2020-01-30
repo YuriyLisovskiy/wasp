@@ -38,8 +38,14 @@ TimeZone::TimeZone(time_t when) : _name("")
 	std::string s = os.str();
 	int h = std::stoi(s.substr(0, 3), nullptr, 10);
 	int m = std::stoi(s[0] + s.substr(3), nullptr, 10);
-
 	this->_offset = h * 3600 + m * 60;
+	this->tz_from_offset(this->_offset);
+}
+
+TimeZone::TimeZone(size_t offset)
+{
+	this->_offset = offset;
+	this->tz_from_offset(this->_offset);
 }
 
 TimeZone::TimeZone(int offset, std::string name) : _offset(offset), _name(std::move(name))
@@ -48,10 +54,22 @@ TimeZone::TimeZone(int offset, std::string name) : _offset(offset), _name(std::m
 
 TimeZone::TimeZone(const std::string& name) : _name(name)
 {
-	this->_offset = internal::TZ_TO_OFFSET.get(name, 0);
+	if (internal::TZ_TO_OFFSET.contains(name))
+	{
+		this->_offset = internal::TZ_TO_OFFSET.get(name);
+	}
+	else
+	{
+		this->_offset = internal::TZ_ABBR_TO_OFFSET.get(name, 0);
+	}
+
+	if (this->_offset == 0)
+	{
+		this->_name = "GMT";
+	}
 }
 
-int TimeZone::get_offset(Units units = Units::SECONDS)
+int TimeZone::get_offset(Units units)
 {
 	int result;
 	switch (units)
@@ -79,6 +97,16 @@ int TimeZone::get_offset(Units units = Units::SECONDS)
 std::string TimeZone::get_name()
 {
 	return this->_name;
+}
+
+void TimeZone::tz_from_offset(size_t offset)
+{
+	this->_name = internal::OFFSET_TO_TZ_ABBR.get(offset, "");
+	if (this->_name.empty())
+	{
+		this->_offset = 0;
+		this->_name = "GMT";
+	}
 }
 
 __DATETIME_END__

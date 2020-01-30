@@ -29,6 +29,10 @@ time_t now()
 	return std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 }
 
+rgx::Regex RE_HOURS = rgx::Regex(R"((?:Z|[+-](?:2[0-3]|[01][0-9]):[0-5][0-9]))");
+
+rgx::Regex RE_ZONE_ABBR = rgx::Regex(R"(([A-Z]{3,}))");
+
 __DATETIME_INTERNAL_END__
 
 
@@ -47,7 +51,7 @@ DateTime now()
 		local_time->tm_hour,
 		local_time->tm_min,
 		local_time->tm_sec,
-		local_time->tm_sec * 1000000,
+		0,
 		TimeZone(local_time->tm_zone)
 	);
 }
@@ -65,11 +69,10 @@ DateTime gmtnow()
 		gm_time->tm_hour,
 		gm_time->tm_min,
 		gm_time->tm_sec,
-		gm_time->tm_sec * 1000000,
+		0,
 		TimeZone(gm_time->tm_zone)
 	);
 }
-
 
 /// DateTime class implementation.
 DateTime::DateTime() : DateTime(internal::now())
@@ -129,46 +132,6 @@ DateTime::DateTime(time_t timestamp) : _date(), _time(), _tz()
 	this->_tz = TimeZone(timestamp);
 }
 
-int DateTime::year()
-{
-	return this->_date.year();
-}
-
-int DateTime::month()
-{
-	return this->_date.month();
-}
-
-int DateTime::day_of_week()
-{
-	return this->_date.day_of_week();
-}
-
-int DateTime::day_of_year()
-{
-	return this->_date.day_of_year();
-}
-
-int DateTime::hour()
-{
-	return this->_time.hour();
-}
-
-int DateTime::minute()
-{
-	return this->_time.minute();
-}
-
-int DateTime::second()
-{
-	return this->_time.second();
-}
-
-int DateTime::microsecond()
-{
-	return this->_time.microsecond();
-}
-
 Date DateTime::date()
 {
 	return this->_date;
@@ -188,7 +151,7 @@ size_t DateTime::utc_epoch()
 {
 	auto* time_info = this->_to_std_tm();
 	time_t epoch = std::mktime(time_info);
-	epoch += time_info->tm_gmtoff;
+	//epoch += this->_tz.get_offset() - time_info->tm_gmtoff;
 	delete time_info;
 	return epoch;
 }
@@ -197,13 +160,28 @@ std::string DateTime::strftime(const char* _format)
 {
 	auto* time_info = this->_to_std_tm();
 	char buffer[80];
-	std::strftime(buffer, 80, _format, time_info);
+	std::strftime(buffer, 80, this->strf_tz(_format).c_str(), time_info);
 	delete time_info;
 	return buffer;
 }
 
 DateTime DateTime::strptime(const char* _datetime, const char* _format)
 {
+	auto re_hours = internal::RE_HOURS;
+	auto re_zone_abbr = internal::RE_ZONE_ABBR;
+	TimeZone tz;
+	if (re_hours.search(_datetime))
+	{
+		auto s = re_hours.group(0);
+		int h = std::stoi(s.substr(0, 3), nullptr, 10);
+		int m = std::stoi(s[0] + s.substr(3), nullptr, 10);
+		tz = TimeZone((size_t)(h * 3600 + m * 60));
+	}
+	else if (re_zone_abbr.search(_datetime))
+	{
+		tz = TimeZone(re_zone_abbr.group(0));
+	}
+
 	struct tm time_info{};
 	::strptime(_datetime, _format, &time_info);
 	auto result = DateTime(
@@ -216,7 +194,7 @@ DateTime DateTime::strptime(const char* _datetime, const char* _format)
 		time_info.tm_min,
 		time_info.tm_sec,
 		0,
-		TimeZone(std::string(time_info.tm_zone))
+		tz
 	);
 	return result;
 }
@@ -232,9 +210,28 @@ std::tm* DateTime::_to_std_tm()
 	time_info->tm_hour = this->_time.hour();
 	time_info->tm_min = this->_time.minute();
 	time_info->tm_sec = this->_time.second();
-	time_info->tm_gmtoff = internal::TZ_TO_OFFSET.get(this->_tz.get_name(), 0);
-	time_info->tm_zone = this->_tz.get_name().c_str();
 	return time_info;
+}
+
+std::string DateTime::strf_tz(const char* _format)
+{
+	auto s_format = std::string(_format);
+	size_t pos;
+	pos = s_format.find("%Z");
+	if (pos != std::string::npos)
+	{
+		s_format.replace(pos, pos + 1, this->_tz.get_name());
+	}
+	else
+	{
+		pos = s_format.find("%z");
+		if (pos != std::string::npos)
+		{
+			// TODO: replace %z to timezone offset, i.e. +00:00
+		}
+	}
+
+	return s_format;
 }
 
 __DATETIME_END__

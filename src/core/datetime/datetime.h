@@ -24,8 +24,9 @@
 
 // C++ libraries.
 #include <map>
-#include <ctime>
-#include <chrono>
+//#include <ctime>
+//#include <chrono>
+#include <sys/time.h>
 #include <string>
 #include <sstream>
 
@@ -37,6 +38,7 @@
 #include "./time.h"
 #include "./timezone.h"
 #include "./constants.h"
+#include "../regex.h"
 
 
 __DATETIME_BEGIN__
@@ -60,14 +62,6 @@ public:
 	DateTime(Date date, Time time, const std::string& tz);
 	explicit DateTime(time_t timestamp);
 
-	int year();
-	int month();
-	int day_of_week();
-	int day_of_year();
-	int hour();
-	int minute();
-	int second();
-	int microsecond();
 	Date date();
 	Time time();
 	TimeZone tz();
@@ -78,6 +72,7 @@ public:
 
 private:
 	std::tm* _to_std_tm();
+	std::string strf_tz(const char* _format);
 };
 
 
@@ -94,5 +89,9 @@ __DATETIME_INTERNAL_BEGIN__
 
 /// Returns current date and time as time_t
 time_t now();
+
+extern rgx::Regex RE_HOURS;
+
+extern rgx::Regex RE_ZONE_ABBR;
 
 __DATETIME_INTERNAL_END__

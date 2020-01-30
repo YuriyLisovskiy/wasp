@@ -642,4 +642,20 @@ collections::Dict<std::string, int> TZ_TO_OFFSET(std::map<std::string, int> {
 	{"Pacific/Kiritimati", 50400}                 // Line Is. Time
 });
 
+collections::Dict<int, std::string> OFFSET_TO_TZ_ABBR(std::map<int, std::string>
+{
+	{0, "GMT"},
+	{7200, "EET"},
+	{10800, "EEDT"},
+	// TODO: add data to OFFSET_TO_TZ_ABBR
+});
+
+collections::Dict<std::string, int> TZ_ABBR_TO_OFFSET(std::map<std::string, int>
+{
+	{"GMT", 0},
+	{"EET", 7200},
+	{"EEDT", 10800},
+	// TODO: add data to TZ_ABBR_TO_OFFSET
+});
+
 __DATETIME_INTERNAL_END__

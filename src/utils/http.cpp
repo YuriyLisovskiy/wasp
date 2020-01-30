@@ -83,7 +83,7 @@ long parse_http_date(const std::string& date)
 	int year = std::stoi(match["year"]);
 	if (year < 100)
 	{
-		int current_year = core::dt::gmtnow().year();
+		int current_year = core::dt::gmtnow().date().year();
 		int current_century = current_year - (current_year % 100);
 		if (year - (current_year % 100) > 50)
 		{

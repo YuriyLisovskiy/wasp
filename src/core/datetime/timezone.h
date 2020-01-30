@@ -48,6 +48,8 @@ private:
 	// Time zone name, i.e. America/Vancouver, US/Central, etc.
 	std::string _name;
 
+	void tz_from_offset(size_t offset);
+
 public:
 	enum Units
 	{
@@ -59,12 +61,13 @@ public:
 
 	TimeZone();
 	explicit TimeZone(time_t when);
+	explicit TimeZone(size_t offset);
 	explicit TimeZone(const std::string& name);
 
 	/// Offset parameter is time offset in seconds.
 	explicit TimeZone(int offset, std::string  name);
 
-	int get_offset(Units units);
+	int get_offset(Units units = TimeZone::Units::SECONDS);
 	std::string get_name();
 };
 

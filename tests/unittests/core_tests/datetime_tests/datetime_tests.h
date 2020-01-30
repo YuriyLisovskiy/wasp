@@ -18,7 +18,6 @@
 #ifndef WASP_UNIT_TESTS_CORE_TESTS_DATETIME_TESTS_DATETIME_TESTS_INCLUDE_H
 #define WASP_UNIT_TESTS_CORE_TESTS_DATETIME_TESTS_DATETIME_TESTS_INCLUDE_H
 
-#include <iostream>
 #include <gtest/gtest.h>
 
 #include "../../_def_.h"
@@ -27,17 +26,41 @@
 
 __UNIT_TESTS_BEGIN__
 
-// FIXME: TEST(DateTimeTestCase, StrptimeTest)
 TEST(DateTimeTestCase, StrptimeTest)
 {
-	const char* str_dt = "Tue, 15 Nov 2019 12:45:26 EET";
+	const char* str_dt = "Fri, 15 Nov 2019 12:45:26 EEDT";
 	auto dt = core::dt::DateTime::strptime(str_dt, "%a, %e %b %Y %T %Z");
-//	auto dt = core::dt::DateTime();
-	auto strf_time = dt.strftime("%a, %e %b %Y %T %Z");
+	ASSERT_EQ(dt.date().day_of_month(), 15);
+	ASSERT_EQ(dt.date().day_of_week(), 5);
+	ASSERT_EQ(dt.date().month(), 11);
+	ASSERT_EQ(dt.date().year(), 2019);
+	ASSERT_EQ(dt.time().hour(), 12);
+	ASSERT_EQ(dt.time().minute(), 45);
+	ASSERT_EQ(dt.time().second(), 26);
+	ASSERT_EQ(dt.tz().get_name(), "EEDT");
+	ASSERT_EQ(dt.tz().get_offset(), 10800);
+}
 
-	std::cout << "Original: " << str_dt << '\n';
-	std::cout << "Strftime: " << strf_time << '\n';
-//	auto e = dt.utc_epoch();
+TEST(DateTimeTestCase, StrftimeTest)
+{
+	const char* str_dt = "Fri, 15 Nov 2019 12:45:26 EEDT";
+	auto dt = core::dt::DateTime::strptime(str_dt, "%a, %e %b %Y %T %Z");
+	auto strf_time = dt.strftime("%a, %e %b %Y %T %Z");
+	ASSERT_EQ(str_dt, strf_time);
+}
+
+// FIXME: fails TEST(DateTimeTestCase, UtcEpochTest)
+TEST(DateTimeTestCase, UtcEpochTest)
+{
+	const char* str_dt = "Fri, 15 Nov 2019 12:45:26 GMT";
+	auto dt = core::dt::DateTime::strptime(str_dt, "%a, %e %b %Y %T %Z");
+	size_t expected = 1573821926;
+//	ASSERT_EQ(expected, dt.utc_epoch());
+
+	str_dt = "Fri, 15 Nov 2019 12:45:26 EEDT";
+	dt = core::dt::DateTime::strptime(str_dt, "%a, %e %b %Y %T %Z");
+	expected = 1573814726;
+	ASSERT_EQ(expected, dt.utc_epoch());
 }
 
 __UNIT_TESTS_END__
