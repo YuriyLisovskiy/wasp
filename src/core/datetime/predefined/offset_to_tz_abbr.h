@@ -17,7 +17,7 @@
 
 /**
  * offset_to_tz_abbr.h
- * Purpose: offsets of known time zones.
+ * Purpose: offsets of some known time zones.
  */
 
 #pragma once
@@ -34,6 +34,6 @@
 
 __DATETIME_INTERNAL_BEGIN__
 
-extern collections::Dict<int, std::string> OFFSET_TO_TZ_ABBR;
+extern collections::Dict<std::string, std::string> OFFSET_TO_TZ_ABBR;
 
 __DATETIME_INTERNAL_END__

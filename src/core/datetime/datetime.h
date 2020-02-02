@@ -36,7 +36,6 @@
 #include "./time.h"
 #include "./timezone.h"
 #include "./predefined/tz_abbr_to_offset.h"
-#include "../regex.h"
 
 
 __DATETIME_BEGIN__
@@ -53,11 +52,22 @@ private:
 
 public:
 	DateTime();
-	DateTime(int year, int month, int day, int hour, int minute, int second);
-	DateTime(int year, int month, int day_of_week, int day_of_month, int day_of_year, int hour, int minute, int second, int microsecond, TimeZone tz);
-	DateTime(int year, int month, int day_of_week, int day_of_month, int day_of_year, int hour, int minute, int second, int microsecond, const std::string& tz);
+	DateTime(
+		int year, int month, int day, int hour, int minute, int second
+	);
+	DateTime(
+		int year,
+		int month,
+		int day_of_week,
+		int day_of_month,
+		int day_of_year,
+		int hour,
+		int minute,
+		int second,
+		int microsecond,
+		TimeZone tz
+	);
 	DateTime(Date date, Time time, TimeZone tz);
-	DateTime(Date date, Time time, const std::string& tz);
 	explicit DateTime(time_t timestamp);
 
 	Date date();
@@ -87,9 +97,5 @@ __DATETIME_INTERNAL_BEGIN__
 
 /// Returns current date and time as time_t
 time_t now();
-
-extern rgx::Regex RE_HOURS;
-
-extern rgx::Regex RE_ZONE_ABBR;
 
 __DATETIME_INTERNAL_END__

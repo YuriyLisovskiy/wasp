@@ -33,24 +33,39 @@
 #include "./_def_.h"
 
 // Wasp libraries.
-#include "./predefined/tz_to_offset.h"
+#include "../regex.h"
 #include "./predefined/tz_abbr_to_offset.h"
 #include "./predefined/offset_to_tz_abbr.h"
 
 
 __DATETIME_BEGIN__
 
-// A class that represents a fixed offset from the UTC.
+/// A class that represents a fixed offset from the UTC.
+///
+/// Note: Date and time expressed according to
+/// ISO 8601 currently is not supported.
 class TimeZone
 {
 private:
-	// Offset in seconds.
-	int _offset;
+	int _h_offset;
+	int _min_offset;
+	int _sign;
 
-	// Time zone name, i.e. America/Vancouver, US/Central, etc.
+	/// Time zone abbreviation, i.e. GMT, ACT, etc.
+	std::string _abbr;
+
+	/// Time zone name, i.e. America/Vancouver, US/Central, etc.
 	std::string _name;
 
-	void tz_from_offset(size_t offset);
+	/// String offset, i.e. +0300
+	std::string _str_offset;
+
+	int _offset();
+	void _make_from_dt(const std::string& datetime_str);
+	void _make_from_offset();
+	std::string _offset_to_str();
+	void _parse_num_offset(const std::string& offset_str);
+	void _make_default();
 
 public:
 	enum Units
@@ -61,16 +76,29 @@ public:
 		MICROSECONDS
 	};
 
-	TimeZone();
 	explicit TimeZone(time_t when);
-	explicit TimeZone(size_t offset);
-	explicit TimeZone(const std::string& name);
+	explicit TimeZone(int offset);
+	explicit TimeZone(
+		int offset_h = 0,
+		int offset_min = 0,
+		const std::string& abbr = "GMT",
+		const std::string& name = ""
+	);
+	TimeZone(const std::string& datetime);
 
-	/// Offset parameter is time offset in seconds.
-	explicit TimeZone(int offset, std::string  name);
-
-	int get_offset(Units units = TimeZone::Units::SECONDS);
-	std::string get_name();
+	int offset(Units units = TimeZone::Units::SECONDS);
+	std::string str_offset();
+	std::string abbr();
+	std::string name();
 };
 
 __DATETIME_END__
+
+
+__DATETIME_INTERNAL_BEGIN__
+
+extern rgx::Regex RE_HOURS;
+
+extern rgx::Regex RE_ZONE_ABBR;
+
+__DATETIME_INTERNAL_END__
