@@ -121,15 +121,42 @@ void Hmac::_prepare_outer()
 }
 
 
-std::string salted_hmac(
+Hmac* salted_hmac(
 	const std::string& salt,
 	const std::string& value,
-	const std::string& key,
+	const std::string& secret_key,
 	IHash* hash_func
 )
 {
-	// TODO: implement salted_hmac
-	return value;
+	if (secret_key.empty())
+	{
+		throw core::ValueError("Secret: key can not be empty", _ERROR_DETAILS_);
+	}
+
+	bool is_default_hf = !hash_func;
+	if (is_default_hf)
+	{
+		hash_func = new MD5();
+	}
+
+	// We need to generate a derived key from our base key.  We can do this by
+	// passing the key_salt and our base key through a pseudo-random function.
+	hash_func->update(salt + secret_key);
+	auto salted_key = hash_func->hex_digest();
+
+	// If len(key_salt + secret) > block size of the hash algorithm, the above
+	// line is redundant and could be replaced by key = key_salt + secret, since
+	// the hmac module does the same thing for keys longer than the block size.
+	// However, we need to ensure that we *always* do this.
+	// TODO: rewrite lambda.
+	Hmac* hmac = new Hmac(salted_key, [hash_func]() -> IHash* { return hash_func; });
+	if (is_default_hf)
+	{
+		delete hash_func;
+	}
+
+	hmac->update(value);
+	return hmac;
 }
 
 __CRYPTO_END__

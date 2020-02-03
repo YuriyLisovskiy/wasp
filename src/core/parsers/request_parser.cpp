@@ -488,6 +488,7 @@ void request_parser::set_parameters(http::HttpRequest::Parameters<std::string, s
 }
 
 // Parses chunks from http request body if request is chunked.
+// TODO: check if parse_chunks parses chunked request properly.
 void request_parser::parse_chunks(const std::string& data)
 {
 	for (const char& input : data)

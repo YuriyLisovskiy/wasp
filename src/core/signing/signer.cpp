@@ -64,7 +64,12 @@ Signer::Signer(
 
 std::string Signer::signature(const std::string& value)
 {
-	return utils::crypto::salted_hmac(this->_salt + "signer", value, this->_key);
+	auto hmac = utils::crypto::salted_hmac(
+		this->_salt + "signer", value, this->_key
+	);
+	auto result = hmac->hex_digest();
+	delete hmac;
+	return result;
 }
 
 std::string Signer::sign(const std::string& value)
