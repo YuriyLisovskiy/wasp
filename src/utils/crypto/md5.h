@@ -97,6 +97,7 @@ private:
 public:
 	MD5();
 	explicit MD5(const std::string& input);
+	MD5* clone() final;
 
 	// Continues an MD5 message-digest operation,
 	// processing another message block.

@@ -148,8 +148,10 @@ Hmac* salted_hmac(
 	// line is redundant and could be replaced by key = key_salt + secret, since
 	// the hmac module does the same thing for keys longer than the block size.
 	// However, we need to ensure that we *always* do this.
-	// TODO: rewrite lambda.
-	Hmac* hmac = new Hmac(salted_key, [hash_func]() -> IHash* { return hash_func; });
+	hash_func->reset();
+	Hmac* hmac = new Hmac(
+		salted_key, [hash_func]() -> IHash* { return hash_func->clone(); }
+	);
 	if (is_default_hf)
 	{
 		delete hash_func;

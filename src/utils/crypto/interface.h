@@ -26,12 +26,17 @@
 // Module definitions.
 #include "./_def_.h"
 
+// Wasp libraries.
+#include "../../core/object/interfaces.h"
+
 
 __CRYPTO_BEGIN__
 
-class IHash
+class IHash : public core::object::IClonable
 {
 public:
+	virtual IHash* clone() = 0;
+
 	// Continues message-digest operation,
 	// processing another message block.
 	virtual void update(const unsigned char input[], unsigned int n) = 0;

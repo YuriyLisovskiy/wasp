@@ -35,6 +35,31 @@ MD5::MD5(const std::string& input)
 	this->update(input.c_str(), input.length());
 }
 
+MD5* MD5::clone()
+{
+	auto* copy = new MD5();
+	copy->_finalized = this->_finalized;
+	for (size_t i = 0; i < MD5::BLOCK_SIZE; i++)
+	{
+		copy->_buffer[i] = this->_buffer[i];
+	}
+
+	copy->_count[0] = this->_count[0];
+	copy->_count[1] = this->_count[1];
+
+	copy->_state[0] = this->_state[0];
+	copy->_state[1] = this->_state[1];
+	copy->_state[2] = this->_state[2];
+	copy->_state[3] = this->_state[3];
+
+	for (size_t i = 0; i < MD5::SIZE; i++)
+	{
+		copy->_digest[i] = this->_digest[i];
+	}
+
+	return copy;
+}
+
 void MD5::update(const unsigned char input[], unsigned int n)
 {
 	// compute number of bytes mod 64

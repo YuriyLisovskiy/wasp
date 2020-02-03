@@ -67,6 +67,11 @@
 #define __UTILITY_END__ } __CORE_END__
 
 
+/// wasp::core::object
+#define __OBJECT_BEGIN__ __CORE_BEGIN__ namespace object {
+#define __OBJECT_END__ } __CORE_END__
+
+
 /// Declares exception's class with given base.
 #define DEF_WASP_EXCEPTION_WITH_BASE(name, base, default_message)\
 class name : public base\

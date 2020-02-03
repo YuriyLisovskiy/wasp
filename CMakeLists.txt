@@ -49,6 +49,8 @@ file(GLOB LIB_FILES
 	"src/core/net/*.cpp"
 	"src/core/string/*.h"
 	"src/core/string/*.cpp"
+	"src/core/types/*.h"
+	"src/core/types/*.cpp"
 	"src/core/management/*.h"
 	"src/core/management/*.cpp"
 	"src/core/management/commands/*.h"
