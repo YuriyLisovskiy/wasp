@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,20 +15,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * _def_.h
- * Purpose: core/flags module's definitions.
- */
+#ifndef WASP_UNIT_TESTS_CORE_TESTS_OBJECT_TESTS_OBJECT_TESTS_H
+#define WASP_UNIT_TESTS_CORE_TESTS_OBJECT_TESTS_OBJECT_TESTS_H
 
-#pragma once
+#include <gtest/gtest.h>
 
-#include "../_def_.h"
+#include "../../_def_.h"
+#include "../../../../src/core/object/object.h"
 
 
-/// wasp::flags
-#define __FLAGS_BEGIN__ __WASP_BEGIN__ namespace flags {
-#define __FLAGS_END__ } __WASP_END__
+__UNIT_TESTS_BEGIN__
 
-/// wasp::flags::internal
-#define __FLAGS_INTERNAL_BEGIN__ __FLAGS_BEGIN__ namespace internal {
-#define __FLAGS_INTERNAL_END__ } __FLAGS_END__
+
+class EmptyObject : public core::object::Object
+{
+};
+
+TEST(ObjectTestsCase, EmptyObjectTypeTest)
+{
+	auto obj = EmptyObject();
+	auto type = obj.get_type();
+
+	ASSERT_EQ(type.name(), "EmptyObject");
+	ASSERT_EQ(type.namespace_(), "wasp::tests::unittests");
+}
+
+__UNIT_TESTS_END__
+
+
+#endif // WASP_UNIT_TESTS_CORE_TESTS_OBJECT_TESTS_OBJECT_TESTS_H

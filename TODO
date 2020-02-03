@@ -27,6 +27,7 @@ TEST_ME:
     - src/core/datetime/*
     - src/core/management/*
     - src/core/net/*
+    - src/core/object/*
     - src/core/signing/*
     - src/core/thread_pool
     - src/core/flags/parser

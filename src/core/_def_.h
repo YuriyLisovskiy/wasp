@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -65,11 +65,6 @@
 /// wasp::core::utility
 #define __UTILITY_BEGIN__ __CORE_BEGIN__ namespace utility {
 #define __UTILITY_END__ } __CORE_END__
-
-
-/// wasp::core::object
-#define __OBJECT_BEGIN__ __CORE_BEGIN__ namespace object {
-#define __OBJECT_END__ } __CORE_END__
 
 
 /// Declares exception's class with given base.

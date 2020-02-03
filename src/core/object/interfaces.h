@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include "../_def_.h"
+#include "./_def_.h"
 
 
 __OBJECT_BEGIN__

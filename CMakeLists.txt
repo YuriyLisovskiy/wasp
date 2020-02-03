@@ -19,6 +19,7 @@ set(PACKAGE_COLLECTIONS_UNIT_TESTS "unit-tests-collections")
 set(PACKAGE_CONF_UNIT_TESTS "unit-tests-conf")
 set(PACKAGE_CORE_UNIT_TESTS "unit-tests-core")
 set(PACKAGE_CORE_DATETIME_UNIT_TESTS "unit-tests-core-datetime")
+set(PACKAGE_CORE_OBJECT_UNIT_TESTS "unit-tests-core-object")
 set(PACKAGE_HTTP_UNIT_TESTS "unit-tests-http")
 set(PACKAGE_UTILS_UNIT_TESTS "unit-tests-utils")
 set(PACKAGE_VIEWS_UNIT_TESTS "unit-tests-views")
@@ -49,8 +50,8 @@ file(GLOB LIB_FILES
 	"src/core/net/*.cpp"
 	"src/core/string/*.h"
 	"src/core/string/*.cpp"
-	"src/core/types/*.h"
-	"src/core/types/*.cpp"
+	"src/core/object/*.h"
+	"src/core/object/*.cpp"
 	"src/core/management/*.h"
 	"src/core/management/*.cpp"
 	"src/core/management/commands/*.h"
@@ -99,6 +100,8 @@ file(GLOB CORE_TEST_SRC
 	"tests/unittests/core_tests/exceptions_tests/*.h"
 	"tests/unittests/core_tests/files_tests/*.h"
 	"tests/unittests/core_tests/flags_tests/*.h"
+	"tests/unittests/core_tests/object_tests/*.h"
+	"tests/unittests/core_tests/parsers_tests/*.h"
 	"tests/unittests/core_tests/string_tests/*.h"
 	"tests/unittests/core_tests/*.h"
 )
@@ -116,6 +119,18 @@ add_executable(
 	"tests/unittests/core_tests/datetime_tests/main.cpp"
 )
 target_link_libraries(${PACKAGE_CORE_DATETIME_UNIT_TESTS} gtest gtest_main rt pthread ${CORE_DATETIME_TEST_SRC})
+
+
+# Core/datetime packages tests setup.
+file(GLOB CORE_OBJECT_TEST_SRC
+	"tests/unittests/core_tests/object_tests/*.h"
+)
+add_executable(
+	${PACKAGE_CORE_OBJECT_UNIT_TESTS}
+	${LIB_SRC} ${CORE_OBJECT_TEST_SRC}
+	"tests/unittests/core_tests/object_tests/main.cpp"
+)
+target_link_libraries(${PACKAGE_CORE_OBJECT_UNIT_TESTS} gtest gtest_main rt pthread ${CORE_OBJECT_TEST_SRC})
 
 
 # Http package tests setup.

@@ -33,6 +33,7 @@
  * - InterruptException;
  * - MultiPartParserError
  * - MultiValueDictError;
+ * - NotImplementedException;
  * - NullPointerException;
  * - ParseError;
  * - RuntimeError;
@@ -162,6 +163,7 @@ DEF_WASP_EXCEPTION_WITH_BASE(ParseError, BaseException, "Parse error");
 DEF_WASP_EXCEPTION_WITH_BASE(RuntimeError, BaseException, "Runtime error");
 DEF_WASP_EXCEPTION_WITH_BASE(MultiPartParserError, ParseError, "Multipart parser error");
 DEF_WASP_EXCEPTION_WITH_BASE(MultiValueDictError, DictError, "Multi-value dict error");
+DEF_WASP_EXCEPTION_WITH_BASE(NotImplementedException, BaseException, "Not implemented");
 DEF_WASP_EXCEPTION_WITH_BASE(NullPointerException, BaseException, "Null pinter exception");
 DEF_WASP_EXCEPTION_WITH_BASE(SocketError, BaseException, "Socket error");
 DEF_WASP_EXCEPTION_WITH_BASE(ValueError, BaseException, "Value error");
