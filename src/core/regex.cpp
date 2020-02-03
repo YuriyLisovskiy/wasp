@@ -52,11 +52,11 @@ bool Regex::search(const std::string& to_search)
 void Regex::_make_groups()
 {
 	this->_groups.clear();
-	for (size_t i = 1; i < this->_matches.size(); i++)
+	for (const auto & match : this->_matches)
 	{
-		if (this->_matches[i].matched)
+		if (match.matched)
 		{
-			this->_groups.push_back(this->_matches[i].str());
+			this->_groups.push_back(match.str());
 		}
 	}
 }

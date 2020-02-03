@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,23 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * constants.h
- * Purpose: datetime constants.
- */
+#include <gtest/gtest.h>
 
-#pragma once
-
-// Module definitions.
-#include "./_def_.h"
+#include "./include.h"
 
 
-__DATETIME_BEGIN__
-
-/// The smallest year number allowed in a date or datetime object.
-const int MIN_YEAR = 1;
-
-/// The largest year number allowed in a date or datetime object.
-const int MAX_YEAR = 9999;
-
-__DATETIME_END__
+int main(int argc, char *argv[])
+{
+	::testing::InitGoogleTest(&argc, argv);
+	return RUN_ALL_TESTS();
+}

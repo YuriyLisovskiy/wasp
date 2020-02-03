@@ -16,22 +16,24 @@
  */
 
 /**
- * constants.h
- * Purpose: datetime constants.
+ * tz_abbr_to_offset.h
+ * Purpose: offsets of some known time zones.
  */
 
 #pragma once
 
+// c++ libraries.
+#include <map>
+
 // Module definitions.
-#include "./_def_.h"
+#include "../_def_.h"
+
+// Wasp libraries.
+#include "../../../collections/dict.h"
 
 
-__DATETIME_BEGIN__
+__DATETIME_INTERNAL_BEGIN__
 
-/// The smallest year number allowed in a date or datetime object.
-const int MIN_YEAR = 1;
+extern collections::Dict<std::string, std::string> TZ_ABBR_TO_OFFSET;
 
-/// The largest year number allowed in a date or datetime object.
-const int MAX_YEAR = 9999;
-
-__DATETIME_END__
+__DATETIME_INTERNAL_END__

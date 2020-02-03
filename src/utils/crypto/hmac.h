@@ -33,6 +33,7 @@
 // Wasp libraries.
 #include "./interface.h"
 #include "./md5.h"
+#include "../../core/exceptions.h"
 
 
 __CRYPTO_BEGIN__
@@ -65,11 +66,14 @@ public:
 };
 
 
-/// Wraps Hmac using salt.
-extern std::string salted_hmac(
+/// Return the HMAC of 'value', using a key generated from key_salt and a
+/// secret. Default algorithm is MD5, but any algorithm witch inherits
+/// IHash is supported and can be passed. A different key_salt should be
+/// passed in for every application of HMAC.
+extern Hmac* salted_hmac(
 	const std::string& salt,
 	const std::string& value,
-	const std::string& key,
+	const std::string& secret_key,
 	IHash* hash_func = nullptr
 );
 
