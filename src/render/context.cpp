@@ -16,10 +16,10 @@
  */
 
 /**
- * An implementation of render/base.h.
+ * An implementation of render/context.h.
  */
 
-#include "./base.h"
+#include "./context.h"
 
 
 __RENDER_BEGIN__

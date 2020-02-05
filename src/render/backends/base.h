@@ -16,21 +16,62 @@
  */
 
 /**
- * base.h
+ * render/backends/base.h
+ *
  * Purpose: base classes for backends.
  */
 
 #pragma once
 
+// C++ libraries.
+#include <string>
+#include <vector>
+#include <utility>
+
 // Module definitions.
 #include "../_def_.h"
+
+// Wasp libraries.
+#include "../base.h"
+#include "../template.h"
+#include "../../core/exceptions.h"
+#include "../../core/path.h"
+#include "../../core/object/object.h"
+#include "../../apps/config.h"
 
 
 __BACKENDS_BEGIN__
 
-class BaseBackend
+class BaseBackend : public core::object::Object
 {
+protected:
+	std::string _name;
+	std::vector<std::string> _dirs;
+	bool _use_app_dirs;
 
+	BaseBackend(
+		std::vector<std::string> dirs,
+		bool use_app_dirs
+	);
+
+public:
+	/// Returns backend name.
+	std::string name();
+
+	/// Create and return a template for the given source code.
+	///
+	/// This method is optional, throws NotImplementedException by default.
+	virtual ITemplate* from_string(const std::string& template_code);
+
+	/// Load and return a template for the given path.
+	///
+	/// Throws TemplateDoesNotExist if no such template exists.
+	virtual ITemplate* get_template(const std::string& template_path) = 0;
+
+	/// Initializes a std::vector of directories to search for templates.
+	virtual std::vector<std::string> template_dirs(
+		const std::vector<apps::IAppConfig*>& apps
+	);
 };
 
 __BACKENDS_END__

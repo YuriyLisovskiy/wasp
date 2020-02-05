@@ -32,6 +32,17 @@ Regex::Regex(const std::string& expr)
 	this->_groups_are_made = false;
 }
 
+Regex::Regex(
+	const std::string& expr,
+	std::regex_constants::syntax_option_type sot
+)
+{
+	this->_expr = std::regex(expr, sot);
+	this->_is_matched = false;
+	this->_is_searched = false;
+	this->_groups_are_made = false;
+}
+
 bool Regex::match(const std::string& to_match)
 {
 	this->_to_match = to_match;

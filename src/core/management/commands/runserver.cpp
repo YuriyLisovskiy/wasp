@@ -107,8 +107,6 @@ void RunserverCommand::handle()
 	{
 		this->settings->LOGGER->error(exc.what(), _ERROR_DETAILS_);
 	}
-
-	this->settings->LOGGER->debug("Interrupted 2");
 }
 
 std::function<void(http::HttpRequest*, const core::net::internal::socket_t&)>

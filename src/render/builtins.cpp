@@ -16,14 +16,20 @@
  */
 
 /**
- * An implementation of render/base.h.
+ * An implementation of render/builtins.h.
  */
 
-#include "./base.h"
+#include "./builtins.h"
 
 
 __RENDER_BEGIN__
 
+// TODO: implement default filters.
+collections::Dict<std::string, Filter> DEFAULT_FILTERS(
+	std::map<std::string, Filter>{
 
+	},
+	true
+);
 
 __RENDER_END__

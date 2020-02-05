@@ -16,14 +16,25 @@
  */
 
 /**
- * An implementation of render/base.h.
+ * An implementation of render/loader.h.
  */
 
-#include "./base.h"
+#include "./loader.h"
 
 
 __RENDER_BEGIN__
 
-
+ITemplate* Loader::get_template(
+	const std::string& template_name,
+	const std::vector<std::string>& dirs,
+	BaseEngine* engine
+)
+{
+	// TODO: implement Loader::get_template(
+	//    const std::string& template_name,
+	//    const std::vector<std::string>& dirs
+	//  )
+	return nullptr;
+}
 
 __RENDER_END__

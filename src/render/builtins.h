@@ -16,14 +16,31 @@
  */
 
 /**
- * An implementation of render/base.h.
+ * render/builtins.h
+ *
+ * Purpose:
+ * TODO: write render/builtins.h docs
  */
 
-#include "./base.h"
+#pragma once
+
+// C++ libraries.
+#include <map>
+
+// Module definitions.
+#include "./_def_.h"
+
+// Wasp libraries.
+#include "../collections/dict.h"
+#include "../core/object/object.h"
 
 
 __RENDER_BEGIN__
 
+typedef collections::Dict<std::string, core::object::Object*> KwArgs;
 
+typedef std::function<core::object::Object*(const KwArgs& kwargs)> Filter;
+
+extern collections::Dict<std::string, Filter> DEFAULT_FILTERS;
 
 __RENDER_END__

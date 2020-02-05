@@ -35,12 +35,16 @@ __HTTP_BEGIN__
 
 size_t parse_http_datetime(const std::string& http_datetime)
 {
-	return core::dt::DateTime::strptime(http_datetime.c_str(), "Wdy, DD Mon YYYY HH:MM:SS GMT").timestamp();
+	return core::dt::DateTime::strptime(
+		http_datetime.c_str(), "%a, %d %b %Y %H:%M:%S GMT"
+	).timestamp();
 }
 
 std::string format_http_datetime(size_t epoch_seconds)
 {
-	return core::dt::DateTime(epoch_seconds).strftime("Wdy, DD Mon YYYY HH:MM:SS GMT");
+	return core::dt::DateTime(epoch_seconds).strftime(
+		"%a, %d %b %Y %H:%M:%S GMT"
+	);
 }
 
 void split_domain_port(

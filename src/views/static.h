@@ -23,9 +23,6 @@
 
 #pragma once
 
-// C++ libraries.
-#include <regex>
-
 // Module definitions.
 #include "./_def_.h"
 
@@ -41,6 +38,7 @@
 #include "../core/files/file.h"
 #include "../core/datetime/datetime.h"
 #include "../core/exceptions.h"
+#include "../core/regex.h"
 
 
 __VIEWS_BEGIN__

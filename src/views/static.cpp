@@ -113,12 +113,11 @@ bool was_modified_since(const std::string& header, size_t time, size_t size)
 	}
 	else
 	{
-		auto rgx = std::regex("([^;]+)(; length=([0-9]+))?", std::regex_constants::icase);
-		std::smatch matches;
-		if (std::regex_match(header, matches, rgx))
+		auto rgx = core::rgx::Regex("([^;]+)(; length=([0-9]+))?", std::regex_constants::icase);
+		if (rgx.search(header))
 		{
-			auto header_time = http::parse_http_datetime(matches[1].str());
-			auto header_len = matches[3].str();
+			auto header_time = http::parse_http_datetime(rgx.group(1));
+			auto header_len = rgx.group(3);
 			if (!header_len.empty() && std::strtol(header_len.c_str(), nullptr, 10) != size)
 			{
 				result = true;

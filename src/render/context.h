@@ -16,14 +16,25 @@
  */
 
 /**
- * An implementation of render/base.h.
+ * render/context.h
+ *
+ * Purpose: main context for Template.
  */
 
+#pragma once
+
+// Module definitions.
+#include "./_def_.h"
+
+// Wasp libraries.
 #include "./base.h"
 
 
 __RENDER_BEGIN__
 
-
+class Context : public IContext
+{
+	// TODO: implement Context.
+};
 
 __RENDER_END__

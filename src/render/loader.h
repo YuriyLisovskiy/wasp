@@ -16,14 +16,32 @@
  */
 
 /**
- * An implementation of render/base.h.
+ * render/loader.h
+ *
+ * Purpose:
+ * Searches for template using template name and a vector of
+ * directories where given template can be located.
  */
 
+#pragma once
+
+// Module definitions.
+#include "./_def_.h"
+
+// Wasp libraries.
 #include "./base.h"
 
 
 __RENDER_BEGIN__
 
-
+class Loader : public ILoader
+{
+public:
+	ITemplate* get_template(
+		const std::string& template_name,
+		const std::vector<std::string>& dirs,
+		BaseEngine* engine
+	) override;
+};
 
 __RENDER_END__

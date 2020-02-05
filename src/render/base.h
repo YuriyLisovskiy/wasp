@@ -17,6 +17,7 @@
 
 /**
  * render/base.h
+ *
  * Purpose: template render base.
  */
 
@@ -25,6 +26,7 @@
 // C++ libraries.
 #include <string>
 #include <vector>
+#include <functional>
 
 // Module definitions.
 #include "./_def_.h"
@@ -35,32 +37,51 @@
 
 __RENDER_BEGIN__
 
-class BaseTemplate
+class IContext
 {
 public:
+	virtual ~IContext() = default;
+};
 
+
+class ITemplate
+{
+public:
+	virtual ~ITemplate() = default;
+
+	/// Renders template code using given context.
+	virtual std::string render(IContext* context) = 0;
 };
 
 
 class BaseEngine
 {
-protected:
-	std::vector<std::string> _dirs;
-	bool _use_app_dirs;
-
 public:
-	/// Create and return a template for the given source code.
-	///
-	/// This method is optional.
-	virtual BaseTemplate* from_string(const std::string& template_code);
+	virtual ~BaseEngine() = default;
 
-	/// Load and return a template for the given path.
-	///
-	/// Throws TemplateDoesNotExist if no such template exists.
-	virtual BaseTemplate* get_template(const std::string& template_path) = 0;
+	/// Return a pointer to compiled BaseTemplate object for the given template code,
+	/// handling template inheritance recursively.
+	virtual ITemplate* from_string(const std::string& template_code) = 0;
 
-	/// Initializes a std::vector of directories to search for templates.
-	virtual void template_dirs(std::vector<std::string>& dirs, bool use_app_dirs);
+	/// Return a pointer to compiled BaseTemplate object for the given template name,
+	/// handling template inheritance recursively.
+	virtual ITemplate* get_template(const std::string& template_name) = 0;
+
+	/// Render the template specified by template_name with the given context.
+	virtual std::string render_to_string(
+		const std::string& template_name, IContext* context = nullptr
+	) = 0;
+};
+
+class ILoader
+{
+public:
+	virtual ~ILoader() = default;
+	virtual ITemplate* get_template(
+		const std::string& template_path,
+		const std::vector<std::string>& dirs,
+		BaseEngine* engine
+	) = 0;
 };
 
 __RENDER_END__

@@ -24,14 +24,25 @@
 
 __APPS_BEGIN__
 
-AppConfig::AppConfig(conf::Settings* settings)
+AppConfig::AppConfig(const std::string& app_path, conf::Settings* settings)
 {
 	this->settings = settings;
+	this->app_path = app_path;
+	auto name = core::str::rtrim(this->get_type().name(), "AppConfig");
+	core::str::rtrim(name, "appconfig");
+	core::str::rtrim(name, "app_config");
+	core::str::rtrim(name, "_");
+	this->app_name = name;
 }
 
 std::string AppConfig::get_name()
 {
 	return this->app_name;
+}
+
+std::string AppConfig::get_app_path()
+{
+	return this->app_path;
 }
 
 std::vector<urls::UrlPattern> AppConfig::get_urlpatterns()

@@ -27,7 +27,8 @@
 class FormAppConfig : public wasp::apps::AppConfig
 {
 public:
-	explicit FormAppConfig(wasp::conf::Settings* settings) : AppConfig(settings)
+	explicit FormAppConfig(wasp::conf::Settings* settings)
+		: AppConfig(__FILE__, settings)
 	{
 	}
 

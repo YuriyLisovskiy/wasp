@@ -20,6 +20,11 @@
 
 __OBJECT_BEGIN__
 
+Object::~Object()
+{
+	delete this->_object_type;
+}
+
 int Object::compare_to(const Object& other) const
 {
 	auto this_hash = this->get_hash_code();
@@ -44,9 +49,14 @@ unsigned long Object::get_hash_code() const
 	return "<" + this->get_type().name() + " object at " + oss.str() + ">";
 }
 
-Type Object::get_type() const
+Type Object::get_type()
 {
-	return Type(*this);
+	if (!this->_object_type)
+	{
+		this->_object_type = new Type(*this);
+	}
+
+	return *this->_object_type;
 }
 
 bool Object::operator<(const Object& other) const

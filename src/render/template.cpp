@@ -16,14 +16,23 @@
  */
 
 /**
- * An implementation of render/base.h.
+ * An implementation of render/template.h.
  */
 
-#include "./base.h"
+#include "./template.h"
 
 
 __RENDER_BEGIN__
 
+Template::Template(const std::string& code, BaseEngine* engine)
+{
+	// TODO: implement Template(const std::string& code, BaseEngine* engine)
+}
 
+std::string Template::render(IContext* context)
+{
+	// TODO: implement Template::render(BaseContext* context)
+	return "";
+}
 
 __RENDER_END__

@@ -37,7 +37,7 @@ __OBJECT_BEGIN__
 
 class Object;
 
-class Type
+class Type final
 {
 private:
 	std::string _name;

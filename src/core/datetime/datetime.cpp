@@ -98,7 +98,7 @@ DateTime::DateTime(Date date, Time time, TimeZone tz)
 
 DateTime::DateTime(time_t timestamp)
 {
-	auto local_time = std::localtime(&timestamp);
+	auto local_time = std::gmtime(&timestamp);
 	this->_date = Date(
 		local_time->tm_year + 1900,
 		local_time->tm_mon + 1,

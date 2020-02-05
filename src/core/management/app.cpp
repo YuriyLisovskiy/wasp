@@ -25,7 +25,7 @@
 __CORE_INTERNAL_BEGIN__
 
 CoreManagementAppConfig::CoreManagementAppConfig(wasp::conf::Settings* settings)
-	: AppConfig(settings)
+	: AppConfig(__FILE__, settings)
 {
 }
 

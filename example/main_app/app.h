@@ -31,7 +31,7 @@ class MainAppConfig : public wasp::apps::AppConfig
 {
 public:
 	explicit MainAppConfig(wasp::conf::Settings* settings)
-		: AppConfig(settings)
+		: AppConfig(__FILE__, settings)
 	{
 	}
 

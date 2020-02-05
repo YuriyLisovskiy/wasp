@@ -48,7 +48,12 @@ __OBJECT_BEGIN__
 /// 'get_type' -> Type.
 class Object
 {
+private:
+	Type* _object_type = nullptr;
+
 public:
+	virtual ~Object();
+
 	/// Returns 0 if objects are equal, -1 if 'this' is less
 	///  than 'other' otherwise returns 1.
 	/// Can be overridden.
@@ -64,7 +69,7 @@ public:
 	[[nodiscard]] virtual std::string to_string();
 
 	/// Returns Type object with object meta information.
-	[[nodiscard]] Type get_type() const;
+	Type get_type();
 
 	/// 'less than' operator.
 	/// Uses Object::compareTo method.

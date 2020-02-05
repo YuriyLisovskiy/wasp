@@ -52,6 +52,10 @@ private:
 
 public:
 	explicit Regex(const std::string& expr);
+	explicit Regex(
+		const std::string& expr,
+		std::regex_constants::syntax_option_type sot
+	);
 	bool match(const std::string& to_match);
 	bool search(const std::string& to_search);
 	std::vector<std::string> groups();

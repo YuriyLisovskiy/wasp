@@ -38,6 +38,7 @@
 #include "../conf/settings.h"
 #include "../core/string/str.h"
 #include "../core/management/base.h"
+#include "../core/object/object.h"
 #include "../core/management/commands/app_command.h"
 
 
@@ -45,7 +46,7 @@ __APPS_BEGIN__
 
 /// Derived class must contain constructor with
 /// pointer to conf::Settings parameter.
-class AppConfig : public IAppConfig
+class AppConfig : public IAppConfig, public core::object::Object
 {
 private:
 	std::vector<urls::UrlPattern> _urlpatterns;
@@ -71,6 +72,7 @@ private:
 
 protected:
 	std::string app_name;
+	std::string app_path;
 	conf::Settings* settings;
 
 	template <typename _ViewT, typename = std::enable_if<std::is_base_of<views::View, _ViewT>::value>>
@@ -115,10 +117,11 @@ protected:
 		this->_commands.push_back(cmd);
 	}
 
-	explicit AppConfig(conf::Settings* settings);
+	explicit AppConfig(const std::string& app_path, conf::Settings* settings);
 
 public:
 	std::string get_name() final;
+	std::string get_app_path() final;
 	std::vector<urls::UrlPattern> get_urlpatterns() final;
 	std::vector<core::BaseCommand*> get_commands() final;
 	virtual void urlpatterns();

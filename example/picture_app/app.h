@@ -26,7 +26,8 @@
 class PictureAppConfig : public wasp::apps::AppConfig
 {
 public:
-	explicit PictureAppConfig(wasp::conf::Settings* settings) : AppConfig(settings)
+	explicit PictureAppConfig(wasp::conf::Settings* settings)
+		: AppConfig(__FILE__, settings)
 	{
 	}
 
