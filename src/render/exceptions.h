@@ -93,4 +93,23 @@ public:
 	);
 };
 
+
+class ContentNotRenderedError : public core::BaseException
+{
+protected:
+	// Use only when initializing of a derived exception!
+	ContentNotRenderedError(
+		const char* message, int line, const char* function, const char* file, const char* type
+	);
+public:
+	explicit ContentNotRenderedError(
+		const char* message,
+		int line = 0, const char* function = "", const char* file = ""
+	);
+	explicit ContentNotRenderedError(
+		const std::string& message,
+		int line = 0, const char* function = "", const char* file = ""
+	);
+};
+
 __RENDER_END__

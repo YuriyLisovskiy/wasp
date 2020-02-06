@@ -27,12 +27,13 @@ __RENDER_BEGIN__
 Template::Template(const std::string& code, BaseEngine* engine)
 {
 	// TODO: implement Template(const std::string& code, BaseEngine* engine)
+	this->_template_code = code;
 }
 
 std::string Template::render(IContext* context)
 {
 	// TODO: implement Template::render(BaseContext* context)
-	return "";
+	return this->_template_code;
 }
 
 __RENDER_END__

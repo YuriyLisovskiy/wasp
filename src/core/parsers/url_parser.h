@@ -56,8 +56,9 @@ struct url_parser final
 	};
 
 	bool is_parsed;
+	bool is_reset;
 	const char* last_err;
-	size_t err_line;
+	long int err_line;
 	const char* err_file;
 	const char* err_func;
 
@@ -74,6 +75,7 @@ struct url_parser final
 	url_parser();
 	void parse(const std::string& str);
 	void parse(const char* str);
+	void reset();
 	static bool is_unreserved(char ch);
 	static bool is_ipv6_symbol(char ch);
 

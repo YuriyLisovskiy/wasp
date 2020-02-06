@@ -33,7 +33,7 @@
 // Wasp libraries.
 #include "./base.h"
 #include "./builtins.h"
-#include "./loader.h"
+#include "./loaders.h"
 #include "./template.h"
 #include "./builtins.h"
 #include "./exceptions.h"
@@ -53,9 +53,11 @@ private:
 	std::vector<ILoader*> _loaders;
 	bool _use_default_loaders;
 	collections::Dict<std::string, Filter> _filters;
+	backends::BaseBackend* _backend;
 
 public:
 	explicit Engine(
+		backends::BaseBackend* backend,
 		const std::vector<std::string>& dirs = {},
 		bool use_app_dirs = false,
 		bool debug = false,
@@ -83,6 +85,9 @@ public:
 	std::string render_to_string(
 		const std::string& template_name,IContext* context = nullptr
 	) override;
+
+	/// Returns current backend.
+	backends::BaseBackend* backend();
 };
 
 __RENDER_END__

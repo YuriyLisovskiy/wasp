@@ -16,41 +16,14 @@
  */
 
 /**
- * render/template.h
- *
- * Purpose:
- * Renders html template with C++.
- *
- * This class is a part of Wasp default render engine and is
- * main implementation of rendering process, for custom renderer,
- * please, inherit from ITemplate interface and implement
- * required methods.
+ * An implementation of render/backends/wasp.h.
  */
 
-#pragma once
-
-// C++ libraries.
-#include <string>
-
-// Module definitions.
-#include "./_def_.h"
-
-// Wasp libraries.
-#include "./base.h"
+#include "./wasp.h"
 
 
-__RENDER_BEGIN__
+__BACKENDS_BEGIN__
 
-class Template : public ITemplate
-{
-protected:
-	std::string _template_code;
 
-public:
-	Template(const std::string& code, BaseEngine* engine);
 
-	/// Renders template code using given context.
-	std::string render(IContext* context) override;
-};
-
-__RENDER_END__
+__BACKENDS_END__

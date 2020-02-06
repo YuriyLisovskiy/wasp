@@ -35,6 +35,7 @@
 // Wasp libraries.
 #include "./config.h"
 #include "../conf/settings.h"
+#include "../core/path.h"
 #include "../core/exceptions.h"
 #include "../core/management/base.h"
 #include "../core/management/app.h"
@@ -48,11 +49,12 @@ private:
 	conf::Settings* _settings;
 	std::string _help_message;
 
-	void setup_commands();
-	void extend_settings_commands_or_error(
+	void _setup_commands();
+	void _extend_settings_commands_or_error(
 		const std::vector<core::BaseCommand*>& from,
 		const std::function<std::string(const std::string& cmd_name)>& err_fn
 	);
+	void _perform_checks();
 
 public:
 	explicit WaspApplication(conf::Settings* settings);

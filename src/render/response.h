@@ -16,32 +16,50 @@
  */
 
 /**
- * render/loader.h
+ * render/response.h
  *
  * Purpose:
- * Searches for template using template name and a vector of
- * directories where given template can be located.
+ * Http response which can render it's content using
+ * configured backend.
  */
 
 #pragma once
+
+// C++ libraries.
+#include <string>
 
 // Module definitions.
 #include "./_def_.h"
 
 // Wasp libraries.
 #include "./base.h"
+#include "./backends/base.h"
+#include "./exceptions.h"
+#include "../http/response.h"
 
 
 __RENDER_BEGIN__
 
-class Loader : public ILoader
+class TemplateResponse : public http::HttpResponse
 {
+protected:
+	std::string _template_name;
+	IContext* _context;
+	backends::BaseBackend* _backend;
+	bool _is_rendered;
+
 public:
-	ITemplate* get_template(
+	explicit TemplateResponse(
+		backends::BaseBackend* backend,
 		const std::string& template_name,
-		const std::vector<std::string>& dirs,
-		BaseEngine* engine
-	) override;
+		IContext* context = nullptr,
+		unsigned short int status = 200,
+		const std::string& content_type = "",
+		const std::string& charset = "utf-8"
+	);
+
+	void render();
+	std::string get_content() override;
 };
 
 __RENDER_END__

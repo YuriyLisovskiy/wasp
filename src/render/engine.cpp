@@ -25,6 +25,7 @@
 __RENDER_BEGIN__
 
 Engine::Engine(
+	backends::BaseBackend* backend,
 	const std::vector<std::string>& dirs,
 	bool use_app_dirs,
 	bool debug,
@@ -33,6 +34,7 @@ Engine::Engine(
 	core::ILogger* logger
 )
 {
+	this->_backend = backend;
 	this->_dirs = dirs;
 	this->_use_app_dirs = use_app_dirs;
 	this->_debug = debug;
@@ -107,7 +109,7 @@ ITemplate* Engine::find_template(
 		}
 	}
 
-	throw TemplateDoesNotExist(name, tried);
+	throw TemplateDoesNotExist(name, tried, this->_backend, _ERROR_DETAILS_);
 }
 
 ITemplate* Engine::from_string(const std::string& template_code)
@@ -128,6 +130,11 @@ std::string Engine::render_to_string(
 	auto result = t->render(context);
 	delete t;
 	return result;
+}
+
+backends::BaseBackend* Engine::backend()
+{
+	return this->_backend;
 }
 
 __RENDER_END__

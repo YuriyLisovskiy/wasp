@@ -33,16 +33,16 @@
 
 // Wasp libraries.
 #include "../base.h"
-#include "../template.h"
+#include "./interfaces.h"
 #include "../../core/exceptions.h"
 #include "../../core/path.h"
 #include "../../core/object/object.h"
-#include "../../apps/config.h"
+#include "../../apps/interface.h"
 
 
 __BACKENDS_BEGIN__
 
-class BaseBackend : public core::object::Object
+class BaseBackend : public IBackend, public core::object::Object
 {
 protected:
 	std::string _name;
@@ -56,22 +56,22 @@ protected:
 
 public:
 	/// Returns backend name.
-	std::string name();
+	std::string name() override;
 
 	/// Create and return a template for the given source code.
 	///
 	/// This method is optional, throws NotImplementedException by default.
-	virtual ITemplate* from_string(const std::string& template_code);
+	ITemplate* from_string(const std::string& template_code) override;
 
 	/// Load and return a template for the given path.
 	///
 	/// Throws TemplateDoesNotExist if no such template exists.
-	virtual ITemplate* get_template(const std::string& template_path) = 0;
+	ITemplate* get_template(const std::string& template_path) override = 0;
 
 	/// Initializes a std::vector of directories to search for templates.
-	virtual std::vector<std::string> template_dirs(
+	std::vector<std::string> template_dirs(
 		const std::vector<apps::IAppConfig*>& apps
-	);
+	) override;
 };
 
 __BACKENDS_END__

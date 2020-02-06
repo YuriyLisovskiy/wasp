@@ -16,7 +16,7 @@
  */
 
 /**
- * An implementation of settings.h.
+ * An implementation of conf/settings.h.
  */
 
 #include "./settings.h"
@@ -37,6 +37,8 @@ Settings::Settings()
 	this->DEFAULT_CHARSET = "utf-8";
 
 	this->ROOT_APP = nullptr;
+
+	this->TEMPLATES_BACKEND = nullptr;
 
 	this->APPEND_SLASH = true;
 
@@ -111,6 +113,7 @@ void Settings::prepare()
 
 Settings::~Settings()
 {
+	delete this->TEMPLATES_BACKEND;
 	delete this->SECURE_PROXY_SSL_HEADER;
 	for (auto& installed_app : this->INSTALLED_APPS)
 	{

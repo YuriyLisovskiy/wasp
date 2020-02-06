@@ -27,17 +27,14 @@ __APPS_BEGIN__
 WaspApplication::WaspApplication(conf::Settings* settings)
 {
 	core::InterruptException::initialize();
-	this->_settings = settings;
-	if (!this->_settings->LOGGER)
-	{
-		throw core::ImproperlyConfigured("logger can not be nullptr", _ERROR_DETAILS_);
-	}
 
+	this->_settings = settings;
 	this->_settings->init();
 	this->_settings->overwrite();
 	this->_settings->prepare();
+	this->_perform_checks();
 
-	this->setup_commands();
+	this->_setup_commands();
 
 	for (auto& command : this->_settings->COMMANDS)
 	{
@@ -85,7 +82,7 @@ void WaspApplication::execute_from_command_line(int argc, char** argv)
 	}
 }
 
-void WaspApplication::setup_commands()
+void WaspApplication::_setup_commands()
 {
 	// Retrieve commands from INSTALLED_APPS and
 	// check if apps' commands do not override
@@ -93,7 +90,7 @@ void WaspApplication::setup_commands()
 	// to settings.COMMANDS
 	for (auto& installed_app : this->_settings->INSTALLED_APPS)
 	{
-		this->extend_settings_commands_or_error(
+		this->_extend_settings_commands_or_error(
 			installed_app->get_commands(),
 			[installed_app](const std::string& cmd_name) -> std::string {
 				return "App with name '" + installed_app->get_name() +
@@ -108,7 +105,7 @@ void WaspApplication::setup_commands()
 
 	// Check if user-defined commands do not override
 	// default commands, if not, append them to settings.COMMANDS
-	this->extend_settings_commands_or_error(
+	this->_extend_settings_commands_or_error(
 		default_commands,
 		[](const std::string& cmd_name) -> std::string {
 			return "Attempting to override '" + cmd_name + "' command which is forbidden.";
@@ -116,7 +113,7 @@ void WaspApplication::setup_commands()
 	);
 }
 
-void WaspApplication::extend_settings_commands_or_error(
+void WaspApplication::_extend_settings_commands_or_error(
 	const std::vector<core::BaseCommand*>& from,
 	const std::function<std::string(const std::string& cmd_name)>& err_fn
 )
@@ -135,6 +132,73 @@ void WaspApplication::extend_settings_commands_or_error(
 		}
 
 		this->_settings->COMMANDS[command->name()] = command;
+	}
+}
+
+void WaspApplication::_perform_checks()
+{
+	if (!this->_settings)
+	{
+		throw core::ImproperlyConfigured("Main application's settings must be instantiated.");
+	}
+
+	if (!this->_settings->LOGGER)
+	{
+		throw core::ImproperlyConfigured("LOGGER instance must be configured");
+	}
+
+	size_t err_count = 0;
+	if (!this->_settings->TEMPLATES_BACKEND)
+	{
+		this->_settings->LOGGER->error(
+			"TEMPLATES_BACKEND instance must be configured in order to use the application."
+		);
+		err_count++;
+	}
+
+	if (this->_settings->MIDDLEWARE.empty())
+	{
+		this->_settings->LOGGER->error(
+			"MIDDLEWARE must be configured in order to use the application."
+		);
+		err_count++;
+	}
+
+	if (this->_settings->BASE_DIR.empty())
+	{
+		this->_settings->LOGGER->error(
+			"BASE_DIR must not be empty in order to use the application."
+		);
+		err_count++;
+	}
+	else if (!core::path::exists(this->_settings->BASE_DIR))
+	{
+		this->_settings->LOGGER->error(
+			"BASE_DIR must exist in order to use the application."
+		);
+		err_count++;
+	}
+
+	if (this->_settings->INSTALLED_APPS.empty())
+	{
+		this->_settings->LOGGER->warning(
+			"You have not added any app to INSTALLED_APPS setting."
+		);
+	}
+
+	if (this->_settings->SECRET_KEY.empty())
+	{
+		this->_settings->LOGGER->error(
+			"SECRET_KEY must be set in order to use the application."
+		);
+		err_count++;
+	}
+
+	if (err_count > 0)
+	{
+		throw core::ImproperlyConfigured(
+			"System check identified " + std::to_string(err_count) + " issues."
+		);
 	}
 }
 

@@ -15,42 +15,38 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * render/template.h
- *
- * Purpose:
- * Renders html template with C++.
- *
- * This class is a part of Wasp default render engine and is
- * main implementation of rendering process, for custom renderer,
- * please, inherit from ITemplate interface and implement
- * required methods.
- */
-
 #pragma once
 
-// C++ libraries.
-#include <string>
-
 // Module definitions.
-#include "./_def_.h"
+#include "../_def_.h"
 
 // Wasp libraries.
-#include "./base.h"
+#include "../base.h"
+#include "../../apps/interface.h"
 
 
-__RENDER_BEGIN__
+__BACKENDS_BEGIN__
 
-class Template : public ITemplate
+class IBackend
 {
-protected:
-	std::string _template_code;
-
 public:
-	Template(const std::string& code, BaseEngine* engine);
+	/// Returns backend name.
+	virtual std::string name() = 0;
 
-	/// Renders template code using given context.
-	std::string render(IContext* context) override;
+	/// Create and return a template for the given source code.
+	///
+	/// This method is optional, throws NotImplementedException by default.
+	virtual ITemplate* from_string(const std::string& template_code) = 0;
+
+	/// Load and return a template for the given path.
+	///
+	/// Throws TemplateDoesNotExist if no such template exists.
+	virtual ITemplate* get_template(const std::string& template_path) = 0;
+
+	/// Initializes a std::vector of directories to search for templates.
+	virtual std::vector<std::string> template_dirs(
+			const std::vector<apps::IAppConfig*>& apps
+	) = 0;
 };
 
-__RENDER_END__
+__BACKENDS_END__
