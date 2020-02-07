@@ -16,7 +16,8 @@
  */
 
 /**
- * interface.h
+ * utils/crypto/interface.h
+ *
  * Purpose:
  * 	A collection of interfaces for cryptography module.
  */

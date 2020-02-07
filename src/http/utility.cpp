@@ -16,7 +16,7 @@
  */
 
 /**
- * An implementation of utility.h.
+ * An implementation of http/utility.h
  */
 
 #include "./utility.h"

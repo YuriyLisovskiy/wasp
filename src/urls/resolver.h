@@ -16,7 +16,8 @@
  */
 
 /**
- * resolver.h
+ * urls/resolver.h
+ *
  * Purpose: resolves given url as string.
  */
 

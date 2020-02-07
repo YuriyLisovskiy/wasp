@@ -16,7 +16,7 @@
  */
 
 /**
- * An implementation of render/loader.h.
+ * An implementation of render/loader.h
  */
 
 #include "./loaders.h"

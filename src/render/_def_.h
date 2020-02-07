@@ -16,7 +16,8 @@
  */
 
 /**
- * _def_.h
+ * render/_def_.h
+ *
  * Purpose: render module's definitions.
  */
 

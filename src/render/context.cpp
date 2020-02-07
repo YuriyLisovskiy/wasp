@@ -16,7 +16,7 @@
  */
 
 /**
- * An implementation of render/context.h.
+ * An implementation of render/context.h
  */
 
 #include "./context.h"

@@ -16,7 +16,7 @@
  */
 
 /**
- * An implementation of cookie.h.
+ * An implementation of http/cookie.h
  */
 
 #include "./cookie.h"

@@ -16,7 +16,7 @@
  */
 
 /**
- * An implementation of hmac.h.
+ * An implementation of utils/crypto/hmac.h
  */
 
 #include "./hmac.h"

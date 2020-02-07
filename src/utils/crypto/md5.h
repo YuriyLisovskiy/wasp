@@ -31,7 +31,8 @@ documentation and/or software.
 */
 
 /**
- * md5.h
+ * utils/crypto/md5.h
+ *
  * Purpose:
  * 	Provides md5 hash function algorithm.
  */
@@ -46,7 +47,7 @@ documentation and/or software.
 #include "./_def_.h"
 
 // Waps libraries.
-#include "./interface.h"
+#include "./interfaces.h"
 
 
 __CRYPTO_BEGIN__

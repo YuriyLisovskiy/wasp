@@ -16,7 +16,7 @@
  */
 
 /**
- * An implementation of render/exceptions.h.
+ * An implementation of render/exceptions.h
  */
 
 #include "./exceptions.h"

@@ -34,7 +34,7 @@
 // Wasp libraries.
 #include "../core/logger.h"
 #include "../apps/interfaces.h"
-#include "../middleware/interface.h"
+#include "../middleware/interfaces.h"
 #include "../core/management/base.h"
 #include "../core/regex.h"
 #include "../render/backends/interfaces.h"

@@ -16,7 +16,7 @@
  */
 
 /**
- * An implementation of render/backends/base.h.
+ * An implementation of render/backends/base.h
  */
 
 #include "./base.h"

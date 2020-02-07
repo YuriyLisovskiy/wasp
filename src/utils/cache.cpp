@@ -16,7 +16,7 @@
  */
 
 /**
- * An implementation of cache.h.
+ * An implementation of utils/cache.h
  */
 
 #include "./cache.h"

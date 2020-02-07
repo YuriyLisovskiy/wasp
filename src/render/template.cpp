@@ -16,7 +16,7 @@
  */
 
 /**
- * An implementation of render/template.h.
+ * An implementation of render/template.h
  */
 
 #include "./template.h"

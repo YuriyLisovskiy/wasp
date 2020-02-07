@@ -16,7 +16,8 @@
  */
 
 /**
- * hmac.h
+ * utils/crypto/hmac.h
+ *
  * Purpose: a collection of hmac functions.
  */
 
@@ -31,7 +32,7 @@
 #include "./_def_.h"
 
 // Wasp libraries.
-#include "./interface.h"
+#include "./interfaces.h"
 #include "./md5.h"
 #include "../../core/exceptions.h"
 

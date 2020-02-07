@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
  */
 
 /**
- * middleware_mixin.h
+ * middleware/middleware_mixin.h
+ *
  * Purpose:
  * 	Base middleware class.
  */
@@ -27,7 +28,7 @@
 #include "./_def_.h"
 
 // Wasp libraries.
-#include "./interface.h"
+#include "./interfaces.h"
 #include "../http/request.h"
 #include "../http/response.h"
 #include "../conf/settings.h"

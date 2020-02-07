@@ -16,7 +16,8 @@
  */
 
 /**
- * cookie.h
+ * http/cookie.h
+ *
  * Purpose: represents an http cookies as object.
  */
 

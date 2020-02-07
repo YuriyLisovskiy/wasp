@@ -16,7 +16,7 @@
  */
 
 /**
- * An implementation of render/builtins.h.
+ * An implementation of render/builtins.h
  */
 
 #include "./builtins.h"

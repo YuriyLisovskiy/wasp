@@ -16,7 +16,7 @@
  */
 
 /**
- * An implementation of render/engine.h.
+ * An implementation of render/engine.h
  */
 
 #include "./engine.h"

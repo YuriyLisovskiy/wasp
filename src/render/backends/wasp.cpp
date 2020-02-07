@@ -16,7 +16,7 @@
  */
 
 /**
- * An implementation of render/backends/wasp.h.
+ * An implementation of render/backends/wasp.h
  */
 
 #include "./wasp.h"

@@ -16,7 +16,7 @@
  */
 
 /**
- * An implementation of response.h.
+ * An implementation of http/response.h
  */
 
 #include "./response.h"

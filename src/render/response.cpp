@@ -16,7 +16,7 @@
  */
 
 /**
- * An implementation of render/response.h.
+ * An implementation of render/response.h
  */
 
 #include "./response.h"

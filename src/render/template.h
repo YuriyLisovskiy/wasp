@@ -19,12 +19,12 @@
  * render/template.h
  *
  * Purpose:
- * Renders html template with C++.
+ * 	Renders html template with C++.
  *
- * This class is a part of Wasp default render engine and is
- * main implementation of rendering process, for custom renderer,
- * please, inherit from ITemplate interface and implement
- * required methods.
+ * 	This class is a part of Wasp default render engine and is
+ * 	main implementation of rendering process, for custom renderer,
+ * 	please, inherit from ITemplate interface and implement
+ * 	required methods.
  */
 
 #pragma once

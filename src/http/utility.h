@@ -16,8 +16,9 @@
  */
 
 /**
- * utility.h
- * Purpose: some http helpers.
+ * http/utility.h
+ *
+ * Purpose: useful http helpers.
  */
 
 #pragma once

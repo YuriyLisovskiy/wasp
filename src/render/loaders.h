@@ -19,9 +19,9 @@
  * render/loader.h
  *
  * Purpose:
- * Default loader.
- * Searches for template using template name and a vector of
- * directories where given template can be located.
+ * 	Default loader.
+ * 	Searches for template using template name and a vector of
+ * 	directories where given template can be located.
  */
 
 #pragma once

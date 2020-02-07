@@ -19,8 +19,8 @@
  * render/response.h
  *
  * Purpose:
- * Http response which can render it's content using
- * configured backend.
+ * 	Http response which can render it's content using
+ * 	configured backend.
  */
 
 #pragma once

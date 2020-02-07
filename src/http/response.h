@@ -16,9 +16,11 @@
  */
 
 /**
- * response.h
- * Purpose: contains base http response and most frequently
- * 			used http response.
+ * http/response.h
+ *
+ * Purpose:
+ * 	Contains base http response and most frequently
+ * 	used http response.
  */
 
 #pragma once
