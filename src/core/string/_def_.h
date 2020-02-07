@@ -16,7 +16,8 @@
  */
 
 /**
- * _def_.h
+ * core/string/_def_.h
+ *
  * Purpose: core/string module's definitions.
  */
 

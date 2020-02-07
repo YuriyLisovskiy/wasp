@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,9 @@
  */
 
 /**
- * app_command.h
- * Purpose: The base class for AppConfig commands.
+ * core/managements/commands/app_command.h
+ *
+ * Purpose: the base class for AppConfig commands.
  */
 
 #pragma once

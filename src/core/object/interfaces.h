@@ -16,7 +16,8 @@
  */
 
 /**
- * interfaces.h
+ * core/object/interfaces.h
+ *
  * Purpose: contains useful interfaces for inheritance.
  */
 

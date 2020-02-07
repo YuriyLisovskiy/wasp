@@ -1,7 +1,5 @@
-#include <utility>
-
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +16,7 @@
  */
 
 /**
- * An implementation of timezone.h.
+ * An implementation of core/datetime/timezone.h
  */
 
 #include "./timezone.h"

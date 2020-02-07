@@ -16,7 +16,8 @@
  */
 
 /**
- * constants.h
+ * core/datetime/constants.h
+ *
  * Purpose: datetime constants.
  */
 

@@ -16,7 +16,8 @@
  */
 
 /**
- * _def_.h
+ * core/signing/_def_.h
+ *
  * Purpose: core/signing module's definitions.
  */
 

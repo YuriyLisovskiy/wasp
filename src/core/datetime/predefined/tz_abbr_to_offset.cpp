@@ -16,7 +16,7 @@
  */
 
 /**
- * An implementation of tz_abbr_to_offset.h.
+ * An implementation of core/datetime/predefined/tz_abbr_to_offset.h.
  */
 
 #include "./tz_abbr_to_offset.h"

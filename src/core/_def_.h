@@ -16,7 +16,8 @@
  */
 
 /**
- * _def_.h
+ * core/_def_.h
+ *
  * Purpose: core module's definitions.
  */
 

@@ -15,6 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * An implementation of core/object/type.h
+ */
+
 #include "./type.h"
 
 // Wasp libraries.

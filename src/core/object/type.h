@@ -17,6 +17,7 @@
 
 /**
  * core/object/type.h
+ *
  * Purpose: represents basic metadata of class inherited from Object.
  */
 

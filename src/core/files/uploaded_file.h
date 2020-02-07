@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +16,11 @@
  */
 
 /**
- * uploaded_file.h
- * Purpose: represents some file data that the user
- * 			submitted with a form.
+ * core/files/uploaded_file.h
+ *
+ * Purpose:
+ * 	Represents some file data that the user
+ * 	submitted with a form.
  */
 
 #pragma once

@@ -16,7 +16,8 @@
  */
 
 /**
- * signer.h
+ * core/signing/signer.h
+ *
  * Purpose: used for signing string.
  */
 

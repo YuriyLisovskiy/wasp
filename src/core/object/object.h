@@ -17,9 +17,10 @@
 
 /**
  * core/object/object.h
+ *
  * Purpose:
- * Main parent for all derived classes which need to be rendered
- * or for some other purposes.
+ * 	Main parent for all derived classes which need to be rendered
+ * 	or for some other purposes.
  */
 
 #pragma once

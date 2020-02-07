@@ -16,7 +16,8 @@
  */
 
 /**
- * offset_to_tz_abbr.h
+ * core/datetime/predefined/offset_to_tz_abbr.h
+ *
  * Purpose: offsets of some known time zones.
  */
 

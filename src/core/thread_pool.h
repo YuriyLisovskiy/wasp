@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,10 @@
  */
 
 /**
- * thread_pool.h
- * Purpose: queued thread pool for executing functions in parallel.
+ * core/thread_pool.h
+ *
+ * Purpose:
+ * 	Queued thread pool for executing functions in parallel.
  */
 
 #pragma once

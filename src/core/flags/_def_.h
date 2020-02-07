@@ -16,7 +16,8 @@
  */
 
 /**
- * _def_.h
+ * core/flags/_def_.h
+ *
  * Purpose: core/flags module's definitions.
  */
 

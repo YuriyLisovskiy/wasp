@@ -16,7 +16,7 @@
  */
 
 /**
- * An implementation of signer.h.
+ * An implementation of core/signing/signer.h
  */
 
 #include "./signer.h"

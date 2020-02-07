@@ -16,7 +16,7 @@
  */
 
 /**
- * An implementation of tz_to_offset.h.
+ * An implementation of core/datetime/predefined/tz_to_offset.h
  */
 
 #include "./tz_to_offset.h"
