@@ -16,9 +16,11 @@
  */
 
 /**
- * dict.h
- * Purpose: template container based on std::map with additional
- * 			methods (extended std::map).
+ * collections/dict.h
+ *
+ * Purpose:
+ * Template container based on std::map with additional
+ * methods (extended std::map).
  */
 
 #pragma once

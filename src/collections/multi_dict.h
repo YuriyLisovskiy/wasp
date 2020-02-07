@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,10 +16,12 @@
  */
 
 /**
- * multi_dict.h
- * Purpose: template container based on collections::Dict with additional
- * 			methods (extended collections::Dict). Main difference is that
- * 			MultiValueDict can contain multiple values in one key.
+ * collections/multi_dict.h
+ *
+ * Purpose:
+ * Template container based on collections::Dict with additional
+ * methods (extended collections::Dict). Main difference is that
+ * MultiValueDict can contain multiple values in one key.
  */
 
 #pragma once

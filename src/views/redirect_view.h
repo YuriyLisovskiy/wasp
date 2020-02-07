@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,9 @@
  */
 
 /**
- * redirect_view.h
- * Purpose: provide a redirect on any GET request.
+ * views/redirect_view.h
+ *
+ * Purpose: provides a redirect on any GET request.
  */
 
 #pragma once
@@ -47,10 +48,10 @@ private:
 
 public:
 	explicit RedirectView(
+		conf::Settings* settings,
 		const std::string& url,
 		bool permanent = false,
-		bool query_string = false,
-		core::ILogger* logger = nullptr
+		bool query_string = false
 	);
 
 	/// Return the URL redirect to.

@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "../../../src/apps/interface.h"
+#include "../../../src/apps/interfaces.h"
 #include "../../../src/core/management/commands/app_command.h"
 
 

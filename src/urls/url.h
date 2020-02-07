@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
  */
 
 /**
- * url.h
+ * urls/url.h
  * Purpose: utility functions for working with url patterns.
  */
 
@@ -29,12 +29,15 @@
 #include "./pattern.h"
 #include "../views/static.h"
 #include "../core/exceptions.h"
+#include "../conf/settings.h"
 
 
 __URLS_BEGIN__
 
 extern UrlPattern make_url(
-	const std::string& rgx, const views::ViewHandler& handler, const std::string& name
+	const std::string& rgx,
+	const views::ViewHandler& handler,
+	const std::string& name
 );
 
 extern UrlPattern make_static(

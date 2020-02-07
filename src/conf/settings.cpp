@@ -16,7 +16,7 @@
  */
 
 /**
- * An implementation of conf/settings.h.
+ * An implementation of conf/settings.h
  */
 
 #include "./settings.h"

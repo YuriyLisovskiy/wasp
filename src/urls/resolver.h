@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@
 // Wasp libraries.
 #include "./pattern.h"
 #include "../http/response.h"
+#include "../conf/settings.h"
 
 
 __URLS_BEGIN__
@@ -40,7 +41,7 @@ __URLS_BEGIN__
 /// to process request if path is found, otherwise returns nullptr.
 extern std::function<http::HttpResponseBase*(
 	http::HttpRequest* request,
-	core::ILogger* logger
+	conf::Settings* settings
 )> resolve(
 	const std::string& path, std::vector<UrlPattern>& urlpatterns
 );

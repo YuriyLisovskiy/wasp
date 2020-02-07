@@ -26,14 +26,14 @@ __URLS_BEGIN__
 
 std::function<http::HttpResponseBase*(
 	http::HttpRequest* request,
-	core::ILogger* logger
+	conf::Settings* settings
 )> resolve(
 	const std::string& path, std::vector<UrlPattern>& urlpatterns
 )
 {
 	std::function<http::HttpResponseBase*(
 		http::HttpRequest* request,
-		core::ILogger* logger
+		conf::Settings* settings
 	)> fn = nullptr;
 	for (auto& url_pattern : urlpatterns)
 	{
@@ -42,11 +42,11 @@ std::function<http::HttpResponseBase*(
 		{
 			fn = [url_pattern, args_map](
 				http::HttpRequest* request,
-				core::ILogger* logger
+				conf::Settings* settings
 			) mutable -> http::HttpResponseBase*
 			{
 				auto* args = new views::Args(args_map);
-				auto result = url_pattern.apply(request, args, logger);
+				auto result = url_pattern.apply(request, settings, args);
 				delete args;
 				return result;
 			};

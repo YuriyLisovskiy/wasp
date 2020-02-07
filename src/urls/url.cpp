@@ -43,10 +43,10 @@ UrlPattern make_static(
 	auto view_func = [static_root](
 		http::HttpRequest* request,
 		views::Args* args,
-		core::ILogger* logger
+		conf::Settings* settings
 	) -> http::HttpResponseBase*
 	{
-		views::StaticView view(logger);
+		views::StaticView view(settings);
 		auto* kwargs = new collections::Dict(
 			std::map<std::string, std::string>{
 				{"document_root", static_root}

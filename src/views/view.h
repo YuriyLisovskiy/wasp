@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +16,11 @@
  */
 
 /**
- * view.h
- * Purpose: Intentionally simple parent class for all views. Only
- * 			implements dispatch-by-method and simple sanity checking.
+ * views/view.h
+ *
+ * Purpose:
+ * Intentionally simple parent class for all views. Only
+ * implements dispatch-by-method and simple sanity checking.
  */
 
 #pragma once
@@ -41,12 +43,20 @@
 #include "../core/string/str.h"
 #include "../core/exceptions.h"
 #include "../collections/dict.h"
+#include "../conf/settings.h"
+
+
+__CONF_BEGIN__
+
+class Settings;
+
+__CONF_END__
 
 
 __VIEWS_BEGIN__
 
 typedef std::function<http::HttpResponseBase*(
-	http::HttpRequest*, views::Args*, core::ILogger*
+	http::HttpRequest*, views::Args*, conf::Settings*
 )> ViewHandler;
 
 
@@ -54,6 +64,8 @@ class View
 {
 protected:
 	core::ILogger* _logger;
+
+	conf::Settings* _settings;
 
 	/// Holds pointer to client's request.
 	/// Caution: must be deleted outside!
@@ -68,7 +80,7 @@ protected:
 	std::vector<std::string> _allowed_methods_list;
 
 public:
-	explicit View(core::ILogger* logger = nullptr);
+	explicit View(conf::Settings* settings);
 
 	/// Processes http GET request.
 	/// Can be overridden in derived class, otherwise returns nullptr.
@@ -165,7 +177,10 @@ public:
 	std::vector<std::string> allowed_methods();
 
 protected:
-	explicit View(const std::vector<std::string>& allowed_methods, core::ILogger* logger = nullptr);
+	explicit View(
+		const std::vector<std::string>& allowed_methods,
+		conf::Settings* settings
+	);
 };
 
 __VIEWS_END__

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
  */
 
 /**
- * An implementation of view.h.
+ * An implementation of views/view.h
  */
 
 #include "./view.h"
@@ -24,12 +24,17 @@
 
 __VIEWS_BEGIN__
 
-View::View(core::ILogger* logger) : _request(nullptr), _allowed_methods_list({"options"})
+View::View(conf::Settings* settings)
+	: _request(nullptr), _allowed_methods_list({"options"})
 {
-	this->_logger = logger;
+	this->_settings = settings;
+	this->_logger = this->_settings->LOGGER;
 }
 
-View::View(const std::vector<std::string>& allowed_methods, core::ILogger* logger) : View(logger)
+View::View(
+	const std::vector<std::string>& allowed_methods,
+	conf::Settings* settings
+) : View(settings)
 {
 	this->_allowed_methods_list = allowed_methods;
 	if (std::find(allowed_methods.begin(), allowed_methods.end(), "options") == allowed_methods.end())

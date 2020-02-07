@@ -27,7 +27,7 @@
 
 // Wasp libraries.
 #include "./app_command.h"
-#include "../../../apps/interface.h"
+#include "../../../apps/interfaces.h"
 #include "../../../urls/url.h"
 #include "../../../urls/resolver.h"
 #include "../../../http/request.h"

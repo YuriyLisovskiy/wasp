@@ -25,8 +25,8 @@
 class FormView : public wasp::views::View
 {
 public:
-	explicit FormView(wasp::core::ILogger* logger = nullptr)
-		: wasp::views::View({"get", "post"}, logger)
+	explicit FormView(wasp::conf::Settings* settings)
+		: wasp::views::View({"get", "post"}, settings)
 	{
 	}
 

@@ -22,7 +22,14 @@
 
 // Wasp libraries.
 #include "../base.h"
-#include "../../apps/interface.h"
+#include "../../apps/interfaces.h"
+
+
+__APPS_BEGIN__
+
+class IAppConfig;
+
+__APPS_END__
 
 
 __BACKENDS_BEGIN__
@@ -30,6 +37,8 @@ __BACKENDS_BEGIN__
 class IBackend
 {
 public:
+	virtual ~IBackend() = default;
+
 	/// Returns backend name.
 	virtual std::string name() = 0;
 
@@ -45,7 +54,7 @@ public:
 
 	/// Initializes a std::vector of directories to search for templates.
 	virtual std::vector<std::string> template_dirs(
-			const std::vector<apps::IAppConfig*>& apps
+		const std::vector<apps::IAppConfig*>& apps
 	) = 0;
 };
 

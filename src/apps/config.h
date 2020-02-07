@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +16,11 @@
  */
 
 /**
- * config.h
- * Purpose: represents application configuration
- * 			with urls and models (will be developed in future)
+ * apps/config.h
+ *
+ * Purpose:
+ * Represents application configuration
+ * with urls and models (will be developed in future)
  */
 
 #pragma once
@@ -31,7 +33,7 @@
 #include "./_def_.h"
 
 // Wasp libraries.
-#include "./interface.h"
+#include "./interfaces.h"
 #include "../views/view.h"
 #include "../urls/url.h"
 #include "../urls/pattern.h"
@@ -78,13 +80,13 @@ protected:
 	template <typename _ViewT, typename = std::enable_if<std::is_base_of<views::View, _ViewT>::value>>
 	void url(const std::string& pattern, const std::string& name = "")
 	{
-		views::ViewHandler view_handler = [](
+		views::ViewHandler view_handler = [this](
 			http::HttpRequest* request,
 			views::Args* args,
-			core::ILogger* logger
+			conf::Settings* settings_ptr
 		) -> http::HttpResponseBase*
 		{
-			_ViewT view(logger);
+			_ViewT view(settings_ptr);
 			view.setup(request);
 			return view.dispatch(args);
 		};

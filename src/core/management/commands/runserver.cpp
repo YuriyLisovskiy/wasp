@@ -324,7 +324,7 @@ http::HttpResponseBase* RunserverCommand::process_urlpatterns(
 	auto apply = urls::resolve(request->path(), settings->ROOT_URLCONF);
 	if (apply)
 	{
-		response = apply(request, settings->LOGGER);
+		response = apply(request, settings);
 	}
 
 	return response;

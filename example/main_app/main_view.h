@@ -25,8 +25,8 @@
 class MainView : public wasp::views::View
 {
 public:
-	explicit MainView(wasp::core::ILogger* logger = nullptr)
-		: View({"get"}, logger)
+	explicit MainView(wasp::conf::Settings* settings)
+		: View({"get"}, settings)
 	{
 	}
 
@@ -47,8 +47,8 @@ public:
 class RedirectView : public wasp::views::RedirectView
 {
 public:
-	explicit RedirectView(wasp::core::ILogger* logger = nullptr)
-		: wasp::views::RedirectView("/index", false, false, logger)
+	explicit RedirectView(wasp::conf::Settings* settings)
+		: wasp::views::RedirectView(settings, "/index", false, false)
 	{
 	};
 };

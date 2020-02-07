@@ -34,41 +34,38 @@
 
 // Wasp libraries.
 #include "../views/args.h"
-#include "../views/view.h"
+//#include "../views/view.h"
 #include "../http/request.h"
 #include "../http/response.h"
-#include "../core/logger.h"
 #include "../core/regex.h"
 #include "../core/string/str.h"
+#include "../conf/settings.h"
+
+
+__CONF_BEGIN__
+struct Settings;
+__CONF_END__
 
 
 __URLS_BEGIN__
 
+typedef std::function<http::HttpResponseBase*(
+	http::HttpRequest*, views::Args*, conf::Settings*
+)> ViewHandler;
+
 class UrlPattern final
 {
 private:
-/*
-	enum state_enum
-	{
-		s_url,
-		s_arg_name,
-		s_regex
-	};
-
-	std::string _s;
-	std::regex _rgx;
-	std::vector<std::string> _keys;
-*/
 	std::string _orig;
 	std::vector<std::string> _pattern_parts;
-	views::ViewHandler _handler;
+	ViewHandler _handler;
 	std::string _name;
 	core::rgx::ArgRegex _regex;
 
 public:
 	UrlPattern(
 		const std::string& rgx,
-		const views::ViewHandler& handler,
+		const ViewHandler& handler,
 		const std::string& name
 	);
 	UrlPattern(
@@ -79,8 +76,8 @@ public:
 	std::string get_name();
 	http::HttpResponseBase* apply(
 		http::HttpRequest* request,
-		views::Args* args = nullptr,
-		core::ILogger* logger = nullptr
+		conf::Settings* settings,
+		views::Args* args = nullptr
 	);
 	bool match(const std::string& url, std::map<std::string, std::string>& args);
 	std::string build(const std::vector<std::string>& args);

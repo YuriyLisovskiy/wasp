@@ -19,20 +19,83 @@
  * views/template_view.h
  *
  * Purpose:
- * TODO: implement docs for views/template_view.h
+ * Classes for working with template responses.
  */
 
 #pragma once
 
+// C++ libraries.
+#include <string>
+
 // Module definitions.
 #include "./_def_.h"
+
+// Wasp libraries.
+#include "../http/request.h"
+#include "../http/response.h"
+#include "../render/base.h"
+#include "../render/response.h"
+#include "../render/backends/base.h"
+#include "../core/logger.h"
+#include "../core/exceptions.h"
+#include "../views/view.h"
+#include "../conf/settings.h"
 
 
 __VIEWS_BEGIN__
 
-class TemplateView
+/// A mixin that can be used to render a template.
+class TemplateResponseMixin
 {
-	// TODO: implement TemplateView
+protected:
+	std::string _template_name;
+	std::string _content_type;
+	render::backends::BaseBackend* _backend;
+	bool _auto_delete_context;
+
+public:
+	explicit TemplateResponseMixin(
+		render::backends::BaseBackend* backend,
+		bool auto_delete_context
+	);
+
+	/// Returns a response with a template rendered with
+	/// the given context.
+	virtual render::TemplateResponse* render(
+		http::HttpRequest* request,
+		const std::string& template_name = "",
+		render::IContext* context = nullptr,
+		unsigned short int status = 200,
+		const std::string& content_type = "",
+		const std::string& charset = "utf-8"
+	);
+
+	/// Returns a template name to be used for the request.
+	/// May not be called if render() is overridden.
+	virtual std::string get_template_name();
+};
+
+
+/// A view that can render a template.
+class TemplateView : public TemplateResponseMixin, public View
+{
+public:
+	explicit TemplateView(conf::Settings* settings);
+
+	/// Used in default get() method, can be overridden
+	/// in derived classes.
+	virtual render::IContext* get_context();
+
+	http::HttpResponseBase* get(
+		http::HttpRequest* request, Args* args
+	) override;
+
+protected:
+	explicit TemplateView(
+		const std::vector<std::string>& allowed_methods,
+		conf::Settings* settings,
+		bool auto_delete_context = true
+	);
 };
 
 __VIEWS_END__

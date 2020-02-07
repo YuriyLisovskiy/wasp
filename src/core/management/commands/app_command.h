@@ -27,7 +27,7 @@
 
 // Wasp libraries.
 #include "./command.h"
-#include "../../../apps/interface.h"
+#include "../../../apps/interfaces.h"
 
 
 __CORE_COMMANDS_BEGIN__

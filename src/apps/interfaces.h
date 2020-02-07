@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
  */
 
 /**
- * interface.h
+ * apps/interface.h
+ *
  * Purpose: apps interfaces.
  */
 
@@ -32,6 +33,13 @@
 // Wasp libraries.
 #include "../urls/pattern.h"
 #include "../core/management/base.h"
+
+
+__URLS_BEGIN__
+
+class UrlPattern;
+
+__URLS_END__
 
 
 __APPS_BEGIN__

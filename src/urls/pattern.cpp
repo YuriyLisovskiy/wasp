@@ -26,7 +26,7 @@ __URLS_BEGIN__
 
 UrlPattern::UrlPattern(
 	const std::string& rgx,
-	const views::ViewHandler& handler,
+	const ViewHandler& handler,
 	const std::string& name
 ) : _regex(rgx)
 {
@@ -60,11 +60,11 @@ std::string UrlPattern::get_name()
 
 http::HttpResponseBase* UrlPattern::apply(
 	http::HttpRequest* request,
-	views::Args* args,
-	core::ILogger* logger
+	conf::Settings* settings,
+	views::Args* args
 )
 {
-	return this->_handler(request, args, logger);
+	return this->_handler(request, args, settings);
 }
 
 bool UrlPattern::match(const std::string& url, std::map<std::string, std::string>& args)

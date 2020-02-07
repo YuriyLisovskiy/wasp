@@ -37,7 +37,7 @@
 #include "../../core/exceptions.h"
 #include "../../core/path.h"
 #include "../../core/object/object.h"
-#include "../../apps/interface.h"
+#include "../../apps/interfaces.h"
 
 
 __BACKENDS_BEGIN__

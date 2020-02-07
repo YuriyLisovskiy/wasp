@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
  */
 
 /**
- * _def_.h
+ * apps/_def_.h
+ *
  * Purpose: apps module's definitions.
  */
 
@@ -25,5 +26,6 @@
 #include "../_def_.h"
 
 
+/// wasp::apps
 #define __APPS_BEGIN__ __WASP_BEGIN__ namespace apps {
 #define __APPS_END__ } __WASP_END__

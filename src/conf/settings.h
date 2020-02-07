@@ -17,6 +17,7 @@
 
 /**
  * conf/settings.h
+ *
  * Purpose: entire Wasp application's settings.
  */
 
@@ -32,11 +33,24 @@
 
 // Wasp libraries.
 #include "../core/logger.h"
-#include "../apps/interface.h"
+#include "../apps/interfaces.h"
 #include "../middleware/interface.h"
 #include "../core/management/base.h"
 #include "../core/regex.h"
 #include "../render/backends/interfaces.h"
+
+
+__URLS_BEGIN__
+class UrlPattern;
+__URLS_END__
+
+__APPS_BEGIN__
+class IAppConfig;
+__APPS_END__
+
+__BACKENDS_BEGIN__
+class IBackend;
+__BACKENDS_END__
 
 
 __CONF_BEGIN__
