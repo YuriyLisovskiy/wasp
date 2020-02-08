@@ -29,6 +29,7 @@ Engine::Engine(
 	const std::vector<std::string>& dirs,
 	bool use_app_dirs,
 	bool debug,
+	bool auto_escape,
 	const std::vector<ILoader*>& loaders,
 	const collections::Dict<std::string, Filter>& custom_filters,
 	core::ILogger* logger
@@ -38,6 +39,7 @@ Engine::Engine(
 	this->_dirs = dirs;
 	this->_use_app_dirs = use_app_dirs;
 	this->_debug = debug;
+	this->_auto_escape = auto_escape;
 	this->_use_default_loaders = loaders.empty();
 	if (this->_use_default_loaders)
 	{

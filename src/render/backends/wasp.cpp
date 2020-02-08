@@ -24,6 +24,42 @@
 
 __BACKENDS_BEGIN__
 
+WaspBackend::WaspBackend(
+	const std::vector<std::string>& dirs,
+	bool use_app_dirs,
+	const Options& opts
+) : BaseBackend(dirs, use_app_dirs)
+{
+	if (!opts.logger)
+	{
+		throw core::ImproperlyConfigured("WaspBackend: logger must be instantiated.");
+	}
 
+	this->_engine = new render::Engine(
+		this,
+		this->_dirs,
+		this->_use_app_dirs,
+		opts.debug,
+		opts.auto_escape,
+		opts.loaders,
+		opts.filters,
+		opts.logger
+	);
+}
+
+WaspBackend::~WaspBackend()
+{
+	delete this->_engine;
+}
+
+ITemplate* WaspBackend::from_string(const std::string& template_code)
+{
+	return this->_engine->from_string(template_code);
+}
+
+ITemplate* WaspBackend::get_template(const std::string& template_path)
+{
+	return this->_engine->get_template(template_path);
+}
 
 __BACKENDS_END__

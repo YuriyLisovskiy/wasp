@@ -33,6 +33,7 @@ BaseBackend::BaseBackend(
 	this->_name = this->get_type().name();
 	core::str::rtrim(this->_name, "Backend");
 	core::str::rtrim(this->_name, "backend");
+	core::str::rtrim(this->_name, "_");
 }
 
 std::string BaseBackend::name()

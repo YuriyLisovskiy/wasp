@@ -12,6 +12,9 @@
 #include "../../src/middleware/security.h"
 #include "../../src/middleware/clickjacking.h"
 
+#include "../../src/render/backends/wasp.h"
+#include "../../src/render/loaders.h"
+
 #include "../../src/core/management/commands/runserver.h"
 
 #include "../picture_app/app.h"
@@ -34,6 +37,20 @@ struct Settings final: public wasp::conf::Settings
 		this->DEBUG = true;
 
 		this->ALLOWED_HOSTS = {"127.0.0.1"};
+
+		this->TEMPLATES_BACKEND = new wasp::render::backends::WaspBackend(
+			{
+				wasp::core::path::join(this->BASE_DIR, "templates")
+			},
+			true,
+			{
+				.debug = this->DEBUG,
+				.logger = this->LOGGER,
+				.loaders = {
+					new wasp::render::Loader()
+				}
+			}
+		);
 
 		this->INSTALLED_APPS = {
 			this->app<MainAppConfig>(),

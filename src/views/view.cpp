@@ -30,7 +30,7 @@ View::View(conf::Settings* settings)
 	this->_settings = settings;
 	if (!this->_settings)
 	{
-		throw core::ImproperlyConfigured("LOGGER instance must be configured");
+		throw core::ImproperlyConfigured("View: LOGGER instance must be configured");
 	}
 
 	this->_logger = this->_settings->LOGGER;

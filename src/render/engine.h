@@ -50,6 +50,7 @@ private:
 	std::vector<std::string> _dirs;
 	bool _use_app_dirs;
 	bool _debug;
+	bool _auto_escape;
 	std::vector<ILoader*> _loaders;
 	bool _use_default_loaders;
 	collections::Dict<std::string, Filter> _filters;
@@ -61,6 +62,7 @@ public:
 		const std::vector<std::string>& dirs = {},
 		bool use_app_dirs = false,
 		bool debug = false,
+		bool auto_escape = true,
 		const std::vector<ILoader*>& loaders = {},
 		const collections::Dict<std::string, Filter>& custom_filters = {},
 		core::ILogger* logger = nullptr
