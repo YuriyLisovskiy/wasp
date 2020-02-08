@@ -60,9 +60,12 @@ struct Settings final: public wasp::conf::Settings
 			{
 				.debug = this->DEBUG,
 				.logger = this->LOGGER,
+
+			//	TODO: not working when uncommented
 			//	.loaders = {
 			//		new wasp::render::Loader()
 			//	}
+
 			}
 		);
 
