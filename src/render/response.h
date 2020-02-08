@@ -45,12 +45,12 @@ class TemplateResponse : public http::HttpResponse
 protected:
 	std::string _template_name;
 	IContext* _context;
-	backends::BaseBackend* _backend;
+	backends::IBackend* _backend;
 	bool _is_rendered;
 
 public:
 	explicit TemplateResponse(
-		backends::BaseBackend* backend,
+		backends::IBackend* backend,
 		const std::string& template_name,
 		IContext* context = nullptr,
 		unsigned short int status = 200,

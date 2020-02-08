@@ -39,6 +39,7 @@
 #include "./exceptions.h"
 #include "../core/logger.h"
 #include "../core/string/str.h"
+#include "../core/path.h"
 #include "../collections/dict.h"
 
 
@@ -46,7 +47,9 @@ __RENDER_BEGIN__
 
 class Engine : public BaseEngine
 {
-private:
+protected:
+	const std::string APP_DIRNAME = "templates";
+
 	std::vector<std::string> _dirs;
 	bool _use_app_dirs;
 	bool _debug;

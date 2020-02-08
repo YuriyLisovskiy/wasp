@@ -38,20 +38,6 @@ struct Settings final: public wasp::conf::Settings
 
 		this->ALLOWED_HOSTS = {"127.0.0.1"};
 
-		this->TEMPLATES_BACKEND = new wasp::render::backends::WaspBackend(
-			{
-				wasp::core::path::join(this->BASE_DIR, "templates")
-			},
-			true,
-			{
-				.debug = this->DEBUG,
-				.logger = this->LOGGER,
-				.loaders = {
-					new wasp::render::Loader()
-				}
-			}
-		);
-
 		this->INSTALLED_APPS = {
 			this->app<MainAppConfig>(),
 			this->app<FormAppConfig>(),
@@ -64,6 +50,21 @@ struct Settings final: public wasp::conf::Settings
 			this->middleware<wasp::middleware::XFrameOptionsMiddleware>(),
 			this->middleware<wasp::middleware::CookieMiddleware>()
 		};
+
+		this->TEMPLATES_BACKEND = new wasp::render::backends::WaspBackend(
+			{
+				wasp::core::path::join(this->BASE_DIR, "templates")
+			},
+			true,
+			this->INSTALLED_APPS,
+			{
+				.debug = this->DEBUG,
+				.logger = this->LOGGER,
+			//	.loaders = {
+			//		new wasp::render::Loader()
+			//	}
+			}
+		);
 
 		this->MEDIA_ROOT = wasp::core::path::join(this->BASE_DIR, "media");
 		this->MEDIA_URL = "/media/";

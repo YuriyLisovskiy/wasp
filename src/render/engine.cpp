@@ -36,7 +36,11 @@ Engine::Engine(
 )
 {
 	this->_backend = backend;
-	this->_dirs = dirs;
+	for (const auto& dir : dirs)
+	{
+		this->_dirs.push_back(core::path::join(dir, this->APP_DIRNAME));
+	}
+
 	this->_use_app_dirs = use_app_dirs;
 	this->_debug = debug;
 	this->_auto_escape = auto_escape;
@@ -49,7 +53,10 @@ Engine::Engine(
 	}
 	else
 	{
-		this->_loaders = loaders;
+		for (auto loader : loaders)
+		{
+			this->_loaders.push_back(loader);
+		}
 	}
 
 	for (auto filter = custom_filters.cbegin(); filter != custom_filters.cend(); filter++)
@@ -100,6 +107,11 @@ ITemplate* Engine::find_template(
 	std::vector<std::string> tried{};
 	for (auto loader : this->_loaders)
 	{
+		if (!loader)
+		{
+			continue;
+		}
+
 		try
 		{
 			return loader->get_template(name, dirs, this);

@@ -4,17 +4,18 @@
 
 #pragma once
 
-#include "../../src/views/view.h"
 #include "../../src/core/logger.h"
 #include "../../src/apps/config.h"
+#include "../../src/views/template_view.h"
 
 
-class FormView : public wasp::views::View
+class FormView : public wasp::views::TemplateView
 {
 public:
 	explicit FormView(wasp::conf::Settings* settings)
-		: wasp::views::View({"get", "post"}, settings)
+		: wasp::views::TemplateView({"get", "post"}, settings)
 	{
+		this->_template_name = "form.html";
 	}
 
 	wasp::http::HttpResponseBase* get(wasp::http::HttpRequest* request, wasp::views::Args* args) final
@@ -35,18 +36,7 @@ public:
 			user_row += "</h3>\n";
 		}
 
-		std::string body(
-			user_row +
-			"<form method=\"post\" enctype=\"multipart/form-data\">\n"
-			"\t<input type=\"file\" name=\"super_file\" />\n"
-			"\t<input type=\"email\" name=\"mail\" />\n"
-			"\t<input type=\"text\" name=\"name\" />\n"
-			"\t<input type=\"number\" name=\"birth_year\" />\n"
-			"\t<input type=\"submit\" value=\"send\" />\n"
-			"\t</form>\n"
-		);
-
-		return new wasp::http::HttpResponse(body);
+		return this->render(request);
 	}
 
 	wasp::http::HttpResponseBase* post(wasp::http::HttpRequest* request, wasp::views::Args* args) final

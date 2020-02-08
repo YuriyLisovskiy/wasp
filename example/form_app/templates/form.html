@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Make POST</title>
+</head>
+<body>
+    <h3><% user_info %></h3>
+    <form method="post" enctype="multipart/form-data">
+        <input type="file" name="super_file" />
+        <label title="Email" for="mail">
+            <input type="email" name="mail" id="mail" />
+        </label>
+        <label title="Name" for="name">
+            <input type="text" name="name" id="name" />
+        </label>
+        <label title="Birth year" for="birth_year">
+            <input type="number" name="birth_year" id="birth_year" />
+        </label>
+        <input type="submit" value="send" />
+    </form>
+</body>
+</html>

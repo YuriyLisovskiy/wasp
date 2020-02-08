@@ -40,6 +40,7 @@
 #include "../core/exceptions.h"
 #include "../views/view.h"
 #include "../conf/settings.h"
+#include "../views/args.h"
 
 
 __VIEWS_BEGIN__
@@ -50,12 +51,12 @@ class TemplateResponseMixin
 protected:
 	std::string _template_name;
 	std::string _content_type;
-	render::backends::BaseBackend* _backend;
+	render::backends::IBackend* _backend;
 	bool _auto_delete_context;
 
 public:
 	explicit TemplateResponseMixin(
-		render::backends::BaseBackend* backend,
+		render::backends::IBackend* backend,
 		bool auto_delete_context
 	);
 
@@ -84,7 +85,9 @@ public:
 
 	/// Used in default get() method, can be overridden
 	/// in derived classes.
-	virtual render::IContext* get_context();
+	virtual render::IContext* get_context(
+		http::HttpRequest* request, Args* args
+	);
 
 	http::HttpResponseBase* get(
 		http::HttpRequest* request, Args* args
@@ -94,7 +97,9 @@ protected:
 	explicit TemplateView(
 		const std::vector<std::string>& allowed_methods,
 		conf::Settings* settings,
-		bool auto_delete_context = true
+		bool auto_delete_context = true,
+		const std::string& template_name = "",
+		const std::string& content_type = ""
 	);
 };
 

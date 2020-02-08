@@ -27,6 +27,7 @@ __BACKENDS_BEGIN__
 WaspBackend::WaspBackend(
 	const std::vector<std::string>& dirs,
 	bool use_app_dirs,
+	const std::vector<apps::IAppConfig*>& installed_apps,
 	const Options& opts
 ) : BaseBackend(dirs, use_app_dirs)
 {
@@ -35,6 +36,7 @@ WaspBackend::WaspBackend(
 		throw core::ImproperlyConfigured("WaspBackend: logger must be instantiated.");
 	}
 
+	this->_dirs = this->template_dirs(installed_apps);
 	this->_engine = new render::Engine(
 		this,
 		this->_dirs,
@@ -45,6 +47,11 @@ WaspBackend::WaspBackend(
 		opts.filters,
 		opts.logger
 	);
+
+	this->_name = this->get_type().name();
+	core::str::rtrim(this->_name, "Backend");
+	core::str::rtrim(this->_name, "backend");
+	core::str::rtrim(this->_name, "_");
 }
 
 WaspBackend::~WaspBackend()

@@ -25,7 +25,7 @@
 __VIEWS_BEGIN__
 
 TemplateResponseMixin::TemplateResponseMixin(
-	render::backends::BaseBackend* backend,
+	render::backends::IBackend* backend,
 	bool auto_delete_context
 )
 {
@@ -86,20 +86,26 @@ std::string TemplateResponseMixin::get_template_name()
 TemplateView::TemplateView(
 	conf::Settings* settings
 ) : views::View({"get", "options"}, settings),
-	TemplateResponseMixin(nullptr, true)
+	TemplateResponseMixin(settings->TEMPLATES_BACKEND, true)
 {
 }
 
 TemplateView::TemplateView(
 	const std::vector<std::string>& allowed_methods,
 	conf::Settings* settings,
-	bool auto_delete_context
+	bool auto_delete_context,
+	const std::string& template_name,
+	const std::string& content_type
 ) : views::View(allowed_methods, settings),
-    TemplateResponseMixin(nullptr, auto_delete_context)
+    TemplateResponseMixin(settings->TEMPLATES_BACKEND, auto_delete_context)
 {
+	this->_template_name = template_name;
+	this->_content_type = content_type;
 }
 
-render::IContext* TemplateView::get_context()
+render::IContext* TemplateView::get_context(
+	http::HttpRequest* request, Args* args
+)
 {
 	return nullptr;
 }
@@ -108,7 +114,11 @@ http::HttpResponseBase* TemplateView::get(
 	http::HttpRequest* request, Args* args
 )
 {
-	return this->render(request, "", this->get_context());
+	return this->render(
+		request,
+		"",
+		this->get_context(request, args)
+	);
 }
 
 __VIEWS_END__

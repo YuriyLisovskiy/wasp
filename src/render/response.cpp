@@ -25,7 +25,7 @@
 __RENDER_BEGIN__
 
 TemplateResponse::TemplateResponse(
-	backends::BaseBackend* backend,
+	backends::IBackend* backend,
 	const std::string& template_name,
 	IContext* context,
 	unsigned short int status,

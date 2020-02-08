@@ -18,8 +18,7 @@
 /**
  * render/backends/wasp.h
  *
- * Purpose:
- * TODO: write docs for render/backends/wasp.h
+ * Purpose: default Wasp's backend.
  */
 
 #pragma once
@@ -51,28 +50,6 @@ public:
 		collections::Dict<std::string, Filter> filters;
 		bool auto_escape = true;
 
-		/*
-		Options(
-			core::ILogger* logger = nullptr,
-			bool auto_escape = true,
-			bool debug = false,
-			const std::vector<ILoader*>& loaders = {},
-			const collections::Dict<std::string, Filter>& filters = {}
-		)
-		{
-			if (!logger)
-			{
-				logger = core::Logger::get_instance({});
-			}
-
-			this->logger = logger,
-			this->auto_escape = auto_escape;
-			this->debug = debug;
-			this->loaders = loaders;
-			this->filters = filters;
-		}
-		*/
-
 		~Options()
 		{
 			for (auto loader : this->loaders)
@@ -85,6 +62,7 @@ public:
 	WaspBackend(
 		const std::vector<std::string>& dirs,
 		bool use_app_dirs,
+		const std::vector<apps::IAppConfig*>& installed_apps,
 		const Options& opts
 	);
 	~WaspBackend() override;
