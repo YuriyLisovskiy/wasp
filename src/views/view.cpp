@@ -28,6 +28,11 @@ View::View(conf::Settings* settings)
 	: _request(nullptr), _allowed_methods_list({"options"})
 {
 	this->_settings = settings;
+	if (!this->_settings)
+	{
+		throw core::ImproperlyConfigured("LOGGER instance must be configured");
+	}
+
 	this->_logger = this->_settings->LOGGER;
 }
 

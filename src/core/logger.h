@@ -38,6 +38,17 @@
 
 __CORE_BEGIN__
 
+struct Config
+{
+	bool enable_info = true;
+	bool enable_debug = true;
+	bool enable_warning = true;
+	bool enable_error = true;
+	bool enable_fatal = true;
+	bool enable_print = true;
+	std::vector<std::ostream*> streams;
+};
+
 class ILogger
 {
 public:
@@ -76,23 +87,14 @@ public:
 	virtual void warning(const core::BaseException& exc) = 0;
 	virtual void error(const core::BaseException& exc) = 0;
 	virtual void fatal(const core::BaseException& exc) = 0;
+
+	virtual void set_config(const Config& config) = 0;
 };
 
 class Logger : public ILogger
 {
 public:
-	struct Config
-	{
-		bool enable_info = true;
-		bool enable_debug = true;
-		bool enable_warning = true;
-		bool enable_error = true;
-		bool enable_fatal = true;
-		bool enable_print = true;
-		std::vector<std::ostream*> streams;
-	};
-
-	static ILogger* get_instance(const Logger::Config& cfg);
+	static ILogger* get_instance(const Config& cfg);
 	static void reset_instance();
 
 	void info(const std::string& msg, int line = 0, const char* function = "", const char* file = "") override;
@@ -135,16 +137,17 @@ private:
 		ll_info, ll_debug, ll_warning, ll_error, ll_fatal
 	};
 
-	Logger::Config _config;
+	Config _config;
 
 	static ILogger* _instance;
 
-	explicit Logger(const Logger::Config& cfg);
+	explicit Logger(const Config& cfg);
 	~Logger() override = default;
 	void log(const std::string& msg, int line, const char* function, const char* file, Logger::log_level_enum level);
 	void write_to_stream(const std::string& msg, const char* colour);
 	void flush();
 	const char* get_colour(Color colour);
+	void set_config(const Config& config) override;
 };
 
 __CORE_END__

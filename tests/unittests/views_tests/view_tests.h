@@ -24,12 +24,32 @@
 
 #include "../_def_.h"
 #include "../../../src/views/view.h"
+#include "../../../src/conf/settings.h"
 #include "../../../src/http/request.h"
 #include "../../../src/collections/dict.h"
 #include "../../../src/collections/multi_dict.h"
 
 
 __UNIT_TESTS_BEGIN__
+
+struct ViewTestSettings : public conf::Settings
+{
+	ViewTestSettings() : conf::Settings()
+	{
+	}
+
+	void init() final
+	{
+		this->LOGGER = core::Logger::get_instance({
+			false,
+			false,
+			false,
+			false,
+			false,
+			false
+		});
+	}
+};
 
 class ViewTestCase : public ::testing::Test
 {
@@ -60,15 +80,20 @@ public:
 
 protected:
 	views::View* view = nullptr;
+	ViewTestSettings* settings;
 
 	void SetUp() override
 	{
-		this->view = new views::View();
+		this->settings = new ViewTestSettings();
+		this->settings->init();
+		this->view = new views::View(this->settings);
 	}
 
 	void TearDown() override
 	{
+		delete this->settings;
 		delete this->view;
+		core::Logger::reset_instance();
 	}
 };
 

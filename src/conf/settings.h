@@ -273,7 +273,7 @@ struct Settings
 	std::pair<std::string, core::BaseCommand*> command()
 	{
 		auto* command = new _CommandT(this);
-		return std::pair{command->name(), command};
+		return std::pair<std::string, core::BaseCommand*>{command->name(), command};
 	}
 };
 

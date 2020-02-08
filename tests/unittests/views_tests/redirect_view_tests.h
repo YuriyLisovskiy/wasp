@@ -25,6 +25,8 @@
 #include "../_def_.h"
 #include "../../../src/views/redirect_view.h"
 #include "../../../src/http/request.h"
+#include "../../../src/conf/settings.h"
+#include "../../../src/core/logger.h"
 #include "../../../src/collections/dict.h"
 #include "../../../src/collections/multi_dict.h"
 
@@ -56,18 +58,43 @@ http::HttpRequest make_request(const std::string& method)
 }
 
 
+struct RedirectViewTestSettings : public conf::Settings
+{
+	RedirectViewTestSettings() : conf::Settings()
+	{
+	}
+
+	void init() final
+	{
+		this->LOGGER = core::Logger::get_instance({
+			false,
+			false,
+			false,
+			false,
+			false,
+			false
+		});
+	}
+};
+
+
 class RedirectViewWithDefaultParamsTestCase : public ::testing::Test
 {
 protected:
 	views::RedirectView* view = nullptr;
+	RedirectViewTestSettings* settings;
 
 	void SetUp() override
 	{
-		this->view = new views::RedirectView("/hello");
+		this->settings = new RedirectViewTestSettings();
+		this->settings->init();
+		this->view = new views::RedirectView(this->settings, "/hello");
 	}
 
 	void TearDown() override
 	{
+		core::Logger::reset_instance();
+		delete this->settings;
 		delete this->view;
 	}
 };
@@ -211,14 +238,21 @@ class RedirectViewPermanentAndQueryStringTestCase : public ::testing::Test
 {
 protected:
 	views::RedirectView* view = nullptr;
+	RedirectViewTestSettings* settings;
 
 	void SetUp() override
 	{
-		this->view = new views::RedirectView("/hello/world", true, true);
+		this->settings = new RedirectViewTestSettings();
+		this->settings->init();
+		this->view = new views::RedirectView(
+			this->settings, "/hello/world", true, true
+		);
 	}
 
 	void TearDown() override
 	{
+		core::Logger::reset_instance();
+		delete this->settings;
 		delete this->view;
 	}
 };
@@ -334,14 +368,19 @@ class RedirectViewEmptyUrlTestCase : public ::testing::Test
 {
 protected:
 	views::RedirectView* view = nullptr;
+	RedirectViewTestSettings* settings;
 
 	void SetUp() override
 	{
-		this->view = new views::RedirectView("");
+		this->settings = new RedirectViewTestSettings();
+		this->settings->init();
+		this->view = new views::RedirectView(this->settings, "");
 	}
 
 	void TearDown() override
 	{
+		core::Logger::reset_instance();
+		delete this->settings;
 		delete this->view;
 	}
 };

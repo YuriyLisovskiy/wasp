@@ -32,17 +32,21 @@ void Logger::reset_instance()
 	Logger::_instance = nullptr;
 }
 
-ILogger* Logger::get_instance(const Logger::Config& cfg)
+ILogger* Logger::get_instance(const Config& cfg)
 {
 	if (Logger::_instance == nullptr)
 	{
 		Logger::_instance = new Logger(cfg);
 	}
+	else
+	{
+		Logger::_instance->set_config(cfg);
+	}
 
 	return Logger::_instance;
 }
 
-Logger::Logger(const Logger::Config& cfg)
+Logger::Logger(const Config& cfg)
 {
 	this->_config = cfg;
 	if (cfg.streams.empty())
@@ -197,6 +201,11 @@ const char* Logger::get_colour(Color colour)
 	}
 
 	return this->_colors[colour];
+}
+
+void Logger::set_config(const Config& config)
+{
+	this->_config = config;
 }
 
 __CORE_END__
