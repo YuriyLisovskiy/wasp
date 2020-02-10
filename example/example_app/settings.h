@@ -57,14 +57,12 @@ struct Settings final: public wasp::conf::Settings
 			},
 			true,
 			this->INSTALLED_APPS,
-			{
+			new wasp::render::backends::WaspBackend::Options{
 				.debug = this->DEBUG,
 				.logger = this->LOGGER,
-
-			//	TODO: not working when uncommented
-			//	.loaders = {
-			//		new wasp::render::Loader()
-			//	}
+				.loaders = {
+					new wasp::render::Loader()
+				}
 
 			}
 		);
@@ -79,5 +77,5 @@ struct Settings final: public wasp::conf::Settings
 	}
 
 	// Override in local_settings.cpp!
-	void overwrite() final;
+	void override() final;
 };

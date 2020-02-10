@@ -5,7 +5,7 @@
 #include "./settings.h"
 
 
-void Settings::overwrite()
+void Settings::override()
 {
 	this->DEBUG = true;
 }

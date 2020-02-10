@@ -99,7 +99,7 @@ Settings::Settings()
 	this->SECURE_SSL_REDIRECT = false;
 }
 
-void Settings::overwrite()
+void Settings::override()
 {
 }
 

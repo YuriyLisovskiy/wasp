@@ -30,7 +30,7 @@ WaspApplication::WaspApplication(conf::Settings* settings)
 
 	this->_settings = settings;
 	this->_settings->init();
-	this->_settings->overwrite();
+	this->_settings->override();
 	this->_settings->prepare();
 	this->_perform_checks();
 
@@ -60,7 +60,6 @@ void WaspApplication::execute_from_command_line(int argc, char** argv)
 			if (this->_settings->COMMANDS.find(argv[1]) != this->_settings->COMMANDS.end())
 			{
 				this->_settings->COMMANDS[argv[1]]->run_from_argv(argc, argv);
-				this->_settings->LOGGER->debug("Interrupted 3");
 			}
 			else
 			{

@@ -63,12 +63,15 @@ public:
 		const std::vector<std::string>& dirs,
 		bool use_app_dirs,
 		const std::vector<apps::IAppConfig*>& installed_apps,
-		const Options& opts
+		Options* opts
 	);
 	~WaspBackend() override;
 
 	ITemplate* from_string(const std::string& template_code) override;
 	ITemplate* get_template(const std::string& template_path) override;
+
+protected:
+	Options* _opts;
 };
 
 __BACKENDS_END__

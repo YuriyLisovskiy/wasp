@@ -254,7 +254,7 @@ struct Settings
 	Settings();
 	virtual ~Settings();
 	virtual void init() = 0;
-	virtual void overwrite();
+	virtual void override();
 	void prepare();
 
 	template <typename _T, typename = std::enable_if<std::is_base_of<apps::IAppConfig, _T>::value>>

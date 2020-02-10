@@ -28,10 +28,16 @@ WaspBackend::WaspBackend(
 	const std::vector<std::string>& dirs,
 	bool use_app_dirs,
 	const std::vector<apps::IAppConfig*>& installed_apps,
-	const Options& opts
+	Options* opts
 ) : BaseBackend(dirs, use_app_dirs)
 {
-	if (!opts.logger)
+	this->_opts = opts;
+	if (!this->_opts)
+	{
+		this->_opts = new Options();
+	}
+
+	if (!this->_opts->logger)
 	{
 		throw core::ImproperlyConfigured("WaspBackend: logger must be instantiated.");
 	}
@@ -41,11 +47,11 @@ WaspBackend::WaspBackend(
 		this,
 		this->_dirs,
 		this->_use_app_dirs,
-		opts.debug,
-		opts.auto_escape,
-		opts.loaders,
-		opts.filters,
-		opts.logger
+		this->_opts->debug,
+		this->_opts->auto_escape,
+		this->_opts->loaders,
+		this->_opts->filters,
+		this->_opts->logger
 	);
 
 	this->_name = this->get_type().name();
@@ -57,6 +63,7 @@ WaspBackend::WaspBackend(
 WaspBackend::~WaspBackend()
 {
 	delete this->_engine;
+	delete this->_opts;
 }
 
 ITemplate* WaspBackend::from_string(const std::string& template_code)

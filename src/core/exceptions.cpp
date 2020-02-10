@@ -136,6 +136,7 @@ void InterruptException::initialize()
 	sig_int_handler.sa_flags = 0;
 	sigaction(SIGINT, &sig_int_handler, nullptr);
 	sigaction(SIGTERM, &sig_int_handler, nullptr);
+//	sigaction(SIGKILL, &sig_int_handler, nullptr);
 }
 
 __CORE_END__
