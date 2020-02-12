@@ -43,9 +43,8 @@ Object* Object::__get_attr__(const char* attr_name) const
 		return this->__attrs__.at(attr_name).get();
 	}
 
-	// TODO: throw AttributeError
-	throw std::invalid_argument(
-			"'" + this->__type__().name() + "' object has no attribute '" + std::string(attr_name) + "'"
+	throw AttributeError(
+		"'" + this->__type__().name() + "' object has no attribute '" + std::string(attr_name) + "'"
 	);
 }
 
@@ -57,9 +56,8 @@ void Object::__set_attr__(const char* attr_name, Object* ptr)
 	}
 	else
 	{
-		// TODO: throw AttributeError
-		throw std::invalid_argument(
-				"'" + this->__type__().name() + "' object has no attribute '" + std::string(attr_name) + "'"
+		throw AttributeError(
+			"'" + this->__type__().name() + "' object has no attribute '" + std::string(attr_name) + "'"
 		);
 	}
 }

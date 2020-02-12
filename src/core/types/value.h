@@ -19,7 +19,10 @@
  * core/types/value.h
  *
  * Purpose:
- * TODO: write docs for core/types/value.h
+ * Wrapper for fundamental types and classes which inherit Object.
+ *
+ * Provides arithmetic operations for fundamentals and some helper
+ * methods.
  */
 
 #pragma once
@@ -61,7 +64,7 @@ public:
 		}
 		else if constexpr (std::is_base_of<Object, _T>::value)
 		{
-			return _T::__str__();
+			return this->_internal_value.__str__();
 		}
 
 		return "<" + this->__type__().name() + " object at " + this->__address__() + ">";

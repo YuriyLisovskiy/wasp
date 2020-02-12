@@ -31,6 +31,7 @@
 #include <cxxabi.h>
 #include <sstream>
 #include <cstdint>
+#include <utility>
 
 // Module definitions.
 #include "./_def_.h"
@@ -53,11 +54,11 @@ private:
 public:
 	Attr() = default;
 
-	explicit Attr(attr_getter getter) : _getter(getter)
+	explicit Attr(attr_getter getter) : _getter(std::move(getter))
 	{
 	}
 
-	explicit Attr(attr_setter setter) : _setter(setter)
+	explicit Attr(attr_setter setter) : _setter(std::move(setter))
 	{
 	}
 
@@ -77,7 +78,7 @@ public:
 		return nullptr;
 	}
 
-	Object* get() const
+	[[nodiscard]] Object* get() const
 	{
 		if (this->_getter)
 		{
@@ -102,7 +103,7 @@ private:
 	std::string _object_address;
 
 protected:
-	std::string __address__() const;
+	[[nodiscard]] std::string __address__() const;
 
 public:
 	std::map<std::string, Attr> __attrs__;
@@ -119,9 +120,9 @@ public:
 	/// Can be overridden.
 	virtual int __cmp__(const Object* other) const;
 
-	virtual unsigned long __hash__() const;
+	[[nodiscard]] virtual unsigned long __hash__() const;
 
-	Type __type__() const;
+	[[nodiscard]] Type __type__() const;
 
 	template <typename _CastT>
 	_CastT __cast__() const
@@ -134,7 +135,7 @@ public:
 		return *((_CastT*)this);
 	}
 
-	virtual std::string __str__() const;
+	[[nodiscard]] virtual std::string __str__() const;
 
 	bool operator<(const Object& other) const;
 	bool operator==(const Object& other) const;
@@ -142,9 +143,10 @@ public:
 	bool operator>(const Object& other) const;
 	bool operator<=(const Object& other) const;
 	bool operator>=(const Object& other) const;
+
 	friend std::ostream& operator<<(std::ostream& out, Object& obj);
 
-	operator bool () const;
+	explicit operator bool () const;
 };
 
 __OBJECT_END__
