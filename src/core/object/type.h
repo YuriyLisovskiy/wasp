@@ -41,24 +41,31 @@ class Object;
 class Type final
 {
 private:
+
+	friend class Object;
+
 	std::string _name;
 	std::string _namespace;
+	std::vector<std::string> _attrs;
 
-public:
 	explicit Type(const Object& obj);
 
+public:
 	std::string name();
+
 	std::string namespace_();
+
+	std::vector<std::string> attributes();
 
 	[[nodiscard]] static std::string type_name(const Object& obj);
 
-	template <typename _T>
+	template<typename _T>
 	[[nodiscard]] static std::string type_name()
 	{
 		return Type::get_full_type_name(typeid(_T).name());
 	}
 
-	template <typename _T>
+	template<typename _T>
 	[[nodiscard]] static std::string type()
 	{
 		std::string pre = std::is_fundamental<_T>::value ? "built-in type" : "class";
@@ -67,7 +74,7 @@ public:
 
 	bool operator==(const Type& other) const;
 
-	friend std::ostream& operator<< (std::ostream &out, const Type& obj);
+	friend std::ostream& operator<<(std::ostream& out, const Type& obj);
 
 private:
 	static std::string get_full_type_name(const std::string& full_name);

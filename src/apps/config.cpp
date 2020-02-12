@@ -28,7 +28,7 @@ AppConfig::AppConfig(const std::string& app_path, conf::Settings* settings)
 {
 	this->settings = settings;
 	this->app_path = app_path;
-	auto name = core::str::rtrim(this->get_type().name(), "AppConfig");
+	auto name = core::str::rtrim(this->__type__().name(), "AppConfig");
 	core::str::rtrim(name, "appconfig");
 	core::str::rtrim(name, "app_config");
 	core::str::rtrim(name, "_");

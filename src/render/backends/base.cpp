@@ -30,7 +30,7 @@ BaseBackend::BaseBackend(
 ) : _dirs(std::move(dirs)),
 	_use_app_dirs(use_app_dirs)
 {
-	this->_name = this->get_type().name();
+	this->_name = this->__type__().name();
 	core::str::rtrim(this->_name, "Backend");
 	core::str::rtrim(this->_name, "backend");
 	core::str::rtrim(this->_name, "_");

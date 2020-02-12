@@ -38,6 +38,10 @@ Type::Type(const Object& obj)
 	}
 
 	this->_name = full_name.back();
+	for (const auto& attr : obj.__attrs__)
+	{
+		this->_attrs.push_back(attr.first);
+	}
 }
 
 std::string Type::name()
@@ -50,12 +54,17 @@ std::string Type::namespace_()
 	return this->_namespace;
 }
 
+std::vector<std::string> Type::attributes()
+{
+	return this->_attrs;
+}
+
 bool Type::operator==(const Type& other) const
 {
 	return this->_name == other._name;
 }
 
-std::ostream& operator<< (std::ostream &out, const Type& obj)
+std::ostream& operator<<(std::ostream& out, const Type& obj)
 {
 	out << "<class '" + obj._name + "'>";
 	return out;

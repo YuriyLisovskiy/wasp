@@ -54,7 +54,7 @@ WaspBackend::WaspBackend(
 		this->_opts->logger
 	);
 
-	this->_name = this->get_type().name();
+	this->_name = this->__type__().name();
 	core::str::rtrim(this->_name, "Backend");
 	core::str::rtrim(this->_name, "backend");
 	core::str::rtrim(this->_name, "_");

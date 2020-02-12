@@ -24,15 +24,55 @@
 
 __OBJECT_BEGIN__
 
-Object::~Object()
+Object::Object()
 {
-	delete this->_object_type;
+	std::stringstream oss;
+	oss << static_cast<const void*>(this);
+	this->_object_address = oss.str();
 }
 
-int Object::compare_to(const Object& other) const
+std::string Object::__address__() const
 {
-	auto this_hash = this->get_hash_code();
-	auto other_hash = other.get_hash_code();
+	return this->_object_address;
+}
+
+Object* Object::__get_attr__(const char* attr_name) const
+{
+	if (this->__has_attr__(attr_name))
+	{
+		return this->__attrs__.at(attr_name).get();
+	}
+
+	// TODO: throw AttributeError
+	throw std::invalid_argument(
+			"'" + this->__type__().name() + "' object has no attribute '" + std::string(attr_name) + "'"
+	);
+}
+
+void Object::__set_attr__(const char* attr_name, Object* ptr)
+{
+	if (this->__has_attr__(attr_name))
+	{
+		this->__attrs__[attr_name].set(ptr);
+	}
+	else
+	{
+		// TODO: throw AttributeError
+		throw std::invalid_argument(
+				"'" + this->__type__().name() + "' object has no attribute '" + std::string(attr_name) + "'"
+		);
+	}
+}
+
+bool Object::__has_attr__(const char* attr_name) const
+{
+	return this->__attrs__.find(attr_name) != this->__attrs__.end();
+}
+
+int Object::__cmp__(const Object* other) const
+{
+	auto this_hash = this->__hash__();
+	auto other_hash = other->__hash__();
 	if (this_hash < other_hash)
 	{
 		return -1;
@@ -41,41 +81,39 @@ int Object::compare_to(const Object& other) const
 	return this_hash == other_hash ? 0 : 1;
 }
 
-unsigned long Object::get_hash_code() const
+unsigned long Object::__hash__() const
 {
 	return reinterpret_cast<std::uintptr_t>(this);
 }
 
-[[nodiscard]] std::string Object::to_string()
+Type Object::__type__() const
 {
-	std::stringstream oss;
-	oss << static_cast<const void*>(this);
-	return "<" + this->get_type().name() + " object at " + oss.str() + ">";
+	return Type(*this);
 }
 
-Type Object::get_type()
+std::string Object::__str__() const
 {
-	if (!this->_object_type)
-	{
-		this->_object_type = new Type(*this);
-	}
-
-	return *this->_object_type;
+	return "<" + this->__type__().name() + " object at " + this->_object_address + ">";
 }
 
 bool Object::operator<(const Object& other) const
 {
-	return this->compare_to(other) == -1;
+	return this->__cmp__(&other) == -1;
 }
 
 bool Object::operator==(const Object& other) const
 {
-	return this->compare_to(other) == 0;
+	return this->__cmp__(&other) == 0;
+}
+
+bool Object::operator!=(const Object& other) const
+{
+	return this->__cmp__(&other) != 0;
 }
 
 bool Object::operator>(const Object& other) const
 {
-	return this->compare_to(other) == 1;
+	return this->__cmp__(&other) == 1;
 }
 
 bool Object::operator<=(const Object& other) const
@@ -90,8 +128,21 @@ bool Object::operator>=(const Object& other) const
 
 std::ostream& operator<<(std::ostream& out, Object& obj)
 {
-	out << obj.to_string();
+	out << obj.__str__();
 	return out;
+}
+
+Object::operator bool () const
+{
+	for (const auto& attr : this->__attrs__)
+	{
+		if (!(bool)(*attr.second.get()))
+		{
+			return false;
+		}
+	}
+
+	return true;
 }
 
 __OBJECT_END__

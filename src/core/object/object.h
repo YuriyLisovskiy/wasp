@@ -41,60 +41,110 @@
 
 __OBJECT_BEGIN__
 
-/// Represents an object with default methods.
-///
-/// 'compare_to' -> int;
-/// 'get_hash_code' -> unsigned long
-/// 'to_string' -> std::string;
-/// 'get_type' -> Type.
+struct Attr
+{
+private:
+	typedef std::function<Object*()> attr_getter;
+	typedef std::function<void(Object*)> attr_setter;
+
+	attr_getter _getter = nullptr;
+	attr_setter _setter = nullptr;
+
+public:
+	Attr() = default;
+
+	explicit Attr(attr_getter getter) : _getter(getter)
+	{
+	}
+
+	explicit Attr(attr_setter setter) : _setter(setter)
+	{
+	}
+
+	Attr(
+		attr_getter getter, attr_setter setter
+	) : _getter(std::move(getter)), _setter(std::move(setter))
+	{
+	}
+
+	Object* get()
+	{
+		if (this->_getter)
+		{
+			return this->_getter();
+		}
+
+		return nullptr;
+	}
+
+	Object* get() const
+	{
+		if (this->_getter)
+		{
+			return this->_getter();
+		}
+
+		return nullptr;
+	}
+
+	void set(Object* val_ptr)
+	{
+		if (this->_setter)
+		{
+			this->_setter(val_ptr);
+		}
+	}
+};
+
 class Object
 {
 private:
-	Type* _object_type = nullptr;
+	std::string _object_address;
+
+protected:
+	std::string __address__() const;
 
 public:
-	virtual ~Object();
+	std::map<std::string, Attr> __attrs__;
+
+	Object();
+	virtual ~Object() = default;
+
+	virtual Object* __get_attr__(const char* attr_name) const;
+	virtual void __set_attr__(const char* attr_name, Object* ptr);
+	bool __has_attr__(const char* attr_name) const;
 
 	/// Returns 0 if objects are equal, -1 if 'this' is less
 	///  than 'other' otherwise returns 1.
 	/// Can be overridden.
-	[[nodiscard]] virtual int compare_to(const Object& other) const;
+	virtual int __cmp__(const Object* other) const;
 
-	/// Returns object's address as unsigned long integer.
-	/// Hash code value will be different for different program executions.
-	/// Overriding of this method is recommended for objects' comparison.
-	[[nodiscard]] virtual unsigned long get_hash_code() const;
+	virtual unsigned long __hash__() const;
 
-	/// Returns <'ObjectType' object at 'ObjectAddress'> by default.
-	/// Can be overridden.
-	[[nodiscard]] virtual std::string to_string();
+	Type __type__() const;
 
-	/// Returns Type object with object meta information.
-	Type get_type();
+	template <typename _CastT>
+	_CastT __cast__() const
+	{
+		if constexpr (std::is_pointer<_CastT>::value)
+		{
+			return ((_CastT)this);
+		}
 
-	/// 'less than' operator.
-	/// Uses Object::compareTo method.
+		return *((_CastT*)this);
+	}
+
+	virtual std::string __str__() const;
+
 	bool operator<(const Object& other) const;
-
-	/// 'equals' operator.
-	/// Uses Object::compareTo method.
 	bool operator==(const Object& other) const;
-
-	/// 'greater than' operator.
-	/// Uses Object::compareTo method.
+	bool operator!=(const Object& other) const;
 	bool operator>(const Object& other) const;
-
-	/// 'less than or equals' operator.
-	/// Uses 'less than' and 'equals' operators.
 	bool operator<=(const Object& other) const;
-
-	/// 'greater than or equals' operator.
-	/// Uses 'greater than' and 'equals' operators.
 	bool operator>=(const Object& other) const;
+	friend std::ostream& operator<<(std::ostream& out, Object& obj);
 
-	/// 'left bitwise shift' operator for std::ostream.
-	/// Uses Object::toString method.
-	friend std::ostream& operator<< (std::ostream &out, Object& obj);
+	operator bool () const;
 };
 
 __OBJECT_END__
