@@ -29,7 +29,6 @@ Regex::Regex(const std::string& expr)
 	this->_expr = std::regex(expr);
 	this->_is_matched = false;
 	this->_is_searched = false;
-	this->_groups_are_made = false;
 }
 
 Regex::Regex(
@@ -40,7 +39,6 @@ Regex::Regex(
 	this->_expr = std::regex(expr, sot);
 	this->_is_matched = false;
 	this->_is_searched = false;
-	this->_groups_are_made = false;
 }
 
 bool Regex::match(const std::string& to_match)
@@ -48,59 +46,65 @@ bool Regex::match(const std::string& to_match)
 	this->_to_match = to_match;
 	this->_is_matched = std::regex_match(this->_to_match, this->_expr);
 	this->_is_searched = false;
-	this->_groups_are_made = false;
 	return this->_is_matched;
 }
 
 bool Regex::search(const std::string& to_search)
 {
 	this->_to_match = to_search;
-	this->_is_searched = std::regex_search(this->_to_match, this->_matches, this->_expr);
-	this->_groups_are_made = false;
-	return this->_is_searched;
-}
-
-void Regex::_make_groups()
-{
-	this->_groups.clear();
-	for (const auto & match : this->_matches)
+	auto start = this->_to_match.cbegin();
+	while (std::regex_search(
+		start,
+		this->_to_match.cend(),
+		this->_matches,
+		this->_expr
+	))
 	{
-		if (match.matched)
+		for (const auto & match : this->_matches)
 		{
-			this->_groups.push_back(match.str());
+			if (match.matched)
+			{
+				this->_groups.push_back(match.str());
+			}
 		}
+
+		start = this->_matches.suffix().first;
 	}
+
+	this->_is_searched = true;
+	return this->_is_searched;
 }
 
 std::vector<std::string> Regex::groups()
 {
-	if (!this->_groups_are_made)
-	{
-		if (this->_is_searched)
-		{
-			this->_make_groups();
-		}
-		else if (this->_is_matched)
-		{
-			if (std::regex_search(this->_to_match, this->_matches, this->_expr))
-			{
-				this->_make_groups();
-			}
-		}
-	}
-
 	return this->_groups;
 }
 
 std::string Regex::group(size_t pos)
 {
-	this->groups();
 	if (pos >= 0 && pos < this->_groups.size())
 	{
 		return this->_groups[pos];
 	}
 
 	return "";
+}
+
+std::string Regex::escape(const std::string& input)
+{
+	std::string special = R"([\^$.|?*+(){})";
+	std::string escaped;
+	for (const auto& chr : input)
+	{
+		if (special.find(chr) != std::string::npos)
+		{
+			escaped += '\\';
+		}
+
+		escaped += chr;
+	}
+
+	return escaped;
 }
 
 

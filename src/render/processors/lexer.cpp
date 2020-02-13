@@ -15,32 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WASP_UNIT_TESTS_CORE_TESTS_OBJECT_TESTS_OBJECT_TESTS_H
-#define WASP_UNIT_TESTS_CORE_TESTS_OBJECT_TESTS_OBJECT_TESTS_H
+/**
+ * An implementation of render/processors/lexer.h
+ */
 
-#include <gtest/gtest.h>
-
-#include "../../_def_.h"
-#include "../../../../src/core/object/object.h"
+#include "./lexer.h"
 
 
-__UNIT_TESTS_BEGIN__
+__RENDER_INTERNAL_BEGIN__
 
 
-class EmptyObject : public core::object::Object
-{
-};
 
-TEST(ObjectTestsCase, EmptyObjectTypeTest)
-{
-	auto obj = EmptyObject();
-	auto type = obj.__type__();
-
-	ASSERT_EQ(type.name(), "EmptyObject");
-	ASSERT_EQ(type.namespace_(), "wasp::tests::unittests");
-}
-
-__UNIT_TESTS_END__
-
-
-#endif // WASP_UNIT_TESTS_CORE_TESTS_OBJECT_TESTS_OBJECT_TESTS_H
+__RENDER_INTERNAL_END__

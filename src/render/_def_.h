@@ -30,6 +30,11 @@
 #define __RENDER_BEGIN__ __WASP_BEGIN__ namespace render {
 #define __RENDER_END__ } __WASP_END__
 
+// wasp::render::internal
+#define __RENDER_INTERNAL_BEGIN__ __RENDER_BEGIN__ namespace internal {
+#define __RENDER_INTERNAL_END__ } __RENDER_END__
+
+
 // wasp::render::backends
 #define __BACKENDS_BEGIN__ __RENDER_BEGIN__ namespace backends {
 #define __BACKENDS_END__ } __RENDER_END__

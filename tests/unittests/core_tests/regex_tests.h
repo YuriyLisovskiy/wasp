@@ -54,6 +54,27 @@ TEST(ArgRegexTestCase, TestSingleSquareBracketsInPattern)
 	ASSERT_EQ(expr.group("hello"), "Double square brackets check");
 }
 
+TEST(RegexTestCase, TestEscape)
+{
+	auto expr = R"(\{%)";
+	ASSERT_EQ(core::rgx::Regex::escape(R"({%)"), expr);
+
+	expr = R"(%\})";
+	ASSERT_EQ(core::rgx::Regex::escape(R"(%})"), expr);
+
+	expr = R"(\{\{)";
+	ASSERT_EQ(core::rgx::Regex::escape(R"({{)"), expr);
+
+	expr = R"(\}\})";
+	ASSERT_EQ(core::rgx::Regex::escape(R"(}})"), expr);
+
+	expr = R"(\{#)";
+	ASSERT_EQ(core::rgx::Regex::escape(R"({#)"), expr);
+
+	expr = R"(#\})";
+	ASSERT_EQ(core::rgx::Regex::escape(R"(#})"), expr);
+}
+
 __UNIT_TESTS_END__
 
 

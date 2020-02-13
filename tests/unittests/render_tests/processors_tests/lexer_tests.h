@@ -15,32 +15,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WASP_UNIT_TESTS_CORE_TESTS_OBJECT_TESTS_OBJECT_TESTS_H
-#define WASP_UNIT_TESTS_CORE_TESTS_OBJECT_TESTS_OBJECT_TESTS_H
+#ifndef WASP_UNIT_TESTS_RENDER_TESTS_PROCESSORS_TESTS_LEXER_TESTS_H
+#define WASP_UNIT_TESTS_RENDER_TESTS_PROCESSORS_TESTS_LEXER_TESTS_H
 
 #include <gtest/gtest.h>
 
 #include "../../_def_.h"
-#include "../../../../src/core/object/object.h"
+#include "../../../../src/render/processors/lexer.h"
 
 
 __UNIT_TESTS_BEGIN__
 
-
-class EmptyObject : public core::object::Object
+TEST(LexerTestCase, TestSplit)
 {
-};
+	auto lexer = render::internal::lexer();
+	std::string tmpl = "<html>{% if test %}<h1>{{ varvalue }}</h1>{% endif %}</html>";
+	auto expected = std::vector<std::string> {
+		"<html>", "{% if test %}", "<h1>", "{{ varvalue }}", "</h1>", "{% endif %}", "</html>"
+	};
+	auto actual = lexer.split(tmpl);
 
-TEST(ObjectTestsCase, EmptyObjectTypeTest)
-{
-	auto obj = EmptyObject();
-	auto type = obj.__type__();
-
-	ASSERT_EQ(type.name(), "EmptyObject");
-	ASSERT_EQ(type.namespace_(), "wasp::tests::unittests");
+	ASSERT_EQ(actual.size(), expected.size());
+	for (size_t i = 0; i < actual.size(); i++)
+	{
+		ASSERT_EQ(actual[i], expected[i]);
+	}
 }
 
 __UNIT_TESTS_END__
 
 
-#endif // WASP_UNIT_TESTS_CORE_TESTS_OBJECT_TESTS_OBJECT_TESTS_H
+#endif // WASP_UNIT_TESTS_RENDER_TESTS_PROCESSORS_TESTS_LEXER_TESTS_H

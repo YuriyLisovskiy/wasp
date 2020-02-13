@@ -21,6 +21,7 @@ set(PACKAGE_CORE_UNIT_TESTS "unit-tests-core")
 set(PACKAGE_CORE_DATETIME_UNIT_TESTS "unit-tests-core-datetime")
 set(PACKAGE_CORE_OBJECT_UNIT_TESTS "unit-tests-core-object")
 set(PACKAGE_HTTP_UNIT_TESTS "unit-tests-http")
+set(PACKAGE_RENDER_UNIT_TESTS "unit-tests-render")
 set(PACKAGE_UTILS_UNIT_TESTS "unit-tests-utils")
 set(PACKAGE_VIEWS_UNIT_TESTS "unit-tests-views")
 
@@ -64,6 +65,8 @@ file(GLOB LIB_FILES
 	"src/middleware/*.cpp"
 	"src/render/backends/*.h"
 	"src/render/backends/*.cpp"
+	"src/render/processors/*.h"
+	"src/render/processors/*.cpp"
 	"src/render/*.h"
 	"src/render/*.cpp"
 	"src/http/*.h"
@@ -148,6 +151,15 @@ add_executable(${PACKAGE_HTTP_UNIT_TESTS} ${LIB_SRC} ${HTTP_TEST_SRC} "tests/uni
 target_link_libraries(${PACKAGE_HTTP_UNIT_TESTS} gtest gtest_main rt pthread ${HTTP_TEST_SRC})
 
 
+# Render package tests setup.
+file(GLOB RENDER_TEST_SRC
+	"tests/unittests/render_tests/processors_tests/*.h"
+	"tests/unittests/render_tests/*.h"
+)
+add_executable(${PACKAGE_RENDER_UNIT_TESTS} ${LIB_SRC} ${RENDER_TEST_SRC} "tests/unittests/render_tests/main.cpp")
+target_link_libraries(${PACKAGE_RENDER_UNIT_TESTS} gtest gtest_main rt pthread ${RENDER_TEST_SRC})
+
+
 # Utils package tests setup.
 file(GLOB UTILS_TEST_SRC
 	"tests/unittests/utils_tests/crypto_tests/*.h"
@@ -173,9 +185,11 @@ file(GLOB OTHER_TEST_SRC
 set(TEST_SRC
 	${OTHER_TEST_SRC}
 	${COLLECTIONS_TEST_SRC}
+	${CONF_TEST_SRC}
 	${CORE_TEST_SRC}
 	${HTTP_TEST_SRC}
-	${UTILITY_TEST_SRC}
+	${RENDER_TEST_SRC}
+	${UTILS_TEST_SRC}
 	${VIEWS_TEST_SRC}
 )
 add_executable(${PACKAGE_MAIN_UNIT_TESTS} ${LIB_SRC} ${TEST_SRC} "tests/unittests/main.cpp")

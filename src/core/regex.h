@@ -28,6 +28,7 @@
 #include <regex>
 #include <vector>
 #include <string>
+#include <functional>
 
 // Module definitions.
 #include "./_def_.h"
@@ -43,13 +44,10 @@ class Regex final
 private:
 	bool _is_matched;
 	bool _is_searched;
-	bool _groups_are_made;
 	std::string _to_match;
 	std::regex _expr;
 	std::smatch _matches;
 	std::vector<std::string> _groups;
-
-	void _make_groups();
 
 public:
 	explicit Regex(const std::string& expr);
@@ -61,6 +59,8 @@ public:
 	bool search(const std::string& to_search);
 	std::vector<std::string> groups();
 	std::string group(size_t pos);
+
+	static std::string escape(const std::string& input);
 };
 
 
