@@ -34,6 +34,7 @@
 
 // Wasp libraries.
 #include "../../core/regex.h"
+#include "../../core/string/str.h"
 
 
 __RENDER_INTERNAL_BEGIN__
@@ -45,6 +46,14 @@ const std::string VAR_TAG_END = "}}";
 const std::string COMMENT_TAG_START = "{#";
 const std::string COMMENT_TAG_END = "#}";
 const std::string VAR_ATTR_SEP = ".";
+const std::string TRANSLATOR_COMMENT_MARK = "Translators";
+
+using Regex = core::rgx::Regex;
+const std::regex TAG_REGEX = std::regex(
+	"" + Regex::escape(BLOCK_TAG_START) + ".*?" + Regex::escape(BLOCK_TAG_END) + "|"
+	+ Regex::escape(VAR_TAG_START) + ".*?" + Regex::escape(VAR_TAG_END) + "|"
+	+ Regex::escape(COMMENT_TAG_START) + ".*?" + Regex::escape(COMMENT_TAG_END) + ""
+);
 
 enum token_type
 {
@@ -54,55 +63,35 @@ enum token_type
 	comment
 };
 
-struct lexer
-{
-	using Regex = core::rgx::Regex;
-	std::regex tag_regex;
-
-	lexer()
-	{
-		std::string any_or_empty = ".*?";
-		this->tag_regex = std::regex(
-			"" + Regex::escape(BLOCK_TAG_START) + any_or_empty + Regex::escape(BLOCK_TAG_END) + "|"
-			+ Regex::escape(VAR_TAG_START) + any_or_empty + Regex::escape(VAR_TAG_END) + "|"
-			+ Regex::escape(COMMENT_TAG_START) + any_or_empty + Regex::escape(COMMENT_TAG_END) + ""
-		);
-	}
-
-	std::vector<std::string> split(const std::string& template_code)
-	{
-		std::vector<std::string> result;
-		std::smatch prev_matches, matches;
-		auto start = template_code.cbegin();
-		while (std::regex_search(
-			start,
-			template_code.cend(),
-			matches,
-			this->tag_regex
-		))
-		{
-			std::string pref = matches.prefix();
-			result.push_back(pref);
-			for (const auto & match : matches)
-			{
-				if (match.matched)
-				{
-					result.push_back(match.str());
-				}
-			}
-
-			start = matches.suffix().first;
-			prev_matches = matches;
-		}
-
-		result.push_back(prev_matches.suffix());
-		return result;
-	}
-};
-
 struct token
 {
+	token_type type;
+	std::string content;
+	std::pair<size_t, size_t> position;
+	size_t line_no;
+};
 
+struct lexer
+{
+	std::string verbatim;
+	std::string template_code;
+	std::vector<std::string> str_tokens;
+	std::vector<token> tokens;
+
+	lexer(const std::string& template_code);
+	void split();
+	void tokenize();
+
+	/// Convert the given token string into a new token object and return it.
+	///
+	/// If in_tag is true, we are processing something that matched a tag,
+	/// otherwise it should be treated as a literal string.
+	void create_token(
+		const std::string& token_str,
+		size_t line_no,
+		bool in_tag,
+		const std::pair<size_t, size_t>& position = {}
+	);
 };
 
 __RENDER_INTERNAL_END__

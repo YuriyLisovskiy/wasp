@@ -227,4 +227,44 @@ std::string trim(const std::string& s, const std::string& to_trim)
 	return copy;
 }
 
+size_t count(const std::string& src, char ch)
+{
+	size_t res = 0;
+	for (const auto& c : src)
+	{
+		if (c == ch)
+		{
+			res++;
+		}
+	}
+
+	return res;
+}
+
+std::string cut_edges(
+	const std::string& s, size_t left, size_t right, bool trim_whitespace
+)
+{
+	std::string copy = s;
+	if (s.size() >= left + right)
+	{
+		if (left)
+		{
+			copy.erase(0, left);
+		}
+
+		if (right)
+		{
+			copy.erase(copy.size() - right);
+		}
+	}
+
+	if (trim_whitespace)
+	{
+		trim(copy);
+	}
+
+	return copy;
+}
+
 __STR_END__

@@ -39,7 +39,7 @@ TEST(SettingsTestCase, CheckMemoryLeakTest)
 	auto* settings = new MySettings();
 
 	settings->init();
-	settings->overwrite();
+	settings->override();
 	settings->prepare();
 
 	delete settings;

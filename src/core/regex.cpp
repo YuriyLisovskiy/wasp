@@ -51,6 +51,7 @@ bool Regex::match(const std::string& to_match)
 
 bool Regex::search(const std::string& to_search)
 {
+	this->_groups.clear();
 	this->_to_match = to_search;
 	auto start = this->_to_match.cbegin();
 	while (std::regex_search(
@@ -69,9 +70,9 @@ bool Regex::search(const std::string& to_search)
 		}
 
 		start = this->_matches.suffix().first;
+		this->_is_searched = true;
 	}
 
-	this->_is_searched = true;
 	return this->_is_searched;
 }
 

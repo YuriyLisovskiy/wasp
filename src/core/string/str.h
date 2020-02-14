@@ -156,4 +156,10 @@ extern void trim(std::string& s, const std::string& to_trim = " ");
 /// @param to_trim: string to be trimmed.
 extern std::string trim(const std::string& s, const std::string& to_trim = " ");
 
+extern size_t count(const std::string& src, char ch);
+
+extern std::string cut_edges(
+	const std::string& s, size_t left, size_t right, bool trim_whitespace = true
+);
+
 __STR_END__

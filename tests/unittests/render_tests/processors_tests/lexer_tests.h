@@ -28,19 +28,30 @@ __UNIT_TESTS_BEGIN__
 
 TEST(LexerTestCase, TestSplit)
 {
-	auto lexer = render::internal::lexer();
-	std::string tmpl = "<html>{% if test %}<h1>{{ varvalue }}</h1>{% endif %}</html>";
+	auto lexer = render::internal::lexer(
+		"<html>\n{% if test %}\n<h1>{{ varvalue }}</h1>\n{% endif %}\n</html>"
+	);
 	auto expected = std::vector<std::string> {
-		"<html>", "{% if test %}", "<h1>", "{{ varvalue }}", "</h1>", "{% endif %}", "</html>"
+		"<html>\n", "{% if test %}", "\n<h1>", "{{ varvalue }}", "</h1>\n", "{% endif %}", "\n</html>"
 	};
-	auto actual = lexer.split(tmpl);
+	lexer.split();
 
-	ASSERT_EQ(actual.size(), expected.size());
-	for (size_t i = 0; i < actual.size(); i++)
+	ASSERT_EQ(lexer.str_tokens.size(), expected.size());
+	for (size_t i = 0; i < lexer.str_tokens.size(); i++)
 	{
-		ASSERT_EQ(actual[i], expected[i]);
+		ASSERT_EQ(lexer.str_tokens[i], expected[i]);
 	}
 }
+
+/*
+TEST(LexerTestCase, TestTokenize)
+{
+	auto lexer = render::internal::lexer(
+		"<html>\n{% if test %}\n<h1>{{ varvalue }}</h1>\n{% endif %}\n</html>"
+	);
+	lexer.tokenize();
+}
+*/
 
 __UNIT_TESTS_END__
 
