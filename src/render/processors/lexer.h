@@ -19,7 +19,7 @@
  * render/processors/lexer.h
  *
  * Purpose:
- * TODO: write docs for render/processors/lexer.h
+ * Tokenizer of default Wasp's render engine.
  */
 
 #pragma once

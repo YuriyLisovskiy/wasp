@@ -46,10 +46,18 @@ TEST(LexerTestCase, TestSplit)
 /*
 TEST(LexerTestCase, TestTokenize)
 {
-	auto lexer = render::internal::lexer(
-		"<html>\n{% if test %}\n<h1>{{ varvalue }}</h1>\n{% endif %}\n</html>"
-	);
+	std::string raw_string = R"(<html>
+{% if test %}
+	<h1>
+		{% if true %}{{ varvalue }}{% endif %}
+	</h1>
+{% endif %}
+</html>)";
+
+	auto lexer = render::internal::lexer(raw_string);
 	lexer.tokenize();
+
+//	size_t i = 0;
 }
 */
 

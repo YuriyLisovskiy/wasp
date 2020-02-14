@@ -16,33 +16,48 @@
  */
 
 /**
- * render/builtins.h
+ * render/processors/parser.h
  *
  * Purpose:
- * TODO: write render/builtins.h docs
+ * TODO: write docs for render/processors/parser.h
  */
 
 #pragma once
 
 // C++ libraries.
-#include <map>
+#include <vector>
+#include <algorithm>
 
 // Module definitions.
-#include "./_def_.h"
+#include "../_def_.h"
 
 // Wasp libraries.
-#include "../collections/dict.h"
-#include "../core/object/object.h"
+#include "./lexer.h"
+#include "../builtins.h"
+#include "../exceptions.h"
 
 
-__RENDER_BEGIN__
+__RENDER_INTERNAL_BEGIN__
 
-typedef collections::Dict<std::string, core::object::Object*> KwArgs;
+struct parser
+{
+	std::vector<token> tokens;
+	Builtins builtins;
 
-typedef std::function<core::object::Object*(const KwArgs& kwargs)> Filter;
+	parser(std::vector<token>& tokens, Builtins& builtins);
 
-typedef collections::Dict<std::string, Filter> Builtins;
+	void skip_past(const std::string& end_tag);
+	void throw_error(
+		token& t,
+		std::string& e,
+		int line,
+		const char* function,
+		const char* file
+	);
+	token next_token();
+	void prepend_token(token& t);
+	void del_first_token();
+	void compile_filter(token& t);
+};
 
-extern Builtins DEFAULT_FILTERS;
-
-__RENDER_END__
+__RENDER_INTERNAL_END__
