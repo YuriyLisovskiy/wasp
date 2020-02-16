@@ -24,37 +24,54 @@
 
 __RENDER_INTERNAL_BEGIN__
 
-parser::parser(std::vector<token>& tokens, Builtins& builtins)
+parser::parser(std::vector<token_t>& tokens, Builtins& builtins)
 {
 	std::reverse(tokens.begin(), tokens.end());
 	this->tokens = std::move(tokens);
 	this->builtins = std::move(builtins);
 }
 
+node_list* parser::parse(
+	const std::vector<std::string>& parse_until
+)
+{
+	// TODO: implement parse(const std::vector<std::string>& parse_until)
+	return nullptr;
+}
+
 void parser::skip_past(const std::string& end_tag)
 {
-	// TODO: implement skip_past(const std::string& end_tag)
+	while (!this->tokens.empty())
+	{
+		auto token = this->next_token();
+		if (token.type == token_type::block && token.content == end_tag)
+		{
+			return;
+		}
+	}
+
+	parser::unclosed_block_tag({ end_tag });
 }
 
 void parser::throw_error(
-	token& t,
 	std::string& e,
+	token_t& t,
 	int line,
 	const char* function,
 	const char* file
 )
 {
-	throw TemplateSyntaxError(e, line, function, file);
+	throw TemplateSyntaxError(e, t, line, function, file);
 }
 
-token parser::next_token()
+token_t parser::next_token()
 {
-	token res = this->tokens.back();
+	token_t res = this->tokens.back();
 	this->tokens.pop_back();
 	return res;
 }
 
-void parser::prepend_token(token& t)
+void parser::prepend_token(token_t& t)
 {
 	this->tokens.push_back(t);
 }
@@ -64,9 +81,23 @@ void parser::del_first_token()
 	this->tokens.pop_back();
 }
 
-void parser::compile_filter(token& t)
+FilterExpression parser::compile_filter(token_t& t)
 {
-	// TODO: implement compile_filter(token& t)
+	return FilterExpression(t, this->builtins);
+}
+
+void parser::unclosed_block_tag(
+	const std::vector<std::string>& parse_until
+)
+{
+	auto command_token = this->command_stack.top();
+	this->command_stack.pop();
+	auto message = "Unclosed tag on line " +
+		std::to_string(command_token.second.line_no) +
+		": '" + command_token.first +
+		"'. Looking for one of: " +
+		core::str::join(parse_until.begin(), parse_until.end(), ", ") + ".";
+	parser::throw_error(message, command_token.second, _ERROR_DETAILS_);
 }
 
 __RENDER_INTERNAL_END__

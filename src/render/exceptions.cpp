@@ -74,16 +74,19 @@ TemplateSyntaxError::TemplateSyntaxError(
 
 TemplateSyntaxError::TemplateSyntaxError(
 	const char* message,
+	internal::token_t& token,
 	int line, const char* function, const char* file
 )
 	: TemplateSyntaxError(message, line, function, file, "TemplateSyntaxError")
 {
+	this->_token = std::move(token);
 }
 
 TemplateSyntaxError::TemplateSyntaxError(
 	const std::string& message,
+	internal::token_t& token,
 	int line, const char *function, const char *file
-) : TemplateSyntaxError(message.c_str(), line, function, file)
+) : TemplateSyntaxError(message.c_str(), token, line, function, file)
 {
 }
 

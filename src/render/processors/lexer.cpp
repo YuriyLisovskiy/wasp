@@ -100,7 +100,7 @@ void lexer::create_token(
 	{
 		if (core::str::starts_with(token_str, VAR_TAG_START))
 		{
-			this->tokens.push_back(token{
+			this->tokens.push_back(token_t{
 				token_type::var,
 				core::str::cut_edges(token_str, 2, 2),
 				position,
@@ -114,7 +114,7 @@ void lexer::create_token(
 				this->verbatim = "end" + block_content;
 			}
 
-			this->tokens.push_back(token{
+			this->tokens.push_back(token_t{
 				token_type::block, block_content, position, line_no
 			});
 		}
@@ -126,14 +126,14 @@ void lexer::create_token(
 				content = core::str::cut_edges(token_str, 2, 2);
 			}
 
-			this->tokens.push_back(token{
+			this->tokens.push_back(token_t{
 				token_type::comment, content, position, line_no
 			});
 		}
 	}
 	else
 	{
-		this->tokens.push_back(token{
+		this->tokens.push_back(token_t{
 			token_type::text, token_str, position, line_no
 		});
 	}

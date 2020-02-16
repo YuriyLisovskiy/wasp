@@ -16,60 +16,43 @@
  */
 
 /**
- * render/processors/parser.h
+ * render/processors/filter_expr.h
  *
  * Purpose:
- * TODO: write docs for render/processors/parser.h
+ * TODO:
  */
 
 #pragma once
 
 // C++ libraries.
-#include <vector>
-#include <stack>
-#include <algorithm>
+#include <string>
 
 // Module definitions.
 #include "../_def_.h"
 
 // Wasp libraries.
-#include "./lexer.h"
 #include "./token.h"
-#include "./node_list.h"
-#include "./filter_expr.h"
+#include "../base.h"
 #include "../builtins.h"
-#include "../exceptions.h"
 
 
 __RENDER_INTERNAL_BEGIN__
 
-struct parser
+// TODO: implement class FilterExpression
+class FilterExpression
 {
-	std::vector<token_t> tokens;
-	Builtins builtins;
-	std::stack<std::pair<std::string, token_t>> command_stack;
+public:
+	FilterExpression() = default;
 
-	parser(std::vector<token_t>& tokens, Builtins& builtins);
+	explicit FilterExpression(token_t& token, Builtins& filters)
+	{
 
-	node_list* parse(
-		const std::vector<std::string>& parse_until = {}
-	);
-	void skip_past(const std::string& end_tag);
-	token_t next_token();
-	void prepend_token(token_t& t);
-	void del_first_token();
-	FilterExpression compile_filter(token_t& t);
+	}
 
-	static void throw_error(
-		std::string& e,
-		token_t& t,
-		int line = 0,
-		const char* function = "",
-		const char* file = ""
-	);
-	void unclosed_block_tag(
-		const std::vector<std::string>& parse_until
-	);
+	std::string resolve(IContext* ctx)
+	{
+		return "";
+	}
 };
 
 __RENDER_INTERNAL_END__

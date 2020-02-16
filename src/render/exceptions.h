@@ -36,6 +36,7 @@
 // Wasp libraries.
 #include "./backends/base.h"
 #include "../core/exceptions.h"
+#include "./processors/token.h"
 
 
 __RENDER_BEGIN__
@@ -77,6 +78,9 @@ public:
 /// The exception used for syntax errors during parsing or rendering.
 class TemplateSyntaxError : public core::BaseException
 {
+private:
+	internal::token_t _token;
+
 protected:
 	// Use only when initializing of a derived exception!
 	TemplateSyntaxError(
@@ -85,10 +89,12 @@ protected:
 public:
 	explicit TemplateSyntaxError(
 		const char* message,
+		internal::token_t& token,
 		int line = 0, const char* function = "", const char* file = ""
 	);
 	explicit TemplateSyntaxError(
 		const std::string& message,
+		internal::token_t& token,
 		int line = 0, const char* function = "", const char* file = ""
 	);
 };

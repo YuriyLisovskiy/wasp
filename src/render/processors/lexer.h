@@ -35,6 +35,7 @@
 // Wasp libraries.
 #include "../../core/regex.h"
 #include "../../core/string/str.h"
+#include "./token.h"
 
 
 __RENDER_INTERNAL_BEGIN__
@@ -55,28 +56,12 @@ const std::regex TAG_REGEX = std::regex(
 	+ Regex::escape(COMMENT_TAG_START) + ".*?" + Regex::escape(COMMENT_TAG_END) + ""
 );
 
-enum token_type
-{
-	text,
-	block,
-	var,
-	comment
-};
-
-struct token
-{
-	token_type type;
-	std::string content;
-	std::pair<size_t, size_t> position;
-	size_t line_no;
-};
-
 struct lexer
 {
 	std::string verbatim;
 	std::string template_code;
 	std::vector<std::string> str_tokens;
-	std::vector<token> tokens;
+	std::vector<token_t> tokens;
 
 	lexer(const std::string& template_code);
 	void split();
