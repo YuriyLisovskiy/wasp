@@ -46,10 +46,10 @@ __RENDER_INTERNAL_BEGIN__
 struct parser
 {
 	std::vector<token_t> tokens;
-	Builtins builtins;
+	Filters builtins;
 	std::stack<std::pair<std::string, token_t>> command_stack;
 
-	parser(std::vector<token_t>& tokens, Builtins& builtins);
+	parser(std::vector<token_t>& tokens, Filters& builtins);
 
 	node_list* parse(
 		const std::vector<std::string>& parse_until = {}

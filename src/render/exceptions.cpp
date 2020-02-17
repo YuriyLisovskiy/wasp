@@ -90,26 +90,4 @@ TemplateSyntaxError::TemplateSyntaxError(
 {
 }
 
-
-// ContentNotRenderedError
-ContentNotRenderedError::ContentNotRenderedError(
-	const char* message, int line, const char* function, const char* file, const char* type
-) : BaseException(message, line, function, file, type)
-{
-}
-
-ContentNotRenderedError::ContentNotRenderedError(
-	const char* message,
-	int line, const char* function, const char* file
-) : ContentNotRenderedError(message, line, function, file, "ContentNotRenderedError")
-{
-}
-
-ContentNotRenderedError::ContentNotRenderedError(
-	const std::string& message,
-	int line, const char *function, const char *file
-) : ContentNotRenderedError(message.c_str(), line, function, file)
-{
-}
-
 __RENDER_END__

@@ -16,33 +16,27 @@
  */
 
 /**
- * render/builtins.h
- *
- * Purpose:
- * TODO: write render/builtins.h docs
+ * An implementation of render/processors/base.h
  */
 
-#pragma once
-
-// C++ libraries.
-#include <map>
-
-// Module definitions.
-#include "./_def_.h"
-
-// Wasp libraries.
-#include "../collections/dict.h"
-#include "../core/object/object.h"
+#include "./base.h"
 
 
-__RENDER_BEGIN__
+__RENDER_INTERNAL_BEGIN__
 
-typedef collections::Dict<std::string, core::object::Object*> KwArgs;
+Variable::Variable() : _content("")
+{
+}
 
-typedef std::function<core::object::Object*(core::object::Object*, const KwArgs& kwargs)> Filter;
+Variable::Variable(const std::string& content)
+{
+	this->_content = content;
+}
 
-typedef collections::Dict<std::string, Filter> Filters;
+core::object::Object* Variable::resolve(IContext* ctx)
+{
+	// TODO: implement Variable::resolve(IContext* ctx)
+	return nullptr;
+}
 
-extern Filters DEFAULT_FILTERS;
-
-__RENDER_END__
+__RENDER_INTERNAL_END__

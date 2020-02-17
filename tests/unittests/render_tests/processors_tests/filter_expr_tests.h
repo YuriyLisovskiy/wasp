@@ -15,34 +15,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * render/builtins.h
- *
- * Purpose:
- * TODO: write render/builtins.h docs
- */
+#ifndef WASP_UNIT_TESTS_RENDER_TESTS_PROCESSORS_TESTS_FILTER_EXPR_TESTS_H
+#define WASP_UNIT_TESTS_RENDER_TESTS_PROCESSORS_TESTS_FILTER_EXPR_TESTS_H
 
-#pragma once
+#include <gtest/gtest.h>
 
-// C++ libraries.
-#include <map>
-
-// Module definitions.
-#include "./_def_.h"
-
-// Wasp libraries.
-#include "../collections/dict.h"
-#include "../core/object/object.h"
+#include "../../_def_.h"
+#include "../../../../src/render/processors/filter_expr.h"
 
 
-__RENDER_BEGIN__
+__UNIT_TESTS_BEGIN__
 
-typedef collections::Dict<std::string, core::object::Object*> KwArgs;
+TEST(FilterRegexTestCase, SearchTest)
+{
+	core::rgx::ArgRegex filter_regex(render::internal::FILTER_REGEX);
+	filter_regex.search_iter("variable|default(val=\"Default value\")");
+	while (filter_regex.next())
+	{
+		auto gr = filter_regex.groups();
+		size_t i = gr.size();
+	}
+}
 
-typedef std::function<core::object::Object*(core::object::Object*, const KwArgs& kwargs)> Filter;
+__UNIT_TESTS_END__
 
-typedef collections::Dict<std::string, Filter> Filters;
-
-extern Filters DEFAULT_FILTERS;
-
-__RENDER_END__
+#endif // WASP_UNIT_TESTS_RENDER_TESTS_PROCESSORS_TESTS_FILTER_EXPR_TESTS_H

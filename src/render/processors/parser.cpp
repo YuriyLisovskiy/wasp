@@ -24,7 +24,7 @@
 
 __RENDER_INTERNAL_BEGIN__
 
-parser::parser(std::vector<token_t>& tokens, Builtins& builtins)
+parser::parser(std::vector<token_t>& tokens, Filters& builtins)
 {
 	std::reverse(tokens.begin(), tokens.end());
 	this->tokens = std::move(tokens);

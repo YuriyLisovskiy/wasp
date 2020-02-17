@@ -155,6 +155,7 @@ void ArgRegex::search_iter(const std::string& to_search)
 
 bool ArgRegex::next()
 {
+	this->_is_searched = false;
 	if (std::regex_search(
 		this->_to_match_iter_start,
 		this->_to_match.cend(),

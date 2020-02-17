@@ -24,11 +24,16 @@
 
 #pragma once
 
+// C++ libraries.
+#include <string>
+
 // Module definitions.
 #include "../_def_.h"
 
 // Wasp libraries.
+#include "../base.h"
 #include "../../core/regex.h"
+#include "../../core/object/object.h"
 
 
 __RENDER_INTERNAL_BEGIN__
@@ -43,7 +48,7 @@ const std::string VAR_ATTR_SEP = ".";
 const std::string TRANSLATOR_COMMENT_MARK = "Translators";
 
 const std::string FILTER_SEP = "|";
-const std::string FILTER_ARG_SEP = ":";
+const std::string FILTER_ARG_SEP = "=";
 
 using re = core::rgx::Regex;
 
@@ -54,5 +59,18 @@ const std::string DQ_STR = R"("[^"\\]*(?:\\.[^"\\]*)*")";
 
 const std::string CONST_STRING = "(?:" + I18NOpen + DQ_STR + I18NClose + "|" +
 	I18NOpen + SQ_STR + I18NClose + "|" + DQ_STR + "|" + SQ_STR + ")";
+
+
+class Variable
+{
+private:
+	std::string _content;
+
+public:
+	Variable();
+	Variable(const std::string& content);
+
+	core::object::Object* resolve(IContext* ctx);
+};
 
 __RENDER_INTERNAL_END__
