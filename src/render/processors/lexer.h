@@ -36,18 +36,10 @@
 #include "../../core/regex.h"
 #include "../../core/string/str.h"
 #include "./token.h"
+#include "./base.h"
 
 
 __RENDER_INTERNAL_BEGIN__
-
-const std::string BLOCK_TAG_START = "{%";
-const std::string BLOCK_TAG_END = "%}";
-const std::string VAR_TAG_START = "{{";
-const std::string VAR_TAG_END = "}}";
-const std::string COMMENT_TAG_START = "{#";
-const std::string COMMENT_TAG_END = "#}";
-const std::string VAR_ATTR_SEP = ".";
-const std::string TRANSLATOR_COMMENT_MARK = "Translators";
 
 using Regex = core::rgx::Regex;
 const std::regex TAG_REGEX = std::regex(

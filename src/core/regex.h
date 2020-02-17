@@ -79,8 +79,8 @@ private:
 
 	bool _is_matched;
 	bool _is_searched;
-	bool _groups_are_made;
 	std::string _to_match;
+	std::string::const_iterator _to_match_iter_start;
 
 	std::string _s;
 	std::string _orig;
@@ -94,7 +94,9 @@ private:
 public:
 	explicit ArgRegex(const std::string& rgx);
 	bool match(const std::string& to_match);
-	bool search(const std::string& to_search);
+	bool search_all(const std::string& to_search);
+	void search_iter(const std::string& to_search);
+	bool next();
 	std::map<std::string, std::string> groups();
 	std::string group(const std::string& key, const std::string& default_val = "");
 	std::vector<std::string> parts();
