@@ -28,6 +28,7 @@
 #include <string>
 #include <regex>
 #include <vector>
+#include <functional>
 
 // Module definitions.
 #include "../_def_.h"
@@ -44,6 +45,7 @@
 
 __RENDER_INTERNAL_BEGIN__
 
+/*
 const std::string NUM = R"([-+\.]?\d[\d\.e]*)";
 const std::string VAR_CHARS = R"(\w\.)";
 
@@ -51,21 +53,73 @@ const std::string VAR_CHARS = R"(\w\.)";
 const std::string FILTER_REGEX(
 	"<constant>" + CONST_STRING + "|" +
 	"<var>([" + VAR_CHARS + "]+|" + NUM + ")|" +
-	R"((?:\s*)" + re::escape(FILTER_SEP) + R"(\s*)" +
+	R"((?:\s*)" + re::escape(std::string(FILTER_SEP, 1)) + R"(\s*)" +
 	R"(<filter_name>(\w+))" +
-	R"((?:\()" + "<arg_name>([" + VAR_CHARS + "]+)" + re::escape(FILTER_ARG_SEP) +
+	R"((?:\()" + "<arg_name>([" + VAR_CHARS + "]+)" + re::escape(std::string(FILTER_ARG_SEP, 1)) +
 	"(?:<constant_arg>" + CONST_STRING + "|" +
 	"<var_arg>([" + VAR_CHARS + "]+|" + NUM + R"())\))?))"
 );
+*/
+
+struct parsed_arg
+{
+	std::string name;
+	std::string value;
+};
+
+struct parsed_filter
+{
+	std::string name;
+	std::vector<parsed_arg> args;
+};
+
+struct parsed_expr
+{
+	std::string var_name;
+	std::vector<std::string> var_attrs;
+	std::vector<parsed_filter> filters;
+};
+
+struct expression_parser
+{
+	token_t token;
+
+	parsed_expr expression;
+
+	enum p_state
+	{
+		s_begin,
+		s_var,
+		s_var_attr_begin,
+		s_var_attr,
+		s_const_str,
+		s_filter_sep,
+		s_filter_name_begin,
+		s_filter_name,
+		s_param_name_begin,
+		s_param_name,
+		s_param_value_begin,
+		s_param_value_var,
+		s_param_value_const_str,
+		s_param_sep
+	};
+
+	void parse();
+	void throw_unexpected_symbol(char ch);
+	static bool is_var_char(char ch);
+	static bool is_var_char_begin(char ch);
+};
 
 /// Parse a variable token and its
 /// optional filters (all as a single string).
 class FilterExpression
 {
 private:
-	std::vector<std::pair<Filter, collections::Dict<std::string, Variable*>>> _filters;
+	token_t _token;
 	Variable* _var = nullptr;
-	core::object::Object* _var_obj = nullptr;
+	std::vector<std::function<void(
+		core::object::Object* obj, IContext* ctx
+	)>> _filters;
 
 public:
 	FilterExpression() = default;

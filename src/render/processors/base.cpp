@@ -28,7 +28,10 @@ Variable::Variable() : _content("")
 {
 }
 
-Variable::Variable(const std::string& content)
+Variable::Variable(
+	const std::string& content,
+	const std::vector<std::string>& attributes
+)
 {
 	this->_content = content;
 }

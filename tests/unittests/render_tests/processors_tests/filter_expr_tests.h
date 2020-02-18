@@ -21,20 +21,40 @@
 #include <gtest/gtest.h>
 
 #include "../../_def_.h"
+#include "../../../../src/render/processors/base.h"
 #include "../../../../src/render/processors/filter_expr.h"
 
 
 __UNIT_TESTS_BEGIN__
 
-TEST(FilterRegexTestCase, SearchTest)
+TEST(FilterRegexTestCase, ParserTest)
 {
-	core::rgx::ArgRegex filter_regex(render::internal::FILTER_REGEX);
-	filter_regex.search_iter("variable|default(val=\"Default value\")");
-	while (filter_regex.next())
-	{
-		auto gr = filter_regex.groups();
-		size_t i = gr.size();
-	}
+	using render::internal::expression_parser;
+	render::internal::token_t token;
+	token.content = "variable.attr1.attr2|default(val=\"Default value\")|date(format='Y-m-d',tz=UTC)";
+
+	expression_parser p{token};
+	p.parse();
+
+	ASSERT_EQ(p.expression.var_name, "variable");
+
+	ASSERT_EQ(p.expression.var_attrs.size(), 2);
+	ASSERT_EQ(p.expression.var_attrs[0], "attr1");
+	ASSERT_EQ(p.expression.var_attrs[1], "attr2");
+
+	ASSERT_EQ(p.expression.filters.size(), 2);
+
+	ASSERT_EQ(p.expression.filters[0].name, "default");
+	ASSERT_EQ(p.expression.filters[0].args.size(), 1);
+	ASSERT_EQ(p.expression.filters[0].args[0].name, "val");
+	ASSERT_EQ(p.expression.filters[0].args[0].value, "\"Default value\"");
+
+	ASSERT_EQ(p.expression.filters[1].name, "date");
+	ASSERT_EQ(p.expression.filters[1].args.size(), 2);
+	ASSERT_EQ(p.expression.filters[1].args[0].name, "format");
+	ASSERT_EQ(p.expression.filters[1].args[0].value, "'Y-m-d'");
+	ASSERT_EQ(p.expression.filters[1].args[1].name, "tz");
+	ASSERT_EQ(p.expression.filters[1].args[1].value, "UTC");
 }
 
 __UNIT_TESTS_END__

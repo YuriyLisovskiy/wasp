@@ -63,15 +63,15 @@ long parse_http_date(const std::string& date)
 	auto rfc_850_date = internal::RFC850_DATE;
 	auto asc_time_date = internal::ASCTIME_DATE;
 	std::map<std::string, std::string> match;
-	if (rfc_1123_date.search_all(date))
+	if (rfc_1123_date.search(date))
 	{
 		match = rfc_1123_date.groups();
 	}
-	else if (rfc_850_date.search_all(date))
+	else if (rfc_850_date.search(date))
 	{
 		match = rfc_850_date.groups();
 	}
-	else if (asc_time_date.search_all(date))
+	else if (asc_time_date.search(date))
 	{
 		match = asc_time_date.groups();
 	}

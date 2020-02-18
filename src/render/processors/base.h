@@ -26,6 +26,7 @@
 
 // C++ libraries.
 #include <string>
+#include <vector>
 
 // Module definitions.
 #include "../_def_.h"
@@ -44,12 +45,14 @@ const std::string VAR_TAG_START = "{{";
 const std::string VAR_TAG_END = "}}";
 const std::string COMMENT_TAG_START = "{#";
 const std::string COMMENT_TAG_END = "#}";
-const std::string VAR_ATTR_SEP = ".";
 const std::string TRANSLATOR_COMMENT_MARK = "Translators";
 
-const std::string FILTER_SEP = "|";
-const std::string FILTER_ARG_SEP = "=";
+const char VAR_ATTR_SEP = '.';
+const char FILTER_SEP = '|';
+const char FILTER_ARG_SEP = ',';
+const char FILTER_ARG_NAME_VAL_SEP = '=';
 
+/*
 using re = core::rgx::Regex;
 
 const std::string I18NOpen = re::escape("_(");
@@ -59,7 +62,7 @@ const std::string DQ_STR = R"("[^"\\]*(?:\\.[^"\\]*)*")";
 
 const std::string CONST_STRING = "(?:" + I18NOpen + DQ_STR + I18NClose + "|" +
 	I18NOpen + SQ_STR + I18NClose + "|" + DQ_STR + "|" + SQ_STR + ")";
-
+*/
 
 class Variable
 {
@@ -68,7 +71,10 @@ private:
 
 public:
 	Variable();
-	Variable(const std::string& content);
+	explicit Variable(
+		const std::string& content,
+		const std::vector<std::string>& attributes
+	);
 
 	core::object::Object* resolve(IContext* ctx);
 };
