@@ -24,22 +24,40 @@
 
 __RENDER_INTERNAL_BEGIN__
 
-Variable::Variable() : _content("")
+Variable::Variable() : _content(""), _is_constant(true)
 {
 }
 
 Variable::Variable(
 	const std::string& content,
-	const std::vector<std::string>& attributes
+	const std::vector<std::string>& attributes,
+	bool is_constant
 )
 {
 	this->_content = content;
+	this->_is_constant = is_constant;
 }
 
 core::object::Object* Variable::resolve(IContext* ctx)
 {
-	// TODO: implement Variable::resolve(IContext* ctx)
-	return nullptr;
+	if (this->_content.empty())
+	{
+		return nullptr;
+	}
+	else if (this->_is_constant)
+	{
+		// TODO: add more value types.
+		return new core::types::Value<std::string>(this->_content);
+	}
+	else
+	{
+		if (!ctx)
+		{
+			return nullptr;
+		}
+
+		return ctx->find_var(this->_content);
+	}
 }
 
 __RENDER_INTERNAL_END__

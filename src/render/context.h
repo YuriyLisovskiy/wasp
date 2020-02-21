@@ -23,11 +23,16 @@
 
 #pragma once
 
+// C++ libraries.
+#include <string>
+#include <map>
+
 // Module definitions.
 #include "./_def_.h"
 
 // Wasp libraries.
 #include "./base.h"
+#include "../core/object/object.h"
 
 
 __RENDER_BEGIN__
@@ -35,6 +40,17 @@ __RENDER_BEGIN__
 class Context : public IContext
 {
 	// TODO: implement Context.
+private:
+	bool _auto_delete;
+	const std::map<std::string, core::object::Object*>* _global_scope;
+
+public:
+	Context(
+		const std::map<std::string, core::object::Object*>& global_scope,
+		bool auto_delete = true
+	);
+	~Context() override;
+	core::object::Object* find_var(const std::string& key) override;
 };
 
 __RENDER_END__

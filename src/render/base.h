@@ -33,6 +33,7 @@
 
 // Wasp libraries.
 #include "../core/exceptions.h"
+#include "../core/object/object.h"
 
 
 __RENDER_BEGIN__
@@ -40,6 +41,7 @@ __RENDER_BEGIN__
 class IContext
 {
 public:
+	virtual core::object::Object* find_var(const std::string& key) = 0;
 	virtual ~IContext() = default;
 };
 

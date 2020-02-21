@@ -24,6 +24,7 @@
 
 __RENDER_INTERNAL_BEGIN__
 
+// TODO: add non-string values parsing
 void expression_parser::parse()
 {
 	std::string last_filter_name, last_param_name, last_param_value, last_var_attr;

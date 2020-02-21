@@ -35,6 +35,7 @@
 #include "../base.h"
 #include "../../core/regex.h"
 #include "../../core/object/object.h"
+#include "../../core/types/value.h"
 
 
 __RENDER_INTERNAL_BEGIN__
@@ -68,12 +69,14 @@ class Variable
 {
 private:
 	std::string _content;
+	bool _is_constant;
 
 public:
 	Variable();
 	explicit Variable(
 		const std::string& content,
-		const std::vector<std::string>& attributes
+		const std::vector<std::string>& attributes,
+		bool is_constant
 	);
 
 	core::object::Object* resolve(IContext* ctx);

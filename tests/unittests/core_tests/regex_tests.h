@@ -49,7 +49,7 @@ TEST(ArgRegexTestCase, TestSingleSquareBracketsInPattern)
 {
 	auto expr = core::rgx::ArgRegex(R"(\w{2}\s{5}<hello>([\w\s]+))");
 	ASSERT_FALSE(expr.match("<<hello>>Double square brackets check"));
-	ASSERT_TRUE(expr.search_all("SS     Double square brackets check"));
+	ASSERT_TRUE(expr.search("SS     Double square brackets check"));
 	ASSERT_EQ(expr.groups().size(), 1);
 	ASSERT_EQ(expr.group("hello"), "Double square brackets check");
 }
