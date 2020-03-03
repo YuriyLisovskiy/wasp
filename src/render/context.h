@@ -45,7 +45,7 @@ private:
 	const std::map<std::string, core::object::Object*>* _global_scope;
 
 public:
-	Context(
+	explicit Context(
 		const std::map<std::string, core::object::Object*>& global_scope,
 		bool auto_delete = true
 	);

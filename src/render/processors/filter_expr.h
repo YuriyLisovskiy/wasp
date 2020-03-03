@@ -65,6 +65,7 @@ struct parsed_arg
 {
 	std::string name;
 	std::string value;
+	bool is_const;
 };
 
 struct parsed_filter
@@ -76,6 +77,7 @@ struct parsed_filter
 struct parsed_expr
 {
 	std::string var_name;
+	bool is_const;
 	std::vector<std::string> var_attrs;
 	std::vector<parsed_filter> filters;
 };
@@ -83,8 +85,9 @@ struct parsed_expr
 struct expression_parser
 {
 	token_t token;
-
+	char ch;
 	parsed_expr expression;
+	size_t symbol_pos;
 
 	enum p_state
 	{
@@ -93,6 +96,8 @@ struct expression_parser
 		s_var_attr_begin,
 		s_var_attr,
 		s_const_str,
+	//	s_const_number_before_dot,
+	//	s_const_number_after_dot,
 		s_filter_sep,
 		s_filter_name_begin,
 		s_filter_name,
@@ -102,9 +107,15 @@ struct expression_parser
 		s_param_value_var,
 		s_param_value_const_str,
 		s_param_sep
-	};
+	} st;
 
 	void parse();
+
+	/// Skips whitespaces.
+	/// Returns true if it equals to cend()
+	bool skip_ws_and_ret(std::string::const_iterator& it);
+	bool parse_number_and_ret(std::string::const_iterator& it, std::string& value);
+	void parse_digits(std::string::const_iterator& it, std::string& value);
 	void throw_unexpected_symbol(char ch);
 	static bool is_var_char(char ch);
 	static bool is_var_char_begin(char ch);

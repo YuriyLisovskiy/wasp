@@ -31,12 +31,13 @@ TEST(FilterRegexTestCase, ParserTest)
 {
 	using render::internal::expression_parser;
 	render::internal::token_t token;
-	token.content = "variable.attr1.attr2|default(val=\"Default value\")|date(format='Y-m-d',tz=UTC)";
+	token.content = "variable.attr1.attr2|default(val=\"Default value  with   spaces    !     \")|date(format='Y-m-d',tz=UTC)";
 
 	expression_parser p{token};
 	p.parse();
 
 	ASSERT_EQ(p.expression.var_name, "variable");
+	ASSERT_EQ(p.expression.is_const, false);
 
 	ASSERT_EQ(p.expression.var_attrs.size(), 2);
 	ASSERT_EQ(p.expression.var_attrs[0], "attr1");
@@ -47,14 +48,136 @@ TEST(FilterRegexTestCase, ParserTest)
 	ASSERT_EQ(p.expression.filters[0].name, "default");
 	ASSERT_EQ(p.expression.filters[0].args.size(), 1);
 	ASSERT_EQ(p.expression.filters[0].args[0].name, "val");
-	ASSERT_EQ(p.expression.filters[0].args[0].value, "\"Default value\"");
+	ASSERT_EQ(p.expression.filters[0].args[0].value, "\"Default value  with   spaces    !     \"");
+	ASSERT_EQ(p.expression.filters[0].args[0].is_const, true);
 
 	ASSERT_EQ(p.expression.filters[1].name, "date");
 	ASSERT_EQ(p.expression.filters[1].args.size(), 2);
 	ASSERT_EQ(p.expression.filters[1].args[0].name, "format");
 	ASSERT_EQ(p.expression.filters[1].args[0].value, "'Y-m-d'");
+	ASSERT_EQ(p.expression.filters[1].args[0].is_const, true);
 	ASSERT_EQ(p.expression.filters[1].args[1].name, "tz");
 	ASSERT_EQ(p.expression.filters[1].args[1].value, "UTC");
+	ASSERT_EQ(p.expression.filters[1].args[1].is_const, false);
+}
+
+TEST(FilterRegexTestCase, ParseNumberParameterInFilterWithSpacesTest)
+{
+	using render::internal::expression_parser;
+	render::internal::token_t token;
+	token.content = "variable | var_list ( val = 10 , val1 = -10 , val2 = +10 )";
+
+	expression_parser p{token};
+	p.parse();
+
+	ASSERT_EQ(p.expression.var_name, "variable");
+	ASSERT_EQ(p.expression.is_const, false);
+
+	ASSERT_EQ(p.expression.var_attrs.size(), 0);
+
+	ASSERT_EQ(p.expression.filters.size(), 1);
+
+	ASSERT_EQ(p.expression.filters[0].name, "var_list");
+	ASSERT_EQ(p.expression.filters[0].args.size(), 3);
+	ASSERT_EQ(p.expression.filters[0].args[0].name, "val");
+	ASSERT_EQ(p.expression.filters[0].args[0].value, "10");
+	ASSERT_EQ(p.expression.filters[0].args[0].is_const, true);
+	ASSERT_EQ(p.expression.filters[0].args[1].name, "val1");
+	ASSERT_EQ(p.expression.filters[0].args[1].value, "-10");
+	ASSERT_EQ(p.expression.filters[0].args[1].is_const, true);
+	ASSERT_EQ(p.expression.filters[0].args[2].name, "val2");
+	ASSERT_EQ(p.expression.filters[0].args[2].value, "+10");
+	ASSERT_EQ(p.expression.filters[0].args[2].is_const, true);
+}
+
+TEST(FilterRegexTestCase, ParseNumberParameterInFilterNoSpacesTest)
+{
+	using render::internal::expression_parser;
+	render::internal::token_t token;
+	token.content = "variable|var_list(val=10,val1=-10,val2=+10)";
+
+	expression_parser p{token};
+	p.parse();
+
+	ASSERT_EQ(p.expression.var_name, "variable");
+	ASSERT_EQ(p.expression.is_const, false);
+
+	ASSERT_EQ(p.expression.var_attrs.size(), 0);
+
+	ASSERT_EQ(p.expression.filters.size(), 1);
+
+	ASSERT_EQ(p.expression.filters[0].name, "var_list");
+	ASSERT_EQ(p.expression.filters[0].args.size(), 3);
+	ASSERT_EQ(p.expression.filters[0].args[0].name, "val");
+	ASSERT_EQ(p.expression.filters[0].args[0].value, "10");
+	ASSERT_EQ(p.expression.filters[0].args[0].is_const, true);
+	ASSERT_EQ(p.expression.filters[0].args[1].name, "val1");
+	ASSERT_EQ(p.expression.filters[0].args[1].value, "-10");
+	ASSERT_EQ(p.expression.filters[0].args[1].is_const, true);
+	ASSERT_EQ(p.expression.filters[0].args[2].name, "val2");
+	ASSERT_EQ(p.expression.filters[0].args[2].value, "+10");
+	ASSERT_EQ(p.expression.filters[0].args[2].is_const, true);
+}
+
+TEST(FilterRegexTestCase, ParseNumberParameterInFilterStandardNotationTest)
+{
+	using render::internal::expression_parser;
+	render::internal::token_t token;
+	token.content = "variable | var_list(val=10, val1=-10, val2=+10)";
+
+	expression_parser p{token};
+	p.parse();
+
+	ASSERT_EQ(p.expression.var_name, "variable");
+	ASSERT_EQ(p.expression.is_const, false);
+
+	ASSERT_EQ(p.expression.var_attrs.size(), 0);
+
+	ASSERT_EQ(p.expression.filters.size(), 1);
+
+	ASSERT_EQ(p.expression.filters[0].name, "var_list");
+	ASSERT_EQ(p.expression.filters[0].args.size(), 3);
+	ASSERT_EQ(p.expression.filters[0].args[0].name, "val");
+	ASSERT_EQ(p.expression.filters[0].args[0].value, "10");
+	ASSERT_EQ(p.expression.filters[0].args[0].is_const, true);
+	ASSERT_EQ(p.expression.filters[0].args[1].name, "val1");
+	ASSERT_EQ(p.expression.filters[0].args[1].value, "-10");
+	ASSERT_EQ(p.expression.filters[0].args[1].is_const, true);
+	ASSERT_EQ(p.expression.filters[0].args[2].name, "val2");
+	ASSERT_EQ(p.expression.filters[0].args[2].value, "+10");
+	ASSERT_EQ(p.expression.filters[0].args[2].is_const, true);
+}
+
+TEST(FilterRegexTestCase, ParseDoubleValueTest)
+{
+	using render::internal::expression_parser;
+	render::internal::token_t token;
+	token.content = "123.321";
+
+	expression_parser p{token};
+	p.parse();
+
+	ASSERT_EQ(p.expression.var_name, "123.321");
+	ASSERT_EQ(p.expression.is_const, true);
+
+	ASSERT_EQ(p.expression.var_attrs.size(), 0);
+	ASSERT_EQ(p.expression.filters.size(), 0);
+}
+
+TEST(FilterRegexTestCase, ParseIntValueTest)
+{
+	using render::internal::expression_parser;
+	render::internal::token_t token;
+	token.content = "123";
+
+	expression_parser p{token};
+	p.parse();
+
+	ASSERT_EQ(p.expression.var_name, "123");
+	ASSERT_EQ(p.expression.is_const, true);
+
+	ASSERT_EQ(p.expression.var_attrs.size(), 0);
+	ASSERT_EQ(p.expression.filters.size(), 0);
 }
 
 __UNIT_TESTS_END__

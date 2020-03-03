@@ -54,7 +54,7 @@ public:
 
 	[[nodiscard]] std::string __str__() const override
 	{
-		if constexpr (std::is_same_v<_T, std::string>)
+		if constexpr (std::is_same<_T, std::string>::value)
 		{
 			return this->_internal_value;
 		}

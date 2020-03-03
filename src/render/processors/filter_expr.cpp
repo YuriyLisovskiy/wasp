@@ -33,149 +33,202 @@ void expression_parser::parse()
 
 	char const_str_quote = '"';
 
-	p_state st = p_state::s_begin;
+	this->symbol_pos = 0;
+	bool param_is_constant = false;
+	this->st = p_state::s_begin;
 	auto it = this->token.content.cbegin();
 	while (it != this->token.content.cend())
 	{
-		char ch = *it++;
-		switch (st)
+		this->ch = *it++;
+		this->symbol_pos++;
+		if (this->skip_ws_and_ret(it))
+		{
+			break;
+		}
+
+		switch (this->st)
 		{
 			case p_state::s_begin:
-				if (ch == '\'' || ch == '"')
+				if (this->ch == '\'' || this->ch == '"')
 				{
-					st = p_state::s_const_str;
-					const_str_quote = ch;
-					this->expression.var_name += ch;
+					this->st = p_state::s_const_str;
+					const_str_quote = this->ch;
+					this->expression.var_name += this->ch;
+					this->expression.is_const = true;
 				}
-				else if (std::isalpha(ch) || ch == '_')
+				if (std::isdigit(this->ch) || std::isdigit(this->ch) || this->ch == '+' || this->ch == '-')
 				{
-					st = p_state::s_var;
-					this->expression.var_name += ch;
+					this->expression.var_name += this->ch;
+					this->expression.is_const = true;
+					if (this->parse_number_and_ret(it, this->expression.var_name))
+					{
+						return;
+					}
+
+					this->st = p_state::s_filter_sep;
+
+			//		this->st = p_state::s_const_number_before_dot;
+			//		this->expression.var_name += this->ch;
+			//		this->expression.is_const = true;
+				}
+				else if (std::isalpha(this->ch) || this->ch == '_')
+				{
+					this->st = p_state::s_var;
+					this->expression.var_name += this->ch;
+					this->expression.is_const = false;
 				}
 				else
 				{
-					this->throw_unexpected_symbol(ch);
+					this->throw_unexpected_symbol(this->ch);
 				}
 				break;
 			case p_state::s_var:
-				if (is_var_char(ch))
+				if (is_var_char(this->ch))
 				{
-					this->expression.var_name += ch;
+					this->expression.var_name += this->ch;
 				}
 				else
 				{
-					if (ch == VAR_ATTR_SEP)
+					if (this->ch == VAR_ATTR_SEP)
 					{
-						st = p_state::s_var_attr_begin;
+						this->st = p_state::s_var_attr_begin;
 					}
-					// TODO: skip whitespaces first
-					else if (ch == FILTER_SEP)
+					else if (this->ch == FILTER_SEP)
 					{
-						st = p_state::s_filter_name_begin;
+						this->st = p_state::s_filter_name_begin;
 					}
 					else
 					{
-						this->throw_unexpected_symbol(ch);
+						this->throw_unexpected_symbol(this->ch);
 					}
 				}
 				break;
 			case p_state::s_var_attr_begin:
-				// TODO: skip whitespaces first
-				if (is_var_char_begin(ch))
+				if (is_var_char_begin(this->ch))
 				{
 					last_var_attr.clear();
-					last_var_attr += ch;
-					st = p_state::s_var_attr;
+					last_var_attr += this->ch;
+					this->st = p_state::s_var_attr;
 				}
 				else
 				{
-					this->throw_unexpected_symbol(ch);
+					this->throw_unexpected_symbol(this->ch);
 				}
 				break;
 			case p_state::s_var_attr:
-				if (is_var_char(ch))
+				if (is_var_char(this->ch))
 				{
-					last_var_attr += ch;
+					last_var_attr += this->ch;
 				}
 				else
 				{
-					// TODO: skip whitespaces first
-					if (ch == '.')
+					if (this->ch == '.')
 					{
-						st = p_state::s_var_attr_begin;
+						this->st = p_state::s_var_attr_begin;
 					}
-					else if (ch == FILTER_SEP)
+					else if (this->ch == FILTER_SEP)
 					{
-						st = p_state::s_filter_name_begin;
+						this->st = p_state::s_filter_name_begin;
 					}
 					else
 					{
-						this->throw_unexpected_symbol(ch);
+						this->throw_unexpected_symbol(this->ch);
 					}
 
 					this->expression.var_attrs.push_back(last_var_attr);
 				}
 				break;
 			case p_state::s_const_str:
-				if (ch == const_str_quote)
+				if (this->ch == const_str_quote)
 				{
-					st = p_state::s_filter_sep;
+					this->st = p_state::s_filter_sep;
 				}
 
-				this->expression.var_name += ch;
+				this->expression.var_name += this->ch;
 				break;
-			case p_state::s_filter_sep:
-				// TODO: skip whitespaces first
-				if (ch == FILTER_SEP)
+			/*
+			case p_state::s_const_number_before_dot:
+				if (this->ch == '.')
 				{
-					args.clear();
-					st = p_state::s_filter_name_begin;
+					this->st = p_state::s_const_number_after_dot;
+					this->expression.var_name += this->ch;
+				}
+				else if (std::isdigit(this->ch))
+				{
+					this->expression.var_name += this->ch;
+				}
+				else if (this->ch == ' ' || this->ch == FILTER_SEP)
+				{
+					it--;
+					this->st = p_state::s_filter_sep;
 				}
 				else
 				{
-					this->throw_unexpected_symbol(ch);
+					this->throw_unexpected_symbol(this->ch);
+				}
+				break;
+			case p_state::s_const_number_after_dot:
+				if (std::isdigit(this->ch))
+				{
+					this->expression.var_name += this->ch;
+				}
+				else if (this->ch == ' ' || this->ch == FILTER_SEP)
+				{
+					it--;
+					this->st = p_state::s_filter_sep;
+				}
+				else
+				{
+					this->throw_unexpected_symbol(this->ch);
+				}
+				break;
+			*/
+			case p_state::s_filter_sep:
+				if (this->ch == FILTER_SEP)
+				{
+					args.clear();
+					this->st = p_state::s_filter_name_begin;
+				}
+				else
+				{
+					this->throw_unexpected_symbol(this->ch);
 				}
 				break;
 			case p_state::s_filter_name_begin:
-				// TODO: skip whitespaces first
-				if (is_var_char_begin(ch))
+				if (is_var_char_begin(this->ch))
 				{
-					last_filter_name.clear();
-					st = p_state::s_filter_name;
+					last_filter_name = this->ch;
+					this->st = p_state::s_filter_name;
 				}
 				else
 				{
-					this->throw_unexpected_symbol(ch);
+					this->throw_unexpected_symbol(this->ch);
 				}
-
-				last_filter_name += ch;
 				break;
 			case p_state::s_filter_name:
-				if (is_var_char(ch))
+				if (is_var_char(this->ch))
 				{
-					last_filter_name += ch;
+					last_filter_name += this->ch;
 				}
 				else
 				{
-					// TODO: skip whitespaces first
-					if (ch == '(')
+					if (this->ch == '(')
 					{
-						st = p_state::s_param_name_begin;
+						this->st = p_state::s_param_name_begin;
 					}
 					else
 					{
-						this->throw_unexpected_symbol(ch);
+						this->throw_unexpected_symbol(this->ch);
 					}
 				}
 				break;
 			case p_state::s_param_name_begin:
-				// TODO: skip whitespaces first
-				if (is_var_char_begin(ch))
+				if (is_var_char_begin(this->ch))
 				{
 					last_param_name.clear();
 					last_param_value.clear();
-					last_param_name += ch;
-					st = p_state::s_param_name;
+					last_param_name += this->ch;
+					this->st = p_state::s_param_name;
 				}
 				else
 				{
@@ -183,111 +236,188 @@ void expression_parser::parse()
 				}
 				break;
 			case p_state::s_param_name:
-				if (is_var_char(ch))
+				if (is_var_char(this->ch))
 				{
-					last_param_name += ch;
+					last_param_name += this->ch;
 				}
 				else
 				{
-					// TODO: skip whitespaces first
-					if (ch == FILTER_ARG_NAME_VAL_SEP)
+					if (this->ch == FILTER_ARG_NAME_VAL_SEP)
 					{
-						st = p_state::s_param_value_begin;
+						this->st = p_state::s_param_value_begin;
 					}
 					else
 					{
-						this->throw_unexpected_symbol(ch);
+						this->throw_unexpected_symbol(this->ch);
 					}
 				}
 				break;
 			case p_state::s_param_value_begin:
-				// TODO: skip whitespaces first
-				if (ch == '\'' || ch == '"')
+				if (this->ch == '\'' || this->ch == '"')
 				{
-					st = p_state::s_param_value_const_str;
-					const_str_quote = ch;
-					last_param_value += ch;
+					this->st = p_state::s_param_value_const_str;
+					const_str_quote = this->ch;
+					last_param_value += this->ch;
 				}
-				else if (std::isalpha(ch) || ch == '_')
+				else if (std::isdigit(this->ch) || this->ch == '+' || this->ch == '-')
 				{
-					st = p_state::s_param_value_var;
-					last_param_value += ch;
+					last_param_value += this->ch;
+					if (this->parse_number_and_ret(it, last_param_value))
+					{
+						this->throw_unexpected_symbol(this->ch);
+					}
+
+					param_is_constant = true;
+					this->st = p_state::s_param_sep;
+				}
+				else if (std::isalpha(this->ch) || this->ch == '_')
+				{
+					this->st = p_state::s_param_value_var;
+					param_is_constant = false;
+					last_param_value += this->ch;
 				}
 				else
 				{
-					this->throw_unexpected_symbol(ch);
+					this->throw_unexpected_symbol(this->ch);
 				}
 				break;
 			case p_state::s_param_value_var:
-				if (is_var_char(ch))
+				if (is_var_char(this->ch))
 				{
-					last_param_value += ch;
+					last_param_value += this->ch;
 				}
 				else
 				{
-					// TODO: skip whitespaces first
-					if (ch == FILTER_ARG_SEP)
+					if (this->ch == FILTER_ARG_SEP)
 					{
-						st = p_state::s_param_name_begin;
-						args.push_back({last_param_name, last_param_value});
+						this->st = p_state::s_param_name_begin;
+						args.push_back({last_param_name, last_param_value, param_is_constant});
 					}
-					else if (ch == ')')
+					else if (this->ch == ')')
 					{
-						st = p_state::s_filter_sep;
-						args.push_back({last_param_name, last_param_value});
+						this->st = p_state::s_filter_sep;
+						args.push_back({last_param_name, last_param_value, param_is_constant});
 						this->expression.filters.push_back({last_filter_name, args});
 					}
 					else
 					{
-						this->throw_unexpected_symbol(ch);
+						this->throw_unexpected_symbol(this->ch);
 					}
 				}
 				break;
 			case p_state::s_param_value_const_str:
-				if (ch == const_str_quote)
+				if (this->ch == const_str_quote)
 				{
-					st = p_state::s_param_sep;
+					this->st = p_state::s_param_sep;
+					param_is_constant = true;
 				}
 
-				last_param_value += ch;
+				last_param_value += this->ch;
 				break;
 			case p_state::s_param_sep:
-				// TODO: skip whitespaces first
-				if (ch == FILTER_ARG_SEP)
+				if (this->ch == FILTER_ARG_SEP)
 				{
-					st = p_state::s_param_name_begin;
-					args.push_back({last_param_name, last_param_value});
+					this->st = p_state::s_param_name_begin;
+					args.push_back({last_param_name, last_param_value, param_is_constant});
 				}
-				else if (ch == ')')
+				else if (this->ch == ')')
 				{
-					st = p_state::s_filter_sep;
-					args.push_back({last_param_name, last_param_value});
+					this->st = p_state::s_filter_sep;
+					args.push_back({last_param_name, last_param_value, param_is_constant});
 					this->expression.filters.push_back({last_filter_name, args});
 				}
 				else
 				{
-					this->throw_unexpected_symbol(ch);
+					this->throw_unexpected_symbol(this->ch);
 				}
 				break;
 		}
 	}
 }
 
-bool expression_parser::is_var_char(char ch)
+bool expression_parser::parse_number_and_ret(
+	std::string::const_iterator& it, std::string& value
+)
 {
-	return std::isalnum(ch) || ch == '_';
+	auto end = this->token.content.cend();
+	if (!std::isdigit(*it))
+	{
+		if (value[0] == '+' || value[0] == '-')
+		{
+			this->throw_unexpected_symbol(value[0]);
+		}
+	}
+
+	this->parse_digits(it, value);
+	bool is_double = *it == '.';
+	if (is_double)
+	{
+		value += *it++;
+		if (!std::isdigit(*it))
+		{
+			this->throw_unexpected_symbol(*it);
+		}
+
+		this->parse_digits(it, value);
+	}
+
+	return it == end;
 }
 
-bool expression_parser::is_var_char_begin(char ch)
+void expression_parser::parse_digits(std::string::const_iterator& it, std::string& value)
 {
-	return std::isalpha(ch) || ch == '_';
+	do
+	{
+		value += *it++;
+	}
+	while (std::isdigit(*it) && it != this->token.content.cend());
 }
 
-void expression_parser::throw_unexpected_symbol(char ch)
+bool expression_parser::skip_ws_and_ret(std::string::const_iterator& it)
+{
+	if (this->ch != ' ')
+	{
+		return false;
+	}
+
+	if (this->st == p_state::s_const_str || this->st == p_state::s_param_value_const_str)
+	{
+		return false;
+	}
+
+	auto end = this->token.content.cend();
+	while (*it == ' ' && it != end)
+	{
+		this->ch = *it++;
+		this->symbol_pos++;
+	}
+
+	bool is_end = it == end;
+	if (!is_end)
+	{
+		this->ch = *it++;
+		this->symbol_pos++;
+	}
+
+	return is_end;
+}
+
+bool expression_parser::is_var_char(char c)
+{
+	return std::isalnum(c) || c == '_';
+}
+
+bool expression_parser::is_var_char_begin(char c)
+{
+	return std::isalpha(c) || c == '_';
+}
+
+void expression_parser::throw_unexpected_symbol(char c)
 {
 	throw TemplateSyntaxError(
-		"Unexpected symbol '" + std::string(ch, 1) +
-		"' in statement: '" + this->token.content + "'",
+		"Unexpected symbol '" + std::string(1, c) +
+		"' in statement, position " + std::to_string(this->symbol_pos) +
+		": '" + this->token.content + "'",
 		this->token
 	);
 }
@@ -299,13 +429,13 @@ FilterExpression::FilterExpression(token_t& token, Filters& builtins)
 	expression_parser p{std::move(this->_token)};
 	p.parse();
 
-	this->_var = new Variable(p.expression.var_name, p.expression.var_attrs);
+	this->_var = new Variable(p.expression.var_name, p.expression.var_attrs, p.expression.is_const);
 	for (const auto& filter : p.expression.filters)
 	{
 		std::vector<std::pair<std::string, Variable*>> args;
 		for (const auto& arg : filter.args)
 		{
-			args.emplace_back(arg.name, new Variable(arg.value, {}));
+			args.emplace_back(arg.name, new Variable(arg.value, {}, arg.is_const));
 		}
 
 		if (!builtins.contains(filter.name))
