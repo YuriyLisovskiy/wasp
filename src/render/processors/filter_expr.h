@@ -45,22 +45,6 @@
 
 __RENDER_INTERNAL_BEGIN__
 
-/*
-const std::string NUM = R"([-+\.]?\d[\d\.e]*)";
-const std::string VAR_CHARS = R"(\w\.)";
-
-// variable|default(val="Default value")
-const std::string FILTER_REGEX(
-	"<constant>" + CONST_STRING + "|" +
-	"<var>([" + VAR_CHARS + "]+|" + NUM + ")|" +
-	R"((?:\s*)" + re::escape(std::string(FILTER_SEP, 1)) + R"(\s*)" +
-	R"(<filter_name>(\w+))" +
-	R"((?:\()" + "<arg_name>([" + VAR_CHARS + "]+)" + re::escape(std::string(FILTER_ARG_SEP, 1)) +
-	"(?:<constant_arg>" + CONST_STRING + "|" +
-	"<var_arg>([" + VAR_CHARS + "]+|" + NUM + R"())\))?))"
-);
-*/
-
 struct parsed_arg
 {
 	std::string name;
@@ -96,8 +80,6 @@ struct expression_parser
 		s_var_attr_begin,
 		s_var_attr,
 		s_const_str,
-	//	s_const_number_before_dot,
-	//	s_const_number_after_dot,
 		s_filter_sep,
 		s_filter_name_begin,
 		s_filter_name,

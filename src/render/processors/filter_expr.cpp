@@ -24,15 +24,11 @@
 
 __RENDER_INTERNAL_BEGIN__
 
-// TODO: add non-string values parsing
 void expression_parser::parse()
 {
 	std::string last_filter_name, last_param_name, last_param_value, last_var_attr;
-
 	std::vector<parsed_arg> args;
-
 	char const_str_quote = '"';
-
 	this->symbol_pos = 0;
 	bool param_is_constant = false;
 	this->st = p_state::s_begin;
@@ -66,10 +62,6 @@ void expression_parser::parse()
 					}
 
 					this->st = p_state::s_filter_sep;
-
-			//		this->st = p_state::s_const_number_before_dot;
-			//		this->expression.var_name += this->ch;
-			//		this->expression.is_const = true;
 				}
 				else if (std::isalpha(this->ch) || this->ch == '_')
 				{
@@ -146,43 +138,6 @@ void expression_parser::parse()
 
 				this->expression.var_name += this->ch;
 				break;
-			/*
-			case p_state::s_const_number_before_dot:
-				if (this->ch == '.')
-				{
-					this->st = p_state::s_const_number_after_dot;
-					this->expression.var_name += this->ch;
-				}
-				else if (std::isdigit(this->ch))
-				{
-					this->expression.var_name += this->ch;
-				}
-				else if (this->ch == ' ' || this->ch == FILTER_SEP)
-				{
-					it--;
-					this->st = p_state::s_filter_sep;
-				}
-				else
-				{
-					this->throw_unexpected_symbol(this->ch);
-				}
-				break;
-			case p_state::s_const_number_after_dot:
-				if (std::isdigit(this->ch))
-				{
-					this->expression.var_name += this->ch;
-				}
-				else if (this->ch == ' ' || this->ch == FILTER_SEP)
-				{
-					it--;
-					this->st = p_state::s_filter_sep;
-				}
-				else
-				{
-					this->throw_unexpected_symbol(this->ch);
-				}
-				break;
-			*/
 			case p_state::s_filter_sep:
 				if (this->ch == FILTER_SEP)
 				{
