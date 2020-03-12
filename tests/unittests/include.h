@@ -19,8 +19,11 @@
 #define WASP_UNIT_TESTS_INCLUDE_H
 
 #include "./collections_tests/include.h"
+#include "./conf_tests/include.h"
 #include "./core_tests/include.h"
 #include "./http_tests/include.h"
+#include "./render_tests/include.h"
+#include "./utils_tests/include.h"
 #include "./views_tests/include.h"
 
 #endif // WASP_UNIT_TESTS_INCLUDE_H
