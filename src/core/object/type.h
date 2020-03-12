@@ -51,11 +51,11 @@ private:
 	explicit Type(const Object& obj);
 
 public:
-	std::string name();
+	[[nodiscard]] std::string name() const;
 
-	std::string namespace_();
+	[[nodiscard]] std::string namespace_() const;
 
-	std::vector<std::string> attributes();
+	[[nodiscard]] std::vector<std::string> attributes() const;
 
 	[[nodiscard]] static std::string type_name(const Object& obj);
 

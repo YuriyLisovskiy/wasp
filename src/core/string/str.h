@@ -162,4 +162,10 @@ extern std::string cut_edges(
 	const std::string& s, size_t left, size_t right, bool trim_whitespace = true
 );
 
+extern std::string replace(
+	const std::string& src,
+	const std::string& old_sub,
+	const std::string& new_sub
+);
+
 __STR_END__

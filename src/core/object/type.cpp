@@ -29,7 +29,8 @@ __OBJECT_BEGIN__
 
 Type::Type(const Object& obj)
 {
-	auto full_name = str::rsplit(Type::type_name(obj), ':', 1);
+	std::string s = Type::type_name(obj);
+	auto full_name = str::rsplit(s, ':', 1);
 	if (full_name.size() == 2)
 	{
 		str::ltrim(full_name.back(), ":");
@@ -44,17 +45,17 @@ Type::Type(const Object& obj)
 	}
 }
 
-std::string Type::name()
+std::string Type::name() const
 {
 	return this->_name;
 }
 
-std::string Type::namespace_()
+std::string Type::namespace_() const
 {
 	return this->_namespace;
 }
 
-std::vector<std::string> Type::attributes()
+std::vector<std::string> Type::attributes() const
 {
 	return this->_attrs;
 }

@@ -67,10 +67,10 @@ std::string lower(const std::string& _str)
 {
 	std::string res(_str);
 	std::transform(
-			res.begin(),
-			res.end(),
-			res.begin(),
-			[](unsigned char c){ return std::tolower(c); }
+		res.begin(),
+		res.end(),
+		res.begin(),
+		[](unsigned char c){ return std::tolower(c); }
 	);
 	return res;
 }
@@ -79,10 +79,10 @@ std::string upper(const std::string& _str)
 {
 	std::string res(_str);
 	std::transform(
-			res.begin(),
-			res.end(),
-			res.begin(),
-			[](unsigned char c){ return std::toupper(c); }
+		res.begin(),
+		res.end(),
+		res.begin(),
+		[](unsigned char c){ return std::toupper(c); }
 	);
 	return res;
 }
@@ -120,10 +120,15 @@ std::vector<std::string> rsplit(const std::string& str, char delimiter, size_t n
 		return split(str, delimiter);
 	}
 
+	long str_last_pos = (long)str.size() - 1;
+	if (str_last_pos == -1)
+	{
+		return {};
+	}
+
 	std::vector<std::string> result;
 	std::string current;
 	size_t split_count = 0;
-	long str_last_pos = (long)str.size() - 1;
 	long int i;
 	for (i = str_last_pos; i >= 0 && split_count < n; i--)
 	{
@@ -140,7 +145,16 @@ std::vector<std::string> rsplit(const std::string& str, char delimiter, size_t n
 		}
 	}
 
-	result.insert(result.begin(), str.substr(0, i + 1));
+	if (result.empty())
+	{
+		std::reverse(current.begin(), current.end());
+		result.insert(result.begin(), current);
+	}
+	else
+	{
+		result.insert(result.begin(), str.substr(0, i + 1));
+	}
+
 	return result;
 }
 
@@ -262,6 +276,24 @@ std::string cut_edges(
 	if (trim_whitespace)
 	{
 		trim(copy);
+	}
+
+	return copy;
+}
+
+std::string replace(
+	const std::string& src,
+	const std::string& old_sub,
+	const std::string& new_sub
+)
+{
+	std::string copy = src;
+	size_t old_sub_size = old_sub.size();
+	size_t pos = copy.find(old_sub);
+	while (pos != std::string::npos)
+	{
+		copy.replace(pos, old_sub_size, new_sub);
+		pos = copy.find(old_sub);
 	}
 
 	return copy;

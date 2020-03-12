@@ -41,6 +41,7 @@
 #include "../core/string/str.h"
 #include "../core/management/base.h"
 #include "../core/object/object.h"
+#include "../core/object/type.h"
 #include "../core/management/commands/app_command.h"
 
 
@@ -119,7 +120,10 @@ protected:
 		this->_commands.push_back(cmd);
 	}
 
-	explicit AppConfig(const std::string& app_path, conf::Settings* settings);
+	explicit AppConfig(
+		const std::string& app_path, conf::Settings* settings
+	);
+	void init(const core::object::Type& type);
 
 public:
 	std::string get_name() final;

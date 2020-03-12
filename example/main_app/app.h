@@ -20,6 +20,7 @@ public:
 	explicit MainAppConfig(wasp::conf::Settings* settings)
 		: AppConfig(__FILE__, settings)
 	{
+		this->init(this->__type__());
 	}
 
 	void urlpatterns() override

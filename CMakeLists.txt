@@ -29,58 +29,12 @@ set(CMAKE_CXX_FLAGS "-pthread")
 
 
 file(GLOB LIB_FILES
-	"src/apps/*.h"
-	"src/apps/*.cpp"
-	"src/conf/*.h"
-	"src/conf/*.cpp"
-	"src/collections/*.h"
-	"src/collections/*.cpp"
-	"src/core/datetime/*.h"
-	"src/core/datetime/*.cpp"
-	"src/core/datetime/predefined/*.h"
-	"src/core/datetime/predefined/*.cpp"
-	"src/core/files/*.h"
-	"src/core/files/*.cpp"
-	"src/core/flags/*.h"
-	"src/core/flags/*.cpp"
-	"src/core/parsers/*.h"
-	"src/core/parsers/*.cpp"
-	"src/core/signing/*.h"
-	"src/core/signing/*.cpp"
-	"src/core/net/*.h"
-	"src/core/net/*.cpp"
-	"src/core/string/*.h"
-	"src/core/string/*.cpp"
-	"src/core/object/*.h"
-	"src/core/object/*.cpp"
-	"src/core/types/*.h"
-	"src/core/types/*.cpp"
-	"src/core/management/*.h"
-	"src/core/management/*.cpp"
-	"src/core/management/commands/*.h"
-	"src/core/management/commands/*.cpp"
-	"src/core/*.h"
-	"src/core/*.cpp"
-	"src/middleware/*.h"
-	"src/middleware/*.cpp"
-	"src/render/backends/*.h"
-	"src/render/backends/*.cpp"
-	"src/render/processors/*.h"
-	"src/render/processors/*.cpp"
-	"src/render/*.h"
-	"src/render/*.cpp"
-	"src/http/*.h"
-	"src/http/*.cpp"
-	"src/views/*.h"
-	"src/views/*.cpp"
-	"src/urls/resolvers/*.h"
-	"src/urls/resolvers/*.cpp"
-	"src/urls/*.h"
-	"src/urls/*.cpp"
-	"src/utils/*.h"
-	"src/utils/*.cpp"
-	"src/utils/crypto/*.h"
-	"src/utils/crypto/*.cpp"
+	"src/*/*/*/*.h"
+	"src/*/*/*/*.cpp"
+	"src/*/*/*.h"
+	"src/*/*/*.cpp"
+	"src/*/*.h"
+	"src/*/*.cpp"
 	"src/*.h"
 	"src/*.cpp"
 )
@@ -89,6 +43,7 @@ set(LIB_SRC ${LIB_FILES})
 
 # Collections package tests setup.
 file(GLOB COLLECTIONS_TEST_SRC
+	"tests/unittests/collections_tests/*.h"
 	"tests/unittests/collections_tests/*.h"
 )
 add_executable(${PACKAGE_COLLECTIONS_UNIT_TESTS} ${LIB_SRC} ${COLLECTIONS_TEST_SRC} "tests/unittests/collections_tests/main.cpp")
@@ -105,13 +60,7 @@ target_link_libraries(${PACKAGE_CONF_UNIT_TESTS} gtest gtest_main rt pthread ${C
 
 # Core packages tests setup.
 file(GLOB CORE_TEST_SRC
-	"tests/unittests/core_tests/datetime_tests/*.h"
-	"tests/unittests/core_tests/exceptions_tests/*.h"
-	"tests/unittests/core_tests/files_tests/*.h"
-	"tests/unittests/core_tests/flags_tests/*.h"
-	"tests/unittests/core_tests/object_tests/*.h"
-	"tests/unittests/core_tests/parsers_tests/*.h"
-	"tests/unittests/core_tests/string_tests/*.h"
+	"tests/unittests/core_tests/*/*.h"
 	"tests/unittests/core_tests/*.h"
 )
 add_executable(${PACKAGE_CORE_UNIT_TESTS} ${LIB_SRC} ${CORE_TEST_SRC} "tests/unittests/core_tests/main.cpp")
@@ -144,7 +93,7 @@ target_link_libraries(${PACKAGE_CORE_OBJECT_UNIT_TESTS} gtest gtest_main rt pthr
 
 # Http package tests setup.
 file(GLOB HTTP_TEST_SRC
-	"tests/unittests/http_tests/parsers_tests/*.h"
+	"tests/unittests/http_tests/*/*.h"
 	"tests/unittests/http_tests/*.h"
 )
 add_executable(${PACKAGE_HTTP_UNIT_TESTS} ${LIB_SRC} ${HTTP_TEST_SRC} "tests/unittests/http_tests/main.cpp")
@@ -153,7 +102,6 @@ target_link_libraries(${PACKAGE_HTTP_UNIT_TESTS} gtest gtest_main rt pthread ${H
 
 # Render package tests setup.
 file(GLOB RENDER_TEST_SRC
-	"tests/unittests/render_tests/processors_tests/*.h"
 	"tests/unittests/render_tests/*.h"
 )
 add_executable(${PACKAGE_RENDER_UNIT_TESTS} ${LIB_SRC} ${RENDER_TEST_SRC} "tests/unittests/render_tests/main.cpp")
@@ -162,7 +110,7 @@ target_link_libraries(${PACKAGE_RENDER_UNIT_TESTS} gtest gtest_main rt pthread $
 
 # Utils package tests setup.
 file(GLOB UTILS_TEST_SRC
-	"tests/unittests/utils_tests/crypto_tests/*.h"
+	"tests/unittests/utils_tests/*/*.h"
 	"tests/unittests/utils_tests/*.h"
 )
 add_executable(${PACKAGE_UTILS_UNIT_TESTS} ${LIB_SRC} ${UTILS_TEST_SRC} "tests/unittests/utils_tests/main.cpp")
@@ -201,9 +149,11 @@ file(GLOB EXAMPLE_SRC
 	"example/*.h"
 	"example/*/*.h"
 	"example/*/*.cpp"
+	"example/*/*/*.h"
+	"example/*/*/*.cpp"
 )
 if(EXISTS "${PROJECT_SOURCE_DIR}/example/main.cpp")
 	add_executable(example ${LIB_SRC} ${EXAMPLE_SRC} "example/main.cpp")
 else()
-    message("main.cpp of example web server does not exist")
+	message("main.cpp of example web server does not exist")
 endif()

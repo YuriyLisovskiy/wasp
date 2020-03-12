@@ -42,7 +42,7 @@ class Context : public IContext
 	// TODO: implement Context.
 private:
 	bool _auto_delete;
-	const std::map<std::string, core::object::Object*>* _global_scope;
+	std::map<std::string, core::object::Object*> _global_scope;
 
 public:
 	explicit Context(

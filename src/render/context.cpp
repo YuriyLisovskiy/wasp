@@ -30,14 +30,14 @@ Context::Context(
 )
 {
 	this->_auto_delete = auto_delete;
-	this->_global_scope = &global_scope;
+	this->_global_scope = global_scope;
 }
 
 Context::~Context()
 {
-	if (this->_auto_delete && this->_global_scope)
+	if (this->_auto_delete)
 	{
-		for (const auto& var : *this->_global_scope)
+		for (const auto& var : this->_global_scope)
 		{
 			delete var.second;
 		}
@@ -46,13 +46,10 @@ Context::~Context()
 
 core::object::Object* Context::find_var(const std::string& key)
 {
-	if (this->_global_scope)
+	auto var_p = this->_global_scope.find(key);
+	if (var_p != this->_global_scope.end())
 	{
-		auto var_p = this->_global_scope->find(key);
-		if (var_p != this->_global_scope->end())
-		{
-			return var_p->second;
-		}
+		return var_p->second;
 	}
 
 	return nullptr;

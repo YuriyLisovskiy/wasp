@@ -74,17 +74,14 @@ public:
 		const UrlPattern& url_pattern
 	);
 
-	std::string get_name();
+	std::string get_name() const;
 	http::HttpResponseBase* apply(
 		http::HttpRequest* request,
 		conf::Settings* settings,
 		views::Args* args = nullptr
 	);
 	bool match(const std::string& url, std::map<std::string, std::string>& args);
-	std::string build(const std::vector<std::string>& args);
-
-//private:
-//	std::string _parse(const std::string& pattern);
+	std::string build(const std::vector<std::string>& args) const;
 };
 
 __URLS_END__

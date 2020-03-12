@@ -27,6 +27,7 @@ __CORE_INTERNAL_BEGIN__
 CoreManagementAppConfig::CoreManagementAppConfig(wasp::conf::Settings* settings)
 	: AppConfig(__FILE__, settings)
 {
+	this->init(this->__type__());
 }
 
 void CoreManagementAppConfig::commands()
