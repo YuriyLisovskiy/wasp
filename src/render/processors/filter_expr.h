@@ -29,6 +29,7 @@
 #include <regex>
 #include <vector>
 #include <functional>
+#include <memory>
 
 // Module definitions.
 #include "../_def_.h"
@@ -109,17 +110,16 @@ class FilterExpression
 {
 private:
 	token_t _token;
-	Variable* _var = nullptr;
+	std::shared_ptr<Variable> _var = nullptr;
 	std::vector<std::function<void(
-		core::object::Object* obj, IContext* ctx
+		std::shared_ptr<core::object::Object>& obj, const std::shared_ptr<IContext>& ctx
 	)>> _filters;
 
 public:
 	FilterExpression() = default;
-	~FilterExpression();
 
 	explicit FilterExpression(token_t& token, Filters& builtins);
-	std::string resolve(IContext* ctx);
+	std::string resolve(const std::shared_ptr<IContext>& ctx);
 };
 
 __RENDER_INTERNAL_END__

@@ -103,11 +103,11 @@ public:
 	/// @param key: dict key which holds std::vector of values.
 	/// @param _default: a default vector of values to be returned if key does not exist.
 	/// @return std::vector of values by given key.
-	std::vector<_Val> get(_Key key, std::vector<_Val> _default) override
+	std::vector<_Val> get(_Key key, std::vector<_Val> _default) const override
 	{
 		if (this->contains(key))
 		{
-			return this->_map[key];
+			return this->_map.at(key);
 		}
 
 		return _default;

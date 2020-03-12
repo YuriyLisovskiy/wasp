@@ -384,10 +384,12 @@ FilterExpression::FilterExpression(token_t& token, Filters& builtins)
 	expression_parser p{std::move(this->_token)};
 	p.parse();
 
-	this->_var = new Variable(p.expression.var_name, p.expression.var_attrs, p.expression.is_const);
+	this->_var = std::shared_ptr<Variable>(new Variable(
+		p.expression.var_name, p.expression.var_attrs, p.expression.is_const
+	));
 	for (const auto& filter : p.expression.filters)
 	{
-		std::vector<std::pair<std::string, Variable*>> args;
+		std::vector<std::pair<std::string, std::shared_ptr<Variable>>> args;
 		for (const auto& arg : filter.args)
 		{
 			args.emplace_back(arg.name, new Variable(arg.value, {}, arg.is_const));
@@ -399,40 +401,27 @@ FilterExpression::FilterExpression(token_t& token, Filters& builtins)
 		}
 
 		this->_filters.emplace_back(
-			[args, builtins, filter](core::object::Object* obj, IContext* ctx) mutable {
-				std::map<std::string, core::object::Object*> params;
+			[args, builtins, filter](
+				std::shared_ptr<core::object::Object>& obj,
+				const std::shared_ptr<IContext>& ctx
+			) mutable {
+				std::map<std::string, std::shared_ptr<core::object::Object>> params;
 				for (const auto& arg : args)
 				{
 					params[arg.first] = arg.second->resolve(ctx);
-					delete arg.second;
 				}
 
-				core::object::Object* new_obj = builtins.get(filter.name)(
+				obj = builtins.get(filter.name)(
 					obj, collections::Dict(params, false)
 				);
-				if (new_obj)
-				{
-					delete obj;
-					obj = new_obj;
-				}
-
-				for (const auto& param : params)
-				{
-					delete param.second;
-				}
 			}
 		);
 	}
 }
 
-FilterExpression::~FilterExpression()
+std::string FilterExpression::resolve(const std::shared_ptr<IContext>& ctx)
 {
-	delete this->_var;
-}
-
-std::string FilterExpression::resolve(IContext* ctx)
-{
-	core::object::Object* var = nullptr;
+	std::shared_ptr<core::object::Object> var = nullptr;
 	try
 	{
 		var = this->_var->resolve(ctx);
@@ -451,9 +440,7 @@ std::string FilterExpression::resolve(IContext* ctx)
 
 		if (var)
 		{
-			std::string result = var->__str__();
-			delete var;
-			return result;
+			return var->__str__();
 		}
 	}
 

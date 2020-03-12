@@ -4,9 +4,11 @@
 
 #pragma once
 
-#include "../../src/core/logger.h"
-#include "../../src/apps/config.h"
+#include <memory>
+
+#include "../../src/core/types/value.h"
 #include "../../src/views/template_view.h"
+#include "../../src/render/context.h"
 
 
 class FormView : public wasp::views::TemplateView
@@ -23,7 +25,7 @@ public:
 		std::string user_row;
 		if (args->contains("user_name"))
 		{
-			user_row += "<h3>User: " + args->get_str("user_name");
+			user_row += "User: " + args->get_str("user_name");
 		}
 
 		if (args->contains("user_id"))
@@ -31,12 +33,19 @@ public:
 			user_row += ", ID: " + args->get_str("user_id");
 		}
 
-		if (!user_row.empty())
+		if (user_row.empty())
 		{
-			user_row += "</h3>\n";
+			user_row += "User is not found";
 		}
 
-		return this->render(request);
+		auto ctx = std::shared_ptr<wasp::render::Context>(new wasp::render::Context({{
+			"user_info",
+			std::shared_ptr<wasp::core::types::Value<std::string>>(
+				new wasp::core::types::Value<std::string>(user_row)
+			)
+		}}));
+
+		return this->render(request, ctx);
 	}
 
 	wasp::http::HttpResponseBase* post(wasp::http::HttpRequest* request, wasp::views::Args* args) final

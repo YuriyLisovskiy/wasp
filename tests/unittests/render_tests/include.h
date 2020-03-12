@@ -20,4 +20,6 @@
 
 #include "./processors_tests/include.h"
 
+#include "./context_tests.h"
+
 #endif // WASP_UNIT_TESTS_RENDER_TESTS_INCLUDE_H

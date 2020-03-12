@@ -15,38 +15,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * render/builtins.h
- *
- * Purpose:
- * TODO: write render/builtins.h docs
- */
+#ifndef WASP_UNIT_TESTS_RENDER_TESTS_PROCESSORS_TESTS_CONTEXT_TESTS_H
+#define WASP_UNIT_TESTS_RENDER_TESTS_PROCESSORS_TESTS_CONTEXT_TESTS_H
 
-#pragma once
-
-// C++ libraries.
-#include <map>
 #include <memory>
 
-// Module definitions.
-#include "./_def_.h"
+#include <gtest/gtest.h>
 
-// Wasp libraries.
-#include "../collections/dict.h"
-#include "../core/object/object.h"
-#include "../core/types/value.h"
+#include "../_def_.h"
+#include "../../../src/render/context.h"
+#include "../../../src/core/types/value.h"
 
 
-__RENDER_BEGIN__
+__UNIT_TESTS_BEGIN__
 
-typedef collections::Dict<std::string, std::shared_ptr<core::object::Object>> KwArgs;
+// TODO: remove test
+TEST(ConextTestCase, check)
+{
+	auto* ctx = new render::Context({
+		{"", std::make_shared<core::types::Value<int>>(10)}
+	});
+	delete ctx;
+}
 
-typedef std::function<std::shared_ptr<core::object::Object>(
-	const std::shared_ptr<core::object::Object>&, const KwArgs&
-)> Filter;
+__UNIT_TESTS_END__
 
-typedef collections::Dict<std::string, Filter> Filters;
 
-extern Filters DEFAULT_FILTERS;
-
-__RENDER_END__
+#endif // WASP_UNIT_TESTS_RENDER_TESTS_PROCESSORS_TESTS_FILTER_EXPR_TESTS_H

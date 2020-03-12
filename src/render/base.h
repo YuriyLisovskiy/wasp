@@ -27,6 +27,7 @@
 #include <string>
 #include <vector>
 #include <functional>
+#include <memory>
 
 // Module definitions.
 #include "./_def_.h"
@@ -41,7 +42,7 @@ __RENDER_BEGIN__
 class IContext
 {
 public:
-	virtual core::object::Object* find_var(const std::string& key) = 0;
+	virtual std::shared_ptr<core::object::Object> find_var(const std::string& key) = 0;
 	virtual ~IContext() = default;
 };
 
@@ -51,8 +52,10 @@ class ITemplate
 public:
 	virtual ~ITemplate() = default;
 
+	virtual void compile() = 0;
+
 	/// Renders template code using given context.
-	virtual std::string render(IContext* context) = 0;
+	virtual std::string render(const std::shared_ptr<IContext>& context) = 0;
 };
 
 
@@ -71,7 +74,7 @@ public:
 
 	/// Render the template specified by template_name with the given context.
 	virtual std::string render_to_string(
-		const std::string& template_name, IContext* context = nullptr
+		const std::string& template_name, const std::shared_ptr<IContext>& context = nullptr
 	) = 0;
 };
 

@@ -25,8 +25,7 @@
 __VIEWS_BEGIN__
 
 TemplateResponseMixin::TemplateResponseMixin(
-	render::backends::IBackend* backend,
-	bool auto_delete_context
+	render::backends::IBackend* backend
 )
 {
 	if (!backend)
@@ -40,13 +39,12 @@ TemplateResponseMixin::TemplateResponseMixin(
 	this->_backend = backend;
 	this->_template_name = "";
 	this->_content_type = "";
-	this->_auto_delete_context = auto_delete_context;
 }
 
 render::TemplateResponse* TemplateResponseMixin::render(
 	http::HttpRequest* request,
+	const std::shared_ptr<render::IContext>& context,
 	const std::string& template_name,
-	render::IContext* context,
 	unsigned short int status,
 	const std::string& content_type,
 	const std::string& charset
@@ -60,12 +58,8 @@ render::TemplateResponse* TemplateResponseMixin::render(
 		content_type,
 		charset
 	);
-	response->render();
-	if (this->_auto_delete_context)
-	{
-		delete context;
-	}
 
+	response->render();
 	return response;
 }
 
@@ -86,24 +80,23 @@ std::string TemplateResponseMixin::get_template_name()
 TemplateView::TemplateView(
 	conf::Settings* settings
 ) : views::View({"get", "options"}, settings),
-	TemplateResponseMixin(settings->TEMPLATES_BACKEND, true)
+	TemplateResponseMixin(settings->TEMPLATES_BACKEND)
 {
 }
 
 TemplateView::TemplateView(
 	const std::vector<std::string>& allowed_methods,
 	conf::Settings* settings,
-	bool auto_delete_context,
 	const std::string& template_name,
 	const std::string& content_type
 ) : views::View(allowed_methods, settings),
-    TemplateResponseMixin(settings->TEMPLATES_BACKEND, auto_delete_context)
+    TemplateResponseMixin(settings->TEMPLATES_BACKEND)
 {
 	this->_template_name = template_name;
 	this->_content_type = content_type;
 }
 
-render::IContext* TemplateView::get_context(
+std::shared_ptr<render::IContext> TemplateView::get_context(
 	http::HttpRequest* request, Args* args
 )
 {
@@ -116,8 +109,8 @@ http::HttpResponseBase* TemplateView::get(
 {
 	return this->render(
 		request,
-		"",
-		this->get_context(request, args)
+		this->get_context(request, args),
+		""
 	);
 }
 

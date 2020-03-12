@@ -38,7 +38,9 @@ Variable::Variable(
 	this->_is_constant = is_constant;
 }
 
-core::object::Object* Variable::resolve(IContext* ctx)
+std::shared_ptr<core::object::Object> Variable::resolve(
+	const std::shared_ptr<IContext>& ctx
+)
 {
 	if (this->_content.empty())
 	{
@@ -47,7 +49,9 @@ core::object::Object* Variable::resolve(IContext* ctx)
 	else if (this->_is_constant)
 	{
 		// TODO: add more value types.
-		return new core::types::Value<std::string>(this->_content);
+		return std::shared_ptr<core::object::Object>(
+			new core::types::Value<std::string>(this->_content)
+		);
 	}
 	else
 	{

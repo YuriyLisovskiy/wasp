@@ -26,6 +26,7 @@
 // C++ libraries.
 #include <string>
 #include <map>
+#include <memory>
 
 // Module definitions.
 #include "./_def_.h"
@@ -39,18 +40,17 @@ __RENDER_BEGIN__
 
 class Context : public IContext
 {
-	// TODO: implement Context.
 private:
 	bool _auto_delete;
-	std::map<std::string, core::object::Object*> _global_scope;
+	std::map<std::string, std::shared_ptr<core::object::Object>> _global_scope;
 
 public:
 	explicit Context(
-		const std::map<std::string, core::object::Object*>& global_scope,
+		std::map<std::string, std::shared_ptr<core::object::Object>> global_scope,
 		bool auto_delete = true
 	);
 	~Context() override;
-	core::object::Object* find_var(const std::string& key) override;
+	std::shared_ptr<core::object::Object> find_var(const std::string& key) override;
 };
 
 __RENDER_END__

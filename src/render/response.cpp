@@ -27,7 +27,7 @@ __RENDER_BEGIN__
 TemplateResponse::TemplateResponse(
 	backends::IBackend* backend,
 	const std::string& template_name,
-	IContext* context,
+	const std::shared_ptr<IContext>& context,
 	unsigned short int status,
 	const std::string& content_type,
 	const std::string& charset

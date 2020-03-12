@@ -59,7 +59,14 @@ void lexer::split()
 		}
 	}
 
-	this->str_tokens.push_back(suffix);
+	if (this->str_tokens.empty())
+	{
+		this->str_tokens.push_back(this->template_code);
+	}
+	else
+	{
+		this->str_tokens.push_back(suffix);
+	}
 }
 
 void lexer::tokenize()

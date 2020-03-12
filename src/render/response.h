@@ -27,6 +27,7 @@
 
 // C++ libraries.
 #include <string>
+#include <memory>
 
 // Module definitions.
 #include "./_def_.h"
@@ -44,7 +45,7 @@ class TemplateResponse : public http::HttpResponse
 {
 protected:
 	std::string _template_name;
-	IContext* _context;
+	std::shared_ptr<IContext> _context;
 	backends::IBackend* _backend;
 	bool _is_rendered;
 
@@ -52,7 +53,7 @@ public:
 	explicit TemplateResponse(
 		backends::IBackend* backend,
 		const std::string& template_name,
-		IContext* context = nullptr,
+		const std::shared_ptr<IContext>& context = nullptr,
 		unsigned short int status = 200,
 		const std::string& content_type = "",
 		const std::string& charset = "utf-8"

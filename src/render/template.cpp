@@ -27,13 +27,38 @@ __RENDER_BEGIN__
 Template::Template(const std::string& code, BaseEngine* engine)
 {
 	// TODO: implement Template(const std::string& code, BaseEngine* engine)
+
+	this->_engine = engine;
 	this->_template_code = code;
 }
 
-std::string Template::render(IContext* context)
+void Template::compile()
+{
+	// TODO: implement void Template::compile()
+}
+
+std::string Template::render(const std::shared_ptr<IContext>& context)
 {
 	// TODO: implement Template::render(BaseContext* context)
-	return this->_template_code;
+
+	auto lexer = internal::lexer(this->_template_code);
+	lexer.tokenize();
+
+	// TODO: tmp
+	std::string result;
+	for (auto& token : lexer.tokens)
+	{
+		if (token.type == internal::token_type::var)
+		{
+			result += internal::FilterExpression(token, DEFAULT_FILTERS).resolve(context);
+		}
+		else
+		{
+			result += token.content;
+		}
+	}
+
+	return result;
 }
 
 __RENDER_END__

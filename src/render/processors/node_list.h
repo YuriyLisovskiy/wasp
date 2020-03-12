@@ -20,6 +20,7 @@
 // C++ libraries.
 #include <string>
 #include <vector>
+#include <memory>
 
 // Module definitions.
 #include "../_def_.h"
@@ -38,7 +39,7 @@ struct node
 	token_t token;
 
 	node();
-	virtual std::string render(IContext* ctx);
+	virtual std::string render(const std::shared_ptr<IContext>& ctx);
 };
 
 struct text_node : public node
@@ -47,7 +48,7 @@ struct text_node : public node
 
 	text_node();
 	explicit text_node(const std::string& s);
-	std::string render(IContext* ctx) override;
+	std::string render(const std::shared_ptr<IContext>& ctx) override;
 };
 
 struct variable_node : public node
@@ -57,7 +58,7 @@ struct variable_node : public node
 	explicit variable_node(
 		const FilterExpression& filter_expr
 	);
-	std::string render(IContext* ctx) override;
+	std::string render(const std::shared_ptr<IContext>& ctx) override;
 };
 
 struct node_list
@@ -69,7 +70,7 @@ struct node_list
 	node_list();
 	~node_list();
 	void append(node* node);
-	std::string render(IContext* ctx);
+	std::string render(const std::shared_ptr<IContext>& ctx);
 };
 
 __RENDER_INTERNAL_END__

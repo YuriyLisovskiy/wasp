@@ -1,11 +1,10 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<title>Make POST</title>
 </head>
 <body>
-    <h3><% user_info %></h3>
+    <h3>{{ user_info|append_sym(sym='!') }}</h3>
     <form method="post" enctype="multipart/form-data">
         <input type="file" name="super_file" />
         <label title="Email" for="mail">

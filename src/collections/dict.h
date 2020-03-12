@@ -93,11 +93,11 @@ public:
 	/// @param key: dict key which holds some value.
 	/// @param _default: a default value to be returned if key does not exist.
 	/// @return value by given key.
-	virtual _Val get(_Key key, _Val _default = _Val())
+	virtual _Val get(_Key key, _Val _default = _Val()) const
 	{
 		if (this->contains(key))
 		{
-			return this->_map[key];
+			return this->_map.at(key);
 		}
 
 		return _default;
@@ -149,7 +149,7 @@ public:
 	///
 	/// @param key: key to check.
 	/// @return true if value exists, otherwise returns false.
-	virtual bool contains(_Key key)
+	virtual bool contains(_Key key) const
 	{
 		return this->_map.find(key) != this->_map.end();
 	}

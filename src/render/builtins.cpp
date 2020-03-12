@@ -28,6 +28,15 @@ __RENDER_BEGIN__
 collections::Dict<std::string, Filter> DEFAULT_FILTERS(
 	std::map<std::string, Filter>{
 
+		// TODO: temporary filter for testing
+		{"append_sym", [](const std::shared_ptr<core::object::Object>& obj, const KwArgs& kwargs) -> std::shared_ptr<core::object::Object>{
+		//	*(obj->__cast__<core::types::Value<std::string>>()) += kwargs.get("sym")->__str__();
+
+			std::string sym = kwargs.get("sym")->__str__();
+			return std::shared_ptr<core::object::Object>(new core::types::Value<std::string>(
+				*(obj->__cast__<core::types::Value<std::string>>()) + sym
+			));
+		}}
 	},
 	true
 );

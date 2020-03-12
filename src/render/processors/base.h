@@ -27,6 +27,7 @@
 // C++ libraries.
 #include <string>
 #include <vector>
+#include <memory>
 
 // Module definitions.
 #include "../_def_.h"
@@ -79,7 +80,9 @@ public:
 		bool is_constant
 	);
 
-	core::object::Object* resolve(IContext* ctx);
+	std::shared_ptr<core::object::Object> resolve(
+		const std::shared_ptr<IContext>& ctx
+	);
 };
 
 __RENDER_INTERNAL_END__

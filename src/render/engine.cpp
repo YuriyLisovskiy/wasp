@@ -137,7 +137,7 @@ ITemplate* Engine::get_template(const std::string& template_name)
 }
 
 std::string Engine::render_to_string(
-	const std::string& template_name, IContext* context
+	const std::string& template_name, const std::shared_ptr<IContext>& context
 )
 {
 	auto t = this->get_template(template_name);

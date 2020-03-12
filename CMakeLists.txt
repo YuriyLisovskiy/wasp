@@ -102,6 +102,7 @@ target_link_libraries(${PACKAGE_HTTP_UNIT_TESTS} gtest gtest_main rt pthread ${H
 
 # Render package tests setup.
 file(GLOB RENDER_TEST_SRC
+	"tests/unittests/render_tests/*/*.h"
 	"tests/unittests/render_tests/*.h"
 )
 add_executable(${PACKAGE_RENDER_UNIT_TESTS} ${LIB_SRC} ${RENDER_TEST_SRC} "tests/unittests/render_tests/main.cpp")

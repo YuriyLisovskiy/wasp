@@ -37,6 +37,9 @@
 
 // Wasp libraries.
 #include "./base.h"
+#include "./builtins.h"
+#include "./processors/lexer.h"
+#include "./processors/filter_expr.h"
 
 
 __RENDER_BEGIN__
@@ -45,12 +48,15 @@ class Template : public ITemplate
 {
 protected:
 	std::string _template_code;
+	BaseEngine* _engine;
 
 public:
 	Template(const std::string& code, BaseEngine* engine);
 
+	void compile() override;
+
 	/// Renders template code using given context.
-	std::string render(IContext* context) override;
+	std::string render(const std::shared_ptr<IContext>& context) override;
 };
 
 __RENDER_END__

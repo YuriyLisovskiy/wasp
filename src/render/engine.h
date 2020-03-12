@@ -26,6 +26,7 @@
 // C++ libraries.
 #include <string>
 #include <vector>
+#include <memory>
 
 // Module definitions.
 #include "./_def_.h"
@@ -88,7 +89,7 @@ public:
 
 	/// Render the template specified by template_name with the given context.
 	std::string render_to_string(
-		const std::string& template_name,IContext* context = nullptr
+		const std::string& template_name, const std::shared_ptr<IContext>& context = nullptr
 	) override;
 
 	/// Returns current backend.

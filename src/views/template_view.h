@@ -26,6 +26,7 @@
 
 // C++ libraries.
 #include <string>
+#include <memory>
 
 // Module definitions.
 #include "./_def_.h"
@@ -52,20 +53,18 @@ protected:
 	std::string _template_name;
 	std::string _content_type;
 	render::backends::IBackend* _backend;
-	bool _auto_delete_context;
 
 public:
 	explicit TemplateResponseMixin(
-		render::backends::IBackend* backend,
-		bool auto_delete_context
+		render::backends::IBackend* backend
 	);
 
 	/// Returns a response with a template rendered with
 	/// the given context.
 	virtual render::TemplateResponse* render(
 		http::HttpRequest* request,
+		const std::shared_ptr<render::IContext>& context = nullptr,
 		const std::string& template_name = "",
-		render::IContext* context = nullptr,
 		unsigned short int status = 200,
 		const std::string& content_type = "",
 		const std::string& charset = "utf-8"
@@ -85,7 +84,7 @@ public:
 
 	/// Used in default get() method, can be overridden
 	/// in derived classes.
-	virtual render::IContext* get_context(
+	virtual std::shared_ptr<render::IContext> get_context(
 		http::HttpRequest* request, Args* args
 	);
 
@@ -97,7 +96,6 @@ protected:
 	explicit TemplateView(
 		const std::vector<std::string>& allowed_methods,
 		conf::Settings* settings,
-		bool auto_delete_context = true,
 		const std::string& template_name = "",
 		const std::string& content_type = ""
 	);
