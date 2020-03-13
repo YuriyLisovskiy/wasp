@@ -142,7 +142,7 @@ set(TEST_SRC
 	${VIEWS_TEST_SRC}
 )
 add_executable(${PACKAGE_MAIN_UNIT_TESTS} ${LIB_SRC} ${TEST_SRC} "tests/unittests/main.cpp")
-target_link_libraries(${PACKAGE_MAIN_UNIT_TESTS} gtest gtest_main rt pthread ${TEST_SRC})
+target_link_libraries(${PACKAGE_MAIN_UNIT_TESTS} gtest gtest_main rt pthread -std=c++1z ${TEST_SRC})
 
 
 # Setup example program.

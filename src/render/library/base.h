@@ -16,10 +16,10 @@
  */
 
 /**
- * render/builtins.h
+ * render/library/base.h
  *
  * Purpose:
- * TODO: write render/builtins.h docs
+ * TODO:
  */
 
 #pragma once
@@ -32,12 +32,18 @@
 #include "./_def_.h"
 
 // Wasp libraries.
-#include "../collections/dict.h"
-#include "../core/object/object.h"
-#include "../core/types/value.h"
+#include "../internal/node_list.h"
+#include "../../collections/dict.h"
+#include "../../core/object/object.h"
+#include "../../core/types/value.h"
 
 
-__RENDER_BEGIN__
+__RENDER_INTERNAL_BEGIN__
+struct parser;
+__RENDER_INTERNAL_END__
+
+
+__LIB_BEGIN__
 
 typedef collections::Dict<std::string, std::shared_ptr<core::object::Object>> KwArgs;
 
@@ -45,8 +51,11 @@ typedef std::function<std::shared_ptr<core::object::Object>(
 	const std::shared_ptr<core::object::Object>&, const KwArgs&
 )> Filter;
 
+typedef std::function<std::shared_ptr<internal::node>(
+	internal::parser*, internal::token_t& token
+)> Tag;
+
 typedef collections::Dict<std::string, Filter> Filters;
+typedef collections::Dict<std::string, Tag> Tags;
 
-extern Filters DEFAULT_FILTERS;
-
-__RENDER_END__
+__LIB_END__

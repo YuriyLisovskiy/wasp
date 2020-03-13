@@ -36,7 +36,7 @@
 // Wasp libraries.
 #include "./backends/base.h"
 #include "../core/exceptions.h"
-#include "./processors/token.h"
+#include "./internal/token.h"
 
 
 __RENDER_BEGIN__
@@ -89,12 +89,12 @@ protected:
 public:
 	explicit TemplateSyntaxError(
 		const char* message,
-		internal::token_t& token,
+		const internal::token_t& token,
 		int line = 0, const char* function = "", const char* file = ""
 	);
 	explicit TemplateSyntaxError(
 		const std::string& message,
-		internal::token_t& token,
+		const internal::token_t& token,
 		int line = 0, const char* function = "", const char* file = ""
 	);
 };

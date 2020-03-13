@@ -28,6 +28,7 @@ __RENDER_INTERNAL_BEGIN__
 node::node()
 {
 	this->must_be_first = false;
+	this->is_text_node = false;
 }
 
 std::string node::render(const std::shared_ptr<IContext>& ctx)
@@ -38,9 +39,10 @@ std::string node::render(const std::shared_ptr<IContext>& ctx)
 /// Struct text_node
 text_node::text_node() : node()
 {
+	this->is_text_node = true;
 }
 
-text_node::text_node(const std::string& s) : node()
+text_node::text_node(const std::string& s) : text_node()
 {
 	this->text = s;
 }
@@ -67,18 +69,9 @@ std::string variable_node::render(const std::shared_ptr<IContext>& ctx)
 node_list::node_list()
 {
 	this->contains_non_text = false;
-	this->auto_clean = true;
 }
 
-node_list::~node_list()
-{
-	for (auto node : this->nodes)
-	{
-		delete node;
-	}
-}
-
-void node_list::append(node* node)
+void node_list::append(const std::shared_ptr<node>& node)
 {
 	this->nodes.push_back(node);
 }
@@ -86,7 +79,7 @@ void node_list::append(node* node)
 std::string node_list::render(const std::shared_ptr<IContext>& ctx)
 {
 	std::string result;
-	for (auto node : this->nodes)
+	for (const auto& node : this->nodes)
 	{
 		result += node->render(ctx);
 	}

@@ -15,61 +15,62 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * render/processors/parser.h
- *
- * Purpose:
- * TODO: write docs for render/processors/parser.h
- */
-
 #pragma once
 
 // C++ libraries.
+#include <string>
 #include <vector>
-#include <stack>
-#include <algorithm>
+#include <memory>
 
 // Module definitions.
 #include "../_def_.h"
 
 // Wasp libraries.
-#include "./lexer.h"
 #include "./token.h"
-#include "./node_list.h"
 #include "./filter_expr.h"
-#include "../builtins.h"
-#include "../exceptions.h"
+#include "../base.h"
 
 
 __RENDER_INTERNAL_BEGIN__
 
-struct parser
+struct node
 {
-	std::vector<token_t> tokens;
-	Filters builtins;
-	std::stack<std::pair<std::string, token_t>> command_stack;
+	bool must_be_first;
+	token_t token;
 
-	parser(std::vector<token_t>& tokens, Filters& builtins);
+	bool is_text_node;
 
-	node_list* parse(
-		const std::vector<std::string>& parse_until = {}
-	);
-	void skip_past(const std::string& end_tag);
-	token_t next_token();
-	void prepend_token(token_t& t);
-	void del_first_token();
-	FilterExpression compile_filter(token_t& t);
+	node();
+	virtual std::string render(const std::shared_ptr<IContext>& ctx);
+};
 
-	static void throw_error(
-		std::string& e,
-		token_t& t,
-		int line = 0,
-		const char* function = "",
-		const char* file = ""
+struct text_node : public node
+{
+	std::string text;
+
+	text_node();
+	explicit text_node(const std::string& s);
+	std::string render(const std::shared_ptr<IContext>& ctx) override;
+};
+
+struct variable_node : public node
+{
+	FilterExpression filter_expr;
+
+	explicit variable_node(
+		const FilterExpression& filter_expr
 	);
-	void unclosed_block_tag(
-		const std::vector<std::string>& parse_until
-	);
+	std::string render(const std::shared_ptr<IContext>& ctx) override;
+};
+
+struct node_list
+{
+	bool contains_non_text;
+	std::vector<std::shared_ptr<node>> nodes;
+
+	node_list();
+	void append(const std::shared_ptr<node>& node);
+	std::string render(const std::shared_ptr<IContext>& ctx);
 };
 
 __RENDER_INTERNAL_END__

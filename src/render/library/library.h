@@ -16,46 +16,23 @@
  */
 
 /**
- * render/template.h
+ * render/library/library.h
  *
  * Purpose:
- * 	Renders html template with C++.
- *
- * 	This class is a part of Wasp default render engine and is
- * 	main implementation of rendering process, for custom renderer,
- * 	please, inherit from ITemplate interface and implement
- * 	required methods.
+ * TODO:
  */
 
 #pragma once
 
-// C++ libraries.
-#include <string>
-
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
-#include "./base.h"
-#include "./internal/lexer.h"
-#include "./internal/filter_expr.h"
 
+__LIB_BEGIN__
 
-__RENDER_BEGIN__
-
-class Template : public ITemplate
+class Library
 {
-protected:
-	std::string _template_code;
-	BaseEngine* _engine;
-
-public:
-	Template(const std::string& code, BaseEngine* engine);
-
-	void compile() override;
-
-	/// Renders template code using given context.
-	std::string render(const std::shared_ptr<IContext>& context) override;
+	// TODO: implement library
 };
 
-__RENDER_END__
+__LIB_END__

@@ -31,7 +31,7 @@ Engine::Engine(
 	bool debug,
 	bool auto_escape,
 	const std::vector<ILoader*>& loaders,
-	const collections::Dict<std::string, Filter>& custom_filters,
+	const std::vector<std::shared_ptr<render::lib::ILibrary>>& libs,
 	core::ILogger* logger
 )
 {
@@ -59,33 +59,7 @@ Engine::Engine(
 		}
 	}
 
-	for (auto filter = custom_filters.cbegin(); filter != custom_filters.cend(); filter++)
-	{
-		if (core::str::starts_with(filter->first, "std::"))
-		{
-			logger->warning(R"(An attempt to extend "std" namespace with ")" + filter->first + "\" filter");
-			break;
-		}
-
-		if (core::str::starts_with(filter->first, "wasp::"))
-		{
-			logger->warning(R"(An attempt to extend "wasp" namespace with ")" + filter->first + "\" filter");
-			break;
-		}
-	}
-
-	this->_filters = DEFAULT_FILTERS;
-	for (auto filter = custom_filters.cbegin(); filter != custom_filters.cend(); filter++)
-	{
-		if (this->_filters.contains(filter->first))
-		{
-			logger->warning("Unable to modify default filters with \"" + filter->first + "\" filter");
-		}
-		else
-		{
-			this->_filters.set(filter->first, filter->second);
-		}
-	}
+	this->_libs = libs;
 }
 
 Engine::~Engine()

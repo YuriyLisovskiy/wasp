@@ -23,6 +23,9 @@
 
 #pragma once
 
+// C++ libraries.
+#include <memory>
+
 // Module definitions.
 #include "../_def_.h"
 
@@ -32,6 +35,7 @@
 #include "../../collections/dict.h"
 #include "../../core/logger.h"
 #include "../../core/exceptions.h"
+#include "../library/interfaces.h"
 
 
 __BACKENDS_BEGIN__
@@ -47,7 +51,7 @@ public:
 		bool debug = false;
 		core::ILogger* logger = core::Logger::get_instance({});
 		std::vector<ILoader*> loaders;
-		collections::Dict<std::string, Filter> filters;
+		std::vector<std::shared_ptr<render::lib::ILibrary>> libraries;
 		bool auto_escape = true;
 
 		~Options()

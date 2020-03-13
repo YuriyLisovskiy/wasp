@@ -168,4 +168,8 @@ extern std::string replace(
 	const std::string& new_sub
 );
 
+extern std::string make_text_list(
+	const std::vector<std::string>& list, const std::string& last
+);
+
 __STR_END__

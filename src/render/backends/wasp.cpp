@@ -50,7 +50,7 @@ WaspBackend::WaspBackend(
 		this->_opts->debug,
 		this->_opts->auto_escape,
 		this->_opts->loaders,
-		this->_opts->filters,
+		this->_opts->libraries,
 		this->_opts->logger
 	);
 

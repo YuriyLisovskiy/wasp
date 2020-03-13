@@ -33,15 +33,14 @@
 
 // Wasp libraries.
 #include "./base.h"
-#include "./builtins.h"
 #include "./loaders.h"
 #include "./template.h"
-#include "./builtins.h"
 #include "./exceptions.h"
 #include "../core/logger.h"
 #include "../core/string/str.h"
 #include "../core/path.h"
 #include "../collections/dict.h"
+#include "../render/library/interfaces.h"
 
 
 __RENDER_BEGIN__
@@ -57,7 +56,7 @@ protected:
 	bool _auto_escape;
 	std::vector<ILoader*> _loaders;
 	bool _use_default_loaders;
-	collections::Dict<std::string, Filter> _filters;
+	std::vector<std::shared_ptr<render::lib::ILibrary>> _libs;
 	backends::BaseBackend* _backend;
 
 public:
@@ -68,7 +67,7 @@ public:
 		bool debug = false,
 		bool auto_escape = true,
 		const std::vector<ILoader*>& loaders = {},
-		const collections::Dict<std::string, Filter>& custom_filters = {},
+		const std::vector<std::shared_ptr<render::lib::ILibrary>>& libs = {},
 		core::ILogger* logger = nullptr
 	);
 

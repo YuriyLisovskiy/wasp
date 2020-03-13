@@ -21,8 +21,8 @@
 #include <gtest/gtest.h>
 
 #include "../../_def_.h"
-#include "../../../../src/render/processors/base.h"
-#include "../../../../src/render/processors/filter_expr.h"
+#include "../../../../src/render/internal/base.h"
+#include "../../../../src/render/internal/filter_expr.h"
 
 
 __UNIT_TESTS_BEGIN__

@@ -299,4 +299,21 @@ std::string replace(
 	return copy;
 }
 
+std::string make_text_list(
+	const std::vector<std::string>& list, const std::string& last
+)
+{
+	if (list.empty())
+	{
+		return "";
+	}
+
+	if (list.size() == 1)
+	{
+		return list[0];
+	}
+
+	return join(list.begin(), list.end() - 1, ", ") + " " + last + " " + *list.end();
+}
+
 __STR_END__

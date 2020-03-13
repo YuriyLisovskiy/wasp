@@ -16,35 +16,17 @@
  */
 
 /**
- * An implementation of render/template.h
+ * render/library/_def_.h
+ *
+ * Purpose:
+ * render/library module's definitions.
  */
 
-#include "./template.h"
+#pragma once
+
+#include "../_def_.h"
 
 
-__RENDER_BEGIN__
-
-Template::Template(const std::string& code, BaseEngine* engine)
-{
-	// TODO: implement Template(const std::string& code, BaseEngine* engine)
-
-	this->_engine = engine;
-	this->_template_code = code;
-}
-
-void Template::compile()
-{
-	// TODO: implement void Template::compile()
-}
-
-std::string Template::render(const std::shared_ptr<IContext>& context)
-{
-	// TODO: implement Template::render(BaseContext* context)
-
-	auto lexer = internal::lexer(this->_template_code);
-	lexer.tokenize();
-
-	return this->_template_code;
-}
-
-__RENDER_END__
+/// wasp::render::lib
+#define __LIB_BEGIN__ __RENDER_BEGIN__ namespace lib {
+#define __LIB_END__ } __RENDER_END__

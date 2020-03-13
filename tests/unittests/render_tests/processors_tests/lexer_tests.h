@@ -21,7 +21,7 @@
 #include <gtest/gtest.h>
 
 #include "../../_def_.h"
-#include "../../../../src/render/processors/lexer.h"
+#include "../../../../src/render/internal/lexer.h"
 
 
 __UNIT_TESTS_BEGIN__

@@ -16,29 +16,32 @@
  */
 
 /**
- * An implementation of render/builtins.h
+ * render/library/interfaces.h
+ *
+ * Purpose: contains an interface for library
  */
 
-#include "./builtins.h"
+#pragma once
+
+// C++ libraries.
+#include <string>
+
+// Module definitions.
+#include "./_def_.h"
+
+// Wasp libraries.
+#include "./base.h"
 
 
-__RENDER_BEGIN__
+__LIB_BEGIN__
 
-// TODO: implement default filters.
-collections::Dict<std::string, Filter> DEFAULT_FILTERS(
-	std::map<std::string, Filter>{
+class ILibrary
+{
+public:
+	virtual ~ILibrary() = default;
+	virtual Filters get_filters() = 0;
+	virtual Tags get_tags() = 0;
+	virtual std::string name() = 0;
+};
 
-		// TODO: temporary filter for testing
-		{"append_sym", [](const std::shared_ptr<core::object::Object>& obj, const KwArgs& kwargs) -> std::shared_ptr<core::object::Object>{
-		//	*(obj->__cast__<core::types::Value<std::string>>()) += kwargs.get("sym")->__str__();
-
-			std::string sym = kwargs.get("sym")->__str__();
-			return std::shared_ptr<core::object::Object>(new core::types::Value<std::string>(
-				*(obj->__cast__<core::types::Value<std::string>>()) + sym
-			));
-		}}
-	},
-	true
-);
-
-__RENDER_END__
+__LIB_END__

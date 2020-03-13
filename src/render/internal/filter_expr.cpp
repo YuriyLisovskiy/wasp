@@ -21,6 +21,8 @@
 
 #include "./filter_expr.h"
 
+#include <memory>
+
 
 __RENDER_INTERNAL_BEGIN__
 
@@ -378,15 +380,15 @@ void expression_parser::throw_unexpected_symbol(char c)
 }
 
 
-FilterExpression::FilterExpression(token_t& token, Filters& builtins)
+FilterExpression::FilterExpression(token_t& token, _Filters& filters)
 {
 	this->_token = std::move(token);
 	expression_parser p{std::move(this->_token)};
 	p.parse();
 
-	this->_var = std::shared_ptr<Variable>(new Variable(
+	this->_var = std::make_shared<Variable>(
 		p.expression.var_name, p.expression.var_attrs, p.expression.is_const
-	));
+	);
 	for (const auto& filter : p.expression.filters)
 	{
 		std::vector<std::pair<std::string, std::shared_ptr<Variable>>> args;
@@ -395,13 +397,13 @@ FilterExpression::FilterExpression(token_t& token, Filters& builtins)
 			args.emplace_back(arg.name, new Variable(arg.value, {}, arg.is_const));
 		}
 
-		if (!builtins.contains(filter.name))
+		if (!filters.contains(filter.name))
 		{
 			throw FilterDoesNotExist("Filter with name '" + filter.name + "' does not exist");
 		}
 
 		this->_filters.emplace_back(
-			[args, builtins, filter](
+			[args, filters, filter](
 				std::shared_ptr<core::object::Object>& obj,
 				const std::shared_ptr<IContext>& ctx
 			) mutable {
@@ -411,7 +413,7 @@ FilterExpression::FilterExpression(token_t& token, Filters& builtins)
 					params[arg.first] = arg.second->resolve(ctx);
 				}
 
-				obj = builtins.get(filter.name)(
+				obj = filters.get(filter.name)(
 					obj, collections::Dict(params, false)
 				);
 			}

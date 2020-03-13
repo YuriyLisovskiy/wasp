@@ -38,7 +38,6 @@
 #include "./base.h"
 #include "./token.h"
 #include "../base.h"
-#include "../builtins.h"
 #include "../exceptions.h"
 #include "../../core/object/object.h"
 #include "../../collections/dict.h"
@@ -104,6 +103,11 @@ struct expression_parser
 	static bool is_var_char_begin(char ch);
 };
 
+typedef collections::Dict<std::string, std::function<std::shared_ptr<core::object::Object>(
+	const std::shared_ptr<core::object::Object>&,
+	const collections::Dict<std::string, std::shared_ptr<core::object::Object>>&
+)>> _Filters;
+
 /// Parse a variable token and its
 /// optional filters (all as a single string).
 class FilterExpression
@@ -118,7 +122,7 @@ private:
 public:
 	FilterExpression() = default;
 
-	explicit FilterExpression(token_t& token, Filters& builtins);
+	explicit FilterExpression(token_t& token, _Filters& filters);
 	std::string resolve(const std::shared_ptr<IContext>& ctx);
 };
 
