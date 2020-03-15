@@ -82,7 +82,7 @@ struct parser
 	);
 	static void invalid_block_tag(
 		token_t& token,
-		const std::string command,
+		const std::string& command,
 		const std::vector<std::string>& parse_until
 	);
 };

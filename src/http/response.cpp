@@ -32,7 +32,7 @@ HttpResponseBase::HttpResponseBase(
 )
 {
 	this->_streaming = false;
-	this->_headers = collections::Dict<std::string, std::string>(true);
+	this->_headers = collections::Dict<std::string, std::string>();
 	this->_closed = false;
 
 	if (status != 0)
@@ -240,19 +240,19 @@ std::string HttpResponseBase::serialize_headers()
 		return _p.first + ": " + _p.second;
 	};
 	std::string result;
-	for (auto it = this->_headers.cbegin(); it != this->_headers.cend(); it++)
+	for (auto it = this->_headers.begin(); it != this->_headers.end(); it++)
 	{
 		result.append(expr(*it));
-		if (std::next(it) != this->_headers.cend())
+		if (std::next(it) != this->_headers.end())
 		{
 			result.append("\r\n");
 		}
 	}
 
-	for (auto it = this->_cookies.cbegin(); it != this->_cookies.cend(); it++)
+	for (auto it = this->_cookies.begin(); it != this->_cookies.end(); it++)
 	{
 		result.append(it->second.to_string());
-		if (std::next(it) != this->_cookies.cend())
+		if (std::next(it) != this->_cookies.end())
 		{
 			result.append("\r\n");
 		}

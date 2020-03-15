@@ -35,7 +35,7 @@
 #include "../../collections/dict.h"
 #include "../../core/logger.h"
 #include "../../core/exceptions.h"
-#include "../library/interfaces.h"
+#include "../library/base.h"
 
 
 __BACKENDS_BEGIN__

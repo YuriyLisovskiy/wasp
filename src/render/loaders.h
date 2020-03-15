@@ -31,6 +31,7 @@
 
 // Wasp libraries.
 #include "./base.h"
+#include "./base_engine.h"
 #include "./exceptions.h"
 #include "./template.h"
 #include "../core/path.h"
@@ -45,7 +46,7 @@ public:
 	ITemplate* get_template(
 		const std::string& template_name,
 		const std::vector<std::string>& dirs,
-		BaseEngine* engine
+		IEngine* engine
 	) override;
 };
 

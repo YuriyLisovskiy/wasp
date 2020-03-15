@@ -37,14 +37,22 @@ void Template::compile()
 	// TODO: implement void Template::compile()
 }
 
-std::string Template::render(const std::shared_ptr<IContext>& context)
+std::string Template::render(const std::shared_ptr<IContext>& ctx)
 {
 	// TODO: implement Template::render(BaseContext* context)
 
 	auto lexer = internal::lexer(this->_template_code);
 	lexer.tokenize();
 
-	return this->_template_code;
+	auto parser = internal::parser(
+		lexer.tokens,
+		this->_engine->get_filters(),
+		this->_engine->get_tags()
+	);
+	parser.parse();
+	return parser.nodes_list->render(ctx);
+
+//	return this->_template_code;
 }
 
 __RENDER_END__

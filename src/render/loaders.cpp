@@ -27,7 +27,7 @@ __RENDER_BEGIN__
 ITemplate* Loader::get_template(
 	const std::string& template_name,
 	const std::vector<std::string>& dirs,
-	BaseEngine* engine
+	IEngine* engine
 )
 {
 	for (const auto& dir : dirs)
@@ -38,7 +38,7 @@ ITemplate* Loader::get_template(
 		file.open();
 		if (file.is_open())
 		{
-			auto* _template = new Template(file.read_str(), engine);
+			auto* _template = new Template(file.read_str(), (BaseEngine*)engine);
 			file.close();
 			return _template;
 		}

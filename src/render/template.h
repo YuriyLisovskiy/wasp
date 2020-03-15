@@ -37,7 +37,9 @@
 
 // Wasp libraries.
 #include "./base.h"
+#include "./base_engine.h"
 #include "./internal/lexer.h"
+#include "./internal/parser.h"
 #include "./internal/filter_expr.h"
 
 
@@ -55,7 +57,7 @@ public:
 	void compile() override;
 
 	/// Renders template code using given context.
-	std::string render(const std::shared_ptr<IContext>& context) override;
+	std::string render(const std::shared_ptr<IContext>& ctx) override;
 };
 
 __RENDER_END__

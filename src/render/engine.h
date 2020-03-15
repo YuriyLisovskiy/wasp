@@ -33,6 +33,7 @@
 
 // Wasp libraries.
 #include "./base.h"
+#include "./base_engine.h"
 #include "./loaders.h"
 #include "./template.h"
 #include "./exceptions.h"
@@ -40,7 +41,7 @@
 #include "../core/string/str.h"
 #include "../core/path.h"
 #include "../collections/dict.h"
-#include "../render/library/interfaces.h"
+#include "./library/base.h"
 
 
 __RENDER_BEGIN__
@@ -56,8 +57,16 @@ protected:
 	bool _auto_escape;
 	std::vector<ILoader*> _loaders;
 	bool _use_default_loaders;
-	std::vector<std::shared_ptr<render::lib::ILibrary>> _libs;
 	backends::BaseBackend* _backend;
+
+	core::ILogger* _logger;
+
+	lib::Filters _filters;
+	lib::Tags _tags;
+
+	void _load_libs(
+		const std::vector<std::shared_ptr<render::lib::ILibrary>>& libs
+	);
 
 public:
 	explicit Engine(
@@ -93,6 +102,9 @@ public:
 
 	/// Returns current backend.
 	backends::BaseBackend* backend();
+
+	lib::Filters& get_filters() override;
+	lib::Tags& get_tags() override;
 };
 
 __RENDER_END__

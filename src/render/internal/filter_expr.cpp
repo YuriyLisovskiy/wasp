@@ -33,6 +33,7 @@ void expression_parser::parse()
 	char const_str_quote = '"';
 	this->symbol_pos = 0;
 	bool param_is_constant = false;
+	bool not_appended_filter = false;
 	this->st = p_state::s_begin;
 	auto it = this->token.content.cbegin();
 	while (it != this->token.content.cend())
@@ -155,6 +156,7 @@ void expression_parser::parse()
 				if (is_var_char_begin(this->ch))
 				{
 					last_filter_name = this->ch;
+					not_appended_filter = true;
 					this->st = p_state::s_filter_name;
 				}
 				else
@@ -167,20 +169,29 @@ void expression_parser::parse()
 				{
 					last_filter_name += this->ch;
 				}
+				else if (this->ch == FILTER_SEP)
+				{
+					not_appended_filter = false;
+					this->expression.filters.push_back({last_filter_name, args});
+					this->st = p_state::s_filter_name_begin;
+				}
+				else if (this->ch == '(')
+				{
+					not_appended_filter = false;
+					this->st = p_state::s_param_name_begin;
+				}
 				else
 				{
-					if (this->ch == '(')
-					{
-						this->st = p_state::s_param_name_begin;
-					}
-					else
-					{
-						this->throw_unexpected_symbol(this->ch);
-					}
+					this->throw_unexpected_symbol(this->ch);
 				}
 				break;
 			case p_state::s_param_name_begin:
-				if (is_var_char_begin(this->ch))
+				if (this->ch == ')')
+				{
+					this->expression.filters.push_back({last_filter_name, args});
+					this->st = p_state::s_filter_sep;
+				}
+				else if (is_var_char_begin(this->ch))
 				{
 					last_param_name.clear();
 					last_param_value.clear();
@@ -290,6 +301,11 @@ void expression_parser::parse()
 				break;
 		}
 	}
+
+	if (not_appended_filter)
+	{
+		this->expression.filters.push_back({last_filter_name, args});
+	}
 }
 
 bool expression_parser::parse_number_and_ret(
@@ -305,17 +321,20 @@ bool expression_parser::parse_number_and_ret(
 		}
 	}
 
-	this->parse_digits(it, value);
-	bool is_double = *it == '.';
-	if (is_double)
+	if (std::isdigit(*it))
 	{
-		value += *it++;
-		if (!std::isdigit(*it))
-		{
-			this->throw_unexpected_symbol(*it);
-		}
-
 		this->parse_digits(it, value);
+		bool is_double = *it == '.';
+		if (is_double)
+		{
+			value += *it++;
+			if (!std::isdigit(*it))
+			{
+				this->throw_unexpected_symbol(*it);
+			}
+
+			this->parse_digits(it, value);
+		}
 	}
 
 	return it == end;
@@ -380,10 +399,10 @@ void expression_parser::throw_unexpected_symbol(char c)
 }
 
 
-FilterExpression::FilterExpression(token_t& token, _Filters& filters)
+FilterExpression::FilterExpression(const token_t& token, const _Filters& filters)
 {
-	this->_token = std::move(token);
-	expression_parser p{std::move(this->_token)};
+	this->_token = token;
+	expression_parser p{this->_token};
 	p.parse();
 
 	this->_var = std::make_shared<Variable>(
@@ -414,7 +433,7 @@ FilterExpression::FilterExpression(token_t& token, _Filters& filters)
 				}
 
 				obj = filters.get(filter.name)(
-					obj, collections::Dict(params, false)
+					obj, collections::Dict(params)
 				);
 			}
 		);

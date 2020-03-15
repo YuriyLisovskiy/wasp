@@ -43,39 +43,16 @@ __COLLECTIONS_BEGIN__
 template <typename _Key, typename _Val>
 class MultiValueDict : public Dict<_Key, std::vector<_Val>>
 {
-protected:
-
-	/// Wrapper for throwing MultiValueDictError exception.
-	void _throw(const std::string& msg, int line, const char* function, const char* file) override
-	{
-		throw core::MultiValueDictError(
-			std::string("unable to ") + msg + std::string(", MultiValueDict instance is immutable"),
-			line, function, file
-		);
-	}
-
 public:
 
-	/// Constructs immutable empty multi-value dictionary.
+	/// Constructs empty multi-value dictionary.
 	MultiValueDict() : Dict<_Key, std::vector<_Val>>()
 	{
 	}
 
-	/// Constructs empty multi-value dictionary with mutability parameter.
-	explicit MultiValueDict(bool is_mutable) : Dict<_Key, std::vector<_Val>>(is_mutable)
-	{
-	}
-
 	/// Constructs MultiValueDict instance from std::map.
-	/// Makes multi-value dictionary immutable by default.
 	explicit MultiValueDict(const std::map<_Key, std::vector<_Val>>& src_map)
-		: Dict<_Key, std::vector<_Val>>(src_map, false)
-	{
-	}
-
-	/// Constructs MultiValueDict instance from std::map with mutability parameter.
-	MultiValueDict(const std::map<_Key, std::vector<_Val>>& srcMap, bool is_mutable)
-		: Dict<_Key, std::vector<_Val>>(srcMap, is_mutable)
+		: Dict<_Key, std::vector<_Val>>(src_map)
 	{
 	}
 
@@ -119,40 +96,25 @@ public:
 	/// @param value: new value to construct std::vector.
 	void set(_Key key, _Val value)
 	{
-		if (!this->_is_mutable)
-		{
-			this->_throw("set new value", _ERROR_DETAILS_);
-		}
-
 		this->_map[key] = std::vector<_Val>{value};
 	}
 
-	/// Sets new vector of values by given key if instance is mutable.
+	/// Sets new vector of values by given key.
 	///
 	/// @param key: new key or existing key.
 	/// @param value: new std::vector.
 	void set(_Key key, std::vector<_Val> value) override
 	{
-		if (!this->_is_mutable)
-		{
-			this->_throw("set new value", _ERROR_DETAILS_);
-		}
-
 		this->_map[key] = value;
 	}
 
-	/// Appends new value by given key if instance is mutable.
+	/// Appends new value by given key.
 	///	If key does not exist, creates new key-value pair.
 	///
 	/// @param key: new key or existing key.
 	/// @param value: new value to append to std::vector.
 	void append(_Key key, _Val val)
 	{
-		if (!this->_is_mutable)
-		{
-			this->_throw("append new value", _ERROR_DETAILS_);
-		}
-
 		if (this->contains(key))
 		{
 			this->_map[key].push_back(val);
@@ -163,18 +125,13 @@ public:
 		}
 	}
 
-	/// Appends new vector of values by given key if instance is mutable.
+	/// Appends new vector of values by given key.
 	///	If key does not exist, creates new key-value pair.
 	///
 	/// @param key: new key or existing key.
 	/// @param value: new std::vector of values to append to std::vector.
 	void append(_Key key, std::vector<_Val> vec)
 	{
-		if (!this->_is_mutable)
-		{
-			this->_throw("append new value", _ERROR_DETAILS_);
-		}
-
 		if (this->contains(key))
 		{
 			for (const auto& item : vec)

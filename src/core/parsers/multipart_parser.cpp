@@ -102,10 +102,10 @@ void multipart_parser::assert_boundary(const std::string& actual, const std::str
 multipart_parser::multipart_parser(const std::string& media_root)
 {
 	this->media_root = str::rtrim(media_root, "/");
-	this->multi_post_value = collections::MultiValueDict<std::string, std::string>(true);
-	this->post_values = collections::Dict<std::string, std::string>(true);
-	this->multi_file_value = collections::MultiValueDict<std::string, UploadedFile>(true);
-	this->file_values = collections::Dict<std::string, UploadedFile>(true);
+	this->multi_post_value = collections::MultiValueDict<std::string, std::string>();
+	this->post_values = collections::Dict<std::string, std::string>();
+	this->multi_file_value = collections::MultiValueDict<std::string, UploadedFile>();
+	this->file_values = collections::Dict<std::string, UploadedFile>();
 }
 
 void multipart_parser::parse(const std::string& content_type, const std::string& body)

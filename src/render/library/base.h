@@ -58,4 +58,17 @@ typedef std::function<std::shared_ptr<internal::node>(
 typedef collections::Dict<std::string, Filter> Filters;
 typedef collections::Dict<std::string, Tag> Tags;
 
+class ILibrary
+{
+public:
+	virtual ~ILibrary() = default;
+	virtual Filters get_filters() = 0;
+	virtual Tags get_tags() = 0;
+	virtual std::string name() = 0;
+};
+
+class Library : public ILibrary, public core::object::Object
+{
+};
+
 __LIB_END__

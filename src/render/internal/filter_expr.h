@@ -122,7 +122,7 @@ private:
 public:
 	FilterExpression() = default;
 
-	explicit FilterExpression(token_t& token, _Filters& filters);
+	explicit FilterExpression(const token_t& token, const _Filters& filters);
 	std::string resolve(const std::shared_ptr<IContext>& ctx);
 };
 

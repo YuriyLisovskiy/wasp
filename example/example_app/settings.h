@@ -21,6 +21,8 @@
 #include "../form_app/app.h"
 #include "../main_app/app.h"
 
+#include "./libs/my_first_lib.h"
+
 
 struct Settings final: public wasp::conf::Settings
 {
@@ -62,8 +64,10 @@ struct Settings final: public wasp::conf::Settings
 				.logger = this->LOGGER,
 				.loaders = {
 					new wasp::render::Loader()
+				},
+				.libraries = {
+					std::make_shared<MyFirstLib>()
 				}
-
 			}
 		);
 

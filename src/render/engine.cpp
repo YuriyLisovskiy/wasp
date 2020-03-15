@@ -35,6 +35,7 @@ Engine::Engine(
 	core::ILogger* logger
 )
 {
+	this->_logger = logger;
 	this->_backend = backend;
 	for (const auto& dir : dirs)
 	{
@@ -59,7 +60,7 @@ Engine::Engine(
 		}
 	}
 
-	this->_libs = libs;
+	this->_load_libs(libs);
 }
 
 Engine::~Engine()
@@ -123,6 +124,58 @@ std::string Engine::render_to_string(
 backends::BaseBackend* Engine::backend()
 {
 	return this->_backend;
+}
+
+lib::Filters& Engine::get_filters()
+{
+	return this->_filters;
+}
+
+lib::Tags& Engine::get_tags()
+{
+	return this->_tags;
+}
+
+void Engine::_load_libs(
+	const std::vector<std::shared_ptr<render::lib::ILibrary>>& libs
+)
+{
+	// TODO: add default libraries first.
+
+	for (const auto& lib : libs)
+	{
+		auto filters = lib->get_filters();
+		for (const auto& filter : filters)
+		{
+			if (this->_filters.contains(filter.first))
+			{
+				this->_logger->warning(
+					"'" + lib->name() + "' contains filter with the same name as the default." +
+					"Filter name: '" + filter.first + "'. It is forbidden and can not be loaded."
+				);
+			}
+			else
+			{
+				this->_filters.set(filter.first, filter.second);
+			}
+		}
+
+		auto tags = lib->get_tags();
+		for (const auto& tag : tags)
+		{
+			if (this->_tags.contains(tag.first))
+			{
+				this->_logger->warning(
+					"'" + lib->name() + "' contains tag with the same name as the default." +
+					"Tag name: '" + tag.first + "'. It is forbidden and can not be loaded."
+				);
+			}
+			else
+			{
+				this->_tags.set(tag.first, tag.second);
+			}
+		}
+	}
 }
 
 __RENDER_END__

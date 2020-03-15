@@ -59,10 +59,10 @@ public:
 };
 
 
-class BaseEngine
+class IEngine
 {
 public:
-	virtual ~BaseEngine() = default;
+	virtual ~IEngine() = default;
 
 	/// Return a pointer to compiled BaseTemplate object for the given template code,
 	/// handling template inheritance recursively.
@@ -86,7 +86,7 @@ public:
 	virtual ITemplate* get_template(
 		const std::string& template_path,
 		const std::vector<std::string>& dirs,
-		BaseEngine* engine
+		IEngine* engine
 	) = 0;
 };
 

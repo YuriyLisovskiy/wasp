@@ -26,8 +26,8 @@ __CORE_INTERNAL_BEGIN__
 
 query_parser::query_parser()
 {
-	this->dict = new collections::Dict<std::string, std::string>(true);
-	this->multi_dict = new collections::MultiValueDict<std::string, std::string>(true);
+	this->dict = new collections::Dict<std::string, std::string>();
+	this->multi_dict = new collections::MultiValueDict<std::string, std::string>();
 }
 
 query_parser::~query_parser()

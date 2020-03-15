@@ -21,22 +21,24 @@
 
 #include "./parser.h"
 
+#include <memory>
+
 
 __RENDER_INTERNAL_BEGIN__
 
 parser::parser(std::vector<token_t>& tokens, lib::Filters& filters, lib::Tags& tags)
 {
 	std::reverse(tokens.begin(), tokens.end());
-	this->tokens = std::move(tokens);
-	this->filters = std::move(filters);
-	this->tags = std::move(tags);
+	this->tokens = tokens;
+	this->filters = filters;
+	this->tags = tags;
 }
 
 void parser::parse(
 	const std::vector<std::string>& parse_until
 )
 {
-	this->nodes_list = std::shared_ptr<node_list>(new node_list());
+	this->nodes_list = std::make_shared<node_list>();
 	while (!this->tokens.empty())
 	{
 		token_t token = this->next_token();
@@ -103,7 +105,7 @@ void parser::parse(
 				// Compile the callback into a node and add it to
 				// the node list.
 				auto compiled_node = compile_func(this, token);
-				this->append_node(this->nodes_list, compiled_node, token);
+				parser::append_node(this->nodes_list, compiled_node, token);
 
 				// Compile success. Remove the token from the command stack.
 				this->command_stack.pop();
@@ -208,7 +210,7 @@ void parser::unclosed_block_tag(
 
 void parser::invalid_block_tag(
 	token_t& token,
-	const std::string command,
+	const std::string& command,
 	const std::vector<std::string>& parse_until
 )
 {

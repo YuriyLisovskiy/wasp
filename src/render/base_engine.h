@@ -15,15 +15,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * An implementation of render/library/library.h
- */
+#pragma once
 
-#include "./library.h"
+// Module definitions.
+#include "./_def_.h"
+
+// Wasp libraries.
+#include "../render/library/base.h"
+#include "./library/base.h"
 
 
-__LIB_BEGIN__
+__RENDER_BEGIN__
 
+class BaseEngine : public IEngine
+{
+public:
+	~BaseEngine() override = default;
+	virtual lib::Filters& get_filters() = 0;
+	virtual lib::Tags& get_tags() = 0;
+};
 
-
-__LIB_END__
+__RENDER_END__
