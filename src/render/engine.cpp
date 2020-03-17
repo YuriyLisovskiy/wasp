@@ -30,7 +30,7 @@ Engine::Engine(
 	bool use_app_dirs,
 	bool debug,
 	bool auto_escape,
-	const std::vector<ILoader*>& loaders,
+	const std::vector<std::shared_ptr<ILoader>>& loaders,
 	const std::vector<std::shared_ptr<render::lib::ILibrary>>& libs,
 	core::ILogger* logger
 )
@@ -45,33 +45,18 @@ Engine::Engine(
 	this->_use_app_dirs = use_app_dirs;
 	this->_debug = debug;
 	this->_auto_escape = auto_escape;
-	this->_use_default_loaders = loaders.empty();
-	if (this->_use_default_loaders)
+	if (loaders.empty())
 	{
 		this->_loaders = {
-			new Loader()
+			std::make_shared<Loader>()
 		};
 	}
 	else
 	{
-		for (auto loader : loaders)
-		{
-			this->_loaders.push_back(loader);
-		}
+		this->_loaders = loaders;
 	}
 
 	this->_load_libs(libs);
-}
-
-Engine::~Engine()
-{
-	if (this->_use_default_loaders)
-	{
-		for (auto loader : this->_loaders)
-		{
-			delete loader;
-		}
-	}
 }
 
 ITemplate* Engine::find_template(

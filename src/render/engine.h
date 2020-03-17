@@ -55,8 +55,7 @@ protected:
 	bool _use_app_dirs;
 	bool _debug;
 	bool _auto_escape;
-	std::vector<ILoader*> _loaders;
-	bool _use_default_loaders;
+	std::vector<std::shared_ptr<ILoader>> _loaders;
 	backends::BaseBackend* _backend;
 
 	core::ILogger* _logger;
@@ -75,12 +74,10 @@ public:
 		bool use_app_dirs = false,
 		bool debug = false,
 		bool auto_escape = true,
-		const std::vector<ILoader*>& loaders = {},
+		const std::vector<std::shared_ptr<ILoader>>& loaders = {},
 		const std::vector<std::shared_ptr<render::lib::ILibrary>>& libs = {},
 		core::ILogger* logger = nullptr
 	);
-
-	~Engine() override;
 
 	ITemplate* find_template(
 		const std::string& name,

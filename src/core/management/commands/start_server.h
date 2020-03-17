@@ -44,7 +44,7 @@
 
 __CORE_COMMANDS_BEGIN__
 
-class RunserverCommand final: public AppCommand
+class StartServerCommand final: public AppCommand
 {
 private:
 	flags::StringFlag* _host_port_flag;
@@ -98,8 +98,8 @@ protected:
 	);
 
 public:
-	explicit RunserverCommand(apps::IAppConfig* config, conf::Settings* settings);
-	~RunserverCommand() final;
+	explicit StartServerCommand(apps::IAppConfig* config, conf::Settings* settings);
+	~StartServerCommand() final;
 };
 
 __CORE_COMMANDS_END__

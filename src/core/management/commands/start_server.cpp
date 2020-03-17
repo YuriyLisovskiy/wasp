@@ -19,13 +19,13 @@
  * An implementation of core/managements/commands/runserver.h
  */
 
-#include "./runserver.h"
+#include "./start_server.h"
 
 
 __CORE_COMMANDS_BEGIN__
 
-RunserverCommand::RunserverCommand(apps::IAppConfig* config, conf::Settings* settings)
-	: AppCommand(config, settings, "runserver", "Starts Wasp web server")
+StartServerCommand::StartServerCommand(apps::IAppConfig* config, conf::Settings* settings)
+	: AppCommand(config, settings, "start-server", "Starts Wasp web server")
 {
 	this->_host_port_flag = nullptr;
 	this->_threads_flag = nullptr;
@@ -49,7 +49,7 @@ RunserverCommand::RunserverCommand(apps::IAppConfig* config, conf::Settings* set
 	);
 }
 
-RunserverCommand::~RunserverCommand()
+StartServerCommand::~StartServerCommand()
 {
 	delete this->_ipv4_ipv6_port_regex;
 	delete this->_ipv4_regex;
@@ -57,7 +57,7 @@ RunserverCommand::~RunserverCommand()
 	delete this->_port_regex;
 }
 
-void RunserverCommand::add_flags()
+void StartServerCommand::add_flags()
 {
 	this->_host_port_flag = this->_flag_set->make_string(
 		"host-port", "", "Server host and port formatted as ip_addr:port"
@@ -76,11 +76,11 @@ void RunserverCommand::add_flags()
 	);
 }
 
-void RunserverCommand::handle()
+void StartServerCommand::handle()
 {
 	if (!this->settings->DEBUG && this->settings->ALLOWED_HOSTS.empty())
 	{
-		throw CommandError("You must set settings.ALLOWED_HOSTS if settings.DEBUG is false.");
+		throw CommandError("You must set ALLOWED_HOSTS if DEBUG is false.");
 	}
 
 	core::net::internal::HttpServer::context ctx{};
@@ -110,7 +110,7 @@ void RunserverCommand::handle()
 }
 
 std::function<void(http::HttpRequest*, const core::net::internal::socket_t&)>
-RunserverCommand::get_handler()
+StartServerCommand::get_handler()
 {
 	// Check if static files can be served
 	// and create necessary urls.
@@ -128,12 +128,12 @@ RunserverCommand::get_handler()
 		http::HttpResponseBase* response = nullptr;
 		try
 		{
-			response = RunserverCommand::process_request_middleware(
+			response = StartServerCommand::process_request_middleware(
 				request, this->settings
 			);
 			if (!response)
 			{
-				response = RunserverCommand::process_urlpatterns(
+				response = StartServerCommand::process_urlpatterns(
 					request, this->settings->ROOT_URLCONF, this->settings
 				);
 				if (!response)
@@ -141,7 +141,7 @@ RunserverCommand::get_handler()
 					response = new http::HttpResponseNotFound("<h2>404 - Not Found</h2>");
 				}
 
-				response = RunserverCommand::process_response_middleware(
+				response = StartServerCommand::process_response_middleware(
 					request, response, this->settings
 				);
 			}
@@ -192,7 +192,7 @@ RunserverCommand::get_handler()
 	return handler;
 }
 
-bool RunserverCommand::static_is_allowed(const std::string& static_url)
+bool StartServerCommand::static_is_allowed(const std::string& static_url)
 {
 	auto parser = core::internal::url_parser();
 	parser.parse(static_url);
@@ -202,7 +202,7 @@ bool RunserverCommand::static_is_allowed(const std::string& static_url)
 	return this->settings->DEBUG && parser.hostname.empty();
 }
 
-void RunserverCommand::build_static_patterns(std::vector<urls::UrlPattern>& patterns)
+void StartServerCommand::build_static_patterns(std::vector<urls::UrlPattern>& patterns)
 {
 	if (!this->settings->STATIC_ROOT.empty() && this->static_is_allowed(this->settings->STATIC_URL))
 	{
@@ -217,7 +217,7 @@ void RunserverCommand::build_static_patterns(std::vector<urls::UrlPattern>& patt
 	}
 }
 
-void RunserverCommand::build_app_patterns(std::vector<urls::UrlPattern>& patterns)
+void StartServerCommand::build_app_patterns(std::vector<urls::UrlPattern>& patterns)
 {
 	if (this->settings->ROOT_APP)
 	{
@@ -226,7 +226,7 @@ void RunserverCommand::build_app_patterns(std::vector<urls::UrlPattern>& pattern
 	}
 }
 
-void RunserverCommand::setup_server_ctx(core::net::internal::HttpServer::context& ctx)
+void StartServerCommand::setup_server_ctx(core::net::internal::HttpServer::context& ctx)
 {
 	// Setup host and port.
 	auto host_port_str = this->_host_port_flag->get();
@@ -297,7 +297,7 @@ void RunserverCommand::setup_server_ctx(core::net::internal::HttpServer::context
 	ctx.handler = this->get_handler();
 }
 
-http::HttpResponseBase* RunserverCommand::process_request_middleware(
+http::HttpResponseBase* StartServerCommand::process_request_middleware(
 	http::HttpRequest* request, conf::Settings* settings
 )
 {
@@ -314,7 +314,7 @@ http::HttpResponseBase* RunserverCommand::process_request_middleware(
 	return response;
 }
 
-http::HttpResponseBase* RunserverCommand::process_urlpatterns(
+http::HttpResponseBase* StartServerCommand::process_urlpatterns(
 	http::HttpRequest* request,
 	std::vector<urls::UrlPattern>& urlpatterns,
 	conf::Settings* settings
@@ -330,7 +330,7 @@ http::HttpResponseBase* RunserverCommand::process_urlpatterns(
 	return response;
 }
 
-http::HttpResponseBase* RunserverCommand::process_response_middleware(
+http::HttpResponseBase* StartServerCommand::process_response_middleware(
 	http::HttpRequest* request,
 	http::HttpResponseBase* response,
 	conf::Settings* settings
@@ -350,7 +350,7 @@ http::HttpResponseBase* RunserverCommand::process_response_middleware(
 	return response;
 }
 
-void RunserverCommand::send_response(
+void StartServerCommand::send_response(
 	http::HttpRequest* request,
 	http::HttpResponseBase* response,
 	const core::net::internal::socket_t& client,
@@ -377,7 +377,7 @@ void RunserverCommand::send_response(
 	);
 }
 
-void RunserverCommand::log_request(
+void StartServerCommand::log_request(
 	const std::string& info,
 	unsigned short status_code,
 	conf::Settings* settings

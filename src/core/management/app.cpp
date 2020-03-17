@@ -32,7 +32,7 @@ CoreManagementAppConfig::CoreManagementAppConfig(wasp::conf::Settings* settings)
 
 void CoreManagementAppConfig::commands()
 {
-	this->command<cmd::RunserverCommand>();
+	this->command<cmd::StartServerCommand>();
 }
 
 __CORE_INTERNAL_END__

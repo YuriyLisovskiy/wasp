@@ -5,6 +5,8 @@
 #pragma once
 
 #include "../../src/conf/settings.h"
+
+#include <memory>
 #include "../../src/core/path.h"
 
 #include "../../src/middleware/common.h"
@@ -14,8 +16,6 @@
 
 #include "../../src/render/backends/wasp.h"
 #include "../../src/render/loaders.h"
-
-#include "../../src/core/management/commands/runserver.h"
 
 #include "../picture_app/app.h"
 #include "../form_app/app.h"
@@ -59,16 +59,19 @@ struct Settings final: public wasp::conf::Settings
 			},
 			true,
 			this->INSTALLED_APPS,
-			new wasp::render::backends::WaspBackend::Options{
-				.debug = this->DEBUG,
-				.logger = this->LOGGER,
-				.loaders = {
-					new wasp::render::Loader()
-				},
-				.libraries = {
-					std::make_shared<MyFirstLib>()
+			nullptr,
+			std::make_shared<wasp::render::backends::WaspBackend::Options>(
+				wasp::render::backends::WaspBackend::Options{
+					.debug = this->DEBUG,
+					.logger = this->LOGGER,
+					.loaders = {
+						std::make_shared<wasp::render::Loader>()
+					},
+					.libraries = {
+						std::make_shared<MyFirstLib>()
+					}
 				}
-			}
+			)
 		);
 
 		this->MEDIA_ROOT = wasp::core::path::join(this->BASE_DIR, "media");

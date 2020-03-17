@@ -43,39 +43,31 @@ __BACKENDS_BEGIN__
 class WaspBackend : public BaseBackend
 {
 protected:
-	Engine* _engine;
+	std::shared_ptr<IEngine> _engine;
 
 public:
 	struct Options final
 	{
 		bool debug = false;
 		core::ILogger* logger = core::Logger::get_instance({});
-		std::vector<ILoader*> loaders;
+		std::vector<std::shared_ptr<ILoader>> loaders;
 		std::vector<std::shared_ptr<render::lib::ILibrary>> libraries;
 		bool auto_escape = true;
-
-		~Options()
-		{
-			for (auto loader : this->loaders)
-			{
-				delete loader;
-			}
-		}
 	};
 
 	WaspBackend(
 		const std::vector<std::string>& dirs,
 		bool use_app_dirs,
 		const std::vector<apps::IAppConfig*>& installed_apps,
-		Options* opts
+		const std::shared_ptr<IEngine>& engine,
+		const std::shared_ptr<Options>& opts = nullptr
 	);
-	~WaspBackend() override;
 
 	ITemplate* from_string(const std::string& template_code) override;
 	ITemplate* get_template(const std::string& template_path) override;
 
 protected:
-	Options* _opts;
+	std::shared_ptr<Options> _opts;
 };
 
 __BACKENDS_END__

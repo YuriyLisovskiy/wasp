@@ -28,13 +28,14 @@ WaspBackend::WaspBackend(
 	const std::vector<std::string>& dirs,
 	bool use_app_dirs,
 	const std::vector<apps::IAppConfig*>& installed_apps,
-	Options* opts
+	const std::shared_ptr<IEngine>& engine,
+	const std::shared_ptr<Options>& opts
 ) : BaseBackend(dirs, use_app_dirs)
 {
 	this->_opts = opts;
 	if (!this->_opts)
 	{
-		this->_opts = new Options();
+		this->_opts = std::make_shared<Options>();
 	}
 
 	if (!this->_opts->logger)
@@ -43,27 +44,25 @@ WaspBackend::WaspBackend(
 	}
 
 	this->_dirs = this->template_dirs(installed_apps);
-	this->_engine = new render::Engine(
-		this,
-		this->_dirs,
-		this->_use_app_dirs,
-		this->_opts->debug,
-		this->_opts->auto_escape,
-		this->_opts->loaders,
-		this->_opts->libraries,
-		this->_opts->logger
-	);
+	if (engine != nullptr)
+	{
+		this->_engine = engine;
+	}
+	else
+	{
+		this->_engine = std::make_shared<render::Engine>(
+			this,
+			this->_dirs,
+			this->_use_app_dirs,
+			this->_opts->debug,
+			this->_opts->auto_escape,
+			this->_opts->loaders,
+			this->_opts->libraries,
+			this->_opts->logger
+		);
+	}
 
 	this->_name = this->__type__().name();
-	core::str::rtrim(this->_name, "Backend");
-	core::str::rtrim(this->_name, "backend");
-	core::str::rtrim(this->_name, "_");
-}
-
-WaspBackend::~WaspBackend()
-{
-	delete this->_engine;
-	delete this->_opts;
 }
 
 ITemplate* WaspBackend::from_string(const std::string& template_code)
