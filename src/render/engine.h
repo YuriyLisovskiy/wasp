@@ -63,6 +63,8 @@ protected:
 	lib::Filters _filters;
 	lib::Tags _tags;
 
+	std::map<std::string, std::shared_ptr<ITemplate>> _cached_templates;
+
 	void _load_libs(
 		const std::vector<std::shared_ptr<render::lib::ILibrary>>& libs
 	);

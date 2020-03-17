@@ -11,6 +11,8 @@ set(PACKAGE_BUG_REPORT "https://github.com/YuriyLisovskiy/wasp/issues")
 
 project(${PACKAGE_NAME})
 
+# set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
+# set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 
 # Test names by packages.
 set(PACKAGE_MAIN_TESTS "unit-tests")
@@ -28,7 +30,7 @@ set(PACKAGE_VIEWS_UNIT_TESTS "unit-tests-views")
 set(CMAKE_CXX_FLAGS "-pthread")
 
 
-file(GLOB LIB_FILES
+file(GLOB LIB_SRC
 	"src/*/*/*/*.h"
 	"src/*/*/*/*.cpp"
 	"src/*/*/*.h"
@@ -38,8 +40,12 @@ file(GLOB LIB_FILES
 	"src/*.h"
 	"src/*.cpp"
 )
-set(LIB_SRC ${LIB_FILES})
 
+# Build shared library.
+# add_library(${PACKAGE_NAME} SHARED ${LIB_SRC})
+
+
+# Perform library testing.
 
 # Collections package tests setup.
 file(GLOB COLLECTIONS_TEST_SRC
@@ -48,6 +54,7 @@ file(GLOB COLLECTIONS_TEST_SRC
 )
 add_executable(${PACKAGE_COLLECTIONS_UNIT_TESTS} ${LIB_SRC} ${COLLECTIONS_TEST_SRC} "tests/unittests/collections_tests/main.cpp")
 target_link_libraries(${PACKAGE_COLLECTIONS_UNIT_TESTS} gtest gtest_main rt pthread ${COLLECTIONS_TEST_SRC})
+target_link_libraries(${PACKAGE_COLLECTIONS_UNIT_TESTS} stdc++fs)
 
 
 # Conf packages tests setup.
@@ -55,7 +62,8 @@ file(GLOB CONF_TEST_SRC
 	"tests/unittests/conf_tests/*.h"
 )
 add_executable(${PACKAGE_CONF_UNIT_TESTS} ${LIB_SRC} ${CONF_TEST_SRC} "tests/unittests/conf_tests/main.cpp")
-target_link_libraries(${PACKAGE_CONF_UNIT_TESTS} gtest gtest_main rt pthread ${CONF_TEST_SRC})
+target_link_libraries(${PACKAGE_CONF_UNIT_TESTS} gtest gtest_main rt pthread -std=c++1z ${CONF_TEST_SRC})
+target_link_libraries(${PACKAGE_CONF_UNIT_TESTS} stdc++fs)
 
 
 # Core packages tests setup.
@@ -64,7 +72,8 @@ file(GLOB CORE_TEST_SRC
 	"tests/unittests/core_tests/*.h"
 )
 add_executable(${PACKAGE_CORE_UNIT_TESTS} ${LIB_SRC} ${CORE_TEST_SRC} "tests/unittests/core_tests/main.cpp")
-target_link_libraries(${PACKAGE_CORE_UNIT_TESTS} gtest gtest_main rt pthread ${CORE_TEST_SRC})
+target_link_libraries(${PACKAGE_CORE_UNIT_TESTS} gtest gtest_main rt pthread -std=c++1z ${CORE_TEST_SRC})
+target_link_libraries(${PACKAGE_CORE_UNIT_TESTS} stdc++fs)
 
 
 # Core/datetime packages tests setup.
@@ -76,7 +85,8 @@ add_executable(
 	${LIB_SRC} ${CORE_DATETIME_TEST_SRC}
 	"tests/unittests/core_tests/datetime_tests/main.cpp"
 )
-target_link_libraries(${PACKAGE_CORE_DATETIME_UNIT_TESTS} gtest gtest_main rt pthread ${CORE_DATETIME_TEST_SRC})
+target_link_libraries(${PACKAGE_CORE_DATETIME_UNIT_TESTS} gtest gtest_main rt pthread -std=c++1z ${CORE_DATETIME_TEST_SRC})
+target_link_libraries(${PACKAGE_CORE_DATETIME_UNIT_TESTS} stdc++fs)
 
 
 # Core/datetime packages tests setup.
@@ -88,7 +98,8 @@ add_executable(
 	${LIB_SRC} ${CORE_OBJECT_TEST_SRC}
 	"tests/unittests/core_tests/object_tests/main.cpp"
 )
-target_link_libraries(${PACKAGE_CORE_OBJECT_UNIT_TESTS} gtest gtest_main rt pthread ${CORE_OBJECT_TEST_SRC})
+target_link_libraries(${PACKAGE_CORE_OBJECT_UNIT_TESTS} gtest gtest_main rt pthread -std=c++1z ${CORE_OBJECT_TEST_SRC})
+target_link_libraries(${PACKAGE_CORE_OBJECT_UNIT_TESTS} stdc++fs)
 
 
 # Http package tests setup.
@@ -97,7 +108,8 @@ file(GLOB HTTP_TEST_SRC
 	"tests/unittests/http_tests/*.h"
 )
 add_executable(${PACKAGE_HTTP_UNIT_TESTS} ${LIB_SRC} ${HTTP_TEST_SRC} "tests/unittests/http_tests/main.cpp")
-target_link_libraries(${PACKAGE_HTTP_UNIT_TESTS} gtest gtest_main rt pthread ${HTTP_TEST_SRC})
+target_link_libraries(${PACKAGE_HTTP_UNIT_TESTS} gtest gtest_main rt pthread -std=c++1z ${HTTP_TEST_SRC})
+target_link_libraries(${PACKAGE_HTTP_UNIT_TESTS} stdc++fs)
 
 
 # Render package tests setup.
@@ -106,7 +118,8 @@ file(GLOB RENDER_TEST_SRC
 	"tests/unittests/render_tests/*.h"
 )
 add_executable(${PACKAGE_RENDER_UNIT_TESTS} ${LIB_SRC} ${RENDER_TEST_SRC} "tests/unittests/render_tests/main.cpp")
-target_link_libraries(${PACKAGE_RENDER_UNIT_TESTS} gtest gtest_main rt pthread ${RENDER_TEST_SRC})
+target_link_libraries(${PACKAGE_RENDER_UNIT_TESTS} gtest gtest_main rt pthread -std=c++1z ${RENDER_TEST_SRC})
+target_link_libraries(${PACKAGE_RENDER_UNIT_TESTS} stdc++fs)
 
 
 # Utils package tests setup.
@@ -115,7 +128,8 @@ file(GLOB UTILS_TEST_SRC
 	"tests/unittests/utils_tests/*.h"
 )
 add_executable(${PACKAGE_UTILS_UNIT_TESTS} ${LIB_SRC} ${UTILS_TEST_SRC} "tests/unittests/utils_tests/main.cpp")
-target_link_libraries(${PACKAGE_UTILS_UNIT_TESTS} gtest gtest_main rt pthread ${UTILS_TEST_SRC})
+target_link_libraries(${PACKAGE_UTILS_UNIT_TESTS} gtest gtest_main rt pthread -std=c++1z ${UTILS_TEST_SRC})
+target_link_libraries(${PACKAGE_UTILS_UNIT_TESTS} stdc++fs)
 
 
 # Views package tests setup.
@@ -123,7 +137,8 @@ file(GLOB VIEWS_TEST_SRC
 	"tests/unittests/views_tests/*.h"
 )
 add_executable(${PACKAGE_VIEWS_UNIT_TESTS} ${LIB_SRC} ${VIEWS_TEST_SRC} "tests/unittests/views_tests/main.cpp")
-target_link_libraries(${PACKAGE_VIEWS_UNIT_TESTS} gtest gtest_main rt pthread ${VIEWS_TEST_SRC})
+target_link_libraries(${PACKAGE_VIEWS_UNIT_TESTS} gtest gtest_main rt pthread -std=c++1z ${VIEWS_TEST_SRC})
+target_link_libraries(${PACKAGE_VIEWS_UNIT_TESTS} stdc++fs)
 
 
 # Setup all test sourses.
@@ -143,6 +158,7 @@ set(TEST_SRC
 )
 add_executable(${PACKAGE_MAIN_UNIT_TESTS} ${LIB_SRC} ${TEST_SRC} "tests/unittests/main.cpp")
 target_link_libraries(${PACKAGE_MAIN_UNIT_TESTS} gtest gtest_main rt pthread -std=c++1z ${TEST_SRC})
+target_link_libraries(${PACKAGE_MAIN_UNIT_TESTS} stdc++fs)
 
 
 # Setup example program.
@@ -153,8 +169,11 @@ file(GLOB EXAMPLE_SRC
 	"example/*/*/*.h"
 	"example/*/*/*.cpp"
 )
+
 if(EXISTS "${PROJECT_SOURCE_DIR}/example/main.cpp")
 	add_executable(example ${LIB_SRC} ${EXAMPLE_SRC} "example/main.cpp")
+	# target_link_libraries(example ${PROJECT_SOURCE_DIR}/bin/lib${PACKAGE_NAME}.so)
+	target_link_libraries(example stdc++fs)
 else()
 	message("main.cpp of example web server does not exist")
 endif()

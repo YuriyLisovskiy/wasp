@@ -26,6 +26,10 @@
 
 #pragma once
 
+// C++ libraries.
+// TODO: After g++ v8+ use <filesystem>
+#include <experimental/filesystem>
+
 // Module definitions.
 #include "./_def_.h"
 
@@ -40,11 +44,16 @@
 
 __RENDER_BEGIN__
 
-class Loader : public ILoader
+class DefaultLoader : public ILoader
 {
 public:
 	ITemplate* get_template(
 		const std::string& template_name,
+		const std::vector<std::string>& dirs,
+		IEngine* engine
+	) override;
+
+	std::map<std::string, std::shared_ptr<ITemplate>> cache_templates(
 		const std::vector<std::string>& dirs,
 		IEngine* engine
 	) override;

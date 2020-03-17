@@ -24,7 +24,7 @@
 
 __RENDER_BEGIN__
 
-ITemplate* Loader::get_template(
+ITemplate* DefaultLoader::get_template(
 	const std::string& template_name,
 	const std::vector<std::string>& dirs,
 	IEngine* engine
@@ -47,6 +47,31 @@ ITemplate* Loader::get_template(
 	throw TemplateDoesNotExist(
 		template_name, dirs, nullptr, _ERROR_DETAILS_
 	);
+}
+
+std::map<std::string, std::shared_ptr<ITemplate>> DefaultLoader::cache_templates(
+	const std::vector<std::string>& dirs,
+	IEngine* engine
+)
+{
+	std::map<std::string, std::shared_ptr<ITemplate>> cache;
+	for (const auto& dir : dirs)
+	{
+		for (auto& entry : std::experimental::filesystem::directory_iterator(dir))
+		{
+			const auto& template_path = entry.path();
+			auto file = core::File(
+					core::path::join(dir, template_path)
+			);
+			file.open();
+			if (file.is_open())
+			{
+				auto* _template = new Template(file.read_str(), (BaseEngine*) engine);
+				file.close();
+				cache[template_path] = std::shared_ptr<Template>(_template);
+			}
+		}
+	}
 }
 
 __RENDER_END__

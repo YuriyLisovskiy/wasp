@@ -59,7 +59,6 @@ public:
 		const std::vector<std::string>& dirs,
 		bool use_app_dirs,
 		const std::vector<apps::IAppConfig*>& installed_apps,
-		const std::shared_ptr<IEngine>& engine,
 		const std::shared_ptr<Options>& opts = nullptr
 	);
 

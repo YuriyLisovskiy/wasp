@@ -28,7 +28,6 @@ WaspBackend::WaspBackend(
 	const std::vector<std::string>& dirs,
 	bool use_app_dirs,
 	const std::vector<apps::IAppConfig*>& installed_apps,
-	const std::shared_ptr<IEngine>& engine,
 	const std::shared_ptr<Options>& opts
 ) : BaseBackend(dirs, use_app_dirs)
 {
@@ -44,23 +43,16 @@ WaspBackend::WaspBackend(
 	}
 
 	this->_dirs = this->template_dirs(installed_apps);
-	if (engine != nullptr)
-	{
-		this->_engine = engine;
-	}
-	else
-	{
-		this->_engine = std::make_shared<render::Engine>(
-			this,
-			this->_dirs,
-			this->_use_app_dirs,
-			this->_opts->debug,
-			this->_opts->auto_escape,
-			this->_opts->loaders,
-			this->_opts->libraries,
-			this->_opts->logger
-		);
-	}
+	this->_engine = std::make_shared<render::Engine>(
+		this,
+		this->_dirs,
+		this->_use_app_dirs,
+		this->_opts->debug,
+		this->_opts->auto_escape,
+		this->_opts->loaders,
+		this->_opts->libraries,
+		this->_opts->logger
+	);
 
 	this->_name = this->__type__().name();
 }

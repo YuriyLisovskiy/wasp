@@ -53,16 +53,20 @@ std::vector<std::string> BaseBackend::template_dirs(
 	const std::vector<apps::IAppConfig*>& apps
 )
 {
-	auto dirs_copy = this->_dirs;
 	if (this->_use_app_dirs)
 	{
+		auto dirs_copy = this->_dirs;
 		for (const auto& app : apps)
 		{
 			dirs_copy.push_back(core::path::dirname(app->get_app_path()));
 		}
-	}
 
-	return dirs_copy;
+		return dirs_copy;
+	}
+	else
+	{
+		return this->_dirs;
+	}
 }
 
 __BACKENDS_END__

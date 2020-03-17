@@ -59,14 +59,11 @@ struct Settings final: public wasp::conf::Settings
 			},
 			true,
 			this->INSTALLED_APPS,
-			nullptr,
 			std::make_shared<wasp::render::backends::WaspBackend::Options>(
 				wasp::render::backends::WaspBackend::Options{
 					.debug = this->DEBUG,
 					.logger = this->LOGGER,
-					.loaders = {
-						std::make_shared<wasp::render::Loader>()
-					},
+					.loaders = {},
 					.libraries = {
 						std::make_shared<MyFirstLib>()
 					}

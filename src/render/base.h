@@ -88,6 +88,10 @@ public:
 		const std::vector<std::string>& dirs,
 		IEngine* engine
 	) = 0;
+	virtual std::map<std::string, std::shared_ptr<ITemplate>> cache_templates(
+		const std::vector<std::string>& dirs,
+		IEngine* engine
+	) = 0;
 };
 
 __RENDER_END__

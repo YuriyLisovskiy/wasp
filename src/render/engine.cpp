@@ -39,7 +39,14 @@ Engine::Engine(
 	this->_backend = backend;
 	for (const auto& dir : dirs)
 	{
-		this->_dirs.push_back(core::path::join(dir, this->APP_DIRNAME));
+		if (core::str::ends_with(core::str::rtrim(dir, "/"), this->APP_DIRNAME))
+		{
+			this->_dirs.push_back(dir);
+		}
+		else
+		{
+			this->_dirs.push_back(core::path::join(dir, this->APP_DIRNAME));
+		}
 	}
 
 	this->_use_app_dirs = use_app_dirs;
@@ -48,7 +55,7 @@ Engine::Engine(
 	if (loaders.empty())
 	{
 		this->_loaders = {
-			std::make_shared<Loader>()
+			std::make_shared<DefaultLoader>()
 		};
 	}
 	else
@@ -57,6 +64,14 @@ Engine::Engine(
 	}
 
 	this->_load_libs(libs);
+	if (!this->_debug)
+	{
+		for (const auto& loader : this->_loaders)
+		{
+			auto templates = loader->cache_templates(dirs, this);
+			this->_cached_templates.insert(templates.begin(), templates.end());
+		}
+	}
 }
 
 ITemplate* Engine::find_template(
@@ -65,21 +80,38 @@ ITemplate* Engine::find_template(
 )
 {
 	std::vector<std::string> tried{};
-	for (auto loader : this->_loaders)
+	if (this->_debug)
 	{
-		if (!loader)
+		// Load template from disk.
+		for (const auto& loader : this->_loaders)
 		{
-			continue;
-		}
+			if (!loader)
+			{
+				continue;
+			}
 
-		try
-		{
-			return loader->get_template(name, dirs, this);
+			try
+			{
+				return loader->get_template(name, dirs, this);
+			}
+			catch (const TemplateDoesNotExist& exc)
+			{
+				auto exc_tried = exc.tried();
+				tried.insert(tried.begin(), exc_tried.begin(), exc_tried.end());
+			}
 		}
-		catch (const TemplateDoesNotExist& exc)
+	}
+	else
+	{
+		// Searches for template in memory.
+		for (const auto& dir : dirs)
 		{
-			auto exc_tried = exc.tried();
-			tried.insert(tried.begin(), exc_tried.begin(), exc_tried.end());
+			std::string template_name = core::path::join(dir, name);
+			auto result = this->_cached_templates.find(template_name);
+			if (result != this->_cached_templates.end())
+			{
+				return result->second.get();
+			}
 		}
 	}
 
