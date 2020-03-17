@@ -26,6 +26,7 @@
 // C++ libraries.
 #include <string>
 #include <cxxabi.h>
+#include <memory>
 
 // Module definitions.
 #include "./_def_.h"
@@ -62,7 +63,7 @@ public:
 	template<typename _T>
 	[[nodiscard]] static std::string type_name()
 	{
-		return Type::get_full_type_name(typeid(_T).name());
+		return Type::demangle(typeid(_T).name());
 	}
 
 	template<typename _T>
@@ -77,7 +78,7 @@ public:
 	friend std::ostream& operator<<(std::ostream& out, const Type& obj);
 
 private:
-	static std::string get_full_type_name(const std::string& full_name);
+	static std::string demangle(const char* full_name);
 };
 
 __OBJECT_END__
