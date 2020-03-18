@@ -115,10 +115,10 @@ Settings::~Settings()
 {
 	delete this->TEMPLATES_BACKEND;
 	delete this->SECURE_PROXY_SSL_HEADER;
-	for (auto& installed_app : this->INSTALLED_APPS)
-	{
-		delete installed_app;
-	}
+//	for (auto& installed_app : this->INSTALLED_APPS)
+//	{
+//		delete installed_app;
+//	}
 
 	for (auto& middleware : this->MIDDLEWARE)
 	{

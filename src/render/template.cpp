@@ -43,10 +43,10 @@ void Template::compile()
 	);
 
 	parser.parse();
-	this->_nodes = parser.nodes_list;
+	this->_nodes = std::move(parser.nodes_list);
 }
 
-std::string Template::render(const std::shared_ptr<IContext>& ctx)
+std::string Template::render(IContext* ctx)
 {
 	return this->_nodes->render(ctx);
 }

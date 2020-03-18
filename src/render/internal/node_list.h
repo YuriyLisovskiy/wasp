@@ -41,7 +41,7 @@ struct node
 	bool is_text_node;
 
 	node();
-	virtual std::string render(const std::shared_ptr<IContext>& ctx);
+	virtual std::string render(IContext* ctx);
 };
 
 struct text_node : public node
@@ -50,7 +50,7 @@ struct text_node : public node
 
 	text_node();
 	explicit text_node(const std::string& s);
-	std::string render(const std::shared_ptr<IContext>& ctx) override;
+	std::string render(IContext* ctx) override;
 };
 
 struct variable_node : public node
@@ -60,7 +60,7 @@ struct variable_node : public node
 	explicit variable_node(
 		const FilterExpression& filter_expr
 	);
-	std::string render(const std::shared_ptr<IContext>& ctx) override;
+	std::string render(IContext* ctx) override;
 };
 
 struct node_list
@@ -70,7 +70,7 @@ struct node_list
 
 	node_list();
 	void append(const std::shared_ptr<node>& node);
-	std::string render(const std::shared_ptr<IContext>& ctx);
+	std::string render(IContext* ctx);
 };
 
 __RENDER_INTERNAL_END__

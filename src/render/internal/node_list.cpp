@@ -31,7 +31,7 @@ node::node()
 	this->is_text_node = false;
 }
 
-std::string node::render(const std::shared_ptr<IContext>& ctx)
+std::string node::render(IContext* ctx)
 {
 	return "";
 }
@@ -47,7 +47,7 @@ text_node::text_node(const std::string& s) : text_node()
 	this->text = s;
 }
 
-std::string text_node::render(const std::shared_ptr<IContext>& ctx)
+std::string text_node::render(IContext* ctx)
 {
 	return this->text;
 }
@@ -60,7 +60,7 @@ variable_node::variable_node(
 	this->filter_expr = filter_expr;
 }
 
-std::string variable_node::render(const std::shared_ptr<IContext>& ctx)
+std::string variable_node::render(IContext* ctx)
 {
 	return this->filter_expr.resolve(ctx);
 }
@@ -76,7 +76,7 @@ void node_list::append(const std::shared_ptr<node>& node)
 	this->nodes.push_back(node);
 }
 
-std::string node_list::render(const std::shared_ptr<IContext>& ctx)
+std::string node_list::render(IContext* ctx)
 {
 	std::string result;
 	for (const auto& node : this->nodes)

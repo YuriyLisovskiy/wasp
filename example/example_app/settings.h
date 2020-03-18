@@ -6,7 +6,6 @@
 
 #include "../../src/conf/settings.h"
 
-#include <memory>
 #include "../../src/core/path.h"
 
 #include "../../src/middleware/common.h"
@@ -38,7 +37,7 @@ struct Settings final: public wasp::conf::Settings
 
 		this->DEBUG = true;
 
-		this->ALLOWED_HOSTS = {"127.0.0.1", "[::1]"};
+		this->ALLOWED_HOSTS = {"127.0.0.1", "::1"};
 
 		this->INSTALLED_APPS = {
 			this->app<MainAppConfig>(),
@@ -59,14 +58,11 @@ struct Settings final: public wasp::conf::Settings
 			},
 			true,
 			this->INSTALLED_APPS,
-			std::make_shared<wasp::render::backends::WaspBackend::Options>(
-				wasp::render::backends::WaspBackend::Options{
-					.debug = this->DEBUG,
-					.logger = this->LOGGER,
-					.loaders = {},
-					.libraries = {
-						std::make_shared<MyFirstLib>()
-					}
+			std::make_unique<wasp::render::backends::WaspBackend::Options>(
+				this->DEBUG,
+				this->LOGGER,
+				std::vector<std::shared_ptr<wasp::render::lib::ILibrary>>{
+					std::make_shared<MyFirstLib>()
 				}
 			)
 		);

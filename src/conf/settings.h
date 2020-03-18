@@ -27,6 +27,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <memory>
 
 // Module definitions.
 #include "./_def_.h"
@@ -86,7 +87,7 @@ struct Settings
 	///
 	/// ROOT_APP is the first installed app by default, it can
 	/// be overridden in project settings.
-	apps::IAppConfig* ROOT_APP;
+	std::shared_ptr<apps::IAppConfig> ROOT_APP;
 
 	/// Vector of patterns which will be loaded from ROOT_APP.
 	/// To change this setting, setup ROOT_APP in your project
@@ -96,7 +97,7 @@ struct Settings
 	/// List of AppConfig-derived objects representing apps.
 	/// Order is required. The first app is interpreted as
 	/// main application configuration.
-	std::vector<apps::IAppConfig*> INSTALLED_APPS;
+	std::vector<std::shared_ptr<apps::IAppConfig>> INSTALLED_APPS;
 
 	/// List of commands to run from command line.
 	std::map<std::string, core::BaseCommand*> COMMANDS;
@@ -258,9 +259,9 @@ struct Settings
 	void prepare();
 
 	template <typename _T, typename = std::enable_if<std::is_base_of<apps::IAppConfig, _T>::value>>
-	apps::IAppConfig* app()
+	std::shared_ptr<apps::IAppConfig> app()
 	{
-		return new _T(this);
+		return std::make_shared<_T>(this);
 	}
 
 	template <typename _T, typename = std::enable_if<std::is_base_of<middleware::IMiddleware, _T>::value>>

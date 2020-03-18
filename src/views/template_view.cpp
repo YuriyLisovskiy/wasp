@@ -53,7 +53,7 @@ std::unique_ptr<http::IHttpResponse> TemplateResponseMixin::render(
 	auto response = std::make_unique<render::TemplateResponse>(
 		this->_backend,
 		template_name.empty() ? this->get_template_name() : template_name,
-		context,
+		context.get(),
 		status,
 		content_type,
 		charset

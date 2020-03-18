@@ -21,8 +21,6 @@
 
 #include "./parser.h"
 
-#include <memory>
-
 
 __RENDER_INTERNAL_BEGIN__
 
@@ -38,7 +36,7 @@ void parser::parse(
 	const std::vector<std::string>& parse_until
 )
 {
-	this->nodes_list = std::make_shared<node_list>();
+	this->nodes_list = std::make_unique<node_list>();
 	while (!this->tokens.empty())
 	{
 		token_t token = this->next_token();
@@ -160,7 +158,7 @@ FilterExpression parser::compile_filter(token_t& t)
 }
 
 void parser::append_node(
-	std::shared_ptr<node_list>& list,
+	std::unique_ptr<node_list>& list,
 	std::shared_ptr<node>& nd,
 	const token_t& token
 )

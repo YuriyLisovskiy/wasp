@@ -30,8 +30,8 @@ Engine::Engine(
 	bool use_app_dirs,
 	bool debug,
 	bool auto_escape,
-	const std::vector<std::shared_ptr<ILoader>>& loaders,
-	const std::vector<std::shared_ptr<render::lib::ILibrary>>& libs,
+	std::vector<std::shared_ptr<ILoader>>& loaders,
+	std::vector<std::shared_ptr<render::lib::ILibrary>>& libs,
 	core::ILogger* logger
 )
 {
@@ -54,13 +54,11 @@ Engine::Engine(
 	this->_auto_escape = auto_escape;
 	if (loaders.empty())
 	{
-		this->_loaders = {
-			std::make_shared<DefaultLoader>()
-		};
+		this->_loaders.push_back(std::make_unique<DefaultLoader>());
 	}
 	else
 	{
-		this->_loaders = loaders;
+		this->_loaders = std::move(loaders);
 	}
 
 	this->_load_libs(libs);
@@ -92,6 +90,7 @@ std::shared_ptr<ITemplate> Engine::find_template(
 
 			try
 			{
+
 				return loader->get_template(name, dirs, this);
 			}
 			catch (const TemplateDoesNotExist& exc)
@@ -144,7 +143,7 @@ lib::Tags& Engine::get_tags()
 }
 
 void Engine::_load_libs(
-	const std::vector<std::shared_ptr<render::lib::ILibrary>>& libs
+	std::vector<std::shared_ptr<render::lib::ILibrary>>& libs
 )
 {
 	// TODO: add default libraries first.

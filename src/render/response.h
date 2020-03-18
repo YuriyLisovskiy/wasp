@@ -45,7 +45,7 @@ class TemplateResponse : public http::HttpResponse
 {
 protected:
 	std::string _template_name;
-	std::shared_ptr<IContext> _context;
+	IContext* _context;
 	backends::IBackend* _backend;
 	bool _is_rendered;
 
@@ -53,7 +53,7 @@ public:
 	explicit TemplateResponse(
 		backends::IBackend* backend,
 		const std::string& template_name,
-		const std::shared_ptr<IContext>& context = nullptr,
+		IContext* context = nullptr,
 		unsigned short int status = 200,
 		const std::string& content_type = "",
 		const std::string& charset = "utf-8"

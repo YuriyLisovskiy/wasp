@@ -54,17 +54,6 @@ const char FILTER_SEP = '|';
 const char FILTER_ARG_SEP = ',';
 const char FILTER_ARG_NAME_VAL_SEP = '=';
 
-/*
-using re = core::rgx::Regex;
-
-const std::string I18NOpen = re::escape("_(");
-const std::string I18NClose = re::escape(")");
-const std::string SQ_STR = R"('[^'\\]*(?:\\.[^'\\]*)*')";
-const std::string DQ_STR = R"("[^"\\]*(?:\\.[^"\\]*)*")";
-
-const std::string CONST_STRING = "(?:" + I18NOpen + DQ_STR + I18NClose + "|" +
-	I18NOpen + SQ_STR + I18NClose + "|" + DQ_STR + "|" + SQ_STR + ")";
-*/
 
 class Variable
 {
@@ -81,7 +70,7 @@ public:
 	);
 
 	std::shared_ptr<core::object::Object> resolve(
-		const std::shared_ptr<IContext>& ctx
+		IContext* ctx
 	);
 };
 

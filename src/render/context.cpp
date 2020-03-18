@@ -25,22 +25,9 @@
 __RENDER_BEGIN__
 
 Context::Context(
-	std::map<std::string, std::shared_ptr<core::object::Object>> global_scope,
-	bool auto_delete
-) : _auto_delete(auto_delete), _global_scope(std::move(global_scope))
+	std::map<std::string, std::shared_ptr<core::object::Object>> global_scope
+) : _global_scope(std::move(global_scope))
 {
-}
-
-Context::~Context()
-{
-	// TODO: ~Context(): check why segmentation fault is thrown after template is rendered
-//	if (this->_auto_delete)
-//	{
-//		for (auto& var : this->_global_scope)
-//		{
-//			delete var.second;
-//		}
-//	}
 }
 
 std::shared_ptr<core::object::Object> Context::find_var(const std::string& key)

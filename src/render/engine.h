@@ -66,19 +66,19 @@ protected:
 	std::map<std::string, std::shared_ptr<ITemplate>> _cached_templates;
 
 	void _load_libs(
-		const std::vector<std::shared_ptr<render::lib::ILibrary>>& libs
+		std::vector<std::shared_ptr<render::lib::ILibrary>>& libs
 	);
 
 public:
 	explicit Engine(
 		backends::BaseBackend* backend,
-		const std::vector<std::string>& dirs = {},
-		bool use_app_dirs = false,
-		bool debug = false,
-		bool auto_escape = true,
-		const std::vector<std::shared_ptr<ILoader>>& loaders = {},
-		const std::vector<std::shared_ptr<render::lib::ILibrary>>& libs = {},
-		core::ILogger* logger = nullptr
+		const std::vector<std::string>& dirs,
+		bool use_app_dirs,
+		bool debug,
+		bool auto_escape,
+		std::vector<std::shared_ptr<ILoader>>& loaders,
+		std::vector<std::shared_ptr<render::lib::ILibrary>>& libs,
+		core::ILogger* logger
 	);
 
 	std::shared_ptr<ITemplate> find_template(
