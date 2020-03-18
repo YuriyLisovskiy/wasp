@@ -76,6 +76,9 @@ void split_domain_port(
 			domain.pop_back();
 		}
 	}
+
+	core::str::rtrim(domain, "]");
+	core::str::ltrim(domain, "[");
 }
 
 bool validate_host(

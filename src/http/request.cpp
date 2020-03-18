@@ -116,7 +116,7 @@ std::string HttpRequest::get_host(
 	auto host = this->get_raw_host(use_x_forwarded_host);
 	if (debug && allowed_hosts.empty())
 	{
-		allowed_hosts = {".localhost", "127.0.0.1", "[::1]"};
+		allowed_hosts = {".localhost", "127.0.0.1", "::1"};
 	}
 
 	std::string domain, port;

@@ -4,7 +4,8 @@ Inspired by [Django](https://github.com/django/django).
 
 ### Requirements
 
-C++ compiler: g++ v7.5.0
+C++ compiler minimum version:
+* Ubuntu: g++ v8.3.0
 
 
 ### Testing

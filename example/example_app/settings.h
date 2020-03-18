@@ -38,7 +38,7 @@ struct Settings final: public wasp::conf::Settings
 
 		this->DEBUG = true;
 
-		this->ALLOWED_HOSTS = {"127.0.0.1"};
+		this->ALLOWED_HOSTS = {"127.0.0.1", "[::1]"};
 
 		this->INSTALLED_APPS = {
 			this->app<MainAppConfig>(),
