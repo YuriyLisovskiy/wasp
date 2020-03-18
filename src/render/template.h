@@ -41,6 +41,7 @@
 #include "./internal/lexer.h"
 #include "./internal/parser.h"
 #include "./internal/filter_expr.h"
+#include "./internal/node_list.h"
 
 
 __RENDER_BEGIN__
@@ -51,10 +52,12 @@ protected:
 	std::string _template_code;
 	BaseEngine* _engine;
 
+	std::shared_ptr<internal::node_list> _nodes;
+
+	void compile();
+
 public:
 	Template(const std::string& code, BaseEngine* engine);
-
-	void compile() override;
 
 	/// Renders template code using given context.
 	std::string render(const std::shared_ptr<IContext>& ctx) override;

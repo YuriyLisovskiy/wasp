@@ -26,21 +26,13 @@ __RENDER_BEGIN__
 
 Template::Template(const std::string& code, BaseEngine* engine)
 {
-	// TODO: implement Template(const std::string& code, BaseEngine* engine)
-
 	this->_engine = engine;
 	this->_template_code = code;
+	this->compile();
 }
 
 void Template::compile()
 {
-	// TODO: implement void Template::compile()
-}
-
-std::string Template::render(const std::shared_ptr<IContext>& ctx)
-{
-	// TODO: implement Template::render(BaseContext* context)
-
 	auto lexer = internal::lexer(this->_template_code);
 	lexer.tokenize();
 
@@ -49,10 +41,14 @@ std::string Template::render(const std::shared_ptr<IContext>& ctx)
 		this->_engine->get_filters(),
 		this->_engine->get_tags()
 	);
-	parser.parse();
-	return parser.nodes_list->render(ctx);
 
-//	return this->_template_code;
+	parser.parse();
+	this->_nodes = parser.nodes_list;
+}
+
+std::string Template::render(const std::shared_ptr<IContext>& ctx)
+{
+	return this->_nodes->render(ctx);
 }
 
 __RENDER_END__

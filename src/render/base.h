@@ -52,8 +52,6 @@ class ITemplate
 public:
 	virtual ~ITemplate() = default;
 
-	virtual void compile() = 0;
-
 	/// Renders template code using given context.
 	virtual std::string render(const std::shared_ptr<IContext>& context) = 0;
 };
