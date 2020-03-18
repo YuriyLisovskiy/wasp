@@ -47,7 +47,7 @@ __RENDER_BEGIN__
 class DefaultLoader : public ILoader
 {
 public:
-	ITemplate* get_template(
+	std::shared_ptr<ITemplate> get_template(
 		const std::string& template_name,
 		const std::vector<std::string>& dirs,
 		IEngine* engine

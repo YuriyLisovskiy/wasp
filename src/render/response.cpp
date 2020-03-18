@@ -48,7 +48,6 @@ void TemplateResponse::render()
 
 	auto t = this->_backend->get_template(this->_template_name);
 	this->_content = t->render(this->_context);
-	delete t;
 	this->_is_rendered = true;
 }
 

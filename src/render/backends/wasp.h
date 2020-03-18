@@ -62,8 +62,8 @@ public:
 		const std::shared_ptr<Options>& opts = nullptr
 	);
 
-	ITemplate* from_string(const std::string& template_code) override;
-	ITemplate* get_template(const std::string& template_path) override;
+	std::shared_ptr<ITemplate> from_string(const std::string& template_code) override;
+	std::shared_ptr<ITemplate> get_template(const std::string& template_path) override;
 
 protected:
 	std::shared_ptr<Options> _opts;

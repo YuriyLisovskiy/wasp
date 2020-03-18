@@ -24,7 +24,7 @@
 
 __RENDER_BEGIN__
 
-ITemplate* DefaultLoader::get_template(
+std::shared_ptr<ITemplate> DefaultLoader::get_template(
 	const std::string& template_name,
 	const std::vector<std::string>& dirs,
 	IEngine* engine
@@ -40,7 +40,7 @@ ITemplate* DefaultLoader::get_template(
 		{
 			auto* _template = new Template(file.read_str(), (BaseEngine*)engine);
 			file.close();
-			return _template;
+			return std::shared_ptr<Template>(_template);
 		}
 	}
 

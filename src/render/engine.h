@@ -81,23 +81,18 @@ public:
 		core::ILogger* logger = nullptr
 	);
 
-	ITemplate* find_template(
+	std::shared_ptr<ITemplate> find_template(
 		const std::string& name,
 		const std::vector<std::string>& dirs
 	);
 
 	/// Return a pointer to compiled BaseTemplate object for the given template code,
 	/// handling template inheritance recursively.
-	ITemplate* from_string(const std::string& template_code) override;
+	std::shared_ptr<ITemplate> from_string(const std::string& template_code) override;
 
 	/// Return a pointer to compiled BaseTemplate object for the given template name,
 	/// handling template inheritance recursively.
-	ITemplate* get_template(const std::string& template_name) override;
-
-	/// Render the template specified by template_name with the given context.
-	std::string render_to_string(
-		const std::string& template_name, const std::shared_ptr<IContext>& context = nullptr
-	) override;
+	std::shared_ptr<ITemplate> get_template(const std::string& template_name) override;
 
 	/// Returns current backend.
 	backends::BaseBackend* backend();

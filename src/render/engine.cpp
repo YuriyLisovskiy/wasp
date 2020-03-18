@@ -74,7 +74,7 @@ Engine::Engine(
 	}
 }
 
-ITemplate* Engine::find_template(
+std::shared_ptr<ITemplate> Engine::find_template(
 	const std::string& name,
 	const std::vector<std::string>& dirs
 )
@@ -110,7 +110,7 @@ ITemplate* Engine::find_template(
 			auto result = this->_cached_templates.find(template_name);
 			if (result != this->_cached_templates.end())
 			{
-				return result->second.get();
+				return result->second;
 			}
 		}
 	}
@@ -118,24 +118,14 @@ ITemplate* Engine::find_template(
 	throw TemplateDoesNotExist(name, tried, this->_backend, _ERROR_DETAILS_);
 }
 
-ITemplate* Engine::from_string(const std::string& template_code)
+std::shared_ptr<ITemplate> Engine::from_string(const std::string& template_code)
 {
-	return new Template(template_code, this);
+	return std::make_shared<Template>(template_code, this);
 }
 
-ITemplate* Engine::get_template(const std::string& template_name)
+std::shared_ptr<ITemplate> Engine::get_template(const std::string& template_name)
 {
 	return this->find_template(template_name, this->_dirs);
-}
-
-std::string Engine::render_to_string(
-	const std::string& template_name, const std::shared_ptr<IContext>& context
-)
-{
-	auto t = this->get_template(template_name);
-	auto result = t->render(context);
-	delete t;
-	return result;
 }
 
 backends::BaseBackend* Engine::backend()
@@ -166,10 +156,12 @@ void Engine::_load_libs(
 		{
 			if (this->_filters.contains(filter.first))
 			{
+				std::string lib_name = lib->name();
 				this->_logger->warning(
 					"'" + lib->name() + "' contains filter with the same name as the default." +
-					"Filter name: '" + filter.first + "'. It is forbidden and can not be loaded."
+					"Filter: '" + filter.first + "', library: '" + lib_name + "'"
 				);
+				this->_filters.set(lib_name + "." + filter.first, filter.second);
 			}
 			else
 			{
@@ -182,10 +174,12 @@ void Engine::_load_libs(
 		{
 			if (this->_tags.contains(tag.first))
 			{
+				std::string lib_name = lib->name();
 				this->_logger->warning(
 					"'" + lib->name() + "' contains tag with the same name as the default." +
-					"Tag name: '" + tag.first + "'. It is forbidden and can not be loaded."
+					"Tag name: '" + tag.first + "', library: '" + lib_name + "'"
 				);
+				this->_tags.set(lib_name + "." + tag.first, tag.second);
 			}
 			else
 			{

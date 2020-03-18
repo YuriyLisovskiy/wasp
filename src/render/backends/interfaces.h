@@ -17,6 +17,9 @@
 
 #pragma once
 
+// C++ libraries.
+#include <memory>
+
 // Module definitions.
 #include "../_def_.h"
 
@@ -45,12 +48,12 @@ public:
 	/// Create and return a template for the given source code.
 	///
 	/// This method is optional, throws NotImplementedException by default.
-	virtual ITemplate* from_string(const std::string& template_code) = 0;
+	virtual std::shared_ptr<ITemplate> from_string(const std::string& template_code) = 0;
 
 	/// Load and return a template for the given path.
 	///
 	/// Throws TemplateDoesNotExist if no such template exists.
-	virtual ITemplate* get_template(const std::string& template_path) = 0;
+	virtual std::shared_ptr<ITemplate> get_template(const std::string& template_path) = 0;
 
 	/// Initializes a std::vector of directories to search for templates.
 	virtual std::vector<std::string> template_dirs(

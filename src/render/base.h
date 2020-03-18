@@ -64,16 +64,11 @@ public:
 
 	/// Return a pointer to compiled BaseTemplate object for the given template code,
 	/// handling template inheritance recursively.
-	virtual ITemplate* from_string(const std::string& template_code) = 0;
+	virtual std::shared_ptr<ITemplate> from_string(const std::string& template_code) = 0;
 
 	/// Return a pointer to compiled BaseTemplate object for the given template name,
 	/// handling template inheritance recursively.
-	virtual ITemplate* get_template(const std::string& template_name) = 0;
-
-	/// Render the template specified by template_name with the given context.
-	virtual std::string render_to_string(
-		const std::string& template_name, const std::shared_ptr<IContext>& context = nullptr
-	) = 0;
+	virtual std::shared_ptr<ITemplate> get_template(const std::string& template_name) = 0;
 };
 
 
@@ -81,7 +76,7 @@ class ILoader
 {
 public:
 	virtual ~ILoader() = default;
-	virtual ITemplate* get_template(
+	virtual std::shared_ptr<ITemplate> get_template(
 		const std::string& template_path,
 		const std::vector<std::string>& dirs,
 		IEngine* engine

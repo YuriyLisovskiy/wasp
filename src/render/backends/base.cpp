@@ -41,7 +41,7 @@ std::string BaseBackend::name()
 	return this->_name;
 }
 
-ITemplate* BaseBackend::from_string(const std::string &template_code)
+std::shared_ptr<ITemplate> BaseBackend::from_string(const std::string &template_code)
 {
 	throw core::NotImplementedException(
 		"subclasses of BaseBackend should provide a from_string() method",

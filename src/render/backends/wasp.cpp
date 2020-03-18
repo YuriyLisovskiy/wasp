@@ -57,12 +57,12 @@ WaspBackend::WaspBackend(
 	this->_name = this->__type__().name();
 }
 
-ITemplate* WaspBackend::from_string(const std::string& template_code)
+std::shared_ptr<ITemplate> WaspBackend::from_string(const std::string& template_code)
 {
 	return this->_engine->from_string(template_code);
 }
 
-ITemplate* WaspBackend::get_template(const std::string& template_path)
+std::shared_ptr<ITemplate> WaspBackend::get_template(const std::string& template_path)
 {
 	return this->_engine->get_template(template_path);
 }
