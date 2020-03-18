@@ -27,7 +27,6 @@
 #include "../_def_.h"
 
 // Wasp libraries.
-#include "../../http/request.h"
 #include "../../collections/dict.h"
 #include "../../collections/multi_dict.h"
 
@@ -42,11 +41,10 @@ struct query_parser final
 		s_val
 	};
 
-	collections::Dict<std::string, std::string>* dict;
-	collections::MultiValueDict<std::string, std::string>* multi_dict;
+	collections::Dict<std::string, std::string> dict;
+	collections::MultiValueDict<std::string, std::string> multi_dict;
 
-	explicit query_parser();
-	~query_parser();
+	query_parser() = default;
 	void append_parameter(const std::string& key, const std::string& value);
 	void parse(const std::string& data);
 };

@@ -36,6 +36,7 @@
 #include "./interfaces.h"
 #include "../views/view.h"
 #include "../urls/url.h"
+#include "../http/interfaces.h"
 #include "../urls/pattern.h"
 #include "../conf/settings.h"
 #include "../core/string/str.h"
@@ -85,7 +86,7 @@ protected:
 			http::HttpRequest* request,
 			views::Args* args,
 			conf::Settings* settings_ptr
-		) -> http::HttpResponseBase*
+		) -> std::unique_ptr<http::IHttpResponse>
 		{
 			_ViewT view(settings_ptr);
 			view.setup(request);

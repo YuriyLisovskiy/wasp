@@ -27,6 +27,7 @@
 // C++ libraries.
 #include <string>
 #include <vector>
+#include <memory>
 
 // Module definitions.
 #include "./_def_.h"
@@ -63,12 +64,12 @@ extern bool _if_unmodified_since_passes(
 	long last_modified, long if_unmodified_since
 );
 
-extern http::HttpResponseBase* _precondition_failed(
+extern std::unique_ptr<http::IHttpResponse> _precondition_failed(
 	http::HttpRequest* request
 );
 
-extern http::HttpResponseBase* _not_modified(
-	http::HttpRequest* request, http::HttpResponseBase* response
+extern std::unique_ptr<http::IHttpResponse> _not_modified(
+	http::HttpRequest* request, http::IHttpResponse* response
 );
 
 __CACHE_INTERNAL_END__
@@ -76,13 +77,13 @@ __CACHE_INTERNAL_END__
 
 __CACHE_BEGIN__
 
-extern void set_response_etag(http::HttpResponseBase* response);
+extern void set_response_etag(http::IHttpResponse* response);
 
-extern http::HttpResponseBase* get_conditional_response(
+extern std::unique_ptr<http::IHttpResponse> get_conditional_response(
 	http::HttpRequest* request,
 	const std::string& etag,
 	long last_modified,
-	http::HttpResponseBase* response
+	http::IHttpResponse* response
 );
 
 __CACHE_END__

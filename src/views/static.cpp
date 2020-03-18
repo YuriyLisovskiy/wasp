@@ -34,7 +34,7 @@ void StaticView::set_kwargs(collections::Dict<std::string, std::string>* kwargs)
 	this->_kwargs = kwargs;
 }
 
-http::HttpResponseBase* StaticView::get(http::HttpRequest* request, Args* args)
+std::unique_ptr<http::IHttpResponse> StaticView::get(http::HttpRequest* request, Args* args)
 {
 	if (!this->_kwargs)
 	{
@@ -61,22 +61,27 @@ http::HttpResponseBase* StaticView::get(http::HttpRequest* request, Args* args)
 		}
 
 		// TODO: add default http 404 error content!
-		return new http::HttpResponseNotFound(this->_kwargs->get("http_404", "404 Not Found"));
+		return std::make_unique<http::HttpResponseNotFound>(
+			this->_kwargs->get("http_404", "404 Not Found")
+		);
 	}
 
 	auto full_path = core::path::join(this->_kwargs->get("document_root", ""), args->get_str("path", ""));
 	if (!core::path::exists(full_path))
 	{
 		// TODO: add default http 404 error content!
-		return new http::HttpResponseNotFound(this->_kwargs->get("http_404", "404 Not Found"));
+		return std::make_unique<http::HttpResponseNotFound>(
+			this->_kwargs->get("http_404", "404 Not Found")
+		);
 	}
 
 	auto stat_info = core::File::stat(full_path);
 	if (!internal::was_modified_since(
-		request->headers.get(http::IF_MODIFIED_SINCE, ""), stat_info.st_mtime, stat_info.st_size)
+		request->headers.get(http::IF_MODIFIED_SINCE, ""),
+		stat_info.st_mtime, stat_info.st_size)
 	)
 	{
-		return new http::HttpResponseNotModified("");
+		return std::make_unique<http::HttpResponseNotModified>("");
 	}
 
 	std::string content_type, encoding;
@@ -86,7 +91,9 @@ http::HttpResponseBase* StaticView::get(http::HttpRequest* request, Args* args)
 		content_type = "application/octet-stream";
 	}
 
-	auto* response = new http::FileResponse(full_path, false, 0, content_type);
+	auto response = std::make_unique<http::FileResponse>(
+		full_path, false, 0, content_type
+	);
 	response->set_header(
 		http::LAST_MODIFIED,
 		http::format_http_datetime(stat_info.st_mtime)

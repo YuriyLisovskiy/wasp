@@ -102,10 +102,6 @@ void multipart_parser::assert_boundary(const std::string& actual, const std::str
 multipart_parser::multipart_parser(const std::string& media_root)
 {
 	this->media_root = str::rtrim(media_root, "/");
-	this->multi_post_value = collections::MultiValueDict<std::string, std::string>();
-	this->post_values = collections::Dict<std::string, std::string>();
-	this->multi_file_value = collections::MultiValueDict<std::string, UploadedFile>();
-	this->file_values = collections::Dict<std::string, UploadedFile>();
 }
 
 void multipart_parser::parse(const std::string& content_type, const std::string& body)
@@ -412,20 +408,6 @@ void multipart_parser::parse(const std::string& content_type, const std::string&
 	}
 
 	throw MultiPartParserError("Unable to parse request body", _ERROR_DETAILS_);
-}
-
-http::HttpRequest::Parameters<std::string, UploadedFile>* multipart_parser::get_files_params()
-{
-	return new http::HttpRequest::Parameters<std::string, UploadedFile>(
-		this->file_values, this->multi_file_value
-	);
-}
-
-http::HttpRequest::Parameters<std::string, std::string>* multipart_parser::get_post_params()
-{
-	return new http::HttpRequest::Parameters<std::string, std::string>(
-		this->post_values, this->multi_post_value
-	);
 }
 
 __CORE_INTERNAL_END__

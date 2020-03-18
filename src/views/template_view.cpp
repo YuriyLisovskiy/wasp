@@ -41,7 +41,7 @@ TemplateResponseMixin::TemplateResponseMixin(
 	this->_content_type = "";
 }
 
-render::TemplateResponse* TemplateResponseMixin::render(
+std::unique_ptr<http::IHttpResponse> TemplateResponseMixin::render(
 	http::HttpRequest* request,
 	const std::shared_ptr<render::IContext>& context,
 	const std::string& template_name,
@@ -50,7 +50,7 @@ render::TemplateResponse* TemplateResponseMixin::render(
 	const std::string& charset
 )
 {
-	auto* response = new render::TemplateResponse(
+	auto response = std::make_unique<render::TemplateResponse>(
 		this->_backend,
 		template_name.empty() ? this->get_template_name() : template_name,
 		context,
@@ -58,7 +58,6 @@ render::TemplateResponse* TemplateResponseMixin::render(
 		content_type,
 		charset
 	);
-
 	response->render();
 	return response;
 }
@@ -103,7 +102,7 @@ std::shared_ptr<render::IContext> TemplateView::get_context(
 	return nullptr;
 }
 
-http::HttpResponseBase* TemplateView::get(
+std::unique_ptr<http::IHttpResponse> TemplateView::get(
 	http::HttpRequest* request, Args* args
 )
 {

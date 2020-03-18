@@ -30,8 +30,8 @@ ConditionalGetMiddleware::ConditionalGetMiddleware(
 {
 }
 
-http::HttpResponseBase* ConditionalGetMiddleware::process_response(
-	http::HttpRequest* request, http::HttpResponseBase* response
+std::unique_ptr<http::IHttpResponse> ConditionalGetMiddleware::process_response(
+	http::HttpRequest* request, http::IHttpResponse* response
 )
 {
 	/// It's too late to prevent an unsafe request with a 412 response, and
@@ -66,7 +66,7 @@ http::HttpResponseBase* ConditionalGetMiddleware::process_response(
 }
 
 bool ConditionalGetMiddleware::needs_etag(
-	http::HttpResponseBase* response
+	http::IHttpResponse* response
 )
 {
 	auto cache_control = core::str::split(

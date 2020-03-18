@@ -24,6 +24,9 @@
 
 #pragma once
 
+// C++ libraries.
+#include <memory>
+
 // Module definitions.
 #include "./_def_.h"
 
@@ -40,11 +43,11 @@ public:
 	virtual ~IMiddleware() = default;
 
 	/// An input http request before processing in views::View.
-	virtual http::HttpResponseBase* process_request(http::HttpRequest* request) = 0;
+	virtual std::unique_ptr<http::IHttpResponse> process_request(http::HttpRequest* request) = 0;
 
 	/// An output http request and response after processing in views::View.
-	virtual http::HttpResponseBase* process_response(
-		http::HttpRequest* request, http::HttpResponseBase* response
+	virtual std::unique_ptr<http::IHttpResponse> process_response(
+		http::HttpRequest* request, http::IHttpResponse* response
 	) = 0;
 };
 

@@ -88,8 +88,6 @@ struct multipart_parser final
 
 	explicit multipart_parser(const std::string& mediaRoot = "");
 	void parse(const std::string& content_type, const std::string& body);
-	http::HttpRequest::Parameters<std::string, UploadedFile>* get_files_params();
-	http::HttpRequest::Parameters<std::string, std::string>* get_post_params();
 };
 
 __CORE_INTERNAL_END__

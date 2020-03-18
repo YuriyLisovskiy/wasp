@@ -17,9 +17,9 @@ public:
 	{
 	}
 
-	wasp::http::HttpResponseBase* get(wasp::http::HttpRequest* request, wasp::views::Args* args) final
+	std::unique_ptr<wasp::http::IHttpResponse> get(wasp::http::HttpRequest* request, wasp::views::Args* args) final
 	{
 		std::string body(R"(<img src="/static/pontar.png" alt="Night over Pontar river" width="1000">)");
-		return new wasp::http::HttpResponse(body);
+		return std::make_unique<wasp::http::HttpResponse>(body);
 	}
 };

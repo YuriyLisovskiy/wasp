@@ -124,8 +124,8 @@ StartServerCommand::get_handler()
 		http::HttpRequest* request, const core::net::internal::socket_t& client
 	) mutable -> void
 	{
-		http::HttpResponseBase* error_response = nullptr;
-		http::HttpResponseBase* response = nullptr;
+		std::unique_ptr<http::IHttpResponse> error_response = nullptr;
+		std::unique_ptr<http::IHttpResponse> response = nullptr;
 		try
 		{
 			response = StartServerCommand::process_request_middleware(
@@ -138,12 +138,17 @@ StartServerCommand::get_handler()
 				);
 				if (!response)
 				{
-					response = new http::HttpResponseNotFound("<h2>404 - Not Found</h2>");
+					response = std::make_unique<http::HttpResponseNotFound>("<h2>404 - Not Found</h2>");
 				}
 
-				response = StartServerCommand::process_response_middleware(
-					request, response, this->settings
+				auto new_response = StartServerCommand::process_response_middleware(
+					request, response.get(), this->settings
 				);
+				if (new_response)
+				{
+					send_response(request, new_response.get(), client, this->settings);
+					return;
+				}
 			}
 		}
 		catch (const core::ErrorResponseException& exc)
@@ -152,19 +157,19 @@ StartServerCommand::get_handler()
 			auto status_code = exc.status_code() < 400 ? 500 : exc.status_code();
 			auto err_msg = "<p style=\"font-size: 24px;\" >" + std::to_string(status_code) + "</p>"
 						   "<p>" + std::string(exc.what()) + "</p>";
-			error_response = new http::HttpResponse(err_msg, status_code);
+			error_response = std::make_unique<http::HttpResponse>(err_msg, status_code);
 		}
 		catch (const core::BaseException& exc)
 		{
 			this->settings->LOGGER->error(exc);
-			error_response = new http::HttpResponseServerError(
+			error_response = std::make_unique<http::HttpResponseServerError>(
 				"<p style=\"font-size: 24px;\" >Internal Server Error</p><p>" + std::string(exc.what()) + "</p>"
 			);
 		}
 		catch (const std::exception& exc)
 		{
 			this->settings->LOGGER->error(exc.what(), __LINE__, "request handler function", __FILE__);
-			error_response = new http::HttpResponseServerError(
+			error_response = std::make_unique<http::HttpResponseServerError>(
 				"<p style=\"font-size: 24px;\" >Internal Server Error</p>"
 			);
 		}
@@ -172,21 +177,22 @@ StartServerCommand::get_handler()
 		if (!response)
 		{
 			// Response was not instantiated.
-			error_response = new http::HttpResponseServerError("<h2>500 - Internal Server Error</h2>");
+			error_response = std::make_unique<http::HttpResponseServerError>(
+				"<h2>500 - Internal Server Error</h2>"
+			);
 		}
 
 		if (error_response)
 		{
-			delete response;
-
 			// TODO: render error response;
 			//  if setting.DEBUG is true render detailed error,
 			//  otherwise render status code and reason phrase.
-			response = error_response;
+			send_response(request, error_response.get(), client, this->settings);
 		}
-
-		send_response(request, response, client, this->settings);
-		delete response;
+		else
+		{
+			send_response(request, response.get(), client, this->settings);
+		}
 	};
 
 	return handler;
@@ -297,42 +303,40 @@ void StartServerCommand::setup_server_ctx(core::net::internal::HttpServer::conte
 	ctx.handler = this->get_handler();
 }
 
-http::HttpResponseBase* StartServerCommand::process_request_middleware(
+std::unique_ptr<http::IHttpResponse> StartServerCommand::process_request_middleware(
 	http::HttpRequest* request, conf::Settings* settings
 )
 {
-	http::HttpResponseBase* response = nullptr;
 	for (auto& middleware : settings->MIDDLEWARE)
 	{
-		response = middleware->process_request(request);
+		auto response = middleware->process_request(request);
 		if (response)
 		{
-			break;
+			return response;
 		}
 	}
 
-	return response;
+	return nullptr;
 }
 
-http::HttpResponseBase* StartServerCommand::process_urlpatterns(
+std::unique_ptr<http::IHttpResponse> StartServerCommand::process_urlpatterns(
 	http::HttpRequest* request,
 	std::vector<urls::UrlPattern>& urlpatterns,
 	conf::Settings* settings
 )
 {
-	http::HttpResponseBase* response = nullptr;
 	auto apply = urls::resolve(request->path(), settings->ROOT_URLCONF);
 	if (apply)
 	{
-		response = apply(request, settings);
+		return apply(request, settings);
 	}
 
-	return response;
+	return nullptr;
 }
 
-http::HttpResponseBase* StartServerCommand::process_response_middleware(
+std::unique_ptr<http::IHttpResponse> StartServerCommand::process_response_middleware(
 	http::HttpRequest* request,
-	http::HttpResponseBase* response,
+	http::IHttpResponse* response,
 	conf::Settings* settings
 )
 {
@@ -341,18 +345,16 @@ http::HttpResponseBase* StartServerCommand::process_response_middleware(
 		auto curr_response = settings->MIDDLEWARE[i]->process_response(request, response);
 		if (curr_response)
 		{
-			delete response;
-			response = curr_response;
-			break;
+			return curr_response;
 		}
 	}
 
-	return response;
+	return nullptr;
 }
 
 void StartServerCommand::send_response(
 	http::HttpRequest* request,
-	http::HttpResponseBase* response,
+	http::IHttpResponse* response,
 	const core::net::internal::socket_t& client,
 	conf::Settings* settings
 )

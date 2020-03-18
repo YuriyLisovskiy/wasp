@@ -44,20 +44,17 @@ UrlPattern make_static(
 		http::HttpRequest* request,
 		views::Args* args,
 		conf::Settings* settings
-	) -> http::HttpResponseBase*
+	) -> std::unique_ptr<http::IHttpResponse>
 	{
 		views::StaticView view(settings);
-		auto* kwargs = new collections::Dict(
+		auto kwargs = std::make_unique<collections::Dict<std::string, std::string>>(
 			std::map<std::string, std::string>{
 				{"document_root", static_root}
 			}
 		);
-		view.set_kwargs(kwargs);
+		view.set_kwargs(kwargs.get());
 		view.setup(request);
-		auto response = view.dispatch(args);
-		delete kwargs;
-
-		return response;
+		return view.dispatch(args);
 	};
 
 	return make_url(

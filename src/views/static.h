@@ -56,7 +56,7 @@ public:
 
 	void set_kwargs(collections::Dict<std::string, std::string>* kwargs);
 
-	http::HttpResponseBase* get(http::HttpRequest* request, wasp::views::Args* args) final;
+	std::unique_ptr<http::IHttpResponse> get(http::HttpRequest* request, wasp::views::Args* args) final;
 };
 
 __VIEWS_END__

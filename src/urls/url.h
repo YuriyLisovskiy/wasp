@@ -23,6 +23,9 @@
 
 #pragma once
 
+// C++ libraries.
+#include <memory>
+
 // Module definitions.
 #include "./_def_.h"
 

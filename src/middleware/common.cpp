@@ -29,11 +29,11 @@ CommonMiddleware::CommonMiddleware(wasp::conf::Settings* settings)
 {
 }
 
-http::HttpResponseRedirectBase* CommonMiddleware::get_response_redirect(
+std::unique_ptr<http::IHttpResponse> CommonMiddleware::get_response_redirect(
 	const std::string& redirect_to
 )
 {
-	return new http::HttpResponsePermanentRedirect(redirect_to);
+	return std::make_unique<http::HttpResponsePermanentRedirect>(redirect_to);
 }
 
 bool CommonMiddleware::should_redirect_with_slash(http::HttpRequest* request)
@@ -76,7 +76,7 @@ std::string CommonMiddleware::get_full_path_with_slash(http::HttpRequest* reques
 	return new_path;
 }
 
-http::HttpResponseBase* CommonMiddleware::process_request(
+std::unique_ptr<http::IHttpResponse> CommonMiddleware::process_request(
 	http::HttpRequest* request
 )
 {
@@ -126,8 +126,8 @@ http::HttpResponseBase* CommonMiddleware::process_request(
 	return nullptr;
 }
 
-http::HttpResponseBase* CommonMiddleware::process_response(
-	http::HttpRequest* request, http::HttpResponseBase* response
+std::unique_ptr<http::IHttpResponse> CommonMiddleware::process_response(
+	http::HttpRequest* request, http::IHttpResponse* response
 )
 {
 	// If the given URL is "Not Found", then check if we

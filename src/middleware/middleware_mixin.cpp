@@ -29,13 +29,13 @@ MiddlewareMixin::MiddlewareMixin(conf::Settings* settings)
 	this->settings = settings;
 }
 
-http::HttpResponseBase* MiddlewareMixin::process_request(http::HttpRequest* request)
+std::unique_ptr<http::IHttpResponse> MiddlewareMixin::process_request(http::HttpRequest* request)
 {
 	return nullptr;
 }
 
-http::HttpResponseBase* MiddlewareMixin::process_response(
-	http::HttpRequest* request, http::HttpResponseBase* response
+std::unique_ptr<http::IHttpResponse> MiddlewareMixin::process_response(
+	http::HttpRequest* request, http::IHttpResponse* response
 )
 {
 	return nullptr;

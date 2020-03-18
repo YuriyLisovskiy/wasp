@@ -18,7 +18,7 @@ public:
 	{
 	}
 
-	wasp::http::HttpResponseBase* get(wasp::http::HttpRequest* request, wasp::views::Args* args) final
+	std::unique_ptr<wasp::http::IHttpResponse> get(wasp::http::HttpRequest* request, wasp::views::Args* args) final
 	{
 		std::string body(
 			"<h2>Hello from main view!</h2>"
@@ -27,7 +27,7 @@ public:
 			"   <li><a href=\"/picture/view/pic\">View picture!</a></li>"
 			"</ul>"
 		);
-		return new wasp::http::HttpResponse(body);
+		return std::make_unique<wasp::http::HttpResponse>(body);
 	}
 };
 

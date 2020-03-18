@@ -25,12 +25,11 @@
 __CORE_INTERNAL_BEGIN__
 
 
-std::map<std::string, std::string>* cookie_parser::parse(const std::string& content)
+void cookie_parser::parse(const std::string& content)
 {
-	auto* result = new std::map<std::string, std::string>();
 	if (content.empty())
 	{
-		return result;
+		return;
 	}
 
 	auto begin = content.begin();
@@ -55,7 +54,7 @@ std::map<std::string, std::string>* cookie_parser::parse(const std::string& cont
 			case cookie_parser::state::req_val:
 				if (input == ';')
 				{
-					(*result)[cookie_key] = cookie_value;
+					this->result[cookie_key] = cookie_value;
 					cookie_key.clear();
 					cookie_value.clear();
 					st = cookie_parser::state::req_key;
@@ -68,8 +67,7 @@ std::map<std::string, std::string>* cookie_parser::parse(const std::string& cont
 		}
 	}
 
-	(*result)[cookie_key] = cookie_value;
-	return result;
+	this->result[cookie_key] = cookie_value;
 }
 
 __CORE_INTERNAL_END__

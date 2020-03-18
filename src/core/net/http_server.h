@@ -31,7 +31,7 @@
 #include <vector>
 #include <fstream>
 #include <thread>
-#include <poll.h>
+#include <memory>
 
 // Module definitions.
 #include "./_def_.h"
@@ -124,7 +124,7 @@ public:
 	~HttpServer();
 	void finish();
 	void listen_and_serve();
-	static void send(http::HttpResponseBase* response, const socket_t& client);
+	static void send(http::IHttpResponse* response, const socket_t& client);
 	static void send(http::StreamingHttpResponse* response, const socket_t& client);
 
 private:

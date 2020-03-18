@@ -41,7 +41,9 @@ struct cookie_parser final
 		req_val
 	};
 
-	static std::map<std::string, std::string>* parse(const std::string& content);
+	std::map<std::string, std::string> result;
+
+	void parse(const std::string& content);
 };
 
 __CORE_INTERNAL_END__

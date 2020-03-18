@@ -70,13 +70,13 @@ struct request_parser final
 	std::map<std::string, std::string> headers;
 
 	/// Contains get request's parameters.
-	http::HttpRequest::Parameters<std::string, std::string>* get_parameters = nullptr;
+	http::HttpRequest::Parameters<std::string, std::string> get_parameters;
 
 	/// Contains post request's parameters.
-	http::HttpRequest::Parameters<std::string, std::string>* post_parameters = nullptr;
+	http::HttpRequest::Parameters<std::string, std::string> post_parameters;
 
 	/// Contains request's files when request was sent as application/form-data.
-	http::HttpRequest::Parameters<std::string, UploadedFile>* files_parameters = nullptr;
+	http::HttpRequest::Parameters<std::string, UploadedFile> files_parameters;
 
 	/// Contains the size of request's content.
 	unsigned long long content_size{};
@@ -161,7 +161,10 @@ struct request_parser final
 	/// Sets parameters according to http request method.
 	///
 	/// @param params: parsed get/post parameters.
-	void set_parameters(http::HttpRequest::Parameters<std::string, std::string>* params);
+	void set_parameters(
+		collections::Dict<std::string, std::string>& dict,
+		collections::MultiValueDict<std::string, std::string>& multi_dict
+	);
 
 	/// Parses chunks from http request body if request is chunked.
 	///
@@ -194,19 +197,6 @@ struct request_parser final
 
 	/// Default constructor.
 	request_parser() = default;
-
-	/// Deletes struct's fields which are pointers.
-	~request_parser();
-
-	/// Builds an http request from parsed data.
-	///
-	/// @return HttpRequest object built from http stream.
-	http::HttpRequest* build_request();
-
-	/// Creates Dict object from headers' map.
-	///
-	/// @return Dict which contains http request headers.
-	collections::Dict<std::string, std::string> get_headers();
 
 	/// Parses http request body from given stream.
 	///

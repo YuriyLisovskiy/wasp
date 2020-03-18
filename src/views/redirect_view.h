@@ -57,13 +57,13 @@ public:
 	/// Return the URL redirect to.
 	std::string get_redirect_url();
 
-	http::HttpResponse* get(http::HttpRequest* request, Args* args) override;
-	http::HttpResponse* post(http::HttpRequest* request, Args* args) override;
-	http::HttpResponse* head(http::HttpRequest* request, Args* args) override;
-	http::HttpResponse* options(http::HttpRequest* request, Args* args) override;
-	http::HttpResponse* put(http::HttpRequest* request, Args* args) override;
-	http::HttpResponse* delete_(http::HttpRequest* request, Args* args) override;
-	http::HttpResponse* patch(http::HttpRequest* request, Args* args) override;
+	std::unique_ptr<http::IHttpResponse> get(http::HttpRequest* request, Args* args) override;
+	std::unique_ptr<http::IHttpResponse> post(http::HttpRequest* request, Args* args) override;
+	std::unique_ptr<http::IHttpResponse> head(http::HttpRequest* request, Args* args) override;
+	std::unique_ptr<http::IHttpResponse> options(http::HttpRequest* request, Args* args) override;
+	std::unique_ptr<http::IHttpResponse> put(http::HttpRequest* request, Args* args) override;
+	std::unique_ptr<http::IHttpResponse> delete_(http::HttpRequest* request, Args* args) override;
+	std::unique_ptr<http::IHttpResponse> patch(http::HttpRequest* request, Args* args) override;
 };
 
 __VIEWS_END__

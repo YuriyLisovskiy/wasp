@@ -56,7 +56,7 @@ std::string RedirectView::get_redirect_url()
 	return url;
 }
 
-http::HttpResponse* RedirectView::get(http::HttpRequest* request, Args* args)
+std::unique_ptr<http::IHttpResponse> RedirectView::get(http::HttpRequest* request, Args* args)
 {
 	std::string url = this->get_redirect_url();
 	if (url.empty())
@@ -66,43 +66,43 @@ http::HttpResponse* RedirectView::get(http::HttpRequest* request, Args* args)
 			this->_logger->warning("Gone: " + request->path());
 		}
 
-		return new http::HttpResponseGone("");
+		return std::make_unique<http::HttpResponseGone>("");
 	}
 
 	if (this->_permanent)
 	{
-		return new http::HttpResponsePermanentRedirect(url);
+		return std::make_unique<http::HttpResponsePermanentRedirect>(url);
 	}
 
-	return new http::HttpResponseRedirect(url);
+	return std::make_unique<http::HttpResponseRedirect>(url);
 }
 
-http::HttpResponse* RedirectView::post(http::HttpRequest* request, Args* args)
+std::unique_ptr<http::IHttpResponse> RedirectView::post(http::HttpRequest* request, Args* args)
 {
 	return this->get(request, args);
 }
 
-http::HttpResponse* RedirectView::put(http::HttpRequest* request, Args* args)
+std::unique_ptr<http::IHttpResponse> RedirectView::put(http::HttpRequest* request, Args* args)
 {
 	return this->get(request, args);
 }
 
-http::HttpResponse* RedirectView::patch(http::HttpRequest* request, Args* args)
+std::unique_ptr<http::IHttpResponse> RedirectView::patch(http::HttpRequest* request, Args* args)
 {
 	return this->get(request, args);
 }
 
-http::HttpResponse* RedirectView::delete_(http::HttpRequest* request, Args* args)
+std::unique_ptr<http::IHttpResponse> RedirectView::delete_(http::HttpRequest* request, Args* args)
 {
 	return this->get(request, args);
 }
 
-http::HttpResponse* RedirectView::head(http::HttpRequest* request, Args* args)
+std::unique_ptr<http::IHttpResponse> RedirectView::head(http::HttpRequest* request, Args* args)
 {
 	return this->get(request, args);
 }
 
-http::HttpResponse* RedirectView::options(http::HttpRequest* request, Args* args)
+std::unique_ptr<http::IHttpResponse> RedirectView::options(http::HttpRequest* request, Args* args)
 {
 	return this->get(request, args);
 }

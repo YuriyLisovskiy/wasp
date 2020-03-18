@@ -53,7 +53,7 @@ void View::setup(http::HttpRequest* request)
 	this->_request = request;
 }
 
-http::HttpResponseBase* View::dispatch(Args* args)
+std::unique_ptr<http::IHttpResponse> View::dispatch(Args* args)
 {
 	if (this->_request == nullptr)
 	{
@@ -73,7 +73,7 @@ http::HttpResponseBase* View::dispatch(Args* args)
 	}
 
 	std::string method = core::str::lower(this->_request->method());
-	http::HttpResponseBase* result = nullptr;
+	std::unique_ptr<http::IHttpResponse> result = nullptr;
 	if (method == "get")
 	{
 		result = this->get(this->_request, args);
@@ -115,7 +115,7 @@ http::HttpResponseBase* View::dispatch(Args* args)
 	return result;
 }
 
-http::HttpResponseBase* View::http_method_not_allowed(http::HttpRequest* request)
+std::unique_ptr<http::IHttpResponse> View::http_method_not_allowed(http::HttpRequest* request)
 {
 	if (this->_logger != nullptr)
 	{
@@ -125,7 +125,7 @@ http::HttpResponseBase* View::http_method_not_allowed(http::HttpRequest* request
 		);
 	}
 
-	return new http::HttpResponseNotAllowed("", this->allowed_methods());
+	return std::make_unique<http::HttpResponseNotAllowed>("", this->allowed_methods());
 }
 
 std::vector<std::string> View::allowed_methods()
@@ -147,39 +147,39 @@ std::vector<std::string> View::allowed_methods()
 	return result;
 }
 
-http::HttpResponseBase* View::get(http::HttpRequest* request, Args* args)
+std::unique_ptr<http::IHttpResponse> View::get(http::HttpRequest* request, Args* args)
 {
 	return nullptr;
 }
 
-http::HttpResponseBase* View::post(http::HttpRequest* request, Args* args)
+std::unique_ptr<http::IHttpResponse> View::post(http::HttpRequest* request, Args* args)
 {
 	return nullptr;
 }
 
-http::HttpResponseBase* View::put(http::HttpRequest* request, Args* args)
+std::unique_ptr<http::IHttpResponse> View::put(http::HttpRequest* request, Args* args)
 {
 	return nullptr;
 }
 
-http::HttpResponseBase* View::patch(http::HttpRequest* request, Args* args)
+std::unique_ptr<http::IHttpResponse> View::patch(http::HttpRequest* request, Args* args)
 {
 	return nullptr;
 }
 
-http::HttpResponseBase* View::delete_(http::HttpRequest* request, Args* args)
+std::unique_ptr<http::IHttpResponse> View::delete_(http::HttpRequest* request, Args* args)
 {
 	return nullptr;
 }
 
-http::HttpResponseBase* View::head(http::HttpRequest* request, Args* args)
+std::unique_ptr<http::IHttpResponse> View::head(http::HttpRequest* request, Args* args)
 {
 	return this->get(request, args);
 }
 
-http::HttpResponseBase* View::options(http::HttpRequest* request, Args* args)
+std::unique_ptr<http::IHttpResponse> View::options(http::HttpRequest* request, Args* args)
 {
-	auto* response = new http::HttpResponse("");
+	auto response = std::make_unique<http::HttpResponse>("");
 	auto allowed_methods = this->allowed_methods();
 	response->set_header(
 		"Allow",
@@ -189,7 +189,7 @@ http::HttpResponseBase* View::options(http::HttpRequest* request, Args* args)
 	return response;
 }
 
-http::HttpResponseBase* View::trace(http::HttpRequest* request, Args* args)
+std::unique_ptr<http::IHttpResponse> View::trace(http::HttpRequest* request, Args* args)
 {
 	return nullptr;
 }

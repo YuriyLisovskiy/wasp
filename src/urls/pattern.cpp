@@ -58,7 +58,7 @@ std::string UrlPattern::get_name() const
 	return this->_name;
 }
 
-http::HttpResponseBase* UrlPattern::apply(
+std::unique_ptr<http::IHttpResponse> UrlPattern::apply(
 	http::HttpRequest* request,
 	conf::Settings* settings,
 	views::Args* args

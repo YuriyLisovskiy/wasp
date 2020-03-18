@@ -20,7 +20,7 @@ public:
 		this->_template_name = "form.html";
 	}
 
-	wasp::http::HttpResponseBase* get(wasp::http::HttpRequest* request, wasp::views::Args* args) final
+	std::unique_ptr<wasp::http::IHttpResponse> get(wasp::http::HttpRequest* request, wasp::views::Args* args) final
 	{
 		std::string user_row;
 		if (args->contains("user_name"))
@@ -48,7 +48,7 @@ public:
 		return this->render(request, ctx);
 	}
 
-	wasp::http::HttpResponseBase* post(wasp::http::HttpRequest* request, wasp::views::Args* args) final
+	std::unique_ptr<wasp::http::IHttpResponse> post(wasp::http::HttpRequest* request, wasp::views::Args* args) final
 	{
 		if (request->FILES.contains("super_file"))
 		{
@@ -56,6 +56,6 @@ public:
 			super_file.save();
 		}
 
-		return new wasp::http::HttpResponseRedirect("/index");
+		return std::make_unique<wasp::http::HttpResponseRedirect>("/index");
 	}
 };
