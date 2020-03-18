@@ -24,18 +24,6 @@
 
 __CORE_INTERNAL_BEGIN__
 
-query_parser::query_parser()
-{
-	this->dict = new collections::Dict<std::string, std::string>();
-	this->multi_dict = new collections::MultiValueDict<std::string, std::string>();
-}
-
-query_parser::~query_parser()
-{
-	delete this->dict;
-	delete this->multi_dict;
-}
-
 void query_parser::parse(const std::string& content)
 {
 	if (content.empty())
@@ -83,12 +71,12 @@ void query_parser::parse(const std::string& content)
 
 void query_parser::append_parameter(const std::string& key, const std::string& value)
 {
-	if (!this->dict->contains(key))
+	if (!this->dict.contains(key))
 	{
-		this->dict->set(key, value);
+		this->dict.set(key, value);
 	}
 
-	this->multi_dict->append(key, value);
+	this->multi_dict.append(key, value);
 }
 
 __CORE_INTERNAL_END__

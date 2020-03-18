@@ -99,16 +99,16 @@ bool _if_unmodified_since_passes(
 	return last_modified != -1 && last_modified <= if_unmodified_since;
 }
 
-http::HttpResponseBase* _precondition_failed(http::HttpRequest* request)
+std::unique_ptr<http::IHttpResponse> _precondition_failed(http::HttpRequest* request)
 {
-	return new http::HttpResponse("", 412);
+	return std::make_unique<http::HttpResponse>("", 412);
 }
 
-http::HttpResponseBase* _not_modified(
-	http::HttpRequest* request, http::HttpResponseBase* response
+std::unique_ptr<http::IHttpResponse> _not_modified(
+	http::HttpRequest* request, http::IHttpResponse* response
 )
 {
-	auto* new_response = new http::HttpResponseNotModified("");
+	auto new_response = std::make_unique<http::HttpResponseNotModified>("");
 	if (response)
 	{
 		auto headers = {
@@ -139,7 +139,7 @@ http::HttpResponseBase* _not_modified(
 		new_response->set_cookies(response->get_cookies());
 	}
 
-	return nullptr;
+	return new_response;
 }
 
 __CACHE_INTERNAL_END__
@@ -147,7 +147,7 @@ __CACHE_INTERNAL_END__
 
 __CACHE_BEGIN__
 
-void set_response_etag(http::HttpResponseBase* response)
+void set_response_etag(http::IHttpResponse* response)
 {
 	if (!response->is_streaming() && response->content_length() > 0)
 	{
@@ -158,11 +158,11 @@ void set_response_etag(http::HttpResponseBase* response)
 	}
 }
 
-http::HttpResponseBase* get_conditional_response(
+std::unique_ptr<http::IHttpResponse> get_conditional_response(
 	http::HttpRequest* request,
 	const std::string& etag,
 	long last_modified,
-	http::HttpResponseBase* response
+	http::IHttpResponse* response
 )
 {
 	// Only return conditional responses on successful requests.

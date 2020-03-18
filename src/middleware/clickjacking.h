@@ -54,7 +54,9 @@ class XFrameOptionsMiddleware : public MiddlewareMixin
 public:
 	explicit XFrameOptionsMiddleware(conf::Settings* settings);
 
-	http::HttpResponseBase* process_response(http::HttpRequest* request, http::HttpResponseBase* response) override;
+	std::unique_ptr<http::IHttpResponse> process_response(
+		http::HttpRequest* request, http::IHttpResponse* response
+	) override;
 
 	/// Get the value to set for the X_FRAME_OPTIONS header. Use the value from
 	/// the X_FRAME_OPTIONS setting, or 'DENY' if not set.
@@ -62,7 +64,7 @@ public:
 	/// This method can be overridden if needed, allowing it to vary based on
 	/// the request or response.
 	virtual std::string get_x_frame_options_value(
-		http::HttpRequest* request, http::HttpResponseBase* response
+		http::HttpRequest* request, http::IHttpResponse* response
 	);
 };
 

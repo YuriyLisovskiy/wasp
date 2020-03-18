@@ -29,9 +29,6 @@
 
 // Wasp libraries.
 #include "./middleware_mixin.h"
-#include "../http/request.h"
-#include "../http/response.h"
-#include "../conf/settings.h"
 #include "../collections/dict.h"
 #include "../core/parsers/cookie_parser.h"
 
@@ -42,7 +39,9 @@ class CookieMiddleware final: public MiddlewareMixin
 {
 public:
 	explicit CookieMiddleware(conf::Settings* settings);
-	http::HttpResponseBase* process_request(http::HttpRequest* request) final;
+	std::unique_ptr<http::IHttpResponse> process_request(
+		http::HttpRequest* request
+	) final;
 };
 
 __MIDDLEWARE_END__

@@ -39,8 +39,8 @@
 #include "./_def_.h"
 
 // Wasp libraries.
+#include "./interfaces.h"
 #include "./request.h"
-#include "./cookie.h"
 #include "../core/exceptions.h"
 #include "./status.h"
 #include "./url.h"
@@ -58,7 +58,7 @@ __HTTP_BEGIN__
 ///
 /// This class doesn't handle content. It should not be used directly.
 /// Use the HttpResponse subclass instead.
-class HttpResponseBase
+class HttpResponseBase : public IHttpResponse
 {
 protected:
 	collections::Dict<std::string, std::string> _headers;
@@ -79,15 +79,15 @@ public:
 		const std::string& reason = "",
 		const std::string& charset = "utf-8"
 	);
-	virtual ~HttpResponseBase() = default;
+	~HttpResponseBase() override = default;
 	std::string get_header(
 		const std::string& key, const std::string& default_value
-	);
-	void set_header(const std::string& key, const std::string& value);
-	void remove_header(const std::string& key);
-	bool has_header(const std::string& key);
-	virtual void set_content(const std::string& content);
-	virtual std::string get_content();
+	) final;
+	void set_header(const std::string& key, const std::string& value) final;
+	void remove_header(const std::string& key) final;
+	bool has_header(const std::string& key) final;
+	void set_content(const std::string& content) override;
+	std::string get_content() override;
 
 	void set_cookie(
 		const std::string& name,
@@ -99,7 +99,7 @@ public:
 		bool is_secure = false,
 		bool is_http_only = false,
 		const std::string& same_site = ""
-	);
+	) final;
 	void set_signed_cookie(
 		const std::string& secret_key,
 		const std::string& name,
@@ -112,39 +112,37 @@ public:
 	    bool is_secure = false,
 	    bool is_http_only = false,
 		const std::string& same_site = ""
-	);
-	const collections::Dict<std::string, Cookie>& get_cookies();
+	) final;
+	const collections::Dict<std::string, Cookie>& get_cookies() final;
 	void set_cookies(
 		const collections::Dict<std::string, Cookie>& cookies
-	);
+	) final;
 	void delete_cookie(
 		const std::string& name, const std::string& path, const std::string& domain
-	);
+	) final;
 
-	std::string get_reason_phrase();
-	void set_reason_phrase(std::string value);
+	std::string get_reason_phrase() final;
+	void set_reason_phrase(std::string value) final;
 
-	unsigned short int status();
-	std::string content_type();
-	virtual size_t content_length();
-	std::string charset();
-	bool is_streaming();
+	unsigned short int status() final;
+	std::string content_type() final;
+	size_t content_length() override;
+	std::string charset() final;
+	bool is_streaming() final;
 
 	// These methods partially implement the file-like object interface.
-	virtual void close();
-	virtual void write(const std::string& content);
-	virtual void flush();
-	virtual unsigned long int tell();
+	void close() override;
+	void write(const std::string& content) override;
+	void flush() override;
+	unsigned long int tell() override;
 
 	/// These methods partially implement a stream-like object interface.
-	virtual bool readable();
-	virtual bool seekable();
-	virtual bool writable();
-	virtual void write_lines(const std::vector<std::string>& lines);
+	bool readable() override;
+	bool seekable() override;
+	bool writable() override;
+	void write_lines(const std::vector<std::string>& lines) override;
 
-	virtual std::string serialize() = 0;
-
-	std::string& operator[] (const std::string& key);
+	std::string& operator[] (const std::string& key) override;
 };
 
 

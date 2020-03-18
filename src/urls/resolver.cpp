@@ -24,14 +24,14 @@
 
 __URLS_BEGIN__
 
-std::function<http::HttpResponseBase*(
+std::function<std::unique_ptr<http::IHttpResponse>(
 	http::HttpRequest* request,
 	conf::Settings* settings
 )> resolve(
 	const std::string& path, std::vector<UrlPattern>& urlpatterns
 )
 {
-	std::function<http::HttpResponseBase*(
+	std::function<std::unique_ptr<http::IHttpResponse>(
 		http::HttpRequest* request,
 		conf::Settings* settings
 	)> fn = nullptr;
@@ -43,12 +43,10 @@ std::function<http::HttpResponseBase*(
 			fn = [url_pattern, args_map](
 				http::HttpRequest* request,
 				conf::Settings* settings
-			) mutable -> http::HttpResponseBase*
+			) mutable -> std::unique_ptr<http::IHttpResponse>
 			{
-				auto* args = new views::Args(args_map);
-				auto result = url_pattern.apply(request, settings, args);
-				delete args;
-				return result;
+				auto args = std::make_unique<views::Args>(args_map);
+				return url_pattern.apply(request, settings, args.get());
 			};
 			break;
 		}

@@ -23,6 +23,9 @@
 
 #pragma once
 
+// C++ libraries.
+#include <memory>
+
 // Module definitions.
 #include "./_def_.h"
 
@@ -32,6 +35,7 @@
 #include "../../../urls/url.h"
 #include "../../../urls/resolver.h"
 #include "../../../http/request.h"
+#include "../../../http/interfaces.h"
 #include "../../../core/net/http_server.h"
 #include "../../../core/parsers/url_parser.h"
 #include "../../../core/datetime/datetime.h"
@@ -72,22 +76,22 @@ protected:
 	void build_app_patterns(std::vector<urls::UrlPattern>& patterns);
 	void setup_server_ctx(core::net::internal::HttpServer::context& ctx);
 
-	static http::HttpResponseBase* process_request_middleware(
+	static std::unique_ptr<http::IHttpResponse> process_request_middleware(
 		http::HttpRequest* request, conf::Settings* settings
 	);
-	static http::HttpResponseBase* process_response_middleware(
+	static std::unique_ptr<http::IHttpResponse> process_response_middleware(
 		http::HttpRequest* request,
-		http::HttpResponseBase* response,
+		http::IHttpResponse* response,
 		conf::Settings* settings
 	);
-	static http::HttpResponseBase* process_urlpatterns(
+	static std::unique_ptr<http::IHttpResponse> process_urlpatterns(
 		http::HttpRequest* request,
 		std::vector<urls::UrlPattern>& urlpatterns,
 		conf::Settings* settings
 	);
 	static void send_response(
 		http::HttpRequest* request,
-		http::HttpResponseBase* response,
+		http::IHttpResponse* response,
 		const core::net::internal::socket_t& client,
 		conf::Settings* settings
 	);

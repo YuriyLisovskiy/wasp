@@ -29,13 +29,13 @@
 #include <string>
 #include <vector>
 #include <regex>
+#include <memory>
 
 // Module definitions.
 #include "./_def_.h"
 
 // Wasp libraries.
 #include "../views/args.h"
-//#include "../views/view.h"
 #include "../http/request.h"
 #include "../http/response.h"
 #include "../core/regex.h"
@@ -50,7 +50,7 @@ __CONF_END__
 
 __URLS_BEGIN__
 
-typedef std::function<http::HttpResponseBase*(
+typedef std::function<std::unique_ptr<http::IHttpResponse>(
 	http::HttpRequest*, views::Args*, conf::Settings*
 )> ViewHandler;
 
@@ -75,7 +75,7 @@ public:
 	);
 
 	std::string get_name() const;
-	http::HttpResponseBase* apply(
+	std::unique_ptr<http::IHttpResponse> apply(
 		http::HttpRequest* request,
 		conf::Settings* settings,
 		views::Args* args = nullptr

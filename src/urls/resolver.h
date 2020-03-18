@@ -26,6 +26,7 @@
 // C++ libraries.
 #include <vector>
 #include <functional>
+#include <memory>
 
 // Module definitions.
 #include "./_def_.h"
@@ -40,7 +41,7 @@ __URLS_BEGIN__
 
 /// Searches path in urlpatterns and returns an expression
 /// to process request if path is found, otherwise returns nullptr.
-extern std::function<http::HttpResponseBase*(
+extern std::function<std::unique_ptr<http::IHttpResponse>(
 	http::HttpRequest* request,
 	conf::Settings* settings
 )> resolve(

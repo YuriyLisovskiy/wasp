@@ -41,7 +41,7 @@ SecurityMiddleware::SecurityMiddleware(conf::Settings* settings)
 	}
 }
 
-http::HttpResponseBase* SecurityMiddleware::process_request(http::HttpRequest* request)
+std::unique_ptr<http::IHttpResponse> SecurityMiddleware::process_request(http::HttpRequest* request)
 {
 	auto path = core::str::ltrim(request->path(), "/");
 	bool matched = false;
@@ -66,7 +66,7 @@ http::HttpResponseBase* SecurityMiddleware::process_request(http::HttpRequest* r
 				this->settings->DEBUG,
 				this->settings->ALLOWED_HOSTS
 			) : this->redirect_host;
-		return new http::HttpResponsePermanentRedirect(
+		return std::make_unique<http::HttpResponsePermanentRedirect>(
 			"https://" + host + request->full_path()
 		);
 	}
@@ -74,8 +74,8 @@ http::HttpResponseBase* SecurityMiddleware::process_request(http::HttpRequest* r
 	return nullptr;
 }
 
-http::HttpResponseBase* SecurityMiddleware::process_response(
-	http::HttpRequest* request, http::HttpResponseBase* response
+std::unique_ptr<http::IHttpResponse> SecurityMiddleware::process_response(
+	http::HttpRequest* request, http::IHttpResponse* response
 )
 {
 	if (

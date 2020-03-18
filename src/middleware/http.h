@@ -35,7 +35,6 @@
 #include "../http/headers.h"
 #include "../utils/cache.h"
 #include "../utils/http.h"
-#include "../conf/settings.h"
 
 
 __MIDDLEWARE_BEGIN__
@@ -45,13 +44,13 @@ class ConditionalGetMiddleware : public MiddlewareMixin
 protected:
 
 	/// Return true if an ETag header should be added to response.
-	static bool needs_etag(http::HttpResponseBase* response);
+	static bool needs_etag(http::IHttpResponse* response);
 
 public:
 	explicit ConditionalGetMiddleware(conf::Settings* settings);
 
-	http::HttpResponseBase* process_response(
-		http::HttpRequest* request, http::HttpResponseBase* response
+	std::unique_ptr<http::IHttpResponse> process_response(
+		http::HttpRequest* request, http::IHttpResponse* response
 	) override;
 };
 

@@ -101,7 +101,7 @@ void HttpServer::listen_and_serve()
 	this->_start_listener();
 }
 
-void HttpServer::send(http::HttpResponseBase* response, const socket_t& client)
+void HttpServer::send(http::IHttpResponse* response, const socket_t& client)
 {
 	HttpServer::_send(response->serialize().c_str(), client);
 }
@@ -248,10 +248,9 @@ http::HttpRequest* HttpServer::_handle_request(const socket_t& client)
 	auto headers_str = HttpServer::_read_headers(client, body_beginning);
 
 	rp.parse_headers(headers_str);
-	auto headers = rp.get_headers();
-	if (headers.contains(http::CONTENT_LENGTH))
+	if (rp.headers.find(http::CONTENT_LENGTH) != rp.headers.end())
 	{
-		size_t body_length = std::strtol(headers.get(http::CONTENT_LENGTH).c_str(), nullptr, 10);
+		size_t body_length = std::strtol(rp.headers[http::CONTENT_LENGTH].c_str(), nullptr, 10);
 		std::string body;
 		if (body_length == body_beginning.size())
 		{
@@ -265,7 +264,20 @@ http::HttpRequest* HttpServer::_handle_request(const socket_t& client)
 		rp.parse_body(body, this->_media_root);
 	}
 
-	return rp.build_request();
+	auto* request = new http::HttpRequest(
+		rp.method,
+		rp.path,
+		rp.major_v,
+		rp.minor_v,
+		rp.query,
+		rp.keep_alive,
+		rp.content,
+		rp.headers,
+		rp.get_parameters,
+		rp.post_parameters,
+		rp.files_parameters
+	);
+	return request;
 }
 
 std::string HttpServer::_read_body(
@@ -401,10 +413,8 @@ void HttpServer::_serve_connection(const socket_t& client)
 		measure.start();
 	}
 
-	http::HttpRequest* request = this->_handle_request(client);
-	this->_http_handler(request, client);
-	delete request;
-
+	auto request = std::unique_ptr<http::HttpRequest>(this->_handle_request(client));
+	this->_http_handler(request.get(), client);
 	if (this->_verbose)
 	{
 		measure.end();

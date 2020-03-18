@@ -32,8 +32,6 @@
 #include "./middleware_mixin.h"
 #include "../core/regex.h"
 #include "../core/string/str.h"
-#include "../http/response.h"
-#include "../conf/settings.h"
 
 
 __MIDDLEWARE_BEGIN__
@@ -54,8 +52,12 @@ protected:
 public:
 	explicit SecurityMiddleware(conf::Settings* settings);
 
-	http::HttpResponseBase* process_request(http::HttpRequest* request) override;
-	http::HttpResponseBase* process_response(http::HttpRequest* request, http::HttpResponseBase* response) override;
+	std::unique_ptr<http::IHttpResponse> process_request(
+		http::HttpRequest* request
+	) override;
+	std::unique_ptr<http::IHttpResponse> process_response(
+		http::HttpRequest* request, http::IHttpResponse* response
+	) override;
 };
 
 __MIDDLEWARE_END__

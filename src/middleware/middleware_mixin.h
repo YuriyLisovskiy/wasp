@@ -29,8 +29,6 @@
 
 // Wasp libraries.
 #include "./interfaces.h"
-#include "../http/request.h"
-#include "../http/response.h"
 #include "../conf/settings.h"
 
 
@@ -45,9 +43,9 @@ public:
 	explicit MiddlewareMixin(conf::Settings* settings);
 	~MiddlewareMixin() override = default;
 
-	http::HttpResponseBase* process_request(http::HttpRequest* request) override;
-	http::HttpResponseBase* process_response(
-		http::HttpRequest* request, http::HttpResponseBase* response
+	std::unique_ptr<http::IHttpResponse> process_request(http::HttpRequest* request) override;
+	std::unique_ptr<http::IHttpResponse> process_response(
+		http::HttpRequest* request, http::IHttpResponse* response
 	) override;
 };
 
