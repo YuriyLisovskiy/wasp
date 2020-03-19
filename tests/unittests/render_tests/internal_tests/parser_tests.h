@@ -15,29 +15,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * render/library/syntax/url_tag.h
- *
- * Purpose:
- * TODO:
- */
+#ifndef WASP_UNIT_TESTS_RENDER_TESTS_INTERNAL_TESTS_PARSER_TESTS_H
+#define WASP_UNIT_TESTS_RENDER_TESTS_INTERNAL_TESTS_PARSER_TESTS_H
 
-#pragma once
+#include <gtest/gtest.h>
 
-// C++ libraries.
-#include <memory>
-
-// Module definitions.
-#include "./_def_.h"
-
-// Framework modules.
-#include "../../internal/parser.h"
+#include "../../_def_.h"
+#include "../../../../src/render/internal/parser.h"
 
 
-__SYNTAX_BEGIN__
+__UNIT_TESTS_BEGIN__
 
-extern std::function<std::shared_ptr<internal::node>(
-	internal::parser*, internal::token_t& token
-)> make_url_tag(const std::vector<urls::UrlPattern>& patterns);
+TEST(ParserTestCase, TestSplit)
+{
+	using namespace wasp::render::internal;
+	ASSERT_EQ(parser::get_command("hello()"), "hello");
+	ASSERT_EQ(parser::get_command("_hello()"), "_hello");
+	ASSERT_EQ(parser::get_command("_h3e_3llo_()"), "_h3e_3llo_");
+}
 
-__SYNTAX_END__
+__UNIT_TESTS_END__
+
+
+#endif // WASP_UNIT_TESTS_RENDER_TESTS_INTERNAL_TESTS_PARSER_TESTS_H

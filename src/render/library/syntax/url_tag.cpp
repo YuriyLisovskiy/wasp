@@ -24,6 +24,18 @@
 
 __SYNTAX_BEGIN__
 
-
+std::function<std::shared_ptr<internal::node>(
+	internal::parser*, internal::token_t& token
+)> make_url_tag(const std::vector<urls::UrlPattern>& patterns)
+{
+	return [](
+		internal::parser*,
+		internal::token_t& token
+	) -> std::shared_ptr<internal::node>
+	{
+		// TODO: implement make_url_tag(const std::vector<urls::UrlPattern>& patterns)
+		return nullptr;
+	};
+}
 
 __SYNTAX_END__

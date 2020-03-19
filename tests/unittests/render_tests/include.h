@@ -18,7 +18,7 @@
 #ifndef WASP_UNIT_TESTS_RENDER_TESTS_INCLUDE_H
 #define WASP_UNIT_TESTS_RENDER_TESTS_INCLUDE_H
 
-#include "./processors_tests/include.h"
+#include "./internal_tests/include.h"
 
 #include "./context_tests.h"
 

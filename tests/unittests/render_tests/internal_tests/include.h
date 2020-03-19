@@ -15,10 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WASP_UNIT_TESTS_RENDER_TESTS_PROCESSORS_TESTS_INCLUDE_H
-#define WASP_UNIT_TESTS_RENDER_TESTS_PROCESSORS_TESTS_INCLUDE_H
+#ifndef WASP_UNIT_TESTS_RENDER_TESTS_INTERNAL_TESTS_INCLUDE_H
+#define WASP_UNIT_TESTS_RENDER_TESTS_INTERNAL_TESTS_INCLUDE_H
 
 #include "./filter_expr_tests.h"
 #include "./lexer_tests.h"
+#include "./parser_tests.h"
 
-#endif // WASP_UNIT_TESTS_RENDER_TESTS_PROCESSORS_TESTS_INCLUDE_H
+#endif // WASP_UNIT_TESTS_RENDER_TESTS_INTERNAL_TESTS_INCLUDE_H

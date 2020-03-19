@@ -67,15 +67,21 @@ void parser::parse(
 		}
 		else if (token.type == token_type::block)
 		{
-			auto arr = core::str::split(token.content);
-			if (arr.empty())
+			if (token.content.empty())
 			{
 				parser::throw_error(
-					"Empty variable tag on line " + std::to_string(token.line_no), token
+					"Empty block tag on line " + std::to_string(token.line_no), token
 				);
 			}
 
-			auto command = arr[0];
+			auto command = get_command(token.content);
+			if (command.empty())
+			{
+				parser::throw_error(
+					"Empty command on line " + std::to_string(token.line_no), token
+				);
+			}
+
 			if (core::utility::contains(command, parse_until))
 			{
 				// A matching token has been reached. Return control to
@@ -228,6 +234,34 @@ void parser::invalid_block_tag(
 		": '" + command + "'. Did you forget to register ",
 		token
 	);
+}
+
+std::string parser::get_command(const std::string& content)
+{
+	std::string command;
+	if (!content.empty())
+	{
+		auto it = content.begin();
+		char ch = *it++;
+		if (std::isalpha(ch) || ch == '_')
+		{
+			command += ch;
+			while (it != content.end())
+			{
+				ch = *it++;
+				if (std::isalnum(ch) || ch == '_')
+				{
+					command += ch;
+				}
+				else
+				{
+					break;
+				}
+			}
+		}
+	}
+
+	return command;
 }
 
 __RENDER_INTERNAL_END__

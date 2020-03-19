@@ -49,8 +49,11 @@ std::shared_ptr<core::object::Object> Variable::resolve(
 	else if (this->_is_constant)
 	{
 		// TODO: add more value types.
+		auto c = this->_content;
+		core::str::trim(c, "'");
+		core::str::trim(c, "\"");
 		return std::shared_ptr<core::object::Object>(
-			new core::types::Value<std::string>(this->_content)
+			new core::types::Value<std::string>(c)
 		);
 	}
 	else

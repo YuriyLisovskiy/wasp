@@ -39,6 +39,7 @@ http::HttpRequest make_request(const std::string& method)
 		collections::Dict<std::string, std::string>(),
 		collections::MultiValueDict<std::string, std::string>()
 	);
+
 	auto empty_map = std::map<std::string, std::string>();
 	return http::HttpRequest(
 		method,

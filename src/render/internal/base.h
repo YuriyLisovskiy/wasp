@@ -37,6 +37,7 @@
 #include "../../core/regex.h"
 #include "../../core/object/object.h"
 #include "../../core/types/value.h"
+#include "../../core/string/str.h"
 
 
 __RENDER_INTERNAL_BEGIN__

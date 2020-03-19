@@ -89,6 +89,7 @@ struct parser
 		const std::string& command,
 		const std::vector<std::string>& parse_until
 	);
+	static std::string get_command(const std::string& content);
 };
 
 __RENDER_INTERNAL_END__
