@@ -39,7 +39,7 @@ Variable::Variable(
 }
 
 std::shared_ptr<core::object::Object> Variable::resolve(
-	const std::shared_ptr<IContext>& ctx
+	IContext* ctx
 )
 {
 	if (this->_content.empty())

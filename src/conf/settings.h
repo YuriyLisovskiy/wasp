@@ -27,6 +27,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <memory>
 
 // Module definitions.
 #include "./_def_.h"
@@ -38,6 +39,7 @@
 #include "../core/management/base.h"
 #include "../core/regex.h"
 #include "../render/backends/interfaces.h"
+#include "../render/library/_def_.h"
 
 
 __URLS_BEGIN__
@@ -52,6 +54,10 @@ __BACKENDS_BEGIN__
 class IBackend;
 __BACKENDS_END__
 
+__LIB_BEGIN__
+class ILibrary;
+__LIB_END__
+
 
 __CONF_BEGIN__
 
@@ -59,9 +65,9 @@ struct Settings
 {
 	bool DEBUG;
 
-	core::ILogger* LOGGER;
+	std::shared_ptr<core::ILogger> LOGGER;
 
-	/// Build paths inside the project like this: wasp::path::join(BASE_DIR, ...)
+	/// Build paths inside the project like this: path::join(BASE_DIR, ...)
 	std::string BASE_DIR;
 
 	/// Hosts/domain names that are valid for this site.
@@ -86,7 +92,7 @@ struct Settings
 	///
 	/// ROOT_APP is the first installed app by default, it can
 	/// be overridden in project settings.
-	apps::IAppConfig* ROOT_APP;
+	std::shared_ptr<apps::IAppConfig> ROOT_APP;
 
 	/// Vector of patterns which will be loaded from ROOT_APP.
 	/// To change this setting, setup ROOT_APP in your project
@@ -96,13 +102,13 @@ struct Settings
 	/// List of AppConfig-derived objects representing apps.
 	/// Order is required. The first app is interpreted as
 	/// main application configuration.
-	std::vector<apps::IAppConfig*> INSTALLED_APPS;
+	std::vector<std::shared_ptr<apps::IAppConfig>> INSTALLED_APPS;
 
 	/// List of commands to run from command line.
-	std::map<std::string, core::BaseCommand*> COMMANDS;
+	std::map<std::string, std::shared_ptr<core::BaseCommand>> COMMANDS;
 
 	/// Backend for rendering templates.
-	render::backends::IBackend* TEMPLATES_BACKEND;
+	std::unique_ptr<render::backends::IBackend> TEMPLATES_BACKEND;
 
 	/// Whether to append trailing slashes to URLs.
 	bool APPEND_SLASH;
@@ -218,12 +224,12 @@ struct Settings
 	/// that header/value, request.is_secure() will return true.
 	/// WARNING! Only set this if you fully understand what you're doing. Otherwise,
 	/// you may be opening yourself up to a security risk.
-	std::pair<std::string, std::string>* SECURE_PROXY_SSL_HEADER;
+	std::shared_ptr<std::pair<std::string, std::string>> SECURE_PROXY_SSL_HEADER;
 
 	/// List of middleware to use. Order is important; in the request phase, these
 	/// middleware will be applied in the order given, and in the response
 	/// phase the middleware will be applied in reverse order.
-	std::vector<middleware::IMiddleware*> MIDDLEWARE;
+	std::vector<std::shared_ptr<middleware::IMiddleware>> MIDDLEWARE;
 
 	/// Settings for CSRF cookie.
 	std::string CSRF_COOKIE_NAME;
@@ -252,28 +258,34 @@ struct Settings
 	bool SECURE_SSL_REDIRECT;
 
 	Settings();
-	virtual ~Settings();
+	virtual ~Settings() = default;
 	virtual void init() = 0;
 	virtual void override();
 	void prepare();
 
 	template <typename _T, typename = std::enable_if<std::is_base_of<apps::IAppConfig, _T>::value>>
-	apps::IAppConfig* app()
+	std::shared_ptr<apps::IAppConfig> app()
 	{
-		return new _T(this);
+		return std::make_shared<_T>(this);
 	}
 
 	template <typename _T, typename = std::enable_if<std::is_base_of<middleware::IMiddleware, _T>::value>>
-	middleware::IMiddleware* middleware()
+	std::shared_ptr<middleware::IMiddleware> middleware()
 	{
-		return new _T(this);
+		return std::make_shared<_T>(this);
 	}
 
 	template <typename _CommandT, typename = std::enable_if<std::is_base_of<core::BaseCommand, _CommandT>::value>>
-	std::pair<std::string, core::BaseCommand*> command()
+	std::pair<std::string, std::shared_ptr<core::BaseCommand>> command()
 	{
-		auto* command = new _CommandT(this);
-		return std::pair<std::string, core::BaseCommand*>{command->name(), command};
+		auto command = std::make_shared<_CommandT>(this);
+		return std::pair<std::string, std::shared_ptr<core::BaseCommand>>{command->name(), command};
+	}
+
+	template <typename _T, typename = std::enable_if<std::is_base_of<render::lib::ILibrary, _T>::value>>
+	std::shared_ptr<render::lib::ILibrary> library()
+	{
+		return std::make_shared<_T>(this);
 	}
 };
 

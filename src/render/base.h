@@ -42,7 +42,9 @@ __RENDER_BEGIN__
 class IContext
 {
 public:
-	virtual std::shared_ptr<core::object::Object> find_var(const std::string& key) = 0;
+	virtual std::shared_ptr<core::object::Object> find_var(
+		const std::string& key
+	) = 0;
 	virtual ~IContext() = default;
 };
 
@@ -53,7 +55,7 @@ public:
 	virtual ~ITemplate() = default;
 
 	/// Renders template code using given context.
-	virtual std::string render(const std::shared_ptr<IContext>& context) = 0;
+	virtual std::string render(IContext* context) = 0;
 };
 
 

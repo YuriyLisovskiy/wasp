@@ -16,29 +16,24 @@
  */
 
 /**
- * An implementation of render/context.h
+ * An implementation of render/library/library.h
  */
 
-#include "./context.h"
+#include "./library.h"
 
 
-__RENDER_BEGIN__
+__LIB_BEGIN__
 
-Context::Context(
-	std::map<std::string, std::shared_ptr<core::object::Object>> global_scope
-) : _global_scope(std::move(global_scope))
+Library::Library(conf::Settings* settings)
 {
-}
-
-std::shared_ptr<core::object::Object> Context::find_var(const std::string& key)
-{
-	auto var_p = this->_global_scope.find(key);
-	if (var_p != this->_global_scope.end())
+	if (!settings)
 	{
-		return var_p->second;
+		throw core::ImproperlyConfigured(
+			"Library: 'settings' parameter must be initialized"
+		);
 	}
 
-	return nullptr;
+	this->settings = settings;
 }
 
-__RENDER_END__
+__LIB_END__

@@ -16,51 +16,28 @@
  */
 
 /**
- * render/response.h
- *
- * Purpose:
- * 	Http response which can render it's content using
- * 	configured backend.
+ * render/library/library.h
  */
 
 #pragma once
 
-// C++ libraries.
-#include <string>
-#include <memory>
-
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
+// Framework includes.
 #include "./base.h"
-#include "./backends/base.h"
-#include "./exceptions.h"
-#include "../http/response.h"
+#include "../../conf/settings.h"
 
 
-__RENDER_BEGIN__
+__LIB_BEGIN__
 
-class TemplateResponse : public http::HttpResponse
+class Library : public ILibrary
 {
 protected:
-	std::string _template_name;
-	IContext* _context;
-	backends::IBackend* _backend;
-	bool _is_rendered;
+	conf::Settings* settings;
 
 public:
-	explicit TemplateResponse(
-		backends::IBackend* backend,
-		const std::string& template_name,
-		IContext* context = nullptr,
-		unsigned short int status = 200,
-		const std::string& content_type = "",
-		const std::string& charset = "utf-8"
-	);
-
-	void render();
-	std::string get_content() override;
+	explicit Library(conf::Settings* settings);
 };
 
-__RENDER_END__
+__LIB_END__

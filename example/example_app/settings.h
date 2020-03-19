@@ -6,7 +6,6 @@
 
 #include "../../src/conf/settings.h"
 
-#include <memory>
 #include "../../src/core/path.h"
 
 #include "../../src/middleware/common.h"
@@ -22,6 +21,7 @@
 #include "../main_app/app.h"
 
 #include "./libs/my_first_lib.h"
+#include "../../src/render/library/builtin.h"
 
 
 struct Settings final: public wasp::conf::Settings
@@ -38,7 +38,7 @@ struct Settings final: public wasp::conf::Settings
 
 		this->DEBUG = true;
 
-		this->ALLOWED_HOSTS = {"127.0.0.1", "[::1]"};
+		this->ALLOWED_HOSTS = {"127.0.0.1", "::1"};
 
 		this->INSTALLED_APPS = {
 			this->app<MainAppConfig>(),
@@ -53,20 +53,18 @@ struct Settings final: public wasp::conf::Settings
 			this->middleware<wasp::middleware::CookieMiddleware>()
 		};
 
-		this->TEMPLATES_BACKEND = new wasp::render::backends::WaspBackend(
-			{
+		this->TEMPLATES_BACKEND = std::make_unique<wasp::render::backends::WaspBackend>(
+			std::vector<std::string>{
 				wasp::core::path::join(this->BASE_DIR, "templates")
 			},
 			true,
 			this->INSTALLED_APPS,
-			std::make_shared<wasp::render::backends::WaspBackend::Options>(
-				wasp::render::backends::WaspBackend::Options{
-					.debug = this->DEBUG,
-					.logger = this->LOGGER,
-					.loaders = {},
-					.libraries = {
-						std::make_shared<MyFirstLib>()
-					}
+			std::make_unique<wasp::render::backends::WaspBackend::Options>(
+				this->DEBUG,
+				this->LOGGER.get(),
+				std::vector<std::shared_ptr<wasp::render::lib::ILibrary>>{
+					this->library<wasp::render::lib::BuiltinLibrary>(),
+					this->library<MyFirstLib>(),
 				}
 			)
 		);
@@ -80,6 +78,6 @@ struct Settings final: public wasp::conf::Settings
 		this->DATA_UPLOAD_MAX_MEMORY_SIZE = 20971520;
 	}
 
-	// Override in local_settings.cpp!
+	// Implement in local_settings.cpp!
 	void override() final;
 };

@@ -16,29 +16,17 @@
  */
 
 /**
- * An implementation of render/context.h
+ * render/library/syntax/_def_.h
+ *
+ * Purpose:
+ * render/library/syntax module's definitions.
  */
 
-#include "./context.h"
+#pragma once
+
+#include "../_def_.h"
 
 
-__RENDER_BEGIN__
-
-Context::Context(
-	std::map<std::string, std::shared_ptr<core::object::Object>> global_scope
-) : _global_scope(std::move(global_scope))
-{
-}
-
-std::shared_ptr<core::object::Object> Context::find_var(const std::string& key)
-{
-	auto var_p = this->_global_scope.find(key);
-	if (var_p != this->_global_scope.end())
-	{
-		return var_p->second;
-	}
-
-	return nullptr;
-}
-
-__RENDER_END__
+/// wasp::render::lib::syntax
+#define __SYNTAX_BEGIN__ __LIB_BEGIN__ namespace syntax {
+#define __SYNTAX_END__ } __LIB_END__

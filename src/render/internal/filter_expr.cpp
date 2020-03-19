@@ -424,9 +424,9 @@ FilterExpression::FilterExpression(const token_t& token, const _Filters& filters
 		this->_filters.emplace_back(
 			[args, filters, filter](
 				std::shared_ptr<core::object::Object>& obj,
-				const std::shared_ptr<IContext>& ctx
+				IContext* ctx
 			) mutable {
-				std::map<std::string, std::shared_ptr<core::object::Object>> params;
+				std::map<std::string, std::shared_ptr<core::object::Object>> params{};
 				for (const auto& arg : args)
 				{
 					params[arg.first] = arg.second->resolve(ctx);
@@ -440,7 +440,7 @@ FilterExpression::FilterExpression(const token_t& token, const _Filters& filters
 	}
 }
 
-std::string FilterExpression::resolve(const std::shared_ptr<IContext>& ctx)
+std::string FilterExpression::resolve(IContext* ctx)
 {
 	std::shared_ptr<core::object::Object> var = nullptr;
 	try

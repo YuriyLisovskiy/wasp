@@ -27,6 +27,7 @@
 #include <vector>
 #include <string>
 #include <cstring>
+#include <memory>
 
 // Module definitions.
 #include "./_def_.h"
@@ -94,8 +95,8 @@ public:
 class Logger : public ILogger
 {
 public:
-	static ILogger* get_instance(const Config& cfg);
-	static void reset_instance();
+	static std::shared_ptr<ILogger> get_instance(const Config& cfg);
+//	static void reset_instance();
 
 	void info(const std::string& msg, int line = 0, const char* function = "", const char* file = "") override;
 	void debug(const std::string& msg, int line = 0, const char* function = "", const char* file = "") override;
@@ -139,10 +140,9 @@ private:
 
 	Config _config;
 
-	static ILogger* _instance;
+	static std::shared_ptr<ILogger> _instance;
 
 	explicit Logger(const Config& cfg);
-	~Logger() override = default;
 	void log(const std::string& msg, int line, const char* function, const char* file, Logger::log_level_enum level);
 	void write_to_stream(const std::string& msg, const char* colour);
 	void flush();

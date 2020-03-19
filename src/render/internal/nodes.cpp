@@ -15,30 +15,54 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+/**
+ * An implementation of render/internal/nodes.h
+ */
 
-// C++ libraries.
-#include <string>
-#include <vector>
-#include <memory>
-
-// Module definitions.
-#include "../_def_.h"
-
-// Wasp libraries.
 #include "./nodes.h"
 
 
 __RENDER_INTERNAL_BEGIN__
 
-struct node_list
+/// Struct node
+node::node()
 {
-	bool contains_non_text;
-	std::vector<std::shared_ptr<node>> nodes;
+	this->must_be_first = false;
+	this->is_text_node = false;
+}
 
-	node_list();
-	void append(const std::shared_ptr<node>& node);
-	std::string render(IContext* ctx);
-};
+std::string node::render(IContext* ctx)
+{
+	return "";
+}
+
+/// Struct text_node
+text_node::text_node() : node()
+{
+	this->is_text_node = true;
+}
+
+text_node::text_node(const std::string& s) : text_node()
+{
+	this->text = s;
+}
+
+std::string text_node::render(IContext* ctx)
+{
+	return this->text;
+}
+
+/// Struct variable_node
+variable_node::variable_node(
+	const FilterExpression& filter_expr
+) : node()
+{
+	this->filter_expr = filter_expr;
+}
+
+std::string variable_node::render(IContext* ctx)
+{
+	return this->filter_expr.resolve(ctx);
+}
 
 __RENDER_INTERNAL_END__

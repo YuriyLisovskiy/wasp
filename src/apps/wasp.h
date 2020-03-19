@@ -52,14 +52,14 @@ private:
 
 	void _setup_commands();
 	void _extend_settings_commands_or_error(
-		const std::vector<core::BaseCommand*>& from,
+		const std::vector<std::shared_ptr<core::BaseCommand>>& from,
 		const std::function<std::string(const std::string& cmd_name)>& err_fn
 	);
 	void _perform_checks();
 
 public:
 	explicit WaspApplication(conf::Settings* settings);
-	void execute_from_command_line(int argc, char** argv);
+	void execute(int argc, char** argv);
 };
 
 __APPS_END__

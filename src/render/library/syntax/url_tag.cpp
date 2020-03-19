@@ -16,29 +16,14 @@
  */
 
 /**
- * An implementation of render/context.h
+ * An implementation of render/library/syntax/url_tag.h
  */
 
-#include "./context.h"
+#include "./url_tag.h"
 
 
-__RENDER_BEGIN__
+__SYNTAX_BEGIN__
 
-Context::Context(
-	std::map<std::string, std::shared_ptr<core::object::Object>> global_scope
-) : _global_scope(std::move(global_scope))
-{
-}
 
-std::shared_ptr<core::object::Object> Context::find_var(const std::string& key)
-{
-	auto var_p = this->_global_scope.find(key);
-	if (var_p != this->_global_scope.end())
-	{
-		return var_p->second;
-	}
 
-	return nullptr;
-}
-
-__RENDER_END__
+__SYNTAX_END__

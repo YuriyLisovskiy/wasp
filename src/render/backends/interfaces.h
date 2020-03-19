@@ -57,7 +57,7 @@ public:
 
 	/// Initializes a std::vector of directories to search for templates.
 	virtual std::vector<std::string> template_dirs(
-		const std::vector<apps::IAppConfig*>& apps
+		const std::vector<std::shared_ptr<apps::IAppConfig>>& apps
 	) = 0;
 };
 

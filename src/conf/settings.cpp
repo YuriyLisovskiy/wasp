@@ -111,26 +111,4 @@ void Settings::prepare()
 	}
 }
 
-Settings::~Settings()
-{
-	delete this->TEMPLATES_BACKEND;
-	delete this->SECURE_PROXY_SSL_HEADER;
-	for (auto& installed_app : this->INSTALLED_APPS)
-	{
-		delete installed_app;
-	}
-
-	for (auto& middleware : this->MIDDLEWARE)
-	{
-		delete middleware;
-	}
-
-	for (auto& command : this->COMMANDS)
-	{
-		delete command.second;
-	}
-
-	core::Logger::reset_instance();
-}
-
 __CONF_END__

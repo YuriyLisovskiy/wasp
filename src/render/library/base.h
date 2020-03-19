@@ -67,8 +67,4 @@ public:
 	virtual std::string name() = 0;
 };
 
-class Library : public ILibrary, public core::object::Object
-{
-};
-
 __LIB_END__

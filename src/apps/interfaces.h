@@ -52,7 +52,7 @@ public:
 	virtual std::string get_name() = 0;
 	virtual std::string get_app_path() = 0;
 	virtual std::vector<urls::UrlPattern> get_urlpatterns() = 0;
-	virtual std::vector<core::BaseCommand*> get_commands() = 0;
+	virtual std::vector<std::shared_ptr<core::BaseCommand>> get_commands() = 0;
 };
 
 __APPS_END__

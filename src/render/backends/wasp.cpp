@@ -27,14 +27,14 @@ __BACKENDS_BEGIN__
 WaspBackend::WaspBackend(
 	const std::vector<std::string>& dirs,
 	bool use_app_dirs,
-	const std::vector<apps::IAppConfig*>& installed_apps,
-	const std::shared_ptr<Options>& opts
+	const std::vector<std::shared_ptr<apps::IAppConfig>>& installed_apps,
+	std::shared_ptr<Options> opts
 ) : BaseBackend(dirs, use_app_dirs)
 {
-	this->_opts = opts;
+	this->_opts = std::move(opts);
 	if (!this->_opts)
 	{
-		this->_opts = std::make_shared<Options>();
+		this->_opts = std::make_unique<Options>();
 	}
 
 	if (!this->_opts->logger)
@@ -43,7 +43,7 @@ WaspBackend::WaspBackend(
 	}
 
 	this->_dirs = this->template_dirs(installed_apps);
-	this->_engine = std::make_shared<render::Engine>(
+	this->_engine = std::make_unique<render::Engine>(
 		this,
 		this->_dirs,
 		this->_use_app_dirs,

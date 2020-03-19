@@ -116,14 +116,14 @@ private:
 	token_t _token;
 	std::shared_ptr<Variable> _var = nullptr;
 	std::vector<std::function<void(
-		std::shared_ptr<core::object::Object>& obj, const std::shared_ptr<IContext>& ctx
+		std::shared_ptr<core::object::Object>& obj, IContext* ctx
 	)>> _filters;
 
 public:
 	FilterExpression() = default;
 
 	explicit FilterExpression(const token_t& token, const _Filters& filters);
-	std::string resolve(const std::shared_ptr<IContext>& ctx);
+	std::string resolve(IContext* ctx);
 };
 
 __RENDER_INTERNAL_END__

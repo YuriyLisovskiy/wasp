@@ -28,6 +28,7 @@
 // C++ libraries.
 #include <string>
 #include <vector>
+#include <memory>
 
 // Module definitions.
 #include "./_def_.h"
@@ -54,21 +55,21 @@ class AppConfig : public IAppConfig, public core::object::Object
 {
 private:
 	std::vector<urls::UrlPattern> _urlpatterns;
-	std::vector<core::BaseCommand*> _commands;
+	std::vector<std::shared_ptr<core::BaseCommand>> _commands;
 
 	template <typename _AppConfigT>
-	IAppConfig* find_or_create_app()
+	std::shared_ptr<apps::IAppConfig> find_or_create_app()
 	{
 		auto app = std::find_if(
 			this->settings->INSTALLED_APPS.begin(),
 			this->settings->INSTALLED_APPS.end(),
-			[](IAppConfig* entry) -> bool {
-				return dynamic_cast<_AppConfigT*>(entry) != nullptr;
+			[](const std::shared_ptr<apps::IAppConfig>& entry) -> bool {
+				return dynamic_cast<_AppConfigT*>(entry.get()) != nullptr;
 			}
 		);
 		if (app == this->settings->INSTALLED_APPS.end())
 		{
-			return new _AppConfigT(this->settings);
+			return std::make_shared<_AppConfigT>(this->settings);
 		}
 
 		return *app;
@@ -117,7 +118,7 @@ protected:
 	template <typename _CommandT, typename = std::enable_if<std::is_base_of<core::cmd::AppCommand, _CommandT>::value>>
 	void command()
 	{
-		auto* cmd = new _CommandT(this, this->settings);
+		auto cmd = std::make_shared<_CommandT>(this, this->settings);
 		this->_commands.push_back(cmd);
 	}
 
@@ -130,7 +131,7 @@ public:
 	std::string get_name() final;
 	std::string get_app_path() final;
 	std::vector<urls::UrlPattern> get_urlpatterns() final;
-	std::vector<core::BaseCommand*> get_commands() final;
+	std::vector<std::shared_ptr<core::BaseCommand>> get_commands() final;
 	virtual void urlpatterns();
 	virtual void commands();
 };

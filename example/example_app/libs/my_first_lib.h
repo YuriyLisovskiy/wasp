@@ -8,7 +8,7 @@
 
 #include "../../../src/core/object/object.h"
 #include "../../../src/core/types/value.h"
-#include "../../../src/render/library/base.h"
+#include "../../../src/render/library/library.h"
 
 
 using namespace wasp::render;
@@ -18,6 +18,10 @@ using namespace wasp::core::object;
 class MyFirstLib : public lib::Library
 {
 public:
+	explicit MyFirstLib(wasp::conf::Settings* settings) : Library(settings)
+	{
+	}
+
 	lib::Filters get_filters() override
 	{
 		return lib::Filters({
@@ -38,6 +42,7 @@ public:
 					if (val[i] == digit[0])
 					{
 						val.erase(i, 1);
+						i--;
 					}
 				}
 
@@ -53,6 +58,6 @@ public:
 
 	std::string name() override
 	{
-		return this->__type__().name();
+		return "MyFirstLib";
 	}
 };

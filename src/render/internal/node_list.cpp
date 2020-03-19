@@ -16,54 +16,13 @@
  */
 
 /**
- * An implementation of render/processors/node_list.h
+ * An implementation of render/internal/node_list.h
  */
 
 #include "./node_list.h"
 
 
 __RENDER_INTERNAL_BEGIN__
-
-/// Struct node
-node::node()
-{
-	this->must_be_first = false;
-	this->is_text_node = false;
-}
-
-std::string node::render(const std::shared_ptr<IContext>& ctx)
-{
-	return "";
-}
-
-/// Struct text_node
-text_node::text_node() : node()
-{
-	this->is_text_node = true;
-}
-
-text_node::text_node(const std::string& s) : text_node()
-{
-	this->text = s;
-}
-
-std::string text_node::render(const std::shared_ptr<IContext>& ctx)
-{
-	return this->text;
-}
-
-/// Struct variable_node
-variable_node::variable_node(
-	const FilterExpression& filter_expr
-) : node()
-{
-	this->filter_expr = filter_expr;
-}
-
-std::string variable_node::render(const std::shared_ptr<IContext>& ctx)
-{
-	return this->filter_expr.resolve(ctx);
-}
 
 /// Struct node_list
 node_list::node_list()
@@ -76,7 +35,7 @@ void node_list::append(const std::shared_ptr<node>& node)
 	this->nodes.push_back(node);
 }
 
-std::string node_list::render(const std::shared_ptr<IContext>& ctx)
+std::string node_list::render(IContext* ctx)
 {
 	std::string result;
 	for (const auto& node : this->nodes)

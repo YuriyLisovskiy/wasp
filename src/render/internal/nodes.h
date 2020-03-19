@@ -15,52 +15,52 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * render/response.h
- *
- * Purpose:
- * 	Http response which can render it's content using
- * 	configured backend.
- */
-
 #pragma once
 
 // C++ libraries.
 #include <string>
+#include <vector>
 #include <memory>
 
 // Module definitions.
-#include "./_def_.h"
+#include "../_def_.h"
 
 // Wasp libraries.
-#include "./base.h"
-#include "./backends/base.h"
-#include "./exceptions.h"
-#include "../http/response.h"
+#include "./token.h"
+#include "./filter_expr.h"
+#include "../base.h"
 
 
-__RENDER_BEGIN__
+__RENDER_INTERNAL_BEGIN__
 
-class TemplateResponse : public http::HttpResponse
+struct node
 {
-protected:
-	std::string _template_name;
-	IContext* _context;
-	backends::IBackend* _backend;
-	bool _is_rendered;
+	bool must_be_first;
+	token_t token;
 
-public:
-	explicit TemplateResponse(
-		backends::IBackend* backend,
-		const std::string& template_name,
-		IContext* context = nullptr,
-		unsigned short int status = 200,
-		const std::string& content_type = "",
-		const std::string& charset = "utf-8"
-	);
+	bool is_text_node;
 
-	void render();
-	std::string get_content() override;
+	node();
+	virtual std::string render(IContext* ctx);
 };
 
-__RENDER_END__
+struct text_node : public node
+{
+	std::string text;
+
+	text_node();
+	explicit text_node(const std::string& s);
+	std::string render(IContext* ctx) override;
+};
+
+struct variable_node : public node
+{
+	FilterExpression filter_expr;
+
+	explicit variable_node(
+		const FilterExpression& filter_expr
+	);
+	std::string render(IContext* ctx) override;
+};
+
+__RENDER_INTERNAL_END__

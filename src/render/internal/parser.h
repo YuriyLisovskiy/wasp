@@ -52,9 +52,13 @@ struct parser
 	lib::Filters filters;
 	lib::Tags tags;
 	std::stack<std::pair<std::string, token_t>> command_stack;
-	std::shared_ptr<node_list> nodes_list;
+	std::unique_ptr<node_list> nodes_list;
 
-	parser(std::vector<token_t>& tokens, lib::Filters& filters, lib::Tags& tags);
+	parser(
+		std::vector<token_t>& tokens,
+		lib::Filters& filters,
+		lib::Tags& tags
+	);
 
 	void parse(
 		const std::vector<std::string>& parse_until = {}
@@ -65,7 +69,7 @@ struct parser
 	void del_first_token();
 	FilterExpression compile_filter(token_t& t);
 	static void append_node(
-		std::shared_ptr<node_list>& list,
+		std::unique_ptr<node_list>& list,
 		std::shared_ptr<node>& nd,
 		const token_t& token
 	);

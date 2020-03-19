@@ -16,29 +16,37 @@
  */
 
 /**
- * An implementation of render/context.h
+ * An implementation of render/library/builtin.h
  */
 
-#include "./context.h"
+#include "./builtin.h"
 
 
-__RENDER_BEGIN__
+__LIB_BEGIN__
 
-Context::Context(
-	std::map<std::string, std::shared_ptr<core::object::Object>> global_scope
-) : _global_scope(std::move(global_scope))
+BuiltinLibrary::BuiltinLibrary(conf::Settings* settings)
 {
-}
-
-std::shared_ptr<core::object::Object> Context::find_var(const std::string& key)
-{
-	auto var_p = this->_global_scope.find(key);
-	if (var_p != this->_global_scope.end())
+	if (!settings)
 	{
-		return var_p->second;
+		throw core::NullPointerException("BuiltinLibrary: 'settings' parameter is not initialized");
 	}
 
-	return nullptr;
+	this->_settings = settings;
 }
 
-__RENDER_END__
+Filters BuiltinLibrary::get_filters()
+{
+	return {};
+}
+
+Tags BuiltinLibrary::get_tags()
+{
+	return {};
+}
+
+std::string BuiltinLibrary::name()
+{
+	return "builtin";
+}
+
+__LIB_END__

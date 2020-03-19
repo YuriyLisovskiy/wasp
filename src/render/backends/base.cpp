@@ -31,9 +31,6 @@ BaseBackend::BaseBackend(
 	_use_app_dirs(use_app_dirs)
 {
 	this->_name = this->__type__().name();
-	core::str::rtrim(this->_name, "Backend");
-	core::str::rtrim(this->_name, "backend");
-	core::str::rtrim(this->_name, "_");
 }
 
 std::string BaseBackend::name()
@@ -44,13 +41,13 @@ std::string BaseBackend::name()
 std::shared_ptr<ITemplate> BaseBackend::from_string(const std::string &template_code)
 {
 	throw core::NotImplementedException(
-		"subclasses of BaseBackend should provide a from_string() method",
+		"subclasses of " + this->_name + " should provide a from_string() method",
 		_ERROR_DETAILS_
 	);
 }
 
 std::vector<std::string> BaseBackend::template_dirs(
-	const std::vector<apps::IAppConfig*>& apps
+	const std::vector<std::shared_ptr<apps::IAppConfig>>& apps
 )
 {
 	if (this->_use_app_dirs)

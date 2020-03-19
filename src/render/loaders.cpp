@@ -61,14 +61,15 @@ std::map<std::string, std::shared_ptr<ITemplate>> DefaultLoader::cache_templates
 		{
 			const auto& template_path = entry.path();
 			auto file = core::File(
-					core::path::join(dir, template_path)
+				core::path::join(dir, template_path)
 			);
 			file.open();
 			if (file.is_open())
 			{
-				auto* _template = new Template(file.read_str(), (BaseEngine*) engine);
+				cache[template_path] = std::make_shared<Template>(
+					file.read_str(), (BaseEngine*) engine
+				);
 				file.close();
-				cache[template_path] = std::shared_ptr<Template>(_template);
 			}
 		}
 	}

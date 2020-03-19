@@ -41,15 +41,12 @@ __RENDER_BEGIN__
 class Context : public IContext
 {
 private:
-	bool _auto_delete;
 	std::map<std::string, std::shared_ptr<core::object::Object>> _global_scope;
 
 public:
 	explicit Context(
-		std::map<std::string, std::shared_ptr<core::object::Object>> global_scope,
-		bool auto_delete = true
+		std::map<std::string, std::shared_ptr<core::object::Object>> global_scope
 	);
-	~Context() override;
 	std::shared_ptr<core::object::Object> find_var(const std::string& key) override;
 };
 

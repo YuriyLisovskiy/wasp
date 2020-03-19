@@ -16,29 +16,24 @@
  */
 
 /**
- * An implementation of render/context.h
+ * core/types/utility.h
+ *
+ * Purpose:
+ * TODO:
  */
 
-#include "./context.h"
+#pragma once
+
+// Module definitions.
+#include "./_def_.h"
 
 
-__RENDER_BEGIN__
+__TYPES_BEGIN__
 
-Context::Context(
-	std::map<std::string, std::shared_ptr<core::object::Object>> global_scope
-) : _global_scope(std::move(global_scope))
+template <auto _BaseTypeVal, typename _DerivedType>
+bool is_of_type()
 {
+	return dynamic_cast<_DerivedType>(_BaseTypeVal) != nullptr;
 }
 
-std::shared_ptr<core::object::Object> Context::find_var(const std::string& key)
-{
-	auto var_p = this->_global_scope.find(key);
-	if (var_p != this->_global_scope.end())
-	{
-		return var_p->second;
-	}
-
-	return nullptr;
-}
-
-__RENDER_END__
+__TYPES_END__
