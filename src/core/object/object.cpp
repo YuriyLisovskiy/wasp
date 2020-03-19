@@ -21,6 +21,9 @@
 
 #include "./object.h"
 
+// Wasp libraries.
+#include "../exceptions.h"
+
 
 __OBJECT_BEGIN__
 

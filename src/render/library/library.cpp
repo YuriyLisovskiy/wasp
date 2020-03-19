@@ -15,30 +15,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+/**
+ * An implementation of render/library/library.h
+ */
 
-// C++ libraries.
-#include <string>
-#include <vector>
-#include <memory>
-
-// Module definitions.
-#include "../_def_.h"
-
-// Wasp libraries.
-#include "./nodes.h"
+#include "./library.h"
 
 
-__RENDER_INTERNAL_BEGIN__
+__LIB_BEGIN__
 
-struct node_list
+Library::Library(conf::Settings* settings)
 {
-	bool contains_non_text;
-	std::vector<std::shared_ptr<node>> nodes;
+	if (!settings)
+	{
+		throw core::ImproperlyConfigured(
+			"Library: 'settings' parameter must be initialized"
+		);
+	}
 
-	node_list();
-	void append(const std::shared_ptr<node>& node);
-	std::string render(IContext* ctx);
-};
+	this->settings = settings;
+}
 
-__RENDER_INTERNAL_END__
+__LIB_END__

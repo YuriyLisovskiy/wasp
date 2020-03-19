@@ -26,19 +26,41 @@
 #include "../_def_.h"
 
 // Wasp libraries.
-#include "./nodes.h"
+#include "./token.h"
+#include "./filter_expr.h"
+#include "../base.h"
 
 
 __RENDER_INTERNAL_BEGIN__
 
-struct node_list
+struct node
 {
-	bool contains_non_text;
-	std::vector<std::shared_ptr<node>> nodes;
+	bool must_be_first;
+	token_t token;
 
-	node_list();
-	void append(const std::shared_ptr<node>& node);
-	std::string render(IContext* ctx);
+	bool is_text_node;
+
+	node();
+	virtual std::string render(IContext* ctx);
+};
+
+struct text_node : public node
+{
+	std::string text;
+
+	text_node();
+	explicit text_node(const std::string& s);
+	std::string render(IContext* ctx) override;
+};
+
+struct variable_node : public node
+{
+	FilterExpression filter_expr;
+
+	explicit variable_node(
+		const FilterExpression& filter_expr
+	);
+	std::string render(IContext* ctx) override;
 };
 
 __RENDER_INTERNAL_END__

@@ -66,8 +66,9 @@ protected:
 	std::map<std::string, std::shared_ptr<ITemplate>> _cached_templates;
 
 	void _load_libs(
-		std::vector<std::shared_ptr<render::lib::ILibrary>>& libs
+		std::vector<std::shared_ptr<lib::ILibrary>>& libs
 	);
+	void _include_lib(lib::ILibrary* lib, bool is_builtin);
 
 public:
 	explicit Engine(
@@ -77,7 +78,7 @@ public:
 		bool debug,
 		bool auto_escape,
 		std::vector<std::shared_ptr<ILoader>>& loaders,
-		std::vector<std::shared_ptr<render::lib::ILibrary>>& libs,
+		std::vector<std::shared_ptr<lib::ILibrary>>& libs,
 		core::ILogger* logger
 	);
 

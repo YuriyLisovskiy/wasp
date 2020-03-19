@@ -15,30 +15,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * render/library/library.h
+ */
+
 #pragma once
 
-// C++ libraries.
-#include <string>
-#include <vector>
-#include <memory>
-
 // Module definitions.
-#include "../_def_.h"
+#include "./_def_.h"
 
-// Wasp libraries.
-#include "./nodes.h"
+// Framework includes.
+#include "./base.h"
+#include "../../conf/settings.h"
 
 
-__RENDER_INTERNAL_BEGIN__
+__LIB_BEGIN__
 
-struct node_list
+class Library : public ILibrary
 {
-	bool contains_non_text;
-	std::vector<std::shared_ptr<node>> nodes;
+protected:
+	conf::Settings* settings;
 
-	node_list();
-	void append(const std::shared_ptr<node>& node);
-	std::string render(IContext* ctx);
+public:
+	explicit Library(conf::Settings* settings);
 };
 
-__RENDER_INTERNAL_END__
+__LIB_END__

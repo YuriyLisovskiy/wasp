@@ -15,30 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+/**
+ * An implementation of render/library/syntax/url_tag.h
+ */
 
-// C++ libraries.
-#include <string>
-#include <vector>
-#include <memory>
-
-// Module definitions.
-#include "../_def_.h"
-
-// Wasp libraries.
-#include "./nodes.h"
+#include "./url_tag.h"
 
 
-__RENDER_INTERNAL_BEGIN__
+__SYNTAX_BEGIN__
 
-struct node_list
-{
-	bool contains_non_text;
-	std::vector<std::shared_ptr<node>> nodes;
 
-	node_list();
-	void append(const std::shared_ptr<node>& node);
-	std::string render(IContext* ctx);
-};
 
-__RENDER_INTERNAL_END__
+__SYNTAX_END__

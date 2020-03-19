@@ -16,54 +16,13 @@
  */
 
 /**
- * An implementation of render/processors/node_list.h
+ * An implementation of render/internal/node_list.h
  */
 
 #include "./node_list.h"
 
 
 __RENDER_INTERNAL_BEGIN__
-
-/// Struct node
-node::node()
-{
-	this->must_be_first = false;
-	this->is_text_node = false;
-}
-
-std::string node::render(IContext* ctx)
-{
-	return "";
-}
-
-/// Struct text_node
-text_node::text_node() : node()
-{
-	this->is_text_node = true;
-}
-
-text_node::text_node(const std::string& s) : text_node()
-{
-	this->text = s;
-}
-
-std::string text_node::render(IContext* ctx)
-{
-	return this->text;
-}
-
-/// Struct variable_node
-variable_node::variable_node(
-	const FilterExpression& filter_expr
-) : node()
-{
-	this->filter_expr = filter_expr;
-}
-
-std::string variable_node::render(IContext* ctx)
-{
-	return this->filter_expr.resolve(ctx);
-}
 
 /// Struct node_list
 node_list::node_list()

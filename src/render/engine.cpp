@@ -21,6 +21,9 @@
 
 #include "./engine.h"
 
+#include "./library/builtin.h"
+#include "../core/types/utility.h"
+
 
 __RENDER_BEGIN__
 
@@ -143,47 +146,64 @@ lib::Tags& Engine::get_tags()
 }
 
 void Engine::_load_libs(
-	std::vector<std::shared_ptr<render::lib::ILibrary>>& libs
+	std::vector<std::shared_ptr<lib::ILibrary>>& libs
 )
 {
-	// TODO: add default libraries first.
-
-	for (const auto& lib : libs)
+	if (!libs.empty())
 	{
-		auto filters = lib->get_filters();
-		for (const auto& filter : filters)
+		if (dynamic_cast<lib::BuiltinLibrary*>(libs[0].get()) == nullptr)
 		{
-			if (this->_filters.contains(filter.first))
-			{
-				std::string lib_name = lib->name();
-				this->_logger->warning(
-					"'" + lib->name() + "' contains filter with the same name as the default." +
-					"Filter: '" + filter.first + "', library: '" + lib_name + "'"
-				);
-				this->_filters.set(lib_name + "." + filter.first, filter.second);
-			}
-			else
-			{
-				this->_filters.set(filter.first, filter.second);
-			}
+			throw core::ImproperlyConfigured("render::lib::BuiltinLibrary must be first");
 		}
 
-		auto tags = lib->get_tags();
-		for (const auto& tag : tags)
+		this->_include_lib(libs[0].get(), true);
+		for (size_t i = 1; i < libs.size(); i++)
 		{
-			if (this->_tags.contains(tag.first))
+			if (dynamic_cast<lib::BuiltinLibrary*>(libs[i].get()) != nullptr)
 			{
-				std::string lib_name = lib->name();
-				this->_logger->warning(
-					"'" + lib->name() + "' contains tag with the same name as the default." +
-					"Tag name: '" + tag.first + "', library: '" + lib_name + "'"
-				);
-				this->_tags.set(lib_name + "." + tag.first, tag.second);
+				throw core::ImproperlyConfigured("render::lib::BuiltinLibrary must appear only once");
 			}
-			else
-			{
-				this->_tags.set(tag.first, tag.second);
-			}
+
+			this->_include_lib(libs[i].get(), false);
+		}
+	}
+}
+
+void Engine::_include_lib(lib::ILibrary* lib, bool is_builtin)
+{
+	auto filters = lib->get_filters();
+	for (const auto& filter : filters)
+	{
+		if (!is_builtin && this->_filters.contains(filter.first))
+		{
+			std::string lib_name = lib->name();
+			this->_logger->warning(
+				"'" + lib->name() + "' contains filter with the same name as the default." +
+				"Filter: '" + filter.first + "', library: '" + lib_name + "'"
+			);
+			this->_filters.set(lib_name + "." + filter.first, filter.second);
+		}
+		else
+		{
+			this->_filters.set(filter.first, filter.second);
+		}
+	}
+
+	auto tags = lib->get_tags();
+	for (const auto& tag : tags)
+	{
+		if (!is_builtin && this->_tags.contains(tag.first))
+		{
+			std::string lib_name = lib->name();
+			this->_logger->warning(
+				"'" + lib->name() + "' contains tag with the same name as the default." +
+				"Tag name: '" + tag.first + "', library: '" + lib_name + "'"
+			);
+			this->_tags.set(lib_name + "." + tag.first, tag.second);
+		}
+		else
+		{
+			this->_tags.set(tag.first, tag.second);
 		}
 	}
 }

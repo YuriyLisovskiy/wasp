@@ -15,30 +15,38 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+/**
+ * An implementation of render/library/builtin.h
+ */
 
-// C++ libraries.
-#include <string>
-#include <vector>
-#include <memory>
-
-// Module definitions.
-#include "../_def_.h"
-
-// Wasp libraries.
-#include "./nodes.h"
+#include "./builtin.h"
 
 
-__RENDER_INTERNAL_BEGIN__
+__LIB_BEGIN__
 
-struct node_list
+BuiltinLibrary::BuiltinLibrary(conf::Settings* settings)
 {
-	bool contains_non_text;
-	std::vector<std::shared_ptr<node>> nodes;
+	if (!settings)
+	{
+		throw core::NullPointerException("BuiltinLibrary: 'settings' parameter is not initialized");
+	}
 
-	node_list();
-	void append(const std::shared_ptr<node>& node);
-	std::string render(IContext* ctx);
-};
+	this->_settings = settings;
+}
 
-__RENDER_INTERNAL_END__
+Filters BuiltinLibrary::get_filters()
+{
+	return {};
+}
+
+Tags BuiltinLibrary::get_tags()
+{
+	return {};
+}
+
+std::string BuiltinLibrary::name()
+{
+	return "builtin";
+}
+
+__LIB_END__

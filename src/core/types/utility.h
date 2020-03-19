@@ -15,30 +15,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * core/types/utility.h
+ *
+ * Purpose:
+ * TODO:
+ */
+
 #pragma once
 
-// C++ libraries.
-#include <string>
-#include <vector>
-#include <memory>
-
 // Module definitions.
-#include "../_def_.h"
-
-// Wasp libraries.
-#include "./nodes.h"
+#include "./_def_.h"
 
 
-__RENDER_INTERNAL_BEGIN__
+__TYPES_BEGIN__
 
-struct node_list
+template <auto _BaseTypeVal, typename _DerivedType>
+bool is_of_type()
 {
-	bool contains_non_text;
-	std::vector<std::shared_ptr<node>> nodes;
+	return dynamic_cast<_DerivedType>(_BaseTypeVal) != nullptr;
+}
 
-	node_list();
-	void append(const std::shared_ptr<node>& node);
-	std::string render(IContext* ctx);
-};
-
-__RENDER_INTERNAL_END__
+__TYPES_END__

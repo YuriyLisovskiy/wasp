@@ -39,6 +39,7 @@
 #include "../core/management/base.h"
 #include "../core/regex.h"
 #include "../render/backends/interfaces.h"
+#include "../render/library/_def_.h"
 
 
 __URLS_BEGIN__
@@ -53,6 +54,10 @@ __BACKENDS_BEGIN__
 class IBackend;
 __BACKENDS_END__
 
+__LIB_BEGIN__
+class ILibrary;
+__LIB_END__
+
 
 __CONF_BEGIN__
 
@@ -62,7 +67,7 @@ struct Settings
 
 	std::shared_ptr<core::ILogger> LOGGER;
 
-	/// Build paths inside the project like this: wasp::path::join(BASE_DIR, ...)
+	/// Build paths inside the project like this: path::join(BASE_DIR, ...)
 	std::string BASE_DIR;
 
 	/// Hosts/domain names that are valid for this site.
@@ -275,6 +280,12 @@ struct Settings
 	{
 		auto command = std::make_shared<_CommandT>(this);
 		return std::pair<std::string, std::shared_ptr<core::BaseCommand>>{command->name(), command};
+	}
+
+	template <typename _T, typename = std::enable_if<std::is_base_of<render::lib::ILibrary, _T>::value>>
+	std::shared_ptr<render::lib::ILibrary> library()
+	{
+		return std::make_shared<_T>(this);
 	}
 };
 

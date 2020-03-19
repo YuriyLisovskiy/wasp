@@ -15,30 +15,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * render/library/builtin.h
+ *
+ * Purpose:
+ * TODO:
+ */
+
 #pragma once
 
-// C++ libraries.
-#include <string>
-#include <vector>
-#include <memory>
-
 // Module definitions.
-#include "../_def_.h"
+#include "./_def_.h"
 
 // Wasp libraries.
-#include "./nodes.h"
+#include "./base.h"
+#include "../../conf/settings.h"
 
 
-__RENDER_INTERNAL_BEGIN__
+__LIB_BEGIN__
 
-struct node_list
+class BuiltinLibrary final : public ILibrary
 {
-	bool contains_non_text;
-	std::vector<std::shared_ptr<node>> nodes;
+private:
+	conf::Settings* _settings;
 
-	node_list();
-	void append(const std::shared_ptr<node>& node);
-	std::string render(IContext* ctx);
+public:
+	explicit BuiltinLibrary(conf::Settings* settings);
+
+	Filters get_filters() override;
+	Tags get_tags() override;
+	std::string name() override;
 };
 
-__RENDER_INTERNAL_END__
+__LIB_END__

@@ -35,7 +35,6 @@
 
 // Wasp libraries.
 #include "./dict.h"
-#include "../core/exceptions.h"
 
 
 __COLLECTIONS_BEGIN__

@@ -21,6 +21,7 @@
 #include "../main_app/app.h"
 
 #include "./libs/my_first_lib.h"
+#include "../../src/render/library/builtin.h"
 
 
 struct Settings final: public wasp::conf::Settings
@@ -62,7 +63,8 @@ struct Settings final: public wasp::conf::Settings
 				this->DEBUG,
 				this->LOGGER.get(),
 				std::vector<std::shared_ptr<wasp::render::lib::ILibrary>>{
-					std::make_shared<MyFirstLib>()
+					this->library<wasp::render::lib::BuiltinLibrary>(),
+					this->library<MyFirstLib>(),
 				}
 			)
 		);
@@ -76,6 +78,6 @@ struct Settings final: public wasp::conf::Settings
 		this->DATA_UPLOAD_MAX_MEMORY_SIZE = 20971520;
 	}
 
-	// Override in local_settings.cpp!
+	// Implement in local_settings.cpp!
 	void override() final;
 };

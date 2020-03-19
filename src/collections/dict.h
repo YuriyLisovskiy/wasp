@@ -32,9 +32,6 @@
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
-#include "../core/exceptions.h"
-
 
 __COLLECTIONS_BEGIN__
 
