@@ -18,8 +18,7 @@
 /**
  * render/library/syntax/_def_.h
  *
- * Purpose:
- * render/library/syntax module's definitions.
+ * Purpose: render/library/syntax module's definitions.
  */
 
 #pragma once
@@ -27,6 +26,6 @@
 #include "../_def_.h"
 
 
-/// wasp::render::lib::syntax
+/// render::lib::syntax
 #define __SYNTAX_BEGIN__ __LIB_BEGIN__ namespace syntax {
 #define __SYNTAX_END__ } __LIB_END__

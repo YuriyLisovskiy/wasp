@@ -26,10 +26,10 @@
 #include "../_def_.h"
 
 
-/// wasp::dt
+/// dt
 #define __DATETIME_BEGIN__ __CORE_BEGIN__ namespace dt {
 #define __DATETIME_END__ } __CORE_END__
 
-/// wasp::dt::internal
+/// dt::internal
 #define __DATETIME_INTERNAL_BEGIN__ __DATETIME_BEGIN__ namespace internal {
 #define __DATETIME_INTERNAL_END__ } __DATETIME_END__

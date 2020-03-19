@@ -24,8 +24,8 @@
 
 
 /// wasp
-#define __WASP_BEGIN__ namespace wasp {
-#define __WASP_END__ }
+#define __MAIN_NAMESPACE_BEGIN__ namespace wasp {
+#define __MAIN_NAMESPACE_END__ }
 
 
 /// Required parameters for Wasp's built-in logger.

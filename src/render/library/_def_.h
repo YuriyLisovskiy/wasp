@@ -18,8 +18,7 @@
 /**
  * render/library/_def_.h
  *
- * Purpose:
- * render/library module's definitions.
+ * Purpose: render/library module's definitions.
  */
 
 #pragma once
@@ -27,6 +26,6 @@
 #include "../_def_.h"
 
 
-/// wasp::render::lib
+/// render::lib
 #define __LIB_BEGIN__ __RENDER_BEGIN__ namespace lib {
 #define __LIB_END__ } __RENDER_END__

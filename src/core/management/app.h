@@ -36,7 +36,7 @@ __CORE_INTERNAL_BEGIN__
 class CoreManagementAppConfig : public apps::AppConfig
 {
 public:
-	explicit CoreManagementAppConfig(wasp::conf::Settings* settings);
+	explicit CoreManagementAppConfig(conf::Settings* settings);
 	void commands() override;
 };
 

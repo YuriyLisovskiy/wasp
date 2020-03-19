@@ -26,10 +26,10 @@
 #include "../_def_.h"
 
 
-/// wasp::str
+/// str
 #define __STR_BEGIN__ __CORE_BEGIN__ namespace str {
 #define __STR_END__ } __CORE_END__
 
-/// wasp::str::internal
+/// str::internal
 #define __STR_INTERNAL_BEGIN__ __STR_BEGIN__ namespace internal {
 #define __STR_INTERNAL_END__ } __STR_END__

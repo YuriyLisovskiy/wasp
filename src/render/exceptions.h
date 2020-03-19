@@ -99,8 +99,8 @@ public:
 	);
 };
 
-DEF_WASP_EXCEPTION_WITH_BASE(ContentNotRenderedError, core::BaseException, "Content is not rendered");
-DEF_WASP_EXCEPTION_WITH_BASE(VariableDoesNotExist, core::BaseException, "Variable does not exist");
-DEF_WASP_EXCEPTION_WITH_BASE(FilterDoesNotExist, core::BaseException, "Filter does not exist");
+DEF_EXCEPTION_WITH_BASE(ContentNotRenderedError, core::BaseException, "Content Is Not Rendered");
+DEF_EXCEPTION_WITH_BASE(VariableDoesNotExist, core::BaseException, "Variable Does Not Exist");
+DEF_EXCEPTION_WITH_BASE(FilterDoesNotExist, core::BaseException, "Filter Does Not Exist");
 
 __RENDER_END__

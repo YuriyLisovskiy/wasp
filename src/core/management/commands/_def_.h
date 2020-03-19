@@ -26,6 +26,6 @@
 #include "../_def_.h"
 
 
-/// wasp::core::cmd
+/// core::cmd
 #define __CORE_COMMANDS_BEGIN__ __CORE_BEGIN__ namespace cmd {
 #define __CORE_COMMANDS_END__ } __CORE_END__

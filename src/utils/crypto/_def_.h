@@ -27,6 +27,6 @@
 #include "../_def_.h"
 
 
-/// wasp::utils::crypto
+/// utils::crypto
 #define __CRYPTO_BEGIN__ __UTILS_BEGIN__ namespace crypto {
 #define __CRYPTO_END__ } __UTILS_END__

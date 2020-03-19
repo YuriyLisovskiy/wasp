@@ -16,9 +16,9 @@
  */
 
 /**
- * types/_def_.h
+ * core/types/_def_.h
  *
- * Purpose: types module's definitions.
+ * Purpose: core/types module's definitions.
  */
 
 #pragma once
@@ -26,6 +26,6 @@
 #include "../_def_.h"
 
 
-// wasp::core::types
+// core::types
 #define __TYPES_BEGIN__ __CORE_BEGIN__ namespace types {
 #define __TYPES_END__ } __CORE_END__

@@ -19,6 +19,9 @@
  * An implementation of core/exceptions.h
  */
 
+// C++ libraries.
+#include <csignal>
+
 #include "./exceptions.h"
 
 

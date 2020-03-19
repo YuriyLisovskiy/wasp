@@ -26,50 +26,50 @@
 #include "../_def_.h"
 
 
-/// wasp::core
-#define __CORE_BEGIN__ __WASP_BEGIN__ namespace core {
-#define __CORE_END__ } __WASP_END__
+/// core
+#define __CORE_BEGIN__ __MAIN_NAMESPACE_BEGIN__ namespace core {
+#define __CORE_END__ } __MAIN_NAMESPACE_END__
 
-/// wasp::core::internal
+/// core::internal
 #define __CORE_INTERNAL_BEGIN__ __CORE_BEGIN__ namespace internal {
 #define __CORE_INTERNAL_END__ } __CORE_END__
 
 
-/// wasp::core::path
+/// core::path
 #define __PATH_BEGIN__ __CORE_BEGIN__ namespace path {
 #define __PATH_END__ } __CORE_END__
 
-/// wasp::core::path::internal
+/// core::path::internal
 #define __PATH_INTERNAL_BEGIN__ __PATH_BEGIN__ namespace internal {
 #define __PATH_INTERNAL_END__ } __PATH_END__
 
 
-/// wasp::core::mime
+/// core::mime
 #define __MIME_BEGIN__ __CORE_BEGIN__ namespace mime {
 #define __MIME_END__ } __CORE_END__
 
 
-/// wasp::core::encoding
+/// core::encoding
 #define __ENCODING_BEGIN__ __CORE_BEGIN__ namespace encoding {
 #define __ENCODING_END__ } __CORE_END__
 
-/// wasp::core::encoding::internal
+/// core::encoding::internal
 #define __ENCODING_INTERNAL_BEGIN__ __CORE_BEGIN__ namespace internal {
 #define __ENCODING_INTERNAL_END__ } __CORE_END__
 
 
-/// wasp::core::rgx
+/// core::rgx
 #define __RGX_BEGIN__ __CORE_BEGIN__ namespace rgx {
 #define __RGX_END__ } __CORE_END__
 
 
-/// wasp::core::utility
+/// core::utility
 #define __UTILITY_BEGIN__ __CORE_BEGIN__ namespace utility {
 #define __UTILITY_END__ } __CORE_END__
 
 
 /// Declares exception's class with given base.
-#define DEF_WASP_EXCEPTION_WITH_BASE(name, base, default_message)\
+#define DEF_EXCEPTION_WITH_BASE(name, base, default_message)\
 class name : public base\
 {\
 protected:\
@@ -99,7 +99,7 @@ public:\
 }
 
 
-#define DEF_WASP_HTTP_EXCEPTION(name, status_code, default_message)\
+#define DEF_HTTP_EXCEPTION(name, status_code, default_message)\
 class name : public ErrorResponseException\
 {\
 protected:\

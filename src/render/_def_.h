@@ -26,15 +26,15 @@
 #include "../_def_.h"
 
 
-// wasp::render
-#define __RENDER_BEGIN__ __WASP_BEGIN__ namespace render {
-#define __RENDER_END__ } __WASP_END__
+// render
+#define __RENDER_BEGIN__ __MAIN_NAMESPACE_BEGIN__ namespace render {
+#define __RENDER_END__ } __MAIN_NAMESPACE_END__
 
-// wasp::render::internal
+// render::internal
 #define __RENDER_INTERNAL_BEGIN__ __RENDER_BEGIN__ namespace internal {
 #define __RENDER_INTERNAL_END__ } __RENDER_END__
 
 
-// wasp::render::backends
+// render::backends
 #define __BACKENDS_BEGIN__ __RENDER_BEGIN__ namespace backends {
 #define __BACKENDS_END__ } __RENDER_END__
