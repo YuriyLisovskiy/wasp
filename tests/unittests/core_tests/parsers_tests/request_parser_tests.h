@@ -173,7 +173,7 @@ protected:
 TEST_F(ParseRequestTestCase, ParseXWWWUrlencodedTest)
 {
 	this->parser->parse_headers(this->HEADERS);
-	auto headers = this->parser->get_headers();
+	auto headers = this->parser->headers;
 
 	ASSERT_EQ(headers.size(), this->HEADERS_COUNT);
 
@@ -182,47 +182,47 @@ TEST_F(ParseRequestTestCase, ParseXWWWUrlencodedTest)
 	ASSERT_EQ(this->parser->minor_v, this->VERSION_MINOR);
 	ASSERT_EQ(this->parser->path, this->PATH);
 
-	ASSERT_TRUE(headers.contains(this->USER_AGENT.first));
-	ASSERT_EQ(headers.get(this->USER_AGENT.first), this->USER_AGENT.second);
+	ASSERT_TRUE(headers.find(this->USER_AGENT.first) != headers.end());
+	ASSERT_EQ(headers[this->USER_AGENT.first], this->USER_AGENT.second);
 
-	ASSERT_TRUE(headers.contains(this->CONTENT_TYPE.first));
-	ASSERT_EQ(headers.get(this->CONTENT_TYPE.first), this->CONTENT_TYPE.second);
+	ASSERT_TRUE(headers.find(this->CONTENT_TYPE.first) != headers.end());
+	ASSERT_EQ(headers[this->CONTENT_TYPE.first], this->CONTENT_TYPE.second);
 
-	ASSERT_TRUE(headers.contains(this->CONTENT_LENGTH.first));
-	ASSERT_EQ(headers.get(this->CONTENT_LENGTH.first), this->CONTENT_LENGTH.second);
+	ASSERT_TRUE(headers.find(this->CONTENT_LENGTH.first) != headers.end());
+	ASSERT_EQ(headers[this->CONTENT_LENGTH.first], this->CONTENT_LENGTH.second);
 
-	ASSERT_TRUE(headers.contains(this->HOST.first));
-	ASSERT_EQ(headers.get(this->HOST.first), this->HOST.second);
+	ASSERT_TRUE(headers.find(this->HOST.first) != headers.end());
+	ASSERT_EQ(headers[this->HOST.first], this->HOST.second);
 
-	ASSERT_TRUE(headers.contains(this->ACCEPT_LANGUAGE.first));
-	ASSERT_EQ(headers.get(this->ACCEPT_LANGUAGE.first), this->ACCEPT_LANGUAGE.second);
+	ASSERT_TRUE(headers.find(this->ACCEPT_LANGUAGE.first) != headers.end());
+	ASSERT_EQ(headers[this->ACCEPT_LANGUAGE.first], this->ACCEPT_LANGUAGE.second);
 
-	ASSERT_TRUE(headers.contains(this->ACCEPT_ENCODING.first));
-	ASSERT_EQ(headers.get(this->ACCEPT_ENCODING.first), this->ACCEPT_ENCODING.second);
+	ASSERT_TRUE(headers.find(this->ACCEPT_ENCODING.first) != headers.end());
+	ASSERT_EQ(headers[this->ACCEPT_ENCODING.first], this->ACCEPT_ENCODING.second);
 
-	ASSERT_TRUE(headers.contains(this->CONNECTION.first));
-	ASSERT_EQ(headers.get(this->CONNECTION.first), this->CONNECTION.second);
+	ASSERT_TRUE(headers.find(this->CONNECTION.first) != headers.end());
+	ASSERT_EQ(headers[this->CONNECTION.first], this->CONNECTION.second);
 
 	this->parser->parse_body(this->BODY, "");
 
 	ASSERT_EQ(this->parser->content, this->BODY);
-	ASSERT_EQ(this->parser->post_parameters->size(), this->PARAMS_COUNT);
-	ASSERT_EQ(this->BODY.size(),std::stoi(headers.get(this->CONTENT_LENGTH.first)));
+	ASSERT_EQ(this->parser->post_parameters.size(), this->PARAMS_COUNT);
+	ASSERT_EQ(this->BODY.size(),std::stoi(headers[this->CONTENT_LENGTH.first]));
 
-	ASSERT_TRUE(this->parser->post_parameters->contains(this->PARAM_HELLO.first));
-	ASSERT_EQ(this->parser->post_parameters->get(this->PARAM_HELLO.first), this->PARAM_HELLO.second);
+	ASSERT_TRUE(this->parser->post_parameters.contains(this->PARAM_HELLO.first));
+	ASSERT_EQ(this->parser->post_parameters.get(this->PARAM_HELLO.first), this->PARAM_HELLO.second);
 
-	ASSERT_TRUE(this->parser->post_parameters->contains(this->PARAM_CONTENT.first));
-	ASSERT_EQ(this->parser->post_parameters->get(this->PARAM_CONTENT.first), this->PARAM_CONTENT.second);
+	ASSERT_TRUE(this->parser->post_parameters.contains(this->PARAM_CONTENT.first));
+	ASSERT_EQ(this->parser->post_parameters.get(this->PARAM_CONTENT.first), this->PARAM_CONTENT.second);
 
-	ASSERT_TRUE(this->parser->post_parameters->contains(this->PARAM_PARAMS.first));
-	ASSERT_EQ(this->parser->post_parameters->get(this->PARAM_PARAMS.first), this->PARAM_PARAMS.second);
+	ASSERT_TRUE(this->parser->post_parameters.contains(this->PARAM_PARAMS.first));
+	ASSERT_EQ(this->parser->post_parameters.get(this->PARAM_PARAMS.first), this->PARAM_PARAMS.second);
 }
 
 TEST_F(ParseRequestTestCase, ParseFormDataTest)
 {
 	this->parser->parse_headers(this->FORM_DATA_HEADERS);
-	auto headers = this->parser->get_headers();
+	auto headers = this->parser->headers;
 
 	ASSERT_EQ(headers.size(), this->HEADERS_COUNT);
 
@@ -231,36 +231,36 @@ TEST_F(ParseRequestTestCase, ParseFormDataTest)
 	ASSERT_EQ(this->parser->minor_v, this->VERSION_MINOR);
 	ASSERT_EQ(this->parser->path, this->PATH);
 
-	ASSERT_TRUE(headers.contains(this->USER_AGENT.first));
-	ASSERT_EQ(headers.get(this->USER_AGENT.first), this->USER_AGENT.second);
+	ASSERT_TRUE(headers.find(this->USER_AGENT.first) != headers.end());
+	ASSERT_EQ(headers[this->USER_AGENT.first], this->USER_AGENT.second);
 
-	ASSERT_TRUE(headers.contains(this->FORM_DATA_CONTENT_TYPE.first));
-	ASSERT_EQ(headers.get(this->FORM_DATA_CONTENT_TYPE.first), this->FORM_DATA_CONTENT_TYPE.second);
+	ASSERT_TRUE(headers.find(this->FORM_DATA_CONTENT_TYPE.first) != headers.end());
+	ASSERT_EQ(headers[this->FORM_DATA_CONTENT_TYPE.first], this->FORM_DATA_CONTENT_TYPE.second);
 
-	ASSERT_TRUE(headers.contains(this->FORM_DATA_CONTENT_LENGTH.first));
-	ASSERT_EQ(headers.get(this->FORM_DATA_CONTENT_LENGTH.first), this->FORM_DATA_CONTENT_LENGTH.second);
+	ASSERT_TRUE(headers.find(this->FORM_DATA_CONTENT_LENGTH.first) != headers.end());
+	ASSERT_EQ(headers[this->FORM_DATA_CONTENT_LENGTH.first], this->FORM_DATA_CONTENT_LENGTH.second);
 
-	ASSERT_TRUE(headers.contains(this->HOST.first));
-	ASSERT_EQ(headers.get(this->HOST.first), this->HOST.second);
+	ASSERT_TRUE(headers.find(this->HOST.first) != headers.end());
+	ASSERT_EQ(headers[this->HOST.first], this->HOST.second);
 
-	ASSERT_TRUE(headers.contains(this->ACCEPT_LANGUAGE.first));
-	ASSERT_EQ(headers.get(this->ACCEPT_LANGUAGE.first), this->ACCEPT_LANGUAGE.second);
+	ASSERT_TRUE(headers.find(this->ACCEPT_LANGUAGE.first) != headers.end());
+	ASSERT_EQ(headers[this->ACCEPT_LANGUAGE.first], this->ACCEPT_LANGUAGE.second);
 
-	ASSERT_TRUE(headers.contains(this->ACCEPT_ENCODING.first));
-	ASSERT_EQ(headers.get(this->ACCEPT_ENCODING.first), this->ACCEPT_ENCODING.second);
+	ASSERT_TRUE(headers.find(this->ACCEPT_ENCODING.first) != headers.end());
+	ASSERT_EQ(headers[this->ACCEPT_ENCODING.first], this->ACCEPT_ENCODING.second);
 
-	ASSERT_TRUE(headers.contains(this->CONNECTION.first));
-	ASSERT_EQ(headers.get(this->CONNECTION.first), this->CONNECTION.second);
+	ASSERT_TRUE(headers.find(this->CONNECTION.first) != headers.end());
+	ASSERT_EQ(headers[this->CONNECTION.first], this->CONNECTION.second);
 
 	this->parser->parse_body(this->FORM_DATA_BODY, "");
 
 	ASSERT_EQ(this->parser->content, this->FORM_DATA_BODY);
-	ASSERT_EQ(this->parser->post_parameters->size(), this->FORM_DATA_POST_COUNT);
-	ASSERT_EQ(this->parser->files_parameters->size(), this->FORM_DATA_FILES_COUNT);
-	ASSERT_EQ(this->FORM_DATA_BODY.size(),std::stoi(headers.get(this->FORM_DATA_CONTENT_LENGTH.first)));
+	ASSERT_EQ(this->parser->post_parameters.size(), this->FORM_DATA_POST_COUNT);
+	ASSERT_EQ(this->parser->files_parameters.size(), this->FORM_DATA_FILES_COUNT);
+	ASSERT_EQ(this->FORM_DATA_BODY.size(),std::stoi(headers[this->FORM_DATA_CONTENT_LENGTH.first]));
 
-	ASSERT_TRUE(this->parser->post_parameters->contains(this->MAIL.first));
-	ASSERT_EQ(this->parser->post_parameters->get(this->MAIL.first), this->MAIL.second);
+	ASSERT_TRUE(this->parser->post_parameters.contains(this->MAIL.first));
+	ASSERT_EQ(this->parser->post_parameters.get(this->MAIL.first), this->MAIL.second);
 }
 
 __UNIT_TESTS_END__

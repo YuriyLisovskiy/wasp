@@ -33,9 +33,9 @@ TEST(TzTestCase, BothDirectionAssertTest)
 
 	ASSERT_EQ(OFFSET_TO_TZ_ABBR.size(), TZ_ABBR_TO_OFFSET.size());
 
-	auto it1 = OFFSET_TO_TZ_ABBR.cbegin();
-	auto it2 = TZ_ABBR_TO_OFFSET.cbegin();
-	while (it1 != OFFSET_TO_TZ_ABBR.cend())
+	auto it1 = OFFSET_TO_TZ_ABBR.begin();
+	auto it2 = TZ_ABBR_TO_OFFSET.begin();
+	while (it1 != OFFSET_TO_TZ_ABBR.end())
 	{
 		ASSERT_TRUE(OFFSET_TO_TZ_ABBR.contains(it2->second));
 		ASSERT_TRUE(TZ_ABBR_TO_OFFSET.contains(it1->second));
@@ -47,7 +47,7 @@ TEST(TzTestCase, BothDirectionAssertTest)
 TEST(DateTimeTestCase, StrptimeTzAbbreviationsTest)
 {
 	using core::dt::internal::OFFSET_TO_TZ_ABBR;
-	for (auto it = OFFSET_TO_TZ_ABBR.cbegin(); it != OFFSET_TO_TZ_ABBR.cend(); it++)
+	for (auto it = OFFSET_TO_TZ_ABBR.begin(); it != OFFSET_TO_TZ_ABBR.end(); it++)
 	{
 		std::string str_dt("Fri, 15 Nov 2019 12:45:26 " + it->second);
 		auto dt = core::dt::DateTime::strptime(str_dt.c_str(), "%a, %e %b %Y %T %Z");
@@ -67,7 +67,7 @@ TEST(DateTimeTestCase, StrptimeTzAbbreviationsTest)
 TEST(DateTimeTestCase, StrptimeTzHourMinTest)
 {
 	using core::dt::internal::OFFSET_TO_TZ_ABBR;
-	for (auto it = OFFSET_TO_TZ_ABBR.cbegin(); it != OFFSET_TO_TZ_ABBR.cend(); it++)
+	for (auto it = OFFSET_TO_TZ_ABBR.begin(); it != OFFSET_TO_TZ_ABBR.end(); it++)
 	{
 		std::string str_dt("Fri, 15 Nov 2019 12:45:26 " + it->first);
 		auto dt = core::dt::DateTime::strptime(str_dt.c_str(), "%a, %e %b %Y %T %z");

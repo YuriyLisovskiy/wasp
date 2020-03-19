@@ -84,7 +84,7 @@ TEST(MimeTypesTestCase, guessContentTypeTestAll)
 {
 	std::string type, encoding;
 
-	for (auto it = core::mime::TYPES_MAP.cbegin(); it != core::mime::TYPES_MAP.cend(); it++)
+	for (auto it = core::mime::TYPES_MAP.begin(); it != core::mime::TYPES_MAP.end(); it++)
 	{
 		core::mime::guess_content_type("./file" + it->first, type, encoding);
 		ASSERT_EQ(type, it->second);

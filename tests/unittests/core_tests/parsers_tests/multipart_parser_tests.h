@@ -203,63 +203,65 @@ protected:
 TEST_F(MultipartParserTestCase, ParseSingleParameterTest)
 {
 	this->parser->parse(this->CONTENT_TYPE, this->BODY_WITH_SINGLE_PARAM);
-	auto params = this->parser->get_post_params();
+	auto params = http::HttpRequest::Parameters(
+		this->parser->post_values, this->parser->multi_post_value
+	);
 
-	ASSERT_EQ(params->size(), 1);
-	ASSERT_TRUE(params->contains("mail"));
-	ASSERT_EQ(params->get("mail"), "some_mail@gmail.com");
+	ASSERT_EQ(params.size(), 1);
+	ASSERT_TRUE(params.contains("mail"));
+	ASSERT_EQ(params.get("mail"), "some_mail@gmail.com");
 
-	auto file_params = this->parser->get_files_params();
-	ASSERT_EQ(file_params->size(), 0);
-
-	delete params;
-	delete file_params;
+	auto file_params = http::HttpRequest::Parameters(
+		this->parser->file_values, this->parser->multi_file_value
+	);
+	ASSERT_EQ(file_params.size(), 0);
 }
 
 TEST_F(MultipartParserTestCase, ParseMultipleParametersWithoutFilesTest)
 {
 	this->parser->parse(this->CONTENT_TYPE, this->BODY_WITH_MULTIPLE_PARAM);
-	auto params = this->parser->get_post_params();
+	auto params = http::HttpRequest::Parameters(
+		this->parser->post_values, this->parser->multi_post_value
+	);
 
-	ASSERT_EQ(params->size(), 3);
-	ASSERT_TRUE(params->contains("mail"));
-	ASSERT_EQ(params->get("mail"), "some_mail@gmail.com");
-	ASSERT_TRUE(params->contains("name"));
-	ASSERT_EQ(params->get("name"), "Xavier");
-	ASSERT_TRUE(params->contains("birth_year"));
-	ASSERT_EQ(params->get("birth_year"), "2000");
+	ASSERT_EQ(params.size(), 3);
+	ASSERT_TRUE(params.contains("mail"));
+	ASSERT_EQ(params.get("mail"), "some_mail@gmail.com");
+	ASSERT_TRUE(params.contains("name"));
+	ASSERT_EQ(params.get("name"), "Xavier");
+	ASSERT_TRUE(params.contains("birth_year"));
+	ASSERT_EQ(params.get("birth_year"), "2000");
 
-	auto file_params = this->parser->get_files_params();
-	ASSERT_EQ(file_params->size(), 0);
-
-	delete params;
-	delete file_params;
+	auto file_params = http::HttpRequest::Parameters(
+		this->parser->file_values, this->parser->multi_file_value
+	);
+	ASSERT_EQ(file_params.size(), 0);
 }
 
 TEST_F(MultipartParserTestCase, ParseMultipleParametersWithFilesTest)
 {
 	this->parser->parse(this->CONTENT_TYPE, this->BODY_WITH_FILE_AND_STR_PARAM);
-	auto post = this->parser->get_post_params();
+	auto post = http::HttpRequest::Parameters(
+		this->parser->post_values, this->parser->multi_post_value
+	);
 
-	ASSERT_EQ(post->size(), 3);
-	ASSERT_TRUE(post->contains("mail"));
-	ASSERT_EQ(post->get("mail"), "some_mail@gmail.com");
-	ASSERT_TRUE(post->contains("name"));
-	ASSERT_EQ(post->get("name"), "Xavier");
-	ASSERT_TRUE(post->contains("birth_year"));
-	ASSERT_EQ(post->get("birth_year"), "2000");
+	ASSERT_EQ(post.size(), 3);
+	ASSERT_TRUE(post.contains("mail"));
+	ASSERT_EQ(post.get("mail"), "some_mail@gmail.com");
+	ASSERT_TRUE(post.contains("name"));
+	ASSERT_EQ(post.get("name"), "Xavier");
+	ASSERT_TRUE(post.contains("birth_year"));
+	ASSERT_EQ(post.get("birth_year"), "2000");
 
-	delete post;
+	auto files = http::HttpRequest::Parameters(
+		this->parser->file_values, this->parser->multi_file_value
+	);
 
-	auto files = this->parser->get_files_params();
+	ASSERT_EQ(files.size(), 1);
+	ASSERT_TRUE(files.contains("super_file"));
 
-	ASSERT_EQ(files->size(), 1);
-	ASSERT_TRUE(files->contains("super_file"));
-
-	auto super_file = files->get("super_file");
+	auto super_file = files.get("super_file");
 	super_file.save();
-
-	delete files;
 
 	ASSERT_EQ(super_file.size(), this->FILE_CONTENT.size());
 	ASSERT_EQ(super_file.name(), this->ROOT + "FamilyTree.pro");

@@ -25,6 +25,7 @@
 
 #include "../../_def_.h"
 #include "../../../../src/core/parsers/query_parser.h"
+#include "../../../../src/http/request.h"
 
 __UNIT_TESTS_BEGIN__
 
@@ -45,7 +46,7 @@ TEST(QueryParserTestCase, get)
 	core::internal::query_parser parser;
 	parser.parse("hello=world&world=hello&hello_key=hello_value&world_key=world_value");
 
-	http::HttpRequest::Parameters<std::string, std::string> actual(*parser.dict, *parser.multi_dict);
+	http::HttpRequest::Parameters<std::string, std::string> actual(parser.dict, parser.multi_dict);
 
 	for (const auto& item : expected)
 	{
@@ -62,7 +63,7 @@ TEST(QueryParserTestCase, getList)
 	};
 	core::internal::query_parser parser;
 	parser.parse("hello=world&hello=hello&hello=hello_value");
-	http::HttpRequest::Parameters<std::string, std::string> parameters(*parser.dict, *parser.multi_dict);
+	http::HttpRequest::Parameters<std::string, std::string> parameters(parser.dict, parser.multi_dict);
 
 	ASSERT_TRUE(parameters.contains_list(key));
 
@@ -86,7 +87,7 @@ TEST(QueryParserTestCase, keys)
 	};
 	core::internal::query_parser parser;
 	parser.parse("hello=world&world=hello&hello_key=hello_value&world_key=world_value");
-	http::HttpRequest::Parameters<std::string, std::string> parsed(*parser.dict, *parser.multi_dict);
+	http::HttpRequest::Parameters<std::string, std::string> parsed(parser.dict, parser.multi_dict);
 	auto actual = parsed.keys();
 
 	ASSERT_TRUE(containers_are_equal(expected, actual));
@@ -97,7 +98,7 @@ TEST(QueryParserTestCase, size)
 	auto expected = 4;
 	core::internal::query_parser parser;
 	parser.parse("hello=world&world=hello&hello_key=hello_value&world_key=world_value");
-	http::HttpRequest::Parameters<std::string, std::string> parsed(*parser.dict, *parser.multi_dict);
+	http::HttpRequest::Parameters<std::string, std::string> parsed(parser.dict, parser.multi_dict);
 	auto actual = parsed.size();
 
 	ASSERT_EQ(expected, actual);
@@ -107,7 +108,7 @@ TEST(QueryParserTestCase, empty)
 {
 	core::internal::query_parser parser;
 	parser.parse("");
-	http::HttpRequest::Parameters<std::string, std::string> parsed(*parser.dict, *parser.multi_dict);
+	http::HttpRequest::Parameters<std::string, std::string> parsed(parser.dict, parser.multi_dict);
 
 	ASSERT_TRUE(parsed.empty());
 }

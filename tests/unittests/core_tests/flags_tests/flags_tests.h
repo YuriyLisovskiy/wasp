@@ -28,7 +28,7 @@ __UNIT_TESTS_BEGIN__
 
 TEST(FlagsTestCase, ParseTest)
 {
-	auto fs = flags::FlagSet("TestFlagSet");
+	auto fs = core::flags::FlagSet("TestFlagSet");
 	auto host = fs.make_string("host", "", "");
 	auto port = fs.make_long("port", 0, "");
 	auto verbose = fs.make_bool("verbose", false, "");
@@ -50,7 +50,7 @@ TEST(FlagsTestCase, ParseTest)
 
 TEST(FlagsTestCase, ParseWithEqSignsTest)
 {
-	auto fs = flags::FlagSet("TestFlagSet");
+	auto fs = core::flags::FlagSet("TestFlagSet");
 	auto host = fs.make_string("host", "", "");
 	auto port = fs.make_long("port", 0, "");
 	auto verbose = fs.make_bool("verbose", true, "");

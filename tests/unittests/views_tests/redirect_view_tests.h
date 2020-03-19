@@ -82,7 +82,7 @@ class RedirectViewWithDefaultParamsTestCase : public ::testing::Test
 {
 protected:
 	views::RedirectView* view = nullptr;
-	RedirectViewTestSettings* settings;
+	RedirectViewTestSettings* settings = nullptr;
 
 	void SetUp() override
 	{
@@ -93,7 +93,6 @@ protected:
 
 	void TearDown() override
 	{
-		core::Logger::reset_instance();
 		delete this->settings;
 		delete this->view;
 	}
@@ -105,9 +104,7 @@ TEST_F(RedirectViewWithDefaultParamsTestCase, GetTest)
 	this->view->setup(&request);
 	auto response = this->view->get(&request, nullptr);
 
-	ASSERT_EQ(typeid(http::HttpResponseRedirect), typeid(*response));
-
-	delete response;
+	ASSERT_TRUE(dynamic_cast<http::HttpResponseRedirect*>(response.get()));
 }
 
 TEST_F(RedirectViewWithDefaultParamsTestCase, PostTest)
@@ -116,9 +113,7 @@ TEST_F(RedirectViewWithDefaultParamsTestCase, PostTest)
 	this->view->setup(&request);
 	auto response = this->view->post(&request, nullptr);
 
-	ASSERT_EQ(typeid(http::HttpResponseRedirect), typeid(*response));
-
-	delete response;
+	ASSERT_TRUE(dynamic_cast<http::HttpResponseRedirect*>(response.get()));
 }
 
 TEST_F(RedirectViewWithDefaultParamsTestCase, PutTest)
@@ -127,9 +122,7 @@ TEST_F(RedirectViewWithDefaultParamsTestCase, PutTest)
 	this->view->setup(&request);
 	auto response = this->view->put(&request, nullptr);
 
-	ASSERT_EQ(typeid(http::HttpResponseRedirect), typeid(*response));
-
-	delete response;
+	ASSERT_TRUE(dynamic_cast<http::HttpResponseRedirect*>(response.get()));
 }
 
 TEST_F(RedirectViewWithDefaultParamsTestCase, PatchTest)
@@ -138,9 +131,7 @@ TEST_F(RedirectViewWithDefaultParamsTestCase, PatchTest)
 	this->view->setup(&request);
 	auto response = this->view->patch(&request, nullptr);
 
-	ASSERT_EQ(typeid(http::HttpResponseRedirect), typeid(*response));
-
-	delete response;
+	ASSERT_TRUE(dynamic_cast<http::HttpResponseRedirect*>(response.get()));
 }
 
 TEST_F(RedirectViewWithDefaultParamsTestCase, DeleteTest)
@@ -149,9 +140,7 @@ TEST_F(RedirectViewWithDefaultParamsTestCase, DeleteTest)
 	this->view->setup(&request);
 	auto response = this->view->delete_(&request, nullptr);
 
-	ASSERT_EQ(typeid(http::HttpResponseRedirect), typeid(*response));
-
-	delete response;
+	ASSERT_TRUE(dynamic_cast<http::HttpResponseRedirect*>(response.get()));
 }
 
 TEST_F(RedirectViewWithDefaultParamsTestCase, HeadTest)
@@ -160,9 +149,7 @@ TEST_F(RedirectViewWithDefaultParamsTestCase, HeadTest)
 	this->view->setup(&request);
 	auto response = this->view->head(&request, nullptr);
 
-	ASSERT_EQ(typeid(http::HttpResponseRedirect), typeid(*response));
-
-	delete response;
+	ASSERT_TRUE(dynamic_cast<http::HttpResponseRedirect*>(response.get()));
 }
 
 TEST_F(RedirectViewWithDefaultParamsTestCase, OptionsTest)
@@ -171,9 +158,7 @@ TEST_F(RedirectViewWithDefaultParamsTestCase, OptionsTest)
 	this->view->setup(&request);
 	auto response = this->view->options(&request, nullptr);
 
-	ASSERT_EQ(typeid(http::HttpResponseRedirect), typeid(*response));
-
-	delete response;
+	ASSERT_TRUE(dynamic_cast<http::HttpResponseRedirect*>(response.get()));
 }
 
 TEST_F(RedirectViewWithDefaultParamsTestCase, TraceTest)
@@ -182,8 +167,6 @@ TEST_F(RedirectViewWithDefaultParamsTestCase, TraceTest)
 	auto response = this->view->trace(&request, nullptr);
 
 	ASSERT_EQ(response, nullptr);
-
-	delete response;
 }
 
 TEST_F(RedirectViewWithDefaultParamsTestCase, AllowedMethodsTest)
@@ -209,8 +192,6 @@ TEST_F(RedirectViewWithDefaultParamsTestCase, SetupAndDispatchAllowedTest)
 	auto response = this->view->dispatch(nullptr);
 
 	ASSERT_EQ(response->status(), 302);
-
-	delete response;
 }
 
 
@@ -222,8 +203,6 @@ TEST_F(RedirectViewWithDefaultParamsTestCase, DispatchTraceNotAllowedTest)
 	auto response = this->view->dispatch(nullptr);
 
 	ASSERT_EQ(response->status(), 405);
-
-	delete response;
 }
 
 TEST_F(RedirectViewWithDefaultParamsTestCase, GetRedirectUrlTest)
@@ -238,7 +217,7 @@ class RedirectViewPermanentAndQueryStringTestCase : public ::testing::Test
 {
 protected:
 	views::RedirectView* view = nullptr;
-	RedirectViewTestSettings* settings;
+	RedirectViewTestSettings* settings = nullptr;
 
 	void SetUp() override
 	{
@@ -251,7 +230,6 @@ protected:
 
 	void TearDown() override
 	{
-		core::Logger::reset_instance();
 		delete this->settings;
 		delete this->view;
 	}
@@ -263,9 +241,7 @@ TEST_F(RedirectViewPermanentAndQueryStringTestCase, GetTest)
 	this->view->setup(&request);
 	auto response = this->view->get(&request, nullptr);
 
-	ASSERT_EQ(typeid(http::HttpResponsePermanentRedirect), typeid(*response));
-
-	delete response;
+	ASSERT_TRUE(dynamic_cast<http::HttpResponsePermanentRedirect*>(response.get()));
 }
 
 TEST_F(RedirectViewPermanentAndQueryStringTestCase, PostTest)
@@ -274,9 +250,7 @@ TEST_F(RedirectViewPermanentAndQueryStringTestCase, PostTest)
 	this->view->setup(&request);
 	auto response = this->view->post(&request, nullptr);
 
-	ASSERT_EQ(typeid(http::HttpResponsePermanentRedirect), typeid(*response));
-
-	delete response;
+	ASSERT_TRUE(dynamic_cast<http::HttpResponsePermanentRedirect*>(response.get()));
 }
 
 TEST_F(RedirectViewPermanentAndQueryStringTestCase, PutTest)
@@ -285,9 +259,7 @@ TEST_F(RedirectViewPermanentAndQueryStringTestCase, PutTest)
 	this->view->setup(&request);
 	auto response = this->view->put(&request, nullptr);
 
-	ASSERT_EQ(typeid(http::HttpResponsePermanentRedirect), typeid(*response));
-
-	delete response;
+	ASSERT_TRUE(dynamic_cast<http::HttpResponsePermanentRedirect*>(response.get()));
 }
 
 TEST_F(RedirectViewPermanentAndQueryStringTestCase, PatchTest)
@@ -296,9 +268,7 @@ TEST_F(RedirectViewPermanentAndQueryStringTestCase, PatchTest)
 	this->view->setup(&request);
 	auto response = this->view->patch(&request, nullptr);
 
-	ASSERT_EQ(typeid(http::HttpResponsePermanentRedirect), typeid(*response));
-
-	delete response;
+	ASSERT_TRUE(dynamic_cast<http::HttpResponsePermanentRedirect*>(response.get()));
 }
 
 TEST_F(RedirectViewPermanentAndQueryStringTestCase, DeleteTest)
@@ -307,9 +277,7 @@ TEST_F(RedirectViewPermanentAndQueryStringTestCase, DeleteTest)
 	this->view->setup(&request);
 	auto response = this->view->delete_(&request, nullptr);
 
-	ASSERT_EQ(typeid(http::HttpResponsePermanentRedirect), typeid(*response));
-
-	delete response;
+	ASSERT_TRUE(dynamic_cast<http::HttpResponsePermanentRedirect*>(response.get()));
 }
 
 TEST_F(RedirectViewPermanentAndQueryStringTestCase, HeadTest)
@@ -318,9 +286,7 @@ TEST_F(RedirectViewPermanentAndQueryStringTestCase, HeadTest)
 	this->view->setup(&request);
 	auto response = this->view->head(&request, nullptr);
 
-	ASSERT_EQ(typeid(http::HttpResponsePermanentRedirect), typeid(*response));
-
-	delete response;
+	ASSERT_TRUE(dynamic_cast<http::HttpResponsePermanentRedirect*>(response.get()));
 }
 
 TEST_F(RedirectViewPermanentAndQueryStringTestCase, OptionsTest)
@@ -329,9 +295,7 @@ TEST_F(RedirectViewPermanentAndQueryStringTestCase, OptionsTest)
 	this->view->setup(&request);
 	auto response = this->view->options(&request, nullptr);
 
-	ASSERT_EQ(typeid(http::HttpResponsePermanentRedirect), typeid(*response));
-
-	delete response;
+	ASSERT_TRUE(dynamic_cast<http::HttpResponsePermanentRedirect*>(response.get()));
 }
 
 TEST_F(RedirectViewPermanentAndQueryStringTestCase, GetRedirectUrlTest)
@@ -368,7 +332,7 @@ class RedirectViewEmptyUrlTestCase : public ::testing::Test
 {
 protected:
 	views::RedirectView* view = nullptr;
-	RedirectViewTestSettings* settings;
+	RedirectViewTestSettings* settings = nullptr;
 
 	void SetUp() override
 	{
@@ -379,7 +343,6 @@ protected:
 
 	void TearDown() override
 	{
-		core::Logger::reset_instance();
 		delete this->settings;
 		delete this->view;
 	}
@@ -391,9 +354,7 @@ TEST_F(RedirectViewEmptyUrlTestCase, GetTest)
 	this->view->setup(&request);
 	auto response = this->view->get(&request, nullptr);
 
-	ASSERT_EQ(typeid(http::HttpResponseGone), typeid(*response));
-
-	delete response;
+	ASSERT_TRUE(dynamic_cast<http::HttpResponseGone*>(response.get()));
 }
 
 TEST_F(RedirectViewEmptyUrlTestCase, PostTest)
@@ -402,9 +363,7 @@ TEST_F(RedirectViewEmptyUrlTestCase, PostTest)
 	this->view->setup(&request);
 	auto response = this->view->post(&request, nullptr);
 
-	ASSERT_EQ(typeid(http::HttpResponseGone), typeid(*response));
-
-	delete response;
+	ASSERT_TRUE(dynamic_cast<http::HttpResponseGone*>(response.get()));
 }
 
 TEST_F(RedirectViewEmptyUrlTestCase, PutTest)
@@ -413,9 +372,7 @@ TEST_F(RedirectViewEmptyUrlTestCase, PutTest)
 	this->view->setup(&request);
 	auto response = this->view->put(&request, nullptr);
 
-	ASSERT_EQ(typeid(http::HttpResponseGone), typeid(*response));
-
-	delete response;
+	ASSERT_TRUE(dynamic_cast<http::HttpResponseGone*>(response.get()));
 }
 
 TEST_F(RedirectViewEmptyUrlTestCase, PatchTest)
@@ -424,9 +381,7 @@ TEST_F(RedirectViewEmptyUrlTestCase, PatchTest)
 	this->view->setup(&request);
 	auto response = this->view->patch(&request, nullptr);
 
-	ASSERT_EQ(typeid(http::HttpResponseGone), typeid(*response));
-
-	delete response;
+	ASSERT_TRUE(dynamic_cast<http::HttpResponseGone*>(response.get()));
 }
 
 TEST_F(RedirectViewEmptyUrlTestCase, DeleteTest)
@@ -435,9 +390,7 @@ TEST_F(RedirectViewEmptyUrlTestCase, DeleteTest)
 	this->view->setup(&request);
 	auto response = this->view->delete_(&request, nullptr);
 
-	ASSERT_EQ(typeid(http::HttpResponseGone), typeid(*response));
-
-	delete response;
+	ASSERT_TRUE(dynamic_cast<http::HttpResponseGone*>(response.get()));
 }
 
 TEST_F(RedirectViewEmptyUrlTestCase, HeadTest)
@@ -446,9 +399,7 @@ TEST_F(RedirectViewEmptyUrlTestCase, HeadTest)
 	this->view->setup(&request);
 	auto response = this->view->head(&request, nullptr);
 
-	ASSERT_EQ(typeid(http::HttpResponseGone), typeid(*response));
-
-	delete response;
+	ASSERT_TRUE(dynamic_cast<http::HttpResponseGone*>(response.get()));
 }
 
 TEST_F(RedirectViewEmptyUrlTestCase, OptionsTest)
@@ -457,9 +408,7 @@ TEST_F(RedirectViewEmptyUrlTestCase, OptionsTest)
 	this->view->setup(&request);
 	auto response = this->view->options(&request, nullptr);
 
-	ASSERT_EQ(typeid(http::HttpResponseGone), typeid(*response));
-
-	delete response;
+	ASSERT_TRUE(dynamic_cast<http::HttpResponseGone*>(response.get()));
 }
 
 TEST_F(RedirectViewEmptyUrlTestCase, GetRedirectUrlTest)

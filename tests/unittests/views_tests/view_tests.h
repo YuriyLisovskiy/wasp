@@ -93,7 +93,6 @@ protected:
 	{
 		delete this->settings;
 		delete this->view;
-		core::Logger::reset_instance();
 	}
 };
 
@@ -103,8 +102,6 @@ TEST_F(ViewTestCase, GetTestReturnsNullptr)
 	auto response = this->view->get(&request, nullptr);
 
 	ASSERT_EQ(response, nullptr);
-
-	delete response;
 }
 
 TEST_F(ViewTestCase, PostTestReturnsNullptr)
@@ -153,8 +150,6 @@ TEST_F(ViewTestCase, OptionsTest)
 	ASSERT_EQ(actual_response->content_type(), expected_response.content_type());
 	ASSERT_EQ(actual_response->status(), expected_response.status());
 	ASSERT_EQ(actual_response->charset(), expected_response.charset());
-
-	delete actual_response;
 }
 
 TEST_F(ViewTestCase, TraceTestReturnsNullptr)
@@ -186,8 +181,6 @@ TEST_F(ViewTestCase, SetupAndDispatchAllowedTest)
 	auto response = this->view->dispatch(nullptr);
 
 	ASSERT_EQ(response->status(), 200);
-
-	delete response;
 }
 
 TEST_F(ViewTestCase, DispatchNotAllowedTest)
@@ -198,8 +191,6 @@ TEST_F(ViewTestCase, DispatchNotAllowedTest)
 	auto response = this->view->dispatch(nullptr);
 
 	ASSERT_EQ(response->status(), 405);
-
-	delete response;
 }
 
 __UNIT_TESTS_END__
