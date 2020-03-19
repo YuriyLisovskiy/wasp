@@ -60,7 +60,7 @@ struct Settings
 {
 	bool DEBUG;
 
-	core::ILogger* LOGGER;
+	std::shared_ptr<core::ILogger> LOGGER;
 
 	/// Build paths inside the project like this: wasp::path::join(BASE_DIR, ...)
 	std::string BASE_DIR;
@@ -100,10 +100,10 @@ struct Settings
 	std::vector<std::shared_ptr<apps::IAppConfig>> INSTALLED_APPS;
 
 	/// List of commands to run from command line.
-	std::map<std::string, core::BaseCommand*> COMMANDS;
+	std::map<std::string, std::shared_ptr<core::BaseCommand>> COMMANDS;
 
 	/// Backend for rendering templates.
-	render::backends::IBackend* TEMPLATES_BACKEND;
+	std::unique_ptr<render::backends::IBackend> TEMPLATES_BACKEND;
 
 	/// Whether to append trailing slashes to URLs.
 	bool APPEND_SLASH;
@@ -219,12 +219,12 @@ struct Settings
 	/// that header/value, request.is_secure() will return true.
 	/// WARNING! Only set this if you fully understand what you're doing. Otherwise,
 	/// you may be opening yourself up to a security risk.
-	std::pair<std::string, std::string>* SECURE_PROXY_SSL_HEADER;
+	std::shared_ptr<std::pair<std::string, std::string>> SECURE_PROXY_SSL_HEADER;
 
 	/// List of middleware to use. Order is important; in the request phase, these
 	/// middleware will be applied in the order given, and in the response
 	/// phase the middleware will be applied in reverse order.
-	std::vector<middleware::IMiddleware*> MIDDLEWARE;
+	std::vector<std::shared_ptr<middleware::IMiddleware>> MIDDLEWARE;
 
 	/// Settings for CSRF cookie.
 	std::string CSRF_COOKIE_NAME;
@@ -253,7 +253,7 @@ struct Settings
 	bool SECURE_SSL_REDIRECT;
 
 	Settings();
-	virtual ~Settings();
+	virtual ~Settings() = default;
 	virtual void init() = 0;
 	virtual void override();
 	void prepare();
@@ -265,16 +265,16 @@ struct Settings
 	}
 
 	template <typename _T, typename = std::enable_if<std::is_base_of<middleware::IMiddleware, _T>::value>>
-	middleware::IMiddleware* middleware()
+	std::shared_ptr<middleware::IMiddleware> middleware()
 	{
-		return new _T(this);
+		return std::make_shared<_T>(this);
 	}
 
 	template <typename _CommandT, typename = std::enable_if<std::is_base_of<core::BaseCommand, _CommandT>::value>>
-	std::pair<std::string, core::BaseCommand*> command()
+	std::pair<std::string, std::shared_ptr<core::BaseCommand>> command()
 	{
-		auto* command = new _CommandT(this);
-		return std::pair<std::string, core::BaseCommand*>{command->name(), command};
+		auto command = std::make_shared<_CommandT>(this);
+		return std::pair<std::string, std::shared_ptr<core::BaseCommand>>{command->name(), command};
 	}
 };
 

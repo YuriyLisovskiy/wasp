@@ -102,7 +102,7 @@ std::unique_ptr<http::IHttpResponse> CommonMiddleware::process_request(
 		!host.empty() &&
 		!core::str::starts_with(host, "www.");
 	auto redirect_url = must_prepend ? (
-		request->scheme(this->settings->SECURE_PROXY_SSL_HEADER) + "://www." + host
+		request->scheme(this->settings->SECURE_PROXY_SSL_HEADER.get()) + "://www." + host
 	) : "";
 
 	// Check if a slash should be appended.

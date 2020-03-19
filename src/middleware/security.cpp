@@ -56,7 +56,7 @@ std::unique_ptr<http::IHttpResponse> SecurityMiddleware::process_request(http::H
 
 	if (
 		this->redirect &&
-		!request->is_secure(this->settings->SECURE_PROXY_SSL_HEADER) &&
+		!request->is_secure(this->settings->SECURE_PROXY_SSL_HEADER.get()) &&
 		!matched
 	)
 	{
@@ -80,7 +80,7 @@ std::unique_ptr<http::IHttpResponse> SecurityMiddleware::process_response(
 {
 	if (
 		this->sts_seconds &&
-		request->is_secure(this->settings->SECURE_PROXY_SSL_HEADER) &&
+		request->is_secure(this->settings->SECURE_PROXY_SSL_HEADER.get()) &&
 		!response->has_header(http::STRICT_TRANSPORT_SECURITY)
 	)
 	{

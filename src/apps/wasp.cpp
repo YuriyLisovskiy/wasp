@@ -27,6 +27,12 @@ __APPS_BEGIN__
 WaspApplication::WaspApplication(conf::Settings* settings)
 {
 	core::InterruptException::initialize();
+	if (!settings)
+	{
+		throw core::ImproperlyConfigured(
+			"Setting must be configured in order to use the application."
+		);
+	}
 
 	this->_settings = settings;
 	this->_settings->init();
@@ -51,7 +57,7 @@ WaspApplication::WaspApplication(conf::Settings* settings)
 	}
 }
 
-void WaspApplication::execute_from_command_line(int argc, char** argv)
+void WaspApplication::execute(int argc, char** argv)
 {
 	if (argc > 1)
 	{
@@ -113,7 +119,7 @@ void WaspApplication::_setup_commands()
 }
 
 void WaspApplication::_extend_settings_commands_or_error(
-	const std::vector<core::BaseCommand*>& from,
+	const std::vector<std::shared_ptr<core::BaseCommand>>& from,
 	const std::function<std::string(const std::string& cmd_name)>& err_fn
 )
 {
@@ -122,7 +128,9 @@ void WaspApplication::_extend_settings_commands_or_error(
 		if (std::find_if(
 			this->_settings->COMMANDS.begin(),
 			this->_settings->COMMANDS.end(),
-			[command](const std::pair<std::string, core::BaseCommand*>& pair) -> bool {
+			[command](const std::pair<
+				std::string, std::shared_ptr<core::BaseCommand>
+			>& pair) -> bool {
 				return command->name() == pair.first;
 			}
 		) != this->_settings->COMMANDS.end())
@@ -136,11 +144,6 @@ void WaspApplication::_extend_settings_commands_or_error(
 
 void WaspApplication::_perform_checks()
 {
-	if (!this->_settings)
-	{
-		throw core::ImproperlyConfigured("Main application's settings must be instantiated.");
-	}
-
 	if (!this->_settings->LOGGER)
 	{
 		throw core::ImproperlyConfigured("LOGGER instance must be configured");

@@ -79,7 +79,7 @@ std::string TemplateResponseMixin::get_template_name()
 TemplateView::TemplateView(
 	conf::Settings* settings
 ) : views::View({"get", "options"}, settings),
-	TemplateResponseMixin(settings->TEMPLATES_BACKEND)
+	TemplateResponseMixin(settings->TEMPLATES_BACKEND.get())
 {
 }
 
@@ -89,7 +89,7 @@ TemplateView::TemplateView(
 	const std::string& template_name,
 	const std::string& content_type
 ) : views::View(allowed_methods, settings),
-    TemplateResponseMixin(settings->TEMPLATES_BACKEND)
+    TemplateResponseMixin(settings->TEMPLATES_BACKEND.get())
 {
 	this->_template_name = template_name;
 	this->_content_type = content_type;

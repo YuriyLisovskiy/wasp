@@ -52,15 +52,15 @@ struct Settings final: public wasp::conf::Settings
 			this->middleware<wasp::middleware::CookieMiddleware>()
 		};
 
-		this->TEMPLATES_BACKEND = new wasp::render::backends::WaspBackend(
-			{
+		this->TEMPLATES_BACKEND = std::make_unique<wasp::render::backends::WaspBackend>(
+			std::vector<std::string>{
 				wasp::core::path::join(this->BASE_DIR, "templates")
 			},
 			true,
 			this->INSTALLED_APPS,
 			std::make_unique<wasp::render::backends::WaspBackend::Options>(
 				this->DEBUG,
-				this->LOGGER,
+				this->LOGGER.get(),
 				std::vector<std::shared_ptr<wasp::render::lib::ILibrary>>{
 					std::make_shared<MyFirstLib>()
 				}

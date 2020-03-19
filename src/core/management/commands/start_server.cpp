@@ -292,7 +292,7 @@ void StartServerCommand::setup_server_ctx(core::net::internal::HttpServer::conte
 
 	ctx.max_body_size = this->settings->DATA_UPLOAD_MAX_MEMORY_SIZE;
 	ctx.media_root = this->settings->MEDIA_ROOT;
-	ctx.logger = this->settings->LOGGER;
+	ctx.logger = this->settings->LOGGER.get();
 
 	if (std::regex_match(this->_threads_flag->get_raw(), std::regex(R"(\d+)")))
 	{

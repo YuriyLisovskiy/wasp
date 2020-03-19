@@ -12,11 +12,11 @@
 
 int main(int argc, char** argv)
 {
-	auto* settings = new Settings();
+	auto settings = std::make_shared<Settings>();
 	try
 	{
-		auto app = wasp::apps::WaspApplication(settings);
-		app.execute_from_command_line(argc, argv);
+		auto app = wasp::apps::WaspApplication(settings.get());
+		app.execute(argc, argv);
 	}
 	catch (const wasp::core::ImproperlyConfigured& exc)
 	{
@@ -26,6 +26,5 @@ int main(int argc, char** argv)
 		}
 	}
 
-	delete settings;
 	return 0;
 }

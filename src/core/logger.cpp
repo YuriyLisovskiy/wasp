@@ -24,19 +24,13 @@
 
 __CORE_BEGIN__
 
-ILogger* Logger::_instance = nullptr;
+std::shared_ptr<ILogger> Logger::_instance = nullptr;
 
-void Logger::reset_instance()
-{
-	delete Logger::_instance;
-	Logger::_instance = nullptr;
-}
-
-ILogger* Logger::get_instance(const Config& cfg)
+std::shared_ptr<ILogger> Logger::get_instance(const Config& cfg)
 {
 	if (Logger::_instance == nullptr)
 	{
-		Logger::_instance = new Logger(cfg);
+		Logger::_instance = std::shared_ptr<Logger>(new Logger(cfg));
 	}
 	else
 	{

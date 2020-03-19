@@ -48,11 +48,11 @@ protected:
 public:
 	struct Options final
 	{
-		bool debug = false;
-		core::ILogger* logger = core::Logger::get_instance({});
+		bool debug;
+		core::ILogger* logger;
 		std::vector<std::shared_ptr<ILoader>> loaders;
 		std::vector<std::shared_ptr<render::lib::ILibrary>> libraries;
-		bool auto_escape = true;
+		bool auto_escape;
 
 		explicit Options(
 			bool debug = false,
@@ -62,8 +62,13 @@ public:
 			bool auto_escape = true
 		)
 		{
+			if (!logger)
+			{
+				throw core::ImproperlyConfigured("WaspBackend: LOGGER instance must be configured.");
+			}
+
 			this->debug = debug;
-			this->logger = logger ? logger : core::Logger::get_instance({});
+			this->logger = logger;
 			this->loaders = std::move(loaders);
 			this->libraries = std::move(libraries);
 			this->auto_escape = auto_escape;

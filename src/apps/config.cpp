@@ -59,7 +59,7 @@ std::vector<urls::UrlPattern> AppConfig::get_urlpatterns()
 	return this->_urlpatterns;
 }
 
-std::vector<core::BaseCommand*> AppConfig::get_commands()
+std::vector<std::shared_ptr<core::BaseCommand>> AppConfig::get_commands()
 {
 	if (this->_commands.empty())
 	{
