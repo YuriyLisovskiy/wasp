@@ -13,7 +13,7 @@
 #include "../../src/middleware/security.h"
 #include "../../src/middleware/clickjacking.h"
 
-#include "../../src/render/backends/wasp.h"
+#include "../../src/render/env/default.h"
 #include "../../src/render/loaders.h"
 
 #include "../picture_app/app.h"
@@ -22,6 +22,7 @@
 
 #include "./libs/my_first_lib.h"
 #include "../../src/render/library/builtin.h"
+#include "../../src/render/env/default.h"
 
 
 struct Settings final: public wasp::conf::Settings
@@ -53,21 +54,21 @@ struct Settings final: public wasp::conf::Settings
 			this->middleware<wasp::middleware::CookieMiddleware>()
 		};
 
-		this->TEMPLATES_BACKEND = std::make_unique<wasp::render::backends::WaspBackend>(
-			std::vector<std::string>{
+		using namespace wasp::render;
+		this->TEMPLATES_ENV = env::DefaultEnvironment::Config{
+			.dirs = std::vector<std::string>{
 				wasp::core::path::join(this->BASE_DIR, "templates")
 			},
-			true,
-			this->INSTALLED_APPS,
-			std::make_unique<wasp::render::backends::WaspBackend::Options>(
-				this->DEBUG,
-				this->LOGGER.get(),
-				std::vector<std::shared_ptr<wasp::render::lib::ILibrary>>{
-					this->library<wasp::render::lib::BuiltinLibrary>(),
-					this->library<MyFirstLib>(),
-				}
-			)
-		);
+			.use_app_dirs		= true,
+			.apps				= this->INSTALLED_APPS,
+			.debug				= this->DEBUG,
+			.logger				= this->LOGGER.get(),
+			.auto_escape		= true,
+			.libraries = std::vector<std::shared_ptr<lib::ILibrary>>{
+				this->library<lib::BuiltinLibrary>(),
+				this->library<MyFirstLib>(),
+			}
+		}.make_env();
 
 		this->MEDIA_ROOT = wasp::core::path::join(this->BASE_DIR, "media");
 		this->MEDIA_URL = "/media/";

@@ -38,7 +38,7 @@ Settings::Settings()
 
 	this->ROOT_APP = nullptr;
 
-	this->TEMPLATES_BACKEND = nullptr;
+	this->TEMPLATES_ENV = nullptr;
 
 	this->APPEND_SLASH = true;
 

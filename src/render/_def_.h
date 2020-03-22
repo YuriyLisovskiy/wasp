@@ -35,6 +35,6 @@
 #define __RENDER_INTERNAL_END__ } __RENDER_END__
 
 
-// render::backends
-#define __BACKENDS_BEGIN__ __RENDER_BEGIN__ namespace backends {
-#define __BACKENDS_END__ } __RENDER_END__
+// render::env
+#define __ENV_BEGIN__ __RENDER_BEGIN__ namespace env {
+#define __ENV_END__ } __RENDER_END__

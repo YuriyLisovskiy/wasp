@@ -38,7 +38,7 @@
 #include "../middleware/interfaces.h"
 #include "../core/management/base.h"
 #include "../core/regex.h"
-#include "../render/backends/interfaces.h"
+#include "../render/env/interfaces.h"
 #include "../render/library/_def_.h"
 
 
@@ -50,9 +50,9 @@ __APPS_BEGIN__
 class IAppConfig;
 __APPS_END__
 
-__BACKENDS_BEGIN__
-class IBackend;
-__BACKENDS_END__
+__ENV_BEGIN__
+class IEnvironment;
+__ENV_END__
 
 __LIB_BEGIN__
 class ILibrary;
@@ -108,7 +108,7 @@ struct Settings
 	std::map<std::string, std::shared_ptr<core::BaseCommand>> COMMANDS;
 
 	/// Backend for rendering templates.
-	std::unique_ptr<render::backends::IBackend> TEMPLATES_BACKEND;
+	std::unique_ptr<render::env::IEnvironment> TEMPLATES_ENV;
 
 	/// Whether to append trailing slashes to URLs.
 	bool APPEND_SLASH;

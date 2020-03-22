@@ -24,69 +24,84 @@
 #pragma once
 
 // C++ libraries.
+#include <string>
+#include <vector>
 #include <memory>
 
 // Module definitions.
 #include "../_def_.h"
 
 // Wasp libraries.
-#include "./base.h"
+#include "./interfaces.h"
 #include "../engine.h"
 #include "../../collections/dict.h"
 #include "../../core/logger.h"
 #include "../../core/exceptions.h"
 #include "../library/base.h"
+#include "../../core/object/object.h"
 
 
-__BACKENDS_BEGIN__
+__ENV_BEGIN__
 
-class WaspBackend : public BaseBackend
+class DefaultEnvironment : public IEnvironment, public core::object::Object
 {
 protected:
 	std::unique_ptr<IEngine> _engine;
+	std::string _name;
+	std::vector<std::string> _dirs;
+	bool _use_app_dirs;
 
 public:
-	struct Options final
+	struct Config final
 	{
 		bool debug;
 		core::ILogger* logger;
 		std::vector<std::shared_ptr<ILoader>> loaders;
 		std::vector<std::shared_ptr<render::lib::ILibrary>> libraries;
 		bool auto_escape;
+		std::vector<std::string> dirs;
+		bool use_app_dirs;
+		std::vector<std::shared_ptr<apps::IAppConfig>> apps;
 
-		explicit Options(
+		explicit Config(
+			std::vector<std::string> dirs = {},
+			bool use_app_dirs = true,
+			std::vector<std::shared_ptr<apps::IAppConfig>> apps = {},
 			bool debug = false,
 			core::ILogger* logger = nullptr,
+			bool auto_escape = true,
 			std::vector<std::shared_ptr<render::lib::ILibrary>> libraries = {},
-			std::vector<std::shared_ptr<ILoader>> loaders = {},
-			bool auto_escape = true
+			std::vector<std::shared_ptr<ILoader>> loaders = {}
 		)
 		{
-			if (!logger)
-			{
-				throw core::ImproperlyConfigured("WaspBackend: LOGGER instance must be configured.");
-			}
-
 			this->debug = debug;
 			this->logger = logger;
 			this->loaders = std::move(loaders);
 			this->libraries = std::move(libraries);
 			this->auto_escape = auto_escape;
+			this->dirs = std::move(dirs);
+			this->use_app_dirs = use_app_dirs;
+			this->apps = std::move(apps);
+		}
+
+		std::unique_ptr<IEnvironment> make_env()
+		{
+			return std::make_unique<env::DefaultEnvironment>(*this);
 		}
 	};
 
-	WaspBackend(
-		const std::vector<std::string>& dirs,
-		bool use_app_dirs,
-		const std::vector<std::shared_ptr<apps::IAppConfig>>& installed_apps,
-		std::shared_ptr<Options> opts = nullptr
-	);
+	explicit DefaultEnvironment(Config& config);
+
+	std::string name() override;
 
 	std::shared_ptr<ITemplate> from_string(const std::string& template_code) override;
 	std::shared_ptr<ITemplate> get_template(const std::string& template_path) override;
+	std::string render(const std::string& src_code, IContext* ctx) override;
 
-protected:
-	std::shared_ptr<Options> _opts;
+	/// Initializes a std::vector of directories to search for templates.
+	std::vector<std::string> template_dirs(
+		const std::vector<std::shared_ptr<apps::IAppConfig>>& apps
+	) override;
 };
 
-__BACKENDS_END__
+__ENV_END__

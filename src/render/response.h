@@ -34,7 +34,7 @@
 
 // Wasp libraries.
 #include "./base.h"
-#include "./backends/base.h"
+#include "./env/interfaces.h"
 #include "./exceptions.h"
 #include "../http/response.h"
 
@@ -46,12 +46,12 @@ class TemplateResponse : public http::HttpResponse
 protected:
 	std::string _template_name;
 	IContext* _context;
-	backends::IBackend* _backend;
+	env::IEnvironment* _env;
 	bool _is_rendered;
 
 public:
 	explicit TemplateResponse(
-		backends::IBackend* backend,
+		env::IEnvironment* env,
 		const std::string& template_name,
 		IContext* context = nullptr,
 		unsigned short int status = 200,

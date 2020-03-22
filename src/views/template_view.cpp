@@ -25,18 +25,18 @@
 __VIEWS_BEGIN__
 
 TemplateResponseMixin::TemplateResponseMixin(
-	render::backends::IBackend* backend
+	render::env::IEnvironment* env
 )
 {
-	if (!backend)
+	if (!env)
 	{
 		throw core::ImproperlyConfigured(
-			"Backend must be initialized in order to use the application",
+			"Environment must be initialized in order to use the application",
 			_ERROR_DETAILS_
 		);
 	}
 
-	this->_backend = backend;
+	this->_env = env;
 	this->_template_name = "";
 	this->_content_type = "";
 }
@@ -51,7 +51,7 @@ std::unique_ptr<http::IHttpResponse> TemplateResponseMixin::render(
 )
 {
 	auto response = std::make_unique<render::TemplateResponse>(
-		this->_backend,
+		this->_env,
 		template_name.empty() ? this->get_template_name() : template_name,
 		context.get(),
 		status,
@@ -79,7 +79,7 @@ std::string TemplateResponseMixin::get_template_name()
 TemplateView::TemplateView(
 	conf::Settings* settings
 ) : views::View({"get", "options"}, settings),
-	TemplateResponseMixin(settings->TEMPLATES_BACKEND.get())
+	TemplateResponseMixin(settings->TEMPLATES_ENV.get())
 {
 }
 
@@ -89,7 +89,7 @@ TemplateView::TemplateView(
 	const std::string& template_name,
 	const std::string& content_type
 ) : views::View(allowed_methods, settings),
-    TemplateResponseMixin(settings->TEMPLATES_BACKEND.get())
+    TemplateResponseMixin(settings->TEMPLATES_ENV.get())
 {
 	this->_template_name = template_name;
 	this->_content_type = content_type;

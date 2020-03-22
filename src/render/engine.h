@@ -42,6 +42,7 @@
 #include "../core/path.h"
 #include "../collections/dict.h"
 #include "./library/base.h"
+#include "./env/interfaces.h"
 
 
 __RENDER_BEGIN__
@@ -56,7 +57,7 @@ protected:
 	bool _debug;
 	bool _auto_escape;
 	std::vector<std::shared_ptr<ILoader>> _loaders;
-	backends::BaseBackend* _backend;
+	env::IEnvironment* _env;
 
 	core::ILogger* _logger;
 
@@ -72,7 +73,7 @@ protected:
 
 public:
 	explicit Engine(
-		backends::BaseBackend* backend,
+		env::IEnvironment* env,
 		const std::vector<std::string>& dirs,
 		bool use_app_dirs,
 		bool debug,
@@ -96,7 +97,7 @@ public:
 	std::shared_ptr<ITemplate> get_template(const std::string& template_name) override;
 
 	/// Returns current backend.
-	backends::BaseBackend* backend();
+	env::IEnvironment* environment();
 
 	lib::Filters& get_filters() override;
 	lib::Tags& get_tags() override;

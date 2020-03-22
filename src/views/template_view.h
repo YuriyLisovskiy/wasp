@@ -36,7 +36,7 @@
 #include "../http/response.h"
 #include "../render/base.h"
 #include "../render/response.h"
-#include "../render/backends/base.h"
+#include "../render/env/interfaces.h"
 #include "../core/logger.h"
 #include "../core/exceptions.h"
 #include "../views/view.h"
@@ -52,11 +52,11 @@ class TemplateResponseMixin
 protected:
 	std::string _template_name;
 	std::string _content_type;
-	render::backends::IBackend* _backend;
+	render::env::IEnvironment* _env;
 
 public:
 	explicit TemplateResponseMixin(
-		render::backends::IBackend* backend
+		render::env::IEnvironment* env
 	);
 
 	/// Returns a response with a template rendered with

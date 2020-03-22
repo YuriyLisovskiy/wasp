@@ -30,27 +30,27 @@ TemplateDoesNotExist::TemplateDoesNotExist(
 ) : BaseException(message, line, function, file, type)
 {
 	this->_tried = {};
-	this->_backend = nullptr;
+	this->_env = nullptr;
 }
 
 TemplateDoesNotExist::TemplateDoesNotExist(
 	const char* message,
 	const std::vector<std::string>& tried,
-	backends::BaseBackend* backend,
+	env::IEnvironment* env,
 	int line, const char* function, const char* file
 )
 	: TemplateDoesNotExist(message, line, function, file, "TemplateDoesNotExist")
 {
 	this->_tried = tried;
-	this->_backend = backend;
+	this->_env = env;
 }
 
 TemplateDoesNotExist::TemplateDoesNotExist(
 	const std::string& message,
 	const std::vector<std::string>& tried,
-	backends::BaseBackend* backend,
+	env::IEnvironment* env,
 	int line, const char *function, const char *file
-) : TemplateDoesNotExist(message.c_str(), tried, backend, line, function, file)
+) : TemplateDoesNotExist(message.c_str(), tried, env, line, function, file)
 {
 }
 
@@ -59,9 +59,9 @@ std::vector<std::string> TemplateDoesNotExist::tried() const
 	return this->_tried;
 }
 
-backends::BaseBackend* TemplateDoesNotExist::backend() const
+env::IEnvironment* TemplateDoesNotExist::environment() const
 {
-	return this->_backend;
+	return this->_env;
 }
 
 

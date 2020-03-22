@@ -15,18 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * render/backends/base.h
- *
- * Purpose: base classes for backends.
- */
-
 #pragma once
 
 // C++ libraries.
 #include <string>
-#include <vector>
-#include <utility>
 #include <memory>
 
 // Module definitions.
@@ -34,45 +26,43 @@
 
 // Wasp libraries.
 #include "../base.h"
-#include "./interfaces.h"
-#include "../../core/exceptions.h"
-#include "../../core/path.h"
-#include "../../core/object/object.h"
 #include "../../apps/interfaces.h"
 
 
-__BACKENDS_BEGIN__
+__APPS_BEGIN__
 
-class BaseBackend : public IBackend, public core::object::Object
+class IAppConfig;
+
+__APPS_END__
+
+
+__ENV_BEGIN__
+
+class IEnvironment
 {
-protected:
-	std::string _name;
-	std::vector<std::string> _dirs;
-	bool _use_app_dirs;
-
-	BaseBackend(
-		std::vector<std::string> dirs,
-		bool use_app_dirs
-	);
-
 public:
+	virtual ~IEnvironment() = default;
+
 	/// Returns backend name.
-	std::string name() override;
+	virtual std::string name() = 0;
 
 	/// Create and return a template for the given source code.
 	///
 	/// This method is optional, throws NotImplementedException by default.
-	std::shared_ptr<ITemplate> from_string(const std::string& template_code) override;
+	virtual std::shared_ptr<ITemplate> from_string(const std::string& template_code) = 0;
 
 	/// Load and return a template for the given path.
 	///
 	/// Throws TemplateDoesNotExist if no such template exists.
-	std::shared_ptr<ITemplate> get_template(const std::string& template_path) override = 0;
+	virtual std::shared_ptr<ITemplate> get_template(const std::string& template_path) = 0;
+
+	/// Render a template from given source code.
+	virtual std::string render(const std::string& code, IContext* ctx) = 0;
 
 	/// Initializes a std::vector of directories to search for templates.
-	std::vector<std::string> template_dirs(
+	virtual std::vector<std::string> template_dirs(
 		const std::vector<std::shared_ptr<apps::IAppConfig>>& apps
-	) override;
+	) = 0;
 };
 
-__BACKENDS_END__
+__ENV_END__

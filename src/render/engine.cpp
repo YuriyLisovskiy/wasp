@@ -28,7 +28,7 @@
 __RENDER_BEGIN__
 
 Engine::Engine(
-	backends::BaseBackend* backend,
+	env::IEnvironment* env,
 	const std::vector<std::string>& dirs,
 	bool use_app_dirs,
 	bool debug,
@@ -39,7 +39,7 @@ Engine::Engine(
 )
 {
 	this->_logger = logger;
-	this->_backend = backend;
+	this->_env = env;
 	for (const auto& dir : dirs)
 	{
 		if (core::str::ends_with(core::str::rtrim(dir, "/"), this->APP_DIRNAME))
@@ -117,7 +117,7 @@ std::shared_ptr<ITemplate> Engine::find_template(
 		}
 	}
 
-	throw TemplateDoesNotExist(name, tried, this->_backend, _ERROR_DETAILS_);
+	throw TemplateDoesNotExist(name, tried, this->_env, _ERROR_DETAILS_);
 }
 
 std::shared_ptr<ITemplate> Engine::from_string(const std::string& template_code)
@@ -130,9 +130,9 @@ std::shared_ptr<ITemplate> Engine::get_template(const std::string& template_name
 	return this->find_template(template_name, this->_dirs);
 }
 
-backends::BaseBackend* Engine::backend()
+env::IEnvironment* Engine::environment()
 {
-	return this->_backend;
+	return this->_env;
 }
 
 lib::Filters& Engine::get_filters()

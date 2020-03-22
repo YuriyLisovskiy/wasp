@@ -25,7 +25,7 @@
 __RENDER_BEGIN__
 
 TemplateResponse::TemplateResponse(
-	backends::IBackend* backend,
+	env::IEnvironment* env,
 	const std::string& template_name,
 	IContext* context,
 	unsigned short int status,
@@ -33,7 +33,7 @@ TemplateResponse::TemplateResponse(
 	const std::string& charset
 ) : HttpResponse("", status, content_type, "", charset)
 {
-	this->_backend = backend;
+	this->_env = env;
 	this->_template_name = template_name;
 	this->_context = context;
 	this->_is_rendered = false;
@@ -46,7 +46,7 @@ void TemplateResponse::render()
 		return;
 	}
 
-	auto t = this->_backend->get_template(this->_template_name);
+	auto t = this->_env->get_template(this->_template_name);
 	this->_content = t->render(this->_context);
 	this->_is_rendered = true;
 }

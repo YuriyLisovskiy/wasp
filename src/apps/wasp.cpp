@@ -150,10 +150,10 @@ void WaspApplication::_perform_checks()
 	}
 
 	size_t err_count = 0;
-	if (!this->_settings->TEMPLATES_BACKEND)
+	if (!this->_settings->TEMPLATES_ENV)
 	{
 		this->_settings->LOGGER->error(
-			"TEMPLATES_BACKEND instance must be configured in order to use the application."
+			"TEMPLATES_ENV instance must be configured in order to use the application."
 		);
 		err_count++;
 	}

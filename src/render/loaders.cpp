@@ -57,7 +57,7 @@ std::map<std::string, std::shared_ptr<ITemplate>> DefaultLoader::cache_templates
 	std::map<std::string, std::shared_ptr<ITemplate>> cache;
 	for (const auto& dir : dirs)
 	{
-		for (auto& entry : std::filesystem::directory_iterator(dir))
+		for (auto& entry : std::experimental::filesystem::directory_iterator(dir))
 		{
 			const auto& template_path = entry.path();
 			auto file = core::File(

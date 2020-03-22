@@ -34,9 +34,10 @@
 #include "./_def_.h"
 
 // Wasp libraries.
-#include "./backends/base.h"
+#include "./env/interfaces.h"
 #include "../core/exceptions.h"
 #include "./internal/token.h"
+#include "env/interfaces.h"
 
 
 __RENDER_BEGIN__
@@ -50,7 +51,7 @@ class TemplateDoesNotExist : public core::BaseException
 {
 private:
 	std::vector<std::string> _tried;
-	backends::BaseBackend* _backend;
+	env::IEnvironment* _env;
 
 protected:
 	// Use only when initializing of a derived exception!
@@ -61,17 +62,17 @@ public:
 	explicit TemplateDoesNotExist(
 		const char* message,
 		const std::vector<std::string>& tried = {},
-		backends::BaseBackend* backend = nullptr,
+		env::IEnvironment* env = nullptr,
 		int line = 0, const char* function = "", const char* file = ""
 	);
 	explicit TemplateDoesNotExist(
 		const std::string& message,
 		const std::vector<std::string>& tried = {},
-		backends::BaseBackend* backend = nullptr,
+		env::IEnvironment* env = nullptr,
 		int line = 0, const char* function = "", const char* file = ""
 	);
 	[[nodiscard]] std::vector<std::string> tried() const;
-	[[nodiscard]] backends::BaseBackend* backend() const;
+	[[nodiscard]] env::IEnvironment* environment() const;
 };
 
 
