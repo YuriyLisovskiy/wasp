@@ -36,6 +36,9 @@ void AppConfig::init(const core::object::Type& type)
 	core::str::rtrim(name, "Config");
 	core::str::rtrim(name, "config");
 	core::str::rtrim(name, "_");
+	core::str::rtrim(name, "App");
+	core::str::rtrim(name, "app");
+	core::str::rtrim(name, "_");
 	this->app_name = name;
 }
 

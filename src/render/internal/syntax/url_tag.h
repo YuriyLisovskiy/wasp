@@ -15,12 +15,39 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WASP_UNIT_TESTS_RENDER_TESTS_INTERNAL_TESTS_INCLUDE_H
-#define WASP_UNIT_TESTS_RENDER_TESTS_INTERNAL_TESTS_INCLUDE_H
+/**
+ * render/internal/syntax/url_tag.h
+ *
+ * Purpose:
+ * TODO:
+ */
 
-#include "./filter_expr_tests.h"
-#include "./lexer_tests.h"
-#include "./parser_tests.h"
-#include "./utility_tests.h"
+#pragma once
 
-#endif // WASP_UNIT_TESTS_RENDER_TESTS_INTERNAL_TESTS_INCLUDE_H
+// C++ libraries.
+#include <string>
+#include <memory>
+
+// Module definitions.
+#include "./_def_.h"
+
+// Framework modules.
+#include "../../internal/parser.h"
+#include "../../internal/nodes.h"
+
+
+__SYNTAX_BEGIN__
+
+struct url_node : public node
+{
+	std::string text;
+
+	explicit url_node(const std::string& var);
+	std::string render(IContext* ctx) override;
+};
+
+extern std::function<std::shared_ptr<internal::node>(
+	internal::parser*, internal::token_t& token
+)> make_url_tag(const std::vector<urls::UrlPattern>& patterns);
+
+__SYNTAX_END__

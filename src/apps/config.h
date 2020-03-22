@@ -102,15 +102,17 @@ protected:
 	}
 
 	template <typename _AppConfigT, typename = std::enable_if<std::is_base_of<IAppConfig, _AppConfigT>::value>>
-	void include(const std::string& prefix)
+	void include(const std::string& prefix, const std::string& namespace_ = "")
 	{
 		auto app = this->find_or_create_app<_AppConfigT>();
 		auto included_urlpatterns = app->get_urlpatterns();
+		std::string ns = namespace_.empty() ? app->get_name() : namespace_;
 		for (const auto& pattern : included_urlpatterns)
 		{
 			this->_urlpatterns.emplace_back(
 				core::str::rtrim(core::str::starts_with(prefix, "/") ? prefix : "/" + prefix, "/"),
-				pattern
+				pattern,
+				ns
 			);
 		}
 	}

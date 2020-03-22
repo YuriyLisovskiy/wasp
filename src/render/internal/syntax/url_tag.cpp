@@ -16,28 +16,37 @@
  */
 
 /**
- * render/library/syntax/url_tag.h
- *
- * Purpose:
- * TODO:
+ * An implementation of render/library/syntax/url_tag.h
  */
 
-#pragma once
-
-// C++ libraries.
-#include <memory>
-
-// Module definitions.
-#include "./_def_.h"
+#include "./url_tag.h"
 
 // Framework modules.
-#include "../../internal/parser.h"
-
+#include "../../../core/string/str.h"
 
 __SYNTAX_BEGIN__
 
-extern std::function<std::shared_ptr<internal::node>(
+
+
+std::function<std::shared_ptr<internal::node>(
 	internal::parser*, internal::token_t& token
-)> make_url_tag(const std::vector<urls::UrlPattern>& patterns);
+)> make_url_tag(const std::vector<urls::UrlPattern>& patterns)
+{
+	return [](
+		internal::parser* parser,
+		internal::token_t& token
+	) -> std::shared_ptr<internal::node>
+	{
+		// left bracket position
+		size_t pos = token.content.find('(');
+		if (pos == std::string::npos)
+		{
+			internal::parser::invalid_syntax(token, token.content.size());
+		}
+
+		// TODO: implement make_url_tag(const std::vector<urls::UrlPattern>& patterns)
+		return nullptr;
+	};
+}
 
 __SYNTAX_END__

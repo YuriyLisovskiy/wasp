@@ -16,26 +16,28 @@
  */
 
 /**
- * An implementation of render/library/syntax/url_tag.h
+ * render/internal/utility.h
+ *
+ * Purpose:
+ * TODO:
  */
 
-#include "./url_tag.h"
+#pragma once
+
+// C++ libraries.
+#include <string>
+#include <vector>
+
+// Module definitions.
+#include "../_def_.h"
 
 
-__SYNTAX_BEGIN__
+__RENDER_INTERNAL_BEGIN__
 
-std::function<std::shared_ptr<internal::node>(
-	internal::parser*, internal::token_t& token
-)> make_url_tag(const std::vector<urls::UrlPattern>& patterns)
-{
-	return [](
-		internal::parser*,
-		internal::token_t& token
-	) -> std::shared_ptr<internal::node>
-	{
-		// TODO: implement make_url_tag(const std::vector<urls::UrlPattern>& patterns)
-		return nullptr;
-	};
-}
+extern bool split_params(
+	const std::string& params_str,
+	size_t& curr_pos,
+	std::vector<std::string>& params
+);
 
-__SYNTAX_END__
+__RENDER_INTERNAL_END__

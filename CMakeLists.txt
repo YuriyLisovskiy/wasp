@@ -155,7 +155,7 @@ set(TEST_SRC
 	${RENDER_TEST_SRC}
 	${UTILS_TEST_SRC}
 	${VIEWS_TEST_SRC}
-)
+		src/render/internal/utility.cpp src/render/internal/utility.h tests/unittests/render_tests/internal_tests/utility_tests.h)
 add_executable(${PACKAGE_MAIN_UNIT_TESTS} ${LIB_SRC} ${TEST_SRC} "tests/unittests/main.cpp")
 target_link_libraries(${PACKAGE_MAIN_UNIT_TESTS} gtest gtest_main rt pthread -std=c++1z ${TEST_SRC})
 target_link_libraries(${PACKAGE_MAIN_UNIT_TESTS} stdc++fs)

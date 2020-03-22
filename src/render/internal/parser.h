@@ -90,6 +90,7 @@ struct parser
 		const std::vector<std::string>& parse_until
 	);
 	static std::string get_command(const std::string& content);
+	static void invalid_syntax(token_t& token, size_t pos);
 };
 
 __RENDER_INTERNAL_END__

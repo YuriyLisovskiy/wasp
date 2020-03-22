@@ -62,6 +62,7 @@ private:
 	ViewHandler _handler;
 	std::string _name;
 	core::rgx::ArgRegex _regex;
+	std::string _namespace;
 
 public:
 	UrlPattern(
@@ -71,7 +72,8 @@ public:
 	);
 	UrlPattern(
 		const std::string& prefix,
-		const UrlPattern& url_pattern
+		const UrlPattern& url_pattern,
+		const std::string& namespace_
 	);
 
 	std::string get_name() const;

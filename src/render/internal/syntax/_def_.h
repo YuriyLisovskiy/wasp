@@ -16,16 +16,16 @@
  */
 
 /**
- * render/library/syntax/_def_.h
+ * render/internal/syntax/_def_.h
  *
- * Purpose: render/library/syntax module's definitions.
+ * Purpose: render/internal/syntax module's definitions.
  */
 
 #pragma once
 
-#include "../_def_.h"
+#include "../../_def_.h"
 
 
-/// render::lib::syntax
-#define __SYNTAX_BEGIN__ __LIB_BEGIN__ namespace syntax {
-#define __SYNTAX_END__ } __LIB_END__
+/// render::internal::syntax
+#define __SYNTAX_BEGIN__ __RENDER_INTERNAL_BEGIN__ namespace syntax {
+#define __SYNTAX_END__ } __RENDER_INTERNAL_END__

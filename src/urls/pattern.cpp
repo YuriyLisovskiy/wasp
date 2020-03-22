@@ -46,9 +46,14 @@ UrlPattern::UrlPattern(
 	this->_name = name;
 }
 
-UrlPattern::UrlPattern(const std::string& prefix, const UrlPattern& url_pattern)
- : UrlPattern(
-	prefix + url_pattern._orig, url_pattern._handler, url_pattern._name
+UrlPattern::UrlPattern(
+	const std::string& prefix,
+	const UrlPattern& url_pattern,
+	const std::string& namespace_
+) : UrlPattern(
+	prefix + url_pattern._orig,
+	url_pattern._handler,
+	namespace_ + "::" + url_pattern._name
 )
 {
 }

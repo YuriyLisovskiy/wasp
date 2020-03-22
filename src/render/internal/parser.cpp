@@ -231,7 +231,7 @@ void parser::invalid_block_tag(
 
 	parser::throw_error(
 		"Invalid block tag on line " + std::to_string(token.line_no) +
-		": '" + command + "'. Did you forget to register ",
+		": '" + command + "'. Did you forget to register this tag?",
 		token
 	);
 }
@@ -262,6 +262,15 @@ std::string parser::get_command(const std::string& content)
 	}
 
 	return command;
+}
+
+void parser::invalid_syntax(token_t& token, size_t pos)
+{
+	parser::throw_error(
+		"Invalid syntax on line " + std::to_string(token.line_no) +
+		", position " + std::to_string(pos) + ": '" + token.content + "'",
+		token
+	);
 }
 
 __RENDER_INTERNAL_END__
