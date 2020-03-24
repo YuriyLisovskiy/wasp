@@ -42,8 +42,8 @@ private:
 public:
 	explicit BuiltinLibrary(conf::Settings* settings);
 
-	Filters get_filters() override;
-	Tags get_tags() override;
+	std::shared_ptr<Filters> get_filters() override;
+	std::shared_ptr<Tags> get_tags() override;
 	std::string name() override;
 };
 

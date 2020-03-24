@@ -42,12 +42,23 @@ class Context : public IContext
 {
 private:
 	std::map<std::string, std::shared_ptr<core::object::Object>> _global_scope;
+	std::map<std::string, std::shared_ptr<core::object::Object>> _local_scope;
+
+protected:
+	static std::shared_ptr<core::object::Object> find_in_scope(
+		std::map<std::string, std::shared_ptr<core::object::Object>>& scope,
+		const std::string& key
+	);
 
 public:
 	explicit Context(
 		std::map<std::string, std::shared_ptr<core::object::Object>> global_scope
 	);
 	std::shared_ptr<core::object::Object> find_var(const std::string& key) override;
+	void push_var(
+		const std::string& key,
+		const std::shared_ptr<core::object::Object>& val
+	) override;
 };
 
 __RENDER_END__

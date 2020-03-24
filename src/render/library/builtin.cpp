@@ -19,7 +19,14 @@
  * An implementation of render/library/builtin.h
  */
 
+// C++ libraries.
+#include <map>
+#include <memory>
+
 #include "./builtin.h"
+
+// Framework modules.
+#include "../internal/syntax/url_tag.h"
 
 
 __LIB_BEGIN__
@@ -34,14 +41,16 @@ BuiltinLibrary::BuiltinLibrary(conf::Settings* settings)
 	this->_settings = settings;
 }
 
-Filters BuiltinLibrary::get_filters()
+std::shared_ptr<Filters> BuiltinLibrary::get_filters()
 {
-	return {};
+	return nullptr;
 }
 
-Tags BuiltinLibrary::get_tags()
+std::shared_ptr<Tags> BuiltinLibrary::get_tags()
 {
-	return {};
+	return std::make_shared<Tags>(std::map<std::string, Tag>{
+		{internal::syntax::TAG_NAME_URL, internal::syntax::make_url_tag(this->_settings->ROOT_URLCONF)}
+	});
 }
 
 std::string BuiltinLibrary::name()

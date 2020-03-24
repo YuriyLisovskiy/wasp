@@ -62,8 +62,8 @@ class ILibrary
 {
 public:
 	virtual ~ILibrary() = default;
-	virtual Filters get_filters() = 0;
-	virtual Tags get_tags() = 0;
+	virtual std::shared_ptr<Filters> get_filters() = 0;
+	virtual std::shared_ptr<Tags> get_tags() = 0;
 	virtual std::string name() = 0;
 };
 

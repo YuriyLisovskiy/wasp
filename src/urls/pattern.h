@@ -72,7 +72,7 @@ public:
 	);
 	UrlPattern(
 		const std::string& prefix,
-		const UrlPattern& url_pattern,
+		const std::shared_ptr<UrlPattern>& url_pattern,
 		const std::string& namespace_
 	);
 

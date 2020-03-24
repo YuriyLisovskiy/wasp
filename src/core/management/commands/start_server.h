@@ -72,8 +72,8 @@ protected:
 	void handle() final;
 	std::function<void(http::HttpRequest*, const core::net::internal::socket_t&)> get_handler();
 	bool static_is_allowed(const std::string& static_url);
-	void build_static_patterns(std::vector<urls::UrlPattern>& patterns);
-	void build_app_patterns(std::vector<urls::UrlPattern>& patterns);
+	void build_static_patterns(std::vector<std::shared_ptr<urls::UrlPattern>>& patterns);
+	void build_app_patterns(std::vector<std::shared_ptr<urls::UrlPattern>>& patterns);
 	void setup_server_ctx(core::net::internal::HttpServer::context& ctx);
 
 	static std::unique_ptr<http::IHttpResponse> process_request_middleware(
@@ -86,7 +86,7 @@ protected:
 	);
 	static std::unique_ptr<http::IHttpResponse> process_urlpatterns(
 		http::HttpRequest* request,
-		std::vector<urls::UrlPattern>& urlpatterns,
+		std::vector<std::shared_ptr<urls::UrlPattern>>& urlpatterns,
 		conf::Settings* settings
 	);
 	static void send_response(

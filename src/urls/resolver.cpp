@@ -28,7 +28,7 @@ std::function<std::unique_ptr<http::IHttpResponse>(
 	http::HttpRequest* request,
 	conf::Settings* settings
 )> resolve(
-	const std::string& path, std::vector<UrlPattern>& urlpatterns
+	const std::string& path, std::vector<std::shared_ptr<UrlPattern>>& urlpatterns
 )
 {
 	std::function<std::unique_ptr<http::IHttpResponse>(
@@ -38,7 +38,7 @@ std::function<std::unique_ptr<http::IHttpResponse>(
 	for (auto& url_pattern : urlpatterns)
 	{
 		std::map<std::string, std::string> args_map;
-		if (url_pattern.match(path, args_map))
+		if (url_pattern->match(path, args_map))
 		{
 			fn = [url_pattern, args_map](
 				http::HttpRequest* request,
@@ -46,7 +46,7 @@ std::function<std::unique_ptr<http::IHttpResponse>(
 			) mutable -> std::unique_ptr<http::IHttpResponse>
 			{
 				auto args = std::make_unique<views::Args>(args_map);
-				return url_pattern.apply(request, settings, args.get());
+				return url_pattern->apply(request, settings, args.get());
 			};
 			break;
 		}
@@ -56,7 +56,7 @@ std::function<std::unique_ptr<http::IHttpResponse>(
 }
 
 bool is_valid_path(
-	const std::string& path, std::vector<UrlPattern>& urlpatterns
+	const std::string& path, std::vector<std::shared_ptr<UrlPattern>>& urlpatterns
 )
 {
 	return resolve(path, urlpatterns) != nullptr;

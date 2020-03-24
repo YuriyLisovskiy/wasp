@@ -27,17 +27,26 @@
 // C++ libraries.
 #include <string>
 #include <vector>
+#include <memory>
 
 // Module definitions.
 #include "../_def_.h"
+
+// Framework modules
+#include "./filter_expr.h"
 
 
 __RENDER_INTERNAL_BEGIN__
 
 extern bool split_params(
 	const std::string& params_str,
+	size_t line_no,
 	size_t& curr_pos,
-	std::vector<std::string>& params
+	std::vector<token_t>& params
 );
+
+extern bool is_var_char(char ch);
+
+extern bool is_var_char_begin(char ch);
 
 __RENDER_INTERNAL_END__

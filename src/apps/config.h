@@ -54,7 +54,7 @@ __APPS_BEGIN__
 class AppConfig : public IAppConfig, public core::object::Object
 {
 private:
-	std::vector<urls::UrlPattern> _urlpatterns;
+	std::vector<std::shared_ptr<urls::UrlPattern>> _urlpatterns;
 	std::vector<std::shared_ptr<core::BaseCommand>> _commands;
 
 	template <typename _AppConfigT>
@@ -109,11 +109,14 @@ protected:
 		std::string ns = namespace_.empty() ? app->get_name() : namespace_;
 		for (const auto& pattern : included_urlpatterns)
 		{
-			this->_urlpatterns.emplace_back(
-				core::str::rtrim(core::str::starts_with(prefix, "/") ? prefix : "/" + prefix, "/"),
+			this->_urlpatterns.push_back(std::make_shared<urls::UrlPattern>(
+				core::str::rtrim(
+					core::str::starts_with(prefix, "/") ? prefix : "/" + prefix,
+					"/"
+				),
 				pattern,
 				ns
-			);
+			));
 		}
 	}
 
@@ -132,7 +135,7 @@ protected:
 public:
 	std::string get_name() final;
 	std::string get_app_path() final;
-	std::vector<urls::UrlPattern> get_urlpatterns() final;
+	std::vector<std::shared_ptr<urls::UrlPattern>> get_urlpatterns() final;
 	std::vector<std::shared_ptr<core::BaseCommand>> get_commands() final;
 	virtual void urlpatterns();
 	virtual void commands();

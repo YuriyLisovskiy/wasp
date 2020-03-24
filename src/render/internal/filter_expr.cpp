@@ -21,8 +21,6 @@
 
 #include "./filter_expr.h"
 
-#include <memory>
-
 
 __RENDER_INTERNAL_BEGIN__
 
@@ -55,7 +53,7 @@ void expression_parser::parse()
 					this->expression.var_name += this->ch;
 					this->expression.is_const = true;
 				}
-				if (std::isdigit(this->ch) || std::isdigit(this->ch) || this->ch == '+' || this->ch == '-')
+				else if (std::isdigit(this->ch) || std::isdigit(this->ch) || this->ch == '+' || this->ch == '-')
 				{
 					this->expression.var_name += this->ch;
 					this->expression.is_const = true;

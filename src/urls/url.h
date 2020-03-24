@@ -38,13 +38,13 @@
 
 __URLS_BEGIN__
 
-extern UrlPattern make_url(
+extern std::shared_ptr<urls::UrlPattern> make_url(
 	const std::string& rgx,
 	const views::ViewHandler& handler,
 	const std::string& name
 );
 
-extern UrlPattern make_static(
+extern std::shared_ptr<urls::UrlPattern> make_static(
 	const std::string& static_url,
 	const std::string& static_root,
 	const std::string& name = ""

@@ -30,15 +30,43 @@ Context::Context(
 {
 }
 
-std::shared_ptr<core::object::Object> Context::find_var(const std::string& key)
+std::shared_ptr<core::object::Object> Context::find_in_scope(
+	std::map<std::string, std::shared_ptr<core::object::Object>>& scope,
+	const std::string& key
+)
 {
-	auto var_p = this->_global_scope.find(key);
-	if (var_p != this->_global_scope.end())
+	auto var_p = scope.find(key);
+	if (var_p != scope.end())
 	{
 		return var_p->second;
 	}
 
 	return nullptr;
+}
+
+std::shared_ptr<core::object::Object> Context::find_var(const std::string& key)
+{
+	auto var_p = Context::find_in_scope(this->_local_scope, key);
+	if (var_p)
+	{
+		return var_p;
+	}
+
+	var_p = Context::find_in_scope(this->_global_scope, key);
+	if (var_p)
+	{
+		return var_p;
+	}
+
+	return nullptr;
+}
+
+void Context::push_var(
+	const std::string& key,
+	const std::shared_ptr<core::object::Object>& val
+)
+{
+	this->_local_scope[key] = val;
 }
 
 __RENDER_END__

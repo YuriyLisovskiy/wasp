@@ -40,6 +40,11 @@
 #define __CACHE_INTERNAL_END__ } __CACHE_END__
 
 
+/// utils::fn
+#define __FUNCTIONAL_BEGIN__ __UTILS_BEGIN__ namespace fn {
+#define __FUNCTIONAL_END__ } __UTILS_END__
+
+
 /// utils_http
 #define __UTILS_HTTP_BEGIN__ __MAIN_NAMESPACE_BEGIN__ namespace utils_http {
 #define __UTILS_HTTP_END__ } __MAIN_NAMESPACE_END__

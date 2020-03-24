@@ -24,12 +24,16 @@
 
 __URLS_BEGIN__
 
-UrlPattern make_url(const std::string& rgx, const views::ViewHandler& handler, const std::string& name)
+std::shared_ptr<urls::UrlPattern> make_url(
+	const std::string& rgx,
+	const views::ViewHandler& handler,
+	const std::string& name
+)
 {
-	return UrlPattern(rgx, handler, name);
+	return std::make_shared<UrlPattern>(rgx, handler, name);
 }
 
-UrlPattern make_static(
+std::shared_ptr<urls::UrlPattern> make_static(
 	const std::string& static_url,
 	const std::string& static_root,
 	const std::string& name

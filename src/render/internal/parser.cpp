@@ -158,9 +158,9 @@ void parser::del_first_token()
 	this->tokens.pop_back();
 }
 
-FilterExpression parser::compile_filter(token_t& t)
+std::shared_ptr<FilterExpression> parser::compile_filter(token_t& t)
 {
-	return FilterExpression(t, this->filters);
+	return std::make_shared<FilterExpression>(t, this->filters);
 }
 
 void parser::append_node(
@@ -169,6 +169,11 @@ void parser::append_node(
 	const token_t& token
 )
 {
+	if (!nd)
+	{
+		return;
+	}
+
 	// Check that non-text nodes don't appear before an extends tag.
 	if (nd->must_be_first && list->contains_non_text)
 	{

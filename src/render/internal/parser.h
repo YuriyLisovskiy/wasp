@@ -67,7 +67,7 @@ struct parser
 	token_t next_token();
 	void prepend_token(token_t& t);
 	void del_first_token();
-	FilterExpression compile_filter(token_t& t);
+	std::shared_ptr<FilterExpression> compile_filter(token_t& t);
 	static void append_node(
 		std::unique_ptr<node_list>& list,
 		std::shared_ptr<node>& nd,

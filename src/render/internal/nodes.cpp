@@ -54,15 +54,15 @@ std::string text_node::render(IContext* ctx)
 
 /// Struct variable_node
 variable_node::variable_node(
-	const FilterExpression& filter_expr
+	std::shared_ptr<FilterExpression> filter_expr
 ) : node()
 {
-	this->filter_expr = filter_expr;
+	this->filter_expr = std::move(filter_expr);
 }
 
 std::string variable_node::render(IContext* ctx)
 {
-	return this->filter_expr.resolve(ctx);
+	return this->filter_expr->resolve(ctx);
 }
 
 __RENDER_INTERNAL_END__

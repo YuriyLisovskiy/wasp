@@ -63,6 +63,8 @@ public:
 	virtual std::vector<std::string> template_dirs(
 		const std::vector<std::shared_ptr<apps::IAppConfig>>& apps
 	) = 0;
+
+	virtual void load_libs() = 0;
 };
 
 __ENV_END__

@@ -26,8 +26,9 @@ __RENDER_INTERNAL_BEGIN__
 
 bool split_params(
 	const std::string& content,
+	size_t line_no,
 	size_t& curr_pos,
-	std::vector<std::string>& params
+	std::vector<token_t>& params
 )
 {
 	curr_pos = 0;
@@ -52,7 +53,7 @@ bool split_params(
 	bool triggered_comma = false;
 	while (curr_pos != end_pos)
 	{
-		char ch = content[curr_pos];
+		char ch = content[curr_pos++];
 		switch (ch)
 		{
 			case '(':
@@ -68,7 +69,12 @@ bool split_params(
 						return false;
 					}
 
-					params.push_back(last_param);
+					token_t token;
+					core::str::trim(last_param);
+					token.content = last_param;
+					token.line_no = line_no;
+					token.position = {curr_pos - last_param.size(), curr_pos};
+					params.push_back(token);
 					return true;
 				}
 
@@ -78,7 +84,12 @@ bool split_params(
 			case ',':
 				if (open_brackets == 0)
 				{
-					params.push_back(last_param);
+					token_t token;
+					core::str::trim(last_param);
+					token.content = last_param;
+					token.line_no = line_no;
+					token.position = {curr_pos - last_param.size(), curr_pos};
+					params.push_back(token);
 					last_param.clear();
 					triggered_comma = true;
 				}
@@ -91,11 +102,19 @@ bool split_params(
 				last_param += ch;
 				triggered_comma = false;
 		}
-
-		curr_pos++;
 	}
 
 	return false;
+}
+
+bool is_var_char(char ch)
+{
+	return std::isalnum(ch) || ch == '_';
+}
+
+bool is_var_char_begin(char ch)
+{
+	return std::isalpha(ch) || ch == '_';
 }
 
 __RENDER_INTERNAL_END__

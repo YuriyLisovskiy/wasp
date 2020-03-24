@@ -45,6 +45,10 @@ public:
 	virtual std::shared_ptr<core::object::Object> find_var(
 		const std::string& key
 	) = 0;
+	virtual void push_var(
+		const std::string& key,
+		const std::shared_ptr<core::object::Object>& val
+	) = 0;
 	virtual ~IContext() = default;
 };
 
@@ -71,6 +75,8 @@ public:
 	/// Return a pointer to compiled BaseTemplate object for the given template name,
 	/// handling template inheritance recursively.
 	virtual std::shared_ptr<ITemplate> get_template(const std::string& template_name) = 0;
+
+	virtual void load_libraries() = 0;
 };
 
 

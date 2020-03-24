@@ -18,5 +18,12 @@
         </label>
         <input type="submit" value="send" />
     </form>
+
+    {% url('Form::profile', 128, 'HelloWorld') -> form_profile %}
+
+    <a href="{{ form_profile }}">Test Link 1</a>
+    <a href="{{ form_profile }}">Test Link 2</a>
+    <a href="{{ form_profile }}">Test Link 3</a>
+
 </body>
 </html>

@@ -45,13 +45,13 @@ extern std::function<std::unique_ptr<http::IHttpResponse>(
 	http::HttpRequest* request,
 	conf::Settings* settings
 )> resolve(
-	const std::string& path, std::vector<UrlPattern>& urlpatterns
+	const std::string& path, std::vector<std::shared_ptr<UrlPattern>>& urlpatterns
 );
 
 /// Return true if the given path can be found in urlpatterns,
 /// false otherwise.
 extern bool is_valid_path(
-	const std::string& path, std::vector<UrlPattern>& urlpatterns
+	const std::string& path, std::vector<std::shared_ptr<UrlPattern>>& urlpatterns
 );
 
 __URLS_END__

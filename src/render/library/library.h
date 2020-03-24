@@ -38,6 +38,8 @@ protected:
 
 public:
 	explicit Library(conf::Settings* settings);
+	std::shared_ptr<Filters> get_filters() override;
+	std::shared_ptr<Tags> get_tags() override;
 };
 
 __LIB_END__

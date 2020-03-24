@@ -16,34 +16,37 @@
  */
 
 /**
- * An implementation of render/library/library.h
+ * utils/functional.h
+ *
+ * Purpose:
+ * TODO:
  */
 
-#include "./library.h"
+#pragma once
+
+// C++ libraries.
+#include <vector>
+#include <functional>
+
+// Module definitions.
+#include "./_def_.h"
 
 
-__LIB_BEGIN__
+__FUNCTIONAL_BEGIN__
 
-Library::Library(conf::Settings* settings)
+template <typename _InputT, typename _ReturnT>
+extern std::vector<_ReturnT> map(
+	const std::vector<_InputT>& input,
+	std::function<_ReturnT(const _InputT&)> apply
+)
 {
-	if (!settings)
+	std::vector<_ReturnT> result;
+	for (const auto& item : input)
 	{
-		throw core::ImproperlyConfigured(
-			"Library: 'settings' parameter must be initialized"
-		);
+		result.push_back(apply(item));
 	}
 
-	this->settings = settings;
+	return result;
 }
 
-std::shared_ptr<Filters> Library::get_filters()
-{
-	return nullptr;
-}
-
-std::shared_ptr<Tags> Library::get_tags()
-{
-	return nullptr;
-}
-
-__LIB_END__
+__FUNCTIONAL_END__

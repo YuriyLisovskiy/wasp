@@ -22,9 +22,9 @@ public:
 	{
 	}
 
-	lib::Filters get_filters() override
+	std::shared_ptr<lib::Filters> get_filters() override
 	{
-		return lib::Filters({
+		return std::make_shared<lib::Filters>(std::map<std::string, lib::Filter>{
 			{"to_upper", [](const std::shared_ptr<Object>& obj, const lib::KwArgs&) -> std::shared_ptr<Object>{
 				auto val = obj->__str__();
 				for (char& ch : val)
@@ -51,9 +51,9 @@ public:
 		});
 	}
 
-	lib::Tags get_tags() override
+	std::shared_ptr<lib::Tags> get_tags() override
 	{
-		return {};
+		return nullptr;
 	}
 
 	std::string name() override

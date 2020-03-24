@@ -52,7 +52,7 @@ std::string AppConfig::get_app_path()
 	return this->app_path;
 }
 
-std::vector<urls::UrlPattern> AppConfig::get_urlpatterns()
+std::vector<std::shared_ptr<urls::UrlPattern>> AppConfig::get_urlpatterns()
 {
 	if (this->_urlpatterns.empty())
 	{

@@ -88,4 +88,9 @@ std::vector<std::string> DefaultEnvironment::template_dirs(
 	}
 }
 
+void DefaultEnvironment::load_libs()
+{
+	this->_engine->load_libraries();
+}
+
 __ENV_END__

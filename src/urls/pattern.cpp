@@ -48,12 +48,12 @@ UrlPattern::UrlPattern(
 
 UrlPattern::UrlPattern(
 	const std::string& prefix,
-	const UrlPattern& url_pattern,
+	const std::shared_ptr<UrlPattern>& url_pattern,
 	const std::string& namespace_
 ) : UrlPattern(
-	prefix + url_pattern._orig,
-	url_pattern._handler,
-	namespace_ + "::" + url_pattern._name
+	prefix + url_pattern->_orig,
+	url_pattern->_handler,
+	namespace_ + "::" + url_pattern->_name
 )
 {
 }

@@ -55,10 +55,10 @@ struct text_node : public node
 
 struct variable_node : public node
 {
-	FilterExpression filter_expr;
+	std::shared_ptr<FilterExpression> filter_expr;
 
 	explicit variable_node(
-		const FilterExpression& filter_expr
+		std::shared_ptr<FilterExpression> filter_expr
 	);
 	std::string render(IContext* ctx) override;
 };

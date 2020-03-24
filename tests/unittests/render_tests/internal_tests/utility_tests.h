@@ -84,7 +84,7 @@ TEST(UtilityTestCase, TestSplitParamsRedundantComma)
 	std::vector<std::string> actual;
 	size_t pos;
 	ASSERT_FALSE(split_params(params, pos, actual));
-	ASSERT_EQ(pos, params.size() - 1);
+	ASSERT_EQ(pos, params.size());
 }
 
 __UNIT_TESTS_END__

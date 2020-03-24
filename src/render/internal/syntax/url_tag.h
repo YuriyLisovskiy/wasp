@@ -32,22 +32,26 @@
 #include "./_def_.h"
 
 // Framework modules.
-#include "../../internal/parser.h"
-#include "../../internal/nodes.h"
+#include "../parser.h"
+#include "../nodes.h"
+#include "../filter_expr.h"
 
 
 __SYNTAX_BEGIN__
 
+const std::string TAG_NAME_URL = "url";
+
 struct url_node : public node
 {
-	std::string text;
+	std::shared_ptr<urls::UrlPattern> pattern;
+	std::vector<std::shared_ptr<FilterExpression>> params;
+	std::string var_name;
 
-	explicit url_node(const std::string& var);
 	std::string render(IContext* ctx) override;
 };
 
 extern std::function<std::shared_ptr<internal::node>(
 	internal::parser*, internal::token_t& token
-)> make_url_tag(const std::vector<urls::UrlPattern>& patterns);
+)> make_url_tag(const std::vector<std::shared_ptr<urls::UrlPattern>>& patterns);
 
 __SYNTAX_END__

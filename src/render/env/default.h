@@ -102,6 +102,8 @@ public:
 	std::vector<std::string> template_dirs(
 		const std::vector<std::shared_ptr<apps::IAppConfig>>& apps
 	) override;
+
+	void load_libs() override;
 };
 
 __ENV_END__

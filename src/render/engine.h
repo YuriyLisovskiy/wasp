@@ -66,9 +66,8 @@ protected:
 
 	std::map<std::string, std::shared_ptr<ITemplate>> _cached_templates;
 
-	void _load_libs(
-		std::vector<std::shared_ptr<lib::ILibrary>>& libs
-	);
+	std::vector<std::shared_ptr<lib::ILibrary>> _libraries;
+
 	void _include_lib(lib::ILibrary* lib, bool is_builtin);
 
 public:
@@ -101,6 +100,7 @@ public:
 
 	lib::Filters& get_filters() override;
 	lib::Tags& get_tags() override;
+	void load_libraries() override;
 };
 
 __RENDER_END__

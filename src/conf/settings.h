@@ -97,7 +97,7 @@ struct Settings
 	/// Vector of patterns which will be loaded from ROOT_APP.
 	/// To change this setting, setup ROOT_APP in your project
 	/// settings.
-	std::vector<urls::UrlPattern> ROOT_URLCONF;
+	std::vector<std::shared_ptr<urls::UrlPattern>> ROOT_URLCONF;
 
 	/// List of AppConfig-derived objects representing apps.
 	/// Order is required. The first app is interpreted as

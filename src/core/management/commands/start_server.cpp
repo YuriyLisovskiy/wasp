@@ -120,6 +120,9 @@ StartServerCommand::get_handler()
 	// to result.
 	this->build_app_patterns(this->settings->ROOT_URLCONF);
 
+	// Initialize template engine's libraries.
+	this->settings->TEMPLATES_ENV->load_libs();
+
 	auto handler = [this](
 		http::HttpRequest* request, const core::net::internal::socket_t& client
 	) mutable -> void
@@ -208,7 +211,7 @@ bool StartServerCommand::static_is_allowed(const std::string& static_url)
 	return this->settings->DEBUG && parser.hostname.empty();
 }
 
-void StartServerCommand::build_static_patterns(std::vector<urls::UrlPattern>& patterns)
+void StartServerCommand::build_static_patterns(std::vector<std::shared_ptr<urls::UrlPattern>>& patterns)
 {
 	if (!this->settings->STATIC_ROOT.empty() && this->static_is_allowed(this->settings->STATIC_URL))
 	{
@@ -223,7 +226,7 @@ void StartServerCommand::build_static_patterns(std::vector<urls::UrlPattern>& pa
 	}
 }
 
-void StartServerCommand::build_app_patterns(std::vector<urls::UrlPattern>& patterns)
+void StartServerCommand::build_app_patterns(std::vector<std::shared_ptr<urls::UrlPattern>>& patterns)
 {
 	if (this->settings->ROOT_APP)
 	{
@@ -321,7 +324,7 @@ std::unique_ptr<http::IHttpResponse> StartServerCommand::process_request_middlew
 
 std::unique_ptr<http::IHttpResponse> StartServerCommand::process_urlpatterns(
 	http::HttpRequest* request,
-	std::vector<urls::UrlPattern>& urlpatterns,
+	std::vector<std::shared_ptr<urls::UrlPattern>>& urlpatterns,
 	conf::Settings* settings
 )
 {
