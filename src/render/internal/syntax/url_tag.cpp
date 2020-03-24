@@ -143,6 +143,7 @@ void parse(
 	}
 
 	// Parse var assigning, i.e. url('u_name', ...) -> var_name
+	// TODO: Maybe move this algorithm to separate parser for future use.
 	curr_pos += pos;
 	parser_state st = parser_state::s_space_1;
 	while (curr_pos < token.content.size())
