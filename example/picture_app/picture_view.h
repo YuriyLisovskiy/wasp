@@ -6,20 +6,15 @@
 
 #include <string>
 
-#include "../../src/views/view.h"
+#include "../../src/views/template_view.h"
 
 
-class PictureView : public wasp::views::View
+class PictureView : public wasp::views::TemplateView
 {
 public:
 	explicit PictureView(wasp::conf::Settings* settings)
-		: View({"get"}, settings)
+		: TemplateView({"get"}, settings)
 	{
-	}
-
-	std::unique_ptr<wasp::http::IHttpResponse> get(wasp::http::HttpRequest* request, wasp::views::Args* args) final
-	{
-		std::string body(R"(<img src="/static/pontar.png" alt="Night over Pontar river" width="1000">)");
-		return std::make_unique<wasp::http::HttpResponse>(body);
+		this->_template_name = "picture_app/river.html";
 	}
 };

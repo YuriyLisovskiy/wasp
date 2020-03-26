@@ -26,6 +26,8 @@
 #include "./builtin.h"
 
 // Framework modules.
+#include "../internal/syntax/ignore.h"
+#include "../internal/syntax/static_tag.h"
 #include "../internal/syntax/url_tag.h"
 
 
@@ -48,8 +50,20 @@ std::shared_ptr<Filters> BuiltinLibrary::get_filters()
 
 std::shared_ptr<Tags> BuiltinLibrary::get_tags()
 {
+	using namespace internal;
 	return std::make_shared<Tags>(std::map<std::string, Tag>{
-		{internal::syntax::TAG_NAME_URL, internal::syntax::make_url_tag(this->_settings->ROOT_URLCONF)}
+
+		// Example: {% ignore %} content {% end_ignore %}
+		{syntax::TAG_NAME_IGNORE, syntax::make_ignore_tag()},
+
+		// Example: {% static('path/to/file.css') -> css_variable %}
+		{syntax::TAG_NAME_STATIC, syntax::make_static_tag("static", this->_settings->STATIC_URL)},
+
+		// Example: {% media('path/to/file.jpg') -> jpg_variable %}
+		{syntax::TAG_NAME_MEDIA, syntax::make_static_tag("media", this->_settings->MEDIA_URL)},
+
+		// Example: {% url('app_namespace::profile', 256) -> profile_256 %}
+		{syntax::TAG_NAME_URL, syntax::make_url_tag(this->_settings->ROOT_URLCONF)}
 	});
 }
 

@@ -6,28 +6,17 @@
 
 #include <string>
 
-#include "../../src/views/view.h"
+#include "../../src/views/template_view.h"
 #include "../../src/views/redirect_view.h"
 
 
-class MainView : public wasp::views::View
+class MainView : public wasp::views::TemplateView
 {
 public:
 	explicit MainView(wasp::conf::Settings* settings)
-		: View({"get"}, settings)
+		: TemplateView({"get"}, settings)
 	{
-	}
-
-	std::unique_ptr<wasp::http::IHttpResponse> get(wasp::http::HttpRequest* request, wasp::views::Args* args) final
-	{
-		std::string body(
-			"<h2>Hello from main view!</h2>"
-			"<ul>"
-			"   <li><a href=\"/form/profile/2048/name/YuriyLisovskiy\">Go to form!</a></li>"
-			"   <li><a href=\"/picture/view/pic\">View picture!</a></li>"
-			"</ul>"
-		);
-		return std::make_unique<wasp::http::HttpResponse>(body);
+		this->_template_name = "main_app/index.html";
 	}
 };
 

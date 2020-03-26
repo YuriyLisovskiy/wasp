@@ -16,48 +16,43 @@
  */
 
 /**
- * An implementation of render/library/syntax/url_tag.h
+ * An implementation of render/library/syntax/static_tag.h
  */
 
-// C++ libraries.
-#include <vector>
-
-#include "./url_tag.h"
+#include "./static_tag.h"
 
 // Framework modules.
 #include "./parse_var_name.h"
 #include "../utility.h"
-#include "../../../utils/functional.h"
 
 
 __SYNTAX_BEGIN__
 
-std::string url_node::render(IContext* ctx)
+std::string static_node::render(IContext* ctx)
 {
-	using Fe = std::shared_ptr<FilterExpression>;
-	auto built_url = this->pattern->build(
-		utils::fn::map<Fe, std::string>(this->params, [ctx](const Fe& p) -> std::string {
-			return p->resolve(ctx);
-		})
-	);
+	std::string result;
+	if (this->path)
+	{
+		result = core::path::join(this->prefix, this->path->resolve(ctx));
+	}
 
 	if (!this->var_name.empty())
 	{
 		ctx->push_var(
 			this->var_name,
-			std::make_shared<core::types::Value<std::string>>(built_url)
+			std::make_shared<core::types::Value<std::string>>(result)
 		);
-		return "";
+		result = "";
 	}
 
-	return built_url;
+	return result;
 }
 
 std::function<std::shared_ptr<internal::node>(
 	internal::parser*, internal::token_t& token
-)> make_url_tag(const std::vector<std::shared_ptr<urls::UrlPattern>>& patterns)
+)> make_static_tag(const std::string& name, const std::string& prefix)
 {
-	return [patterns](
+	return [name, prefix](
 		internal::parser* parser,
 		internal::token_t& token
 	) -> std::shared_ptr<internal::node>
@@ -69,9 +64,9 @@ std::function<std::shared_ptr<internal::node>(
 			parser::invalid_syntax(token, curr_pos);
 		}
 
-		if (params.empty())
+		if (params.size() != 1)
 		{
-			parser::throw_error("'url' tag takes, at least, one argument", token);
+			parser::throw_error("'" + name + "' tag takes exactly one argument", token);
 		}
 
 		std::string var_name;
@@ -82,33 +77,12 @@ std::function<std::shared_ptr<internal::node>(
 			parser::invalid_syntax(token, curr_pos - 1);
 		}
 
-		auto url_name = params[0].content;
-		if (!trim_quotes(url_name))
-		{
-			parser::throw_error("first parameter of 'url' tag must be constant string", token);
-		}
+		auto node = std::make_shared<static_node>();
+		node->path = parser->compile_filter(params[0]);
+		node->prefix = prefix;
+		node->var_name = var_name;
 
-		for (const auto& url_p : patterns)
-		{
-			if (url_p->get_name() == url_name)
-			{
-				auto node = std::make_shared<url_node>();
-				if (params.size() > 1)
-				{
-					for (size_t i = 1; i < params.size(); i++)
-					{
-						node->params.push_back(parser->compile_filter(params[i]));
-					}
-				}
-
-				node->pattern = url_p;
-				node->var_name = var_name;
-				return node;
-			}
-		}
-
-		parser::throw_error("url pattern '" + url_name + "' does not exist", token);
-		return nullptr;
+		return node;
 	};
 }
 

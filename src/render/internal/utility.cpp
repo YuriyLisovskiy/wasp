@@ -21,6 +21,9 @@
 
 #include "./utility.h"
 
+// Framework modules.
+#include "../../core/string/str.h"
+
 
 __RENDER_INTERNAL_BEGIN__
 
@@ -31,8 +34,15 @@ bool split_params(
 	std::vector<token_t>& params
 )
 {
-	curr_pos = 0;
-	if (content.size() < 2)
+	// left bracket position
+	curr_pos = content.find('(');
+	if (curr_pos == std::string::npos)
+	{
+		curr_pos = 0;
+		return false;
+	}
+
+	if (content.substr(curr_pos).size() < 2)
 	{
 		return false;
 	}
@@ -115,6 +125,30 @@ bool is_var_char(char ch)
 bool is_var_char_begin(char ch)
 {
 	return std::isalpha(ch) || ch == '_';
+}
+
+bool trim_quotes(std::string& str)
+{
+	if (
+		core::str::starts_with(str, "'") &&
+		core::str::ends_with(str, "'")
+	)
+	{
+		core::str::trim(str, "'");
+	}
+	else if (
+		core::str::starts_with(str, "\"") &&
+		core::str::ends_with(str, "\"")
+	)
+	{
+		core::str::trim(str, "\"");
+	}
+	else
+	{
+		return false;
+	}
+
+	return true;
 }
 
 __RENDER_INTERNAL_END__

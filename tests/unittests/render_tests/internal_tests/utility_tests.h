@@ -32,18 +32,22 @@ __UNIT_TESTS_BEGIN__
 TEST(UtilityTestCase, TestSplitParams)
 {
 	using namespace wasp::render::internal;
-	std::vector<std::string> expected = {
-		"23", " hello | def(one=1, two='zzz')"
-	};
+	token_t first{};
+	first.content = "23";
+
+	token_t second{};
+	second.content = " hello | def(one=1, two='zzz')";
+
+	std::vector<token_t> expected = {first, second};
 	std::string params = "(23, hello | def(one=1, two='zzz'))";
-	std::vector<std::string> actual;
+	std::vector<token_t> actual;
 	size_t pos;
 
-	ASSERT_TRUE(split_params(params, pos, actual));
+	ASSERT_TRUE(split_params(params, 1, pos, actual));
 	ASSERT_EQ(expected.size(), actual.size());
 	for (size_t i = 0; i < expected.size(); i++)
 	{
-		ASSERT_EQ(expected[i], actual[i]);
+		ASSERT_EQ(expected[i].content, actual[i].content);
 	}
 }
 
@@ -51,9 +55,9 @@ TEST(UtilityTestCase, TestSplitParamsMissingLastBracket)
 {
 	using namespace wasp::render::internal;
 	std::string params = "(23, hello | def(one=1, two='zzz')";
-	std::vector<std::string> actual;
+	std::vector<token_t> actual;
 	size_t pos;
-	ASSERT_FALSE(split_params(params, pos, actual));
+	ASSERT_FALSE(split_params(params, 1, pos, actual));
 	ASSERT_EQ(pos, params.size());
 }
 
@@ -61,9 +65,9 @@ TEST(UtilityTestCase, TestSplitParamsMissingOpenBracket)
 {
 	using namespace wasp::render::internal;
 	std::string params = "23, hello | def(one=1, two='zzz'))";
-	std::vector<std::string> actual;
+	std::vector<token_t> actual;
 	size_t pos;
-	ASSERT_FALSE(split_params(params, pos, actual));
+	ASSERT_FALSE(split_params(params, 1, pos, actual));
 	ASSERT_EQ(pos, 1);
 }
 
@@ -71,9 +75,9 @@ TEST(UtilityTestCase, TestSplitParamsTooShortContent)
 {
 	using namespace wasp::render::internal;
 	std::string params = "(";
-	std::vector<std::string> actual;
+	std::vector<token_t> actual;
 	size_t pos;
-	ASSERT_FALSE(split_params(params, pos, actual));
+	ASSERT_FALSE(split_params(params, 1, pos, actual));
 	ASSERT_EQ(pos, 0);
 }
 
@@ -81,9 +85,9 @@ TEST(UtilityTestCase, TestSplitParamsRedundantComma)
 {
 	using namespace wasp::render::internal;
 	std::string params = "(23, hello | def(one=1, two='zzz'),)";
-	std::vector<std::string> actual;
+	std::vector<token_t> actual;
 	size_t pos;
-	ASSERT_FALSE(split_params(params, pos, actual));
+	ASSERT_FALSE(split_params(params, 1, pos, actual));
 	ASSERT_EQ(pos, params.size());
 }
 

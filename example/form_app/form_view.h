@@ -17,7 +17,7 @@ public:
 	explicit FormView(wasp::conf::Settings* settings)
 		: wasp::views::TemplateView({"get", "post"}, settings)
 	{
-		this->_template_name = "form.html";
+		this->_template_name = "form_app/form.html";
 	}
 
 	std::unique_ptr<wasp::http::IHttpResponse> get(wasp::http::HttpRequest* request, wasp::views::Args* args) final

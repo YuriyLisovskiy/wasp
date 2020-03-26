@@ -26,7 +26,7 @@ public:
 	void urlpatterns() override
 	{
 		this->url<MainView>(R"(index/?)", "index");
-		this->include<PictureAppConfig>(R"(picture/)");
+		this->include<PictureAppConfig>(R"(picture/)", "picture");
 		this->include<FormAppConfig>(R"(form/)");
 		this->url<RedirectView>(R"(/?)", "root");
 	}

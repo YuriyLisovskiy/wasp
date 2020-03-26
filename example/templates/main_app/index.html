@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Index</title>
+</head>
+<body>
+    <h2>Hello from main view!</h2>
+    <ul>
+        {% ignore %}
+            Some multiline comment
+        {% end_ignore %}
+        <li><a href="{% url('Form::profile', 2048, 'YuriyLisovskiy') %}">Go to form!</a></li>
+
+        {# Some single-line comment #}
+        <li><a href="{% url('picture::view_pic') %}">View picture!</a></li>
+    </ul>
+</body>
+</html>

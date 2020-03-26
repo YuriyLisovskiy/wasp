@@ -16,39 +16,33 @@
  */
 
 /**
- * render/internal/utility.h
+ * render/library/syntax/ignore.h
  *
  * Purpose:
- * TODO:
+ * Ignores everything between '{% ignore %}' and '{% end_ignore %}'.
  */
 
 #pragma once
 
-// C++ libraries.
-#include <string>
-#include <vector>
-#include <memory>
-
 // Module definitions.
-#include "../_def_.h"
+#include "./_def_.h"
 
-// Framework modules
-#include "./filter_expr.h"
+// Framework modules.
+#include "../nodes.h"
+#include "../parser.h"
 
 
-__RENDER_INTERNAL_BEGIN__
+__SYNTAX_BEGIN__
 
-extern bool split_params(
-	const std::string& params_str,
-	size_t line_no,
-	size_t& curr_pos,
-	std::vector<token_t>& params
-);
+const std::string TAG_NAME_IGNORE = "ignore";
 
-extern bool is_var_char(char ch);
+struct ignore_node : public node
+{
+	std::string render(IContext* ctx) override { return ""; };
+};
 
-extern bool is_var_char_begin(char ch);
+extern std::function<std::shared_ptr<internal::node>(
+	internal::parser*, internal::token_t& token
+)> make_ignore_tag();
 
-extern bool trim_quotes(std::string& str);
-
-__RENDER_INTERNAL_END__
+__SYNTAX_END__

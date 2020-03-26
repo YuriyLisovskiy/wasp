@@ -16,10 +16,11 @@
  */
 
 /**
- * render/internal/utility.h
+ * render/internal/syntax/parse_var_name.h
  *
  * Purpose:
- * TODO:
+ * 	Parses variable assigning, i.e. if we have 'tag_name(param_1, ...) -> var_name' code,
+ * 	function will parse '-> var_name' and retrieve variable name.
  */
 
 #pragma once
@@ -27,28 +28,21 @@
 // C++ libraries.
 #include <string>
 #include <vector>
-#include <memory>
 
 // Module definitions.
-#include "../_def_.h"
+#include "./_def_.h"
 
-// Framework modules
-#include "./filter_expr.h"
+// Framework modules.
+#include "../token.h"
 
 
-__RENDER_INTERNAL_BEGIN__
+__SYNTAX_BEGIN__
 
-extern bool split_params(
-	const std::string& params_str,
-	size_t line_no,
+bool parse_var_name(
+	internal::token_t& token,
+	std::string& var_name,
 	size_t& curr_pos,
-	std::vector<token_t>& params
+	bool has_content_after_var
 );
 
-extern bool is_var_char(char ch);
-
-extern bool is_var_char_begin(char ch);
-
-extern bool trim_quotes(std::string& str);
-
-__RENDER_INTERNAL_END__
+__SYNTAX_END__

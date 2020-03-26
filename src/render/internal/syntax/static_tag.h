@@ -16,7 +16,7 @@
  */
 
 /**
- * render/internal/utility.h
+ * render/library/syntax/static_tag.h
  *
  * Purpose:
  * TODO:
@@ -26,29 +26,32 @@
 
 // C++ libraries.
 #include <string>
-#include <vector>
-#include <memory>
 
 // Module definitions.
-#include "../_def_.h"
+#include "./_def_.h"
 
-// Framework modules
-#include "./filter_expr.h"
+// Framework modules.
+#include "../nodes.h"
+#include "../parser.h"
+#include "../filter_expr.h"
 
 
-__RENDER_INTERNAL_BEGIN__
+__SYNTAX_BEGIN__
 
-extern bool split_params(
-	const std::string& params_str,
-	size_t line_no,
-	size_t& curr_pos,
-	std::vector<token_t>& params
-);
+const std::string TAG_NAME_STATIC = "static";
+const std::string TAG_NAME_MEDIA = "media";
 
-extern bool is_var_char(char ch);
+struct static_node : public node
+{
+	std::string prefix;
+	std::string var_name;
+	std::shared_ptr<FilterExpression> path;
 
-extern bool is_var_char_begin(char ch);
+	std::string render(IContext* ctx) override;
+};
 
-extern bool trim_quotes(std::string& str);
+extern std::function<std::shared_ptr<internal::node>(
+	internal::parser*, internal::token_t& token
+)> make_static_tag(const std::string& name, const std::string& prefix);
 
-__RENDER_INTERNAL_END__
+__SYNTAX_END__

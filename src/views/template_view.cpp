@@ -108,8 +108,7 @@ std::unique_ptr<http::IHttpResponse> TemplateView::get(
 {
 	return this->render(
 		request,
-		this->get_context(request, args),
-		""
+		this->get_context(request, args)
 	);
 }
 
