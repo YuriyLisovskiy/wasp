@@ -36,7 +36,7 @@ TEST(UtilityTestCase, TestSplitParams)
 	first.content = "23";
 
 	token_t second{};
-	second.content = " hello | def(one=1, two='zzz')";
+	second.content = "hello | def(one=1, two='zzz')";
 
 	std::vector<token_t> expected = {first, second};
 	std::string params = "(23, hello | def(one=1, two='zzz'))";
@@ -64,7 +64,7 @@ TEST(UtilityTestCase, TestSplitParamsMissingLastBracket)
 TEST(UtilityTestCase, TestSplitParamsMissingOpenBracket)
 {
 	using namespace wasp::render::internal;
-	std::string params = "23, hello | def(one=1, two='zzz'))";
+	std::string params = "23, hello | def)";
 	std::vector<token_t> actual;
 	size_t pos;
 	ASSERT_FALSE(split_params(params, 1, pos, actual));
