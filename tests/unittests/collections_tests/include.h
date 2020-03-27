@@ -18,7 +18,7 @@
 #ifndef WASP_UNIT_TESTS_COLLECTIONS_TESTS_INCLUDE_H
 #define WASP_UNIT_TESTS_COLLECTIONS_TESTS_INCLUDE_H
 
-#include "./dict_tests.h"
-#include "./multi_dict_tests.h"
+//#include "./dict_tests.h"
+//#include "./multi_dict_tests.h"
 
 #endif // WASP_UNIT_TESTS_COLLECTIONS_TESTS_INCLUDE_H

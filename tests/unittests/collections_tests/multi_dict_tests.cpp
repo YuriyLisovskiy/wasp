@@ -15,9 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WASP_UNIT_TESTS_COLLECTIONS_TESTS_MULTI_DICT_TESTS_H
-#define WASP_UNIT_TESTS_COLLECTIONS_TESTS_MULTI_DICT_TESTS_H
-
 #include <map>
 
 #include <gtest/gtest.h>
@@ -208,6 +205,3 @@ TEST(MultiValueDictTestCase, TestREndNotThrows)
 }
 
 __UNIT_TESTS_END__
-
-
-#endif // WASP_UNIT_TESTS_COLLECTIONS_TESTS_MULTI_DICT_TESTS_H

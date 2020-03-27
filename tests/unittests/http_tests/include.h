@@ -18,7 +18,6 @@
 #ifndef WASP_UNIT_TESTS_HTTP_TESTS_INCLUDE_H
 #define WASP_UNIT_TESTS_HTTP_TESTS_INCLUDE_H
 
-#include "./cookie_tests.h"
 #include "./request_tests.h"
 #include "./url_tests.h"
 #include "./utility_tests.h"
