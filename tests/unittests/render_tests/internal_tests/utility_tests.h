@@ -68,7 +68,7 @@ TEST(UtilityTestCase, TestSplitParamsMissingOpenBracket)
 	std::vector<token_t> actual;
 	size_t pos;
 	ASSERT_FALSE(split_params(params, 1, pos, actual));
-	ASSERT_EQ(pos, 1);
+	ASSERT_EQ(pos, 0);
 }
 
 TEST(UtilityTestCase, TestSplitParamsTooShortContent)

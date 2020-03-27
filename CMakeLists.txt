@@ -103,10 +103,16 @@ target_link_libraries(${PACKAGE_CORE_OBJECT_UNIT_TESTS} stdc++fs)
 
 
 # Http package tests setup.
-file(GLOB HTTP_TEST_SRC
+file(GLOB HTTP_TEST_SRC_
 	"tests/unittests/http_tests/*/*.h"
 	"tests/unittests/http_tests/*.h"
 )
+set(HTTP_TEST_SRC ${HTTP_TEST_SRC_})
+
+list(REMOVE_ITEM HTTP_TEST_SRC tests/unittests/http_tests/main.cpp)
+
+message(${HTTP_TEST_SRC})
+
 add_executable(${PACKAGE_HTTP_UNIT_TESTS} ${LIB_SRC} ${HTTP_TEST_SRC} "tests/unittests/http_tests/main.cpp")
 target_link_libraries(${PACKAGE_HTTP_UNIT_TESTS} gtest gtest_main rt pthread -std=c++1z ${HTTP_TEST_SRC})
 target_link_libraries(${PACKAGE_HTTP_UNIT_TESTS} stdc++fs)
