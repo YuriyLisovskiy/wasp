@@ -1,7 +1,16 @@
 cmake_minimum_required(VERSION 3.13)
 
 set(CMAKE_CXX_STANDARD 17)
+set(BINARY "wasp-framework")
 
+project(${BINARY})
+
+set(CMAKE_CXX_FLAGS "-pthread")
+
+add_subdirectory(src)
+add_subdirectory(example)
+
+#[[
 # Package information.
 set(PACKAGE_NAME "wasp")
 set(PACKAGE_VERSION "0.0.1-dev")
@@ -183,3 +192,5 @@ if(EXISTS "${PROJECT_SOURCE_DIR}/example/main.cpp")
 else()
 	message("main.cpp of example web server does not exist")
 endif()
+
+]]
