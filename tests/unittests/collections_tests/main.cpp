@@ -17,9 +17,6 @@
 
 #include <gtest/gtest.h>
 
-//#include "./include.h"
-
-
 int main(int argc, char *argv[])
 {
 	::testing::InitGoogleTest(&argc, argv);

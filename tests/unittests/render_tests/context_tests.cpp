@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,10 +15,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <memory>
+
 #include <gtest/gtest.h>
 
-int main(int argc, char *argv[])
+#include "../_def_.h"
+#include "../../../src/render/context.h"
+#include "../../../src/core/types/value.h"
+
+
+__UNIT_TESTS_BEGIN__
+
+// TODO: remove test
+TEST(ConextTestCase, check)
 {
-	::testing::InitGoogleTest(&argc, argv);
-	return RUN_ALL_TESTS();
+	auto* ctx = new render::Context({
+		{"", std::make_shared<core::types::Value<int>>(10)}
+	});
+	delete ctx;
 }
+
+__UNIT_TESTS_END__

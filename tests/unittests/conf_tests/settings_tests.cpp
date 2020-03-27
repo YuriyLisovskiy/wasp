@@ -17,8 +17,29 @@
 
 #include <gtest/gtest.h>
 
-int main(int argc, char *argv[])
+#include "../_def_.h"
+#include "../../../src/conf/settings.h"
+
+
+__UNIT_TESTS_BEGIN__
+
+class MySettings : public wasp::conf::Settings
 {
-	::testing::InitGoogleTest(&argc, argv);
-	return RUN_ALL_TESTS();
+public:
+	void init() override
+	{
+	}
+};
+
+TEST(SettingsTestCase, CheckMemoryLeakTest)
+{
+	auto* settings = new MySettings();
+
+	settings->init();
+	settings->override();
+	settings->prepare();
+
+	delete settings;
 }
+
+__UNIT_TESTS_END__

@@ -17,8 +17,8 @@
 
 #pragma once
 
-//#ifndef MEM_LEAK_CHECK_H
-//#define MEM_LEAK_CHECK_H
+#ifndef MEM_LEAK_CHECK_H
+#define MEM_LEAK_CHECK_H
 
 #include <map>
 #include <memory>
@@ -120,4 +120,4 @@ void operator delete(void* mem) throw()
 #endif // DETECT_MEMORY_LEAK
 
 
-//#endif // MEM_LEAK_CHECK_H
+#endif // MEM_LEAK_CHECK_H

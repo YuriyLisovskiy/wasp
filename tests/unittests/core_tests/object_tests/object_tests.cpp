@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,24 @@
 
 #include <gtest/gtest.h>
 
-int main(int argc, char *argv[])
+#include "../../_def_.h"
+#include "../../../../src/core/object/object.h"
+
+
+__UNIT_TESTS_BEGIN__
+
+
+class EmptyObject : public core::object::Object
 {
-	::testing::InitGoogleTest(&argc, argv);
-	return RUN_ALL_TESTS();
+};
+
+TEST(ObjectTestsCase, EmptyObjectTypeTest)
+{
+	auto obj = EmptyObject();
+	auto type = obj.__type__();
+
+	ASSERT_EQ(type.name(), "EmptyObject");
+	ASSERT_EQ(type.namespace_(), "wasp::tests::unittests");
 }
+
+__UNIT_TESTS_END__

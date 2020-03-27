@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,18 @@
 
 #include <gtest/gtest.h>
 
-int main(int argc, char *argv[])
+#include "../../_def_.h"
+#include "../../../../src/render/internal/parser.h"
+
+
+__UNIT_TESTS_BEGIN__
+
+TEST(ParserTestCase, TestSplit)
 {
-	::testing::InitGoogleTest(&argc, argv);
-	return RUN_ALL_TESTS();
+	using namespace wasp::render::internal;
+	ASSERT_EQ(parser::get_command("hello()"), "hello");
+	ASSERT_EQ(parser::get_command("_hello()"), "_hello");
+	ASSERT_EQ(parser::get_command("_h3e_3llo_()"), "_h3e_3llo_");
 }
+
+__UNIT_TESTS_END__
