@@ -21,6 +21,9 @@
 
 #include "./view.h"
 
+// Framework modules.
+#include "../core/utility.h"
+
 
 __VIEWS_BEGIN__
 
@@ -57,16 +60,9 @@ std::unique_ptr<http::IHttpResponse> View::dispatch(Args* args)
 {
 	if (this->_request == nullptr)
 	{
-		int status;
-		std::string name = typeid(*this).name();
-		char* fullName = abi::__cxa_demangle(name.c_str(), nullptr, nullptr, &status);
-		if (status == 0)
-		{
-			name = fullName;
-		}
-
 		throw core::NullPointerException(
-			name + " instance has not initialized request."
+			core::utility::demangle(typeid(*this).name()) +
+			" instance has not initialized request."
 			" Did you override setup() and forget to call base method?",
 			_ERROR_DETAILS_
 		);

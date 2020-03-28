@@ -146,7 +146,7 @@ public:
 
 	friend std::ostream& operator<<(std::ostream& out, Object& obj);
 
-	explicit operator bool () const;
+	explicit virtual operator bool () const;
 };
 
 __OBJECT_END__

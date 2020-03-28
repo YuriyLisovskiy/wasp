@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,33 +15,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * An implementation of core/utility.h
- */
+#include <gtest/gtest.h>
 
-// C++ libraries.
-#include <cxxabi.h>
-#include <memory>
+#include "../../../../src/core/object/object.h"
 
-// Header.
-#include "./utility.h"
+using namespace wasp;
 
-__UTILITY_BEGIN__
-
-// Statuses:
-// 0 - operation succeeded
-// 1 - a memory allocation failure occurred
-// 2 - mangled_name is not a valid name under the C++ ABI mangling rules
-// 3 - one of the arguments is invalid
-std::string demangle(const char* name)
+namespace test_namespace
 {
-	int status = -4;
-	std::unique_ptr<char, void(*)(void*)> res {
-		abi::__cxa_demangle(name, nullptr, nullptr, &status),
-		std::free
+	class EmptyObject : public core::object::Object
+	{
 	};
-
-	return status == 0 ? res.get() : name;
 }
 
-__UTILITY_END__
+TEST(ObjectTestsCase, EmptyObjectTypeTest)
+{
+	auto obj = test_namespace::EmptyObject();
+	auto type = obj.__type__();
+
+	ASSERT_EQ(type.name(), "EmptyObject");
+	ASSERT_EQ(type.namespace_(), "test_namespace");
+}

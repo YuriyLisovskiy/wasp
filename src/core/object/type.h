@@ -33,6 +33,7 @@
 
 // Wasp libraries.
 #include "../string/str.h"
+#include "../utility.h"
 
 
 __OBJECT_BEGIN__
@@ -63,7 +64,7 @@ public:
 	template<typename _T>
 	[[nodiscard]] static std::string type_name()
 	{
-		return Type::demangle(typeid(_T).name());
+		return utility::demangle(typeid(_T).name());
 	}
 
 	template<typename _T>
@@ -76,9 +77,6 @@ public:
 	bool operator==(const Type& other) const;
 
 	friend std::ostream& operator<<(std::ostream& out, const Type& obj);
-
-private:
-	static std::string demangle(const char* full_name);
 };
 
 __OBJECT_END__

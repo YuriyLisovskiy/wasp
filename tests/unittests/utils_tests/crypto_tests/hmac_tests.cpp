@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,33 +15,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * An implementation of core/utility.h
- */
+#include <string>
 
-// C++ libraries.
-#include <cxxabi.h>
-#include <memory>
+#include <gtest/gtest.h>
 
-// Header.
-#include "./utility.h"
+#include "../../../../src/core/logger.h"
+#include "../../../../src/utils/crypto/hmac.h"
 
-__UTILITY_BEGIN__
+using namespace wasp;
 
-// Statuses:
-// 0 - operation succeeded
-// 1 - a memory allocation failure occurred
-// 2 - mangled_name is not a valid name under the C++ ABI mangling rules
-// 3 - one of the arguments is invalid
-std::string demangle(const char* name)
+
+TEST(HmacTestCase, Md5HasherTest)
 {
-	int status = -4;
-	std::unique_ptr<char, void(*)(void*)> res {
-		abi::__cxa_demangle(name, nullptr, nullptr, &status),
-		std::free
-	};
+	std::string key = "+s6cv712&nw4gsk)1dmgpje+f#%^4lhp@!up+=p3ts+hxz(fr2";
+	auto hmac = utils::crypto::Hmac(key);
 
-	return status == 0 ? res.get() : name;
+	ASSERT_EQ(hmac.size(), 16);
+	ASSERT_EQ(hmac.block_size(), 64);
+
+	hmac.update("The quick brown fox jumps over the lazy dog");
+	ASSERT_EQ("811a406877bbee0e26be8ec53c6bcdf4", hmac.hex_digest());
 }
-
-__UTILITY_END__
