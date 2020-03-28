@@ -19,15 +19,14 @@
 
 #include <gtest/gtest.h>
 
-#include "../_def_.h"
 #include "../../../src/views/view.h"
 #include "../../../src/conf/settings.h"
 #include "../../../src/http/request.h"
 #include "../../../src/collections/dict.h"
 #include "../../../src/collections/multi_dict.h"
 
+using namespace wasp;
 
-__UNIT_TESTS_BEGIN__
 
 struct ViewTestSettings : public conf::Settings
 {
@@ -189,5 +188,3 @@ TEST_F(ViewTestCase, DispatchNotAllowedTest)
 
 	ASSERT_EQ(response->status(), 405);
 }
-
-__UNIT_TESTS_END__

@@ -21,11 +21,10 @@
 
 #include <gtest/gtest.h>
 
-#include "../../_def_.h"
 #include "../../../../src/core/parsers/request_parser.h"
 
+using namespace wasp;
 
-__UNIT_TESTS_BEGIN__
 
 TEST(RequestParserTestCase, IsCharTest)
 {
@@ -259,5 +258,3 @@ TEST_F(ParseRequestTestCase, ParseFormDataTest)
 	ASSERT_TRUE(this->parser->post_parameters.contains(this->MAIL.first));
 	ASSERT_EQ(this->parser->post_parameters.get(this->MAIL.first), this->MAIL.second);
 }
-
-__UNIT_TESTS_END__

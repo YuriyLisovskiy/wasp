@@ -17,11 +17,10 @@
 
 #include <gtest/gtest.h>
 
-#include "../_def_.h"
 #include "../../../src/http/url.h"
 
+using namespace wasp;
 
-__UNIT_TESTS_BEGIN__
 
 class SimpleUrlTestCase : public ::testing::Test
 {
@@ -147,5 +146,3 @@ TEST_F(ComplexUrlTestCase, QueryTest)
 {
 	ASSERT_EQ(this->url->query(), QUERY_EXPECTED);
 }
-
-__UNIT_TESTS_END__

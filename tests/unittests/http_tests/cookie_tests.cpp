@@ -17,11 +17,10 @@
 
 #include <gtest/gtest.h>
 
-#include "../_def_.h"
 #include "../../../src/http/cookie.h"
 
+using namespace wasp;
 
-__UNIT_TESTS_BEGIN__
 
 TEST(CookieTestCase, toStringTestAllParameters)
 {
@@ -56,5 +55,3 @@ TEST(CookieTestCase, toStringTestEmptyPath)
 	auto actual = cookie.to_string();
 	ASSERT_EQ(actual, expected);
 }
-
-__UNIT_TESTS_END__

@@ -17,11 +17,10 @@
 
 #include <gtest/gtest.h>
 
-#include "../../_def_.h"
 #include "../../../../src/render/internal/parser.h"
 
+using namespace wasp;
 
-__UNIT_TESTS_BEGIN__
 
 TEST(ParserTestCase, TestSplit)
 {
@@ -30,5 +29,3 @@ TEST(ParserTestCase, TestSplit)
 	ASSERT_EQ(parser::get_command("_hello()"), "_hello");
 	ASSERT_EQ(parser::get_command("_h3e_3llo_()"), "_h3e_3llo_");
 }
-
-__UNIT_TESTS_END__

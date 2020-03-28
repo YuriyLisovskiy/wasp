@@ -73,27 +73,7 @@ std::ostream& operator<<(std::ostream& out, const Type& obj)
 
 [[nodiscard]] std::string Type::type_name(const Object& obj)
 {
-	return Type::demangle(typeid(obj).name());
-}
-
-std::string Type::demangle(const char* type_name)
-{
-	int status = -4;
-	std::unique_ptr<char, void(*)(void*)> res {
-		abi::__cxa_demangle(type_name, NULL, NULL, &status),
-		std::free
-	};
-
-	return status == 0 ? res.get() : type_name;
-
-//	std::string name = type_name;
-//	char* full_name = abi::__cxa_demangle(name.c_str(), nullptr, nullptr, &status);
-//	if (status == 0)
-//	{
-//		name = full_name;
-//	}
-
-//	return name;
+	return utility::demangle(typeid(obj).name());
 }
 
 __OBJECT_END__

@@ -17,11 +17,10 @@
 
 #include <gtest/gtest.h>
 
-#include "../_def_.h"
 #include "../../../src/core/encoding.h"
 
+using namespace wasp;
 
-__UNIT_TESTS_BEGIN__
 
 TEST(EncodeUrlTestCase, encode)
 {
@@ -33,5 +32,3 @@ TEST(EncodeUrlTestCase, encode)
 	toEncode = "https://www.google.com/?q=フォーディー";
 	ASSERT_EQ(core::encoding::encode_url(toEncode), expected);
 }
-
-__UNIT_TESTS_END__

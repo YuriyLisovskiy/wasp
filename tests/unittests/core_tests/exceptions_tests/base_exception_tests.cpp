@@ -17,11 +17,10 @@
 
 #include <gtest/gtest.h>
 
-#include "../../_def_.h"
 #include "../../../../src/core/exceptions.h"
 
+using namespace wasp;
 
-__UNIT_TESTS_BEGIN__
 
 class BaseExceptionTestCase : public ::testing::Test
 {
@@ -58,5 +57,3 @@ TEST_F(BaseExceptionTestCase, TestFile)
 {
 	ASSERT_EQ(this->Error.file(), this->ErrorFile);
 }
-
-__UNIT_TESTS_END__

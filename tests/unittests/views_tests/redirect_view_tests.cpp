@@ -19,7 +19,6 @@
 
 #include <gtest/gtest.h>
 
-#include "../_def_.h"
 #include "../../../src/views/redirect_view.h"
 #include "../../../src/http/request.h"
 #include "../../../src/conf/settings.h"
@@ -27,8 +26,8 @@
 #include "../../../src/collections/dict.h"
 #include "../../../src/collections/multi_dict.h"
 
+using namespace wasp;
 
-__UNIT_TESTS_BEGIN__
 
 http::HttpRequest make_request(const std::string& method)
 {
@@ -416,5 +415,3 @@ TEST_F(RedirectViewEmptyUrlTestCase, GetRedirectUrlTest)
 
 	ASSERT_EQ(this->view->get_redirect_url(), "");
 }
-
-__UNIT_TESTS_END__

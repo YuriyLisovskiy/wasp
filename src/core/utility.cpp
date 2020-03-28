@@ -16,14 +16,32 @@
  */
 
 /**
- * An implementation of core/utils.h
+ * An implementation of core/utility.h
  */
 
-#include "./utility.h"
+// C++ libraries.
+#include <cxxabi.h>
+#include <memory>
 
+// Header.
+#include "./utility.h"
 
 __UTILITY_BEGIN__
 
+// Statuses:
+// 0 - operation succeeded
+// 1 - a memory allocation failure occurred
+// 2 - mangled_name is not a valid name under the C++ ABI mangling rules
+// 3 - one of the arguments is invalid
+std::string demangle(const char* name)
+{
+	int status = -4;
+	std::unique_ptr<char, void(*)(void*)> res {
+		abi::__cxa_demangle(name, nullptr, nullptr, &status),
+		std::free
+	};
 
+	return status == 0 ? res.get() : name;
+}
 
 __UTILITY_END__

@@ -19,12 +19,11 @@
 
 #include <gtest/gtest.h>
 
-#include "../_def_.h"
 #include "../../../src/render/context.h"
 #include "../../../src/core/types/value.h"
 
+using namespace wasp;
 
-__UNIT_TESTS_BEGIN__
 
 // TODO: remove test
 TEST(ConextTestCase, check)
@@ -34,5 +33,3 @@ TEST(ConextTestCase, check)
 	});
 	delete ctx;
 }
-
-__UNIT_TESTS_END__

@@ -17,11 +17,10 @@
 
 #include <gtest/gtest.h>
 
-#include "../../_def_.h"
 #include "../../../../src/utils/crypto/md5.h"
 
+using namespace wasp;
 
-__UNIT_TESTS_BEGIN__
 
 TEST(Md5TestCase, TestDigest)
 {
@@ -37,5 +36,3 @@ TEST(Md5TestCase, TestDigest)
 	actual = utils::crypto::MD5("").hex_digest();
 	ASSERT_EQ(actual, expected);
 }
-
-__UNIT_TESTS_END__

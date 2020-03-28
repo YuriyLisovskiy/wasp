@@ -17,24 +17,22 @@
 
 #include <gtest/gtest.h>
 
-#include "../../_def_.h"
 #include "../../../../src/core/object/object.h"
 
+using namespace wasp;
 
-__UNIT_TESTS_BEGIN__
-
-
-class EmptyObject : public core::object::Object
+namespace test_namespace
 {
-};
+	class EmptyObject : public core::object::Object
+	{
+	};
+}
 
 TEST(ObjectTestsCase, EmptyObjectTypeTest)
 {
-	auto obj = EmptyObject();
+	auto obj = test_namespace::EmptyObject();
 	auto type = obj.__type__();
 
 	ASSERT_EQ(type.name(), "EmptyObject");
-	ASSERT_EQ(type.namespace_(), "wasp::tests::unittests");
+	ASSERT_EQ(type.namespace_(), "test_namespace");
 }
-
-__UNIT_TESTS_END__

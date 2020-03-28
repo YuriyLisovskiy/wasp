@@ -16,7 +16,7 @@
  */
 
 /**
- * core/utils.h
+ * core/utility.h
  *
  * Purpose: core utilities.
  */
@@ -26,6 +26,7 @@
 // C++ libraries.
 #include <algorithm>
 #include <vector>
+#include <string>
 
 // Module definitions.
 #include "./_def_.h"
@@ -58,5 +59,8 @@ long index_of(_IteratorT begin, _IteratorT end, const _ItemT& item)
 
 	return std::distance(begin, it);
 }
+
+/// Converts typeid.name() to full name.
+extern std::string demangle(const char* name);
 
 __UTILITY_END__

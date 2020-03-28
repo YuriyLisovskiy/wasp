@@ -19,11 +19,10 @@
 
 #include <gtest/gtest.h>
 
-#include "../_def_.h"
 #include "../../../src/collections/multi_dict.h"
 
+using namespace wasp;
 
-__UNIT_TESTS_BEGIN__
 
 template <typename _T>
 bool vectorsAreEqual(const std::vector<_T>& left, const std::vector<_T>& right)
@@ -203,5 +202,3 @@ TEST(MultiValueDictTestCase, TestREndNotThrows)
 	collections::MultiValueDict<int, int> testDict;
 	ASSERT_NO_THROW(testDict.rend());
 }
-
-__UNIT_TESTS_END__

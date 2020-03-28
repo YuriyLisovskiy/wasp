@@ -17,13 +17,12 @@
 
 #include <gtest/gtest.h>
 
-#include "../_def_.h"
 #include "../../../src/conf/settings.h"
 
+using namespace wasp;
 
-__UNIT_TESTS_BEGIN__
 
-class MySettings : public wasp::conf::Settings
+class MySettings : public conf::Settings
 {
 public:
 	void init() override
@@ -41,5 +40,3 @@ TEST(SettingsTestCase, CheckMemoryLeakTest)
 
 	delete settings;
 }
-
-__UNIT_TESTS_END__

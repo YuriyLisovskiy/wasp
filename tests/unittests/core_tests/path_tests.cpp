@@ -17,11 +17,10 @@
 
 #include <gtest/gtest.h>
 
-#include "../_def_.h"
 #include "../../../src/core/path.h"
 
+using namespace wasp;
 
-__UNIT_TESTS_BEGIN__
 
 TEST(PathTestCase, DirnameTest)
 {
@@ -94,5 +93,3 @@ TEST(PathTestCase, JoinVectorTest)
 	auto actual = core::path::join(paths);
 	ASSERT_EQ(expected, actual);
 }
-
-__UNIT_TESTS_END__

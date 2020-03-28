@@ -20,11 +20,10 @@
 
 #include <gtest/gtest.h>
 
-#include "../../_def_.h"
 #include "../../../../src/render/internal/utility.h"
 
+using namespace wasp;
 
-__UNIT_TESTS_BEGIN__
 
 TEST(UtilityTestCase, TestSplitParams)
 {
@@ -87,5 +86,3 @@ TEST(UtilityTestCase, TestSplitParamsRedundantComma)
 	ASSERT_FALSE(split_params(params, 1, pos, actual));
 	ASSERT_EQ(pos, params.size());
 }
-
-__UNIT_TESTS_END__

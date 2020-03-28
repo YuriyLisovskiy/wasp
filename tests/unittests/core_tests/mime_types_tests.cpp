@@ -17,11 +17,10 @@
 
 #include <gtest/gtest.h>
 
-#include "../_def_.h"
 #include "../../../src/core/mime_types.h"
 
+using namespace wasp;
 
-__UNIT_TESTS_BEGIN__
 
 // Testing 'ext_from_file_name' function.
 TEST(MimeTypesTestCase, extFromFileNameTestSuccess)
@@ -150,5 +149,3 @@ TEST(MimeTypesTestCase, guessContentTypeTestTextZ)
 	ASSERT_EQ(type, "application/x-z");
 	ASSERT_EQ(encoding, "compress");
 }
-
-__UNIT_TESTS_END__

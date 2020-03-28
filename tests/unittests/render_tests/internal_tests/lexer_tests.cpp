@@ -17,11 +17,10 @@
 
 #include <gtest/gtest.h>
 
-#include "../../_def_.h"
 #include "../../../../src/render/internal/lexer.h"
 
+using namespace wasp;
 
-__UNIT_TESTS_BEGIN__
 
 TEST(LexerTestCase, TestSplit)
 {
@@ -57,5 +56,3 @@ TEST(LexerTestCase, TestTokenize)
 //	size_t i = 0;
 }
 */
-
-__UNIT_TESTS_END__

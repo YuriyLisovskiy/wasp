@@ -17,11 +17,10 @@
 
 #include <gtest/gtest.h>
 
-#include "../../_def_.h"
 #include "../../../../src/core/datetime/datetime.h"
 
+using namespace wasp;
 
-__UNIT_TESTS_BEGIN__
 
 TEST(TzTestCase, BothDirectionAssertTest)
 {
@@ -112,5 +111,3 @@ TEST(DateTimeTestCase, TimestampTest)
 	dt = core::dt::DateTime::strptime(str_dt, "%a, %e %b %Y %T %Z");
 	ASSERT_EQ(expected, dt.timestamp());
 }
-
-__UNIT_TESTS_END__

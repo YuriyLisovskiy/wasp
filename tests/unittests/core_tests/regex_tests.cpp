@@ -17,11 +17,10 @@
 
 #include <gtest/gtest.h>
 
-#include "../_def_.h"
 #include "../../../src/core/regex.h"
 
+using namespace wasp;
 
-__UNIT_TESTS_BEGIN__
 
 TEST(RegexTestCase, TestETagPattern)
 {
@@ -71,5 +70,3 @@ TEST(RegexTestCase, TestEscape)
 	expr = R"(#\})";
 	ASSERT_EQ(core::rgx::Regex::escape(R"(#})"), expr);
 }
-
-__UNIT_TESTS_END__

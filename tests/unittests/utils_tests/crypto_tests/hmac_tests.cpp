@@ -19,12 +19,11 @@
 
 #include <gtest/gtest.h>
 
-#include "../../_def_.h"
 #include "../../../../src/core/logger.h"
 #include "../../../../src/utils/crypto/hmac.h"
 
+using namespace wasp;
 
-__UNIT_TESTS_BEGIN__
 
 TEST(HmacTestCase, Md5HasherTest)
 {
@@ -37,5 +36,3 @@ TEST(HmacTestCase, Md5HasherTest)
 	hmac.update("The quick brown fox jumps over the lazy dog");
 	ASSERT_EQ("811a406877bbee0e26be8ec53c6bcdf4", hmac.hex_digest());
 }
-
-__UNIT_TESTS_END__

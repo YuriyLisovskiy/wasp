@@ -17,11 +17,10 @@
 
 #include <gtest/gtest.h>
 
-#include "../../_def_.h"
 #include "../../../../src/core/string/str.h"
 
+using namespace wasp;
 
-__UNIT_TESTS_BEGIN__
 
 TEST(StrUtilsUrlSplitTypeTestCase, TestSuccess)
 {
@@ -230,5 +229,3 @@ TEST(StrEndsWithTestCase, TestEndsWithReturnsTrue)
 {
 	ASSERT_TRUE(core::str::ends_with("Hello, World", ", World"));
 }
-
-__UNIT_TESTS_END__

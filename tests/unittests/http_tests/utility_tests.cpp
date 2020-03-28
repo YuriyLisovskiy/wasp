@@ -17,11 +17,10 @@
 
 #include <gtest/gtest.h>
 
-#include "../_def_.h"
 #include "../../../src/http/utility.h"
 
+using namespace wasp;
 
-__UNIT_TESTS_BEGIN__
 
 TEST(IsSameDomainTestCase, TestPatternIsEmpty)
 {
@@ -58,5 +57,3 @@ TEST(IsSameDomainTestCase, TestReturnsTrue)
 	pattern = "[::1]";
 	ASSERT_TRUE(http::is_same_domain(domain, pattern));
 }
-
-__UNIT_TESTS_END__

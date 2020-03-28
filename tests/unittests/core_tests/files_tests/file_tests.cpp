@@ -22,12 +22,11 @@
 
 #include <gtest/gtest.h>
 
-#include "../../_def_.h"
 #include "../../../../src/core/path.h"
 #include "../../../../src/core/files/file.h"
 
+using namespace wasp;
 
-__UNIT_TESTS_BEGIN__
 
 using byte = core::byte;
 using File = core::File;
@@ -214,7 +213,7 @@ protected:
 		if (f.is_open())
 		{
 			size_t n = data.size();
-			char* buffer = new char[n];
+			char* buffer = new char[n + 1];
 			f.read(buffer, n);
 			buffer[n] = '\0';
 
@@ -280,5 +279,3 @@ TEST_F(WriteFileTestCase, TestReadFileIsInWriteOnlyModeError)
 {
 	ASSERT_THROW(file.read(), core::FileError);
 }
-
-__UNIT_TESTS_END__

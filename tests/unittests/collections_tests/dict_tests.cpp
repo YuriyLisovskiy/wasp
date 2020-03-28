@@ -17,11 +17,10 @@
 
 #include <gtest/gtest.h>
 
-#include "../_def_.h"
 #include "../../../src/collections/dict.h"
 
+using namespace wasp;
 
-__UNIT_TESTS_BEGIN__
 
 // Dict testing.
 TEST(DictTestCase, TestGetItemExists)
@@ -159,5 +158,3 @@ TEST(DictTestCase, TestGetSize)
 
 	ASSERT_EQ(expected, actual);
 }
-
-__UNIT_TESTS_END__

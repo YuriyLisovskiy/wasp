@@ -19,11 +19,10 @@
 
 #include <gtest/gtest.h>
 
-#include "../_def_.h"
 #include "../../../src/views/args.h"
 
+using namespace wasp;
 
-__UNIT_TESTS_BEGIN__
 
 class ArgsTestCase : public ::testing::Test
 {
@@ -75,5 +74,3 @@ TEST_F(ArgsTestCase, GetStringTestReturnsDefault)
 {
 	ASSERT_EQ(this->args->get_str("account", "default value"), "default value");
 }
-
-__UNIT_TESTS_END__

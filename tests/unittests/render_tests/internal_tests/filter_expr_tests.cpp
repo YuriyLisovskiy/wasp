@@ -17,12 +17,11 @@
 
 #include <gtest/gtest.h>
 
-#include "../../_def_.h"
 #include "../../../../src/render/internal/base.h"
 #include "../../../../src/render/internal/filter_expr.h"
 
+using namespace wasp;
 
-__UNIT_TESTS_BEGIN__
 
 TEST(FilterRegexTestCase, ParserTest)
 {
@@ -176,5 +175,3 @@ TEST(FilterRegexTestCase, ParseIntValueTest)
 	ASSERT_EQ(p.expression.var_attrs.size(), 0);
 	ASSERT_EQ(p.expression.filters.size(), 0);
 }
-
-__UNIT_TESTS_END__

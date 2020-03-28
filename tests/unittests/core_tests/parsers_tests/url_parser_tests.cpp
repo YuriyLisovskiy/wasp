@@ -17,12 +17,11 @@
 
 #include <gtest/gtest.h>
 
-#include "../../_def_.h"
 #include "../../../../src/core/exceptions.h"
 #include "../../../../src/core/parsers/url_parser.h"
 
+using namespace wasp;
 
-__UNIT_TESTS_BEGIN__
 
 class UrlParserIPv4TestCase : public ::testing::Test
 {
@@ -187,5 +186,3 @@ TEST_F(UrlParserErrorsTestCase, UsernameOrHostnameErrorTest)
 	this->parser.parse("http://$example.com");
 	ASSERT_FALSE(this->parser.is_parsed);
 }
-
-__UNIT_TESTS_END__

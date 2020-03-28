@@ -17,11 +17,10 @@
 
 #include <gtest/gtest.h>
 
-#include "../../_def_.h"
 #include "../../../../src/core/flags/flag_set.h"
 
+using namespace wasp;
 
-__UNIT_TESTS_BEGIN__
 
 TEST(FlagsTestCase, ParseTest)
 {
@@ -66,5 +65,3 @@ TEST(FlagsTestCase, ParseWithEqSignsTest)
 	ASSERT_EQ(port->get(), 8000);
 	ASSERT_EQ(verbose->get(), false);
 }
-
-__UNIT_TESTS_END__

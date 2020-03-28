@@ -19,12 +19,29 @@
 
 #include <gtest/gtest.h>
 
-#include "../_def_.h"
-#include "../../utils.h"
 #include "../../../src/utils/http.h"
 
+using namespace wasp;
 
-__UNIT_TESTS_BEGIN__
+
+template <typename _T>
+bool assert_vector(const std::vector<_T>& actual, const std::vector<_T>& expected)
+{
+	if (actual.size() != expected.size())
+	{
+		return false;
+	}
+
+	for (size_t i = 0; i < actual.size(); i++)
+	{
+		if (actual[i] != expected[i])
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
 
 TEST(ParseHttpDateTestCase, ParseGMTDate)
 {
@@ -57,7 +74,7 @@ TEST(ParseETagsTestCase, MatchAllTest)
 	auto e_tags = "*";
 	std::vector<std::string> expected = {"*"};
 	auto actual = utils_http::parse_etags(e_tags);
-	ASSERT_TRUE(utils::assert_vector(actual, expected));
+	ASSERT_TRUE(assert_vector(actual, expected));
 }
 
 TEST(ParseETagsTestCase, SingleETagTest)
@@ -65,7 +82,7 @@ TEST(ParseETagsTestCase, SingleETagTest)
 	auto e_tags = R"("bfc13a64729c4290ef5b2c2730249c88ca92d82d")";
 	std::vector<std::string> expected = {R"("bfc13a64729c4290ef5b2c2730249c88ca92d82d")"};
 	auto actual = utils_http::parse_etags(e_tags);
-	ASSERT_TRUE(utils::assert_vector(actual, expected));
+	ASSERT_TRUE(assert_vector(actual, expected));
 }
 
 TEST(ParseETagsTestCase, MultipleETagsTest)
@@ -73,7 +90,5 @@ TEST(ParseETagsTestCase, MultipleETagsTest)
 	auto e_tags = R"(W/"67ab43", "54ed21", "7892dd")";
 	std::vector<std::string> expected = {R"(W/"67ab43")", R"("54ed21")", R"("7892dd")"};
 	auto actual = utils_http::parse_etags(e_tags);
-	ASSERT_TRUE(utils::assert_vector(actual, expected));
+	ASSERT_TRUE(assert_vector(actual, expected));
 }
-
-__UNIT_TESTS_END__

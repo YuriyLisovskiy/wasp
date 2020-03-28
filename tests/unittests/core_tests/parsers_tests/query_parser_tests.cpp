@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <gtest/gtest.h>
-
 #include <map>
 #include <vector>
 
-#include "../../_def_.h"
+#include <gtest/gtest.h>
+
 #include "../../../../src/core/parsers/query_parser.h"
 #include "../../../../src/http/request.h"
 
-__UNIT_TESTS_BEGIN__
+using namespace wasp;
+
 
 template <typename _Container>
 bool containers_are_equal(const _Container& lhs, const _Container& rhs)
@@ -109,5 +109,3 @@ TEST(QueryParserTestCase, empty)
 
 	ASSERT_TRUE(parsed.empty());
 }
-
-__UNIT_TESTS_END__

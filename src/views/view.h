@@ -28,7 +28,6 @@
 // C++ libraries.
 #include <vector>
 #include <string>
-#include <cxxabi.h>
 #include <algorithm>
 #include <functional>
 #include <memory>

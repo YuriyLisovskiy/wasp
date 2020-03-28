@@ -15,16 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <gtest/gtest.h>
-
 #include <map>
 #include <string>
 
-#include "../../_def_.h"
+#include <gtest/gtest.h>
+
 #include "../../../../src/core/parsers/cookie_parser.h"
 
+using namespace wasp;
 
-__UNIT_TESTS_BEGIN__
 
 class RequestCookieParserTestCase : public ::testing::Test
 {
@@ -56,5 +55,3 @@ TEST_F(RequestCookieParserTestCase, SecondCookieTest)
 	ASSERT_TRUE(this->parsedMap.find(SECOND_COOKIE_EXPECTED_KEY) != this->parsedMap.end());
 	ASSERT_EQ(this->parsedMap.at(SECOND_COOKIE_EXPECTED_KEY), SECOND_COOKIE_EXPECTED_VALUE);
 }
-
-__UNIT_TESTS_END__

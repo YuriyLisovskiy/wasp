@@ -15,16 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WASP_UNIT_TESTS_CORE_TESTS_EXCEPTIONS_TESTS_DICT_ERROR_TESTS_H
-#define WASP_UNIT_TESTS_CORE_TESTS_EXCEPTIONS_TESTS_DICT_ERROR_TESTS_H
-
 #include <gtest/gtest.h>
 
-#include "../../_def_.h"
 #include "../../../../src/core/exceptions.h"
 
+using namespace wasp;
 
-__UNIT_TESTS_BEGIN__
 
 class DictErrorTestCase : public ::testing::Test
 {
@@ -67,8 +63,3 @@ TEST_F(DictErrorTestCase, TestFile)
 	ASSERT_EQ(this->ConstCharConstructorError.file(), this->ErrorFile);
 	ASSERT_EQ(this->StringConstructorError.file(), this->ErrorFile);
 }
-
-__UNIT_TESTS_END__
-
-
-#endif // WASP_UNIT_TESTS_CORE_TESTS_EXCEPTIONS_TESTS_DICT_ERROR_TESTS_H
