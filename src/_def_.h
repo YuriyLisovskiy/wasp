@@ -29,4 +29,4 @@
 
 
 /// Required parameters for Wasp's built-in logger.
-#define _ERROR_DETAILS_ __LINE__, __FUNCTION__, __FILE__
+#define _ERROR_DETAILS_ __LINE__, __PRETTY_FUNCTION__, __FILE__
