@@ -28,22 +28,14 @@
 #include <ctime>
 #include <iostream>
 #include <string>
+#include <functional>
+#include <tuple>
 
 // Module definitions.
 #include "./_def_.h"
 
 // Framework modules.
 // TODO:
-
-
-__DATETIME_BEGIN__
-
-enum time_spec
-{
-	AUTO, HOURS, MINUTES, SECONDS, MILLISECONDS, MICROSECONDS
-};
-
-__DATETIME_END__
 
 
 __DATETIME_INTERNAL_BEGIN__
@@ -57,8 +49,31 @@ void __M_Assert(const char* expr_str, bool expr, const char* function, int line,
 	}
 }
 
+__DATETIME_INTERNAL_END__
+
+
+__DATETIME_BEGIN__
+
+enum time_spec
+{
+	AUTO, HOURS, MINUTES, SECONDS, MILLISECONDS, MICROSECONDS
+};
+
+#ifndef ushort
+typedef unsigned short int ushort;
+#endif
+
+#ifndef uint
+typedef unsigned int uint;
+#endif
+
 #define m_assert(_expr, _msg) \
-	__M_Assert(#_expr, _expr, __PRETTY_FUNCTION__, __LINE__, _msg)
+	internal::__M_Assert(#_expr, _expr, __PRETTY_FUNCTION__, __LINE__, _msg)
+
+__DATETIME_END__
+
+
+__DATETIME_INTERNAL_BEGIN__
 
 template <typename _T>
 signed char _cmp(_T left, _T right)
@@ -146,7 +161,7 @@ extern tm _build_struct_time(
 
 // Prepends 'c' 'w'-times and appends 'num' as std::string;
 // if 'num' string is longer than 'w', returns 'num' as std::string.
-extern std::string _lf(int num, int w = 2, char c = '0');
+extern std::string _lf(long long  num, int w = 2, char c = '0');
 
 extern std::string _format_time(
 	ushort hh, ushort mm, ushort ss, uint us, time_spec ts = time_spec::AUTO
@@ -154,9 +169,6 @@ extern std::string _format_time(
 
 // TODO:
 //  std::string _format_offset();
-
-// TODO:
-//  _wrap_strftime(object, format, timetuple);
 
 // Helpers for parsing the result of isoformat()
 extern ymd _parse_isoformat_date(const std::string& dt_str);
@@ -179,24 +191,12 @@ extern void _check_time_fields(
 //
 // When the ratio is exactly half-way between two integers,
 // the even integer is returned.
-extern int _divide_and_round(double a, double b);
+extern long long int _divide_and_round(long long int a, long long int b);
 
 __DATETIME_INTERNAL_END__
 
 
 __DATETIME_BEGIN__
-
-#ifndef ushort
-typedef unsigned short int ushort;
-#endif
-
-#ifndef uint
-typedef unsigned int uint;
-#endif
-
-#ifndef ullint
-typedef unsigned long long int ullint;
-#endif
 
 const ushort MIN_YEAR = 1;
 const ushort MAX_YEAR = 9999;
@@ -218,30 +218,220 @@ const ushort MAX_YEAR = 9999;
 class Timedelta final
 {
 private:
-	uint _days;
-	uint _seconds;
-	uint _microseconds;
-	uint _hashcode;
+	long long int _days;
+	long long int _seconds;
+	long long int _microseconds;
 
 private:
-	[[nodiscard]] std::string _plural(uint n) const;
+	[[nodiscard]] std::string _plural(long long int n) const;
+	[[nodiscard]] uint _to_microseconds() const;
+	[[nodiscard]] signed char _cmp(const Timedelta& other) const;
+
+public:
+	static const Timedelta MIN;
+	static const Timedelta MAX;
+	static const Timedelta RESOLUTION;
 
 public:
 	explicit Timedelta(
-		uint days = 0, ullint seconds = 0, ullint microseconds = 0,
-		ullint milliseconds = 0, uint minutes = 0, uint hours = 0, uint weeks = 0
+		long long int days = 0, long long int seconds = 0,
+		long long int microseconds = 0, long long int milliseconds = 0,
+		long long int minutes = 0, long long int hours = 0,
+		long long int weeks = 0
 	);
 	[[nodiscard]] std::string str() const;
 
 	// Total seconds in the duration.
-	[[nodiscard]] ullint total_seconds() const;
+	[[nodiscard]] long long int total_seconds() const;
 
 	// Read-only field accessors.
-	[[nodiscard]] uint days() const;
-	[[nodiscard]] uint seconds() const;
-	[[nodiscard]] uint microseconds() const;
+	[[nodiscard]] long long int days() const;
+	[[nodiscard]] long long int seconds() const;
+	[[nodiscard]] long long int microseconds() const;
 
-	// TODO: impl arithmetic and conditional ops
+	Timedelta operator + (const Timedelta & other) const;
+	Timedelta operator - (const Timedelta & other) const;
+	Timedelta operator - () const;
+	[[nodiscard]] Timedelta abs() const;
+	Timedelta operator * (const Timedelta & other) const;
+	uint operator / (const Timedelta& other) const;
+	Timedelta operator / (const long long int& other) const;
+	Timedelta operator % (const Timedelta& other) const;
+
+	bool operator == (const Timedelta& other) const;
+	bool operator != (const Timedelta& other) const;
+	bool operator <= (const Timedelta& other) const;
+	bool operator < (const Timedelta& other) const;
+	bool operator >= (const Timedelta& other) const;
+	bool operator > (const Timedelta& other) const;
+
+	explicit operator bool () const;
+};
+
+// Concrete date type.
+//
+// Constructors:
+//
+//  Date()
+//  from_timestamp()
+//  today()
+//  from_ordinal()
+//
+// Operators:
+//
+//  ==, <=, <, >=, >, +, -
+//
+// Methods:
+//
+//  str()
+//  timetuple()
+//  to_ordinal()
+//  weekday()
+//  iso_weekday(), iso_calendar(), iso_format()
+//  ctime()
+//  strftime()
+//
+// Readonly fields' getters:
+//  year(), month(), day()
+class Date final
+{
+private:
+	ushort _year;
+	ushort _month;
+	ushort _day;
+
+private:
+	[[nodiscard]] signed char _cmp(const Date& other) const;
+
+public:
+	static const Date MIN;
+	static const Date MAX;
+	static const Timedelta RESOLUTION;
+
+public:
+	Date(ushort year, ushort month, ushort day);
+
+	// Construct a date from a POSIX timestamp (like time()).
+	static Date from_timestamp(time_t t);
+
+	// Construct a date from time().
+	static Date today();
+
+	// Construct a date from a proleptic Gregorian ordinal.
+	//
+	// January 1 of year 1 is day 1.  Only the year, month and day are
+	// non-zero in the result.
+	static Date from_ordinal(size_t n);
+
+	// Construct a date from the output of date.iso_format().
+	static Date from_iso_format(const std::string& date_str);
+
+	// Construct a date from the ISO year, week number and weekday.
+	//
+	// This is the inverse of the date.iso_calendar()
+	static Date from_iso_calendar(ushort year, ushort week, ushort day);
+
+	// XXX These shouldn't depend on time.localtime(), because that
+	// clips the usable dates to [1970 .. 2038).  At least ctime() is
+	// easily done without using strftime() -- that's better too because
+	// strftime("%c", ...) is locale specific.
+
+	// Return ctime() style string.
+	[[nodiscard]] std::string ctime() const;
+
+	// Format using strftime().
+	[[nodiscard]] std::string strftime(const std::string& fmt) const;
+
+	// Return the date formatted according to ISO.
+	//
+	// This is 'YYYY-MM-DD'.
+	//
+	// References:
+	//  - http://www.w3.org/TR/NOTE-datetime
+	//  - http://www.cl.cam.ac.uk/~mgk25/iso-time.html
+	[[nodiscard]] std::string iso_format() const;
+
+	[[nodiscard]] std::string str() const;
+
+	// Read-only field accessors.
+	[[nodiscard]] ushort year() const;
+	[[nodiscard]] ushort month() const;
+	[[nodiscard]] ushort day() const;
+
+	// Standard conversions, ==, !=, <=, <, >=, > and helpers.
+
+	// Return local time of struct tm type.
+	[[nodiscard]] tm time_tuple() const;
+
+	// Return proleptic Gregorian ordinal for the year, month and day.
+	//
+	// January 1 of year 1 is day 1.  Only the year, month and day values
+	// contribute to the result.
+	[[nodiscard]] size_t to_ordinal() const;
+
+	// Return a new date with new values for the specified fields.
+	[[nodiscard]] Date replace(
+		ushort year = 0, ushort month = 0, ushort day = 0
+	) const;
+
+	// Comparisons of date objects with other.
+	bool operator == (const Date& other) const;
+	bool operator != (const Date& other) const;
+	bool operator <= (const Date& other) const;
+	bool operator < (const Date& other) const;
+	bool operator >= (const Date& other) const;
+	bool operator > (const Date& other) const;
+
+	// Computations
+
+	// Add a date to a timedelta.
+	Date operator + (const Timedelta& other) const;
+
+	// Subtract two dates.
+	Timedelta operator - (const Date& other) const;
+
+	// Subtract a date and a timedelta.
+	Date operator - (const Timedelta& other) const;
+
+	// Return day of the week, where Monday == 0 ... Sunday == 6.
+	[[nodiscard]] short int weekday() const;
+
+	// Day-of-the-week and week-of-the-year, according to ISO
+
+	// Return day of the week, where Monday == 1 ... Sunday == 7.
+	[[nodiscard]] short int iso_weekday() const;
+
+	// Return a 3-tuple containing ISO year, week number, and weekday.
+	//
+	// The first ISO week of the year is the (Mon-Sun) week
+	// containing the year's first Thursday; everything else derives
+	// from that.
+	//
+	// The first week is 1; Monday is 1 ... Sunday is 7.
+	//
+	// ISO calendar algorithm taken from
+	// http://www.phys.uu.nl/~vgent/calendar/isocalendar.htm
+	// (used with permission)
+	[[nodiscard]] std::tuple<ushort, ushort, ushort> iso_calendar() const;
 };
 
 __DATETIME_END__
+
+
+__DATETIME_INTERNAL_BEGIN__
+
+extern void _replace(
+	std::string& src, const std::string& old, const std::string& new_
+);
+
+extern std::string _wrap_strftime(
+	const std::string& format, const tm& time_tuple,
+	const std::function<long long int()>& microsecond = nullptr,
+	const std::function<Timedelta()>& utc_offset = nullptr,
+	const std::function<std::string()>& tz_name = nullptr
+);
+
+// Helper to calculate the day number of the Monday starting week 1
+extern size_t _iso_week1monday(ushort year);
+
+__DATETIME_INTERNAL_END__
