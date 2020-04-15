@@ -402,7 +402,7 @@ void StartServerCommand::log_request(
 
 		settings->LOGGER->print(str::format(
 			"[{0!s}] \"{1!s}\" {2!d}",
-			dt::now().strftime("%d/%b/%Y %T").c_str(),
+			dt::Datetime::now().strftime("%d/%b/%Y %T").c_str(),
 			info.c_str(),
 			status_code
 		), color);

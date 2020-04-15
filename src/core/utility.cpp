@@ -22,9 +22,13 @@
 // C++ libraries.
 #include <cxxabi.h>
 #include <memory>
+#include <cassert>
 
 // Header.
 #include "./utility.h"
+
+// Framework libraries.
+#include "./datetime.h"
 
 __UTILITY_BEGIN__
 
@@ -44,4 +48,81 @@ std::string demangle(const char* name)
 	return status == 0 ? res.get() : name;
 }
 
+std::string format_datetime(
+	const dt::Datetime* dt, bool use_gmt
+)
+{
+	assert(dt != nullptr);
+	auto now = dt->time_tuple();
+	std::string zone;
+	if (use_gmt)
+	{
+		if (!dt->tz_info() || *dt->tz_info() != dt::Timezone::UTC)
+		{
+			throw std::invalid_argument("use_gmt option requires a UTC datetime");
+		}
+
+		zone = "GMT";
+	}
+	else if (!dt->tz_info())
+	{
+		zone = "-0000";
+	}
+	else
+	{
+		zone = dt->strftime("%z");
+	}
+
+	return internal::_format_timetuple_and_zone(&now, zone);
+}
+
+std::string format_date(
+	time_t time_val, bool local_time, bool use_gmt
+)
+{
+	// Note: we cannot use strftime() because that honors the locale and RFC
+	// 2822 requires that day and month names be the English abbreviations.
+	if (!time_val)
+	{
+		time_val = dt::internal::_time();
+	}
+
+	std::shared_ptr<dt::Datetime> dt;
+	if (local_time || use_gmt)
+	{
+		dt = std::make_shared<dt::Datetime>(
+			dt::Datetime::from_timestamp(
+				time_val, std::make_shared<dt::Timezone>(dt::Timezone::UTC)
+			)
+		);
+	}
+	else
+	{
+		dt = std::make_shared<dt::Datetime>(
+			dt::Datetime::utc_from_timestamp(time_val)
+		);
+	}
+
+	if (local_time)
+	{
+		*dt = dt->as_timezone();
+		use_gmt = false;
+	}
+
+	return format_datetime(dt.get(), use_gmt);
+}
+
 __UTILITY_END__
+
+
+__UTILITY_INTERNAL_BEGIN__
+
+std::string _format_timetuple_and_zone(
+	tm* tm_tuple, const std::string& zone
+)
+{
+	// TODO: std::string _format_timetuple_and_zone
+	return "";
+}
+
+__UTILITY_INTERNAL_END__

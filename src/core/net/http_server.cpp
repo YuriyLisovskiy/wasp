@@ -407,7 +407,7 @@ void HttpServer::_start_listener()
 
 void HttpServer::_serve_connection(const socket_t& client)
 {
-	dt::Measure<std::chrono::milliseconds> measure;
+	Measure<std::chrono::milliseconds> measure;
 	if (this->_verbose)
 	{
 		measure.start();

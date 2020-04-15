@@ -33,7 +33,7 @@
 #include "../core/regex.h"
 #include "../core/signing/signer.h"
 #include "../core/string/str.h"
-#include "../core/datetime/datetime.h"
+#include "../core/datetime.h"
 
 
 __HTTP_BEGIN__
@@ -41,8 +41,15 @@ __HTTP_BEGIN__
 /// Converts std::string datetime to utc epoch in seconds.
 extern size_t parse_http_datetime(const std::string& http_datetime);
 
-/// Converts utc epoch seconds to std::string datetime.
-extern std::string format_http_datetime(size_t epoch_seconds);
+/// Format the time to match the RFC1123 date format as specified by HTTP
+/// RFC7231 section 7.1.1.1.
+///
+/// `epoch_seconds` is a floating point number expressed in seconds since the
+/// epoch, in UTC - such as that outputted by dt::internal::_time().
+/// If set to None, it defaults to the current time.
+///
+/// Output a string in the format 'Wdy, DD Mon YYYY HH:MM:SS GMT'.
+extern std::string http_date(size_t epoch_seconds);
 
 /// Writes domain and port from a given host.
 ///

@@ -16,7 +16,7 @@
  */
 
 /**
- * core/datetime/dt.h
+ * core/datetime.h
  *
  * Purpose:
  *  C++ implementation of Python's datetime utilities.
@@ -32,7 +32,6 @@
 
 // C++ libraries.
 #include <ctime>
-#include <iostream>
 #include <string>
 #include <functional>
 #include <tuple>
@@ -44,14 +43,11 @@
 
 __DATETIME_INTERNAL_BEGIN__
 
-void __M_Assert(const char* expr_str, bool expr, const char* function, int /* line */, const char* msg)
-{
-	if (!expr)
-	{
-		std::cerr << function << ": assertion failed: '"  << expr_str << "'\n\t" << msg << "\n";
-		abort();
-	}
-}
+extern void __M_Assert(
+	const char* expr_str,
+	bool expr, const char* function,
+	int /* line */, const char* msg
+);
 
 __DATETIME_INTERNAL_END__
 
@@ -125,7 +121,7 @@ const signed char _DAYS_IN_MONTH[_MONTHS_COUNT + 1] = {
 	-1, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
 };
 
-short int _DAYS_BEFORE_MONTH[_MONTHS_COUNT + 1] = {
+const short int _DAYS_BEFORE_MONTH[_MONTHS_COUNT + 1] = {
 	-1,             // a placeholder for indexing purposes
 	0,              // Jan
 	31,             // Feb

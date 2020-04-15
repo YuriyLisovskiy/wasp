@@ -17,73 +17,15 @@
 
 #include <gtest/gtest.h>
 
-#include "../../../../src/core/datetime/datetime.h"
+#include "../../../../src/core/datetime.h"
 
 using namespace wasp;
 
 
-TEST(TzTestCase, BothDirectionAssertTest)
-{
-	using core::dt::internal::OFFSET_TO_TZ_ABBR;
-	using core::dt::internal::TZ_ABBR_TO_OFFSET;
-
-	ASSERT_EQ(OFFSET_TO_TZ_ABBR.size(), TZ_ABBR_TO_OFFSET.size());
-
-	auto it1 = OFFSET_TO_TZ_ABBR.begin();
-	auto it2 = TZ_ABBR_TO_OFFSET.begin();
-	while (it1 != OFFSET_TO_TZ_ABBR.end())
-	{
-		ASSERT_TRUE(OFFSET_TO_TZ_ABBR.contains(it2->second));
-		ASSERT_TRUE(TZ_ABBR_TO_OFFSET.contains(it1->second));
-		it1++;
-		it2++;
-	}
-}
-
-TEST(DateTimeTestCase, StrptimeTzAbbreviationsTest)
-{
-	using core::dt::internal::OFFSET_TO_TZ_ABBR;
-	for (auto it = OFFSET_TO_TZ_ABBR.begin(); it != OFFSET_TO_TZ_ABBR.end(); it++)
-	{
-		std::string str_dt("Fri, 15 Nov 2019 12:45:26 " + it->second);
-		auto dt = core::dt::DateTime::strptime(str_dt.c_str(), "%a, %e %b %Y %T %Z");
-		ASSERT_EQ(dt.date().day_of_month(), 15);
-		ASSERT_EQ(dt.date().day_of_week(), 5);
-		ASSERT_EQ(dt.date().month(), 11);
-		ASSERT_EQ(dt.date().year(), 2019);
-		ASSERT_EQ(dt.time().hour(), 12);
-		ASSERT_EQ(dt.time().minute(), 45);
-		ASSERT_EQ(dt.time().second(), 26);
-		ASSERT_EQ(dt.tz().abbr(), it->second);
-		ASSERT_EQ(dt.tz().name(), it->second);
-		ASSERT_EQ(dt.tz().str_offset(), it->first);
-	}
-}
-
-TEST(DateTimeTestCase, StrptimeTzHourMinTest)
-{
-	using core::dt::internal::OFFSET_TO_TZ_ABBR;
-	for (auto it = OFFSET_TO_TZ_ABBR.begin(); it != OFFSET_TO_TZ_ABBR.end(); it++)
-	{
-		std::string str_dt("Fri, 15 Nov 2019 12:45:26 " + it->first);
-		auto dt = core::dt::DateTime::strptime(str_dt.c_str(), "%a, %e %b %Y %T %z");
-		ASSERT_EQ(dt.date().day_of_month(), 15);
-		ASSERT_EQ(dt.date().day_of_week(), 5);
-		ASSERT_EQ(dt.date().month(), 11);
-		ASSERT_EQ(dt.date().year(), 2019);
-		ASSERT_EQ(dt.time().hour(), 12);
-		ASSERT_EQ(dt.time().minute(), 45);
-		ASSERT_EQ(dt.time().second(), 26);
-		ASSERT_EQ(dt.tz().abbr(), it->second);
-		ASSERT_EQ(dt.tz().name(), it->second);
-		ASSERT_EQ(dt.tz().str_offset(), it->first);
-	}
-}
-
 TEST(DateTimeTestCase, StrftimeTest)
 {
-	const char* str_dt = "Fri, 15 Nov 2019 12:45:26 EET";
-	auto dt = core::dt::DateTime::strptime(str_dt, "%a, %e %b %Y %T %Z");
+	const char* str_dt = "Fri, 15 Nov 2019 12:45:26 GMT";
+	auto dt = core::dt::Datetime::strptime(str_dt, "%a, %e %b %Y %T %Z");
 	auto strf_time = dt.strftime("%a, %e %b %Y %T %Z");
 	ASSERT_EQ(str_dt, strf_time);
 }
@@ -91,23 +33,23 @@ TEST(DateTimeTestCase, StrftimeTest)
 TEST(DateTimeTestCase, TimestampTest)
 {
 	const char* str_dt = "Fri, 15 Nov 2019 12:45:26 GMT";
-	auto dt = core::dt::DateTime::strptime(str_dt, "%a, %e %b %Y %T %Z");
+	auto dt = core::dt::Datetime::strptime(str_dt, "%a, %e %b %Y %T %Z");
 	long expected = 1573821926;
 	ASSERT_EQ(expected, dt.timestamp());
 
 	str_dt = "Fri, 15 Nov 2019 12:45:26 EET";
-	dt = core::dt::DateTime::strptime(str_dt, "%a, %e %b %Y %T %Z");
+	dt = core::dt::Datetime::strptime(str_dt, "%a, %e %b %Y %T %Z");
 	ASSERT_EQ(expected, dt.timestamp());
 
 	str_dt = "Fri, 15 Nov 2019 12:45:26 Y";
-	dt = core::dt::DateTime::strptime(str_dt, "%a, %e %b %Y %T %Z");
+	dt = core::dt::Datetime::strptime(str_dt, "%a, %e %b %Y %T %Z");
 	ASSERT_EQ(expected, dt.timestamp());
 
 	str_dt = "Fri, 15 Nov 2019 12:45:26 AFT";
-	dt = core::dt::DateTime::strptime(str_dt, "%a, %e %b %Y %T %Z");
+	dt = core::dt::Datetime::strptime(str_dt, "%a, %e %b %Y %T %Z");
 	ASSERT_EQ(expected, dt.timestamp());
 
 	str_dt = "Fri, 15 Nov 2019 12:45:26 IRST";
-	dt = core::dt::DateTime::strptime(str_dt, "%a, %e %b %Y %T %Z");
+	dt = core::dt::Datetime::strptime(str_dt, "%a, %e %b %Y %T %Z");
 	ASSERT_EQ(expected, dt.timestamp());
 }

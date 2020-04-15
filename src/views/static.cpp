@@ -96,7 +96,7 @@ std::unique_ptr<http::IHttpResponse> StaticView::get(http::HttpRequest* request,
 	);
 	response->set_header(
 		http::LAST_MODIFIED,
-		http::format_http_datetime(stat_info.st_mtime)
+		http::http_date(stat_info.st_mtime)
 	);
 	if (!encoding.empty())
 	{

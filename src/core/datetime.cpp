@@ -20,15 +20,29 @@
  */
 
 // C++ libraries.
+#include <iostream>
 #include <cassert>
 #include <cmath>
 #include <chrono>
 
 // Header.
-#include "./dt.h"
+#include "./datetime.h"
 
 
 __DATETIME_INTERNAL_BEGIN__
+
+void __M_Assert(
+	const char* expr_str, bool expr,
+	const char* function, int /* line */,
+	const char* msg
+)
+{
+	if (!expr)
+	{
+		std::cerr << function << ": assertion failed: '"  << expr_str << "'\n\t" << msg << "\n";
+		abort();
+	}
+}
 
 bool _is_leap(ushort year)
 {
