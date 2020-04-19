@@ -19,37 +19,104 @@
 
 #include "../../../../src/core/datetime.h"
 
-using namespace wasp;
+using namespace wasp::core;
 
 
-TEST(DateTimeTestCase, StrftimeTest)
+TEST(DatetimeTestCase, StrftimeTest)
 {
-	const char* str_dt = "Fri, 15 Nov 2019 12:45:26 GMT";
-	auto dt = core::dt::Datetime::strptime(str_dt, "%a, %e %b %Y %T %Z");
+	const char* str_dt = "Fri, 15 Nov 2019 12:45:26 EET";
+	auto dt = dt::Datetime::strptime(str_dt, "%a, %e %b %Y %T %Z");
+	dt = dt.as_timezone(std::make_shared<dt::Timezone>(
+		dt::Timedelta(0, 0, 0 ,0 , 0, 2), "EET"
+	));
+
 	auto strf_time = dt.strftime("%a, %e %b %Y %T %Z");
 	ASSERT_EQ(str_dt, strf_time);
 }
 
-TEST(DateTimeTestCase, TimestampTest)
+TEST(DatetimeTestCase, TimestampTest)
 {
 	const char* str_dt = "Fri, 15 Nov 2019 12:45:26 GMT";
-	auto dt = core::dt::Datetime::strptime(str_dt, "%a, %e %b %Y %T %Z");
-	long expected = 1573821926;
+	auto dt = dt::Datetime::strptime(str_dt, "%a, %e %b %Y %T %Z");
+	double expected = 1573814726.0;
 	ASSERT_EQ(expected, dt.timestamp());
 
 	str_dt = "Fri, 15 Nov 2019 12:45:26 EET";
-	dt = core::dt::Datetime::strptime(str_dt, "%a, %e %b %Y %T %Z");
+	dt = dt::Datetime::strptime(str_dt, "%a, %e %b %Y %T %Z");
 	ASSERT_EQ(expected, dt.timestamp());
 
 	str_dt = "Fri, 15 Nov 2019 12:45:26 Y";
-	dt = core::dt::Datetime::strptime(str_dt, "%a, %e %b %Y %T %Z");
+	dt = dt::Datetime::strptime(str_dt, "%a, %e %b %Y %T %Z");
 	ASSERT_EQ(expected, dt.timestamp());
 
 	str_dt = "Fri, 15 Nov 2019 12:45:26 AFT";
-	dt = core::dt::Datetime::strptime(str_dt, "%a, %e %b %Y %T %Z");
+	dt = dt::Datetime::strptime(str_dt, "%a, %e %b %Y %T %Z");
 	ASSERT_EQ(expected, dt.timestamp());
 
 	str_dt = "Fri, 15 Nov 2019 12:45:26 IRST";
-	dt = core::dt::Datetime::strptime(str_dt, "%a, %e %b %Y %T %Z");
+	dt = dt::Datetime::strptime(str_dt, "%a, %e %b %Y %T %Z");
 	ASSERT_EQ(expected, dt.timestamp());
+}
+
+TEST(ModuleTestCase, TestContacts)
+{
+	ASSERT_EQ(dt::MIN_YEAR, 1);
+	ASSERT_EQ(dt::MAX_YEAR, 9999);
+}
+
+TEST(ModuleTestCase, TestDivideAndRound)
+{
+	ASSERT_EQ(dt::internal::_divide_and_round(-10, -3), 3);
+	ASSERT_EQ(dt::internal::_divide_and_round(5, -2), -2);
+
+	// four cases: (2 signs of a) x (2 signs of b)
+	ASSERT_EQ(dt::internal::_divide_and_round(7, 3), 2);
+	ASSERT_EQ(dt::internal::_divide_and_round(-7, 3), -2);
+	ASSERT_EQ(dt::internal::_divide_and_round(7, -3), -2);
+	ASSERT_EQ(dt::internal::_divide_and_round(-7, -3), 2);
+
+	// ties to even - eight cases:
+	// (2 signs of a) x (2 signs of b) x (even / odd quotient)
+	ASSERT_EQ(dt::internal::_divide_and_round(10, 4), 2);
+	ASSERT_EQ(dt::internal::_divide_and_round(-10, 4), -2);
+	ASSERT_EQ(dt::internal::_divide_and_round(10, -4), -2);
+	ASSERT_EQ(dt::internal::_divide_and_round(-10, -4), 2);
+
+	ASSERT_EQ(dt::internal::_divide_and_round(6, 4), 2);
+	ASSERT_EQ(dt::internal::_divide_and_round(-6, 4), -2);
+	ASSERT_EQ(dt::internal::_divide_and_round(6, -4), -2);
+	ASSERT_EQ(dt::internal::_divide_and_round(-6, -4), 2);
+}
+
+class FixedOffset : public dt::Timezone
+{
+private:
+	dt::Timedelta _dst_offset;
+
+public:
+	FixedOffset(
+		int offset, const std::string& name, int dst_offset = 42
+	) : Timezone(dt::Timedelta(0, 0, 0, 0, offset), name)
+	{
+		this->_dst_offset = dt::Timedelta(0, 0, 0, 0, dst_offset);
+	}
+
+	std::shared_ptr<dt::Timedelta> dst(const dt::Datetime* dt) const override
+	{
+		return std::make_shared<dt::Timedelta>(this->_dst_offset);
+	}
+};
+
+TEST(TimezoneTestCase, NormalTest)
+{
+	auto fo = FixedOffset(3, "Three");
+
+	auto now = dt::Datetime::now();
+	ASSERT_EQ(*fo.utc_offset(&now), dt::Timedelta(0, 0, 0, 0, 3));
+	ASSERT_EQ(fo.tz_name(&now), std::string("Three"));
+	ASSERT_EQ(*fo.dst(&now), dt::Timedelta(0, 0, 0, 0, 42));
+
+	ASSERT_EQ(*fo.utc_offset(nullptr), dt::Timedelta(0, 0, 0, 0, 3));
+	ASSERT_EQ(fo.tz_name(nullptr), std::string("Three"));
+	ASSERT_EQ(*fo.dst(nullptr), dt::Timedelta(0, 0, 0, 0, 42));
 }

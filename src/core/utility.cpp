@@ -27,8 +27,6 @@
 // Header.
 #include "./utility.h"
 
-// Framework libraries.
-#include "./datetime.h"
 
 __UTILITY_BEGIN__
 
@@ -121,8 +119,14 @@ std::string _format_timetuple_and_zone(
 	tm* tm_tuple, const std::string& zone
 )
 {
-	// TODO: std::string _format_timetuple_and_zone
-	return "";
+	return dt::internal::_DAY_NAMES[((tm_tuple->tm_wday+6)%7)+1] + ", " +
+		dt::internal::_lf(tm_tuple->tm_mday) + " " +
+		dt::internal::_MONTH_NAMES[tm_tuple->tm_mon+1] + " " +
+		dt::internal::_lf(tm_tuple->tm_year, 4) + " " +
+		dt::internal::_lf(tm_tuple->tm_hour) + ":" +
+		dt::internal::_lf(tm_tuple->tm_min) + ":" +
+		dt::internal::_lf(tm_tuple->tm_sec) + " " +
+		zone;
 }
 
 __UTILITY_INTERNAL_END__

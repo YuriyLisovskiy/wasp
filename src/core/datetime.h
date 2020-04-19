@@ -43,7 +43,7 @@
 
 __DATETIME_INTERNAL_BEGIN__
 
-extern void __M_Assert(
+extern void _M_Assert(
 	const char* expr_str,
 	bool expr, const char* function,
 	int /* line */, const char* msg
@@ -68,27 +68,35 @@ typedef unsigned int uint;
 #endif
 
 #define m_assert(_expr, _msg) \
-	internal::__M_Assert(#_expr, _expr, __PRETTY_FUNCTION__, __LINE__, _msg)
+	internal::_M_Assert(#_expr, _expr, __PRETTY_FUNCTION__, __LINE__, _msg)
 
 __DATETIME_END__
 
 
 __DATETIME_INTERNAL_BEGIN__
 
-template <typename _T1, typename _T2>
-_T1 _mod(const _T1& a, const _T2& b)
+template <typename T1, typename T2>
+T1 _mod(const T1& a, const T2& b)
 {
 	return (b + (a % b)) % b;
 }
 
-template <typename _T1, typename _T2>
-std::pair<_T1, _T1> _div_mod(const _T1& a, const _T2& b)
+// !IMPORTANT! Use only integer as ResultT!
+template <typename T1, typename T2, typename ResultT>
+ResultT _true_div(T1 a, T2 b)
 {
-	return {a / b, _mod(a, b)};
+	ResultT r = a / b;
+	return r < 0 ? r - 1 : r;
 }
 
-template <typename _T>
-signed char _cmp(_T left, _T right)
+template <typename T1, typename T2>
+std::pair<T1, T1> _div_mod(const T1& a, const T2& b)
+{
+	return {_true_div<T1, T2, T1>(a, b), _mod(a, b)};
+}
+
+template <typename T>
+signed char _cmp(T left, T right)
 {
 	if (left == right)
 	{
@@ -98,8 +106,8 @@ signed char _cmp(_T left, _T right)
 	return left > right ? 1 : -1;
 }
 
-template <typename _T>
-signed char _cmp_arr(const _T* left, const _T* right, size_t n)
+template <typename T>
+signed char _cmp_arr(const T* left, const T* right, size_t n)
 {
 	for (size_t i = 0; i < n; i++)
 	{
@@ -186,6 +194,10 @@ extern tm _build_struct_time(
 	ushort y, ushort m, ushort d, ushort hh, ushort mm, ushort ss, int dst_flag
 );
 
+extern void _mk_tz_info(tm* tm_tuple, bool is_gmt = false);
+
+extern char* _strptime(const char* _s, const char* _fmt, tm* _tp);
+
 // Prepends 'c' 'w'-times and appends 'num' as std::string;
 // if 'num' string is longer than 'w', returns 'num' as std::string.
 extern std::string _lf(long long  num, int w = 2, char c = '0');
@@ -214,6 +226,9 @@ extern long long int _divide_and_round(long long int a, long long int b);
 
 extern time_t _time();
 
+extern tm* _localtime(const time_t* _timer);
+extern tm* _gmtime(const time_t* _timer);
+
 __DATETIME_INTERNAL_END__
 
 
@@ -239,13 +254,13 @@ const ushort MAX_YEAR = 9999;
 class Timedelta final
 {
 private:
-	long long int _days;
-	long long int _seconds;
-	long long int _microseconds;
+	long _days;
+	long _seconds;
+	long _microseconds;
 
 private:
-	[[nodiscard]] std::string _plural(long long int n) const;
-	[[nodiscard]] uint _to_microseconds() const;
+	[[nodiscard]] static std::string _plural(long n) ;
+	[[nodiscard]] long long int _to_microseconds() const;
 	[[nodiscard]] signed char _cmp(const Timedelta& other) const;
 
 public:
@@ -255,30 +270,30 @@ public:
 
 public:
 	explicit Timedelta(
-		long long int days = 0, long long int seconds = 0,
-		long long int microseconds = 0, long long int milliseconds = 0,
-		long long int minutes = 0, long long int hours = 0,
-		long long int weeks = 0
+		long days = 0, long seconds = 0,
+		long microseconds = 0, long milliseconds = 0,
+		long minutes = 0, long hours = 0,
+		long weeks = 0
 	);
 	[[nodiscard]] std::string str() const;
 
 	// Total seconds in the duration.
-	[[nodiscard]] long long int total_seconds() const;
+	[[nodiscard]] double total_seconds() const;
 
 	// Read-only field accessors.
-	[[nodiscard]] long long int days() const;
-	[[nodiscard]] long long int seconds() const;
-	[[nodiscard]] long long int microseconds() const;
+	[[nodiscard]] long days() const;
+	[[nodiscard]] long seconds() const;
+	[[nodiscard]] long microseconds() const;
 
 	Timedelta operator + (const Timedelta & other) const;
 	Timedelta operator - (const Timedelta & other) const;
 	Timedelta operator - () const;
 	[[nodiscard]] Timedelta abs() const;
-	Timedelta operator * (const int& other) const;
-	friend Timedelta operator * (int left, const Timedelta& right);
-	uint operator / (const Timedelta& other) const;
-	Timedelta operator / (const int& other) const;
-	friend Timedelta operator / (int left, const Timedelta& right);
+	Timedelta operator * (const long& other) const;
+	friend Timedelta operator * (long left, const Timedelta& right);
+	double operator / (const Timedelta& other) const;
+	Timedelta operator / (const long& other) const;
+	friend Timedelta operator / (long left, const Timedelta& right);
 	Timedelta operator % (const Timedelta& other) const;
 
 	Timedelta& operator = (const Timedelta& other);
@@ -378,7 +393,7 @@ public:
 	[[nodiscard]] virtual std::string ctime() const;
 
 	// Format using strftime().
-	[[nodiscard]] std::string strftime(const std::string& fmt) const;
+	[[nodiscard]] virtual std::string strftime(const std::string& fmt) const;
 
 	// Return the date formatted according to ISO.
 	//
@@ -453,7 +468,6 @@ public:
 	[[nodiscard]] std::tuple<ushort, ushort, ushort> iso_calendar() const;
 };
 
-class TzInfo;
 class Timezone;
 
 // Time with time zone.
@@ -477,7 +491,7 @@ private:
 	ushort _minute;
 	ushort _second;
 	uint _microsecond;
-	std::shared_ptr<TzInfo> _tz_info;
+	std::shared_ptr<Timezone> _tz_info;
 	ushort _fold;
 
 public:
@@ -501,6 +515,8 @@ public:
 		const std::shared_ptr<Timezone>& tz_info = nullptr,
 		ushort fold = 0
 	);
+
+	Time(const Time& other);
 
 	// Read-only field accessors
 
@@ -579,12 +595,14 @@ public:
 	[[nodiscard]] std::shared_ptr<Timedelta> dst() const;
 
 	// Return a new time with new values for the specified fields.
+	// If this_tz_info is true, then set current _tz_info, otherwise set tz
 	[[nodiscard]] Time replace(
 		short int hour = -1,
 		short int minute = -1,
 		short int second = -1,
 		int microsecond = -1,
-		bool tz_info = true,
+		bool this_tz_info = true,
+		const std::shared_ptr<Timezone>& tz = nullptr,
 		short int fold = -1
 	) const;
 };
@@ -633,6 +651,8 @@ public:
 		const std::shared_ptr<Timezone>& tz_info = nullptr,
 		ushort fold = 0
 	);
+
+	Datetime(const Datetime& other);
 
 	// Read-only field accessors.
 
@@ -696,10 +716,13 @@ public:
 	[[nodiscard]] Time time_tz() const;
 
 	// Return a new datetime with new values for the specified fields.
+	//
+	// If this_tz_info is true, then set current _tz_info, otherwise set tz
 	[[nodiscard]] Datetime replace(
 		ushort year = 0, ushort month = 0, ushort day = 0,
 		short int hour = -1, short int minute = -1, short int second = -1,
-		int microsecond = -1, bool tz_info = true, short int fold = -1
+		int microsecond = -1, bool this_tz_info = true,
+		const std::shared_ptr<Timezone>& tz = nullptr, short int fold = -1
 	) const;
 
 	[[nodiscard]] Datetime as_timezone(
@@ -730,6 +753,8 @@ public:
 
 	// Convert to string, for str().
 	[[nodiscard]] std::string str() const override;
+
+	[[nodiscard]] std::string strftime(const std::string& fmt) const override;
 
 	// string, format -> new datetime parsed from a string (like std::strptime()).
 	static Datetime strptime(const std::string& date_str, const char* format);
@@ -775,29 +800,7 @@ public:
 	Datetime operator - (const Timedelta& other) const;
 };
 
-// Abstract base class for time zone info classes.
-//
-// Subclasses must override the tz_name(), utc_offset() and dst() methods.
-class TzInfo
-{
-public:
-	// datetime -> string name of time zone.
-	[[nodiscard]] virtual std::string tz_name(const Datetime* dt) const = 0;
-
-	// datetime -> timedelta, positive for east of UTC, negative for west of UTC
-	[[nodiscard]] virtual std::shared_ptr<Timedelta> utc_offset(const Datetime* dt) const = 0;
-
-	// datetime -> DST offset as timedelta, positive for east of UTC.
-	//
-	// Return 0 if DST not in effect.  utcoffset() must include the DST
-	// offset.
-	[[nodiscard]] virtual std::shared_ptr<Timedelta> dst(const Datetime* dt) const = 0;
-
-	// datetime in UTC -> datetime in local time.
-	[[nodiscard]] virtual Datetime from_utc(Datetime dt) const;
-};
-
-class Timezone final : public TzInfo
+class Timezone
 {
 private:
 	std::shared_ptr<Timedelta> _offset;
@@ -832,26 +835,44 @@ public:
 		const std::string& name = ""
 	);
 
+	// Required for copying inherited timezone objects or
+	// converting them to std::shared_ptr<Timezone> with derived functionality.
+	//
+	// Sample:
+	//  [[nodiscard]] std::shared_ptr<Timezone> ptr_copy() const override
+	//  {
+	//      auto ptr = std::make_shared<TimezoneDerived>(*this);
+	//      return {ptr, static_cast<Timezone*>(ptr.get())};
+	//  }
+	virtual std::shared_ptr<Timezone> ptr_copy() const;
+
+	Timezone& operator = (const Timezone& other);
+
 	bool operator == (const Timezone& other) const;
 	bool operator != (const Timezone& other) const;
 
 	[[nodiscard]] std::string str() const;
 
 	// datetime -> timedelta, positive for east of UTC, negative for west of UTC
-	std::shared_ptr<Timedelta> utc_offset(const Datetime* dt) const final;
+	virtual std::shared_ptr<Timedelta> utc_offset(const Datetime* dt) const;
 
 	// datetime -> string name of time zone.
-	std::string tz_name(const Datetime* dt) const final;
+	virtual std::string tz_name(const Datetime* dt) const;
 
 	// datetime -> DST offset as timedelta, positive for east of UTC.
 	//
 	// Return 0 if DST not in effect.  utc_offset() must include the DST
 	// offset.
-	std::shared_ptr<Timedelta> dst(const Datetime* dt) const final;
+	virtual std::shared_ptr<Timedelta> dst(const Datetime* dt) const;
 
-	Datetime from_utc(const Datetime* dt) const;
+	/*
+	// datetime in UTC -> datetime in local time.
+	[[nodiscard]] virtual Datetime from_utc(Datetime dt) const;
+	*/
 
-	std::string _name_from_offset(const Timedelta* delta) const;
+	virtual Datetime from_utc(const Datetime* dt) const;
+
+	static std::string _name_from_offset(const Timedelta* delta) ;
 };
 
 __DATETIME_END__

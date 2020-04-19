@@ -16,7 +16,7 @@
  */
 
 /**
- * An implementation of dt.h
+ * An implementation of core/datetime.h
  */
 
 // C++ libraries.
@@ -24,6 +24,8 @@
 #include <cassert>
 #include <cmath>
 #include <chrono>
+#include <strings.h>
+#include <cstring>
 
 // Header.
 #include "./datetime.h"
@@ -31,7 +33,7 @@
 
 __DATETIME_INTERNAL_BEGIN__
 
-void __M_Assert(
+void _M_Assert(
 	const char* expr_str, bool expr,
 	const char* function, int /* line */,
 	const char* msg
@@ -163,16 +165,55 @@ tm _build_struct_time(
 )
 {
 	tm t{};
-	t.tm_year = y;
-	t.tm_mon = m;
+	t.tm_year = y - 1900;
+	t.tm_mon = m - 1;
 	t.tm_mday = d;
 	t.tm_hour = hh;
 	t.tm_min = mm;
 	t.tm_sec = ss;
-	t.tm_wday = internal::_mod((int)(_ymd2ord(y, m, d) + 6), 7);
-	t.tm_yday = (int)_days_before_month(y, m) + d;
+	t.tm_wday = (internal::_mod((int)(_ymd2ord(y, m, d) + 6), 7) + 1)%7;
+	t.tm_yday = ((int)_days_before_month(y, m) + d) - 1;
 	t.tm_isdst = dst_flag;
 	return t;
+}
+
+void _mk_tz_info(tm* tm_tuple, bool is_gmt)
+{
+	if (!tm_tuple)
+	{
+		return;
+	}
+
+	if (is_gmt)
+	{
+		tm_tuple->tm_gmtoff = 0;
+		tm_tuple->tm_zone = "GMT";
+		return;
+	}
+
+	const short buff_sz = 15;
+	char buffer[buff_sz];
+	::strftime(buffer, buff_sz, "%z|%Z", tm_tuple);
+	std::string s = buffer;
+
+	auto pos = s.find('|');
+	auto offset = std::string(s.substr(0, pos));
+	auto abbr = s.substr(pos + 1);
+
+	tm_tuple->tm_zone = abbr.c_str();
+
+	// `offset` is in ISO 8601 format: "±HHMM"
+	int h = std::stoi(offset.substr(0,3), nullptr, 10);
+	int m = std::stoi(offset.substr(3), nullptr, 10);
+
+	tm_tuple->tm_gmtoff = h*3600 + m*60;
+}
+
+char* _strptime(const char* _s, const char* _fmt, tm* _tp)
+{
+	auto res = ::strptime(_s, _fmt, _tp);
+	_tp->tm_year += 1900;
+	return res;
 }
 
 Datetime _strptime_datetime(
@@ -181,14 +222,15 @@ Datetime _strptime_datetime(
 )
 {
 	tm dt_tm{};
-	::strptime(datetime_str.c_str(), format, &dt_tm);
+	internal::_strptime(datetime_str.c_str(), format, &dt_tm);
+//	internal::_mk_tz_info(&dt_tm);
 
 	std::shared_ptr<Timezone> tz = nullptr;
-	if (dt_tm.tm_gmtoff)
+	if (dt_tm.tm_zone)
 	{
 		// !IMPROVEMENT! Calculate microseconds.
 		auto tz_delta = Timedelta(0, dt_tm.tm_gmtoff, 0);
-		if (dt_tm.tm_zone)
+		if (std::strlen(dt_tm.tm_zone) != 0)
 		{
 			tz = std::make_shared<Timezone>(tz_delta, dt_tm.tm_zone);
 		}
@@ -197,14 +239,10 @@ Datetime _strptime_datetime(
 			tz = std::make_shared<Timezone>(tz_delta);
 		}
 	}
-	else
-	{
-		tz = std::make_shared<Timezone>(Timezone::UTC);
-	}
 
 	// !IMPROVEMENT! Calculate microseconds.
 	return Datetime(
-		dt_tm.tm_year, dt_tm.tm_mon, dt_tm.tm_mday,
+		dt_tm.tm_year, dt_tm.tm_mon + 1, dt_tm.tm_mday,
 		dt_tm.tm_hour, dt_tm.tm_min, dt_tm.tm_sec, 0, tz
 	);
 }
@@ -534,7 +572,7 @@ long long int _divide_and_round(long long int a, long long int b)
 	// positive, 2 * r < b if b negative.
 	r *= 2;
 	auto greater_than_half = b > 0 ? r > b : r < b;
-	if (greater_than_half || (r == b && internal::_mod(q, 2) == 1))
+	if (greater_than_half || r == b && internal::_mod(q, 2) == 1)
 	{
 		q += 1;
 	}
@@ -544,9 +582,21 @@ long long int _divide_and_round(long long int a, long long int b)
 
 time_t _time()
 {
-	return std::chrono::duration_cast<std::chrono::milliseconds>(
-		std::chrono::system_clock::now().time_since_epoch()
-	).count();
+	return std::time(nullptr);
+}
+
+tm* _localtime(const time_t* _timer)
+{
+	auto t = ::localtime(_timer);
+	t->tm_year += 1900;
+	return t;
+}
+
+tm* _gmtime(const time_t* _timer)
+{
+	auto t = ::gmtime(_timer);
+	t->tm_year += 1900;
+	return t;
 }
 
 __DATETIME_INTERNAL_END__
@@ -554,24 +604,27 @@ __DATETIME_INTERNAL_END__
 
 __DATETIME_BEGIN__
 
-std::string Timedelta::_plural(long long int n) const
+std::string Timedelta::_plural(long n)
 {
 	return n != 1 ? "s" : "";
 }
 
-uint Timedelta::_to_microseconds() const
+long long int Timedelta::_to_microseconds() const
 {
-	return ((this->_days * (24 * 3600) + this->_seconds) * 1000000 + this->_microseconds);
+	return  ((this->_days * (24*3600) + this->_seconds) * 1000000 + this->_microseconds);
 }
 
 signed char Timedelta::_cmp(const Timedelta& other) const
 {
-	return internal::_cmp(this->_to_microseconds(), other._to_microseconds());
+	const short arr_sz = 3;
+	long long left[arr_sz] = {this->_days, this->_seconds, this->_microseconds};
+	long long right[arr_sz] = {other._days, other._seconds, other._microseconds};
+	return internal::_cmp_arr(left, right, arr_sz);
 }
 
 Timedelta::Timedelta(
-	long long int days, long long int seconds, long long int microseconds,
-	long long int milliseconds, long long int minutes, long long int hours, long long int weeks
+	long days, long seconds, long microseconds,
+	long milliseconds, long minutes, long hours, long weeks
 )
 {
 	long long int d = 0, s = 0, us = 0;
@@ -652,7 +705,7 @@ std::string Timedelta::str() const
 	auto s = std::to_string(hh) + ":" + internal::_lf(mm) + ":" + internal::_lf(ss);
 	if (this->_days != 0)
 	{
-		s = std::to_string(this->_days) + " day" + this->_plural(this->_days) + ", " + s;
+		s = std::to_string(this->_days) + " day" + Timedelta::_plural(this->_days) + ", " + s;
 	}
 
 	if (this->_microseconds != 0)
@@ -663,23 +716,23 @@ std::string Timedelta::str() const
 	return s;
 }
 
-long long int Timedelta::total_seconds() const
+double Timedelta::total_seconds() const
 {
-	long long power = std::pow(10, 6);
-	return ((this->_days * 86400 + this->_seconds) * power + this->_microseconds) / power;
+	auto power = std::pow(10, 6);
+	return ((this->_days * 86400.0 + this->_seconds) * power + this->_microseconds) / power;
 }
 
-long long int Timedelta::days() const
+long Timedelta::days() const
 {
 	return this->_days;
 }
 
-long long int Timedelta::seconds() const
+long Timedelta::seconds() const
 {
 	return this->_seconds;
 }
 
-long long int Timedelta::microseconds() const
+long Timedelta::microseconds() const
 {
 	return this->_microseconds;
 }
@@ -721,7 +774,7 @@ Timedelta Timedelta::abs() const
 	return *this;
 }
 
-Timedelta Timedelta::operator * (const int& other) const
+Timedelta Timedelta::operator * (const long& other) const
 {
 	return Timedelta(
 		this->_days * other,
@@ -730,7 +783,7 @@ Timedelta Timedelta::operator * (const int& other) const
 	);
 }
 
-Timedelta operator * (int left, const Timedelta& right)
+Timedelta operator * (long left, const Timedelta& right)
 {
 	return Timedelta(
 		right._days * left,
@@ -739,12 +792,12 @@ Timedelta operator * (int left, const Timedelta& right)
 	);
 }
 
-uint Timedelta::operator / (const Timedelta& other) const
+double Timedelta::operator / (const Timedelta& other) const
 {
-	return this->_to_microseconds() / other._to_microseconds();
+	return (double)this->_to_microseconds() / (double)other._to_microseconds();
 }
 
-Timedelta Timedelta::operator / (const int& other) const
+Timedelta Timedelta::operator / (const long& other) const
 {
 	return Timedelta(
 		0, 0,
@@ -752,7 +805,7 @@ Timedelta Timedelta::operator / (const int& other) const
 	);
 }
 
-Timedelta operator / (int left, const Timedelta& right)
+Timedelta operator / (long left, const Timedelta& right)
 {
 	return Timedelta(
 		0, 0,
@@ -859,8 +912,8 @@ Date::Date(ushort year, ushort month, ushort day)
 
 Date Date::from_timestamp(time_t t)
 {
-	auto lt = std::localtime(&t);
-	return Date(lt->tm_year, lt->tm_mon, lt->tm_mday);
+	auto lt = internal::_localtime(&t);
+	return Date(lt->tm_year, lt->tm_mon+1, lt->tm_mday);
 }
 
 Date Date::today()
@@ -1127,8 +1180,21 @@ Time::Time(
 	this->_minute = minute;
 	this->_second = second;
 	this->_microsecond = microsecond;
-	this->_tz_info = tz_info;
+	this->_tz_info = tz_info ? tz_info->ptr_copy() : nullptr;
 	this->_fold = fold;
+}
+
+Time::Time(const Time& other)
+{
+	if (this != &other)
+	{
+		this->_hour = other._hour;
+		this->_minute = other._minute;
+		this->_second = other._second;
+		this->_microsecond = other._microsecond;
+		this->_tz_info = other._tz_info ? other._tz_info->ptr_copy() : nullptr;
+		this->_fold = other._fold;
+	}
 }
 
 ushort Time::hour() const
@@ -1153,7 +1219,7 @@ uint Time::microsecond() const
 
 Timezone* Time::tz_info() const
 {
-	return (Timezone*)this->_tz_info.get();
+	return this->_tz_info.get();
 }
 
 ushort Time::fold() const
@@ -1193,11 +1259,11 @@ bool Time::operator > (const Time& other) const
 
 signed char Time::_cmp(const Time& other, bool allow_mixed) const
 {
-	TzInfo* my_tz = this->_tz_info.get();
-	TzInfo* ot_tz = other._tz_info.get();
+	auto* my_tz = this->_tz_info.get();
+	auto* ot_tz = other._tz_info.get();
 	std::shared_ptr<Timedelta> my_off, ot_off;
 	bool base_compare;
-	if (my_tz == ot_tz)
+	if ((!my_tz && !ot_tz) || (my_tz && ot_tz && *my_tz == *ot_tz))
 	{
 		base_compare = true;
 	}
@@ -1205,7 +1271,7 @@ signed char Time::_cmp(const Time& other, bool allow_mixed) const
 	{
 		my_off = this->utc_offset();
 		ot_off = other.utc_offset();
-		base_compare = *my_off == *ot_off;
+		base_compare = (!my_off && !ot_off) || (my_off && ot_off && *my_off == *ot_off);
 	}
 
 	if (base_compare)
@@ -1232,8 +1298,8 @@ signed char Time::_cmp(const Time& other, bool allow_mixed) const
 	auto ot_hh_mm = other._hour * 60 + other._minute - *ot_off / Timedelta(0, 0, 0, 0, 1);
 
 	const short arr_sz = 3;
-	uint left[arr_sz] = {my_hh_mm, this->_second, this->_microsecond};
-	uint right[arr_sz] = {ot_hh_mm, other._second, other._microsecond};
+	uint left[arr_sz] = {(uint)my_hh_mm, this->_second, this->_microsecond};
+	uint right[arr_sz] = {(uint)ot_hh_mm, other._second, other._microsecond};
 	return internal::_cmp_arr(left, right, arr_sz);
 }
 
@@ -1276,7 +1342,7 @@ std::string Time::strftime(const std::string& fmt) const
 	time.tm_hour = this->_hour;
 	time.tm_min = this->_minute;
 	time.tm_sec = this->_second;
-	time.tm_wday = 0;
+	time.tm_wday = 1;
 	time.tm_yday = 1;
 	time.tm_isdst = -1;
 
@@ -1326,11 +1392,11 @@ Time Time::replace(
 	short int minute,
 	short int second,
 	int microsecond,
-	bool tz_info,
+	bool this_tz_info,
+	const std::shared_ptr<Timezone>& tz,
 	short int fold
 ) const
 {
-	std::shared_ptr<Timezone> tz_info_;
 	if (hour < 0)
 	{
 		hour = this->_hour;
@@ -1351,9 +1417,14 @@ Time Time::replace(
 		microsecond = this->_microsecond;
 	}
 
-	if (tz_info)
+	std::shared_ptr<Timezone> tz_info_;
+	if (this_tz_info)
 	{
-		tz_info_ = std::make_shared<Timezone>(*(Timezone*)(this->_tz_info.get()));
+		tz_info_ = this->_tz_info ? this->_tz_info->ptr_copy() : nullptr;
+	}
+	else
+	{
+		tz_info_ = tz ? tz->ptr_copy() : nullptr;
 	}
 
 	if (fold < 0)
@@ -1391,21 +1462,21 @@ Datetime Datetime::_from_timestamp(
 	{
 		converter = [](double t) -> tm* {
 			time_t tt = t;
-			return std::gmtime(&tt);
+			return internal::_gmtime(&tt);
 		};
 	}
 	else
 	{
 		converter = [](double t) -> tm* {
 			time_t tt = t;
-			return std::localtime(&tt);
+			return internal::_localtime(&tt);
 		};
 	}
 
 	auto ct = converter(t);
 	ct->tm_sec = std::min(ct->tm_sec, 59);
 	auto result = Datetime(
-		ct->tm_year, ct->tm_mon, ct->tm_mday,
+		ct->tm_year, ct->tm_mon+1, ct->tm_mday,
 		ct->tm_hour, ct->tm_min, ct->tm_sec, us, tz
 	);
 	if (tz == nullptr)
@@ -1428,7 +1499,7 @@ Datetime Datetime::_from_timestamp(
 
 		ct = converter(t - max_fold_seconds);
 		auto probe1 = Datetime(
-			ct->tm_year, ct->tm_mon, ct->tm_mday,
+			ct->tm_year, ct->tm_mon+1, ct->tm_mday,
 			ct->tm_hour, ct->tm_min, ct->tm_sec, us, tz
 		);
 		auto trans = result - probe1 - Timedelta(0, (long long int)max_fold_seconds);
@@ -1436,7 +1507,7 @@ Datetime Datetime::_from_timestamp(
 		{
 			ct = converter(t + trans / Timedelta(0, 1));
 			auto probe2 = Datetime(
-				ct->tm_year, ct->tm_mon, ct->tm_mday,
+				ct->tm_year, ct->tm_mon+1, ct->tm_mday,
 				ct->tm_hour, ct->tm_min, ct->tm_sec, us, tz
 			);
 			if (probe2 == result)
@@ -1457,21 +1528,24 @@ time_t Datetime::_mk_time() const
 {
 	auto epoch = Datetime(1970, 1, 1);
 	auto max_fold_seconds = 24 * 3600;
-	auto t = (*this - epoch) / Timedelta(0, 1);
-	auto local = [epoch](time_t u) -> uint
+	time_t t = (*this - epoch) / Timedelta(0, 1);
+	auto local = [epoch](time_t u) -> double
 	{
-		auto tm_ = std::localtime(&u);
-		return (Datetime(
-			tm_->tm_year, tm_->tm_mon, tm_->tm_mday,
+		auto tm_ = internal::_localtime(&u);
+
+		auto sub = Datetime(
+			tm_->tm_year, tm_->tm_mon+1, tm_->tm_mday,
 			tm_->tm_hour, tm_->tm_min, tm_->tm_sec
-		) - epoch) / Timedelta(0, 1);
+		) - epoch;
+
+		return sub / Timedelta(0, 1);
 	};
 
 	// Our goal is to solve t = local(u) for u.
 	auto a = local(t) - t;
 	auto u1 = t - a;
 	auto t1 = local(u1);
-	uint b;
+	double b;
 	if (t1 == t)
 	{
 		// We found one solution, but it may not be the one we need.
@@ -1531,16 +1605,32 @@ time_t Datetime::_mk_time() const
 
 Timezone Datetime::_local_timezone() const
 {
-	auto ts = this->_tz_info == nullptr ? this->_mk_time() : (*this - internal::_EPOCH) / Timedelta(0, 1);
-	auto local_tm = std::localtime(&ts);
+	time_t ts;
+	if (!this->_tz_info)
+	{
+		ts = this->_mk_time();
+	}
+	else
+	{
+		ts = (*this - internal::_EPOCH) / Timedelta(0, 1);
+	}
+
+	auto local_tm = internal::_localtime(&ts);
 	auto local = Datetime(
-		local_tm->tm_year, local_tm->tm_mon, local_tm->tm_mday,
+		local_tm->tm_year, local_tm->tm_mon+1, local_tm->tm_mday,
 		local_tm->tm_hour, local_tm->tm_min, local_tm->tm_sec
 	);
+	if (!this->_tz_info)
+	{
+		internal::_mk_tz_info(local_tm);
+	}
 
 	// Extract TZ data
 	auto gmt_off = local_tm->tm_gmtoff;
-	auto zone = local_tm->tm_zone;
+
+	char buffer[10];
+	std::strcpy(buffer, local_tm->tm_zone);
+	std::string zone = buffer;
 	return Timezone(Timedelta(0, gmt_off), zone);
 }
 
@@ -1557,8 +1647,22 @@ Datetime::Datetime(
 	this->_minute = minute;
 	this->_second = second;
 	this->_microsecond = microsecond;
-	this->_tz_info = tz_info;
+	this->_tz_info = tz_info ? tz_info->ptr_copy() : nullptr;
 	this->_fold = fold;
+}
+
+Datetime::Datetime(const Datetime& other)
+ : Date(other._year, other._month, other._day)
+{
+	if (this != &other)
+	{
+		this->_hour = other._hour;
+		this->_minute = other._minute;
+		this->_second = other._second;
+		this->_microsecond = other._microsecond;
+		this->_tz_info = other._tz_info ? other._tz_info->ptr_copy() : nullptr;
+		this->_fold = other._fold;
+	}
 }
 
 ushort Datetime::hour() const
@@ -1583,7 +1687,7 @@ uint Datetime::microsecond() const
 
 Timezone* Datetime::tz_info() const
 {
-	return (Timezone*)this->_tz_info.get();
+	return this->_tz_info.get();
 }
 
 ushort Datetime::fold() const
@@ -1622,7 +1726,8 @@ Datetime Datetime::combine(
 	std::shared_ptr<Timezone> tz;
 	if (tz_info)
 	{
-		tz = std::make_shared<Timezone>(*time.tz_info());
+		auto tz_info_p = time.tz_info();
+		tz = tz_info_p ? tz_info_p->ptr_copy() : nullptr;
 	}
 
 	return Datetime(
@@ -1682,8 +1787,8 @@ double Datetime::timestamp() const
 {
 	if (this->_tz_info == nullptr)
 	{
-		auto s = this->_mk_time();
-		return s + this->_microsecond / 1e6;
+		double s = this->_mk_time();
+		return s + (double)this->_microsecond / 1e6;
 	}
 	else
 	{
@@ -1722,14 +1827,15 @@ Time Datetime::time_tz() const
 {
 	return Time(
 		this->_hour, this->_minute, this->_second, this->_microsecond,
-		std::make_shared<Timezone>(*this->_tz_info), this->_fold
+		this->_tz_info->ptr_copy(), this->_fold
 	);
 }
 
 Datetime Datetime::replace(
 	ushort year, ushort month, ushort day,
 	short int hour, short int minute, short int second,
-	int microsecond, bool tz_info, short int fold
+	int microsecond, bool this_tz_info,
+	const std::shared_ptr<Timezone>& tz, short int fold
 ) const
 {
 	if (year == 0)
@@ -1767,10 +1873,14 @@ Datetime Datetime::replace(
 		microsecond = this->_microsecond;
 	}
 
-	std::shared_ptr<Timezone> tz = nullptr;
-	if (tz_info)
+	std::shared_ptr<Timezone> time_zone = nullptr;
+	if (this_tz_info)
 	{
-		tz = std::make_shared<Timezone>(*this->_tz_info);
+		time_zone = this->_tz_info ? this->_tz_info->ptr_copy() : nullptr;
+	}
+	else
+	{
+		time_zone = tz ? tz->ptr_copy() : nullptr;
 	}
 
 	if (fold < 0)
@@ -1790,14 +1900,14 @@ Datetime Datetime::as_timezone(
 {
 	if (tz == nullptr)
 	{
-		tz = std::make_shared<Timezone>(this->_local_timezone());
+		tz = this->_local_timezone().ptr_copy();
 	}
 
 	auto my_tz = this->_tz_info;
 	std::shared_ptr<Timedelta> my_offset = nullptr;
-	if (my_tz == nullptr)
+	if (!my_tz)
 	{
-		my_tz = std::make_shared<Timezone>(this->_local_timezone());
+		my_tz = this->_local_timezone().ptr_copy();
 		my_offset = my_tz->utc_offset(this);
 	}
 	else
@@ -1805,20 +1915,28 @@ Datetime Datetime::as_timezone(
 		my_offset = my_tz->utc_offset(this);
 		if (my_offset == nullptr)
 		{
-			my_tz = std::make_shared<Timezone>(
-				this->replace(0, 0, 0, -1, -1, -1, -1, false)._local_timezone()
-			);
+			my_tz = this->replace(
+				0, 0, 0, -1, -1, -1, -1, false
+			)._local_timezone().ptr_copy();
 			my_offset = my_tz->utc_offset(this);
 		}
 	}
 
-	if (tz == my_tz)
+	if (*tz == *my_tz)
 	{
-		return *this;
+		auto new_dt = *this;
+		if (!this->_tz_info)
+		{
+			new_dt._tz_info = my_tz->ptr_copy();
+		}
+
+		return new_dt;
 	}
 
 	// Convert self to UTC, and attach the new time zone object.
-	auto utc = (*this - *my_offset).replace(0, 0, 0, -1, -1, -1, -1, true);
+	auto utc = (*this - *my_offset).replace(
+		0, 0, 0, -1, -1, -1, -1, false, tz
+	);
 
 	// Convert from UTC to tz's local time.
 	return tz->from_utc(&utc);
@@ -1863,6 +1981,17 @@ std::string Datetime::iso_format(char sep, time_spec ts) const
 std::string Datetime::str() const
 {
 	return this->iso_format(' ');
+}
+
+std::string Datetime::strftime(const std::string& fmt) const
+{
+	auto microsecond = [this]() -> long long { return this->microsecond(); };
+	auto utc_offset = [this]() -> std::shared_ptr<Timedelta> { return this->utc_offset(); };
+	auto tz_name = [this]() -> std::string { return this->tz_name(); };
+
+	return internal::_wrap_strftime(
+		fmt, this->time_tuple(), microsecond, utc_offset, tz_name
+	);
 }
 
 Datetime Datetime::strptime(const std::string& date_str, const char* format)
@@ -1936,11 +2065,11 @@ bool Datetime::operator > (const Datetime& other) const
 
 signed char Datetime::_cmp(const Datetime& other, bool allow_mixed) const
 {
-	TzInfo* my_tz = this->_tz_info.get();
-	TzInfo* ot_tz = other._tz_info.get();
+	auto* my_tz = this->_tz_info.get();
+	auto* ot_tz = other._tz_info.get();
 	std::shared_ptr<Timedelta> my_off, ot_off;
 	bool base_compare;
-	if (my_tz == ot_tz)
+	if ((!my_tz && !ot_tz) || (my_tz && ot_tz && *my_tz == *ot_tz))
 	{
 		base_compare = true;
 	}
@@ -1952,22 +2081,24 @@ signed char Datetime::_cmp(const Datetime& other, bool allow_mixed) const
 		// Assume that allow_mixed means that we are called from operator==
 		if (allow_mixed)
 		{
-			if (*my_off != *this->replace(
-				0, 0, 0, -1, -1, -1, -1, true, !this->fold()
-			).utc_offset())
+			auto this_rep_off = this->replace(
+				0, 0, 0, -1, -1, -1, -1, true, nullptr, !this->fold()
+			).utc_offset();
+			if ((!my_off && this_rep_off) || (my_off && !this_rep_off) || *my_off != *this_rep_off)
 			{
 				return 2;
 			}
 
-			if (*ot_off != *other.replace(
-				0, 0, 0, -1, -1, -1, -1, true, !this->fold()
-			).utc_offset())
+			auto ot_rep_off = other.replace(
+				0, 0, 0, -1, -1, -1, -1, true, nullptr, !this->fold()
+			).utc_offset();
+			if ((!ot_off && ot_rep_off) || (ot_off && !ot_rep_off) || *ot_off != *ot_rep_off)
 			{
 				return 2;
 			}
 		}
 
-		base_compare = *my_off == *ot_off;
+		base_compare = (!my_off && !ot_off) || (my_off && ot_off && *my_off == *ot_off);
 	}
 
 	if (base_compare)
@@ -2043,8 +2174,11 @@ Datetime& Datetime::operator = (const Datetime& other)
 		this->_minute = other._minute;
 		this->_second = other._second;
 		this->_microsecond = other._microsecond;
-		this->_tz_info = std::make_shared<Timezone>(*other._tz_info);
+		this->_tz_info = other._tz_info ? other._tz_info->ptr_copy() : nullptr;
 		this->_fold = other._fold;
+		this->_year = other._year;
+		this->_month = other._month;
+		this->_day = other._day;
 	}
 
 	return *this;
@@ -2074,14 +2208,17 @@ Timedelta Datetime::operator - (const Datetime& other) const
 		this->_microsecond - other._microsecond
 	);
 
-	if (this->_tz_info == other._tz_info)
+	if (
+		(!this->_tz_info && !other._tz_info) ||
+		(this->_tz_info && other._tz_info && *this->_tz_info == *other._tz_info)
+	)
 	{
 		return base;
 	}
 
 	auto my_off = this->utc_offset();
 	auto ot_off = other.utc_offset();
-	if (*my_off == *ot_off)
+	if ((!my_off && !ot_off) || (my_off && ot_off && *my_off == *ot_off))
 	{
 		return base;
 	}
@@ -2103,10 +2240,119 @@ const Datetime Datetime::MIN = Datetime(1, 1, 1);
 const Datetime Datetime::MAX = Datetime(9999, 12, 31, 23, 59, 59, 999999);
 const Timedelta Datetime::RESOLUTION = Timedelta(0, 0, 1);
 
-// TzInfo class definitions.
-Datetime TzInfo::from_utc(Datetime dt) const
+// Timezone class definitions.
+const std::string Timezone::_Omitted = "Omitted";
+
+const Timezone Timezone::UTC = Timezone::_create(Timedelta(0));
+const Timezone Timezone::MIN = Timezone::_create(-Timedelta(0, 0, 0, 0, 59, 23));
+const Timezone Timezone::MAX = Timezone::_create(Timedelta(0, 0, 0, 0, 59, 23));
+
+const Timedelta Timezone::_max_offset = Timedelta(0, 0, -1, 0, 0, 24);
+const Timedelta Timezone::_min_offset = -Timezone::_max_offset;
+
+Timezone::Timezone(const Timedelta& offset, const std::string& name)
 {
-	if (dt.tz_info() != this)
+	if (name == Timezone::_Omitted)
+	{
+		if (!offset)
+		{
+			this->operator=(Timezone::UTC);
+			return;
+		}
+		else
+		{
+			this->_name = "";
+		}
+	}
+	else if (name.empty())
+	{
+		throw std::invalid_argument("name can not be empty");
+	}
+
+	if (!(offset >= Timezone::_min_offset && offset <= Timezone::_max_offset))
+	{
+		throw std::invalid_argument(
+			"offset must be a timedelta strictly between"
+			"-timedelta(hours=24) and timedelta(hours=24)."
+		);
+	}
+
+	this->_offset = std::make_shared<Timedelta>(offset);
+	this->_name = name;
+}
+
+Timezone Timezone::_create(
+	const Timedelta& offset,
+	const std::string& name
+)
+{
+	Timezone self;
+	self._offset = std::make_shared<Timedelta>(offset);
+	self._name = name;
+	return self;
+}
+
+std::shared_ptr<Timezone> Timezone::ptr_copy() const
+{
+	return std::make_shared<Timezone>(*this);
+}
+
+Timezone& Timezone::operator = (const Timezone& other)
+{
+	if (this != &other)
+	{
+		this->_offset = other._offset ? std::make_shared<Timedelta>(*other._offset) : nullptr;
+		this->_name = other._name;
+	}
+
+	return *this;
+}
+
+bool Timezone::operator == (const Timezone& other) const
+{
+	return *this->_offset == *other._offset;
+}
+
+bool Timezone::operator != (const Timezone& other) const
+{
+	return *this->_offset != *other._offset;
+}
+
+std::string Timezone::str() const
+{
+	return this->tz_name(nullptr);
+}
+
+std::shared_ptr<Timedelta> Timezone::utc_offset(const Datetime*) const
+{
+	if (!this->_offset)
+	{
+		return nullptr;
+	}
+
+	return std::make_shared<Timedelta>(*this->_offset);
+}
+
+std::string Timezone::tz_name(const Datetime*) const
+{
+	if (this->_name.empty())
+	{
+		return Timezone::_name_from_offset(this->_offset.get());
+	}
+
+	return this->_name;
+}
+
+std::shared_ptr<Timedelta> Timezone::dst(const Datetime*) const
+{
+	return nullptr;
+}
+
+/*
+Datetime Timezone::from_utc(Datetime dt) const
+{
+	auto tzinfo = dt.tz_info();
+	if (!tzinfo || (*tzinfo != *this))
 	{
 		throw std::invalid_argument("dt.tz_info() is not this");
 	}
@@ -2140,99 +2386,14 @@ Datetime TzInfo::from_utc(Datetime dt) const
 
 	return dt + *dt_dst;
 }
-
-// Timezone class definitions.
-const std::string Timezone::_Omitted = "Omitted";
-
-const Timezone Timezone::UTC = Timezone::_create(Timedelta(0));
-const Timezone Timezone::MIN = Timezone::_create(-Timedelta(0, 0, 0, 0, 59, 23));
-const Timezone Timezone::MAX = Timezone::_create(Timedelta(0, 0, 0, 0, 59, 23));
-
-const Timedelta Timezone::_max_offset = Timedelta(0, 0, -1, 0, 0, 24);
-const Timedelta Timezone::_min_offset = -Timezone::_max_offset;
-
-Timezone::Timezone(const Timedelta& offset, const std::string& name)
-{
-	if (name == Timezone::_Omitted)
-	{
-		if (!offset)
-		{
-			this->operator=(Timezone::UTC);
-			return;
-		}
-		else
-		{
-			this->_name = "";
-		}
-	}
-	else if (this->_name.empty())
-	{
-		throw std::invalid_argument("name can not be empty");
-	}
-
-	if (!(offset >= Timezone::_min_offset && offset <= Timezone::_max_offset))
-	{
-		throw std::invalid_argument(
-			"offset must be a timedelta strictly between"
-			"-timedelta(hours=24) and timedelta(hours=24)."
-		);
-	}
-
-	this->_offset = std::make_shared<Timedelta>(offset);
-	this->_name = name;
-}
-
-Timezone Timezone::_create(
-	const Timedelta& offset,
-	const std::string& name
-)
-{
-	Timezone self;
-	self._offset = std::make_shared<Timedelta>(offset);
-	self._name = name;
-	return self;
-}
-
-bool Timezone::operator == (const Timezone& other) const
-{
-	return this->_offset == other._offset;
-}
-
-bool Timezone::operator != (const Timezone& other) const
-{
-	return this->_offset != other._offset;
-}
-
-std::string Timezone::str() const
-{
-	return this->tz_name(nullptr);
-}
-
-std::shared_ptr<Timedelta> Timezone::utc_offset(const Datetime*) const
-{
-	return std::make_shared<Timedelta>(*this->_offset);
-}
-
-std::string Timezone::tz_name(const Datetime*) const
-{
-	if (this->_name.empty())
-	{
-		return Timezone::_name_from_offset(this->_offset.get());
-	}
-
-	return this->_name;
-}
-
-std::shared_ptr<Timedelta> Timezone::dst(const Datetime*) const
-{
-	return nullptr;
-}
+*/
 
 Datetime Timezone::from_utc(const Datetime* dt) const
 {
 	if (dt)
 	{
-		if (dt->tz_info() != this)
+		auto tzinfo = dt->tz_info();
+		if (!tzinfo || (*tzinfo != *this))
 		{
 			throw std::invalid_argument("from_utc: dt.tz_info() is not this");
 		}
@@ -2243,7 +2404,7 @@ Datetime Timezone::from_utc(const Datetime* dt) const
 	throw std::invalid_argument("from_utc() argument must be instantiated");
 }
 
-std::string Timezone::_name_from_offset(const Timedelta* delta) const
+std::string Timezone::_name_from_offset(const Timedelta* delta)
 {
 	if (!delta)
 	{
@@ -2304,7 +2465,7 @@ void _check_utc_offset(
 	if (!(*offset > -Timedelta(1) && *offset < Timedelta(1)))
 	{
 		throw std::invalid_argument(
-			name + "()=" + offset->str() +
+			name + "() = " + offset->str() +
 			", must be strictly between -timedelta(hours=24) and timedelta(hours=24)"
 		);
 	}
@@ -2411,7 +2572,7 @@ hmsfz _parse_isoformat_time(const std::string& t_str)
 			tz_comps.ss == 0 && tz_comps.ff == 0
 		)
 		{
-			time_comps.tz = std::make_shared<Timezone>(Timezone::UTC);
+			time_comps.tz = Timezone::UTC.ptr_copy();
 		}
 		else
 		{
@@ -2419,7 +2580,7 @@ hmsfz _parse_isoformat_time(const std::string& t_str)
 			auto td = Timedelta(
 				0, tz_comps.ss, tz_comps.ff, 0, tz_comps.mm, tz_comps.hh
 			);
-			time_comps.tz = std::make_shared<Timezone>(Timezone(tz_sign * td));
+			time_comps.tz = Timezone(tz_sign * td).ptr_copy();
 		}
 	}
 

@@ -288,12 +288,17 @@ std::string replace(
 )
 {
 	std::string copy = src;
-	size_t old_sub_size = old_sub.size();
-	size_t pos = copy.find(old_sub);
-	while (pos != std::string::npos)
+	size_t index = 0;
+	while (true)
 	{
-		copy.replace(pos, old_sub_size, new_sub);
-		pos = copy.find(old_sub);
+		index = src.find(old_sub, index);
+		if (index == std::string::npos)
+		{
+			break;
+		}
+
+		copy.replace(index, old_sub.size(), new_sub);
+		index += new_sub.size();
 	}
 
 	return copy;
