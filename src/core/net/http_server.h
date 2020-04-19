@@ -42,7 +42,7 @@
 #include "../exceptions.h"
 #include "../thread_pool.h"
 #include "../files/uploaded_file.h"
-#include "../datetime/time.h"
+#include "../datetime.h"
 #include "../string/str.h"
 #include "../string/format.h"
 #include "../parsers/request_parser.h"
@@ -63,6 +63,44 @@ __NET_INTERNAL_BEGIN__
 #define MAX_HEADERS_SIZE 4096 * 38 + 403    // 156051 bytes.
 
 typedef std::function<void(http::HttpRequest*, const socket_t&)> http_handler;
+
+
+// TODO: temporary helper class Measure.
+template <typename _TimeT = std::chrono::milliseconds>
+class Measure
+{
+private:
+	std::chrono::high_resolution_clock::time_point _begin;
+	std::chrono::high_resolution_clock::time_point _end;
+
+public:
+	void start()
+	{
+		this->_begin = std::chrono::high_resolution_clock::now();
+	}
+
+	void end()
+	{
+		this->_end = std::chrono::high_resolution_clock::now();
+	}
+
+	double elapsed(bool reset = true)
+	{
+		auto result = std::chrono::duration_cast<_TimeT>(this->_end - this->_begin).count();
+		if (reset)
+		{
+			this->reset();
+		}
+
+		return result;
+	}
+
+	void reset()
+	{
+		this->_begin = {};
+		this->_end = {};
+	}
+};
 
 
 class HttpServer

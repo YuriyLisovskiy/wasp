@@ -30,6 +30,7 @@
 
 // Module definitions.
 #include "./_def_.h"
+#include "./datetime.h"
 
 
 __UTILITY_BEGIN__
@@ -63,4 +64,40 @@ long index_of(_IteratorT begin, _IteratorT end, const _ItemT& item)
 /// Converts typeid.name() to full name.
 extern std::string demangle(const char* name);
 
+// Turn a datetime into a date string as specified in RFC 2822.
+//
+// If usegmt is True, dt must be an aware datetime with an offset of zero.  In
+// this case 'GMT' will be rendered instead of the normal +0000 required by
+// RFC2822.  This is to support HTTP headers involving date stamps.
+extern std::string format_datetime(
+	const dt::Datetime* dt, bool use_gmt = false
+);
+
+// Returns a date string as specified by RFC 2822, e.g.:
+//
+// Fri, 09 Nov 2001 01:08:47 -0000
+//
+// Optional timeval if given is a floating point time value as accepted by
+// gmtime() and localtime(), otherwise the current time is used.
+//
+// Optional localtime is a flag that when True, interprets timeval, and
+// returns a date relative to the local timezone instead of UTC, properly
+// taking daylight savings time into account.
+//
+// Optional argument usegmt means that the timezone is written out as
+// an ascii string, not numeric one (so "GMT" instead of "+0000"). This
+// is needed for HTTP, and is only used when localtime==false.
+extern std::string format_date(
+	time_t time_val, bool local_time = false, bool use_gmt = false
+);
+
 __UTILITY_END__
+
+
+__UTILITY_INTERNAL_BEGIN__
+
+extern std::string _format_timetuple_and_zone(
+	tm* tm_tuple, const std::string& zone
+);
+
+__UTILITY_INTERNAL_END__

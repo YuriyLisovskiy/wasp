@@ -83,7 +83,7 @@ long parse_http_date(const std::string& date)
 	int year = std::stoi(match["year"]);
 	if (year < 100)
 	{
-		int current_year = core::dt::gmtnow().date().year();
+		int current_year = core::dt::Datetime::utc_now().date().year();
 		int current_century = current_year - (current_year % 100);
 		if (year - (current_year % 100) > 50)
 		{
@@ -107,8 +107,8 @@ long parse_http_date(const std::string& date)
 	int min = std::stoi(match["min"]);
 	int sec = std::stoi(match["sec"]);
 
-	auto date_time = core::dt::DateTime(year, month, day, hour, min, sec);
-	return date_time.timestamp();
+	auto date_time = core::dt::Datetime(year, month, day, hour, min, sec);
+	return (long)date_time.timestamp();
 }
 
 std::string quote_etag(const std::string& e_tag)

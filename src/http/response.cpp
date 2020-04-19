@@ -103,9 +103,22 @@ void HttpResponseBase::set_cookie(
 	const std::string& same_site
 )
 {
-	this->_cookies.set(name, Cookie(
-		name, value, max_age, expires, domain, path, is_secure, is_http_only, same_site
-	));
+	std::string same_site_;
+	if (!same_site.empty())
+	{
+		auto ss_lower = core::str::lower(same_site_);
+		if (ss_lower != "lax" && ss_lower != "strict")
+		{
+			throw core::ValueError(R"(samesite must be "lax" or "strict".)");
+		}
+
+		same_site_ = same_site;
+	}
+
+	auto cookie = Cookie(
+		name, value, max_age, expires, domain, path, is_secure, is_http_only, same_site_
+	);
+	this->_cookies.set(name, cookie);
 }
 
 void HttpResponseBase::set_signed_cookie(
@@ -320,11 +333,16 @@ void HttpResponse::write_lines(const std::vector<std::string>& lines)
 
 std::string HttpResponse::serialize()
 {
-	this->set_header("Date", core::dt::gmtnow().strftime("%a, %d %b %Y %T %Z"));
-	this->set_header("Content-Length", std::to_string(this->_content.size()));
+	this->set_header(
+		"Date",
+		core::dt::Datetime::utc_now().strftime("%a, %d %b %Y %T GMT")
+	);
+	this->set_header(
+		"Content-Length",
+		std::to_string(this->_content.size())
+	);
 
 	auto reason_phrase = this->get_reason_phrase();
-
 	auto headers = this->serialize_headers();
 
 	return "HTTP/1.1 " + std::to_string(this->_status) + " " + reason_phrase + "\r\n" +
@@ -366,7 +384,9 @@ FileResponse::FileResponse(
 {
 	if (!core::path::exists(this->_file_path))
 	{
-		throw core::FileDoesNotExistError("file '" + this->_file_path + "' does not exist", _ERROR_DETAILS_);
+		throw core::FileDoesNotExistError(
+			"file '" + this->_file_path + "' does not exist", _ERROR_DETAILS_
+		);
 	}
 
 	// Initializing file stream.
@@ -443,7 +463,10 @@ std::string FileResponse::_get_headers_chunk()
 {
 	auto reason_phrase = this->get_reason_phrase();
 	this->_set_headers();
-	this->set_header("Date", core::dt::gmtnow().strftime("%a, %d %b %Y %T %Z"));
+	this->set_header(
+		"Date",
+		core::dt::Datetime::utc_now().strftime("%a, %d %b %Y %T GMT")
+	);
 	auto headers = this->serialize_headers();
 
 	std::string headers_chunk = "HTTP/1.1 " + std::to_string(this->_status) + " " + reason_phrase + "\r\n"
