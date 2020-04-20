@@ -16,7 +16,7 @@
  */
 
 /**
- * An implementation of render/library/syntax/ignore.h
+ * An implementation of render/internal/syntax/ignore.h
  */
 
 #include "./ignore.h"

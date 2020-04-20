@@ -42,8 +42,7 @@ void Template::compile()
 		this->_engine->get_tags()
 	);
 
-	parser.parse();
-	this->_nodes = std::move(parser.nodes_list);
+	this->_nodes = std::move(parser.parse());
 }
 
 std::string Template::render(IContext* ctx)

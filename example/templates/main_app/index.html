@@ -5,7 +5,11 @@
     <title>Index</title>
 </head>
 <body>
-    <h2>Hello from main view!</h2>
+    {% if_equal(5, 4) %}
+        <h2>Hello from main view!</h2>
+    {% else %}
+        <h2>Hello, home!</h2>
+    {% end_if_equal %}
     <ul>
         {% ignore %}
             Some multiline comment

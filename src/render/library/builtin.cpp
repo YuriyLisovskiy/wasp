@@ -29,6 +29,7 @@
 #include "../internal/syntax/ignore.h"
 #include "../internal/syntax/static_tag.h"
 #include "../internal/syntax/url_tag.h"
+#include "../internal/syntax/if_equal_tag.h"
 
 
 __LIB_BEGIN__
@@ -63,7 +64,10 @@ std::shared_ptr<Tags> BuiltinLibrary::get_tags()
 		{syntax::TAG_NAME_MEDIA, syntax::make_static_tag("media", this->_settings->MEDIA_URL)},
 
 		// Example: {% url('app_namespace::profile', 256) -> profile_256 %}
-		{syntax::TAG_NAME_URL, syntax::make_url_tag(this->_settings->ROOT_URLCONF)}
+		{syntax::TAG_NAME_URL, syntax::make_url_tag(this->_settings->ROOT_URLCONF)},
+
+		{syntax::TAG_NAME_IF_EQUAL, syntax::make_if_equal_tag()},
+		{syntax::TAG_NAME_IF_NOT_EQUAL, syntax::make_if_not_equal_tag()}
 	});
 }
 

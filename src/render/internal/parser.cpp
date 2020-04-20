@@ -32,18 +32,18 @@ parser::parser(std::vector<token_t>& tokens, lib::Filters& filters, lib::Tags& t
 	this->tags = tags;
 }
 
-void parser::parse(
+std::shared_ptr<node_list> parser::parse(
 	const std::vector<std::string>& parse_until
 )
 {
-	this->nodes_list = std::make_unique<node_list>();
+	auto nodes_list = std::make_shared<node_list>();
 	while (!this->tokens.empty())
 	{
 		token_t token = this->next_token();
 		if (token.type == token_type::text)
 		{
 			auto t_node = std::shared_ptr<node>(new text_node(token.content));
-			parser::append_node(this->nodes_list, t_node, token);
+			parser::append_node(nodes_list, t_node, token);
 		}
 		else if (token.type == token_type::var)
 		{
@@ -58,7 +58,7 @@ void parser::parse(
 			{
 				auto filer_expr = this->compile_filter(token);
 				auto var_node = std::shared_ptr<node>(new variable_node(filer_expr));
-				parser::append_node(this->nodes_list, var_node, token);
+				parser::append_node(nodes_list, var_node, token);
 			}
 			catch (const core::BaseException& exc)
 			{
@@ -88,7 +88,7 @@ void parser::parse(
 				// the caller. Put the token back on the token list so the
 				// caller knows where it terminated.
 				this->prepend_token(token);
-				return;
+				return nodes_list;
 			}
 
 			// Add the token to the command stack. This is used for error
@@ -109,7 +109,7 @@ void parser::parse(
 				// Compile the callback into a node and add it to
 				// the node list.
 				auto compiled_node = compile_func(this, token);
-				parser::append_node(this->nodes_list, compiled_node, token);
+				parser::append_node(nodes_list, compiled_node, token);
 
 				// Compile success. Remove the token from the command stack.
 				this->command_stack.pop();
@@ -125,6 +125,8 @@ void parser::parse(
 	{
 		this->unclosed_block_tag(parse_until);
 	}
+
+	return nodes_list;
 }
 
 void parser::skip_past(const std::string& end_tag)
@@ -164,7 +166,7 @@ std::shared_ptr<FilterExpression> parser::compile_filter(token_t& t)
 }
 
 void parser::append_node(
-	std::unique_ptr<node_list>& list,
+	std::shared_ptr<node_list>& list,
 	std::shared_ptr<node>& nd,
 	const token_t& token
 )

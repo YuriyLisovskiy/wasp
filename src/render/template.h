@@ -52,7 +52,7 @@ protected:
 	std::string _template_code;
 	BaseEngine* _engine;
 
-	std::unique_ptr<internal::node_list> _nodes;
+	std::shared_ptr<internal::node_list> _nodes;
 
 	void compile();
 

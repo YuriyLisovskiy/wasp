@@ -16,7 +16,7 @@
  */
 
 /**
- * render/library/syntax/ignore.h
+ * render/internal/syntax/ignore.h
  *
  * Purpose:
  * Ignores everything between '{% ignore %}' and '{% end_ignore %}'.
