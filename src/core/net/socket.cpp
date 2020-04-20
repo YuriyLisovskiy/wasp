@@ -71,25 +71,14 @@ int Socket::bind()
 	return ::bind(this->_socket, (sockaddr*) &this->_ipv4_socket, sizeof(this->_ipv4_socket));
 }
 
-int Socket::listen()
+int Socket::listen() const
 {
 	return ::listen(this->_socket, SOMAXCONN);
 }
 
-socket_t Socket::accept()
+socket_t Socket::accept() const
 {
-	socket_t conn;
-	if (this->_use_ipv6)
-	{
-		socklen_t conn_len = sizeof(this->_ipv6_socket);
-		conn = ::accept(this->_socket, (sockaddr*) &this->_ipv6_socket, &conn_len);
-	}
-	else
-	{
-		socklen_t conn_len = sizeof(this->_ipv4_socket);
-		conn = ::accept(this->_socket, (sockaddr*) &this->_ipv4_socket, &conn_len);
-	}
-
+	socket_t conn = ::accept(this->_socket, nullptr, nullptr);
 	if (conn == INVALID_SOCKET)
 	{
 		throw SocketError("Invalid socket connection", _ERROR_DETAILS_);
@@ -98,7 +87,7 @@ socket_t Socket::accept()
 	return conn;
 }
 
-int Socket::close()
+int Socket::close() const
 {
 	if (this->_closed)
 	{
@@ -118,19 +107,19 @@ int Socket::close()
 	return -1;
 }
 
-int Socket::set_reuse_addr()
+int Socket::set_reuse_addr() const
 {
 	const int true_flag = 1;
 	return ::setsockopt(this->_socket, SOL_SOCKET, SO_REUSEADDR, &true_flag, sizeof(true_flag));
 }
 
-int Socket::set_reuse_port()
+int Socket::set_reuse_port() const
 {
 	const int true_flag = 1;
 	return ::setsockopt(this->_socket, SOL_SOCKET, SO_REUSEPORT, &true_flag, sizeof(true_flag));
 }
 
-bool Socket::set_blocking(bool blocking)
+bool Socket::set_blocking(bool blocking) const
 {
 	if (this->_closed)
 	{

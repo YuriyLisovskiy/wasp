@@ -164,7 +164,7 @@ void Logger::log(const std::string& msg, int line, const char* function, const c
 	}
 
 	std::string result = "[" + dt::Datetime::now().strftime("%F %T") +
-		"] " + level_name + ":" + full_msg + "\n";
+		"] " + level_name + ":" + full_msg;
 	this->write_to_stream(result, this->get_colour(colour));
 }
 

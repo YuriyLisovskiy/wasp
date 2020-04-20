@@ -52,7 +52,6 @@ struct parser
 	lib::Filters filters;
 	lib::Tags tags;
 	std::stack<std::pair<std::string, token_t>> command_stack;
-//	std::shared_ptr<node_list> nodes_list;
 
 	parser(
 		std::vector<token_t>& tokens,

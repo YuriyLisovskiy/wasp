@@ -50,12 +50,12 @@ public:
 
 	socket_t create(const char* host, uint16_t port, bool use_ipv6 = false);
 	int bind();
-	int listen();
-	socket_t accept();
-	int close();
-	int set_reuse_addr();
-	int set_reuse_port();
-	bool set_blocking(bool blocking);
+	[[nodiscard]] int listen() const;
+	[[nodiscard]] socket_t accept() const;
+	[[nodiscard]] int close() const;
+	[[nodiscard]] int set_reuse_addr() const;
+	[[nodiscard]] int set_reuse_port() const;
+	[[nodiscard]] bool set_blocking(bool blocking) const;
 
 private:
 	socket_t create_ipv4(const char* host, uint16_t port);

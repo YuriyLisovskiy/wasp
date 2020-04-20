@@ -38,6 +38,8 @@ HttpServer::HttpServer(HttpServer::context& ctx) : _finished(true)
 
 	this->_max_body_size = ctx.max_body_size;
 	this->_threads_count = ctx.threads_count;
+	this->_timeout_sec = ctx.timeout_sec;
+	this->_timeout_us = ctx.timeout_us;
 
 	// Default schema, https will be implemented in future.
 	this->_schema = "http";
@@ -57,6 +59,7 @@ HttpServer::~HttpServer()
 void HttpServer::finish()
 {
 	delete this->_thread_pool;
+	this->_thread_pool = nullptr;
 	if (this->_finished)
 	{
 		return;
@@ -242,11 +245,15 @@ void HttpServer::_clean_up(const socket_t& client)
 
 http::HttpRequest* HttpServer::_handle_request(const socket_t& client)
 {
+	if (!this->_wait_for_client(client))
+	{
+		return nullptr;
+	}
+
 	core::internal::request_parser rp;
 	std::string body_beginning;
 
 	auto headers_str = HttpServer::_read_headers(client, body_beginning);
-
 	rp.parse_headers(headers_str);
 	if (rp.headers.find(http::CONTENT_LENGTH) != rp.headers.end())
 	{
@@ -282,7 +289,7 @@ http::HttpRequest* HttpServer::_handle_request(const socket_t& client)
 
 std::string HttpServer::_read_body(
 	const socket_t& client, const std::string& body_beginning, size_t body_length
-)
+) const
 {
 	std::string data;
 	if (body_length <= 0)
@@ -296,7 +303,7 @@ std::string HttpServer::_read_body(
 		return body_beginning;
 	}
 
-	msg_size_t ret = 0;
+	msg_size_t ret;
 	size_t buff_size = MAX_BUFF_SIZE < body_length ? MAX_BUFF_SIZE : body_length;
 	char* buffer = (char*) calloc(buff_size, sizeof(char));
 	while (size < body_length)
@@ -336,9 +343,47 @@ std::string HttpServer::_read_body(
 	return data;
 }
 
+bool HttpServer::_wait_for_client(const socket_t& client) const
+{
+	struct timeval tv{};
+	tv.tv_sec = this->_timeout_sec;
+	tv.tv_usec = this->_timeout_us;
+	fd_set fds;
+	FD_ZERO(&fds);
+	FD_SET(client, &fds);
+	int ret = select(client + 1, &fds, nullptr, nullptr, &tv);
+	if (ret == -1)
+	{
+		if (this->_verbose)
+		{
+			this->_logger->error("select failed: " + std::string(strerror(errno)));
+		}
+	}
+	else if (ret == 0)
+	{
+		if (this->_verbose)
+		{
+			this->_logger->error("timeout waiting for client");
+		}
+	}
+	else if (!FD_ISSET(client, &fds))
+	{
+		if (this->_verbose)
+		{
+			this->_logger->error("file descriptor is not set");
+		}
+	}
+	else
+	{
+		return true;
+	}
+
+	return false;
+}
+
 std::string HttpServer::_read_headers(const socket_t& client, std::string& body_beginning)
 {
-	msg_size_t ret = 0;
+	msg_size_t ret;
 	unsigned long size = 0;
 	std::string data;
 	size_t headers_delimiter_pos = std::string::npos;
@@ -389,18 +434,26 @@ std::string HttpServer::_read_headers(const socket_t& client, std::string& body_
 
 void HttpServer::_start_listener()
 {
-	while (true)
+	bool running = true;
+	while (running)
 	{
-		socket_t connection = this->_socket.accept();
-		if (connection != INVALID_SOCKET)
+		try
 		{
-			this->_thread_pool->push(
-				[this, connection] { this->_thread_func(connection); }
-			);
+			socket_t connection = this->_socket.accept();
+			if (connection != INVALID_SOCKET)
+			{
+				this->_thread_pool->push(
+					[this, connection] { this->_thread_func(connection); }
+				);
+			}
+			else
+			{
+				this->_logger->error("Invalid socket connection", _ERROR_DETAILS_);
+			}
 		}
-		else
+		catch (core::InterruptException&)
 		{
-			this->_logger->error("Invalid socket connection", _ERROR_DETAILS_);
+			running = false;
 		}
 	}
 }
@@ -414,11 +467,14 @@ void HttpServer::_serve_connection(const socket_t& client)
 	}
 
 	auto request = std::unique_ptr<http::HttpRequest>(this->_handle_request(client));
-	this->_http_handler(request.get(), client);
-	if (this->_verbose)
+	if (request)
 	{
-		measure.end();
-		std::cout << '\n' << request->method() << " request took " << measure.elapsed() << " ms\n";
+		this->_http_handler(request.get(), client);
+		if (this->_verbose)
+		{
+			measure.end();
+			std::cout << '\n' << request->method() << " request took " << measure.elapsed() << " ms\n";
+		}
 	}
 }
 

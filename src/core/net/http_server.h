@@ -66,7 +66,7 @@ typedef std::function<void(http::HttpRequest*, const socket_t&)> http_handler;
 
 
 // TODO: temporary helper class Measure.
-template <typename _TimeT = std::chrono::milliseconds>
+template <typename TimeT = std::chrono::milliseconds>
 class Measure
 {
 private:
@@ -86,7 +86,7 @@ public:
 
 	double elapsed(bool reset = true)
 	{
-		auto result = std::chrono::duration_cast<_TimeT>(this->_end - this->_begin).count();
+		auto result = std::chrono::duration_cast<TimeT>(this->_end - this->_begin).count();
 		if (reset)
 		{
 			this->reset();
@@ -118,6 +118,8 @@ private:
 	core::ILogger* _logger;
 	std::string _media_root;
 	size_t _threads_count;
+	size_t _timeout_sec;
+	size_t _timeout_us;
 	core::internal::ThreadPool* _thread_pool;
 
 	enum read_result_enum
@@ -133,7 +135,8 @@ private:
 	void _close_server_socket();
 	void _clean_up(const socket_t& client);
 	http::HttpRequest* _handle_request(const socket_t& client);
-	std::string _read_body(const socket_t& client, const std::string& body_beginning, size_t body_length);
+	std::string _read_body(const socket_t& client, const std::string& body_beginning, size_t body_length) const;
+	bool _wait_for_client(const socket_t& client) const;
 	static std::string _read_headers(const socket_t& client, std::string& body_beginning);
 	void _start_listener();
 	void _serve_connection(const socket_t& client);
@@ -156,6 +159,8 @@ public:
 		size_t threads_count = 0;
 		bool use_ipv6 = false;
 		bool verbose = false;
+		size_t timeout_sec = 2;
+		size_t timeout_us = 0;
 	};
 
 	explicit HttpServer(HttpServer::context& ctx);
