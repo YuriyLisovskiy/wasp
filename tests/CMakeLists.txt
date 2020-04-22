@@ -3,8 +3,10 @@ set(BINARY unittests)
 set(WASP_LIB_DLL ${PROJECT_SOURCE_DIR}/cmake-build-debug/src/libwasp.so)
 
 function(add_tests SUB_DIR SUB_NAME)
+
     set(TESTS_DIR ${PROJECT_SOURCE_DIR}/tests/unittests/${SUB_DIR})
     file(GLOB_RECURSE SOURCES LIST_DIRECTORIES true ${TESTS_DIR}*.cpp)
+
     file(GLOB FILES_TO_REMOVE
         "${TESTS_DIR}*/main.cpp"
         "${TESTS_DIR}*/*/main.cpp"

@@ -51,4 +51,12 @@ extern bool is_var_char_begin(char ch);
 
 extern bool trim_quotes(std::string& str);
 
+extern bool split_for_loop_vars(
+	const std::string& vars_str,
+	size_t line_no,
+	size_t& curr_pos,
+	std::vector<token_t>& vars,
+	size_t max_vars
+);
+
 __RENDER_INTERNAL_END__

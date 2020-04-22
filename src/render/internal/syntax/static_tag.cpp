@@ -33,7 +33,8 @@ std::string static_node::render(IContext* ctx)
 	std::string result;
 	if (this->path)
 	{
-		result = core::path::join(this->prefix, this->path->resolve(ctx));
+		auto path_var = this->path->resolve(ctx);
+		result = core::path::join(this->prefix, path_var ? path_var->__str__() : "");
 	}
 
 	if (!this->var_name.empty())

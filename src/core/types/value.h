@@ -52,14 +52,36 @@ public:
 		this->_internal_value = std::move(val);
 	}
 
+	Value(const Value& other)
+	{
+		if (this != &other)
+		{
+			this->_internal_value = other->_internal_value;
+		}
+	}
+
+	_T get() const
+	{
+		return this->_internal_value;
+	}
+
 	[[nodiscard]] std::string __str__() const override
 	{
 		if constexpr (std::is_same<_T, std::string>::value)
 		{
-			return this->_internal_value;
+			return "\"" + this->_internal_value + "\"";
+		}
+		else if constexpr (std::is_same<_T, const char*>::value)
+		{
+			return "\"" + std::string(this->_internal_value) + "\"";
 		}
 		else if constexpr (std::is_fundamental<_T>::value)
 		{
+			if constexpr (std::is_same<_T, bool>::value)
+			{
+				return this->_internal_value ? "true" : "false";
+			}
+
 			return std::to_string(this->_internal_value);
 		}
 		else if constexpr (std::is_base_of<Object, _T>::value)
@@ -68,6 +90,12 @@ public:
 		}
 
 		return "<" + this->__type__().name() + " object at " + this->__address__() + ">";
+	}
+
+	Value<_T>& operator=(const _T& new_val)
+	{
+		this->_internal_value = new_val;
+		return *this;
 	}
 
 	Value<_T> operator+(const Value<_T>& right)
@@ -118,6 +146,27 @@ public:
 	_T& operator*()
 	{
 		return this->_internal_value;
+	}
+
+	operator bool() const override
+	{
+		if constexpr (std::is_fundamental<_T>::value)
+		{
+			return this->_internal_value;
+		}
+		else if constexpr (
+			std::is_same<_T, const char*>::value ||
+			std::is_base_of<Object, _T>::value
+		)
+		{
+			return this->_internal_value != nullptr;
+		}
+		else if constexpr (std::is_same<std::string, _T>::value)
+		{
+			return !this->_internal_value.empty();
+		}
+
+		return Object::operator bool();
 	}
 };
 

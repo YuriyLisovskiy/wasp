@@ -62,7 +62,8 @@ variable_node::variable_node(
 
 std::string variable_node::render(IContext* ctx)
 {
-	return this->filter_expr->resolve(ctx);
+	auto expr = this->filter_expr->resolve(ctx);
+	return expr ? expr->__str__() : "";
 }
 
 __RENDER_INTERNAL_END__

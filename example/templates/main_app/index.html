@@ -10,6 +10,21 @@
     {% else %}
         <h2>Hello, home!</h2>
     {% end_if_equal %}
+
+    <table style="border: 1px solid black">
+        {% for i, item : test_array %}
+            <tr>
+				<td>{{ i }}</td>
+				<td>{{ item }}</td>
+			</tr>
+        {% empty %}
+            <tr>
+                <td>-</td>
+                <td>Sorry, test_array is empty :(</td>
+            </tr>
+        {% end_for %}
+    </table>
+
     <ul>
         {% ignore %}
             Some multiline comment

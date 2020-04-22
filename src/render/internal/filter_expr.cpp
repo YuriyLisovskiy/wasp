@@ -438,7 +438,7 @@ FilterExpression::FilterExpression(const token_t& token, const _Filters& filters
 	}
 }
 
-std::string FilterExpression::resolve(IContext* ctx)
+std::shared_ptr<core::object::Object> FilterExpression::resolve(IContext* ctx)
 {
 	std::shared_ptr<core::object::Object> var = nullptr;
 	try
@@ -447,7 +447,7 @@ std::string FilterExpression::resolve(IContext* ctx)
 	}
 	catch (const VariableDoesNotExist& exc)
 	{
-		return "";
+		return nullptr;
 	}
 
 	if (var)
@@ -459,11 +459,11 @@ std::string FilterExpression::resolve(IContext* ctx)
 
 		if (var)
 		{
-			return var->__str__();
+			return var;
 		}
 	}
 
-	return "";
+	return nullptr;
 }
 
 __RENDER_INTERNAL_END__

@@ -82,7 +82,7 @@ void lexer::tokenize()
 		}
 
 		in_tag = !in_tag;
-		line_no = core::str::count(str_token, '\n');
+		line_no += core::str::count(str_token, '\n');
 	}
 }
 
@@ -93,7 +93,7 @@ void lexer::create_token(
 	const std::pair<size_t, size_t>& position
 )
 {
-	std::string block_content = "";
+	std::string block_content;
 	if (in_tag && core::str::starts_with(token_str, BLOCK_TAG_START))
 	{
 		block_content = core::str::cut_edges(token_str, 2, 2);

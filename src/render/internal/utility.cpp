@@ -151,4 +151,117 @@ bool trim_quotes(std::string& str)
 	return true;
 }
 
+enum sflv_p_state
+{
+	space_before, var_name, space
+};
+
+bool split_for_loop_vars(
+	const std::string& vars_str,
+	size_t line_no,
+	size_t& curr_pos,
+	std::vector<token_t>& vars,
+	size_t max_vars
+)
+{
+	if (max_vars == 0)
+	{
+		return true;
+	}
+
+	auto end_pos = vars_str.size();
+	if (curr_pos >= end_pos)
+	{
+		return true;
+	}
+
+	auto st = sflv_p_state::space_before;
+	std::string var_name;
+
+	bool found_comma = false;
+	while (curr_pos < end_pos)
+	{
+		char ch = vars_str[curr_pos++];
+		switch (st)
+		{
+			case sflv_p_state::space_before:
+				if (is_var_char_begin(ch))
+				{
+					var_name += ch;
+					st = sflv_p_state::var_name;
+				}
+				else if (ch != ' ')
+				{
+					return false;
+				}
+				break;
+			case sflv_p_state::var_name:
+				if (ch == ',')
+				{
+					found_comma = true;
+				}
+
+				if (ch == ' ' || found_comma)
+				{
+					st = sflv_p_state::space;
+					if (var_name.empty())
+					{
+						return false;
+					}
+
+					token_t token;
+					token.content = var_name;
+					token.line_no = line_no;
+					token.position = {curr_pos - var_name.size(), curr_pos};
+					vars.push_back(token);
+					if (vars.size() == max_vars)
+					{
+						curr_pos -= 2;
+						return true;
+					}
+
+					var_name.clear();
+				}
+				else if (is_var_char(ch))
+				{
+					var_name += ch;
+				}
+				else
+				{
+					return false;
+				}
+				break;
+			case sflv_p_state::space:
+				if (is_var_char_begin(ch))
+				{
+					if (!found_comma)
+					{
+						return false;
+					}
+
+					var_name += ch;
+					st = sflv_p_state::var_name;
+					found_comma = false;
+				}
+				else if (ch != ' ')
+				{
+					return false;
+				}
+				break;
+		}
+	}
+
+	if (!var_name.empty())
+	{
+		token_t token;
+		token.content = var_name;
+		token.line_no = line_no;
+		token.position = {curr_pos - var_name.size(), curr_pos};
+		vars.push_back(token);
+	}
+
+	curr_pos--;
+	return true;
+}
+
 __RENDER_INTERNAL_END__

@@ -40,25 +40,27 @@ __RENDER_BEGIN__
 
 class Context : public IContext
 {
+public:
+	typedef IContext::scope_t scope_t;
+
 private:
-	std::map<std::string, std::shared_ptr<core::object::Object>> _global_scope;
-	std::map<std::string, std::shared_ptr<core::object::Object>> _local_scope;
+	std::vector<scope_t> _scopes;
 
 protected:
 	static std::shared_ptr<core::object::Object> find_in_scope(
-		std::map<std::string, std::shared_ptr<core::object::Object>>& scope,
+		scope_t& scope,
 		const std::string& key
 	);
 
 public:
-	explicit Context(
-		std::map<std::string, std::shared_ptr<core::object::Object>> global_scope
-	);
+	explicit Context(const scope_t& global_scope);
 	std::shared_ptr<core::object::Object> find_var(const std::string& key) override;
 	void push_var(
 		const std::string& key,
 		const std::shared_ptr<core::object::Object>& val
 	) override;
+	void push_scope(const scope_t& scope) override;
+	void pop_scope() override;
 };
 
 __RENDER_END__

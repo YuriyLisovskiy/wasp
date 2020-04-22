@@ -22,6 +22,9 @@ public:
 
 	std::unique_ptr<wasp::http::IHttpResponse> get(wasp::http::HttpRequest* request, wasp::views::Args* args) final
 	{
+		using namespace wasp::render;
+		using namespace wasp::core::types;
+
 		std::string user_row;
 		if (args->contains("user_name"))
 		{
@@ -38,12 +41,12 @@ public:
 			user_row += "User is not found";
 		}
 
-		auto ctx = std::shared_ptr<wasp::render::Context>(new wasp::render::Context({{
+		auto ctx = std::make_shared<Context>(Context::scope_t{{
 			"user_info",
-			std::shared_ptr<wasp::core::types::Value<std::string>>(
-				new wasp::core::types::Value<std::string>(user_row)
+			std::shared_ptr<Value<std::string>>(
+				new Value<std::string>(user_row)
 			)
-		}}));
+		}});
 
 		return this->render(request, ctx);
 	}

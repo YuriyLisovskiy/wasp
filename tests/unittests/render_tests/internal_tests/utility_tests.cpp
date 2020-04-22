@@ -86,3 +86,18 @@ TEST(UtilityTestCase, TestSplitParamsRedundantComma)
 	ASSERT_FALSE(split_params(params, 1, pos, actual));
 	ASSERT_EQ(pos, params.size());
 }
+
+TEST(UtilityTestCase, TestSplitForLoopVars)
+{
+	using namespace wasp::render::internal;
+	std::string vars = "hello, world    reversed";
+	std::vector<token_t> actual;
+	size_t pos = 0;
+	ASSERT_TRUE(split_for_loop_vars(vars, 1, pos, actual, 2));
+	ASSERT_EQ(actual.size(), 2);
+
+	ASSERT_EQ(actual[0].content, "hello");
+	ASSERT_EQ(actual[1].content, "world");
+
+	ASSERT_EQ(pos, 11);
+}

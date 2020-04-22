@@ -123,7 +123,7 @@ public:
 	FilterExpression() = default;
 
 	explicit FilterExpression(const token_t& token, const _Filters& filters);
-	std::string resolve(IContext* ctx);
+	std::shared_ptr<core::object::Object> resolve(IContext* ctx);
 };
 
 __RENDER_INTERNAL_END__

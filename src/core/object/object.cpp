@@ -70,7 +70,7 @@ bool Object::__has_attr__(const char* attr_name) const
 	return this->__attrs__.find(attr_name) != this->__attrs__.end();
 }
 
-int Object::__cmp__(const Object* other) const
+short Object::__cmp__(const Object* other) const
 {
 	auto this_hash = this->__hash__();
 	auto other_hash = other->__hash__();

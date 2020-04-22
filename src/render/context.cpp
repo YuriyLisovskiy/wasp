@@ -24,15 +24,13 @@
 
 __RENDER_BEGIN__
 
-Context::Context(
-	std::map<std::string, std::shared_ptr<core::object::Object>> global_scope
-) : _global_scope(std::move(global_scope))
+Context::Context(const scope_t& global_scope)
 {
+	this->_scopes.push_back(global_scope);
 }
 
 std::shared_ptr<core::object::Object> Context::find_in_scope(
-	std::map<std::string, std::shared_ptr<core::object::Object>>& scope,
-	const std::string& key
+	scope_t& scope, const std::string& key
 )
 {
 	auto var_p = scope.find(key);
@@ -46,16 +44,13 @@ std::shared_ptr<core::object::Object> Context::find_in_scope(
 
 std::shared_ptr<core::object::Object> Context::find_var(const std::string& key)
 {
-	auto var_p = Context::find_in_scope(this->_local_scope, key);
-	if (var_p)
+	for (long i = (long)this->_scopes.size() - 1; i >= 0; i--)
 	{
-		return var_p;
-	}
-
-	var_p = Context::find_in_scope(this->_global_scope, key);
-	if (var_p)
-	{
-		return var_p;
+		auto var_p = Context::find_in_scope(this->_scopes[i], key);
+		if (var_p)
+		{
+			return var_p;
+		}
 	}
 
 	return nullptr;
@@ -66,7 +61,22 @@ void Context::push_var(
 	const std::shared_ptr<core::object::Object>& val
 )
 {
-	this->_local_scope[key] = val;
+	this->_scopes[this->_scopes.size() - 1][key] = val;
+}
+
+void Context::push_scope(const scope_t& scope)
+{
+	this->_scopes.push_back(scope);
+}
+
+void Context::pop_scope()
+{
+	if (this->_scopes.size() == 1)
+	{
+		throw core::RuntimeError("unable to pop global scope");
+	}
+
+	this->_scopes.pop_back();
 }
 
 __RENDER_END__

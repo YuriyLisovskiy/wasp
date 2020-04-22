@@ -173,7 +173,7 @@ void Logger::write_to_stream(const std::string& msg, const char* colour)
 	const char* default_colour = this->_colors[Color::DEFAULT];
 	for (auto& stream : this->_config.streams)
 	{
-		*stream << '\n' << colour << msg << default_colour << '\n';
+		*stream << colour << msg << default_colour << '\n';
 	}
 
 	this->flush();

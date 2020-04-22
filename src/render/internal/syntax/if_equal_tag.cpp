@@ -65,8 +65,8 @@ std::shared_ptr<internal::node> do_if_equal(
 
 	auto end_tag = "end_" + tag_name;
 	res_node->node_list_true = parser->parse({"else", end_tag});
-	token = parser->next_token();
-	if (token.content == "else")
+	auto next_token = parser->next_token();
+	if (next_token.content == "else")
 	{
 		res_node->node_list_false = parser->parse({end_tag});
 		parser->del_first_token();
@@ -96,12 +96,12 @@ std::function<std::shared_ptr<internal::node>(
 }
 
 std::function<std::shared_ptr<internal::node>(
-		internal::parser*, internal::token_t& token
+	internal::parser*, internal::token_t& token
 )> make_if_not_equal_tag()
 {
 	return [](
-			internal::parser* parser,
-			internal::token_t& token
+		internal::parser* parser,
+		internal::token_t& token
 	) -> std::shared_ptr<internal::node>
 	{
 		return do_if_equal(parser, token, true);

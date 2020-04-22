@@ -118,7 +118,7 @@ public:
 	/// Returns 0 if objects are equal, -1 if 'this' is less
 	///  than 'other' otherwise returns 1.
 	/// Can be overridden.
-	virtual int __cmp__(const Object* other) const;
+	virtual short __cmp__(const Object* other) const;
 
 	[[nodiscard]] virtual unsigned long __hash__() const;
 

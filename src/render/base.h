@@ -42,6 +42,9 @@ __RENDER_BEGIN__
 class IContext
 {
 public:
+	typedef std::map<std::string, std::shared_ptr<core::object::Object>> scope_t;
+
+	virtual ~IContext() = default;
 	virtual std::shared_ptr<core::object::Object> find_var(
 		const std::string& key
 	) = 0;
@@ -49,7 +52,8 @@ public:
 		const std::string& key,
 		const std::shared_ptr<core::object::Object>& val
 	) = 0;
-	virtual ~IContext() = default;
+	virtual void push_scope(const scope_t& scope) = 0;
+	virtual void pop_scope() = 0;
 };
 
 

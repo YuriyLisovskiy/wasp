@@ -37,7 +37,8 @@ std::string url_node::render(IContext* ctx)
 	using Fe = std::shared_ptr<FilterExpression>;
 	auto built_url = this->pattern->build(
 		utils::fn::map<Fe, std::string>(this->params, [ctx](const Fe& p) -> std::string {
-			return p->resolve(ctx);
+			auto p_var = p->resolve(ctx);
+			return p_var ? p_var->__str__() : "";
 		})
 	);
 
