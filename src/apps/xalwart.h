@@ -16,35 +16,23 @@
  */
 
 /**
- * apps/wasp.h
+ * apps/xalwart.h
  *
- * Purpose: an implementation of main Wasp application.
+ * Purpose: an implementation of main application.
  */
 
 #pragma once
 
-// C++ libraries.
-#include <map>
-#include <vector>
-#include <string>
-#include <iostream>
-#include <functional>
-
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
-#include "./config.h"
+// Framework libraries.
 #include "../conf/settings.h"
-#include "../core/path.h"
-#include "../core/exceptions.h"
-#include "../core/management/base.h"
-#include "../core/management/app.h"
 
 
 __APPS_BEGIN__
 
-class WaspApplication final
+class MainApplication final
 {
 private:
 	conf::Settings* _settings;
@@ -58,7 +46,7 @@ private:
 	void _perform_checks();
 
 public:
-	explicit WaspApplication(conf::Settings* settings);
+	explicit MainApplication(conf::Settings* settings);
 	void execute(int argc, char** argv);
 };
 

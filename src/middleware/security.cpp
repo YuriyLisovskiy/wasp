@@ -21,6 +21,9 @@
 
 #include "./security.h"
 
+// Framework modules.
+#include "../http/headers.h"
+
 
 __MIDDLEWARE_BEGIN__
 

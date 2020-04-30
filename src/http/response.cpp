@@ -21,6 +21,14 @@
 
 #include "./response.h"
 
+// Framework modules.
+#include "./status.h"
+#include "./url.h"
+#include "./utility.h"
+#include "../core/encoding.h"
+#include "../core/mime_types.h"
+#include "../core/datetime.h"
+
 
 __HTTP_BEGIN__
 
@@ -621,9 +629,9 @@ HttpResponseGone::HttpResponseGone(
 
 // HttpResponseEntityTooLarge implementation
 HttpResponseEntityTooLarge::HttpResponseEntityTooLarge(
-		const std::string& content,
-		const std::string& content_type,
-		const std::string& charset
+	const std::string& content,
+	const std::string& content_type,
+	const std::string& charset
 ) : HttpResponse(content, 413, content_type, "", charset)
 {
 }

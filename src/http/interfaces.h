@@ -20,8 +20,9 @@
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
+// Framework modules.
 #include "./cookie.h"
+#include "../collections/dict.h"
 
 
 __HTTP_BEGIN__
@@ -86,7 +87,7 @@ public:
 	virtual void flush() = 0;
 	virtual unsigned long int tell() = 0;
 
-	/// These methods partially implement a stream-like object interface.
+	// These methods partially implement a stream-like object interface.
 	virtual bool readable() = 0;
 	virtual bool seekable() = 0;
 	virtual bool writable() = 0;

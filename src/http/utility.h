@@ -23,17 +23,11 @@
 
 #pragma once
 
-// C++ libraries.
-#include <string>
-
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
-#include "../core/regex.h"
+// Framework modules.
 #include "../core/signing/signer.h"
-#include "../core/string/str.h"
-#include "../core/datetime.h"
 
 
 __HTTP_BEGIN__
@@ -90,7 +84,7 @@ extern void escape_leading_slashes(std::string& url);
 
 extern core::signing::Signer get_cookie_signer(
 	const std::string& secret_key,
-	const std::string& salt = "wasp.core.signing.get_cookie_signer"
+	const std::string& salt = "xalwart.core.signing.get_cookie_signer"
 );
 
 __HTTP_END__

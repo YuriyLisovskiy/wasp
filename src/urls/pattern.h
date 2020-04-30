@@ -25,21 +25,14 @@
 
 #pragma once
 
-// C++ libraries.
-#include <string>
-#include <vector>
-#include <regex>
-#include <memory>
-
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
+// Framework modules.
 #include "../views/args.h"
+#include "../core/regex.h"
 #include "../http/request.h"
 #include "../http/response.h"
-#include "../core/regex.h"
-#include "../core/string/str.h"
 #include "../conf/settings.h"
 
 
@@ -76,14 +69,14 @@ public:
 		const std::string& namespace_
 	);
 
-	std::string get_name() const;
+	[[nodiscard]] std::string get_name() const;
 	std::unique_ptr<http::IHttpResponse> apply(
 		http::HttpRequest* request,
 		conf::Settings* settings,
 		views::Args* args = nullptr
 	);
 	bool match(const std::string& url, std::map<std::string, std::string>& args);
-	std::string build(const std::vector<std::string>& args) const;
+	[[nodiscard]] std::string build(const std::vector<std::string>& args) const;
 };
 
 __URLS_END__

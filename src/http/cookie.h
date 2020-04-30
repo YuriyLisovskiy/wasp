@@ -29,12 +29,6 @@
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
-#include "../core/utility.h"
-#include "../core/string/str.h"
-#include "../core/exceptions.h"
-#include "../core/datetime.h"
-
 
 __HTTP_BEGIN__
 

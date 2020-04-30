@@ -24,20 +24,11 @@
 
 #pragma once
 
-// C++ libraries.
-#include <map>
-#include <string>
-#include <vector>
-
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
+// Framework modules.
 #include "../core/regex.h"
-#include "../core/utility.h"
-#include "../core/string/str.h"
-#include "../core/exceptions.h"
-#include "../core/datetime.h"
 
 
 __UTILS_HTTP_BEGIN__

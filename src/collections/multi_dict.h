@@ -27,7 +27,6 @@
 #pragma once
 
 // C++ libraries.
-#include <vector>
 #include <initializer_list>
 
 // Module definitions.

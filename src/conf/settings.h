@@ -18,26 +18,18 @@
 /**
  * conf/settings.h
  *
- * Purpose: entire Wasp application's settings.
+ * Purpose: entire application's settings.
  */
 
 #pragma once
 
-// C++ libraries.
-#include <map>
-#include <string>
-#include <vector>
-#include <memory>
-
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
-#include "../core/logger.h"
-#include "../apps/interfaces.h"
-#include "../middleware/interfaces.h"
+// Framework modules.
 #include "../core/management/base.h"
-#include "../core/regex.h"
+#include "../core/logger.h"
+#include "../middleware/interfaces.h"
 #include "../render/env/interfaces.h"
 #include "../render/library/_def_.h"
 
@@ -79,7 +71,7 @@ struct Settings
 	/// https://en.wikipedia.org/wiki/List_of_tz_zones_by_name (although not all
 	/// systems may support all possibilities). When USE_TZ is true, this is
 	/// interpreted as the default user time zone.
-	std::string TIME_ZONE;
+	std::shared_ptr<core::dt::Timezone> TIME_ZONE;
 
 	/// If you set this to True, Django will use timezone-aware datetimes.
 	bool USE_TZ;
@@ -88,7 +80,7 @@ struct Settings
 	/// manually specified. It's used to construct the Content-Type header.
 	std::string DEFAULT_CHARSET;
 
-	/// Root application where Wasp will load urlpatterns.
+	/// Root application where framework will load urlpatterns.
 	///
 	/// ROOT_APP is the first installed app by default, it can
 	/// be overridden in project settings.
@@ -119,10 +111,10 @@ struct Settings
 	///
 	/// Here are a few examples:
 	///     DISALLOWED_USER_AGENTS = {
-	///         wasp::core::rgx::Regex(R"(NaverBot.*)"),
-	///         wasp::core::rgx::Regex(R"(EmailSiphon.*)"),
-	///         wasp::core::rgx::Regex(R"(SiteSucker.*)"),
-	///         wasp::core::rgx::Regex(R"(sohu-search.*)")
+	///         core::rgx::Regex(R"(NaverBot.*)"),
+	///         core::rgx::Regex(R"(EmailSiphon.*)"),
+	///         core::rgx::Regex(R"(SiteSucker.*)"),
+	///         core::rgx::Regex(R"(sohu-search.*)")
 	///     };
 	std::vector<core::rgx::Regex> DISALLOWED_USER_AGENTS;
 
@@ -131,11 +123,11 @@ struct Settings
 	///
 	/// Here are a few examples:
 	///    IGNORABLE_404_URLS = {
-	///        wasp::core::rgx::Regex(R"(/apple-touch-icon.*\.png)"),
-	///        wasp::core::rgx::Regex(R"(/favicon.ico)"),
-	///        wasp::core::rgx::Regex(R"(/robots.txt)"),
-	///        wasp::core::rgx::Regex(R"(/phpmyadmin/)"),
-	///        wasp::core::rgx::Regex(R"(/apple-touch-icon.*\.png)")
+	///        core::rgx::Regex(R"(/apple-touch-icon.*\.png)"),
+	///        core::rgx::Regex(R"(/favicon.ico)"),
+	///        core::rgx::Regex(R"(/robots.txt)"),
+	///        core::rgx::Regex(R"(/phpmyadmin/)"),
+	///        core::rgx::Regex(R"(/apple-touch-icon.*\.png)")
 	///    };
 	std::vector<core::rgx::Regex> IGNORABLE_404_URLS;
 

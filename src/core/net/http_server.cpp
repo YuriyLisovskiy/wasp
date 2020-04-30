@@ -21,6 +21,9 @@
 
 #include "./http_server.h"
 
+// Framework modules.
+#include "../datetime.h"
+
 
 __NET_INTERNAL_BEGIN__
 
@@ -95,9 +98,17 @@ void HttpServer::listen_and_serve()
 	}
 #endif
 
-	std::cout << str::format(
-		conf::internal::STARTUP_MESSAGE, this->_schema, this->_host, this->_port
-	) << '\n';
+	// TODO: add timezone
+//	auto tz = std::make_shared<dt::Timezone>(
+//		dt::Timedelta(0, 0, 0, 0, 0, 0),
+//		"GMT"
+//	);
+	std::string message = dt::Datetime::now().strftime("%B %d, %Y - %T") + "\n" +
+		LIB_NAME + " version " + LIB_VERSION + "\n" +
+		"Starting development server at " +
+			std::string(this->_schema) + "://" + std::string(this->_host) + ":" + std::to_string(this->_port) + "/\n" +
+		"Quit the server with CONTROL-C.\n";
+	std::cout << message;
 	std::cout.flush();
 
 	this->_finished = false;

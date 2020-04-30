@@ -21,10 +21,13 @@
 
 #include "./cookies.h"
 
+// Framework modules.
+#include "../core/parsers/cookie_parser.h"
+
 
 __MIDDLEWARE_BEGIN__
 
-CookieMiddleware::CookieMiddleware(wasp::conf::Settings* settings)
+CookieMiddleware::CookieMiddleware(conf::Settings* settings)
 	: MiddlewareMixin(settings)
 {
 }

@@ -7,17 +7,6 @@ TODO:
 
 TODO:
     Add utf8 strings' support.
-    Implement basic template engine.
-
-
-Check out TODOs in (not urgent):
-    - src/core/management/runserver.cpp
-    - src/core/encoding.cpp
-    - src/core/http_server.cpp
-
-    - src/http/response.cpp
-
-    - src/views/static.cpp
 
 
 TEST_ME:

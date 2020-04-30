@@ -24,6 +24,7 @@
 // Framework modules.
 #include "./parse_var_name.h"
 #include "../utility.h"
+#include "../../../core/path.h"
 
 
 __SYNTAX_BEGIN__

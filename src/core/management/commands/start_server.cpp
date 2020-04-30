@@ -78,6 +78,7 @@ void StartServerCommand::add_flags()
 
 void StartServerCommand::handle()
 {
+	std::cout << "Performing checks...\n";
 	if (!this->settings->DEBUG && this->settings->ALLOWED_HOSTS.empty())
 	{
 		throw CommandError("You must set ALLOWED_HOSTS if DEBUG is false.");

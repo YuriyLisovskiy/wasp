@@ -31,9 +31,8 @@
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
+// Framework modules.
 #include "./middleware_mixin.h"
-#include "../http/headers.h"
 
 
 __MIDDLEWARE_BEGIN__
@@ -47,7 +46,7 @@ __MIDDLEWARE_BEGIN__
  * By default, set the X-Frame-Options header to 'SAMEORIGIN', meaning the
  * response can only be loaded on a frame within the same site. To prevent the
  * response from being loaded in a frame in any site, set X_FRAME_OPTIONS in
- * your project's Django settings to 'DENY'.
+ * your project's settings to 'DENY'.
  */
 class XFrameOptionsMiddleware : public MiddlewareMixin
 {

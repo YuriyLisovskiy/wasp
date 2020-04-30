@@ -28,5 +28,13 @@
 #define __MAIN_NAMESPACE_END__ }
 
 
-/// Required parameters for Wasp's built-in logger.
+__MAIN_NAMESPACE_BEGIN__
+
+const char* const LIB_NAME = "Xalwart";
+const char* const LIB_VERSION = "0.0.1-dev";
+
+__MAIN_NAMESPACE_END__
+
+
+/// Required parameters for built-in logger.
 #define _ERROR_DETAILS_ __LINE__, __PRETTY_FUNCTION__, __FILE__

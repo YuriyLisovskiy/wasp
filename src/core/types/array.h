@@ -96,7 +96,7 @@ public:
 
 	Array& operator= (const std::vector<value_type>& other);
 	Array& operator= (const Array& other);
-
+	
 	template <class T, typename = std::enable_if<std::is_fundamental<T>::value>>
 	Array& operator= (const std::vector<T>& other)
 	{

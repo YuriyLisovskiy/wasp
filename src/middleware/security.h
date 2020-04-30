@@ -28,10 +28,8 @@
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
+// Framework modules.
 #include "./middleware_mixin.h"
-#include "../core/regex.h"
-#include "../core/string/str.h"
 
 
 __MIDDLEWARE_BEGIN__

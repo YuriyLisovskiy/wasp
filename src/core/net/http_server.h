@@ -46,7 +46,6 @@
 #include "../string/str.h"
 #include "../string/format.h"
 #include "../parsers/request_parser.h"
-#include "../../conf/defaults.h"
 #include "../../conf/settings.h"
 #include "../../http/response.h"
 #include "../../http/request.h"

@@ -21,6 +21,11 @@
 
 #include "./cookie.h"
 
+// Framework modules.
+#include "../core/utility.h"
+#include "../core/string/str.h"
+#include "../core/exceptions.h"
+
 
 __HTTP_BEGIN__
 

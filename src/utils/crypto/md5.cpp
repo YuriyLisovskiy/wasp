@@ -21,6 +21,9 @@
 
 #include "./md5.h"
 
+// C++ libraries.
+#include <cstring>
+
 
 __CRYPTO_BEGIN__
 

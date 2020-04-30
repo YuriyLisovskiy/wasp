@@ -19,31 +19,18 @@
  * apps/config.h
  *
  * Purpose:
- * Represents application configuration
- * with urls and models (will be developed in future)
+ * 	Represents application configuration
+ * 	with urls and models (will be developed in future)
  */
 
 #pragma once
 
-// C++ libraries.
-#include <string>
-#include <vector>
-#include <memory>
-
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
-#include "./interfaces.h"
+// Framework modules.
 #include "../views/view.h"
 #include "../urls/url.h"
-#include "../http/interfaces.h"
-#include "../urls/pattern.h"
-#include "../conf/settings.h"
-#include "../core/string/str.h"
-#include "../core/management/base.h"
-#include "../core/object/object.h"
-#include "../core/object/type.h"
 #include "../core/management/commands/app_command.h"
 
 
@@ -57,19 +44,19 @@ private:
 	std::vector<std::shared_ptr<urls::UrlPattern>> _urlpatterns;
 	std::vector<std::shared_ptr<core::BaseCommand>> _commands;
 
-	template <typename _AppConfigT>
+	template <typename AppConfigT>
 	std::shared_ptr<apps::IAppConfig> find_or_create_app()
 	{
 		auto app = std::find_if(
 			this->settings->INSTALLED_APPS.begin(),
 			this->settings->INSTALLED_APPS.end(),
 			[](const std::shared_ptr<apps::IAppConfig>& entry) -> bool {
-				return dynamic_cast<_AppConfigT*>(entry.get()) != nullptr;
+				return dynamic_cast<AppConfigT*>(entry.get()) != nullptr;
 			}
 		);
 		if (app == this->settings->INSTALLED_APPS.end())
 		{
-			return std::make_shared<_AppConfigT>(this->settings);
+			return std::make_shared<AppConfigT>(this->settings);
 		}
 
 		return *app;
@@ -80,7 +67,7 @@ protected:
 	std::string app_path;
 	conf::Settings* settings;
 
-	template <typename _ViewT, typename = std::enable_if<std::is_base_of<views::View, _ViewT>::value>>
+	template <typename ViewT, typename = std::enable_if<std::is_base_of<views::View, ViewT>::value>>
 	void url(const std::string& pattern, const std::string& name = "")
 	{
 		views::ViewHandler view_handler = [this](
@@ -89,7 +76,7 @@ protected:
 			conf::Settings* settings_ptr
 		) -> std::unique_ptr<http::IHttpResponse>
 		{
-			_ViewT view(settings_ptr);
+			ViewT view(settings_ptr);
 			view.setup(request);
 			return view.dispatch(args);
 		};
@@ -101,10 +88,10 @@ protected:
 		));
 	}
 
-	template <typename _AppConfigT, typename = std::enable_if<std::is_base_of<IAppConfig, _AppConfigT>::value>>
+	template <typename AppConfigT, typename = std::enable_if<std::is_base_of<IAppConfig, AppConfigT>::value>>
 	void include(const std::string& prefix, const std::string& namespace_ = "")
 	{
-		auto app = this->find_or_create_app<_AppConfigT>();
+		auto app = this->find_or_create_app<AppConfigT>();
 		auto included_urlpatterns = app->get_urlpatterns();
 		std::string ns = namespace_.empty() ? app->get_name() : namespace_;
 		for (const auto& pattern : included_urlpatterns)
@@ -120,10 +107,10 @@ protected:
 		}
 	}
 
-	template <typename _CommandT, typename = std::enable_if<std::is_base_of<core::cmd::AppCommand, _CommandT>::value>>
+	template <typename CommandT, typename = std::enable_if<std::is_base_of<core::cmd::AppCommand, CommandT>::value>>
 	void command()
 	{
-		auto cmd = std::make_shared<_CommandT>(this, this->settings);
+		auto cmd = std::make_shared<CommandT>(this, this->settings);
 		this->_commands.push_back(cmd);
 	}
 

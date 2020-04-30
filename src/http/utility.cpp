@@ -19,7 +19,6 @@
  * An implementation of http/utility.h
  */
 
-// Header.
 #include "./utility.h"
 
 // Framework modules.

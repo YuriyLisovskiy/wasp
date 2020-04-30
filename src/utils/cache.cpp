@@ -21,6 +21,12 @@
 
 #include "./cache.h"
 
+// Framework modules.
+#include "./crypto/md5.h"
+#include "../http/headers.h"
+#include "./http.h"
+#include "../core/utility.h"
+
 
 __CACHE_INTERNAL_BEGIN__
 

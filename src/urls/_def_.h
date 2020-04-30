@@ -26,10 +26,6 @@
 #include "../_def_.h"
 
 
-/// urls
+// urls
 #define __URLS_BEGIN__ __MAIN_NAMESPACE_BEGIN__ namespace urls {
 #define __URLS_END__ } __MAIN_NAMESPACE_END__
-
-/// urls::internal
-#define __URLS_INTERNAL_BEGIN__ __URLS_BEGIN__ namespace internal {
-#define __URLS_INTERNAL_END__ } __URLS_END__

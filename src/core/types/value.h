@@ -56,7 +56,7 @@ public:
 	{
 		if (this != &other)
 		{
-			this->_internal_value = other->_internal_value;
+			this->_internal_value = other._internal_value;
 		}
 	}
 

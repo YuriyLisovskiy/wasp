@@ -31,10 +31,6 @@
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
-#include "../core/exceptions.h"
-#include "../core/parsers/url_parser.h"
-
 
 __HTTP_BEGIN__
 

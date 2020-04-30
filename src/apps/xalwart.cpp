@@ -16,15 +16,18 @@
  */
 
 /**
- * An implementation of apps/wasp.h
+ * An implementation of apps/xalwart.h
  */
 
-#include "./wasp.h"
+#include "./xalwart.h"
+
+// Framework modules.
+#include "../core/management/app.h"
 
 
 __APPS_BEGIN__
 
-WaspApplication::WaspApplication(conf::Settings* settings)
+MainApplication::MainApplication(conf::Settings* settings)
 {
 	core::InterruptException::initialize();
 	if (!settings)
@@ -57,7 +60,7 @@ WaspApplication::WaspApplication(conf::Settings* settings)
 	}
 }
 
-void WaspApplication::execute(int argc, char** argv)
+void MainApplication::execute(int argc, char** argv)
 {
 	if (argc > 1)
 	{
@@ -87,7 +90,7 @@ void WaspApplication::execute(int argc, char** argv)
 	}
 }
 
-void WaspApplication::_setup_commands()
+void MainApplication::_setup_commands()
 {
 	// Retrieve commands from INSTALLED_APPS and
 	// check if apps' commands do not override
@@ -118,7 +121,7 @@ void WaspApplication::_setup_commands()
 	);
 }
 
-void WaspApplication::_extend_settings_commands_or_error(
+void MainApplication::_extend_settings_commands_or_error(
 	const std::vector<std::shared_ptr<core::BaseCommand>>& from,
 	const std::function<std::string(const std::string& cmd_name)>& err_fn
 )
@@ -142,7 +145,7 @@ void WaspApplication::_extend_settings_commands_or_error(
 	}
 }
 
-void WaspApplication::_perform_checks()
+void MainApplication::_perform_checks()
 {
 	if (!this->_settings->LOGGER)
 	{
