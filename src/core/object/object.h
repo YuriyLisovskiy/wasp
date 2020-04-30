@@ -136,6 +136,7 @@ public:
 	}
 
 	[[nodiscard]] virtual std::string __str__() const;
+	[[nodiscard]] virtual std::string __repr__() const;
 
 	bool operator<(const Object& other) const;
 	bool operator==(const Object& other) const;

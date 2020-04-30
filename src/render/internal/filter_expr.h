@@ -19,7 +19,7 @@
  * render/processors/filter_expr.h
  *
  * Purpose:
- * TODO:
+ * TODO: docs for render/processors/filter_expr.h
  */
 
 #pragma once
@@ -80,6 +80,7 @@ struct expression_parser
 		s_var_attr_begin,
 		s_var_attr,
 		s_const_str,
+	//	s_filter_sep_begin,
 		s_filter_sep,
 		s_filter_name_begin,
 		s_filter_name,
@@ -96,9 +97,13 @@ struct expression_parser
 	/// Skips whitespaces.
 	/// Returns true if it equals to cend()
 	bool skip_ws_and_ret(std::string::const_iterator& it);
-	bool parse_number_and_ret(std::string::const_iterator& it, std::string& value);
-	void parse_digits(std::string::const_iterator& it, std::string& value);
-	void throw_unexpected_symbol(char ch);
+	bool parse_number_and_ret(
+		std::string::const_iterator& it, std::string& value
+	) const;
+	void parse_digits(
+		std::string::const_iterator& it, std::string& value
+	) const;
+	void throw_unexpected_symbol(char ch) const;
 	static bool is_var_char(char ch);
 	static bool is_var_char_begin(char ch);
 };

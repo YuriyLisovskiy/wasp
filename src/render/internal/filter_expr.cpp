@@ -53,7 +53,7 @@ void expression_parser::parse()
 					this->expression.var_name += this->ch;
 					this->expression.is_const = true;
 				}
-				else if (std::isdigit(this->ch) || std::isdigit(this->ch) || this->ch == '+' || this->ch == '-')
+				else if (std::isdigit(this->ch) || this->ch == '+' || this->ch == '-')
 				{
 					this->expression.var_name += this->ch;
 					this->expression.is_const = true;
@@ -308,7 +308,7 @@ void expression_parser::parse()
 
 bool expression_parser::parse_number_and_ret(
 	std::string::const_iterator& it, std::string& value
-)
+) const
 {
 	auto end = this->token.content.cend();
 	if (!std::isdigit(*it))
@@ -322,23 +322,37 @@ bool expression_parser::parse_number_and_ret(
 	if (std::isdigit(*it))
 	{
 		this->parse_digits(it, value);
-		bool is_double = *it == '.';
-		if (is_double)
+		if (*it == 'l')
 		{
 			value += *it++;
-			if (!std::isdigit(*it))
+		}
+		else
+		{
+			bool is_double = *it == '.';
+			if (is_double)
 			{
-				this->throw_unexpected_symbol(*it);
-			}
+				value += *it++;
+				if (!std::isdigit(*it))
+				{
+					this->throw_unexpected_symbol(*it);
+				}
 
-			this->parse_digits(it, value);
+				this->parse_digits(it, value);
+				if (it != end && *it == 'f')
+				{
+					value += 'f';
+					it++;
+				}
+			}
 		}
 	}
 
 	return it == end;
 }
 
-void expression_parser::parse_digits(std::string::const_iterator& it, std::string& value)
+void expression_parser::parse_digits(
+	std::string::const_iterator& it, std::string& value
+) const
 {
 	do
 	{
@@ -386,7 +400,7 @@ bool expression_parser::is_var_char_begin(char c)
 	return std::isalpha(c) || c == '_';
 }
 
-void expression_parser::throw_unexpected_symbol(char c)
+void expression_parser::throw_unexpected_symbol(char c) const
 {
 	throw TemplateSyntaxError(
 		"Unexpected symbol '" + std::string(1, c) +

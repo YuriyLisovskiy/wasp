@@ -28,6 +28,7 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <regex>
 
 // Module definitions.
 #include "../_def_.h"
@@ -38,7 +39,6 @@
 #include "../../core/object/object.h"
 #include "../../core/types/value.h"
 #include "../../core/string/str.h"
-
 
 __RENDER_INTERNAL_BEGIN__
 
@@ -56,11 +56,13 @@ const char FILTER_ARG_SEP = ',';
 const char FILTER_ARG_NAME_VAL_SEP = '=';
 
 
-class Variable
+class Variable final
 {
 private:
 	std::string _content;
 	bool _is_constant;
+
+	static std::regex number_regex;
 
 public:
 	Variable();

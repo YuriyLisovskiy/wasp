@@ -357,8 +357,9 @@ std::string Array::__str__() const
 		auto item = *it;
 		if (item)
 		{
-			res += item->__str__();
-		} else
+			res += item->__repr__();
+		}
+		else
 		{
 			res += "nullptr";
 		}
@@ -370,6 +371,11 @@ std::string Array::__str__() const
 	}
 
 	return res + "}";
+}
+
+std::string Array::__repr__() const
+{
+	return this->__str__();
 }
 
 Array::operator bool () const

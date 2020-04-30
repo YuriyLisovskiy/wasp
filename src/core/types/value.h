@@ -65,7 +65,40 @@ public:
 		return this->_internal_value;
 	}
 
+	template <typename InternalType>
+	constexpr bool internal_type_is()
+	{
+		return std::is_same<_T, InternalType>::value;
+	}
+
 	[[nodiscard]] std::string __str__() const override
+	{
+		if constexpr (std::is_same<_T, std::string>::value)
+		{
+			return this->_internal_value;
+		}
+		else if constexpr (std::is_same<_T, const char*>::value)
+		{
+			return std::string(this->_internal_value);
+		}
+		else if constexpr (std::is_fundamental<_T>::value)
+		{
+			if constexpr (std::is_same<_T, bool>::value)
+			{
+				return this->_internal_value ? "true" : "false";
+			}
+
+			return std::to_string(this->_internal_value);
+		}
+		else if constexpr (std::is_base_of<Object, _T>::value)
+		{
+			return this->_internal_value.__str__();
+		}
+
+		return "<" + this->__type__().name() + " object at " + this->__address__() + ">";
+	}
+
+	[[nodiscard]] std::string __repr__() const override
 	{
 		if constexpr (std::is_same<_T, std::string>::value)
 		{
@@ -86,7 +119,7 @@ public:
 		}
 		else if constexpr (std::is_base_of<Object, _T>::value)
 		{
-			return this->_internal_value.__str__();
+			return this->_internal_value.__repr__();
 		}
 
 		return "<" + this->__type__().name() + " object at " + this->__address__() + ">";

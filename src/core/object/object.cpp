@@ -97,6 +97,11 @@ std::string Object::__str__() const
 	return "<" + this->__type__().name() + " object at " + this->_object_address + ">";
 }
 
+std::string Object::__repr__() const
+{
+	return this->__str__();
+}
+
 bool Object::operator<(const Object& other) const
 {
 	return this->__cmp__(&other) == -1;

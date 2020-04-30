@@ -47,6 +47,10 @@ private:
 	friend class Object;
 
 	std::string _name;
+	bool _is_const;
+	bool _is_volatile;
+	bool _is_lvalue_ref;
+	bool _is_rvalue_ref;
 	std::string _namespace;
 	std::vector<std::string> _attrs;
 
@@ -54,11 +58,12 @@ private:
 
 public:
 	[[nodiscard]] std::string name() const;
-
+	bool is_const() const;
+	bool is_volatile() const;
+	bool is_lvalue_ref() const;
+	bool is_rvalue_ref() const;
 	[[nodiscard]] std::string namespace_() const;
-
 	[[nodiscard]] std::vector<std::string> attributes() const;
-
 	[[nodiscard]] static std::string type_name(const Object& obj);
 
 	template<typename _T>
@@ -75,7 +80,6 @@ public:
 	}
 
 	bool operator==(const Type& other) const;
-
 	friend std::ostream& operator<<(std::ostream& out, const Type& obj);
 };
 

@@ -276,6 +276,7 @@ public:
 	friend bool operator>= (const Array& lhs, const Array& rhs);
 
 	[[nodiscard]] std::string __str__() const;
+	[[nodiscard]] std::string __repr__() const;
 
 	explicit operator bool () const override;
 

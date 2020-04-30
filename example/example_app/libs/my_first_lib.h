@@ -47,6 +47,17 @@ public:
 				}
 
 				return std::make_shared<types::Value<std::string>>(val);
+			}},
+			{"type", [](const std::shared_ptr<Object>& obj, const lib::KwArgs&) -> std::shared_ptr<Object>{
+				auto obj_type = obj->__type__();
+				auto name = str::replace(
+					str::replace(obj_type.name(), "<", "&lt"),
+					">",
+					"&gt"
+				);
+				return std::make_shared<types::Value<std::string>>(
+					obj_type.namespace_() + "::" + name
+				);
 			}}
 		});
 	}

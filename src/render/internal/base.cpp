@@ -28,6 +28,8 @@ Variable::Variable() : _content(""), _is_constant(true)
 {
 }
 
+std::regex Variable::number_regex = std::regex(R"((\-|\+?)?\d+(\.\d+(f)?)?(l)?)");
+
 Variable::Variable(
 	const std::string& content,
 	const std::vector<std::string>& attributes,
@@ -48,13 +50,43 @@ std::shared_ptr<core::object::Object> Variable::resolve(
 	}
 	else if (this->_is_constant)
 	{
-		// TODO: add more value types.
+		std::shared_ptr<core::object::Object> const_obj;
 		auto c = this->_content;
-		core::str::trim(c, "'");
-		core::str::trim(c, "\"");
-		return std::shared_ptr<core::object::Object>(
-			new core::types::Value<std::string>(c)
-		);
+		std::smatch sm;
+		if (std::regex_match(c, sm, Variable::number_regex))
+		{
+			bool is_int = sm[2].str().empty();
+			if (is_int)
+			{
+				if (sm[4].str().empty())
+				{
+					const_obj = std::make_shared<core::types::Value<int>>(std::stoi(sm[0]));
+				}
+				else
+				{
+					const_obj = std::make_shared<core::types::Value<long>>(std::stol(sm[0]));
+				}
+			}
+			else
+			{
+				if (sm[3].str().empty())
+				{
+					const_obj = std::make_shared<core::types::Value<double>>(std::stod(sm[0]));
+				}
+				else
+				{
+					const_obj = std::make_shared<core::types::Value<float>>(std::stof(sm[0]));
+				}
+			}
+		}
+		else
+		{
+			core::str::trim(c, "'");
+			core::str::trim(c, "\"");
+			const_obj = std::make_shared<core::types::Value<std::string>>(c);
+		}
+
+		return const_obj;
 	}
 	else
 	{

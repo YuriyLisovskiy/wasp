@@ -4,7 +4,8 @@
 	<title>Make POST</title>
 </head>
 <body>
-    <h3>{{ user_info | rm_digits(digit = 8) | to_upper }}</h3>
+    <h3>{{ user_info | rm_digits(digit = 8) | to_upper() }}</h3>
+    <h2>{{ "some string to process" | to_upper }}</h2>
     <form method="post" enctype="multipart/form-data">
         <input type="file" name="super_file" />
         <label title="Email" for="mail">

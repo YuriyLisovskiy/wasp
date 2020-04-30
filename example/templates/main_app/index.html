@@ -34,5 +34,11 @@
         {# Some single-line comment #}
         <li><a href="{% url('picture::view_pic') %}">View picture!</a></li>
     </ul>
+
+    <hr>
+    <p>{{ -10.56 }}: {{ -10.56 | type }}</p>
+    <p>{{ -10.56f }}: {{ -10.56f | type }}</p>
+    <p>{{ -10l }}: {{ -10l | type }}</p>
+
 </body>
 </html>

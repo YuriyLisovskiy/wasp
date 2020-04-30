@@ -43,11 +43,37 @@ Type::Type(const Object& obj)
 	{
 		this->_attrs.push_back(attr.first);
 	}
+
+	using T = decltype(obj);
+	this->_is_const = std::is_const<T>::value;
+	this->_is_volatile = std::is_volatile<T>::value;
+	this->_is_lvalue_ref = std::is_lvalue_reference<T>::value;
+	this->_is_rvalue_ref = std::is_rvalue_reference<T>::value;
 }
 
 std::string Type::name() const
 {
 	return this->_name;
+}
+
+bool Type::is_const() const
+{
+	return this->_is_const;
+}
+
+bool Type::is_volatile() const
+{
+	return this->_is_volatile;
+}
+
+bool Type::is_lvalue_ref() const
+{
+	return this->_is_lvalue_ref;
+}
+
+bool Type::is_rvalue_ref() const
+{
+	return this->_is_rvalue_ref;
 }
 
 std::string Type::namespace_() const
