@@ -24,23 +24,12 @@
 
 #pragma once
 
-// C++ libraries.
-#include <string>
-#include <regex>
-#include <vector>
-#include <functional>
-#include <memory>
-
 // Module definitions.
 #include "../_def_.h"
 
-// Wasp libraries.
+// Framework modules.
 #include "./base.h"
 #include "./token.h"
-#include "../base.h"
-#include "../exceptions.h"
-#include "../../core/object/object.h"
-#include "../../collections/dict.h"
 
 
 __RENDER_INTERNAL_BEGIN__
@@ -80,7 +69,6 @@ struct expression_parser
 		s_var_attr_begin,
 		s_var_attr,
 		s_const_str,
-	//	s_filter_sep_begin,
 		s_filter_sep,
 		s_filter_name_begin,
 		s_filter_name,

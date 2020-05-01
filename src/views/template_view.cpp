@@ -21,6 +21,9 @@
 
 #include "./template_view.h"
 
+// Framework modules.
+#include "../render/response.h"
+
 
 __VIEWS_BEGIN__
 

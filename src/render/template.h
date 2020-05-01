@@ -21,7 +21,7 @@
  * Purpose:
  * 	Renders html template with C++.
  *
- * 	This class is a part of Wasp default render engine and is
+ * 	This class is a part of default render engine and is
  * 	main implementation of rendering process, for custom renderer,
  * 	please, inherit from ITemplate interface and implement
  * 	required methods.
@@ -29,19 +29,11 @@
 
 #pragma once
 
-// C++ libraries.
-#include <string>
-
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
-#include "./base.h"
+// Framework modules.
 #include "./base_engine.h"
-#include "./internal/lexer.h"
-#include "./internal/parser.h"
-#include "./internal/filter_expr.h"
-#include "./internal/node_list.h"
 
 
 __RENDER_BEGIN__

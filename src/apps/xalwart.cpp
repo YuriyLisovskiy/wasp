@@ -22,6 +22,7 @@
 #include "./xalwart.h"
 
 // Framework modules.
+#include "../core/path.h"
 #include "../core/management/app.h"
 
 

@@ -21,6 +21,9 @@
 
 #include "./parser.h"
 
+// Framework modules.
+#include "../exceptions.h"
+
 
 __RENDER_INTERNAL_BEGIN__
 

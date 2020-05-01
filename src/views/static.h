@@ -19,8 +19,8 @@
  * views/static.h
  *
  * Purpose:
- * Views and functions for serving static files. These are only to be used
- * during development, and SHOULD NOT be used in a production setting.
+ * 	Views and functions for serving static files. These are only to be used
+ * 	during development, and SHOULD NOT be used in a production setting.
  */
 
 #pragma once
@@ -28,19 +28,8 @@
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
-#include "./args.h"
+// Framework modules.
 #include "./view.h"
-#include "../http/headers.h"
-#include "../http/request.h"
-#include "../http/response.h"
-#include "../http/utility.h"
-#include "../core/mime_types.h"
-#include "../core/files/file.h"
-#include "../core/datetime.h"
-#include "../core/exceptions.h"
-#include "../core/regex.h"
-#include "../conf/settings.h"
 
 
 __VIEWS_BEGIN__
@@ -56,7 +45,7 @@ public:
 
 	void set_kwargs(collections::Dict<std::string, std::string>* kwargs);
 
-	std::unique_ptr<http::IHttpResponse> get(http::HttpRequest* request, wasp::views::Args* args) final;
+	std::unique_ptr<http::IHttpResponse> get(http::HttpRequest* request, Args* args) final;
 };
 
 __VIEWS_END__

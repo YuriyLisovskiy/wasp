@@ -23,17 +23,11 @@
 
 #pragma once
 
-// C++ libraries.
-#include <string>
-#include <map>
-#include <memory>
-
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
+// Framework modules.
 #include "./base.h"
-#include "../core/object/object.h"
 
 
 __RENDER_BEGIN__

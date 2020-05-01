@@ -17,18 +17,12 @@
 
 #pragma once
 
-// C++ libraries.
-#include <string>
-#include <vector>
-#include <memory>
-
 // Module definitions.
 #include "../_def_.h"
 
-// Wasp libraries.
+// Framework modules.
 #include "./token.h"
 #include "./filter_expr.h"
-#include "../base.h"
 
 
 __RENDER_INTERNAL_BEGIN__

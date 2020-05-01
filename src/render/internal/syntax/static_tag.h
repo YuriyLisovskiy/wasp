@@ -24,16 +24,11 @@
 
 #pragma once
 
-// C++ libraries.
-#include <string>
-
 // Module definitions.
 #include "./_def_.h"
 
 // Framework modules.
-#include "../nodes.h"
 #include "../parser.h"
-#include "../filter_expr.h"
 
 
 __SYNTAX_BEGIN__

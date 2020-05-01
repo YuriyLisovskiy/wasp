@@ -25,18 +25,11 @@
 
 #pragma once
 
-// C++ libraries.
-#include <string>
-#include <memory>
-
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
-#include "./base.h"
+// Framework modules.
 #include "./env/interfaces.h"
-#include "./exceptions.h"
-#include "../http/response.h"
 
 
 __RENDER_BEGIN__

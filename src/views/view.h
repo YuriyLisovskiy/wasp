@@ -19,30 +19,19 @@
  * views/view.h
  *
  * Purpose:
- * Intentionally simple parent class for all views. Only
- * implements dispatch-by-method and simple sanity checking.
+ * 	Intentionally simple parent class for all views. Only
+ * 	implements dispatch-by-method and simple sanity checking.
  */
 
 #pragma once
 
-// C++ libraries.
-#include <vector>
-#include <string>
-#include <algorithm>
-#include <functional>
-#include <memory>
-
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
+// Framework modules.
 #include "./args.h"
 #include "../http/request.h"
 #include "../http/response.h"
-#include "../core/logger.h"
-#include "../core/string/str.h"
-#include "../core/exceptions.h"
-#include "../collections/dict.h"
 #include "../conf/settings.h"
 
 

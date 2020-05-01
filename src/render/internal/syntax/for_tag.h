@@ -16,7 +16,7 @@
  */
 
 /**
- * for_tag.h
+ * render/internal/syntax/for_tag.h
  *
  * Purpose:
  *  TODO: implement docs for for_tag.h
@@ -24,14 +24,10 @@
 
 #pragma once
 
-// C++ libraries.
-// TODO:
-
 // Module definitions.
 #include "./_def_.h"
 
 // Framework modules.
-#include "../nodes.h"
 #include "../parser.h"
 
 

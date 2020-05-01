@@ -21,6 +21,9 @@
 
 #include "./base.h"
 
+// Framework modules.
+#include "../../core/types/value.h"
+
 
 __RENDER_INTERNAL_BEGIN__
 

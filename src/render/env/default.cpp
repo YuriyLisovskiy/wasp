@@ -16,10 +16,14 @@
  */
 
 /**
- * An implementation of render/backends/wasp.h
+ * An implementation of render/env/default.h
  */
 
 #include "./default.h"
+
+// Framework modules.
+#include "../engine.h"
+#include "../../core/path.h"
 
 
 __ENV_BEGIN__

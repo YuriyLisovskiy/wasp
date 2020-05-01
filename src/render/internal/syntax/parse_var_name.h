@@ -25,10 +25,6 @@
 
 #pragma once
 
-// C++ libraries.
-#include <string>
-#include <vector>
-
 // Module definitions.
 #include "./_def_.h"
 

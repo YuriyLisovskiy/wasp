@@ -20,8 +20,7 @@
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
-#include "../render/library/base.h"
+// Framework modules.
 #include "./library/base.h"
 
 

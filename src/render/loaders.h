@@ -26,19 +26,11 @@
 
 #pragma once
 
-// C++ libraries.
-#include <experimental/filesystem>
-
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
-#include "./base.h"
+// Framework modules.
 #include "./base_engine.h"
-#include "./exceptions.h"
-#include "./template.h"
-#include "../core/path.h"
-#include "../core/files/file.h"
 
 
 __RENDER_BEGIN__

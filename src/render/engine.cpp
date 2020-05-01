@@ -23,6 +23,10 @@
 
 // Framework modules.
 #include "./library/builtin.h"
+#include "./loaders.h"
+#include "../core/path.h"
+#include "./exceptions.h"
+#include "./template.h"
 
 
 __RENDER_BEGIN__

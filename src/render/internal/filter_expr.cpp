@@ -21,6 +21,9 @@
 
 #include "./filter_expr.h"
 
+// Framework modules.
+#include "../exceptions.h"
+
 
 __RENDER_INTERNAL_BEGIN__
 

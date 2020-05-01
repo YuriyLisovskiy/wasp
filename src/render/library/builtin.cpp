@@ -19,10 +19,6 @@
  * An implementation of render/library/builtin.h
  */
 
-// C++ libraries.
-#include <map>
-#include <memory>
-
 #include "./builtin.h"
 
 // Framework modules.

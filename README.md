@@ -1,4 +1,4 @@
-## XAlwart
+## Xalwart
 
 Inspired by [Django](https://github.com/django/django).
 

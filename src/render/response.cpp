@@ -21,6 +21,9 @@
 
 #include "./response.h"
 
+// Framework modules.
+#include "./exceptions.h"
+
 
 __RENDER_BEGIN__
 

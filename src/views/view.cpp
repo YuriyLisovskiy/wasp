@@ -21,9 +21,6 @@
 
 #include "./view.h"
 
-// Framework modules.
-#include "../core/utility.h"
-
 
 __VIEWS_BEGIN__
 
