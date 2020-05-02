@@ -21,8 +21,13 @@
 
 #include "./http_server.h"
 
+// C++ libraries.
+#include <iostream>
+
 // Framework modules.
 #include "../datetime.h"
+#include "../parsers/request_parser.h"
+#include "../../http/headers.h"
 
 
 __NET_INTERNAL_BEGIN__

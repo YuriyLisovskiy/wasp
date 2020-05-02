@@ -23,16 +23,10 @@
 
 #pragma once
 
-// C++ libraries.
-#include <string>
-#include <cxxabi.h>
-#include <memory>
-
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
-#include "../string/str.h"
+// Framework modules.
 #include "../utility.h"
 
 

@@ -39,15 +39,10 @@
 
 #pragma once
 
-// C++ libraries.
-#include <string>
-
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
-#include "./path.h"
-#include "./string/str.h"
+// Framework modules.
 #include "../collections/dict.h"
 
 

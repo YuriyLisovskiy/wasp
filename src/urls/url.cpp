@@ -21,6 +21,9 @@
 
 #include "./url.h"
 
+// Framework modules.
+#include "../core/string/str.h"
+
 
 __URLS_BEGIN__
 

@@ -21,6 +21,13 @@
 
 #include "./logger.h"
 
+// C++ libraries.
+#include <iostream>
+#include <cstring>
+
+// Framework modules.
+#include "../core/datetime.h"
+
 
 __CORE_BEGIN__
 

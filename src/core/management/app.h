@@ -16,7 +16,7 @@
  */
 
 /**
- * core/managements/app.h
+ * core/management/app.h
  *
  * Purpose: core/management app config.
  */
@@ -24,10 +24,9 @@
 #pragma once
 
 // Module definitions.
-#include "./_def_.h"
+#include "../_def_.h"
 
-// Wasp libraries.
-#include "./commands/start_server.h"
+// Framework modules.
 #include "../../apps/config.h"
 
 

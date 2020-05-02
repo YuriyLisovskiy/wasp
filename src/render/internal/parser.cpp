@@ -23,6 +23,7 @@
 
 // Framework modules.
 #include "../exceptions.h"
+#include "../../core/string/str.h"
 
 
 __RENDER_INTERNAL_BEGIN__

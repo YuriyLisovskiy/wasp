@@ -21,7 +21,8 @@
 
 #include "./type.h"
 
-// Wasp libraries.
+// Framework modules.
+#include "../string/str.h"
 #include "./object.h"
 
 

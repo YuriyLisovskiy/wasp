@@ -16,16 +16,16 @@
  */
 
 /**
- * core/managements/commands/_def_.h
+ * core/management/commands/_def_.h
  *
  * Purpose: core/management/commands module's definitions.
  */
 
 #pragma once
 
-#include "../_def_.h"
+#include "../../_def_.h"
 
 
-/// core::cmd
+// core::cmd
 #define __CORE_COMMANDS_BEGIN__ __CORE_BEGIN__ namespace cmd {
 #define __CORE_COMMANDS_END__ } __CORE_END__

@@ -25,6 +25,7 @@
 #include "../http/headers.h"
 #include "../http/utility.h"
 #include "../core/mime_types.h"
+#include "../core/path.h"
 
 
 __VIEWS_BEGIN__

@@ -21,6 +21,10 @@
 
 #include "./mime_types.h"
 
+// Framework modules.
+#include "./path.h"
+#include "./string/str.h"
+
 
 __MIME_BEGIN__
 

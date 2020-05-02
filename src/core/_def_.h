@@ -26,61 +26,61 @@
 #include "../_def_.h"
 
 
-/// core
+// core
 #define __CORE_BEGIN__ __MAIN_NAMESPACE_BEGIN__ namespace core {
 #define __CORE_END__ } __MAIN_NAMESPACE_END__
 
-/// core::internal
+// core::internal
 #define __CORE_INTERNAL_BEGIN__ __CORE_BEGIN__ namespace internal {
 #define __CORE_INTERNAL_END__ } __CORE_END__
 
 
-/// core::path
+// core::path
 #define __PATH_BEGIN__ __CORE_BEGIN__ namespace path {
 #define __PATH_END__ } __CORE_END__
 
-/// core::path::internal
+// core::path::internal
 #define __PATH_INTERNAL_BEGIN__ __PATH_BEGIN__ namespace internal {
 #define __PATH_INTERNAL_END__ } __PATH_END__
 
 
-/// core::mime
+// core::mime
 #define __MIME_BEGIN__ __CORE_BEGIN__ namespace mime {
 #define __MIME_END__ } __CORE_END__
 
-/// core::encoding
+// core::encoding
 #define __ENCODING_BEGIN__ __CORE_BEGIN__ namespace encoding {
 #define __ENCODING_END__ } __CORE_END__
 
-/// core::encoding::internal
+// core::encoding::internal
 #define __ENCODING_INTERNAL_BEGIN__ __CORE_BEGIN__ namespace internal {
 #define __ENCODING_INTERNAL_END__ } __CORE_END__
 
 
-/// dt
+// dt
 #define __DATETIME_BEGIN__ __CORE_BEGIN__ namespace dt {
 #define __DATETIME_END__ } __CORE_END__
 
-/// dt::internal
+// dt::internal
 #define __DATETIME_INTERNAL_BEGIN__ __DATETIME_BEGIN__ namespace internal {
 #define __DATETIME_INTERNAL_END__ } __DATETIME_END__
 
 
-/// core::rgx
+// core::rgx
 #define __RGX_BEGIN__ __CORE_BEGIN__ namespace rgx {
 #define __RGX_END__ } __CORE_END__
 
 
-/// core::utility
+// core::utility
 #define __UTILITY_BEGIN__ __CORE_BEGIN__ namespace utility {
 #define __UTILITY_END__ } __CORE_END__
 
-/// core::utility::internal
+// core::utility::internal
 #define __UTILITY_INTERNAL_BEGIN__ __UTILITY_BEGIN__ namespace internal {
 #define __UTILITY_INTERNAL_END__ } __UTILITY_END__
 
 
-/// Declares exception's class with given base.
+// Declares exception's class with given base.
 #define DEF_EXCEPTION_WITH_BASE(name, base, default_message)\
 class name : public base\
 {\

@@ -21,6 +21,12 @@
 
 #include "./socket.h"
 
+// C++ libraries.
+#include <fcntl.h>
+
+// Framework modules.
+#include "../exceptions.h"
+
 
 __NET_INTERNAL_BEGIN__
 

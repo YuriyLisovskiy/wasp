@@ -31,7 +31,8 @@
 // Framework modules.
 #include "../views/view.h"
 #include "../urls/url.h"
-#include "../core/management/commands/app_command.h"
+#include "../core/management/app_command.h"
+#include "../core/string/str.h"
 
 
 __APPS_BEGIN__
@@ -107,7 +108,7 @@ protected:
 		}
 	}
 
-	template <typename CommandT, typename = std::enable_if<std::is_base_of<core::cmd::AppCommand, CommandT>::value>>
+	template <typename CommandT, typename = std::enable_if<std::is_base_of<core::AppCommand, CommandT>::value>>
 	void command()
 	{
 		auto cmd = std::make_shared<CommandT>(this, this->settings);

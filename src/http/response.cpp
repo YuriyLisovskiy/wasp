@@ -28,6 +28,9 @@
 #include "../core/encoding.h"
 #include "../core/mime_types.h"
 #include "../core/datetime.h"
+#include "../core/path.h"
+#include "../core/string/str.h"
+#include "../core/exceptions.h"
 
 
 __HTTP_BEGIN__

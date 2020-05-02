@@ -24,15 +24,10 @@
 #pragma once
 
 // C++ libraries.
-#include <string>
 #include <sstream>
-#include <iomanip>
 
 // Module definitions.
 #include "./_def_.h"
-
-// Wasp libraries.
-#include "../core/exceptions.h"
 
 
 __ENCODING_BEGIN__

@@ -21,6 +21,9 @@
 
 #include "./xalwart.h"
 
+// C++ libraries.
+#include <iostream>
+
 // Framework modules.
 #include "../core/path.h"
 #include "../core/management/app.h"

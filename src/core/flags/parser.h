@@ -25,14 +25,9 @@
 
 // C++ libraries.
 #include <map>
-#include <string>
-#include <iostream>
 
 // Module definitions.
 #include "./_def_.h"
-
-// Wasp libraries.
-#include "../string/str.h"
 
 
 __FLAGS_INTERNAL_BEGIN__

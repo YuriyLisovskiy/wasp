@@ -21,7 +21,10 @@
 
 #include "./object.h"
 
-// Wasp libraries.
+// C++ libraries.
+#include <sstream>
+
+// Framework modules.
 #include "../exceptions.h"
 
 

@@ -26,10 +26,7 @@
 
 // C++ libraries.
 #include <thread>
-#include <vector>
 #include <queue>
-#include <mutex>
-#include <string>
 #include <functional>
 #include <condition_variable>
 

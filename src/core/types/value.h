@@ -19,10 +19,10 @@
  * core/types/value.h
  *
  * Purpose:
- * Wrapper for fundamental types and classes which inherit Object.
+ * 	Wrapper for fundamental types and classes which inherit Object.
  *
- * Provides arithmetic operations for fundamentals and some helper
- * methods.
+ * 	Provides arithmetic operations for fundamentals and some helper
+ * 	methods.
  */
 
 #pragma once
@@ -30,7 +30,7 @@
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
+// Framework modules.
 #include "../object/object.h"
 
 

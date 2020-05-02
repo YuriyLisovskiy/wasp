@@ -25,6 +25,7 @@
 #include "./library/builtin.h"
 #include "./loaders.h"
 #include "../core/path.h"
+#include "../core/string/str.h"
 #include "./exceptions.h"
 #include "./template.h"
 

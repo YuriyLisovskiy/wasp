@@ -21,6 +21,9 @@
 
 #include "./view.h"
 
+// Framework modules.
+#include "../core/string/str.h"
+
 
 __VIEWS_BEGIN__
 

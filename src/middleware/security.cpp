@@ -23,6 +23,7 @@
 
 // Framework modules.
 #include "../http/headers.h"
+#include "../core/string/str.h"
 
 
 __MIDDLEWARE_BEGIN__

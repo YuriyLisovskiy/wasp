@@ -16,31 +16,19 @@
  */
 
 /**
- * core/managements/commands/command.h
- *
- * Purpose: base class for all commands
+ * An implementation of core/management/app_command.h
  */
 
-#pragma once
-
-// Module definitions.
-#include "./_def_.h"
-
-// Wasp libraries.
-#include "../base.h"
-#include "../../../conf/settings.h"
+#include "./app_command.h"
 
 
-__CORE_COMMANDS_BEGIN__
+__CORE_BEGIN__
 
-class Command : public BaseCommand
+AppCommand::AppCommand(
+	apps::IAppConfig* app_cfg, conf::Settings* settings, const std::string& cmd_name, const std::string& help
+) : Command(settings, cmd_name, help)
 {
-protected:
-	conf::Settings* settings;
+	this->app_config = app_cfg;
+}
 
-	Command(
-		conf::Settings* settings, const std::string& cmd_name, const std::string& help
-	);
-};
-
-__CORE_COMMANDS_END__
+__CORE_END__

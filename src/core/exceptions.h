@@ -18,38 +18,37 @@
 /**
  * core/exceptions.h
  *
- * - BaseException - main exception class
+ * 	- BaseException - main exception class
 
- * - AttributeError
- * - BadSignature
- * - CommandError
- * - DictError
- * - DisallowedHost
- * - DisallowedRedirect
- * - EntityTooLargeError
- * - EncodingError
- * - ErrorResponseException
- * - FileDoesNotExistError
- * - FileError
- * - HttpError
- * - ImproperlyConfigured
- * - InterruptException
- * - MultiPartParserError
- * - MultiValueDictError
- * - NotImplementedException
- * - NullPointerException
- * - ParseError
- * - PermissionDenied
- * - RuntimeError
- * - SocketError
- * - SuspiciousOperation
- * - ValueError
+ * 	- AttributeError
+ * 	- BadSignature
+ * 	- CommandError
+ * 	- DictError
+ * 	- DisallowedHost
+ * 	- DisallowedRedirect
+ * 	- EntityTooLargeError
+ * 	- EncodingError
+ * 	- ErrorResponseException
+ * 	- FileDoesNotExistError
+ * 	- FileError
+ * 	- HttpError
+ * 	- ImproperlyConfigured
+ * 	- InterruptException
+ * 	- MultiPartParserError
+ * 	- MultiValueDictError
+ * 	- NotImplementedException
+ * 	- NullPointerException
+ * 	- ParseError
+ * 	- PermissionDenied
+ * 	- RuntimeError
+ * 	- SocketError
+ * 	- SuspiciousOperation
+ * 	- ValueError
  */
 
 #pragma once
 
 // C++ libraries.
-#include <exception>
 #include <string>
 
 // Module definitions.
@@ -61,8 +60,8 @@ __CORE_BEGIN__
 class BaseException : public std::exception
 {
 protected:
-	std::string _fullMessage;
-	std::string _exceptionType;
+	std::string _full_message;
+	std::string _exception_type;
 	const char* _message;
 	int _line;
 	const char* _function;

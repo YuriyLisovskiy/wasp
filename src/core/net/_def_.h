@@ -21,16 +21,18 @@
  * Purpose: core/net module's definitions.
  */
 
+// TODO: refactor net/_def_.h
+
 #pragma once
 
 #include "../_def_.h"
 
 
-/// core::net
+// core::net
 #define __NET_BEGIN__ __CORE_BEGIN__ namespace net {
 #define __NET_END__ } __CORE_END__
 
-/// core::net::internal
+// core::net::internal
 #define __NET_INTERNAL_BEGIN__ __NET_BEGIN__ namespace internal {
 #define __NET_INTERNAL_END__ } __NET_END__
 

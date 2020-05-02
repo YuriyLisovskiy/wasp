@@ -24,17 +24,10 @@
 #pragma once
 
 // C++ libraries.
-#include <map>
 #include <regex>
-#include <vector>
-#include <string>
-#include <functional>
 
 // Module definitions.
 #include "./_def_.h"
-
-// Wasp libraries.
-#include "./string/str.h"
 
 
 __RGX_BEGIN__

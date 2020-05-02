@@ -30,6 +30,7 @@
 // Framework modules.
 #include "./base.h"
 #include "./token.h"
+#include "../../collections/dict.h"
 
 
 __RENDER_INTERNAL_BEGIN__

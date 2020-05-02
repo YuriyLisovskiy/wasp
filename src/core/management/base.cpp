@@ -16,7 +16,7 @@
  */
 
 /**
- * An implementation of core/managements/base.h
+ * An implementation of core/management/base.h
  */
 
 #include "./base.h"

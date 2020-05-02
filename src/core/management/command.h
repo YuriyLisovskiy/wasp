@@ -16,34 +16,31 @@
  */
 
 /**
- * core/managements/commands/app_command.h
+ * core/management/command.h
  *
- * Purpose: the base class for AppConfig commands.
+ * Purpose: base class for all commands
  */
 
 #pragma once
 
 // Module definitions.
-#include "./_def_.h"
+#include "../_def_.h"
 
-// Wasp libraries.
-#include "./command.h"
-#include "../../../apps/interfaces.h"
+// Framework modules.
+#include "./base.h"
+#include "../../conf/settings.h"
 
 
-__CORE_COMMANDS_BEGIN__
+__CORE_BEGIN__
 
-/// Derived commands must have a constructor
-///	with pointer to apps::IAppConfig and pointer
-/// to conf::Settings parameters.
-class AppCommand : public Command
+class Command : public BaseCommand
 {
 protected:
-	apps::IAppConfig* app_config;
+	conf::Settings* settings;
 
-	AppCommand(
-		apps::IAppConfig* app_cfg, conf::Settings* settings, const std::string& cmd_name, const std::string& help
+	Command(
+		conf::Settings* settings, const std::string& cmd_name, const std::string& help
 	);
 };
 
-__CORE_COMMANDS_END__
+__CORE_END__

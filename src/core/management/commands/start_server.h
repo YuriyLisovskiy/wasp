@@ -16,34 +16,19 @@
  */
 
 /**
- * core/managements/commands/runserver.h
+ * core/management/commands/runserver.h
  *
  * Purpose: runs server from command line.
  */
 
 #pragma once
 
-// C++ libraries.
-#include <memory>
-
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
-#include "./app_command.h"
-#include "../../../apps/interfaces.h"
-#include "../../../urls/url.h"
-#include "../../../urls/resolver.h"
-#include "../../../http/request.h"
-#include "../../../http/interfaces.h"
+// Framework modules.
+#include "../app_command.h"
 #include "../../../core/net/http_server.h"
-#include "../../../core/parsers/url_parser.h"
-#include "../../../core/datetime.h"
-#include "../../../core/exceptions.h"
-#include "../../../core/flags/flags.h"
-#include "../../../core/string/str.h"
-#include "../../../core/string/format.h"
-#include "../../../core/regex.h"
 
 
 __CORE_COMMANDS_BEGIN__

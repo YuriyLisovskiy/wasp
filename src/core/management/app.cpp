@@ -16,15 +16,18 @@
  */
 
 /**
- * An implementation of core/managements/app.h
+ * An implementation of core/management/app.h
  */
 
 #include "./app.h"
 
+// Framework modules.
+#include "./commands/start_server.h"
+
 
 __CORE_INTERNAL_BEGIN__
 
-CoreManagementAppConfig::CoreManagementAppConfig(wasp::conf::Settings* settings)
+CoreManagementAppConfig::CoreManagementAppConfig(conf::Settings* settings)
 	: AppConfig(__FILE__, settings)
 {
 	this->init(this->__type__());

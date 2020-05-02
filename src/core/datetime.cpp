@@ -19,16 +19,14 @@
  * An implementation of core/datetime.h
  */
 
+#include "./datetime.h"
+
 // C++ libraries.
 #include <iostream>
 #include <cassert>
+#include <ctime>
 #include <cmath>
-#include <chrono>
-#include <strings.h>
 #include <cstring>
-
-// Header.
-#include "./datetime.h"
 
 
 __DATETIME_INTERNAL_BEGIN__

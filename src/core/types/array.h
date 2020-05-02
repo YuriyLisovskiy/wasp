@@ -24,18 +24,11 @@
 
 #pragma once
 
-// C++ libraries.
-#include <memory>
-#include <vector>
-#include <exception>
-
 // Module definitions.
 #include "./_def_.h"
 
 // Framework modules.
-#include "../object/object.h"
 #include "../types/value.h"
-#include "../types/utility.h"
 
 
 __TYPES_BEGIN__
