@@ -22,7 +22,7 @@
 #include "./signer.h"
 
 // Framework modules.
-#include "../string/str.h"
+#include "../string.h"
 #include "../exceptions.h"
 #include "../../utils/crypto/hmac.h"
 

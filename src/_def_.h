@@ -23,8 +23,8 @@
 #pragma once
 
 
-// wasp (xw)
-#define __MAIN_NAMESPACE_BEGIN__ namespace wasp {
+// xw
+#define __MAIN_NAMESPACE_BEGIN__ namespace xw {
 #define __MAIN_NAMESPACE_END__ }
 
 

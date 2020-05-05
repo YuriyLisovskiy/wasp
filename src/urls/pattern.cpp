@@ -22,7 +22,7 @@
 #include "./pattern.h"
 
 // Framework modules.
-#include "../core/string/str.h"
+#include "../core/string.h"
 
 
 __URLS_BEGIN__

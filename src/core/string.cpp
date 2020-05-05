@@ -19,7 +19,7 @@
  * An implementation of core/string/str.h
  */
 
-#include "./str.h"
+#include "./string.h"
 
 // C++ libraries.
 #include <algorithm>

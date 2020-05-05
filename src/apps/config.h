@@ -32,7 +32,7 @@
 #include "../views/view.h"
 #include "../urls/url.h"
 #include "../core/management/app_command.h"
-#include "../core/string/str.h"
+#include "../core/string.h"
 
 
 __APPS_BEGIN__

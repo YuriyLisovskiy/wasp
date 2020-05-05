@@ -71,6 +71,15 @@
 #define __RGX_END__ } __CORE_END__
 
 
+// core::str
+#define __STR_BEGIN__ __CORE_BEGIN__ namespace str {
+#define __STR_END__ } __CORE_END__
+
+// core::str::internal
+#define __STR_INTERNAL_BEGIN__ __STR_BEGIN__ namespace internal {
+#define __STR_INTERNAL_END__ } __STR_END__
+
+
 // core::utility
 #define __UTILITY_BEGIN__ __CORE_BEGIN__ namespace utility {
 #define __UTILITY_END__ } __CORE_END__

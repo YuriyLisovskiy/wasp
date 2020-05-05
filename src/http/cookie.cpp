@@ -23,7 +23,7 @@
 
 // Framework modules.
 #include "../core/utility.h"
-#include "../core/string/str.h"
+#include "../core/string.h"
 #include "../core/exceptions.h"
 
 

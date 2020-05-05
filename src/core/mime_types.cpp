@@ -23,7 +23,7 @@
 
 // Framework modules.
 #include "./path.h"
-#include "./string/str.h"
+#include "./string.h"
 
 
 __MIME_BEGIN__

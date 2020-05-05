@@ -21,6 +21,15 @@
 
 #include "./request_parser.h"
 
+// C++ libraries.
+#include <algorithm>
+#include <cstring>
+
+// Framework modules.
+#include "./multipart_parser.h"
+#include "./query_parser.h"
+#include "../exceptions.h"
+
 
 __CORE_INTERNAL_BEGIN__
 

@@ -10,10 +10,10 @@
 #include "./picture_view.h"
 
 
-class PictureAppConfig : public wasp::apps::AppConfig
+class PictureAppConfig : public xw::apps::AppConfig
 {
 public:
-	explicit PictureAppConfig(wasp::conf::Settings* settings)
+	explicit PictureAppConfig(xw::conf::Settings* settings)
 		: AppConfig(__FILE__, settings)
 	{
 		this->init(this->__type__());

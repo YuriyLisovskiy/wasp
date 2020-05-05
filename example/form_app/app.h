@@ -11,10 +11,10 @@
 #include "./form_view.h"
 
 
-class FormAppConfig : public wasp::apps::AppConfig
+class FormAppConfig : public xw::apps::AppConfig
 {
 public:
-	explicit FormAppConfig(wasp::conf::Settings* settings)
+	explicit FormAppConfig(xw::conf::Settings* settings)
 		: AppConfig(__FILE__, settings)
 	{
 		this->init(this->__type__());

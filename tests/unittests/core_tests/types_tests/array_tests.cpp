@@ -21,7 +21,7 @@
 
 #include "../../../../src/core/types/array.h"
 
-using namespace wasp;
+using namespace xw;
 
 
 TEST(ArrayTestCase, AssignTest)

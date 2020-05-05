@@ -34,7 +34,7 @@
 #endif
 
 // Framework modules.
-#include "./string/str.h"
+#include "./string.h"
 #include "../core/exceptions.h"
 
 

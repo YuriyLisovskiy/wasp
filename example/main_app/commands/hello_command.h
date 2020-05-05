@@ -8,10 +8,10 @@
 #include "../../../src/core/management/app_command.h"
 
 
-class HelloCommand : public wasp::core::AppCommand
+class HelloCommand : public xw::core::AppCommand
 {
 public:
-	HelloCommand(wasp::apps::IAppConfig* config, wasp::conf::Settings* settings)
+	HelloCommand(xw::apps::IAppConfig* config, xw::conf::Settings* settings)
 		: AppCommand(config, settings, "hello", "Prints hello from MainApp")
 	{
 	}

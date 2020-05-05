@@ -19,7 +19,7 @@
 
 #include "../../../../src/render/internal/lexer.h"
 
-using namespace wasp;
+using namespace xw;
 
 
 TEST(LexerTestCase, TestSplit)

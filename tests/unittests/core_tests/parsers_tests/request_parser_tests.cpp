@@ -23,7 +23,7 @@
 
 #include "../../../../src/core/parsers/request_parser.h"
 
-using namespace wasp;
+using namespace xw;
 
 
 TEST(RequestParserTestCase, IsCharTest)

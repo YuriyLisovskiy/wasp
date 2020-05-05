@@ -11,21 +11,21 @@
 #include "../../src/core/types/array.h"
 
 
-class MainView : public wasp::views::TemplateView
+class MainView : public xw::views::TemplateView
 {
 public:
-	explicit MainView(wasp::conf::Settings* settings)
+	explicit MainView(xw::conf::Settings* settings)
 		: TemplateView({"get"}, settings)
 	{
 		this->_template_name = "main_app/index.html";
 	}
 
-	std::shared_ptr<wasp::render::IContext> get_context(
-		wasp::http::HttpRequest* request, wasp::views::Args* args
+	std::shared_ptr<xw::render::IContext> get_context(
+		xw::http::HttpRequest* request, xw::views::Args* args
 	) override
 	{
-		using namespace wasp::render;
-		using namespace wasp::core;
+		using namespace xw::render;
+		using namespace xw::core;
 
 		auto test_array = types::Array();
 		test_array.push_back("Yuriy Lisovskiy");
@@ -37,11 +37,11 @@ public:
 };
 
 
-class RedirectView : public wasp::views::RedirectView
+class RedirectView : public xw::views::RedirectView
 {
 public:
-	explicit RedirectView(wasp::conf::Settings* settings)
-		: wasp::views::RedirectView(settings, "/index", false, false)
+	explicit RedirectView(xw::conf::Settings* settings)
+		: xw::views::RedirectView(settings, "/index", false, false)
 	{
 	};
 };

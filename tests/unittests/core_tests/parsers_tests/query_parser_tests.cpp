@@ -23,7 +23,7 @@
 #include "../../../../src/core/parsers/query_parser.h"
 #include "../../../../src/http/request.h"
 
-using namespace wasp;
+using namespace xw;
 
 
 template <typename _Container>

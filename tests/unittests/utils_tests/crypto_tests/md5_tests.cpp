@@ -19,7 +19,7 @@
 
 #include "../../../../src/utils/crypto/md5.h"
 
-using namespace wasp;
+using namespace xw;
 
 
 TEST(Md5TestCase, TestDigest)

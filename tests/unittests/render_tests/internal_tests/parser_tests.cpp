@@ -19,12 +19,12 @@
 
 #include "../../../../src/render/internal/parser.h"
 
-using namespace wasp;
+using namespace xw;
 
 
 TEST(ParserTestCase, TestSplit)
 {
-	using namespace wasp::render::internal;
+	using namespace xw::render::internal;
 	ASSERT_EQ(parser::get_command("hello()"), "hello");
 	ASSERT_EQ(parser::get_command("_hello()"), "_hello");
 	ASSERT_EQ(parser::get_command("_h3e_3llo_()"), "_h3e_3llo_");

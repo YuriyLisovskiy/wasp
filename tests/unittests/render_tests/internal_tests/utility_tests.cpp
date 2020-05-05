@@ -22,12 +22,12 @@
 
 #include "../../../../src/render/internal/utility.h"
 
-using namespace wasp;
+using namespace xw;
 
 
 TEST(UtilityTestCase, TestSplitParams)
 {
-	using namespace wasp::render::internal;
+	using namespace xw::render::internal;
 	token_t first{};
 	first.content = "23";
 
@@ -49,7 +49,7 @@ TEST(UtilityTestCase, TestSplitParams)
 
 TEST(UtilityTestCase, TestSplitParamsMissingLastBracket)
 {
-	using namespace wasp::render::internal;
+	using namespace xw::render::internal;
 	std::string params = "(23, hello | def(one=1, two='zzz')";
 	std::vector<token_t> actual;
 	size_t pos;
@@ -59,7 +59,7 @@ TEST(UtilityTestCase, TestSplitParamsMissingLastBracket)
 
 TEST(UtilityTestCase, TestSplitParamsMissingOpenBracket)
 {
-	using namespace wasp::render::internal;
+	using namespace xw::render::internal;
 	std::string params = "23, hello | def)";
 	std::vector<token_t> actual;
 	size_t pos;
@@ -69,7 +69,7 @@ TEST(UtilityTestCase, TestSplitParamsMissingOpenBracket)
 
 TEST(UtilityTestCase, TestSplitParamsTooShortContent)
 {
-	using namespace wasp::render::internal;
+	using namespace xw::render::internal;
 	std::string params = "(";
 	std::vector<token_t> actual;
 	size_t pos;
@@ -79,7 +79,7 @@ TEST(UtilityTestCase, TestSplitParamsTooShortContent)
 
 TEST(UtilityTestCase, TestSplitParamsRedundantComma)
 {
-	using namespace wasp::render::internal;
+	using namespace xw::render::internal;
 	std::string params = "(23, hello | def(one=1, two='zzz'),)";
 	std::vector<token_t> actual;
 	size_t pos;
@@ -89,7 +89,7 @@ TEST(UtilityTestCase, TestSplitParamsRedundantComma)
 
 TEST(UtilityTestCase, TestSplitForLoopVars)
 {
-	using namespace wasp::render::internal;
+	using namespace xw::render::internal;
 	std::string vars = "hello, world    reversed";
 	std::vector<token_t> actual;
 	size_t pos = 0;

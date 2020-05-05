@@ -24,8 +24,9 @@
 
 #include "../../../../src/core/path.h"
 #include "../../../../src/core/files/file.h"
+#include "../../../../src/core/exceptions.h"
 
-using namespace wasp;
+using namespace xw;
 
 
 using byte = core::byte;

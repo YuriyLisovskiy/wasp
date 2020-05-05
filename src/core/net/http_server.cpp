@@ -23,9 +23,11 @@
 
 // C++ libraries.
 #include <iostream>
+#include <cstring>
 
 // Framework modules.
 #include "../datetime.h"
+#include "../string.h"
 #include "../parsers/request_parser.h"
 #include "../../http/headers.h"
 

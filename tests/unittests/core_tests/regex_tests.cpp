@@ -19,7 +19,7 @@
 
 #include "../../../src/core/regex.h"
 
-using namespace wasp;
+using namespace xw;
 
 
 TEST(RegexTestCase, TestETagPattern)

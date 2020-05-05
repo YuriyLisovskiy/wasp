@@ -11,14 +11,14 @@
 #include "../../../src/render/library/library.h"
 
 
-using namespace wasp::render;
-using namespace wasp::core;
-using namespace wasp::core::object;
+using namespace xw::render;
+using namespace xw::core;
+using namespace xw::core::object;
 
 class MyFirstLib : public lib::Library
 {
 public:
-	explicit MyFirstLib(wasp::conf::Settings* settings) : Library(settings)
+	explicit MyFirstLib(xw::conf::Settings* settings) : Library(settings)
 	{
 	}
 

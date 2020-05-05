@@ -25,7 +25,7 @@
 #include <iostream>
 
 // Framework modules.
-#include "../string/str.h"
+#include "../string.h"
 
 
 __FLAGS_INTERNAL_BEGIN__

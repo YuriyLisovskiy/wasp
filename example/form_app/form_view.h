@@ -11,19 +11,19 @@
 #include "../../src/render/context.h"
 
 
-class FormView : public wasp::views::TemplateView
+class FormView : public xw::views::TemplateView
 {
 public:
-	explicit FormView(wasp::conf::Settings* settings)
-		: wasp::views::TemplateView({"get", "post"}, settings)
+	explicit FormView(xw::conf::Settings* settings)
+		: TemplateView({"get", "post"}, settings)
 	{
 		this->_template_name = "form_app/form.html";
 	}
 
-	std::unique_ptr<wasp::http::IHttpResponse> get(wasp::http::HttpRequest* request, wasp::views::Args* args) final
+	std::unique_ptr<xw::http::IHttpResponse> get(xw::http::HttpRequest* request, xw::views::Args* args) final
 	{
-		using namespace wasp::render;
-		using namespace wasp::core::types;
+		using namespace xw::render;
+		using namespace xw::core::types;
 
 		std::string user_row;
 		if (args->contains("user_name"))
@@ -51,7 +51,7 @@ public:
 		return this->render(request, ctx);
 	}
 
-	std::unique_ptr<wasp::http::IHttpResponse> post(wasp::http::HttpRequest* request, wasp::views::Args* args) final
+	std::unique_ptr<xw::http::IHttpResponse> post(xw::http::HttpRequest* request, xw::views::Args* args) final
 	{
 		if (request->FILES.contains("super_file"))
 		{
@@ -59,6 +59,6 @@ public:
 			super_file.save();
 		}
 
-		return std::make_unique<wasp::http::HttpResponseRedirect>("/index");
+		return std::make_unique<xw::http::HttpResponseRedirect>("/index");
 	}
 };

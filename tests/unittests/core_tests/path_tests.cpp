@@ -19,7 +19,7 @@
 
 #include "../../../src/core/path.h"
 
-using namespace wasp;
+using namespace xw;
 
 
 TEST(PathTestCase, DirnameTest)

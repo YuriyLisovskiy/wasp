@@ -14,10 +14,10 @@ int main(int argc, char** argv)
 	auto settings = std::make_shared<Settings>();
 	try
 	{
-		auto app = wasp::apps::MainApplication(settings.get());
+		auto app = xw::apps::MainApplication(settings.get());
 		app.execute(argc, argv);
 	}
-	catch (const wasp::core::ImproperlyConfigured& exc)
+	catch (const xw::core::ImproperlyConfigured& exc)
 	{
 		if (settings->LOGGER)
 		{

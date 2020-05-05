@@ -23,22 +23,12 @@
 
 #pragma once
 
-// C++ libraries.
-#include <string>
-#include <functional>
-#include <fstream>
-
 // Module definitions.
 #include "../_def_.h"
 
-// Wasp libraries.
-#include "../../core/string/str.h"
-#include "../../core/exceptions.h"
-#include "../../collections/dict.h"
+// Framework modules.
 #include "../../collections/multi_dict.h"
-#include "../../core/files/file.h"
 #include "../../core/files/uploaded_file.h"
-#include "../../http/request.h"
 
 
 __CORE_INTERNAL_BEGIN__

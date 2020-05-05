@@ -17,9 +17,9 @@
 
 #include <gtest/gtest.h>
 
-#include "../../../../src/core/string/str.h"
+#include "../../../../src/core/string.h"
 
-using namespace wasp;
+using namespace xw;
 
 
 TEST(StrUtilsUrlSplitTypeTestCase, TestSuccess)

@@ -9,10 +9,10 @@
 #include "../../src/views/template_view.h"
 
 
-class PictureView : public wasp::views::TemplateView
+class PictureView : public xw::views::TemplateView
 {
 public:
-	explicit PictureView(wasp::conf::Settings* settings)
+	explicit PictureView(xw::conf::Settings* settings)
 		: TemplateView({"get"}, settings)
 	{
 		this->_template_name = "picture_app/river.html";
