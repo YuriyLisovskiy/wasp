@@ -21,6 +21,9 @@
 
 #include "./context.h"
 
+// Framework modules.
+#include "../core/exceptions.h"
+
 
 __RENDER_BEGIN__
 

@@ -26,9 +26,6 @@
 // C++ libraries.
 #include <map>
 #include <string>
-#include <cxxabi.h>
-#include <iostream>
-#include <functional>
 
 // Module definitions.
 #include "./_def_.h"

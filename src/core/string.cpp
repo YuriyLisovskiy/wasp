@@ -19,7 +19,10 @@
  * An implementation of core/string/str.h
  */
 
-#include "./str.h"
+#include "./string.h"
+
+// C++ libraries.
+#include <algorithm>
 
 
 __STR_BEGIN__
@@ -321,4 +324,112 @@ std::string make_text_list(
 	return join(list.begin(), list.end() - 1, ", ") + " " + last + " " + *list.end();
 }
 
+std::string ftoa_fixed(double value)
+{
+	if (value == 0.0)
+	{
+		return "0";
+	}
+
+	std::string result;
+	if (value < 0.0)
+	{
+		result += '-';
+		value = -value;
+	}
+
+	int exponent = internal::normalize_exp(&value);
+	int places = 0;
+	static const int width = 4;
+
+	while (exponent > 0)
+	{
+		int digit = value * 10;
+		result += std::to_string(digit) + '0';
+		value = value * 10 - digit;
+		++places;
+		--exponent;
+	}
+
+	if (places == 0)
+	{
+		result += '0';
+	}
+
+	result += '.';
+	while (exponent < 0 && places < width)
+	{
+		result += '0';
+		--exponent;
+		++places;
+	}
+
+	while (places < width)
+	{
+		int digit = value * 10.0;
+		result += std::to_string(digit) + '0';
+		value = value * 10.0 - digit;
+		++places;
+	}
+
+	return result;
+}
+
+std::string ftoa_sci(double value)
+{
+	if (value == 0.0)
+	{
+		return "0";
+	}
+
+	std::string result;
+	if (value < 0.0)
+	{
+		result += '-';
+		value = -value;
+	}
+
+	static const int width = 4;
+	int exponent = internal::normalize_exp(&value);
+	int digit = value * 10.0;
+	result += std::to_string(digit) + '0';
+	value = value * 10.0 - digit;
+	--exponent;
+
+	result += '.';
+	for (int i = 0; i < width; i++)
+	{
+		digit = value * 10.0;
+		result += std::to_string(digit) + '0';
+		value = value * 10.0 - digit;
+	}
+
+	return result + 'e' + std::to_string(exponent);
+}
+
 __STR_END__
+
+
+__STR_INTERNAL_BEGIN__
+
+int normalize_exp(double* val)
+{
+	int exponent = 0;
+	double value = *val;
+	while (value >= 1.0)
+	{
+		value /= 10.0;
+		++exponent;
+	}
+
+	while (value < 0.1)
+	{
+		value *= 10.0;
+		--exponent;
+	}
+
+	*val = value;
+	return exponent;
+}
+
+__STR_INTERNAL_END__

@@ -22,7 +22,7 @@
 #include "../../../src/render/context.h"
 #include "../../../src/core/types/value.h"
 
-using namespace wasp;
+using namespace xw;
 
 
 // TODO: remove test

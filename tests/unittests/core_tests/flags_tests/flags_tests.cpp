@@ -19,7 +19,7 @@
 
 #include "../../../../src/core/flags/flag_set.h"
 
-using namespace wasp;
+using namespace xw;
 
 
 TEST(FlagsTestCase, ParseTest)

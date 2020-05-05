@@ -29,12 +29,8 @@
 // Module definitions
 #include "./_def_.h"
 
-// Wasp libraries.
+// Framework modules.
 #include "./middleware_mixin.h"
-#include "../core/string/str.h"
-#include "../http/headers.h"
-#include "../utils/cache.h"
-#include "../utils/http.h"
 
 
 __MIDDLEWARE_BEGIN__

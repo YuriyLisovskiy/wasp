@@ -1,7 +1,7 @@
-set(BINARY "${CMAKE_PROJECT_NAME}-example")
+set(BINARY "${LIBRARY_NAME}-example")
 
 # Shared library.
-set(WASP_LIB_DLL ${PROJECT_SOURCE_DIR}/cmake-build-debug/src/libwasp.so)
+set(WASP_LIB_DLL ${PROJECT_SOURCE_DIR}/cmake-build-debug/src/lib${LIBRARY_NAME}.so)
 
 # Setup example app sources.
 file(GLOB_RECURSE SOURCES LIST_DIRECTORIES true ./*/*.h ./*/*.cpp)

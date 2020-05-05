@@ -16,19 +16,19 @@
  */
 
 /**
- * An implementation of core/managements/commands/app_command.h
+ * An implementation of core/management/command.h
  */
 
-#include "./app_command.h"
+#include "./command.h"
 
 
-__CORE_COMMANDS_BEGIN__
+__CORE_BEGIN__
 
-AppCommand::AppCommand(
-	apps::IAppConfig* app_cfg, conf::Settings* settings, const std::string& cmd_name, const std::string& help
-) : Command(settings, cmd_name, help)
+Command::Command(
+	conf::Settings* settings, const std::string& cmd_name, const std::string& help
+) : BaseCommand(cmd_name, help)
 {
-	this->app_config = app_cfg;
+	this->settings = settings;
 }
 
-__CORE_COMMANDS_END__
+__CORE_END__

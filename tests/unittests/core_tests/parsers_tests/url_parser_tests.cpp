@@ -20,7 +20,7 @@
 #include "../../../../src/core/exceptions.h"
 #include "../../../../src/core/parsers/url_parser.h"
 
-using namespace wasp;
+using namespace xw;
 
 
 class UrlParserIPv4TestCase : public ::testing::Test

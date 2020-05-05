@@ -23,34 +23,15 @@
 
 #pragma once
 
-// C++ libraries.
-#include <iostream>
-#include <cstdint>
-#include <string>
-#include <functional>
-#include <vector>
-#include <fstream>
-#include <thread>
-#include <memory>
-
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
+// Framework modules.
 #include "./socket.h"
 #include "../logger.h"
-#include "../exceptions.h"
 #include "../thread_pool.h"
-#include "../files/uploaded_file.h"
-#include "../datetime.h"
-#include "../string/str.h"
-#include "../string/format.h"
-#include "../parsers/request_parser.h"
-#include "../../conf/defaults.h"
-#include "../../conf/settings.h"
-#include "../../http/response.h"
 #include "../../http/request.h"
-#include "../../http/headers.h"
+#include "../../http/response.h"
 
 
 __NET_INTERNAL_BEGIN__
@@ -135,8 +116,12 @@ private:
 	void _close_server_socket();
 	void _clean_up(const socket_t& client);
 	http::HttpRequest* _handle_request(const socket_t& client);
-	std::string _read_body(const socket_t& client, const std::string& body_beginning, size_t body_length) const;
-	bool _wait_for_client(const socket_t& client) const;
+	[[nodiscard]] std::string _read_body(
+		const socket_t& client,
+		const std::string& body_beginning,
+		size_t body_length
+	) const;
+	[[nodiscard]] bool _wait_for_client(const socket_t& client) const;
 	static std::string _read_headers(const socket_t& client, std::string& body_beginning);
 	void _start_listener();
 	void _serve_connection(const socket_t& client);

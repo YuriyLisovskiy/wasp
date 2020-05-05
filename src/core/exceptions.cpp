@@ -19,18 +19,17 @@
  * An implementation of core/exceptions.h
  */
 
+#include "./exceptions.h"
+
 // C++ libraries.
 #include <csignal>
-
-#include "./exceptions.h"
 
 
 __CORE_BEGIN__
 
-
 // BaseException
 BaseException::BaseException(const char *message, int line, const char *function, const char *file, const char* exceptionType)
-	: _message(message), _line(line), _function(function), _file(file), _exceptionType(exceptionType)
+	: _message(message), _line(line), _function(function), _file(file), _exception_type(exceptionType)
 {
 	this->init();
 }
@@ -42,12 +41,12 @@ BaseException::BaseException(const char* message, int line, const char* function
 
 void BaseException::init()
 {
-	this->_fullMessage = this->_exceptionType + ": " + std::string(this->_message);
+	this->_full_message = this->_exception_type + ": " + std::string(this->_message);
 }
 
 const char* BaseException::what() const noexcept
 {
-	return this->_fullMessage.c_str();
+	return this->_full_message.c_str();
 }
 
 int BaseException::line() const noexcept

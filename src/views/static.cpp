@@ -21,6 +21,12 @@
 
 #include "./static.h"
 
+// Framework modules.
+#include "../http/headers.h"
+#include "../http/utility.h"
+#include "../core/mime_types.h"
+#include "../core/path.h"
+
 
 __VIEWS_BEGIN__
 
@@ -39,14 +45,14 @@ std::unique_ptr<http::IHttpResponse> StaticView::get(http::HttpRequest* request,
 	if (!this->_kwargs)
 	{
 		throw core::ImproperlyConfigured(
-			"wasp::views::StaticView requires kwargs", _ERROR_DETAILS_
+			"views::StaticView requires kwargs", _ERROR_DETAILS_
 		);
 	}
 
 	if (!this->_kwargs->contains("document_root"))
 	{
 		throw core::ImproperlyConfigured(
-			"wasp::views::StaticView requires \"document_root\" argument", _ERROR_DETAILS_
+			"views::StaticView requires \"document_root\" argument", _ERROR_DETAILS_
 		);
 	}
 

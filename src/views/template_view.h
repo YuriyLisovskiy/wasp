@@ -19,29 +19,17 @@
  * views/template_view.h
  *
  * Purpose:
- * Classes for working with template responses.
+ * 	Classes for working with template responses.
  */
 
 #pragma once
 
-// C++ libraries.
-#include <string>
-#include <memory>
-
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
-#include "../http/request.h"
-#include "../http/response.h"
-#include "../render/base.h"
-#include "../render/response.h"
+// Framework modules.
 #include "../render/env/interfaces.h"
-#include "../core/logger.h"
-#include "../core/exceptions.h"
 #include "../views/view.h"
-#include "../conf/settings.h"
-#include "../views/args.h"
 
 
 __VIEWS_BEGIN__

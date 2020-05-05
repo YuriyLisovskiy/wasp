@@ -21,6 +21,12 @@
 
 #include "./http.h"
 
+// Framework modules.
+#include "../utils/cache.h"
+#include "../utils/http.h"
+#include "../http/headers.h"
+#include "../core/string.h"
+
 
 __MIDDLEWARE_BEGIN__
 

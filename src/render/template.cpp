@@ -21,6 +21,10 @@
 
 #include "./template.h"
 
+// Framework modules.
+#include "./internal/lexer.h"
+#include "./internal/parser.h"
+
 
 __RENDER_BEGIN__
 

@@ -21,7 +21,7 @@
 
 #include "../../../src/views/args.h"
 
-using namespace wasp;
+using namespace xw;
 
 
 class ArgsTestCase : public ::testing::Test

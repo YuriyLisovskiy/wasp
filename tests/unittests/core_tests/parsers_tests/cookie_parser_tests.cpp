@@ -22,7 +22,7 @@
 
 #include "../../../../src/core/parsers/cookie_parser.h"
 
-using namespace wasp;
+using namespace xw;
 
 
 class RequestCookieParserTestCase : public ::testing::Test

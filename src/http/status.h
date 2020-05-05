@@ -28,7 +28,7 @@
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
+// Framework modules.
 #include "../collections/dict.h"
 
 

@@ -19,24 +19,18 @@
  * render/processors/lexer.h
  *
  * Purpose:
- * Tokenizer of default Wasp's render engine.
+ * 	Tokenizer of default render engine.
  */
 
 #pragma once
 
-// C++ libraries.
-#include <string>
-#include <vector>
-#include <regex>
-
 // Module definitions.
 #include "../_def_.h"
 
-// Wasp libraries.
-#include "../../core/regex.h"
-#include "../../core/string/str.h"
-#include "./token.h"
+// Framework modules.
 #include "./base.h"
+#include "./token.h"
+#include "../../core/regex.h"
 
 
 __RENDER_INTERNAL_BEGIN__

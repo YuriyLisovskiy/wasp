@@ -25,18 +25,12 @@
 #pragma once
 
 // C++ libraries.
-#include <string>
-#include <vector>
 #include <memory>
 
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
-#include "./http.h"
-#include "./crypto/md5.h"
-#include "../core/utility.h"
-#include "../http/headers.h"
+// Framework modules.
 #include "../http/request.h"
 #include "../http/response.h"
 

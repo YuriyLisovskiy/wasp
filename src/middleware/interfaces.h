@@ -24,13 +24,10 @@
 
 #pragma once
 
-// C++ libraries.
-#include <memory>
-
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
+// Framework modules.
 #include "../http/request.h"
 #include "../http/response.h"
 

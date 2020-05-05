@@ -21,6 +21,12 @@
 
 #include "./file.h"
 
+// C++ libraries.
+#include <cmath>
+
+// Framework modules.
+#include "../exceptions.h"
+
 
 __CORE_BEGIN__
 

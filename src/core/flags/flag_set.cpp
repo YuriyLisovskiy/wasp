@@ -21,6 +21,9 @@
 
 #include "./flag_set.h"
 
+// Framework modules.
+#include "./parser.h"
+
 
 __FLAGS_BEGIN__
 

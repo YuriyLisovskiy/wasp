@@ -21,6 +21,10 @@
 
 #include "./hmac.h"
 
+// Framework modules.
+#include "./md5.h"
+#include "../../core/exceptions.h"
+
 
 __CRYPTO_BEGIN__
 
@@ -90,12 +94,12 @@ void Hmac::update(const std::string& input)
 	this->_inner->update(input);
 }
 
-size_t Hmac::size()
+size_t Hmac::size() const
 {
 	return this->_size;
 }
 
-size_t Hmac::block_size()
+size_t Hmac::block_size() const
 {
 	return this->_block_size;
 }

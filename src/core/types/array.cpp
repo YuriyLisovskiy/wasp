@@ -19,14 +19,7 @@
  * An implementation of core/types/array.h
  */
 
-// C++ libraries.
-// TODO:
-
-// Header.
 #include "./array.h"
-
-// Framework modules.
-// TODO:
 
 
 __TYPES_BEGIN__

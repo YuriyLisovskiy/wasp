@@ -21,7 +21,7 @@
 
 #include "../../../src/collections/multi_dict.h"
 
-using namespace wasp;
+using namespace xw;
 
 
 template <typename _T>

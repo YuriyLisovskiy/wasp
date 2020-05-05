@@ -19,7 +19,7 @@
 
 #include "../../../src/core/mime_types.h"
 
-using namespace wasp;
+using namespace xw;
 
 
 // Testing 'ext_from_file_name' function.

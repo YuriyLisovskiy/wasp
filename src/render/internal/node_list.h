@@ -17,15 +17,10 @@
 
 #pragma once
 
-// C++ libraries.
-#include <string>
-#include <vector>
-#include <memory>
-
 // Module definitions.
 #include "../_def_.h"
 
-// Wasp libraries.
+// Framework modules.
 #include "./nodes.h"
 
 

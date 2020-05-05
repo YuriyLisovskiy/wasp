@@ -16,21 +16,19 @@
  */
 
 /**
- * conf/defaults.h
- *
- * Default configuration constants.
+ * An implementation of core/management/app_command.h
  */
 
-#pragma once
-
-// Module definitions.
-#include "./_def_.h"
+#include "./app_command.h"
 
 
-__CONF_INTERNAL_BEGIN__
+__CORE_BEGIN__
 
-const char* const STARTUP_MESSAGE = "Wasp version 0.0.1-dev, using app settings"
-									"\nStarting development server at {0!s}://{1!s}:{2!d}/"
-		                            "\nQuit the server with CONTROL-C.";
+AppCommand::AppCommand(
+	apps::IAppConfig* app_cfg, conf::Settings* settings, const std::string& cmd_name, const std::string& help
+) : Command(settings, cmd_name, help)
+{
+	this->app_config = app_cfg;
+}
 
-__CONF_INTERNAL_END__
+__CORE_END__

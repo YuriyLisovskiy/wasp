@@ -21,6 +21,10 @@
 
 #include "./multipart_parser.h"
 
+// Framework modules.
+#include "../../core/string.h"
+#include "../../core/exceptions.h"
+
 
 __CORE_INTERNAL_BEGIN__
 

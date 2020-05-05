@@ -25,15 +25,13 @@
 #pragma once
 
 // C++ libraries.
-#include <string>
 #include <vector>
-#include <memory>
 
 // Module definitions.
 #include "../_def_.h"
 
-// Framework modules
-#include "./filter_expr.h"
+// Framework modules.
+#include "./token.h"
 
 
 __RENDER_INTERNAL_BEGIN__

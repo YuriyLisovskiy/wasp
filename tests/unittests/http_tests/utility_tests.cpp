@@ -19,7 +19,7 @@
 
 #include "../../../src/http/utility.h"
 
-using namespace wasp;
+using namespace xw;
 
 
 TEST(IsSameDomainTestCase, TestPatternIsEmpty)

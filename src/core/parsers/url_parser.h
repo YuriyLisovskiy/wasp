@@ -25,14 +25,9 @@
 
 // C++ libraries.
 #include <string>
-#include <cassert>
 
 // Module definitions.
 #include "../_def_.h"
-
-// Wasp libraries.
-#include "../string/str.h"
-#include "../../core/exceptions.h"
 
 
 __CORE_INTERNAL_BEGIN__

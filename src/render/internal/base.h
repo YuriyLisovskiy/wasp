@@ -25,20 +25,14 @@
 #pragma once
 
 // C++ libraries.
-#include <string>
-#include <vector>
-#include <memory>
 #include <regex>
 
 // Module definitions.
 #include "../_def_.h"
 
-// Wasp libraries.
+// Framework modules.
 #include "../base.h"
-#include "../../core/regex.h"
-#include "../../core/object/object.h"
-#include "../../core/types/value.h"
-#include "../../core/string/str.h"
+
 
 __RENDER_INTERNAL_BEGIN__
 

@@ -19,11 +19,11 @@
  * An implementation of http/utility.h
  */
 
-// Header.
 #include "./utility.h"
 
 // Framework modules.
 #include "../core/utility.h"
+#include "../core/string.h"
 
 
 __HTTP_INTERNAL_BEGIN__

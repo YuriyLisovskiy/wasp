@@ -20,7 +20,7 @@
  */
 
 // C++ libraries.
-#include <vector>
+//#include <vector>
 
 // Header.
 #include "./for_tag.h"
@@ -28,6 +28,7 @@
 // Framework modules.
 #include "../utility.h"
 #include "../../../core/types/array.h"
+#include "../../../core/exceptions.h"
 
 
 __SYNTAX_BEGIN__

@@ -26,30 +26,15 @@
 #pragma once
 
 // C++ libraries.
-#include <string>
-#include <map>
-#include <vector>
-#include <cstring>
-#include <iterator>
 #include <set>
 #include <fstream>
-#include <utility>
 
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
+// Framework modules.
 #include "./interfaces.h"
-#include "./request.h"
-#include "../core/exceptions.h"
-#include "./status.h"
-#include "./url.h"
-#include "./utility.h"
-#include "../core/string/str.h"
-#include "../core/encoding.h"
-#include "../core/path.h"
-#include "../core/mime_types.h"
-#include "../core/datetime.h"
+#include "../collections/dict.h"
 
 
 __HTTP_BEGIN__

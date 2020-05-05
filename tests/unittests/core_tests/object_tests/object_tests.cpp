@@ -19,7 +19,7 @@
 
 #include "../../../../src/core/object/object.h"
 
-using namespace wasp;
+using namespace xw;
 
 namespace test_namespace
 {

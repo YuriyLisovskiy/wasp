@@ -19,7 +19,7 @@
 
 #include "../../../src/collections/dict.h"
 
-using namespace wasp;
+using namespace xw;
 
 
 // Dict testing.

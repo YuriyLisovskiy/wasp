@@ -16,7 +16,7 @@
  */
 
 /**
- * core/managements/base.h
+ * core/management/base.h
  *
  * Purpose:
  * 	The base class from which all management commands
@@ -25,13 +25,10 @@
 
 #pragma once
 
-// C++ libraries.
-#include <string>
-
 // Module definitions.
-#include "./_def_.h"
+#include "../_def_.h"
 
-// Wasp libraries.
+// Framework modules.
 #include "../../core/flags/flag_set.h"
 
 

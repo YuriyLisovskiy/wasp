@@ -21,6 +21,12 @@
 
 #include "./encoding.h"
 
+// C++ libraries.
+#include <iomanip>
+
+// Framework modules.
+#include "../core/exceptions.h"
+
 
 __ENCODING_BEGIN__
 
@@ -125,9 +131,7 @@ std::string encode(const std::string& _str, uint encoding, Mode mode)
 			result = encode_ascii(_str, mode);
 			break;
 		default:
-			#define wasp_name_of(v) std::string(#v)
-			throw core::EncodingError("unknown encoding: " + wasp_name_of(encoding), _ERROR_DETAILS_);
-			#undef wasp_name_of
+			throw core::EncodingError("unknown encoding", _ERROR_DETAILS_);
 	}
 
 	return result;

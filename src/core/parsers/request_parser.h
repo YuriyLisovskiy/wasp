@@ -23,20 +23,11 @@
 
 #pragma once
 
-// C++ libraries.
-#include <algorithm>
-#include <cstring>
-#include <map>
-#include <string>
-
 // Module definitions.
 #include "../_def_.h"
 
-// Wasp libraries.
+// Framework modules.
 #include "../../http/request.h"
-#include "./multipart_parser.h"
-#include "./query_parser.h"
-#include "../string/str.h"
 
 
 __CORE_INTERNAL_BEGIN__

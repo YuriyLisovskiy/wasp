@@ -23,20 +23,17 @@
 
 #pragma once
 
-// C++ libraries.
-#include <algorithm>
-#include <vector>
-#include <string>
-
 // Module definitions.
 #include "./_def_.h"
+
+// Framework modules.
 #include "./datetime.h"
 
 
 __UTILITY_BEGIN__
 
-template <typename _ItemT>
-bool contains(const _ItemT& to_check, const std::vector<_ItemT>& items)
+template <typename ItemT>
+bool contains(const ItemT& to_check, const std::vector<ItemT>& items)
 {
 	for (const auto& item : items)
 	{
@@ -49,8 +46,8 @@ bool contains(const _ItemT& to_check, const std::vector<_ItemT>& items)
 	return false;
 }
 
-template <typename _ItemT, typename _IteratorT>
-long index_of(_IteratorT begin, _IteratorT end, const _ItemT& item)
+template <typename ItemT, typename IteratorT>
+long index_of(IteratorT begin, IteratorT end, const ItemT& item)
 {
 	auto it = std::find(begin, end, item);
 	if (it == end)

@@ -20,7 +20,7 @@
 #include "../../../../src/render/internal/base.h"
 #include "../../../../src/render/internal/filter_expr.h"
 
-using namespace wasp;
+using namespace xw;
 
 
 TEST(FilterRegexTestCase, ParserTest)

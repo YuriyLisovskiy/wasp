@@ -26,17 +26,12 @@
 #pragma once
 
 // C++ libraries.
-#include <string>
-#include <iostream>
-#include <cxxabi.h>
-#include <sstream>
-#include <cstdint>
-#include <utility>
+#include <map>
 
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
+// Framework modules.
 #include "./type.h"
 
 

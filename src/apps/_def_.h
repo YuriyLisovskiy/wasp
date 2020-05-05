@@ -26,6 +26,6 @@
 #include "../_def_.h"
 
 
-/// apps
+// apps
 #define __APPS_BEGIN__ __MAIN_NAMESPACE_BEGIN__ namespace apps {
 #define __APPS_END__ } __MAIN_NAMESPACE_END__

@@ -21,10 +21,11 @@
 
 #include "../../../../src/core/path.h"
 #include "../../../../src/core/exceptions.h"
-#include "../../../../src/core/string/str.h"
+#include "../../../../src/core/string.h"
 #include "../../../../src/core/parsers/multipart_parser.h"
+#include "../../../../src/http/request.h"
 
-using namespace wasp;
+using namespace xw;
 
 
 class MultipartParserStaticTestCase : public ::testing::Test

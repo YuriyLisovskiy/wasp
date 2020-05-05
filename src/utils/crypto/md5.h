@@ -41,12 +41,11 @@ documentation and/or software.
 
 // C++ libraries.
 #include <string>
-#include <cstring>
 
 // Module definitions.
 #include "./_def_.h"
 
-// Waps libraries.
+// Framework modules.
 #include "./interfaces.h"
 
 

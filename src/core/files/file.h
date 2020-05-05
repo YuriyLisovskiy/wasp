@@ -25,12 +25,10 @@
 
 // C++ libraries.
 #include <fstream>
-#include <string>
 #include <vector>
-#include <cmath>
 
 #if defined(__unix__) || defined(__linux__)
-#include <sys/types.h>
+//#include <sys/types.h>
 #include <sys/stat.h>
 #endif
 
@@ -44,10 +42,6 @@
 
 // Module definitions.
 #include "../_def_.h"
-
-// Wasp libraries.
-#include "../exceptions.h"
-#include "../string/str.h"
 
 
 __CORE_BEGIN__

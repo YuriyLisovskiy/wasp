@@ -19,7 +19,7 @@
 
 #include "../../../../src/core/datetime.h"
 
-using namespace wasp::core;
+using namespace xw::core;
 
 
 TEST(DatetimeTestCase, StrftimeTest)

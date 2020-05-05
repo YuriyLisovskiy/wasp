@@ -19,7 +19,7 @@
 
 #include "../../../../src/core/exceptions.h"
 
-using namespace wasp;
+using namespace xw;
 
 
 class SocketErrorTestCase : public ::testing::Test

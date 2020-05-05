@@ -19,7 +19,7 @@
 
 #include "../../../src/core/encoding.h"
 
-using namespace wasp;
+using namespace xw;
 
 
 TEST(EncodeUrlTestCase, encode)

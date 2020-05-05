@@ -23,18 +23,11 @@
 
 #pragma once
 
-// C++ libraries.
-#include <vector>
-#include <functional>
-#include <memory>
-
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
+// Framework modules.
 #include "./pattern.h"
-#include "../http/response.h"
-#include "../conf/settings.h"
 
 
 __URLS_BEGIN__

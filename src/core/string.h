@@ -24,17 +24,11 @@
 #pragma once
 
 // C++ libraries.
-#include <string>
 #include <vector>
 #include <sstream>
-#include <algorithm>
-#include <functional>
 
 // Module definitions.
 #include "./_def_.h"
-
-// Wasp libraries.
-#include "../../collections/dict.h"
 
 
 __STR_BEGIN__
@@ -172,4 +166,29 @@ extern std::string make_text_list(
 	const std::vector<std::string>& list, const std::string& last
 );
 
+/// Carries out a fixed conversion of a double value to a string, with a precision of 5 decimal digits.
+/// Values with absolute values less than 0.000001 are rounded to 0.0
+/// Note: this blindly assumes that the buffer will be large enough to hold the largest possible result.
+/// The largest value we expect is an IEEE 754 double precision real, with maximum magnitude of approximately
+/// e+308. The C standard requires an implementation to allow a single conversion to produce up to 512
+/// characters, so that's what we really expect as the buffer size.
+extern std::string ftoa_fixed(double value);
+
+/// Converts double value to scientific number in string form.
+///
+/// @param value: value to convert
+/// @return	std::string representation of converted value.
+extern std::string ftoa_sci(double value);
+
 __STR_END__
+
+
+__STR_INTERNAL_BEGIN__
+
+/// Normalizes value to exponent.
+///
+/// @param val: pointer to value to normalize.
+/// @return normalized value as int.
+extern int normalize_exp(double* val);
+
+__STR_INTERNAL_END__

@@ -24,18 +24,11 @@
 
 #pragma once
 
-// C++ libraries.
-#include <map>
-#include <memory>
-
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
+// Framework modules.
 #include "../internal/node_list.h"
-#include "../../collections/dict.h"
-#include "../../core/object/object.h"
-#include "../../core/types/value.h"
 
 
 __RENDER_INTERNAL_BEGIN__

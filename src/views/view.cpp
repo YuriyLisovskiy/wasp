@@ -22,7 +22,7 @@
 #include "./view.h"
 
 // Framework modules.
-#include "../core/utility.h"
+#include "../core/string.h"
 
 
 __VIEWS_BEGIN__

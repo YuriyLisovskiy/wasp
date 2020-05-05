@@ -21,10 +21,16 @@
 
 #include "./common.h"
 
+// Framework modules.
+#include "../urls/resolver.h"
+#include "../http/headers.h"
+#include "../http/utility.h"
+#include "../core/string.h"
+
 
 __MIDDLEWARE_BEGIN__
 
-CommonMiddleware::CommonMiddleware(wasp::conf::Settings* settings)
+CommonMiddleware::CommonMiddleware(conf::Settings* settings)
 	: MiddlewareMixin(settings)
 {
 }

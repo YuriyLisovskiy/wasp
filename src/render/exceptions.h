@@ -20,24 +20,18 @@
  *
  * Purpose:
  * 	This module contains generic exceptions used by template backends. Although,
- * 	Wasp template language also internally uses these exceptions, other exceptions
+ * 	default template language also internally uses these exceptions, other exceptions
  * 	specific to the DTL should not be added here.
  */
 
 #pragma once
 
-// C++ libraries.
-#include <string>
-#include <vector>
-
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
-#include "./env/interfaces.h"
-#include "../core/exceptions.h"
+// Framework modules.
 #include "./internal/token.h"
-#include "env/interfaces.h"
+#include "./env/interfaces.h"
 
 
 __RENDER_BEGIN__

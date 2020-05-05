@@ -21,6 +21,10 @@
 
 #include "./http.h"
 
+// Framework modules.
+#include "../core/utility.h"
+#include "../core/string.h"
+
 
 __UTILS_HTTP_INTERNAL_BEGIN__
 

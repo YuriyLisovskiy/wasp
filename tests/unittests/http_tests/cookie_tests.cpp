@@ -19,7 +19,7 @@
 
 #include "../../../src/http/cookie.h"
 
-using namespace wasp;
+using namespace xw;
 
 
 TEST(CookieTestCase, toStringTestAllParameters)

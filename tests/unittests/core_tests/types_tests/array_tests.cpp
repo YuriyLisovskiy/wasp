@@ -15,11 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <vector>
+
 #include <gtest/gtest.h>
 
 #include "../../../../src/core/types/array.h"
 
-using namespace wasp;
+using namespace xw;
 
 
 TEST(ArrayTestCase, AssignTest)
@@ -30,7 +32,8 @@ TEST(ArrayTestCase, AssignTest)
 	Array null_arr;
 	ASSERT_FALSE(null_arr);
 
-	Array arr = std::vector<int>{10, 2, 5};
+	Array arr;
+	arr = std::vector<int>{10, 2, 5};
 	ASSERT_TRUE(arr);
 
 	ASSERT_EQ(*(arr[0]->__cast__<Value<int>>()), 10);

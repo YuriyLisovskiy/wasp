@@ -19,8 +19,8 @@
  * collections/dict.h
  *
  * Purpose:
- * Template container based on std::map with additional
- * methods (extended std::map).
+ * 	Template container based on std::map with additional
+ * 	methods (extended std::map).
  */
 
 #pragma once

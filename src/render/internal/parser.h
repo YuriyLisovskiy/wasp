@@ -24,24 +24,13 @@
 
 #pragma once
 
-// C++ libraries.
-#include <vector>
-#include <stack>
-#include <algorithm>
-#include <memory>
-
 // Module definitions.
 #include "../_def_.h"
 
-// Wasp libraries.
-#include "./lexer.h"
+// Framework modules.
 #include "./token.h"
 #include "./node_list.h"
-#include "./filter_expr.h"
 #include "../library/base.h"
-#include "../exceptions.h"
-#include "../../core/string/str.h"
-#include "../../core/utility.h"
 
 
 __RENDER_INTERNAL_BEGIN__

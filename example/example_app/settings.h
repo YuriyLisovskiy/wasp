@@ -25,15 +25,15 @@
 #include "../../src/render/env/default.h"
 
 
-struct Settings final: public wasp::conf::Settings
+struct Settings final: public xw::conf::Settings
 {
-	Settings() : wasp::conf::Settings()
+	Settings() : xw::conf::Settings()
 	{
 	}
 
 	void init() final
 	{
-		this->BASE_DIR = wasp::core::path::dirname(wasp::core::path::dirname(__FILE__));
+		this->BASE_DIR = xw::core::path::dirname(xw::core::path::dirname(__FILE__));
 
 		this->SECRET_KEY = "+s6cv712&nw4gsk)1dmgpje+f#%^4lhp@!up+=p3ts+hxz(fr2";
 
@@ -48,16 +48,16 @@ struct Settings final: public wasp::conf::Settings
 		};
 
 		this->MIDDLEWARE = {
-			this->middleware<wasp::middleware::SecurityMiddleware>(),
-			this->middleware<wasp::middleware::CommonMiddleware>(),
-			this->middleware<wasp::middleware::XFrameOptionsMiddleware>(),
-			this->middleware<wasp::middleware::CookieMiddleware>()
+			this->middleware<xw::middleware::SecurityMiddleware>(),
+			this->middleware<xw::middleware::CommonMiddleware>(),
+			this->middleware<xw::middleware::XFrameOptionsMiddleware>(),
+			this->middleware<xw::middleware::CookieMiddleware>()
 		};
 
-		using namespace wasp::render;
+		using namespace xw::render;
 		this->TEMPLATES_ENV = env::DefaultEnvironment::Config{
 			.dirs = std::vector<std::string>{
-				wasp::core::path::join(this->BASE_DIR, "templates")
+				xw::core::path::join(this->BASE_DIR, "templates")
 			},
 			.use_app_dirs		= true,
 			.apps				= this->INSTALLED_APPS,
@@ -70,10 +70,10 @@ struct Settings final: public wasp::conf::Settings
 			}
 		}.make_env();
 
-		this->MEDIA_ROOT = wasp::core::path::join(this->BASE_DIR, "media");
+		this->MEDIA_ROOT = xw::core::path::join(this->BASE_DIR, "media");
 		this->MEDIA_URL = "/media/";
 
-		this->STATIC_ROOT = wasp::core::path::join(this->BASE_DIR, "static");
+		this->STATIC_ROOT = xw::core::path::join(this->BASE_DIR, "static");
 		this->STATIC_URL = "/static/";
 
 		this->DATA_UPLOAD_MAX_MEMORY_SIZE = 20971520;

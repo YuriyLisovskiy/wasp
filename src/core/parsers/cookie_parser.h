@@ -25,7 +25,6 @@
 
 // C++ libraries.
 #include <map>
-#include <string>
 
 // Module definitions.
 #include "../_def_.h"

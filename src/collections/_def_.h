@@ -26,6 +26,6 @@
 #include "../_def_.h"
 
 
-/// collections
+// collections
 #define __COLLECTIONS_BEGIN__ __MAIN_NAMESPACE_BEGIN__ namespace collections {
 #define __COLLECTIONS_END__ } __MAIN_NAMESPACE_END__

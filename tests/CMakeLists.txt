@@ -1,6 +1,6 @@
 set(BINARY unittests)
 
-set(WASP_LIB_DLL ${PROJECT_SOURCE_DIR}/cmake-build-debug/src/libwasp.so)
+set(LIB_DLL ${PROJECT_SOURCE_DIR}/cmake-build-debug/src/lib${LIBRARY_NAME}.so)
 
 function(add_tests SUB_DIR SUB_NAME)
 
@@ -18,7 +18,7 @@ function(add_tests SUB_DIR SUB_NAME)
     endif()
 
     add_executable(${BINARY}-${SUB_NAME} ${SOURCES})
-    target_link_libraries(${BINARY}-${SUB_NAME} PUBLIC ${WASP_LIB_DLL} gtest stdc++fs)
+    target_link_libraries(${BINARY}-${SUB_NAME} PUBLIC ${LIB_DLL} gtest stdc++fs)
 endfunction()
 
 function(add_sub_tests SUB_NAME)

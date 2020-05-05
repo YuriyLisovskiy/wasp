@@ -19,13 +19,11 @@
  * An implementation of core/utility.h
  */
 
+#include "./utility.h"
+
 // C++ libraries.
 #include <cxxabi.h>
-#include <memory>
 #include <cassert>
-
-// Header.
-#include "./utility.h"
 
 
 __UTILITY_BEGIN__

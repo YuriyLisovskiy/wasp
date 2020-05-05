@@ -19,7 +19,7 @@
 
 #include "../../../src/conf/settings.h"
 
-using namespace wasp;
+using namespace xw;
 
 
 class MySettings : public conf::Settings

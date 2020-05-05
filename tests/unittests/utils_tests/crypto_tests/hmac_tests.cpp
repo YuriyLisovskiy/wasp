@@ -22,7 +22,7 @@
 #include "../../../../src/core/logger.h"
 #include "../../../../src/utils/crypto/hmac.h"
 
-using namespace wasp;
+using namespace xw;
 
 
 TEST(HmacTestCase, Md5HasherTest)

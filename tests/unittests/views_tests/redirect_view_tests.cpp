@@ -26,7 +26,7 @@
 #include "../../../src/collections/dict.h"
 #include "../../../src/collections/multi_dict.h"
 
-using namespace wasp;
+using namespace xw;
 
 
 http::HttpRequest make_request(const std::string& method)

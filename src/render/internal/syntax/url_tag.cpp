@@ -19,15 +19,13 @@
  * An implementation of render/library/syntax/url_tag.h
  */
 
-// C++ libraries.
-#include <vector>
-
 #include "./url_tag.h"
 
 // Framework modules.
 #include "./parse_var_name.h"
 #include "../utility.h"
 #include "../../../utils/functional.h"
+#include "../../../core/types/value.h"
 
 
 __SYNTAX_BEGIN__

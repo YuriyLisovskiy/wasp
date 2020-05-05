@@ -21,6 +21,9 @@
 
 #include "./lexer.h"
 
+// Framework modules.
+#include "../../core/string.h"
+
 
 __RENDER_INTERNAL_BEGIN__
 

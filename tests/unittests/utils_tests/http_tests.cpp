@@ -21,7 +21,7 @@
 
 #include "../../../src/utils/http.h"
 
-using namespace wasp;
+using namespace xw;
 
 
 template <typename _T>

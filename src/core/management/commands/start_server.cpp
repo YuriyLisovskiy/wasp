@@ -16,16 +16,24 @@
  */
 
 /**
- * An implementation of core/managements/commands/runserver.h
+ * An implementation of core/management/commands/runserver.h
  */
 
 #include "./start_server.h"
+
+// C++ libraries.
+#include <iostream>
+
+// Framework modules.
+#include "../../../urls/url.h"
+#include "../../../urls/resolver.h"
+#include "../../../core/parsers/url_parser.h"
 
 
 __CORE_COMMANDS_BEGIN__
 
 StartServerCommand::StartServerCommand(apps::IAppConfig* config, conf::Settings* settings)
-	: AppCommand(config, settings, "start-server", "Starts Wasp web server")
+	: AppCommand(config, settings, "start-server", "Starts web server")
 {
 	this->_host_port_flag = nullptr;
 	this->_threads_flag = nullptr;
@@ -69,7 +77,7 @@ void StartServerCommand::add_flags()
 		"port", this->DEFAULT_PORT, "Server port"
 	);
 	this->_threads_flag = this->_flag_set->make_long(
-		"threads", this->DEFAULT_THREADS, "Tells Wasp how many threads to use"
+		"threads", this->DEFAULT_THREADS, "Tells framework how many threads to use"
 	);
 	this->_use_ipv6_flag = this->_flag_set->make_bool(
 		"use-ipv6", false, "Detect if use IPv6 or not"
@@ -78,6 +86,7 @@ void StartServerCommand::add_flags()
 
 void StartServerCommand::handle()
 {
+	std::cout << "Performing checks...\n";
 	if (!this->settings->DEBUG && this->settings->ALLOWED_HOSTS.empty())
 	{
 		throw CommandError("You must set ALLOWED_HOSTS if DEBUG is false.");
@@ -400,12 +409,10 @@ void StartServerCommand::log_request(
 			color = core::Logger::Color::RED;
 		}
 
-		settings->LOGGER->print(str::format(
-			"[{0!s}] \"{1!s}\" {2!d}",
-			dt::Datetime::now().strftime("%d/%b/%Y %T").c_str(),
-			info.c_str(),
-			status_code
-		), color);
+		settings->LOGGER->print(
+			"[" + dt::Datetime::now().strftime("%d/%b/%Y %T") + "] \"" +
+			info + "\" " + std::to_string(status_code)
+		, color);
 	}
 }
 

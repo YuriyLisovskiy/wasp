@@ -24,26 +24,11 @@
 #pragma once
 
 // C++ libraries.
-#if defined(_WIN32) || defined(_WIN64)
-#include <io.h>
-#include <direct.h>
-
-#define access _access_s
-#define getcwd _getcwd
-#else
-#include <unistd.h>
-#endif
-
 #include <string>
-#include <fstream>
 #include <vector>
 
 // Module definitions.
 #include "./_def_.h"
-
-// Wasp libraries.
-#include "./string/str.h"
-#include "../core/exceptions.h"
 
 
 __PATH_BEGIN__

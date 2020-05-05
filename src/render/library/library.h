@@ -24,7 +24,7 @@
 // Module definitions.
 #include "./_def_.h"
 
-// Framework includes.
+// Framework modules.
 #include "./base.h"
 #include "../../conf/settings.h"
 

@@ -16,20 +16,38 @@
  */
 
 /**
- * core/string/_def_.h
+ * apps/xalwart.h
  *
- * Purpose: core/string module's definitions.
+ * Purpose: an implementation of main application.
  */
 
 #pragma once
 
-#include "../_def_.h"
+// Module definitions.
+#include "./_def_.h"
+
+// Framework libraries.
+#include "../conf/settings.h"
 
 
-/// str
-#define __STR_BEGIN__ __CORE_BEGIN__ namespace str {
-#define __STR_END__ } __CORE_END__
+__APPS_BEGIN__
 
-/// str::internal
-#define __STR_INTERNAL_BEGIN__ __STR_BEGIN__ namespace internal {
-#define __STR_INTERNAL_END__ } __STR_END__
+class MainApplication final
+{
+private:
+	conf::Settings* _settings;
+	std::string _help_message;
+
+	void _setup_commands();
+	void _extend_settings_commands_or_error(
+		const std::vector<std::shared_ptr<core::BaseCommand>>& from,
+		const std::function<std::string(const std::string& cmd_name)>& err_fn
+	);
+	void _perform_checks();
+
+public:
+	explicit MainApplication(conf::Settings* settings);
+	void execute(int argc, char** argv);
+};
+
+__APPS_END__

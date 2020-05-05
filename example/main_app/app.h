@@ -14,10 +14,10 @@
 #include "./commands/hello_command.h"
 
 
-class MainAppConfig : public wasp::apps::AppConfig
+class MainAppConfig : public xw::apps::AppConfig
 {
 public:
-	explicit MainAppConfig(wasp::conf::Settings* settings)
+	explicit MainAppConfig(xw::conf::Settings* settings)
 		: AppConfig(__FILE__, settings)
 	{
 		this->init(this->__type__());

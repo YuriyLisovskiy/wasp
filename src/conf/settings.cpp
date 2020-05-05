@@ -30,7 +30,7 @@ Settings::Settings()
 
 	this->LOGGER = core::Logger::get_instance({});
 
-	this->TIME_ZONE = "America/Chicago";
+	this->TIME_ZONE = std::make_shared<core::dt::Timezone>(core::dt::Timezone::UTC);
 
 	this->USE_TZ = false;
 

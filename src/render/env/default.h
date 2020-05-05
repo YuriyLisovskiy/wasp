@@ -16,29 +16,18 @@
  */
 
 /**
- * render/backends/wasp.h
+ * render/env/default.h
  *
- * Purpose: default Wasp's backend.
+ * Purpose: default environment.
  */
 
 #pragma once
 
-// C++ libraries.
-#include <string>
-#include <vector>
-#include <memory>
-
 // Module definitions.
 #include "../_def_.h"
 
-// Wasp libraries.
+// Framework modules.
 #include "./interfaces.h"
-#include "../engine.h"
-#include "../../collections/dict.h"
-#include "../../core/logger.h"
-#include "../../core/exceptions.h"
-#include "../library/base.h"
-#include "../../core/object/object.h"
 
 
 __ENV_BEGIN__

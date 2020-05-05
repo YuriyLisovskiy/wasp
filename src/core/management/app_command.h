@@ -16,19 +16,36 @@
  */
 
 /**
- * An implementation of core/managements/commands/command.h
+ * core/management/app_command.h
+ *
+ * Purpose: the base class for AppConfig commands.
  */
 
+#pragma once
+
+// Module definitions.
+#include "../_def_.h"
+
+// Framework modules.
 #include "./command.h"
 
 
-__CORE_COMMANDS_BEGIN__
+__CORE_BEGIN__
 
-Command::Command(
-	conf::Settings* settings, const std::string& cmd_name, const std::string& help
-) : BaseCommand(cmd_name, help)
+/// Derived commands must have a constructor
+///	with pointer to apps::IAppConfig and pointer
+/// to conf::Settings parameters.
+class AppCommand : public Command
 {
-	this->settings = settings;
-}
+protected:
+	apps::IAppConfig* app_config;
 
-__CORE_COMMANDS_END__
+	AppCommand(
+		apps::IAppConfig* app_cfg,
+		conf::Settings* settings,
+		const std::string& cmd_name,
+		const std::string& help
+	);
+};
+
+__CORE_END__

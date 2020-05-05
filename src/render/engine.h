@@ -18,30 +18,16 @@
 /**
  * render/engine.h
  *
- * Purpose: Wasp's default template render engine.
+ * Purpose: default template render engine.
  */
 
 #pragma once
 
-// C++ libraries.
-#include <string>
-#include <vector>
-#include <memory>
-
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
-#include "./base.h"
+// Framework modules.
 #include "./base_engine.h"
-#include "./loaders.h"
-#include "./template.h"
-#include "./exceptions.h"
-#include "../core/logger.h"
-#include "../core/string/str.h"
-#include "../core/path.h"
-#include "../collections/dict.h"
-#include "./library/base.h"
 #include "./env/interfaces.h"
 
 

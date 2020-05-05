@@ -21,6 +21,14 @@
 
 #include "./loaders.h"
 
+// C++ libraries.
+#include <experimental/filesystem>
+
+// Framework modules.
+#include "./exceptions.h"
+#include "./template.h"
+#include "../core/path.h"
+
 
 __RENDER_BEGIN__
 

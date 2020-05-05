@@ -19,7 +19,7 @@
 
 #include "../../../src/http/url.h"
 
-using namespace wasp;
+using namespace xw;
 
 
 class SimpleUrlTestCase : public ::testing::Test

@@ -25,13 +25,10 @@
 
 #pragma once
 
-// C++ libraries.
-#include <string>
-
 // Module definitions.
 #include "../_def_.h"
 
-// Wasp libraries.
+// Framework modules.
 #include "./file.h"
 
 
@@ -62,13 +59,13 @@ public:
 	UploadedFile(const UploadedFile& other);
 	UploadedFile& operator=(const UploadedFile& other);
 
-	std::string name();
-	std::string boundary();
-	std::string content_disposition();
-	std::string charset();
-	std::string content_type();
-	size_t size();
-	bool exists();
+	std::string name() const;
+	std::string boundary() const;
+	std::string content_disposition() const;
+	std::string charset() const;
+	std::string content_type() const;
+	size_t size() const;
+	bool exists() const;
 	void save();
 };
 

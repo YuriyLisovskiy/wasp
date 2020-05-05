@@ -27,10 +27,8 @@
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
+// Framework modules.
 #include "./middleware_mixin.h"
-#include "../collections/dict.h"
-#include "../core/parsers/cookie_parser.h"
 
 
 __MIDDLEWARE_BEGIN__
