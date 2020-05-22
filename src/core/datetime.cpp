@@ -52,7 +52,8 @@ bool _is_leap(ushort year)
 size_t _days_before_year(ushort year)
 {
 	auto y = year - 1;
-	return y*365 + y/4 - y/100 + y/400;
+	auto res = y*365 + y/4 - y/100 + y/400;
+	return res;
 }
 
 int _days_in_month(ushort year, ushort month)
@@ -69,7 +70,8 @@ int _days_in_month(ushort year, ushort month)
 size_t _days_before_month(ushort year, ushort month)
 {
 	m_assert(month >= 1 && month <= 12, "month must be in 1..12");
-	return _DAYS_BEFORE_MONTH[month] + (month > 2 && _is_leap(year));
+	auto res = _DAYS_BEFORE_MONTH[month] + (month > 2 && _is_leap(year));
+	return res;
 }
 
 size_t _ymd2ord(ushort year, ushort month, ushort day)
@@ -122,8 +124,9 @@ ymd _ord2ymd(size_t n)
 	n = n100_n.second;
 
 	// Now compute how many 4-year cycles precede it.
-	auto n4 = n / _DI4Y;
-	n = n & _DI4Y;
+	auto n4_n = internal::_div_mod(n, _DI4Y);
+	auto n4 = n4_n.first;
+	n = n4_n.second;
 
 	// And now how many single years.  Again n1 can be 4, and again meaning
 	// that the desired day is December 31 at the end of the 4-year cycle.
@@ -644,18 +647,19 @@ Timedelta::Timedelta(
 	long long int d = 0, s = 0, us = 0;
 
 	// Normalize everything to days, seconds, microseconds.
-	days += weeks*7;
-	seconds += minutes*60 + hours * 3600;
-	microseconds += milliseconds*1000;
+	days += weeks * 7;
+	seconds += minutes * 60 + hours * 3600;
+	microseconds += milliseconds * 1000;
 
 	// Get rid of all fractions, and normalize s and us.
 	// Take a deep breath <wink>.
 	auto day_seconds_frac = 0.0;
 	d = days;
-	assert(std::abs(day_seconds_frac) < 1.0);
+	assert(std::abs(day_seconds_frac) <= 1.0);
 	assert(std::abs(s) <= 24 * 3600);
 
 	auto seconds_frac = day_seconds_frac;
+	assert(std::abs(seconds_frac) <= 2.0);
 
 	auto d_s = internal::_div_mod(seconds, (long long)24*3600);
 	days = d_s.first;

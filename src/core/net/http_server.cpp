@@ -105,10 +105,10 @@ void HttpServer::listen_and_serve()
 	}
 #endif
 
-	// TODO: add timezone
+	// TODO: add timezone from settings!
 //	auto tz = std::make_shared<dt::Timezone>(
 //		dt::Timedelta(0, 0, 0, 0, 0, 0),
-//		"GMT"
+//		"UTC"
 //	);
 	std::string message = dt::Datetime::now().strftime("%B %d, %Y - %T") + "\n" +
 		LIB_NAME + " version " + LIB_VERSION + "\n" +
