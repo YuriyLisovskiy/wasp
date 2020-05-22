@@ -16,10 +16,10 @@
  */
 
 /**
- * render/internal/syntax/for_tag.h
+ * render/internal/syntax/foreach_tag.h
  *
  * Purpose:
- *  TODO: implement docs for for_tag.h
+ *  TODO: add docs for foreach_tag.h
  */
 
 #pragma once
@@ -33,9 +33,9 @@
 
 __SYNTAX_BEGIN__
 
-const std::string TAG_NAME_FOR = "for";
+const std::string TAG_NAME_FOREACH = "foreach";
 
-struct for_node : public node
+struct foreach_node : public node
 {
 	std::vector<token_t> loop_vars;
 	std::shared_ptr<FilterExpression> sequence;
@@ -50,29 +50,29 @@ struct for_node : public node
 // For example, to display a list of athletes given ``athlete_list``:
 
 //     <ul>
-//         {% for athlete : athlete_list %}
+//         {% foreach athlete : athlete_list %}
 //             <li>{{ athlete.name }}</li>
-//         {% end_for %}
+//         {% end_foreach %}
 //     </ul>
 //
 // You can loop over a list in reverse by using
-// ``{% for obj : list reversed %}``.
+// ``{% foreach obj : list reversed %}``.
 //
 // You can also unpack multiple values from a two-dimensional array:
 //
-//     {% for key,value in dict.items %}
+//     {% foreach key,value in dict.items %}
 //         {{ key }}: {{ value }}
-//     {% end_for %}
+//     {% end_foreach %}
 //
-// The ``for`` tag can take an optional ``{% empty %}`` clause that will
+// The ``foreach`` tag can take an optional ``{% empty %}`` clause that will
 // be displayed if the given array is empty or could not be found:
 //
 //     <ul>
-//         {% for athlete : athlete_list %}
+//         {% foreach athlete : athlete_list %}
 //             <li>{{ athlete.name }}</li>
 //         {% empty %}
 //             <li>Sorry, no athletes in this list.</li>
-//         {% end_for %}
+//         {% end_foreach %}
 //     <ul>
 //
 // The for loop sets a number of variables available within the loop:
@@ -90,13 +90,13 @@ struct for_node : public node
 //     ``for_loop.parent_loop``    For nested loops, this is the loop "above" the
 //                                 current one
 //     ==========================  ================================================
-extern std::shared_ptr<internal::node> parse_for(
+extern std::shared_ptr<internal::node> parse_foreach(
 	internal::parser* parser,
 	internal::token_t& token
 );
 
 extern std::function<std::shared_ptr<internal::node>(
 	internal::parser*, internal::token_t& token
-)> make_for_tag();
+)> make_foreach_tag();
 
 __SYNTAX_END__

@@ -12,7 +12,7 @@
     {% end_if_equal %}
 
     <table style="border: 1px solid black">
-        {% for i, item : test_array %}
+        {% foreach(i, item : test_array) %}
             <tr>
 				<td>{{ i }}</td>
 				<td>{{ item }}</td>
@@ -22,7 +22,7 @@
                 <td>-</td>
                 <td>Sorry, test_array is empty :(</td>
             </tr>
-        {% end_for %}
+        {% end_foreach %}
     </table>
 
     <ul>

@@ -16,14 +16,14 @@
  */
 
 /**
- * An implementation of render/internal/syntax/for_tag.h
+ * An implementation of render/internal/syntax/foreach_tag.h
  */
 
 // C++ libraries.
 //#include <vector>
 
 // Header.
-#include "./for_tag.h"
+#include "./foreach_tag.h"
 
 // Framework modules.
 #include "../utility.h"
@@ -33,7 +33,7 @@
 
 __SYNTAX_BEGIN__
 
-class ForLoop : public core::object::Object
+class ForEachLoop : public core::object::Object
 {
 public:
 	core::types::Value<long long> counter;
@@ -42,9 +42,9 @@ public:
 	core::types::Value<long long> rev_counter0;
 	core::types::Value<bool> first;
 	core::types::Value<bool> last;
-	core::types::Value<std::shared_ptr<ForLoop>> parent_loop;
+	core::types::Value<std::shared_ptr<ForEachLoop>> parent_loop;
 
-	ForLoop()
+	ForEachLoop()
 	{
 		using Attr = core::object::Attr;
 		this->__attrs__ = {
@@ -57,7 +57,7 @@ public:
 		};
 	}
 
-	ForLoop(const ForLoop& other) : Object(other)
+	ForEachLoop(const ForEachLoop& other) : Object(other)
 	{
 		if (this != &other)
 		{
@@ -70,8 +70,8 @@ public:
 			auto pl_ptr = other.parent_loop.get();
 			if (pl_ptr)
 			{
-				this->parent_loop = core::types::Value<std::shared_ptr<ForLoop>>(
-					std::make_shared<ForLoop>(*pl_ptr)
+				this->parent_loop = core::types::Value<std::shared_ptr<ForEachLoop>>(
+					std::make_shared<ForEachLoop>(*pl_ptr)
 				);
 			}
 
@@ -88,15 +88,15 @@ public:
 	}
 };
 
-std::string for_node::render(IContext* ctx)
+std::string foreach_node::render(IContext* ctx)
 {
 	using Array = core::types::Array;
 
-	auto fl_ptr = ctx->find_var("for_loop");
-	ForLoop* parent_loop = nullptr;
+	auto fl_ptr = ctx->find_var("foreach_loop");
+	ForEachLoop* parent_loop = nullptr;
 	if (fl_ptr)
 	{
-		parent_loop = dynamic_cast<ForLoop*>(fl_ptr.get());
+		parent_loop = dynamic_cast<ForEachLoop*>(fl_ptr.get());
 	}
 
 	auto values_ptr = this->sequence->resolve(ctx);
@@ -126,27 +126,27 @@ std::string for_node::render(IContext* ctx)
 	auto unpack = num_loop_vars > 1;
 	ctx->push_scope({});
 
-	// Create a for_loop value in the context.
+	// Create a foreach_loop value in the context.
 	// We'll update counters on each iteration just below.
-	auto for_loop = std::make_shared<ForLoop>();
+	auto foreach_loop = std::make_shared<ForEachLoop>();
 	if (parent_loop)
 	{
-		for_loop->parent_loop = std::make_shared<ForLoop>(*parent_loop);
+		foreach_loop->parent_loop = std::make_shared<ForEachLoop>(*parent_loop);
 	}
 
 	for (size_t i = 0; i < len_values; i++)
 	{
 		// Shortcuts for current loop iteration number.
-		for_loop->counter0 = i;
-		for_loop->counter = i + 1;
+		foreach_loop->counter0 = i;
+		foreach_loop->counter = i + 1;
 
 		// Reverse counter iteration numbers.
-		for_loop->rev_counter = len_values - i;
-		for_loop->rev_counter0 = len_values - i - 1;
+		foreach_loop->rev_counter = len_values - i;
+		foreach_loop->rev_counter0 = len_values - i - 1;
 
 		// Boolean values designating first and last times through loop.
-		for_loop->first = (i == 0);
-		for_loop->last = (i == (len_values - 1));
+		foreach_loop->first = (i == 0);
+		foreach_loop->last = (i == (len_values - 1));
 
 		auto pop_context = false;
 		if (unpack)
@@ -179,30 +179,49 @@ std::string for_node::render(IContext* ctx)
 		}
 	}
 
-	ctx->push_var("for_loop", for_loop);
+	ctx->push_var("foreach_loop", foreach_loop);
 	return rendered_result;
 }
 
-std::shared_ptr<internal::node> parse_for(
+std::shared_ptr<internal::node> parse_foreach(
 	internal::parser* parser,
 	internal::token_t& token
 )
 {
-	auto curr_pos = token.content.find("for") + 3;
-	auto colon_pos = token.content.find(':', curr_pos);
-	if (colon_pos == std::string::npos)
+	auto curr_pos = token.content.find(TAG_NAME_FOREACH) + TAG_NAME_FOREACH.size();
+	auto open_bracket_pos = token.content.find('(', curr_pos);
+	if (open_bracket_pos == std::string::npos)
 	{
 		parser::throw_error(
-			"incorrect 'for' statement, use the format 'for x : y': " + token.content,
+			"missing opening bracket: " + token.content,
 			token, token.line_no
 		);
 	}
 
-	for_node fnd{};
+	if (*(token.content.end() - 1) != ')')
+	{
+		parser::throw_error(
+			"missing closing bracket: " + token.content,
+			token, token.line_no
+		);
+	}
+
+	auto content = token.content.substr(0, token.content.size() - 1);
+	curr_pos = open_bracket_pos + 1;
+	auto colon_pos = content.find(':', curr_pos);
+	if (colon_pos == std::string::npos)
+	{
+		parser::throw_error(
+			"incorrect '" + TAG_NAME_FOREACH + "' statement, use the format 'foreach(x : y)': " + token.content,
+			token, token.line_no
+		);
+	}
+
+	foreach_node fnd{};
 
 	// retrieve vars, i.e. ``i, item``
 	if (!split_for_loop_vars(
-		token.content, token.line_no,
+		content, token.line_no,
 		curr_pos, fnd.loop_vars, 2
 	))
 	{
@@ -214,8 +233,8 @@ std::shared_ptr<internal::node> parse_for(
 	// retrieve container variables
 	std::vector<token_t> sequence_var;
 	if (!split_for_loop_vars(
-		token.content,
-		token.line_no, ++curr_pos, sequence_var, 1
+		content, token.line_no,
+		++curr_pos, sequence_var, 1
 	))
 	{
 		parser::invalid_syntax(token, curr_pos);
@@ -231,8 +250,8 @@ std::shared_ptr<internal::node> parse_for(
 	// identify if reverse container items
 	std::vector<token_t> reversed_sig;
 	if (!split_for_loop_vars(
-		token.content,
-		token.line_no, ++curr_pos, reversed_sig, 1
+		content, token.line_no,
+		++curr_pos, reversed_sig, 1
 	))
 	{
 		parser::invalid_syntax(token, curr_pos);
@@ -256,12 +275,12 @@ std::shared_ptr<internal::node> parse_for(
 	}
 
 	fnd.nodelist_loop = parser->parse(
-		{"empty", "end_" + TAG_NAME_FOR}
+		{"empty", "end_" + TAG_NAME_FOREACH}
 	);
 	auto next_token = parser->next_token();
 	if (next_token.content == "empty")
 	{
-		fnd.nodelist_empty = parser->parse({"end_" + TAG_NAME_FOR});
+		fnd.nodelist_empty = parser->parse({"end_" + TAG_NAME_FOREACH});
 		parser->del_first_token();
 	}
 	else
@@ -269,19 +288,19 @@ std::shared_ptr<internal::node> parse_for(
 		fnd.nodelist_empty = std::make_shared<node_list>();
 	}
 
-	return std::make_shared<for_node>(fnd);
+	return std::make_shared<foreach_node>(fnd);
 }
 
 std::function<std::shared_ptr<internal::node>(
 	internal::parser*, internal::token_t& token
-)> make_for_tag()
+)> make_foreach_tag()
 {
 	return [](
 		internal::parser* parser,
 		internal::token_t& token
 	) -> std::shared_ptr<internal::node>
 	{
-		return parse_for(parser, token);
+		return parse_foreach(parser, token);
 	};
 }
 

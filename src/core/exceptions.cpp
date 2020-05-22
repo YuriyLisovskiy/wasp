@@ -28,10 +28,9 @@
 __CORE_BEGIN__
 
 // BaseException
-BaseException::BaseException(const char *message, int line, const char *function, const char *file, const char* exceptionType)
+BaseException::BaseException(const char* message, int line, const char* function, const char* file, const char* exceptionType)
 	: _message(message), _line(line), _function(function), _file(file), _exception_type(exceptionType)
 {
-	this->init();
 }
 
 BaseException::BaseException(const char* message, int line, const char* function, const char* file)
@@ -39,14 +38,9 @@ BaseException::BaseException(const char* message, int line, const char* function
 {
 }
 
-void BaseException::init()
-{
-	this->_full_message = this->_exception_type + ": " + std::string(this->_message);
-}
-
 const char* BaseException::what() const noexcept
 {
-	return this->_full_message.c_str();
+	return this->_message.c_str();
 }
 
 int BaseException::line() const noexcept
@@ -62,6 +56,11 @@ const char* BaseException::function() const noexcept
 const char* BaseException::file() const noexcept
 {
 	return this->_file;
+}
+
+std::string BaseException::get_message() const noexcept
+{
+	return this->_exception_type + ": " + this->_message;
 }
 
 

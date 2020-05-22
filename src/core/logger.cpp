@@ -96,27 +96,27 @@ void Logger::print(const char* msg, Color colour, char end)
 
 void Logger::info(const core::BaseException& exc)
 {
-	this->info(exc.what(), exc.line(), exc.function(), exc.file());
+	this->info(exc.get_message(), exc.line(), exc.function(), exc.file());
 }
 
 void Logger::debug(const core::BaseException& exc)
 {
-	this->debug(exc.what(), exc.line(), exc.function(), exc.file());
+	this->debug(exc.get_message(), exc.line(), exc.function(), exc.file());
 }
 
 void Logger::warning(const core::BaseException& exc)
 {
-	this->warning(exc.what(), exc.line(), exc.function(), exc.file());
+	this->warning(exc.get_message(), exc.line(), exc.function(), exc.file());
 }
 
 void Logger::error(const core::BaseException& exc)
 {
-	this->error(exc.what(), exc.line(), exc.function(), exc.file());
+	this->error(exc.get_message(), exc.line(), exc.function(), exc.file());
 }
 
 void Logger::fatal(const core::BaseException& exc)
 {
-	this->fatal(exc.what(), exc.line(), exc.function(), exc.file());
+	this->fatal(exc.get_message(), exc.line(), exc.function(), exc.file());
 }
 
 void Logger::log(const std::string& msg, int line, const char* function, const char* file, Logger::log_level_enum level)

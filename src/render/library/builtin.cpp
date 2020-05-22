@@ -26,7 +26,7 @@
 #include "../internal/syntax/static_tag.h"
 #include "../internal/syntax/url_tag.h"
 #include "../internal/syntax/if_equal_tag.h"
-#include "../internal/syntax/for_tag.h"
+#include "../internal/syntax/foreach_tag.h"
 
 
 __LIB_BEGIN__
@@ -66,7 +66,7 @@ std::shared_ptr<Tags> BuiltinLibrary::get_tags()
 		{syntax::TAG_NAME_IF_EQUAL, syntax::make_if_equal_tag()},
 		{syntax::TAG_NAME_IF_NOT_EQUAL, syntax::make_if_not_equal_tag()},
 
-		{syntax::TAG_NAME_FOR, syntax::make_for_tag()}
+		{syntax::TAG_NAME_FOREACH, syntax::make_foreach_tag()}
 	});
 }
 

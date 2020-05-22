@@ -60,20 +60,15 @@ __CORE_BEGIN__
 class BaseException : public std::exception
 {
 protected:
-	std::string _full_message;
+//	std::string _full_message;
 	std::string _exception_type;
-	const char* _message;
+	std::string _message;
 	int _line;
 	const char* _function;
 	const char* _file;
 
 	// Use only when initializing of a derived exception!
 	BaseException(const char* message, int line, const char* function, const char* file, const char* type);
-
-	/// Initializes '_fullMessage' member.
-	///
-	/// Calls only in constructor.
-	void init();
 
 public:
 	BaseException(const char* message, int line, const char* function, const char* file);
@@ -83,6 +78,7 @@ public:
 	[[nodiscard]] virtual int line() const noexcept;
 	[[nodiscard]] virtual const char* function() const noexcept;
 	[[nodiscard]] virtual const char* file() const noexcept;
+	virtual std::string get_message() const noexcept;
 };
 
 
