@@ -67,6 +67,55 @@ typedef unsigned int uint;
 #define m_assert(_expr, _msg) \
 	internal::_M_Assert(#_expr, _expr, __PRETTY_FUNCTION__, __LINE__, _msg)
 
+struct tm_tuple
+{
+	int tm_sec;             /* Seconds (0-60) */
+	int tm_min;             /* Minutes (0-59) */
+	int tm_hour;            /* Hours (0-23) */
+	int tm_mday;            /* Day of the month (1-31) */
+	int tm_mon;             /* Month (0-11) */
+	int tm_year;            /* Year - 1900 */
+	int tm_wday;            /* Day of the week (0-6, Sunday = 0) */
+	int tm_yday;            /* Day in the year (0-365, 1 Jan = 0) */
+	int tm_isdst;           /* Daylight saving time */
+	long int tm_gmtoff;     /* Seconds east of UTC.  */
+	const char* tm_zone;	/* Timezone abbreviation.  */
+
+	[[nodiscard]] struct tm as_tm() const
+	{
+		struct tm res{};
+		res.tm_sec = this->tm_sec;
+		res.tm_min = this->tm_min;
+		res.tm_hour = this->tm_hour;
+		res.tm_mday = this->tm_mday;
+		res.tm_mon = this->tm_mon;
+		res.tm_year = this->tm_year;
+		res.tm_wday = this->tm_wday;
+		res.tm_yday = this->tm_yday;
+		res.tm_isdst = this->tm_isdst;
+		res.tm_gmtoff = this->tm_gmtoff;
+		res.tm_zone = this->tm_zone;
+		return res;
+	}
+
+	tm_tuple() = default;
+
+	explicit tm_tuple(tm* t)
+	{
+		this->tm_sec = t->tm_sec;
+		this->tm_min = t->tm_min;
+		this->tm_hour = t->tm_hour;
+		this->tm_mday = t->tm_mday;
+		this->tm_mon = t->tm_mon;
+		this->tm_year = t->tm_year;
+		this->tm_wday = t->tm_wday;
+		this->tm_yday = t->tm_yday;
+		this->tm_isdst = t->tm_isdst;
+		this->tm_gmtoff = t->tm_gmtoff;
+		this->tm_zone = t->tm_zone;
+	}
+};
+
 __DATETIME_END__
 
 
@@ -187,13 +236,13 @@ const std::string _DAY_NAMES[7 + 1] = {
 	"", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"
 };
 
-extern tm _build_struct_time(
+extern tm_tuple _build_struct_time(
 	ushort y, ushort m, ushort d, ushort hh, ushort mm, ushort ss, int dst_flag
 );
 
-extern void _mk_tz_info(tm* tm_tuple, bool is_gmt = false);
+extern void _mk_tz_info(tm_tuple* time_tuple, bool is_gmt = false);
 
-extern char* _strptime(const char* _s, const char* _fmt, tm* _tp);
+extern char* _strptime(const char* _s, const char* _fmt, tm_tuple* _tp);
 
 // Prepends 'c' 'w'-times and appends 'num' as std::string;
 // if 'num' string is longer than 'w', returns 'num' as std::string.
@@ -223,8 +272,8 @@ extern long long int _divide_and_round(long long int a, long long int b);
 
 extern time_t _time();
 
-extern tm* _localtime(const time_t* _timer);
-extern tm* _gmtime(const time_t* _timer);
+extern tm_tuple _localtime(const time_t* _timer);
+extern tm_tuple _gmtime(const time_t* _timer);
 
 __DATETIME_INTERNAL_END__
 
@@ -410,8 +459,8 @@ public:
 
 	// Standard conversions, ==, !=, <=, <, >=, > and helpers.
 
-	// Return local time of struct tm type.
-	[[nodiscard]] virtual tm time_tuple() const;
+	// Return local time of struct time_tuple type.
+	[[nodiscard]] virtual tm_tuple time_tuple() const;
 
 	// Return proleptic Gregorian ordinal for the year, month and day.
 	//
@@ -695,13 +744,13 @@ public:
 	static Datetime from_iso_format(const std::string& date_str);
 
 	// Return local time tuple compatible with time.localtime().
-	[[nodiscard]] tm time_tuple() const override;
+	[[nodiscard]] tm_tuple time_tuple() const override;
 
 	// Return POSIX timestamp as double.
 	[[nodiscard]] double timestamp() const;
 
 	// Return UTC time tuple compatible with time.gmtime().
-	tm utc_time_tuple();
+	tm_tuple utc_time_tuple();
 
 	// Return the date part.
 	[[nodiscard]] Date date() const;
@@ -882,7 +931,7 @@ extern void _replace(
 );
 
 extern std::string _wrap_strftime(
-	const std::string& format, const tm& time_tuple,
+	const std::string& format, const tm_tuple& time_tuple,
 	const std::function<long long int()>& microsecond = nullptr,
 	const std::function<std::shared_ptr<Timedelta>()>& utc_offset = nullptr,
 	const std::function<std::string()>& tz_name = nullptr

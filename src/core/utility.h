@@ -94,7 +94,7 @@ __UTILITY_END__
 __UTILITY_INTERNAL_BEGIN__
 
 extern std::string _format_timetuple_and_zone(
-	tm* tm_tuple, const std::string& zone
+	dt::tm_tuple* time_tuple, const std::string& zone
 );
 
 __UTILITY_INTERNAL_END__

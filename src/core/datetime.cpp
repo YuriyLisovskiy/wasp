@@ -158,11 +158,11 @@ ymd _ord2ymd(size_t n)
 	return ymd{(ushort)year, (ushort)month, (ushort)(n + 1)};
 }
 
-tm _build_struct_time(
+tm_tuple _build_struct_time(
 	ushort y, ushort m, ushort d, ushort hh, ushort mm, ushort ss, int dst_flag
 )
 {
-	tm t{};
+	tm_tuple t{};
 	t.tm_year = y - 1900;
 	t.tm_mon = m - 1;
 	t.tm_mday = d;
@@ -175,41 +175,56 @@ tm _build_struct_time(
 	return t;
 }
 
-void _mk_tz_info(tm* tm_tuple, bool is_gmt)
+void _mk_tz_info(tm_tuple* time_tuple, bool is_gmt)
 {
-	if (!tm_tuple)
+	if (!time_tuple)
 	{
 		return;
 	}
 
 	if (is_gmt)
 	{
-		tm_tuple->tm_gmtoff = 0;
-		tm_tuple->tm_zone = "GMT";
+		time_tuple->tm_gmtoff = 0;
+		time_tuple->tm_zone = "GMT";
 		return;
 	}
 
 	const short buff_sz = 15;
 	char buffer[buff_sz];
-	::strftime(buffer, buff_sz, "%z|%Z", tm_tuple);
+	tm t = time_tuple->as_tm();
+	::strftime(buffer, buff_sz, "%z|%Z", &t);
 	std::string s = buffer;
 
 	auto pos = s.find('|');
 	auto offset = std::string(s.substr(0, pos));
 	auto abbr = s.substr(pos + 1);
 
-	tm_tuple->tm_zone = abbr.c_str();
+	time_tuple->tm_zone = abbr.c_str();
 
 	// `offset` is in ISO 8601 format: "±HHMM"
 	int h = std::stoi(offset.substr(0,3), nullptr, 10);
 	int m = std::stoi(offset.substr(3), nullptr, 10);
 
-	tm_tuple->tm_gmtoff = h*3600 + m*60;
+	time_tuple->tm_gmtoff = h*3600 + m*60;
 }
 
-char* _strptime(const char* _s, const char* _fmt, tm* _tp)
+char* _strptime(const char* _s, const char* _fmt, tm_tuple* _tp)
 {
-	auto res = ::strptime(_s, _fmt, _tp);
+	tm t{};
+	auto res = ::strptime(_s, _fmt, &t);
+
+	_tp->tm_sec = t.tm_sec;
+	_tp->tm_min = t.tm_min;
+	_tp->tm_hour = t.tm_hour;
+	_tp->tm_mday = t.tm_mday;
+	_tp->tm_mon = t.tm_mon;
+	_tp->tm_year = t.tm_year;
+	_tp->tm_wday = t.tm_wday;
+	_tp->tm_yday = t.tm_yday;
+	_tp->tm_isdst = t.tm_isdst;
+	_tp->tm_gmtoff = t.tm_gmtoff;
+	_tp->tm_zone = t.tm_zone;
+
 	_tp->tm_year += 1900;
 	return res;
 }
@@ -219,7 +234,7 @@ Datetime _strptime_datetime(
 	const char* format
 )
 {
-	tm dt_tm{};
+	tm_tuple dt_tm{};
 	internal::_strptime(datetime_str.c_str(), format, &dt_tm);
 //	internal::_mk_tz_info(&dt_tm);
 
@@ -312,7 +327,7 @@ void _replace(
 }
 
 std::string _wrap_strftime(
-	const std::string& format, const tm& time_tuple,
+	const std::string& format, const tm_tuple& time_tuple,
 	const std::function<long long int()>& microsecond,
 	const std::function<std::shared_ptr<Timedelta>()>& utc_offset,
 	const std::function<std::string()>& tz_name
@@ -423,7 +438,8 @@ std::string _wrap_strftime(
 
 	const auto buff_size = 100;
 	char buffer[buff_size];
-	std::strftime(buffer, buff_size, new_format.c_str(), &time_tuple);
+	tm t = time_tuple.as_tm();
+	std::strftime(buffer, buff_size, new_format.c_str(), &t);
 	return buffer;
 }
 
@@ -583,18 +599,18 @@ time_t _time()
 	return std::time(nullptr);
 }
 
-tm* _localtime(const time_t* _timer)
+tm_tuple _localtime(const time_t* _timer)
 {
 	auto t = ::localtime(_timer);
 	t->tm_year += 1900;
-	return t;
+	return tm_tuple(t);
 }
 
-tm* _gmtime(const time_t* _timer)
+tm_tuple _gmtime(const time_t* _timer)
 {
 	auto t = ::gmtime(_timer);
 	t->tm_year += 1900;
-	return t;
+	return tm_tuple(t);
 }
 
 __DATETIME_INTERNAL_END__
@@ -911,7 +927,7 @@ Date::Date(ushort year, ushort month, ushort day)
 Date Date::from_timestamp(time_t t)
 {
 	auto lt = internal::_localtime(&t);
-	return Date(lt->tm_year, lt->tm_mon+1, lt->tm_mday);
+	return Date(lt.tm_year, lt.tm_mon+1, lt.tm_mday);
 }
 
 Date Date::today()
@@ -1027,7 +1043,7 @@ ushort Date::day() const
 	return this->_day;
 }
 
-tm Date::time_tuple() const
+tm_tuple Date::time_tuple() const
 {
 	return internal::_build_struct_time(
 		this->_year, this->_month, this->_day, 0, 0, 0, -1
@@ -1333,7 +1349,7 @@ Time Time::from_iso_format(const std::string& time_str)
 
 std::string Time::strftime(const std::string& fmt) const
 {
-	tm time{};
+	tm_tuple time{};
 	time.tm_year = 1900;
 	time.tm_mon = 1;
 	time.tm_mday = 1;
@@ -1343,7 +1359,6 @@ std::string Time::strftime(const std::string& fmt) const
 	time.tm_wday = 1;
 	time.tm_yday = 1;
 	time.tm_isdst = -1;
-
 	auto microsecond = [this]() -> long long { return this->microsecond(); };
 	auto utc_offset = [this]() -> std::shared_ptr<Timedelta> { return this->utc_offset(); };
 	auto tz_name = [this]() -> std::string { return this->tz_name(); };
@@ -1455,27 +1470,27 @@ Datetime Datetime::_from_timestamp(
 		us += 1000000;
 	}
 
-	std::function<tm*(double)> converter;
+	std::function<tm_tuple(double)> converter;
 	if (utc)
 	{
-		converter = [](double t) -> tm* {
+		converter = [](double t) -> tm_tuple {
 			time_t tt = t;
 			return internal::_gmtime(&tt);
 		};
 	}
 	else
 	{
-		converter = [](double t) -> tm* {
+		converter = [](double t) -> tm_tuple {
 			time_t tt = t;
 			return internal::_localtime(&tt);
 		};
 	}
 
 	auto ct = converter(t);
-	ct->tm_sec = std::min(ct->tm_sec, 59);
+	ct.tm_sec = std::min(ct.tm_sec, 59);
 	auto result = Datetime(
-		ct->tm_year, ct->tm_mon+1, ct->tm_mday,
-		ct->tm_hour, ct->tm_min, ct->tm_sec, us, tz
+		ct.tm_year, ct.tm_mon+1, ct.tm_mday,
+		ct.tm_hour, ct.tm_min, ct.tm_sec, us, tz
 	);
 	if (tz == nullptr)
 	{
@@ -1497,16 +1512,16 @@ Datetime Datetime::_from_timestamp(
 
 		ct = converter(t - max_fold_seconds);
 		auto probe1 = Datetime(
-			ct->tm_year, ct->tm_mon+1, ct->tm_mday,
-			ct->tm_hour, ct->tm_min, ct->tm_sec, us, tz
+			ct.tm_year, ct.tm_mon+1, ct.tm_mday,
+			ct.tm_hour, ct.tm_min, ct.tm_sec, us, tz
 		);
 		auto trans = result - probe1 - Timedelta(0, (long long int)max_fold_seconds);
 		if (trans.days() < 0)
 		{
 			ct = converter(t + trans / Timedelta(0, 1));
 			auto probe2 = Datetime(
-				ct->tm_year, ct->tm_mon+1, ct->tm_mday,
-				ct->tm_hour, ct->tm_min, ct->tm_sec, us, tz
+				ct.tm_year, ct.tm_mon+1, ct.tm_mday,
+				ct.tm_hour, ct.tm_min, ct.tm_sec, us, tz
 			);
 			if (probe2 == result)
 			{
@@ -1532,8 +1547,8 @@ time_t Datetime::_mk_time() const
 		auto tm_ = internal::_localtime(&u);
 
 		auto sub = Datetime(
-			tm_->tm_year, tm_->tm_mon+1, tm_->tm_mday,
-			tm_->tm_hour, tm_->tm_min, tm_->tm_sec
+			tm_.tm_year, tm_.tm_mon+1, tm_.tm_mday,
+			tm_.tm_hour, tm_.tm_min, tm_.tm_sec
 		) - epoch;
 
 		return sub / Timedelta(0, 1);
@@ -1615,19 +1630,19 @@ Timezone Datetime::_local_timezone() const
 
 	auto local_tm = internal::_localtime(&ts);
 	auto local = Datetime(
-		local_tm->tm_year, local_tm->tm_mon+1, local_tm->tm_mday,
-		local_tm->tm_hour, local_tm->tm_min, local_tm->tm_sec
+		local_tm.tm_year, local_tm.tm_mon+1, local_tm.tm_mday,
+		local_tm.tm_hour, local_tm.tm_min, local_tm.tm_sec
 	);
 	if (!this->_tz_info)
 	{
-		internal::_mk_tz_info(local_tm);
+		internal::_mk_tz_info(&local_tm);
 	}
 
 	// Extract TZ data
-	auto gmt_off = local_tm->tm_gmtoff;
+	auto gmt_off = local_tm.tm_gmtoff;
 
 	char buffer[10];
-	std::strcpy(buffer, local_tm->tm_zone);
+	std::strcpy(buffer, local_tm.tm_zone);
 	std::string zone = buffer;
 	return Timezone(Timedelta(0, gmt_off), zone);
 }
@@ -1758,7 +1773,7 @@ Datetime Datetime::from_iso_format(const std::string& date_str)
 	);
 }
 
-tm Datetime::time_tuple() const
+tm_tuple Datetime::time_tuple() const
 {
 	auto dst = this->dst();
 	int dst_flag;
@@ -1794,7 +1809,7 @@ double Datetime::timestamp() const
 	}
 }
 
-tm Datetime::utc_time_tuple()
+tm_tuple Datetime::utc_time_tuple()
 {
 	auto offset = this->utc_offset();
 	if (offset)
