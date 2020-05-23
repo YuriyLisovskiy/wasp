@@ -30,36 +30,6 @@
 
 __NET_INTERNAL_BEGIN__
 
-/*
-#if defined(_WIN32) || defined(_WIN64)
-int inet_pton(int af, const char* src, void* dst)
-{
-	struct sockaddr_storage ss{};
-	int size = sizeof(ss);
-	char src_copy[INET6_ADDRSTRLEN + 1];
-
-	ZeroMemory(&ss, sizeof(ss));
-	strncpy(src_copy, src, INET6_ADDRSTRLEN + 1);
-	src_copy[INET6_ADDRSTRLEN] = 0;
-
-	if (WSAStringToAddress(src_copy, af, nullptr, (struct sockaddr*)&ss, &size) == 0)
-	{
-		switch (af)
-		{
-			case AF_INET:
-				*(struct in_addr *) dst = ((struct sockaddr_in *) &ss)->sin_addr;
-				return 1;
-			case AF_INET6:
-				*(struct in6_addr *) dst = ((struct sockaddr_in6 *) &ss)->sin6_addr;
-				return 1;
-		}
-	}
-
-	return 0;
-}
-#endif // _WIN32 || _WIN64
-*/
-
 Socket::Socket() : _socket(-1), _closed(true), _use_ipv6(false)
 {
 }
@@ -68,7 +38,6 @@ socket_t Socket::create_ipv4(const char* host, uint16_t port)
 {
 	this->_ipv4_socket.sin_family = AF_INET;
 	this->_ipv4_socket.sin_port = ::htons(port);
-	//this->_ipv4_socket.sin_addr.s_addr = ::inet_addr(host);
 	::inet_pton(AF_INET, host, (void*) &this->_ipv4_socket.sin_addr.s_addr);
 	return ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 }
@@ -210,16 +179,6 @@ bool Socket::set_blocking(bool blocking) const
 	flags = blocking ? (flags & ~O_NONBLOCK) : (flags | O_NONBLOCK);
 	return fcntl(this->_socket, F_SETFL, flags) == 0;
 #endif
-}
-
-int Socket::close_socket(socket_t s)
-{
-	if (s != -1)
-	{
-		return ::closesocket(s);
-	}
-
-	return 0;
 }
 
 __NET_INTERNAL_END__

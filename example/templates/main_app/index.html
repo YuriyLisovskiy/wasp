@@ -29,8 +29,9 @@
         {% ignore %}
             Some multiline comment
 
-        <li><a href="{% url('Form::profile', 2048, 'YuriyLisovskiy') %}">Go to form!</a></li>
         {% end_ignore %}
+
+        <li><a href="{% url('Form::profile', 2048, 'YuriyLisovskiy') %}">Go to form!</a></li>
 
         {# Some single-line comment #}
         <li><a href="{% url('picture::view_pic') %}">View picture!</a></li>

@@ -55,8 +55,6 @@ public:
 	[[nodiscard]] int set_reuse_port() const;
 	[[nodiscard]] bool set_blocking(bool blocking) const;
 
-	static int close_socket(socket_t s);
-
 private:
 	socket_t create_ipv4(const char* host, uint16_t port);
 	socket_t create_ipv6(const char* host, uint16_t port);
