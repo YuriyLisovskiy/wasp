@@ -6,8 +6,6 @@ project(XalwartFramework)
 
 set(LIBRARY_NAME "xalwart")
 
-set(CMAKE_CXX_FLAGS "-pthread")
-
 add_subdirectory(src)
 add_subdirectory(example)
 add_subdirectory(tests)

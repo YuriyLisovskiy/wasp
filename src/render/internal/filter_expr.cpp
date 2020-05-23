@@ -314,6 +314,11 @@ bool expression_parser::parse_number_and_ret(
 ) const
 {
 	auto end = this->token.content.cend();
+	if (it == end)
+	{
+		return true;
+	}
+
 	if (!std::isdigit(*it))
 	{
 		if (value[0] == '+' || value[0] == '-')
@@ -361,7 +366,7 @@ void expression_parser::parse_digits(
 	{
 		value += *it++;
 	}
-	while (std::isdigit(*it) && it != this->token.content.cend());
+	while (it != this->token.content.cend() && std::isdigit(*it));
 }
 
 bool expression_parser::skip_ws_and_ret(std::string::const_iterator& it)

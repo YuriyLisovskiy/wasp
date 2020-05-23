@@ -26,6 +26,10 @@
 // C++ libraries.
 #include <map>
 
+#ifdef _MSC_VER
+#include <string>
+#endif
+
 // Module definitions.
 #include "./_def_.h"
 

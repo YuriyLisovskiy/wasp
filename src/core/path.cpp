@@ -33,6 +33,10 @@
 #include <unistd.h>
 #endif
 
+#ifdef _MSC_VER
+#include <algorithm>
+#endif
+
 // Framework modules.
 #include "./string.h"
 #include "../core/exceptions.h"

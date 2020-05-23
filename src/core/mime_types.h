@@ -39,6 +39,13 @@
 
 #pragma once
 
+#ifdef _MSC_VER
+
+// C++ libraries.
+#include <string>
+
+#endif
+
 // Module definitions.
 #include "./_def_.h"
 

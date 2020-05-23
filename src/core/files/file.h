@@ -36,9 +36,9 @@
 #include <unistd.h>
 #endif
 
-#if defined(_WIN32) || defined(_WIN64)
-#define stat _stat
-#endif
+//#if defined(_WIN32) || defined(_WIN64)
+//#define stat _stat
+//#endif
 
 // Module definitions.
 #include "../_def_.h"
@@ -105,7 +105,7 @@ public:
 	bool multiple_chunks(size_t chunk_size = -1);
 	std::string path() const;
 
-	static struct stat stat(const std::string& file_path);
+	static struct stat file_stat(const std::string& file_path);
 };
 
 __CORE_END__

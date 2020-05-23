@@ -42,7 +42,9 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 
-#pragma comment (lib, "Ws2_32.lib")
+//#pragma comment (lib, "Ws2_32.lib")
+
+__NET_INTERNAL_BEGIN__
 
 typedef SOCKET socket_t;
 typedef int msg_size_t;
@@ -51,7 +53,12 @@ typedef int msg_size_t;
 #define SOCKET_SEND SD_SEND
 #define SOCKET_RECEIVE SD_RECEIVE
 
-static inline int poll(struct pollfd *pfd, int nfds, int timeout) { return WSAPoll (pfd, nfds, timeout); }
+//static inline int poll(struct pollfd* pfd, int nfds, int timeout)
+//{
+//    return WSAPoll(pfd, nfds, timeout);
+//}
+
+__NET_INTERNAL_END__
 
 #elif defined(__unix__) || defined(__linux__)
 
