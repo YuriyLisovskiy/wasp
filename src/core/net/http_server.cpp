@@ -518,6 +518,11 @@ void HttpServer::_serve_connection(const socket_t& client)
 			std::cout << '\n' << request->method() << " request took " << measure.elapsed() << " ms\n";
 		}
 	}
+
+	if (Socket::close_socket(client) == SOCKET_ERROR)
+	{
+		this->_logger->error("Failed to close client connection");
+	}
 }
 
 void HttpServer::_thread_func(const socket_t& client)

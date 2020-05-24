@@ -109,6 +109,7 @@ public:
 	void fatal(const core::BaseException& exc) override;
 
 private:
+#if defined(__unix__) || defined(__linux__)
 	std::map<Color, const char*> _colors = {
 		{DEFAULT, "\033[0m"},
 		{BLACK, "\033[30m"},
@@ -128,6 +129,7 @@ private:
 		{BOLD_CYAN, "\033[1m\033[36m"},
 		{BOLD_WHITE, "\033[1m\033[37m"},
 	};
+#endif
 
 	enum log_level_enum
 	{
@@ -140,9 +142,9 @@ private:
 
 	explicit Logger(const Config& cfg);
 	void log(const std::string& msg, int line, const char* function, const char* file, Logger::log_level_enum level);
-	void write_to_stream(const std::string& msg, const char* colour);
+	void write_to_stream(const std::string& msg, Color colour);
 	void flush();
-	const char* get_colour(Color colour);
+	void set_colour(Color colour);
 	void set_config(const Config& config) override;
 };
 

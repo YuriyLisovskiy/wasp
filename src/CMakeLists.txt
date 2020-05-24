@@ -13,4 +13,10 @@ endif()
 add_library(${LIBRARY_NAME} SHARED ${SOURCES})
 if (WIN32)
     target_link_libraries(${LIBRARY_NAME} wsock32 Ws2_32)
+    add_custom_command(
+        TARGET ${LIBRARY_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+        ${CMAKE_BINARY_DIR}/src/${LIBRARY_NAME}.dll
+        ${CMAKE_BINARY_DIR}/example/${LIBRARY_NAME}.dll
+    )
 endif()

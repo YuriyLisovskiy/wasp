@@ -85,7 +85,9 @@ void Logger::print(const std::string& msg, Color colour, char end)
 {
 	if (this->_config.enable_print)
 	{
-		std::cout << this->get_colour(colour) << msg << this->_colors[Color::DEFAULT] << end;
+		this->set_colour(colour);
+		std::cout << msg << end;
+		this->set_colour(Color::DEFAULT);
 	}
 }
 
@@ -172,15 +174,16 @@ void Logger::log(const std::string& msg, int line, const char* function, const c
 
 	std::string result = "[" + dt::Datetime::now().strftime("%F %T") +
 		"] " + level_name + ":" + full_msg;
-	this->write_to_stream(result, this->get_colour(colour));
+	this->write_to_stream(result, colour);
 }
 
-void Logger::write_to_stream(const std::string& msg, const char* colour)
+void Logger::write_to_stream(const std::string& msg, Color colour)
 {
-	const char* default_colour = this->_colors[Color::DEFAULT];
 	for (auto& stream : this->_config.streams)
 	{
-		*stream << colour << msg << default_colour << '\n';
+		this->set_colour(colour);
+		*stream << msg << '\n';
+		this->set_colour(Color::DEFAULT);
 	}
 
 	this->flush();
@@ -194,14 +197,16 @@ void Logger::flush()
 	}
 }
 
-const char* Logger::get_colour(Color colour)
+void Logger::set_colour(Color colour)
 {
+#if defined(__unix__) || defined(__linux__)
 	if (this->_colors.find(colour) == this->_colors.end())
 	{
 		colour = Color::DEFAULT;
 	}
 
-	return this->_colors[colour];
+	std::cout << this->_colors[colour];
+#endif
 }
 
 void Logger::set_config(const Config& config)

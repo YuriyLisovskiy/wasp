@@ -30,6 +30,9 @@
 #include <cxxabi.h>
 #endif
 
+// Framework modules.
+#include "./string.h"
+
 
 __UTILITY_BEGIN__
 
@@ -41,7 +44,7 @@ __UTILITY_BEGIN__
 std::string demangle(const char* name)
 {
 #ifdef _MSC_VER
-	return name;
+	return core::str::ltrim(core::str::ltrim(name, "class"));
 #else
 	int status = -4;
 	std::unique_ptr<char, void(*)(void*)> res {

@@ -103,17 +103,7 @@ int Socket::close() const
 		return 0;
 	}
 
-	if (this->_socket != -1)
-	{
-#if defined(_WIN32) || defined(_WIN64)
-		return ::closesocket(this->_socket);
-#elif defined(__unix__) || defined(__linux__)
-		return ::close(this->_socket);
-#else
-#error Library is not supported on this platform
-#endif
-	}
-	return -1;
+	return Socket::close_socket(this->_socket);
 }
 
 int Socket::set_reuse_addr() const
@@ -179,6 +169,20 @@ bool Socket::set_blocking(bool blocking) const
 	flags = blocking ? (flags & ~O_NONBLOCK) : (flags | O_NONBLOCK);
 	return fcntl(this->_socket, F_SETFL, flags) == 0;
 #endif
+}
+
+int Socket::close_socket(socket_t s)
+{
+	if (s != -1)
+	{
+#if defined(_WIN32) || defined(_WIN64)
+		return ::closesocket(s);
+#else
+		return ::close(s);
+#endif
+	}
+
+	return -1;
 }
 
 __NET_INTERNAL_END__

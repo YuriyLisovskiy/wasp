@@ -47,7 +47,11 @@ Engine::Engine(
 	this->_env = env;
 	for (const auto& dir : dirs)
 	{
-		if (core::str::ends_with(core::str::rtrim(dir, "/"), this->APP_DIRNAME))
+		if (core::str::ends_with(
+			core::str::rtrim(
+				core::str::rtrim(dir, "/"), "\\"
+			), this->APP_DIRNAME
+		))
 		{
 			this->_dirs.push_back(dir);
 		}

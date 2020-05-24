@@ -330,6 +330,11 @@ bool expression_parser::parse_number_and_ret(
 	if (std::isdigit(*it))
 	{
 		this->parse_digits(it, value);
+		if (it == end)
+		{
+			return true;
+		}
+
 		if (*it == 'l')
 		{
 			value += *it++;

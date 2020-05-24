@@ -21,6 +21,8 @@
 
 #include "./url_tag.h"
 
+#include <iostream>
+
 // Framework modules.
 #include "./parse_var_name.h"
 #include "../utility.h"
