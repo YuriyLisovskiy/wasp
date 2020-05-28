@@ -34,7 +34,7 @@ Settings::Settings()
 
 	this->USE_TZ = false;
 
-	this->DEFAULT_CHARSET = "utf-8";
+	this->CHARSET = "utf-8";
 
 	this->ROOT_APP = nullptr;
 

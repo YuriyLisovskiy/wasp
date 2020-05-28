@@ -37,4 +37,12 @@ __MAIN_NAMESPACE_END__
 
 
 // Required parameters for built-in logger.
+#ifdef _MSC_VER
+#define _ERROR_DETAILS_ __LINE__, __FUNCTION__, __FILE__
+#else
 #define _ERROR_DETAILS_ __LINE__, __PRETTY_FUNCTION__, __FILE__
+#endif
+
+#if defined(_WIN32) || defined(_WIN64)
+typedef unsigned int uint;
+#endif

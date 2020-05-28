@@ -32,6 +32,9 @@
 *.app
 
 # Other
+.vs/
 .idea/
+out/
 cmake-build-*
 example/media/
+CMakeSettings.json

@@ -25,8 +25,15 @@
 #include <iostream>
 #include <cassert>
 #include <ctime>
-#include <cmath>
 #include <cstring>
+#include <iomanip>
+#include <sstream>
+
+#ifdef _MSC_VER
+#include <algorithm>
+#else
+#include <cmath>
+#endif
 
 
 __DATETIME_INTERNAL_BEGIN__
@@ -211,10 +218,20 @@ void _mk_tz_info(tm_tuple* time_tuple, bool is_gmt)
 	time_tuple->tm_gmtoff = h*3600 + m*60;
 }
 
-char* _strptime(const char* _s, const char* _fmt, tm_tuple* _tp)
+void _strptime(const char* _s, const char* _fmt, tm_tuple* _tp)
 {
 	tm t{};
-	auto res = ::strptime(_s, _fmt, &t);
+#if defined(_WIN32) || defined(_WIN64)
+	std::stringstream ss(_s);
+	ss >> std::get_time(&t, _fmt);
+#elif defined(__unix__) || defined(__linux__)
+	::strptime(_s, _fmt, &t);
+#else
+#error Library is not supported on this platform
+#endif
+
+//	auto res = ::strptime(_s, _fmt, &t);
+//	auto res = std::get_time(&t, _fmt);
 
 	_tp->tm_sec = t.tm_sec;
 	_tp->tm_min = t.tm_min;
@@ -225,11 +242,19 @@ char* _strptime(const char* _s, const char* _fmt, tm_tuple* _tp)
 	_tp->tm_wday = t.tm_wday;
 	_tp->tm_yday = t.tm_yday;
 	_tp->tm_isdst = t.tm_isdst;
+
+#if defined(_WIN32) || defined(_WIN64)
+	_tp->tm_gmtoff = 0;
+	_tp->tm_zone = "";
+#elif defined(__unix__) || defined(__linux__)
 	_tp->tm_gmtoff = t.tm_gmtoff;
 	_tp->tm_zone = t.tm_zone;
+#else
+#error Library is not supported on this platform
+#endif
 
 	_tp->tm_year += 1900;
-	return res;
+//	return res;
 }
 
 Datetime _strptime_datetime(

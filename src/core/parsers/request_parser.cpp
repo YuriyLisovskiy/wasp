@@ -30,6 +30,11 @@
 #include "./query_parser.h"
 #include "../exceptions.h"
 
+#ifdef _MSC_VER
+#define strncasecmp _strnicmp
+#define strcasecmp _stricmp
+#endif
+
 
 __CORE_INTERNAL_BEGIN__
 

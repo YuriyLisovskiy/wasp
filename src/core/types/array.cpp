@@ -21,6 +21,11 @@
 
 #include "./array.h"
 
+#ifdef _MSC_VER
+#include <string>
+#include <stdexcept>
+#endif
+
 
 __TYPES_BEGIN__
 

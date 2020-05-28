@@ -55,20 +55,20 @@ struct Settings final: public xw::conf::Settings
 		};
 
 		using namespace xw::render;
-		this->TEMPLATES_ENV = env::DefaultEnvironment::Config{
-			.dirs = std::vector<std::string>{
+		this->TEMPLATES_ENV = env::DefaultEnvironment::Config(
+			std::vector<std::string>{
 				xw::core::path::join(this->BASE_DIR, "templates")
 			},
-			.use_app_dirs		= true,
-			.apps				= this->INSTALLED_APPS,
-			.debug				= this->DEBUG,
-			.logger				= this->LOGGER.get(),
-			.auto_escape		= true,
-			.libraries = std::vector<std::shared_ptr<lib::ILibrary>>{
+			true,
+			this->INSTALLED_APPS,
+			this->DEBUG,
+			this->LOGGER.get(),
+			true,
+			std::vector<std::shared_ptr<lib::ILibrary>>{
 				this->library<lib::BuiltinLibrary>(),
 				this->library<MyFirstLib>(),
 			}
-		}.make_env();
+		).make_env();
 
 		this->MEDIA_ROOT = xw::core::path::join(this->BASE_DIR, "media");
 		this->MEDIA_URL = "/media/";

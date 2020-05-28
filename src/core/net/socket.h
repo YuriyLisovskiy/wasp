@@ -23,6 +23,10 @@
 
 #pragma once
 
+#if defined(_WIN32) || defined(_WIN64)
+#include <cstdint>
+#endif
+
 // Module definitions.
 #include "./_def_.h"
 
@@ -41,6 +45,7 @@ private:
 public:
 	Socket();
 
+	[[nodiscard]] int initialize() const;
 	socket_t create(const char* host, uint16_t port, bool use_ipv6 = false);
 	int bind();
 	[[nodiscard]] int listen() const;
@@ -49,6 +54,8 @@ public:
 	[[nodiscard]] int set_reuse_addr() const;
 	[[nodiscard]] int set_reuse_port() const;
 	[[nodiscard]] bool set_blocking(bool blocking) const;
+
+	static int close_socket(socket_t s);
 
 private:
 	socket_t create_ipv4(const char* host, uint16_t port);

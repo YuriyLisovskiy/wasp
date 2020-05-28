@@ -22,8 +22,16 @@
 #include "./utility.h"
 
 // C++ libraries.
-#include <cxxabi.h>
 #include <cassert>
+
+#ifdef _MSC_VER
+#include <stdexcept>
+#else
+#include <cxxabi.h>
+#endif
+
+// Framework modules.
+#include "./string.h"
 
 
 __UTILITY_BEGIN__
@@ -35,6 +43,9 @@ __UTILITY_BEGIN__
 // 3 - one of the arguments is invalid
 std::string demangle(const char* name)
 {
+#ifdef _MSC_VER
+	return core::str::ltrim(core::str::ltrim(name, "class"));
+#else
 	int status = -4;
 	std::unique_ptr<char, void(*)(void*)> res {
 		abi::__cxa_demangle(name, nullptr, nullptr, &status),
@@ -42,6 +53,7 @@ std::string demangle(const char* name)
 	};
 
 	return status == 0 ? res.get() : name;
+#endif
 }
 
 std::string format_datetime(

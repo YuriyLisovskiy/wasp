@@ -25,6 +25,10 @@
 
 #pragma once
 
+#ifdef _MSC_VER
+#include <string>
+#endif
+
 // Module definitions.
 #include "./_def_.h"
 

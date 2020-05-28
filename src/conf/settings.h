@@ -78,7 +78,7 @@ struct Settings
 
 	/// Default charset to use for all HttpResponse objects, if a MIME type isn't
 	/// manually specified. It's used to construct the Content-Type header.
-	std::string DEFAULT_CHARSET;
+	std::string CHARSET;
 
 	/// Root application where framework will load urlpatterns.
 	///

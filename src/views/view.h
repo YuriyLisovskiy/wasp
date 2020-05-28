@@ -37,7 +37,7 @@
 
 __CONF_BEGIN__
 
-class Settings;
+struct Settings;
 
 __CONF_END__
 

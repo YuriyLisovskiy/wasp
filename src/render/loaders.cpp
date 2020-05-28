@@ -22,7 +22,12 @@
 #include "./loaders.h"
 
 // C++ libraries.
+#if defined(_WIN32) || defined(_WIN64)
+#undef _GLIBCXX_FILESYSTEM_IS_WINDOWS
+#include <filesystem>
+#else
 #include <experimental/filesystem>
+#endif // _WIN32 || _WIN64
 
 // Framework modules.
 #include "./exceptions.h"
@@ -65,9 +70,15 @@ std::map<std::string, std::shared_ptr<ITemplate>> DefaultLoader::cache_templates
 	std::map<std::string, std::shared_ptr<ITemplate>> cache;
 	for (const auto& dir : dirs)
 	{
+#if defined(_WIN32) || defined(_WIN64)
+		for (auto& entry : std::filesystem::directory_iterator(dir))
+		{
+			const auto& template_path = entry.path().string();
+#else
 		for (auto& entry : std::experimental::filesystem::directory_iterator(dir))
 		{
 			const auto& template_path = entry.path();
+#endif
 			auto file = core::File(
 				core::path::join(dir, template_path)
 			);

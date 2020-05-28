@@ -81,7 +81,7 @@ std::unique_ptr<http::IHttpResponse> StaticView::get(http::HttpRequest* request,
 		);
 	}
 
-	auto stat_info = core::File::stat(full_path);
+	auto stat_info = core::File::file_stat(full_path);
 	if (!internal::was_modified_since(
 		request->headers.get(http::IF_MODIFIED_SINCE, ""),
 		stat_info.st_mtime, stat_info.st_size)

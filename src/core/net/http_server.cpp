@@ -141,7 +141,13 @@ void HttpServer::send(http::StreamingHttpResponse* response, const socket_t& cli
 // Private methods.
 int HttpServer::_init()
 {
-	int init_status = this->_create();
+	int init_status = this->_initialize();
+	if (init_status != 0)
+	{
+		return init_status;
+	}
+
+	init_status = this->_create();
 	if (init_status == INVALID_SOCKET)
 	{
 		return init_status;
@@ -165,6 +171,23 @@ int HttpServer::_init()
 		return init_status;
 	}
 
+	return 0;
+}
+
+int HttpServer::_initialize()
+{
+#if defined(_WIN32) || defined(_WIN64)
+	if (this->_socket.initialize() != 0)
+	{
+		auto err = WSAGetLastError();
+		this->_logger->error(
+			"\"WSAStartup failed with error: " + std::to_string(err),
+			_ERROR_DETAILS_
+		);
+		HttpServer::_wsa_clean_up();
+		return err;
+	}
+#endif
 	return 0;
 }
 
@@ -467,6 +490,7 @@ void HttpServer::_start_listener()
 			else
 			{
 				this->_logger->error("Invalid socket connection", _ERROR_DETAILS_);
+				running = false;
 			}
 		}
 		catch (core::InterruptException&)
@@ -493,6 +517,11 @@ void HttpServer::_serve_connection(const socket_t& client)
 			measure.end();
 			std::cout << '\n' << request->method() << " request took " << measure.elapsed() << " ms\n";
 		}
+	}
+
+	if (Socket::close_socket(client) == SOCKET_ERROR)
+	{
+		this->_logger->error("Failed to close client connection");
 	}
 }
 
@@ -576,10 +605,17 @@ void HttpServer::_send(const char* data, const socket_t& client)
 
 void HttpServer::_write(const char* data, size_t bytesToWrite, const socket_t& client)
 {
+#if defined(_WIN32) || defined(_WIN64)
+	if (::send(client, data, bytesToWrite, 0) == -1)
+	{
+		throw HttpError("Failed to send bytes to socket connection", _ERROR_DETAILS_);
+	}
+#else
 	if (::write(client, data, bytesToWrite) == -1)
 	{
 		throw HttpError("Failed to send bytes to socket connection", _ERROR_DETAILS_);
 	}
+#endif // _WIN32 || _WIN64
 }
 
 void HttpServer::_wsa_clean_up()

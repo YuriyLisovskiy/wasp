@@ -64,8 +64,13 @@ typedef unsigned short int ushort;
 typedef unsigned int uint;
 #endif
 
+#ifdef _MSC_VER
+#define m_assert(_expr, _msg) \
+	internal::_M_Assert(#_expr, _expr, __FUNCTION__, __LINE__, _msg)
+#else
 #define m_assert(_expr, _msg) \
 	internal::_M_Assert(#_expr, _expr, __PRETTY_FUNCTION__, __LINE__, _msg)
+#endif
 
 struct tm_tuple
 {
@@ -93,8 +98,10 @@ struct tm_tuple
 		res.tm_wday = this->tm_wday;
 		res.tm_yday = this->tm_yday;
 		res.tm_isdst = this->tm_isdst;
+#if defined(__unix__) || defined(__linux__)
 		res.tm_gmtoff = this->tm_gmtoff;
 		res.tm_zone = this->tm_zone;
+#endif
 		return res;
 	}
 
@@ -111,8 +118,15 @@ struct tm_tuple
 		this->tm_wday = t->tm_wday;
 		this->tm_yday = t->tm_yday;
 		this->tm_isdst = t->tm_isdst;
+#if defined(_WIN32) || defined(_WIN64)
+		this->tm_gmtoff = 0;
+		this->tm_zone = "";
+#elif defined(__unix__) || defined(__linux__)
 		this->tm_gmtoff = t->tm_gmtoff;
 		this->tm_zone = t->tm_zone;
+#else
+#error Library is not supported on this platform
+#endif
 	}
 };
 
@@ -242,7 +256,7 @@ extern tm_tuple _build_struct_time(
 
 extern void _mk_tz_info(tm_tuple* time_tuple, bool is_gmt = false);
 
-extern char* _strptime(const char* _s, const char* _fmt, tm_tuple* _tp);
+extern void _strptime(const char* _s, const char* _fmt, tm_tuple* _tp);
 
 // Prepends 'c' 'w'-times and appends 'num' as std::string;
 // if 'num' string is longer than 'w', returns 'num' as std::string.
@@ -862,7 +876,7 @@ private:
 	Timezone() = default;
 
 public:
-	static const Timezone UTC;
+	const static Timezone UTC;
 
 	// bpo-37642: These attributes are rounded to the nearest minute for backwards
 	// compatibility, even though the constructor will accept a wider range of
@@ -952,8 +966,8 @@ extern Datetime _strptime_datetime(
 	const char* format = "%a %b %d %H:%M:%S %Y"
 );
 
-const Datetime _EPOCH = Datetime(
-	1970, 1, 1, 0, 0, 0, 0, std::make_shared<Timezone>(Timezone::UTC)
+const static Datetime _EPOCH = Datetime(
+	1970, 1, 1, 0, 0, 0, 0, std::make_shared<Timezone>(Timezone::_create(Timedelta(0)))
 );
 
 __DATETIME_INTERNAL_END__
