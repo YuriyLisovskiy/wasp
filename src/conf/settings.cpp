@@ -16,7 +16,7 @@
  */
 
 /**
- * An implementation of settings.h.
+ * An implementation of conf/settings.h
  */
 
 #include "./settings.h"
@@ -30,13 +30,15 @@ Settings::Settings()
 
 	this->LOGGER = core::Logger::get_instance({});
 
-	this->TIME_ZONE = "America/Chicago";
+	this->TIME_ZONE = std::make_shared<core::dt::Timezone>(core::dt::Timezone::UTC);
 
 	this->USE_TZ = false;
 
-	this->DEFAULT_CHARSET = "utf-8";
+	this->CHARSET = "utf-8";
 
 	this->ROOT_APP = nullptr;
+
+	this->TEMPLATES_ENV = nullptr;
 
 	this->APPEND_SLASH = true;
 
@@ -97,7 +99,7 @@ Settings::Settings()
 	this->SECURE_SSL_REDIRECT = false;
 }
 
-void Settings::overwrite()
+void Settings::override()
 {
 }
 
@@ -107,27 +109,6 @@ void Settings::prepare()
 	{
 		this->ROOT_APP = this->INSTALLED_APPS.front();
 	}
-}
-
-Settings::~Settings()
-{
-	delete this->SECURE_PROXY_SSL_HEADER;
-	for (auto& installed_app : this->INSTALLED_APPS)
-	{
-		delete installed_app;
-	}
-
-	for (auto& middleware : this->MIDDLEWARE)
-	{
-		delete middleware;
-	}
-
-	for (auto& command : this->COMMANDS)
-	{
-		delete command.second;
-	}
-
-	core::Logger::reset_instance();
 }
 
 __CONF_END__

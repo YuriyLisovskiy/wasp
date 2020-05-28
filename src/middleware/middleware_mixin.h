@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
  */
 
 /**
- * middleware_mixin.h
+ * middleware/middleware_mixin.h
+ *
  * Purpose:
  * 	Base middleware class.
  */
@@ -26,10 +27,7 @@
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
-#include "./interface.h"
-#include "../http/request.h"
-#include "../http/response.h"
+// Framework modules.
 #include "../conf/settings.h"
 
 
@@ -44,9 +42,9 @@ public:
 	explicit MiddlewareMixin(conf::Settings* settings);
 	~MiddlewareMixin() override = default;
 
-	http::HttpResponseBase* process_request(http::HttpRequest* request) override;
-	http::HttpResponseBase* process_response(
-		http::HttpRequest* request, http::HttpResponseBase* response
+	std::unique_ptr<http::IHttpResponse> process_request(http::HttpRequest* request) override;
+	std::unique_ptr<http::IHttpResponse> process_response(
+		http::HttpRequest* request, http::IHttpResponse* response
 	) override;
 };
 

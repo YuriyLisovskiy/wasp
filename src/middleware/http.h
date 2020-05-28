@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
  */
 
 /**
- * http.h
+ * middleware/http.h
+ *
  * Purpose:
  * 	Handle conditional GET operations. If the response has an ETag or
  * 	Last-Modified header and the request has If-None-Match or If-Modified-Since,
@@ -28,13 +29,8 @@
 // Module definitions
 #include "./_def_.h"
 
-// Wasp libraries.
+// Framework modules.
 #include "./middleware_mixin.h"
-#include "../core/string/str.h"
-#include "../http/headers.h"
-#include "../utils/cache.h"
-#include "../utils/http.h"
-#include "../conf/settings.h"
 
 
 __MIDDLEWARE_BEGIN__
@@ -44,13 +40,13 @@ class ConditionalGetMiddleware : public MiddlewareMixin
 protected:
 
 	/// Return true if an ETag header should be added to response.
-	static bool needs_etag(http::HttpResponseBase* response);
+	static bool needs_etag(http::IHttpResponse* response);
 
 public:
 	explicit ConditionalGetMiddleware(conf::Settings* settings);
 
-	http::HttpResponseBase* process_response(
-		http::HttpRequest* request, http::HttpResponseBase* response
+	std::unique_ptr<http::IHttpResponse> process_response(
+		http::HttpRequest* request, http::IHttpResponse* response
 	) override;
 };
 

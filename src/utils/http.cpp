@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,10 +16,14 @@
  */
 
 /**
- * An implementation of http.h.
+ * An implementation of utils/http.h
  */
 
 #include "./http.h"
+
+// Framework modules.
+#include "../core/utility.h"
+#include "../core/string.h"
 
 
 __UTILS_HTTP_INTERNAL_BEGIN__
@@ -83,7 +87,7 @@ long parse_http_date(const std::string& date)
 	int year = std::stoi(match["year"]);
 	if (year < 100)
 	{
-		int current_year = core::dt::gmtnow().date().year();
+		int current_year = core::dt::Datetime::utc_now().date().year();
 		int current_century = current_year - (current_year % 100);
 		if (year - (current_year % 100) > 50)
 		{
@@ -107,8 +111,8 @@ long parse_http_date(const std::string& date)
 	int min = std::stoi(match["min"]);
 	int sec = std::stoi(match["sec"]);
 
-	auto date_time = core::dt::DateTime(year, month, day, hour, min, sec);
-	return date_time.timestamp();
+	auto date_time = core::dt::Datetime(year, month, day, hour, min, sec);
+	return (long)date_time.timestamp();
 }
 
 std::string quote_etag(const std::string& e_tag)

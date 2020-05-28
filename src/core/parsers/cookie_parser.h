@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
  */
 
 /**
- * cookie_parser.h
+ * core/parsers/cookie_parser.h
+ *
  * Purpose: parses cookies from http request.
  */
 
@@ -24,7 +25,10 @@
 
 // C++ libraries.
 #include <map>
+
+#ifdef _MSC_VER
 #include <string>
+#endif
 
 // Module definitions.
 #include "../_def_.h"
@@ -40,7 +44,9 @@ struct cookie_parser final
 		req_val
 	};
 
-	static std::map<std::string, std::string>* parse(const std::string& content);
+	std::map<std::string, std::string> result;
+
+	void parse(const std::string& content);
 };
 
 __CORE_INTERNAL_END__

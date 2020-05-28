@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,24 +16,30 @@
  */
 
 /**
- * An implementation of common.h.
+ * An implementation of middleware/common.h
  */
 
 #include "./common.h"
 
+// Framework modules.
+#include "../urls/resolver.h"
+#include "../http/headers.h"
+#include "../http/utility.h"
+#include "../core/string.h"
+
 
 __MIDDLEWARE_BEGIN__
 
-CommonMiddleware::CommonMiddleware(wasp::conf::Settings* settings)
+CommonMiddleware::CommonMiddleware(conf::Settings* settings)
 	: MiddlewareMixin(settings)
 {
 }
 
-http::HttpResponseRedirectBase* CommonMiddleware::get_response_redirect(
+std::unique_ptr<http::IHttpResponse> CommonMiddleware::get_response_redirect(
 	const std::string& redirect_to
 )
 {
-	return new http::HttpResponsePermanentRedirect(redirect_to);
+	return std::make_unique<http::HttpResponsePermanentRedirect>(redirect_to);
 }
 
 bool CommonMiddleware::should_redirect_with_slash(http::HttpRequest* request)
@@ -76,7 +82,7 @@ std::string CommonMiddleware::get_full_path_with_slash(http::HttpRequest* reques
 	return new_path;
 }
 
-http::HttpResponseBase* CommonMiddleware::process_request(
+std::unique_ptr<http::IHttpResponse> CommonMiddleware::process_request(
 	http::HttpRequest* request
 )
 {
@@ -102,7 +108,7 @@ http::HttpResponseBase* CommonMiddleware::process_request(
 		!host.empty() &&
 		!core::str::starts_with(host, "www.");
 	auto redirect_url = must_prepend ? (
-		request->scheme(this->settings->SECURE_PROXY_SSL_HEADER) + "://www." + host
+		request->scheme(this->settings->SECURE_PROXY_SSL_HEADER.get()) + "://www." + host
 	) : "";
 
 	// Check if a slash should be appended.
@@ -126,8 +132,8 @@ http::HttpResponseBase* CommonMiddleware::process_request(
 	return nullptr;
 }
 
-http::HttpResponseBase* CommonMiddleware::process_response(
-	http::HttpRequest* request, http::HttpResponseBase* response
+std::unique_ptr<http::IHttpResponse> CommonMiddleware::process_response(
+	http::HttpRequest* request, http::IHttpResponse* response
 )
 {
 	// If the given URL is "Not Found", then check if we

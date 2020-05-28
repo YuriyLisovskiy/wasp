@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,10 +16,30 @@
  */
 
 /**
- * An implementation of path.h.
+ * An implementation of core/path.h
  */
 
 #include "./path.h"
+
+// C++ libraries.
+#include <fstream>
+
+#if defined(_WIN32) || defined(_WIN64)
+#include <io.h>
+#include <direct.h>
+#define access _access_s
+#define getcwd _getcwd
+#else
+#include <unistd.h>
+#endif
+
+#ifdef _MSC_VER
+#include <algorithm>
+#endif
+
+// Framework modules.
+#include "./string.h"
+#include "../core/exceptions.h"
 
 
 __PATH_BEGIN__

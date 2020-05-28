@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,38 +16,40 @@
  */
 
 /**
- * Available exceptions.
+ * core/exceptions.h
  *
- * - AttributeError;
- * - BadSignature;
- * - BaseException.
- * - CommandError;
- * - DictError;
- * - DisallowedRedirect;
- * - EncodingError;
- * - EntityTooLargeError;
- * - FileError;
- * - FileDoesNotExistError;
- * - HttpError;
- * - ImproperlyConfigured;
- * - InterruptException;
- * - MultiPartParserError
- * - MultiValueDictError;
- * - NullPointerException;
- * - ParseError;
- * - RuntimeError;
- * - SocketError.
- * - SuspiciousOperation;
- * - ValueError.
+ * 	- BaseException - main exception class
+
+ * 	- AttributeError
+ * 	- BadSignature
+ * 	- CommandError
+ * 	- DictError
+ * 	- DisallowedHost
+ * 	- DisallowedRedirect
+ * 	- EntityTooLargeError
+ * 	- EncodingError
+ * 	- ErrorResponseException
+ * 	- FileDoesNotExistError
+ * 	- FileError
+ * 	- HttpError
+ * 	- ImproperlyConfigured
+ * 	- InterruptException
+ * 	- MultiPartParserError
+ * 	- MultiValueDictError
+ * 	- NotImplementedException
+ * 	- NullPointerException
+ * 	- ParseError
+ * 	- PermissionDenied
+ * 	- RuntimeError
+ * 	- SocketError
+ * 	- SuspiciousOperation
+ * 	- ValueError
  */
 
 #pragma once
 
 // C++ libraries.
-#include <exception>
 #include <string>
-#include <csignal>
-#include <cstdlib>
 
 // Module definitions.
 #include "./_def_.h"
@@ -58,20 +60,15 @@ __CORE_BEGIN__
 class BaseException : public std::exception
 {
 protected:
-	std::string _fullMessage;
-	std::string _exceptionType;
-	const char* _message;
+//	std::string _full_message;
+	std::string _exception_type;
+	std::string _message;
 	int _line;
 	const char* _function;
 	const char* _file;
 
 	// Use only when initializing of a derived exception!
 	BaseException(const char* message, int line, const char* function, const char* file, const char* type);
-
-	/// Initializes '_fullMessage' member.
-	///
-	/// Calls only in constructor.
-	void init();
 
 public:
 	BaseException(const char* message, int line, const char* function, const char* file);
@@ -81,14 +78,15 @@ public:
 	[[nodiscard]] virtual int line() const noexcept;
 	[[nodiscard]] virtual const char* function() const noexcept;
 	[[nodiscard]] virtual const char* file() const noexcept;
+	virtual std::string get_message() const noexcept;
 };
 
 
-DEF_WASP_EXCEPTION_WITH_BASE(AttributeError, BaseException, "Attribute error");
-DEF_WASP_EXCEPTION_WITH_BASE(BadSignature, BaseException, "Bad signature error");
-DEF_WASP_EXCEPTION_WITH_BASE(CommandError, BaseException, "Command error");
-DEF_WASP_EXCEPTION_WITH_BASE(DictError, BaseException, "Dict error");
-DEF_WASP_EXCEPTION_WITH_BASE(HttpError, BaseException, "Http error");
+DEF_EXCEPTION_WITH_BASE(AttributeError, BaseException, "Attribute Error");
+DEF_EXCEPTION_WITH_BASE(BadSignature, BaseException, "Bad Signature Error");
+DEF_EXCEPTION_WITH_BASE(CommandError, BaseException, "Command Error");
+DEF_EXCEPTION_WITH_BASE(DictError, BaseException, "Dict Error");
+DEF_EXCEPTION_WITH_BASE(HttpError, BaseException, "Http Error");
 
 class ErrorResponseException : public HttpError
 {
@@ -108,14 +106,14 @@ protected:
 public:
 	explicit ErrorResponseException(
 		short int status_code = -1,
-		const char* message = "Error response exception",
+		const char* message = "Error Response Exception",
 		int line = 0,
 		const char* function = "",
 		const char* file = ""
 	);
 	explicit ErrorResponseException(
 		short int status_code = -1,
-		const std::string& message = "Error response exception",
+		const std::string& message = "Error Response Exception",
 		int line = 0,
 		const char* function = "",
 		const char* file = ""
@@ -124,20 +122,20 @@ public:
 };
 
 // The user did something suspicious.
-DEF_WASP_HTTP_EXCEPTION(SuspiciousOperation, 400, "Suspicious operation");
+DEF_HTTP_EXCEPTION(SuspiciousOperation, 400, "Suspicious Operation");
 
 // Length of request's header is too large.
-DEF_WASP_HTTP_EXCEPTION(EntityTooLargeError, 413, "Entity Too Large");
-DEF_WASP_HTTP_EXCEPTION(FileDoesNotExistError, 404, "File does not exist");
-DEF_WASP_HTTP_EXCEPTION(PermissionDenied, 403, "Permission denied");
+DEF_HTTP_EXCEPTION(EntityTooLargeError, 413, "Entity Too Large");
+DEF_HTTP_EXCEPTION(FileDoesNotExistError, 404, "File Does Not Exist");
+DEF_HTTP_EXCEPTION(PermissionDenied, 403, "Permission Denied");
 
-DEF_WASP_EXCEPTION_WITH_BASE(DisallowedHost, SuspiciousOperation, "Disallowed host");
+DEF_EXCEPTION_WITH_BASE(DisallowedHost, SuspiciousOperation, "Disallowed Host");
 
 // Redirect to scheme not in allowed list.
-DEF_WASP_EXCEPTION_WITH_BASE(DisallowedRedirect, SuspiciousOperation, "Disallowed redirect");
-DEF_WASP_EXCEPTION_WITH_BASE(EncodingError, BaseException, "Encoding error");
-DEF_WASP_EXCEPTION_WITH_BASE(FileError, BaseException, "File error");
-DEF_WASP_EXCEPTION_WITH_BASE(ImproperlyConfigured, BaseException, "Improperly configured");
+DEF_EXCEPTION_WITH_BASE(DisallowedRedirect, SuspiciousOperation, "Disallowed Redirect");
+DEF_EXCEPTION_WITH_BASE(EncodingError, BaseException, "Encoding Error");
+DEF_EXCEPTION_WITH_BASE(FileError, BaseException, "File Error");
+DEF_EXCEPTION_WITH_BASE(ImproperlyConfigured, BaseException, "Improperly Configured");
 
 class InterruptException : public BaseException
 {
@@ -158,12 +156,13 @@ public:
 	static void initialize();
 };
 
-DEF_WASP_EXCEPTION_WITH_BASE(ParseError, BaseException, "Parse error");
-DEF_WASP_EXCEPTION_WITH_BASE(RuntimeError, BaseException, "Runtime error");
-DEF_WASP_EXCEPTION_WITH_BASE(MultiPartParserError, ParseError, "Multipart parser error");
-DEF_WASP_EXCEPTION_WITH_BASE(MultiValueDictError, DictError, "Multi-value dict error");
-DEF_WASP_EXCEPTION_WITH_BASE(NullPointerException, BaseException, "Null pinter exception");
-DEF_WASP_EXCEPTION_WITH_BASE(SocketError, BaseException, "Socket error");
-DEF_WASP_EXCEPTION_WITH_BASE(ValueError, BaseException, "Value error");
+DEF_EXCEPTION_WITH_BASE(ParseError, BaseException, "Parse Error");
+DEF_EXCEPTION_WITH_BASE(RuntimeError, BaseException, "Runtime Error");
+DEF_EXCEPTION_WITH_BASE(MultiPartParserError, ParseError, "Multipart Parser Error");
+DEF_EXCEPTION_WITH_BASE(MultiValueDictError, DictError, "Multi-Value Dict Error");
+DEF_EXCEPTION_WITH_BASE(NotImplementedException, BaseException, "Not Implemented");
+DEF_EXCEPTION_WITH_BASE(NullPointerException, BaseException, "Null Pointer Exception");
+DEF_EXCEPTION_WITH_BASE(SocketError, BaseException, "Socket Error");
+DEF_EXCEPTION_WITH_BASE(ValueError, BaseException, "Value Error");
 
 __CORE_END__

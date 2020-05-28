@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
  */
 
 /**
- * cookies.h
+ * middleware/cookies.h
+ *
  * Purpose:
  * 	Enables cookies in http request object.
  */
@@ -26,13 +27,8 @@
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
+// Framework modules.
 #include "./middleware_mixin.h"
-#include "../http/request.h"
-#include "../http/response.h"
-#include "../conf/settings.h"
-#include "../collections/dict.h"
-#include "../core/parsers/cookie_parser.h"
 
 
 __MIDDLEWARE_BEGIN__
@@ -41,7 +37,9 @@ class CookieMiddleware final: public MiddlewareMixin
 {
 public:
 	explicit CookieMiddleware(conf::Settings* settings);
-	http::HttpResponseBase* process_request(http::HttpRequest* request) final;
+	std::unique_ptr<http::IHttpResponse> process_request(
+		http::HttpRequest* request
+	) final;
 };
 
 __MIDDLEWARE_END__

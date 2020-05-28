@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
  */
 
 /**
- * _def_.h
+ * utils/crypto/_def_.h
+ *
  * Purpose: utils/crypto module definitions.
  */
 
@@ -26,6 +27,6 @@
 #include "../_def_.h"
 
 
-/// wasp::utils::crypto
+// utils::crypto
 #define __CRYPTO_BEGIN__ __UTILS_BEGIN__ namespace crypto {
 #define __CRYPTO_END__ } __UTILS_END__

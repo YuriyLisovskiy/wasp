@@ -16,10 +16,21 @@
  */
 
 /**
- * An implementation of response.h.
+ * An implementation of http/response.h
  */
 
 #include "./response.h"
+
+// Framework modules.
+#include "./status.h"
+#include "./url.h"
+#include "./utility.h"
+#include "../core/encoding.h"
+#include "../core/mime_types.h"
+#include "../core/datetime.h"
+#include "../core/path.h"
+#include "../core/string.h"
+#include "../core/exceptions.h"
 
 
 __HTTP_BEGIN__
@@ -32,7 +43,7 @@ HttpResponseBase::HttpResponseBase(
 )
 {
 	this->_streaming = false;
-	this->_headers = collections::Dict<std::string, std::string>(true);
+	this->_headers = collections::Dict<std::string, std::string>();
 	this->_closed = false;
 
 	if (status != 0)
@@ -103,9 +114,22 @@ void HttpResponseBase::set_cookie(
 	const std::string& same_site
 )
 {
-	this->_cookies.set(name, Cookie(
-		name, value, max_age, expires, domain, path, is_secure, is_http_only, same_site
-	));
+	std::string same_site_;
+	if (!same_site.empty())
+	{
+		auto ss_lower = core::str::lower(same_site_);
+		if (ss_lower != "lax" && ss_lower != "strict")
+		{
+			throw core::ValueError(R"(samesite must be "lax" or "strict".)");
+		}
+
+		same_site_ = same_site;
+	}
+
+	auto cookie = Cookie(
+		name, value, max_age, expires, domain, path, is_secure, is_http_only, same_site_
+	);
+	this->_cookies.set(name, cookie);
 }
 
 void HttpResponseBase::set_signed_cookie(
@@ -240,19 +264,19 @@ std::string HttpResponseBase::serialize_headers()
 		return _p.first + ": " + _p.second;
 	};
 	std::string result;
-	for (auto it = this->_headers.cbegin(); it != this->_headers.cend(); it++)
+	for (auto it = this->_headers.begin(); it != this->_headers.end(); it++)
 	{
 		result.append(expr(*it));
-		if (std::next(it) != this->_headers.cend())
+		if (std::next(it) != this->_headers.end())
 		{
 			result.append("\r\n");
 		}
 	}
 
-	for (auto it = this->_cookies.cbegin(); it != this->_cookies.cend(); it++)
+	for (auto it = this->_cookies.begin(); it != this->_cookies.end(); it++)
 	{
 		result.append(it->second.to_string());
-		if (std::next(it) != this->_cookies.cend())
+		if (std::next(it) != this->_cookies.end())
 		{
 			result.append("\r\n");
 		}
@@ -320,11 +344,16 @@ void HttpResponse::write_lines(const std::vector<std::string>& lines)
 
 std::string HttpResponse::serialize()
 {
-	this->set_header("Date", core::dt::gmtnow().strftime("%a, %d %b %Y %T %Z"));
-	this->set_header("Content-Length", std::to_string(this->_content.size()));
+	this->set_header(
+		"Date",
+		core::dt::Datetime::utc_now().strftime("%a, %d %b %Y %T GMT")
+	);
+	this->set_header(
+		"Content-Length",
+		std::to_string(this->_content.size())
+	);
 
 	auto reason_phrase = this->get_reason_phrase();
-
 	auto headers = this->serialize_headers();
 
 	return "HTTP/1.1 " + std::to_string(this->_status) + " " + reason_phrase + "\r\n" +
@@ -366,7 +395,9 @@ FileResponse::FileResponse(
 {
 	if (!core::path::exists(this->_file_path))
 	{
-		throw core::FileDoesNotExistError("file '" + this->_file_path + "' does not exist", _ERROR_DETAILS_);
+		throw core::FileDoesNotExistError(
+			"file '" + this->_file_path + "' does not exist", _ERROR_DETAILS_
+		);
 	}
 
 	// Initializing file stream.
@@ -443,7 +474,10 @@ std::string FileResponse::_get_headers_chunk()
 {
 	auto reason_phrase = this->get_reason_phrase();
 	this->_set_headers();
-	this->set_header("Date", core::dt::gmtnow().strftime("%a, %d %b %Y %T %Z"));
+	this->set_header(
+		"Date",
+		core::dt::Datetime::utc_now().strftime("%a, %d %b %Y %T GMT")
+	);
 	auto headers = this->serialize_headers();
 
 	std::string headers_chunk = "HTTP/1.1 " + std::to_string(this->_status) + " " + reason_phrase + "\r\n"
@@ -598,9 +632,9 @@ HttpResponseGone::HttpResponseGone(
 
 // HttpResponseEntityTooLarge implementation
 HttpResponseEntityTooLarge::HttpResponseEntityTooLarge(
-		const std::string& content,
-		const std::string& content_type,
-		const std::string& charset
+	const std::string& content,
+	const std::string& content_type,
+	const std::string& charset
 ) : HttpResponse(content, 413, content_type, "", charset)
 {
 }

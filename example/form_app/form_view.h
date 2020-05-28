@@ -1,41 +1,34 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  */
 
 #pragma once
 
-#include "../../src/views/view.h"
-#include "../../src/core/logger.h"
-#include "../../src/apps/config.h"
+#include <memory>
+
+#include "../../src/core/types/value.h"
+#include "../../src/views/template_view.h"
+#include "../../src/render/context.h"
 
 
-class FormView : public wasp::views::View
+class FormView : public xw::views::TemplateView
 {
 public:
-	explicit FormView(wasp::core::ILogger* logger = nullptr)
-		: wasp::views::View({"get", "post"}, logger)
+	explicit FormView(xw::conf::Settings* settings)
+		: TemplateView({"get", "post"}, settings)
 	{
+		this->_template_name = "form_app/form.html";
 	}
 
-	wasp::http::HttpResponseBase* get(wasp::http::HttpRequest* request, wasp::views::Args* args) final
+	std::unique_ptr<xw::http::IHttpResponse> get(xw::http::HttpRequest* request, xw::views::Args* args) final
 	{
+		using namespace xw::render;
+		using namespace xw::core::types;
+
 		std::string user_row;
 		if (args->contains("user_name"))
 		{
-			user_row += "<h3>User: " + args->get_str("user_name");
+			user_row += "User: " + args->get_str("user_name");
 		}
 
 		if (args->contains("user_id"))
@@ -43,26 +36,22 @@ public:
 			user_row += ", ID: " + args->get_str("user_id");
 		}
 
-		if (!user_row.empty())
+		if (user_row.empty())
 		{
-			user_row += "</h3>\n";
+			user_row += "User is not found";
 		}
 
-		std::string body(
-			user_row +
-			"<form method=\"post\" enctype=\"multipart/form-data\">\n"
-			"\t<input type=\"file\" name=\"super_file\" />\n"
-			"\t<input type=\"email\" name=\"mail\" />\n"
-			"\t<input type=\"text\" name=\"name\" />\n"
-			"\t<input type=\"number\" name=\"birth_year\" />\n"
-			"\t<input type=\"submit\" value=\"send\" />\n"
-			"\t</form>\n"
-		);
+		auto ctx = std::make_shared<Context>(Context::scope_t{{
+			"user_info",
+			std::shared_ptr<Value<std::string>>(
+				new Value<std::string>(user_row)
+			)
+		}});
 
-		return new wasp::http::HttpResponse(body);
+		return this->render(request, ctx);
 	}
 
-	wasp::http::HttpResponseBase* post(wasp::http::HttpRequest* request, wasp::views::Args* args) final
+	std::unique_ptr<xw::http::IHttpResponse> post(xw::http::HttpRequest* request, xw::views::Args* args) final
 	{
 		if (request->FILES.contains("super_file"))
 		{
@@ -70,6 +59,6 @@ public:
 			super_file.save();
 		}
 
-		return new wasp::http::HttpResponseRedirect("/index");
+		return std::make_unique<xw::http::HttpResponseRedirect>("/index");
 	}
 };

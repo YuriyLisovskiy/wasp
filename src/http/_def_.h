@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
  */
 
 /**
- * _def_.h
+ * http/_def_.h
+ *
  * Purpose: http module's definitions.
  */
 
@@ -25,10 +26,10 @@
 #include "../_def_.h"
 
 
-/// wasp::http
-#define __HTTP_BEGIN__ __WASP_BEGIN__ namespace http {
-#define __HTTP_END__ } __WASP_END__
+// http
+#define __HTTP_BEGIN__ __MAIN_NAMESPACE_BEGIN__ namespace http {
+#define __HTTP_END__ } __MAIN_NAMESPACE_END__
 
-/// wasp::http::internal
+// http::internal
 #define __HTTP_INTERNAL_BEGIN__ __HTTP_BEGIN__ namespace internal {
 #define __HTTP_INTERNAL_END__ } __HTTP_END__

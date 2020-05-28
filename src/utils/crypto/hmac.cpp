@@ -16,10 +16,14 @@
  */
 
 /**
- * An implementation of hmac.h.
+ * An implementation of utils/crypto/hmac.h
  */
 
 #include "./hmac.h"
+
+// Framework modules.
+#include "./md5.h"
+#include "../../core/exceptions.h"
 
 
 __CRYPTO_BEGIN__
@@ -90,12 +94,12 @@ void Hmac::update(const std::string& input)
 	this->_inner->update(input);
 }
 
-size_t Hmac::size()
+size_t Hmac::size() const
 {
 	return this->_size;
 }
 
-size_t Hmac::block_size()
+size_t Hmac::block_size() const
 {
 	return this->_block_size;
 }
@@ -148,8 +152,10 @@ Hmac* salted_hmac(
 	// line is redundant and could be replaced by key = key_salt + secret, since
 	// the hmac module does the same thing for keys longer than the block size.
 	// However, we need to ensure that we *always* do this.
-	// TODO: rewrite lambda.
-	Hmac* hmac = new Hmac(salted_key, [hash_func]() -> IHash* { return hash_func; });
+	hash_func->reset();
+	Hmac* hmac = new Hmac(
+		salted_key, [hash_func]() -> IHash* { return hash_func->clone(); }
+	);
 	if (is_default_hf)
 	{
 		delete hash_func;

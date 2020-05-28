@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,26 +16,27 @@
  */
 
 /**
- * An implementation of cookies.h.
+ * An implementation of middleware/cookies.h
  */
 
 #include "./cookies.h"
 
+// Framework modules.
+#include "../core/parsers/cookie_parser.h"
+
 
 __MIDDLEWARE_BEGIN__
 
-CookieMiddleware::CookieMiddleware(wasp::conf::Settings* settings)
+CookieMiddleware::CookieMiddleware(conf::Settings* settings)
 	: MiddlewareMixin(settings)
 {
 }
 
-http::HttpResponseBase* CookieMiddleware::process_request(http::HttpRequest* request)
+std::unique_ptr<http::IHttpResponse> CookieMiddleware::process_request(http::HttpRequest* request)
 {
-	auto* cookies = core::internal::cookie_parser::parse(
-		request->headers.get("Cookie", "")
-	);
-	request->COOKIES = collections::Dict(*cookies);
-	delete cookies;
+	core::internal::cookie_parser cp;
+	cp.parse(request->headers.get("Cookie", ""));
+	request->COOKIES = collections::Dict(cp.result);
 	return nullptr;
 }
 

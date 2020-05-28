@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,18 +16,22 @@
  */
 
 /**
- * query_parser.h
+ * core/parsers/query_parser.h
+ *
  * Purpose: parses url's query.
  */
 
 #pragma once
 
+#ifdef _MSC_VER
+// C++ libraries.
+#include <string>
+#endif
+
 // Module definitions.
 #include "../_def_.h"
 
-// Wasp libraries.
-#include "../../http/request.h"
-#include "../../collections/dict.h"
+// Framework modules.
 #include "../../collections/multi_dict.h"
 
 
@@ -41,11 +45,10 @@ struct query_parser final
 		s_val
 	};
 
-	collections::Dict<std::string, std::string>* dict;
-	collections::MultiValueDict<std::string, std::string>* multi_dict;
+	collections::Dict<std::string, std::string> dict;
+	collections::MultiValueDict<std::string, std::string> multi_dict;
 
-	explicit query_parser();
-	~query_parser();
+	query_parser() = default;
 	void append_parameter(const std::string& key, const std::string& value);
 	void parse(const std::string& data);
 };

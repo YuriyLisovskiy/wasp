@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,22 +16,18 @@
  */
 
 /**
- * encoding.h
+ * core/encoding.h
+ *
  * Purpose: encode/decode strings.
  */
 
 #pragma once
 
 // C++ libraries.
-#include <string>
 #include <sstream>
-#include <iomanip>
 
 // Module definitions.
 #include "./_def_.h"
-
-// Wasp libraries.
-#include "../core/exceptions.h"
 
 
 __ENCODING_BEGIN__

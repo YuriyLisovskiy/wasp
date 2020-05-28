@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,23 +16,22 @@
  */
 
 /**
- * regex.h
+ * core/regex.h
+ *
  * Purpose: C++ regular expression's utilities.
  */
 
 #pragma once
 
 // C++ libraries.
-#include <map>
 #include <regex>
-#include <vector>
-#include <string>
+
+#ifdef _MSC_VER
+#include <map>
+#endif
 
 // Module definitions.
 #include "./_def_.h"
-
-// Wasp libraries.
-#include "./string/str.h"
 
 
 __RGX_BEGIN__
@@ -42,20 +41,23 @@ class Regex final
 private:
 	bool _is_matched;
 	bool _is_searched;
-	bool _groups_are_made;
 	std::string _to_match;
 	std::regex _expr;
 	std::smatch _matches;
 	std::vector<std::string> _groups;
 
-	void _make_groups();
-
 public:
 	explicit Regex(const std::string& expr);
+	explicit Regex(
+		const std::string& expr,
+		std::regex_constants::syntax_option_type sot
+	);
 	bool match(const std::string& to_match);
 	bool search(const std::string& to_search);
 	std::vector<std::string> groups();
 	std::string group(size_t pos);
+
+	static std::string escape(const std::string& input);
 };
 
 

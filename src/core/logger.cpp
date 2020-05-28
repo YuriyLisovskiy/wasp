@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,30 +15,39 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * An implementation of core/logger.h
+ */
+
 #include "./logger.h"
+
+// C++ libraries.
+#include <iostream>
+#include <cstring>
+
+// Framework modules.
+#include "../core/datetime.h"
 
 
 __CORE_BEGIN__
 
-ILogger* Logger::_instance = nullptr;
+std::shared_ptr<ILogger> Logger::_instance = nullptr;
 
-void Logger::reset_instance()
-{
-	delete Logger::_instance;
-	Logger::_instance = nullptr;
-}
-
-ILogger* Logger::get_instance(const Logger::Config& cfg)
+std::shared_ptr<ILogger> Logger::get_instance(const Config& cfg)
 {
 	if (Logger::_instance == nullptr)
 	{
-		Logger::_instance = new Logger(cfg);
+		Logger::_instance = std::shared_ptr<Logger>(new Logger(cfg));
+	}
+	else
+	{
+		Logger::_instance->set_config(cfg);
 	}
 
 	return Logger::_instance;
 }
 
-Logger::Logger(const Logger::Config& cfg)
+Logger::Logger(const Config& cfg)
 {
 	this->_config = cfg;
 	if (cfg.streams.empty())
@@ -76,7 +85,9 @@ void Logger::print(const std::string& msg, Color colour, char end)
 {
 	if (this->_config.enable_print)
 	{
-		std::cout << this->get_colour(colour) << msg << this->_colors[Color::DEFAULT] << end;
+		this->set_colour(colour);
+		std::cout << msg << end;
+		this->set_colour(Color::DEFAULT);
 	}
 }
 
@@ -87,27 +98,27 @@ void Logger::print(const char* msg, Color colour, char end)
 
 void Logger::info(const core::BaseException& exc)
 {
-	this->info(exc.what(), exc.line(), exc.function(), exc.file());
+	this->info(exc.get_message(), exc.line(), exc.function(), exc.file());
 }
 
 void Logger::debug(const core::BaseException& exc)
 {
-	this->debug(exc.what(), exc.line(), exc.function(), exc.file());
+	this->debug(exc.get_message(), exc.line(), exc.function(), exc.file());
 }
 
 void Logger::warning(const core::BaseException& exc)
 {
-	this->warning(exc.what(), exc.line(), exc.function(), exc.file());
+	this->warning(exc.get_message(), exc.line(), exc.function(), exc.file());
 }
 
 void Logger::error(const core::BaseException& exc)
 {
-	this->error(exc.what(), exc.line(), exc.function(), exc.file());
+	this->error(exc.get_message(), exc.line(), exc.function(), exc.file());
 }
 
 void Logger::fatal(const core::BaseException& exc)
 {
-	this->fatal(exc.what(), exc.line(), exc.function(), exc.file());
+	this->fatal(exc.get_message(), exc.line(), exc.function(), exc.file());
 }
 
 void Logger::log(const std::string& msg, int line, const char* function, const char* file, Logger::log_level_enum level)
@@ -161,17 +172,18 @@ void Logger::log(const std::string& msg, int line, const char* function, const c
 		full_msg = " " + msg;
 	}
 
-	std::string result = "[" + dt::now().strftime("%F %T") +
-		"] " + level_name + ":" + full_msg + "\n";
-	this->write_to_stream(result, this->get_colour(colour));
+	std::string result = "[" + dt::Datetime::now().strftime("%F %T") +
+		"] " + level_name + ":" + full_msg;
+	this->write_to_stream(result, colour);
 }
 
-void Logger::write_to_stream(const std::string& msg, const char* colour)
+void Logger::write_to_stream(const std::string& msg, Color colour)
 {
-	const char* default_colour = this->_colors[Color::DEFAULT];
 	for (auto& stream : this->_config.streams)
 	{
-		*stream << '\n' << colour << msg << default_colour << '\n';
+		this->set_colour(colour);
+		*stream << msg << '\n';
+		this->set_colour(Color::DEFAULT);
 	}
 
 	this->flush();
@@ -185,14 +197,21 @@ void Logger::flush()
 	}
 }
 
-const char* Logger::get_colour(Color colour)
+void Logger::set_colour(Color colour)
 {
+#if defined(__unix__) || defined(__linux__)
 	if (this->_colors.find(colour) == this->_colors.end())
 	{
 		colour = Color::DEFAULT;
 	}
 
-	return this->_colors[colour];
+	std::cout << this->_colors[colour];
+#endif
+}
+
+void Logger::set_config(const Config& config)
+{
+	this->_config = config;
 }
 
 __CORE_END__

@@ -16,10 +16,15 @@
  */
 
 /**
- * An implementation of signer.h.
+ * An implementation of core/signing/signer.h
  */
 
 #include "./signer.h"
+
+// Framework modules.
+#include "../string.h"
+#include "../exceptions.h"
+#include "../../utils/crypto/hmac.h"
 
 
 __SIGNING_INTERNAL_BEGIN__
@@ -54,7 +59,7 @@ Signer::Signer(
 
 	if (salt.empty())
 	{
-		this->_salt = "wasp.core.signing.Signer";
+		this->_salt = "core.signing.Signer";
 	}
 	else
 	{

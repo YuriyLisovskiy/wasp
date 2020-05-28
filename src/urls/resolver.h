@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,39 +16,35 @@
  */
 
 /**
- * resolver.h
+ * urls/resolver.h
+ *
  * Purpose: resolves given url as string.
  */
 
 #pragma once
 
-// C++ libraries.
-#include <vector>
-#include <functional>
-
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
+// Framework modules.
 #include "./pattern.h"
-#include "../http/response.h"
 
 
 __URLS_BEGIN__
 
 /// Searches path in urlpatterns and returns an expression
 /// to process request if path is found, otherwise returns nullptr.
-extern std::function<http::HttpResponseBase*(
+extern std::function<std::unique_ptr<http::IHttpResponse>(
 	http::HttpRequest* request,
-	core::ILogger* logger
+	conf::Settings* settings
 )> resolve(
-	const std::string& path, std::vector<UrlPattern>& urlpatterns
+	const std::string& path, std::vector<std::shared_ptr<UrlPattern>>& urlpatterns
 );
 
 /// Return true if the given path can be found in urlpatterns,
 /// false otherwise.
 extern bool is_valid_path(
-	const std::string& path, std::vector<UrlPattern>& urlpatterns
+	const std::string& path, std::vector<std::shared_ptr<UrlPattern>>& urlpatterns
 );
 
 __URLS_END__

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,22 +16,22 @@
  */
 
 /**
- * flag_set.h
- * Purpose: represents set of flags which can be parsed from char** argv
+ * core/flags/flag_set.h
+ *
+ * Purpose:
+ * 	Represents set of flags which can be parsed from char** argv
  */
 
 #pragma once
 
 // C++ libraries.
 #include <map>
-#include <string>
 
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
+// Framework modules.
 #include "./flags.h"
-#include "./parser.h"
 
 
 __FLAGS_BEGIN__

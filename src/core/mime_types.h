@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,36 +16,40 @@
  */
 
 /**
- * mime_types.h
+ * core/mime_types.h
  *
- * Purpose: guess the MIME type of a file.
+ * Purpose:
+ * 	Guess the MIME type of a file.
  *
- * Variables:
+ * 	Variables:
  *
- * SUFFIX_MAP -- dictionary mapping suffixes to suffixes
- * ENCODINGS_MAP -- dictionary mapping suffixes to encodings
- * TYPES_MAP -- dictionary mapping suffixes to types
+ * 	SUFFIX_MAP -- dictionary mapping suffixes to suffixes
+ * 	ENCODINGS_MAP -- dictionary mapping suffixes to encodings
+ * 	TYPES_MAP -- dictionary mapping suffixes to types
  *
  *
- * Functions:
+ * 	Functions:
  *
- * std::string ext_from_path(const std::string& path) - retrieves an extension from file path.
+ * 	std::string ext_from_path(const std::string& path) - retrieves
+ * 	an extension from file path.
  *
- * void guessContentType(const std::string& _path, std::string& type, std::string& encoding) -- guess
+ * 	void guessContentType(const std::string& _path, std::string& type, std::string& encoding) -- guess
  *  the MIME type and encoding of a URL.
  */
 
 #pragma once
 
+#ifdef _MSC_VER
+
 // C++ libraries.
 #include <string>
+
+#endif
 
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
-#include "./path.h"
-#include "./string/str.h"
+// Framework modules.
 #include "../collections/dict.h"
 
 

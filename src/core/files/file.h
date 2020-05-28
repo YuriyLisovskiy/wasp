@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
  */
 
 /**
- * file.h
+ * core/files/file.h
+ *
  * Purpose: file stream wrapper for easier file handling.
  */
 
@@ -24,12 +25,10 @@
 
 // C++ libraries.
 #include <fstream>
-#include <string>
 #include <vector>
-#include <cmath>
 
 #if defined(__unix__) || defined(__linux__)
-#include <sys/types.h>
+//#include <sys/types.h>
 #include <sys/stat.h>
 #endif
 
@@ -37,16 +36,12 @@
 #include <unistd.h>
 #endif
 
-#if defined(_WIN32) || defined(_WIN64)
-#define stat _stat
-#endif
+//#if defined(_WIN32) || defined(_WIN64)
+//#define stat _stat
+//#endif
 
 // Module definitions.
 #include "../_def_.h"
-
-// Wasp libraries.
-#include "../exceptions.h"
-#include "../string/str.h"
 
 
 __CORE_BEGIN__
@@ -110,7 +105,7 @@ public:
 	bool multiple_chunks(size_t chunk_size = -1);
 	std::string path() const;
 
-	static struct stat stat(const std::string& file_path);
+	static struct stat file_stat(const std::string& file_path);
 };
 
 __CORE_END__

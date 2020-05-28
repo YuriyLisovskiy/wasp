@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,21 +16,19 @@
  */
 
 /**
- * socket.h
+ * core/net/socket.h
+ *
  * Purpose: tcp/ip socket's wrapper.
  */
 
 #pragma once
 
-#include <fcntl.h>
-
-#include <iostream>
+#if defined(_WIN32) || defined(_WIN64)
+#include <cstdint>
+#endif
 
 // Module definitions.
 #include "./_def_.h"
-
-// Wasp libraries.
-#include "../exceptions.h"
 
 
 __NET_INTERNAL_BEGIN__
@@ -47,14 +45,17 @@ private:
 public:
 	Socket();
 
+	[[nodiscard]] int initialize() const;
 	socket_t create(const char* host, uint16_t port, bool use_ipv6 = false);
 	int bind();
-	int listen();
-	socket_t accept();
-	int close();
-	int set_reuse_addr();
-	int set_reuse_port();
-	bool set_blocking(bool blocking);
+	[[nodiscard]] int listen() const;
+	[[nodiscard]] socket_t accept() const;
+	[[nodiscard]] int close() const;
+	[[nodiscard]] int set_reuse_addr() const;
+	[[nodiscard]] int set_reuse_port() const;
+	[[nodiscard]] bool set_blocking(bool blocking) const;
+
+	static int close_socket(socket_t s);
 
 private:
 	socket_t create_ipv4(const char* host, uint16_t port);

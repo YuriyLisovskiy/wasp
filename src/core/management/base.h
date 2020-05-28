@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,20 +16,19 @@
  */
 
 /**
- * base.h
- * Purpose: The base class from which all management commands
- * 			ultimately derive.
+ * core/management/base.h
+ *
+ * Purpose:
+ * 	The base class from which all management commands
+ * 	ultimately derive.
  */
 
 #pragma once
 
-// C++ libraries.
-#include <string>
-
 // Module definitions.
-#include "./_def_.h"
+#include "../_def_.h"
 
-// Wasp libraries.
+// Framework modules.
 #include "../../core/flags/flag_set.h"
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,15 +16,16 @@
  */
 
 /**
- * _def_.h
+ * core/management/commands/_def_.h
+ *
  * Purpose: core/management/commands module's definitions.
  */
 
 #pragma once
 
-#include "../_def_.h"
+#include "../../_def_.h"
 
 
-/// wasp::core::cmd
+// core::cmd
 #define __CORE_COMMANDS_BEGIN__ __CORE_BEGIN__ namespace cmd {
 #define __CORE_COMMANDS_END__ } __CORE_END__

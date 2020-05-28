@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,10 +23,26 @@
 #pragma once
 
 
-/// wasp
-#define __WASP_BEGIN__ namespace wasp {
-#define __WASP_END__ }
+// xw
+#define __MAIN_NAMESPACE_BEGIN__ namespace xw {
+#define __MAIN_NAMESPACE_END__ }
 
 
-/// Required parameters for Wasp's built-in logger.
+__MAIN_NAMESPACE_BEGIN__
+
+const char* const LIB_NAME = "Xalwart";
+const char* const LIB_VERSION = "0.0.1-dev";
+
+__MAIN_NAMESPACE_END__
+
+
+// Required parameters for built-in logger.
+#ifdef _MSC_VER
 #define _ERROR_DETAILS_ __LINE__, __FUNCTION__, __FILE__
+#else
+#define _ERROR_DETAILS_ __LINE__, __PRETTY_FUNCTION__, __FILE__
+#endif
+
+#if defined(_WIN32) || defined(_WIN64)
+typedef unsigned int uint;
+#endif

@@ -16,23 +16,18 @@
  */
 
 /**
- * signer.h
+ * core/signing/signer.h
+ *
  * Purpose: used for signing string.
  */
 
 #pragma once
 
-// C++ libraries.
-#include <string>
-
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
+// Framework modules.
 #include "../regex.h"
-#include "../string/str.h"
-#include "../exceptions.h"
-#include "../../utils/crypto/hmac.h"
 
 
 __SIGNING_INTERNAL_BEGIN__

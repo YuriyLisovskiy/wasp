@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
  */
 
 /**
- * args.h
+ * views/args.h
+ *
  * Purpose: class that contains url arguments based on std::map.
  */
 
@@ -25,9 +26,6 @@
 // C++ libraries.
 #include <map>
 #include <string>
-#include <cxxabi.h>
-#include <iostream>
-#include <functional>
 
 // Module definitions.
 #include "./_def_.h"

@@ -16,10 +16,14 @@
  */
 
 /**
- * An implementation of utility.h.
+ * An implementation of http/utility.h
  */
 
 #include "./utility.h"
+
+// Framework modules.
+#include "../core/utility.h"
+#include "../core/string.h"
 
 
 __HTTP_INTERNAL_BEGIN__
@@ -35,12 +39,14 @@ __HTTP_BEGIN__
 
 size_t parse_http_datetime(const std::string& http_datetime)
 {
-	return core::dt::DateTime::strptime(http_datetime.c_str(), "Wdy, DD Mon YYYY HH:MM:SS GMT").timestamp();
+	return core::dt::Datetime::strptime(
+		http_datetime, "%a, %d %b %Y %H:%M:%S GMT"
+	).timestamp();
 }
 
-std::string format_http_datetime(size_t epoch_seconds)
+std::string http_date(size_t epoch_seconds)
 {
-	return core::dt::DateTime(epoch_seconds).strftime("Wdy, DD Mon YYYY HH:MM:SS GMT");
+	return core::utility::format_date(epoch_seconds, false, true);
 }
 
 void split_domain_port(
@@ -72,6 +78,9 @@ void split_domain_port(
 			domain.pop_back();
 		}
 	}
+
+	core::str::rtrim(domain, "]");
+	core::str::ltrim(domain, "[");
 }
 
 bool validate_host(

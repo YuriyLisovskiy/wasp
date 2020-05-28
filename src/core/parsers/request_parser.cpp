@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,52 +16,33 @@
  */
 
 /**
- * An implementation of request_parser.h
+ * An implementation of core/parsers/request_parser.h
  */
 
 #include "./request_parser.h"
 
+// C++ libraries.
+#include <algorithm>
+#include <cstring>
+
+// Framework modules.
+#include "./multipart_parser.h"
+#include "./query_parser.h"
+#include "../exceptions.h"
+
+#ifdef _MSC_VER
+#define strncasecmp _strnicmp
+#define strcasecmp _stricmp
+#endif
+
 
 __CORE_INTERNAL_BEGIN__
-
-// Deletes struct's fields which are pointers.
-request_parser::~request_parser()
-{
-	delete this->get_parameters;
-	delete this->post_parameters;
-	delete this->files_parameters;
-}
-
-// Builds an http request from parsed data.
-http::HttpRequest* request_parser::build_request()
-{
-	http::HttpRequest::Parameters<std::string, std::string> empty;
-	return new http::HttpRequest(
-		this->method,
-		this->path,
-		this->major_v,
-		this->minor_v,
-		this->query,
-		this->keep_alive,
-		this->content,
-		this->headers,
-		this->get_parameters ? *this->get_parameters : empty,
-		this->post_parameters ? *this->post_parameters : empty,
-		this->files_parameters ? *this->files_parameters : http::HttpRequest::Parameters<std::string, UploadedFile>()
-	);
-}
-
-// Creates Dict object from headers' map.
-collections::Dict<std::string, std::string> request_parser::get_headers()
-{
-	return collections::Dict<std::string, std::string>(this->headers);
-}
 
 // Parses http request headers from given stream.
 void request_parser::parse_headers(const std::string& data)
 {
-	std::string newHeaderName;
-	std::string newHeaderValue;
+	std::string new_header_name;
+	std::string new_header_value;
 
 	std::map<std::string, std::string>::iterator connectionIt;
 
@@ -260,9 +241,9 @@ void request_parser::parse_headers(const std::string& data)
 				}
 				else
 				{
-					newHeaderName.reserve(16);
-					newHeaderValue.reserve(16);
-					newHeaderName.push_back(input);
+					new_header_name.reserve(16);
+					new_header_value.reserve(16);
+					new_header_name.push_back(input);
 					this->state = request_parser::state_enum::s_header_name;
 				}
 				break;
@@ -281,7 +262,7 @@ void request_parser::parse_headers(const std::string& data)
 				else
 				{
 					this->state = request_parser::state_enum::s_header_value;
-					newHeaderValue.push_back(input);
+					new_header_value.push_back(input);
 				}
 				break;
 			case request_parser::state_enum::s_header_name:
@@ -295,7 +276,7 @@ void request_parser::parse_headers(const std::string& data)
 				}
 				else
 				{
-					newHeaderName.push_back(input);
+					new_header_name.push_back(input);
 				}
 				break;
 			case request_parser::state_enum::s_header_space_before_value:
@@ -311,22 +292,22 @@ void request_parser::parse_headers(const std::string& data)
 			case request_parser::state_enum::s_header_value:
 				if (input == '\r')
 				{
-					if (strcasecmp(newHeaderName.c_str(), "Content-Length") == 0)
+					if (strcasecmp(new_header_name.c_str(), "Content-Length") == 0)
 					{
-						this->content_size = strtol(newHeaderValue.c_str(), nullptr, 0);
+						this->content_size = strtol(new_header_value.c_str(), nullptr, 0);
 						this->content.reserve(this->content_size);
 					}
-					else if (strcasecmp(newHeaderName.c_str(), "Transfer-Encoding") == 0)
+					else if (strcasecmp(new_header_name.c_str(), "Transfer-Encoding") == 0)
 					{
-						if (strcasecmp(newHeaderValue.c_str(), "chunked") == 0)
+						if (strcasecmp(new_header_value.c_str(), "chunked") == 0)
 						{
 							this->chunked = true;
 						}
 					}
 
-					this->headers[newHeaderName] = newHeaderValue;
-					newHeaderName.clear();
-					newHeaderValue.clear();
+					this->headers[new_header_name] = new_header_value;
+					new_header_name.clear();
+					new_header_value.clear();
 					this->state = request_parser::state_enum::s_expecting_new_line_2;
 				}
 				else if (request_parser::is_control(input))
@@ -335,7 +316,7 @@ void request_parser::parse_headers(const std::string& data)
 				}
 				else
 				{
-					newHeaderValue.push_back(input);
+					new_header_value.push_back(input);
 				}
 				break;
 			case request_parser::state_enum::s_expecting_new_line_2:
@@ -418,9 +399,7 @@ void request_parser::parse_body(const std::string& data, const std::string& medi
 	if (data.empty())
 	{
 		qp.parse(this->query);
-		this->set_parameters(
-			new http::HttpRequest::Parameters<std::string, std::string>(*qp.dict, *qp.multi_dict)
-		);
+		this->set_parameters(qp.dict, qp.multi_dict);
 	}
 	else
 	{
@@ -439,18 +418,18 @@ void request_parser::parse_body(const std::string& data, const std::string& medi
 			{
 				case request_parser::content_type_enum::ct_application_x_www_form_url_encoded:
 					qp.parse(this->content);
-					this->set_parameters(
-						new http::HttpRequest::Parameters<std::string, std::string>(
-							*qp.dict, *qp.multi_dict
-						)
-					);
+					this->set_parameters(qp.dict, qp.multi_dict);
 					break;
 				case request_parser::content_type_enum::ct_application_json:
 					break;
 				case request_parser::content_type_enum::ct_multipart_form_data:
 					mp.parse(this->headers["Content-Type"], this->content);
-					this->post_parameters = mp.get_post_params();
-					this->files_parameters = mp.get_files_params();
+					this->post_parameters = http::HttpRequest::Parameters(
+						mp.post_values, mp.multi_post_value
+					);
+					this->files_parameters = http::HttpRequest::Parameters(
+						mp.file_values, mp.multi_file_value
+					);
 					break;
 				case request_parser::content_type_enum::ct_other:
 					break;
@@ -475,15 +454,18 @@ void request_parser::parse_http_word(char input, char expected, request_parser::
 }
 
 // Sets parameters according to http request method.
-void request_parser::set_parameters(http::HttpRequest::Parameters<std::string, std::string>* params)
+void request_parser::set_parameters(
+	collections::Dict<std::string, std::string>& dict,
+    collections::MultiValueDict<std::string, std::string>& multi_dict
+)
 {
 	if (this->method == "GET")
 	{
-		this->get_parameters = params;
+		this->get_parameters = http::HttpRequest::Parameters(dict, multi_dict);
 	}
 	else if (this->method == "POST")
 	{
-		this->post_parameters = params;
+		this->post_parameters = http::HttpRequest::Parameters(dict, multi_dict);
 	}
 }
 

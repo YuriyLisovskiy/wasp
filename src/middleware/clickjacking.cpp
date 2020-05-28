@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,10 +16,13 @@
  */
 
 /**
- * An implementation of clickjacking.h.
+ * An implementation of middleware/clickjacking.h
  */
 
 #include "./clickjacking.h"
+
+// Framework modules.
+#include "../http/headers.h"
 
 
 __MIDDLEWARE_BEGIN__
@@ -29,8 +32,8 @@ XFrameOptionsMiddleware::XFrameOptionsMiddleware(conf::Settings* settings)
 {
 }
 
-http::HttpResponseBase* XFrameOptionsMiddleware::process_response(
-	http::HttpRequest* request, http::HttpResponseBase* response
+std::unique_ptr<http::IHttpResponse> XFrameOptionsMiddleware::process_response(
+	http::HttpRequest* request, http::IHttpResponse* response
 )
 {
 	// Don't set it if it's already in the response.
@@ -44,7 +47,7 @@ http::HttpResponseBase* XFrameOptionsMiddleware::process_response(
 }
 
 std::string XFrameOptionsMiddleware::get_x_frame_options_value(
-	http::HttpRequest* request, http::HttpResponseBase* response
+	http::HttpRequest* request, http::IHttpResponse* response
 )
 {
 	return this->settings->X_FRAME_OPTIONS.empty() ? "DENY" : this->settings->X_FRAME_OPTIONS;

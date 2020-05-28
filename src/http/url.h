@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +16,11 @@
  */
 
 /**
- * url.h
- * Purpose: represents url as Url object.
- * 			Parses url from string using url parser.
+ * http/url.h
+ *
+ * Purpose:
+ * 	Represents url as Url object.
+ * 	Parses url from string using url parser.
  */
 
 #pragma once
@@ -28,10 +30,6 @@
 
 // Module definitions.
 #include "./_def_.h"
-
-// Wasp libraries.
-#include "../core/exceptions.h"
-#include "../core/parsers/url_parser.h"
 
 
 __HTTP_BEGIN__

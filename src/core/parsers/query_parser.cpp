@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,25 +16,13 @@
  */
 
 /**
- * An implementation of query_parser.h
+ * An implementation of core/parsers/query_parser.h
  */
 
 #include "./query_parser.h"
 
 
 __CORE_INTERNAL_BEGIN__
-
-query_parser::query_parser()
-{
-	this->dict = new collections::Dict<std::string, std::string>(true);
-	this->multi_dict = new collections::MultiValueDict<std::string, std::string>(true);
-}
-
-query_parser::~query_parser()
-{
-	delete this->dict;
-	delete this->multi_dict;
-}
 
 void query_parser::parse(const std::string& content)
 {
@@ -83,12 +71,12 @@ void query_parser::parse(const std::string& content)
 
 void query_parser::append_parameter(const std::string& key, const std::string& value)
 {
-	if (!this->dict->contains(key))
+	if (!this->dict.contains(key))
 	{
-		this->dict->set(key, value);
+		this->dict.set(key, value);
 	}
 
-	this->multi_dict->append(key, value);
+	this->multi_dict.append(key, value);
 }
 
 __CORE_INTERNAL_END__

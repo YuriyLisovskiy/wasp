@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,24 +15,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * core/logger.h
+ */
+
 #pragma once
 
 // C++ libraries.
 #include <map>
-#include <iostream>
 #include <vector>
-#include <string>
-#include <cstring>
+#include <memory>
 
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
+// Framework modules.
 #include "../core/exceptions.h"
-#include "../core/datetime/datetime.h"
 
 
 __CORE_BEGIN__
+
+struct Config
+{
+	bool enable_info = true;
+	bool enable_debug = true;
+	bool enable_warning = true;
+	bool enable_error = true;
+	bool enable_fatal = true;
+	bool enable_print = true;
+	std::vector<std::ostream*> streams;
+};
 
 class ILogger
 {
@@ -72,24 +84,15 @@ public:
 	virtual void warning(const core::BaseException& exc) = 0;
 	virtual void error(const core::BaseException& exc) = 0;
 	virtual void fatal(const core::BaseException& exc) = 0;
+
+	virtual void set_config(const Config& config) = 0;
 };
 
 class Logger : public ILogger
 {
 public:
-	struct Config
-	{
-		bool enable_info = true;
-		bool enable_debug = true;
-		bool enable_warning = true;
-		bool enable_error = true;
-		bool enable_fatal = true;
-		bool enable_print = true;
-		std::vector<std::ostream*> streams;
-	};
-
-	static ILogger* get_instance(const Logger::Config& cfg);
-	static void reset_instance();
+	static std::shared_ptr<ILogger> get_instance(const Config& cfg);
+//	static void reset_instance();
 
 	void info(const std::string& msg, int line = 0, const char* function = "", const char* file = "") override;
 	void debug(const std::string& msg, int line = 0, const char* function = "", const char* file = "") override;
@@ -106,6 +109,7 @@ public:
 	void fatal(const core::BaseException& exc) override;
 
 private:
+#if defined(__unix__) || defined(__linux__)
 	std::map<Color, const char*> _colors = {
 		{DEFAULT, "\033[0m"},
 		{BLACK, "\033[30m"},
@@ -125,22 +129,23 @@ private:
 		{BOLD_CYAN, "\033[1m\033[36m"},
 		{BOLD_WHITE, "\033[1m\033[37m"},
 	};
+#endif
 
 	enum log_level_enum
 	{
 		ll_info, ll_debug, ll_warning, ll_error, ll_fatal
 	};
 
-	Logger::Config _config;
+	Config _config;
 
-	static ILogger* _instance;
+	static std::shared_ptr<ILogger> _instance;
 
-	explicit Logger(const Logger::Config& cfg);
-	~Logger() override = default;
+	explicit Logger(const Config& cfg);
 	void log(const std::string& msg, int line, const char* function, const char* file, Logger::log_level_enum level);
-	void write_to_stream(const std::string& msg, const char* colour);
+	void write_to_stream(const std::string& msg, Color colour);
 	void flush();
-	const char* get_colour(Color colour);
+	void set_colour(Color colour);
+	void set_config(const Config& config) override;
 };
 
 __CORE_END__

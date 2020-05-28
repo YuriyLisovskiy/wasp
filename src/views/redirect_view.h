@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,24 +16,18 @@
  */
 
 /**
- * redirect_view.h
- * Purpose: provide a redirect on any GET request.
+ * views/redirect_view.h
+ *
+ * Purpose: provides a redirect on any GET request.
  */
 
 #pragma once
 
-// C++ libraries.
-#include <string>
-
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
+// Framework modules.
 #include "./view.h"
-#include "./args.h"
-#include "../core/logger.h"
-#include "../http/request.h"
-#include "../http/response.h"
 
 
 __VIEWS_BEGIN__
@@ -47,22 +41,22 @@ private:
 
 public:
 	explicit RedirectView(
+		conf::Settings* settings,
 		const std::string& url,
 		bool permanent = false,
-		bool query_string = false,
-		core::ILogger* logger = nullptr
+		bool query_string = false
 	);
 
 	/// Return the URL redirect to.
 	std::string get_redirect_url();
 
-	http::HttpResponse* get(http::HttpRequest* request, Args* args) override;
-	http::HttpResponse* post(http::HttpRequest* request, Args* args) override;
-	http::HttpResponse* head(http::HttpRequest* request, Args* args) override;
-	http::HttpResponse* options(http::HttpRequest* request, Args* args) override;
-	http::HttpResponse* put(http::HttpRequest* request, Args* args) override;
-	http::HttpResponse* delete_(http::HttpRequest* request, Args* args) override;
-	http::HttpResponse* patch(http::HttpRequest* request, Args* args) override;
+	std::unique_ptr<http::IHttpResponse> get(http::HttpRequest* request, Args* args) override;
+	std::unique_ptr<http::IHttpResponse> post(http::HttpRequest* request, Args* args) override;
+	std::unique_ptr<http::IHttpResponse> head(http::HttpRequest* request, Args* args) override;
+	std::unique_ptr<http::IHttpResponse> options(http::HttpRequest* request, Args* args) override;
+	std::unique_ptr<http::IHttpResponse> put(http::HttpRequest* request, Args* args) override;
+	std::unique_ptr<http::IHttpResponse> delete_(http::HttpRequest* request, Args* args) override;
+	std::unique_ptr<http::IHttpResponse> patch(http::HttpRequest* request, Args* args) override;
 };
 
 __VIEWS_END__

@@ -16,9 +16,11 @@
  */
 
 /**
- * dict.h
- * Purpose: template container based on std::map with additional
- * 			methods (extended std::map).
+ * collections/dict.h
+ *
+ * Purpose:
+ * 	Template container based on std::map with additional
+ * 	methods (extended std::map).
  */
 
 #pragma once
@@ -30,9 +32,6 @@
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
-#include "../core/exceptions.h"
-
 
 __COLLECTIONS_BEGIN__
 
@@ -40,48 +39,20 @@ template <typename _Key, typename _Val>
 class Dict
 {
 protected:
-
-	/// Identifies if dictionary is mutable or not.
-	bool _is_mutable;
-
 	/// An actual container.
 	std::map<_Key, _Val> _map;
 
-	/// Wrapper for throwing DictError exception.
-	virtual void _throw(const std::string& msg, int line, const char* function, const char* file)
-	{
-		throw core::DictError(
-			std::string("unable to ") + msg + std::string(", Dict instance is immutable"),
-			line, function, file
-		);
-	}
-
 public:
-	typedef typename std::map<_Key, _Val>::const_iterator const_iterator;
-	typedef typename std::map<_Key, _Val>::const_reverse_iterator const_reverse_iterator;
-
 	typedef typename std::map<_Key, _Val>::iterator iterator;
 	typedef typename std::map<_Key, _Val>::reverse_iterator reverse_iterator;
 
-	/// Constructs immutable empty dictionary.
-	Dict() : _is_mutable(false)
-	{
-	}
-
-	/// Constructs empty dictionary with mutability parameter.
-	explicit Dict(bool is_mutable) : _is_mutable(is_mutable)
+	/// Constructs empty dictionary.
+	Dict()
 	{
 	}
 
 	/// Constructs Dict instance from std::map.
-	/// Makes dictionary immutable by default.
-	explicit Dict(const std::map<_Key, _Val>& src_map) : _is_mutable(false)
-	{
-		this->_map = src_map;
-	}
-
-	/// Constructs Dict instance from std::map with mutability parameter.
-	Dict(const std::map<_Key, _Val>& src_map, bool is_mutable) : _is_mutable(is_mutable)
+	explicit Dict(const std::map<_Key, _Val>& src_map)
 	{
 		this->_map = src_map;
 	}
@@ -91,27 +62,22 @@ public:
 	/// @param key: dict key which holds some value.
 	/// @param _default: a default value to be returned if key does not exist.
 	/// @return value by given key.
-	virtual _Val get(_Key key, _Val _default = _Val())
+	virtual _Val get(_Key key, _Val _default = _Val()) const
 	{
 		if (this->contains(key))
 		{
-			return this->_map[key];
+			return this->_map.at(key);
 		}
 
 		return _default;
 	}
 
-	/// Sets new value by given key if instance is mutable.
+	/// Sets new value by given key.
 	///
 	/// @param key: new key or existing key.
 	/// @param value: new value.
 	virtual void set(_Key key, _Val value)
 	{
-		if (!this->_is_mutable)
-		{
-			this->_throw("set new value", _ERROR_DETAILS_);
-		}
-
 		this->_map[key] = value;
 	}
 
@@ -120,11 +86,6 @@ public:
 	/// @param key: key to be removed.
 	virtual void remove(_Key key)
 	{
-		if (!this->_is_mutable)
-		{
-			this->_throw("remove value", _ERROR_DETAILS_);
-		}
-
 		if (this->contains(key))
 		{
 			this->_map.erase(key);
@@ -147,17 +108,9 @@ public:
 	///
 	/// @param key: key to check.
 	/// @return true if value exists, otherwise returns false.
-	virtual bool contains(_Key key)
+	virtual bool contains(_Key key) const
 	{
 		return this->_map.find(key) != this->_map.end();
-	}
-
-	/// Checks if dictionary is mutable.
-	///
-	/// @return true if dictionary can be changed, otherwise returns false.
-	bool is_mutable()
-	{
-		return this->_is_mutable;
 	}
 
 	/// Checks if dictionary is empty.
@@ -174,7 +127,7 @@ public:
 	virtual std::vector<_Key> keys()
 	{
 		std::vector<_Key> keys;
-		for (auto it = this->cbegin(); it != this->cend(); it++)
+		for (auto it = this->begin(); it != this->end(); it++)
 		{
 			keys.push_back(it->first);
 		}
@@ -182,78 +135,27 @@ public:
 		return keys;
 	}
 
-	/// Returns constant begin iterator.
-	const_iterator cbegin() const
-	{
-		return this->_map.cbegin();
-	}
-
-	/// Returns constant end iterator.
-	const_iterator cend() const
-	{
-		return this->_map.cend();
-	}
-
-	/// Returns constant reversed begin iterator.
-	const_reverse_iterator crbegin() const
-	{
-		return this->_map.crbegin();
-	}
-
-	/// Returns constant reversed end iterator.
-	const_reverse_iterator crend() const
-	{
-		return this->_map.crend();
-	}
-
 	/// Returns begin iterator.
-	///	Works only if dictionary is mutable, otherwise
-	///		an exception will be thrown.
 	iterator begin()
 	{
-		if (!this->_is_mutable)
-		{
-			this->_throw("retrieve non-constant iterator", _ERROR_DETAILS_);
-		}
-
 		return this->_map.begin();
 	}
 
 	/// Returns end iterator.
-	///	Works only if dictionary is mutable, otherwise
-	///		an exception will be thrown.
 	iterator end()
 	{
-		if (!this->_is_mutable)
-		{
-			this->_throw("retrieve non-constant iterator", _ERROR_DETAILS_);
-		}
 		return this->_map.end();
 	}
 
 	/// Returns reversed begin iterator.
-	///	Works only if dictionary is mutable, otherwise
-	///		an exception will be thrown.
 	reverse_iterator rbegin()
 	{
-		if (!this->_is_mutable)
-		{
-			this->_throw("retrieve non-constant reverse iterator", _ERROR_DETAILS_);
-		}
-
 		return this->_map.rbegin();
 	}
 
 	/// Returns reversed end iterator.
-	///	Works only if dictionary is mutable, otherwise
-	///		an exception will be thrown.
 	reverse_iterator rend()
 	{
-		if (!this->_is_mutable)
-		{
-			this->_throw("retrieve non-constant reverse iterator", _ERROR_DETAILS_);
-		}
-
 		return this->_map.rend();
 	}
 

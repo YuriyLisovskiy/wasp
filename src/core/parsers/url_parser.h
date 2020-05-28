@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
  */
 
 /**
- * url_parser.h
+ * core/parsers/url_parser.h
+ *
  * Purpose: parses url from given string.
  */
 
@@ -24,14 +25,9 @@
 
 // C++ libraries.
 #include <string>
-#include <cassert>
 
 // Module definitions.
 #include "../_def_.h"
-
-// Wasp libraries.
-#include "../string/str.h"
-#include "../../core/exceptions.h"
 
 
 __CORE_INTERNAL_BEGIN__
@@ -56,8 +52,9 @@ struct url_parser final
 	};
 
 	bool is_parsed;
+	bool is_reset;
 	const char* last_err;
-	size_t err_line;
+	long int err_line;
 	const char* err_file;
 	const char* err_func;
 
@@ -74,6 +71,7 @@ struct url_parser final
 	url_parser();
 	void parse(const std::string& str);
 	void parse(const char* str);
+	void reset();
 	static bool is_unreserved(char ch);
 	static bool is_ipv6_symbol(char ch);
 

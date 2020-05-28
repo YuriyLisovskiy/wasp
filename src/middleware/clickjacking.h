@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
  */
 
 /**
- * clickjacking.h
+ * middleware/clickjacking.h
  *
  * Purpose:
  * 	Provides a middleware that implements protection against a
@@ -31,9 +31,8 @@
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
+// Framework modules.
 #include "./middleware_mixin.h"
-#include "../http/headers.h"
 
 
 __MIDDLEWARE_BEGIN__
@@ -47,14 +46,16 @@ __MIDDLEWARE_BEGIN__
  * By default, set the X-Frame-Options header to 'SAMEORIGIN', meaning the
  * response can only be loaded on a frame within the same site. To prevent the
  * response from being loaded in a frame in any site, set X_FRAME_OPTIONS in
- * your project's Django settings to 'DENY'.
+ * your project's settings to 'DENY'.
  */
 class XFrameOptionsMiddleware : public MiddlewareMixin
 {
 public:
 	explicit XFrameOptionsMiddleware(conf::Settings* settings);
 
-	http::HttpResponseBase* process_response(http::HttpRequest* request, http::HttpResponseBase* response) override;
+	std::unique_ptr<http::IHttpResponse> process_response(
+		http::HttpRequest* request, http::IHttpResponse* response
+	) override;
 
 	/// Get the value to set for the X_FRAME_OPTIONS header. Use the value from
 	/// the X_FRAME_OPTIONS setting, or 'DENY' if not set.
@@ -62,7 +63,7 @@ public:
 	/// This method can be overridden if needed, allowing it to vary based on
 	/// the request or response.
 	virtual std::string get_x_frame_options_value(
-		http::HttpRequest* request, http::HttpResponseBase* response
+		http::HttpRequest* request, http::IHttpResponse* response
 	);
 };
 

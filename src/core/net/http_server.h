@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,40 +16,22 @@
  */
 
 /**
- * http_server.h
+ * core/net/http_server.h
+ *
  * Purpose: http server based on tcp/ip socket.
  */
 
 #pragma once
 
-// C++ libraries.
-#include <iostream>
-#include <cstdint>
-#include <string>
-#include <functional>
-#include <vector>
-#include <fstream>
-#include <thread>
-#include <poll.h>
-
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
+// Framework modules.
 #include "./socket.h"
 #include "../logger.h"
-#include "../exceptions.h"
 #include "../thread_pool.h"
-#include "../files/uploaded_file.h"
-#include "../datetime/time.h"
-#include "../string/str.h"
-#include "../string/format.h"
-#include "../parsers/request_parser.h"
-#include "../../conf/defaults.h"
-#include "../../conf/settings.h"
-#include "../../http/response.h"
 #include "../../http/request.h"
-#include "../../http/headers.h"
+#include "../../http/response.h"
 
 
 __NET_INTERNAL_BEGIN__
@@ -62,6 +44,44 @@ __NET_INTERNAL_BEGIN__
 #define MAX_HEADERS_SIZE 4096 * 38 + 403    // 156051 bytes.
 
 typedef std::function<void(http::HttpRequest*, const socket_t&)> http_handler;
+
+
+// TODO: temporary helper class Measure.
+template <typename TimeT = std::chrono::milliseconds>
+class Measure
+{
+private:
+	std::chrono::high_resolution_clock::time_point _begin;
+	std::chrono::high_resolution_clock::time_point _end;
+
+public:
+	void start()
+	{
+		this->_begin = std::chrono::high_resolution_clock::now();
+	}
+
+	void end()
+	{
+		this->_end = std::chrono::high_resolution_clock::now();
+	}
+
+	double elapsed(bool reset = true)
+	{
+		auto result = std::chrono::duration_cast<TimeT>(this->_end - this->_begin).count();
+		if (reset)
+		{
+			this->reset();
+		}
+
+		return result;
+	}
+
+	void reset()
+	{
+		this->_begin = {};
+		this->_end = {};
+	}
+};
 
 
 class HttpServer
@@ -79,6 +99,8 @@ private:
 	core::ILogger* _logger;
 	std::string _media_root;
 	size_t _threads_count;
+	size_t _timeout_sec;
+	size_t _timeout_us;
 	core::internal::ThreadPool* _thread_pool;
 
 	enum read_result_enum
@@ -87,6 +109,7 @@ private:
 	};
 
 	int _init();
+	int _initialize();
 	int _create();
 	int _bind();
 	int _listen();
@@ -94,7 +117,12 @@ private:
 	void _close_server_socket();
 	void _clean_up(const socket_t& client);
 	http::HttpRequest* _handle_request(const socket_t& client);
-	std::string _read_body(const socket_t& client, const std::string& body_beginning, size_t body_length);
+	[[nodiscard]] std::string _read_body(
+		const socket_t& client,
+		const std::string& body_beginning,
+		size_t body_length
+	) const;
+	[[nodiscard]] bool _wait_for_client(const socket_t& client) const;
 	static std::string _read_headers(const socket_t& client, std::string& body_beginning);
 	void _start_listener();
 	void _serve_connection(const socket_t& client);
@@ -117,13 +145,15 @@ public:
 		size_t threads_count = 0;
 		bool use_ipv6 = false;
 		bool verbose = false;
+		size_t timeout_sec = 2;
+		size_t timeout_us = 0;
 	};
 
 	explicit HttpServer(HttpServer::context& ctx);
 	~HttpServer();
 	void finish();
 	void listen_and_serve();
-	static void send(http::HttpResponseBase* response, const socket_t& client);
+	static void send(http::IHttpResponse* response, const socket_t& client);
 	static void send(http::StreamingHttpResponse* response, const socket_t& client);
 
 private:

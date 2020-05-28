@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,17 +16,23 @@
  */
 
 /**
- * status.h
- * Purpose: hold all available http statuses, which contains status code,
- * 			reason phrase and brief explanation.
+ * http/status.h
+ *
+ * Purpose:
+ * 	Hold all available http statuses, which contains status code,
+ * 	reason phrase and brief explanation.
  */
 
 #pragma once
 
+#ifdef _MSC_VER
+#include <string>
+#endif
+
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
+// Framework modules.
 #include "../collections/dict.h"
 
 

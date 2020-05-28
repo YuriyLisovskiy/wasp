@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
  */
 
 /**
- * security.h
+ * middleware/security.h
  */
 
 #pragma once
@@ -28,12 +28,8 @@
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
+// Framework modules.
 #include "./middleware_mixin.h"
-#include "../core/regex.h"
-#include "../core/string/str.h"
-#include "../http/response.h"
-#include "../conf/settings.h"
 
 
 __MIDDLEWARE_BEGIN__
@@ -54,8 +50,12 @@ protected:
 public:
 	explicit SecurityMiddleware(conf::Settings* settings);
 
-	http::HttpResponseBase* process_request(http::HttpRequest* request) override;
-	http::HttpResponseBase* process_response(http::HttpRequest* request, http::HttpResponseBase* response) override;
+	std::unique_ptr<http::IHttpResponse> process_request(
+		http::HttpRequest* request
+	) override;
+	std::unique_ptr<http::IHttpResponse> process_response(
+		http::HttpRequest* request, http::IHttpResponse* response
+	) override;
 };
 
 __MIDDLEWARE_END__

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
  */
 
 /**
- * An implementation of config.h.
+ * An implementation of apps/config.h
  */
 
 #include "./config.h"
@@ -24,9 +24,22 @@
 
 __APPS_BEGIN__
 
-AppConfig::AppConfig(conf::Settings* settings)
+AppConfig::AppConfig(const std::string& app_path, conf::Settings* settings)
 {
 	this->settings = settings;
+	this->app_path = app_path;
+}
+
+void AppConfig::init(const core::object::Type& type)
+{
+	std::string name = type.name();
+	core::str::rtrim(name, "Config");
+	core::str::rtrim(name, "config");
+	core::str::rtrim(name, "_");
+	core::str::rtrim(name, "App");
+	core::str::rtrim(name, "app");
+	core::str::rtrim(name, "_");
+	this->app_name = name;
 }
 
 std::string AppConfig::get_name()
@@ -34,7 +47,12 @@ std::string AppConfig::get_name()
 	return this->app_name;
 }
 
-std::vector<urls::UrlPattern> AppConfig::get_urlpatterns()
+std::string AppConfig::get_app_path()
+{
+	return this->app_path;
+}
+
+std::vector<std::shared_ptr<urls::UrlPattern>> AppConfig::get_urlpatterns()
 {
 	if (this->_urlpatterns.empty())
 	{
@@ -44,7 +62,7 @@ std::vector<urls::UrlPattern> AppConfig::get_urlpatterns()
 	return this->_urlpatterns;
 }
 
-std::vector<core::BaseCommand*> AppConfig::get_commands()
+std::vector<std::shared_ptr<core::BaseCommand>> AppConfig::get_commands()
 {
 	if (this->_commands.empty())
 	{

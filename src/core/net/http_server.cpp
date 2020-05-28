@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,10 +16,20 @@
  */
 
 /**
- * An implementation of http_server.h.
+ * An implementation of core/net/http_server.h
  */
 
 #include "./http_server.h"
+
+// C++ libraries.
+#include <iostream>
+#include <cstring>
+
+// Framework modules.
+#include "../datetime.h"
+#include "../string.h"
+#include "../parsers/request_parser.h"
+#include "../../http/headers.h"
 
 
 __NET_INTERNAL_BEGIN__
@@ -38,6 +48,8 @@ HttpServer::HttpServer(HttpServer::context& ctx) : _finished(true)
 
 	this->_max_body_size = ctx.max_body_size;
 	this->_threads_count = ctx.threads_count;
+	this->_timeout_sec = ctx.timeout_sec;
+	this->_timeout_us = ctx.timeout_us;
 
 	// Default schema, https will be implemented in future.
 	this->_schema = "http";
@@ -57,6 +69,7 @@ HttpServer::~HttpServer()
 void HttpServer::finish()
 {
 	delete this->_thread_pool;
+	this->_thread_pool = nullptr;
 	if (this->_finished)
 	{
 		return;
@@ -92,16 +105,24 @@ void HttpServer::listen_and_serve()
 	}
 #endif
 
-	std::cout << str::format(
-		conf::internal::STARTUP_MESSAGE, this->_schema, this->_host, this->_port
-	) << '\n';
+	// TODO: add timezone from settings!
+//	auto tz = std::make_shared<dt::Timezone>(
+//		dt::Timedelta(0, 0, 0, 0, 0, 0),
+//		"UTC"
+//	);
+	std::string message = dt::Datetime::now().strftime("%B %d, %Y - %T") + "\n" +
+		LIB_NAME + " version " + LIB_VERSION + "\n" +
+		"Starting development server at " +
+			std::string(this->_schema) + "://" + std::string(this->_host) + ":" + std::to_string(this->_port) + "/\n" +
+		"Quit the server with CONTROL-C.\n";
+	std::cout << message;
 	std::cout.flush();
 
 	this->_finished = false;
 	this->_start_listener();
 }
 
-void HttpServer::send(http::HttpResponseBase* response, const socket_t& client)
+void HttpServer::send(http::IHttpResponse* response, const socket_t& client)
 {
 	HttpServer::_send(response->serialize().c_str(), client);
 }
@@ -120,7 +141,13 @@ void HttpServer::send(http::StreamingHttpResponse* response, const socket_t& cli
 // Private methods.
 int HttpServer::_init()
 {
-	int init_status = this->_create();
+	int init_status = this->_initialize();
+	if (init_status != 0)
+	{
+		return init_status;
+	}
+
+	init_status = this->_create();
 	if (init_status == INVALID_SOCKET)
 	{
 		return init_status;
@@ -144,6 +171,23 @@ int HttpServer::_init()
 		return init_status;
 	}
 
+	return 0;
+}
+
+int HttpServer::_initialize()
+{
+#if defined(_WIN32) || defined(_WIN64)
+	if (this->_socket.initialize() != 0)
+	{
+		auto err = WSAGetLastError();
+		this->_logger->error(
+			"\"WSAStartup failed with error: " + std::to_string(err),
+			_ERROR_DETAILS_
+		);
+		HttpServer::_wsa_clean_up();
+		return err;
+	}
+#endif
 	return 0;
 }
 
@@ -242,16 +286,19 @@ void HttpServer::_clean_up(const socket_t& client)
 
 http::HttpRequest* HttpServer::_handle_request(const socket_t& client)
 {
+	if (!this->_wait_for_client(client))
+	{
+		return nullptr;
+	}
+
 	core::internal::request_parser rp;
 	std::string body_beginning;
 
 	auto headers_str = HttpServer::_read_headers(client, body_beginning);
-
 	rp.parse_headers(headers_str);
-	auto headers = rp.get_headers();
-	if (headers.contains(http::CONTENT_LENGTH))
+	if (rp.headers.find(http::CONTENT_LENGTH) != rp.headers.end())
 	{
-		size_t body_length = std::strtol(headers.get(http::CONTENT_LENGTH).c_str(), nullptr, 10);
+		size_t body_length = std::strtol(rp.headers[http::CONTENT_LENGTH].c_str(), nullptr, 10);
 		std::string body;
 		if (body_length == body_beginning.size())
 		{
@@ -265,12 +312,25 @@ http::HttpRequest* HttpServer::_handle_request(const socket_t& client)
 		rp.parse_body(body, this->_media_root);
 	}
 
-	return rp.build_request();
+	auto* request = new http::HttpRequest(
+		rp.method,
+		rp.path,
+		rp.major_v,
+		rp.minor_v,
+		rp.query,
+		rp.keep_alive,
+		rp.content,
+		rp.headers,
+		rp.get_parameters,
+		rp.post_parameters,
+		rp.files_parameters
+	);
+	return request;
 }
 
 std::string HttpServer::_read_body(
 	const socket_t& client, const std::string& body_beginning, size_t body_length
-)
+) const
 {
 	std::string data;
 	if (body_length <= 0)
@@ -284,7 +344,7 @@ std::string HttpServer::_read_body(
 		return body_beginning;
 	}
 
-	msg_size_t ret = 0;
+	msg_size_t ret;
 	size_t buff_size = MAX_BUFF_SIZE < body_length ? MAX_BUFF_SIZE : body_length;
 	char* buffer = (char*) calloc(buff_size, sizeof(char));
 	while (size < body_length)
@@ -324,9 +384,47 @@ std::string HttpServer::_read_body(
 	return data;
 }
 
+bool HttpServer::_wait_for_client(const socket_t& client) const
+{
+	struct timeval tv{};
+	tv.tv_sec = this->_timeout_sec;
+	tv.tv_usec = this->_timeout_us;
+	fd_set fds;
+	FD_ZERO(&fds);
+	FD_SET(client, &fds);
+	int ret = select(client + 1, &fds, nullptr, nullptr, &tv);
+	if (ret == -1)
+	{
+		if (this->_verbose)
+		{
+			this->_logger->error("select failed: " + std::string(strerror(errno)));
+		}
+	}
+	else if (ret == 0)
+	{
+		if (this->_verbose)
+		{
+			this->_logger->error("timeout waiting for client");
+		}
+	}
+	else if (!FD_ISSET(client, &fds))
+	{
+		if (this->_verbose)
+		{
+			this->_logger->error("file descriptor is not set");
+		}
+	}
+	else
+	{
+		return true;
+	}
+
+	return false;
+}
+
 std::string HttpServer::_read_headers(const socket_t& client, std::string& body_beginning)
 {
-	msg_size_t ret = 0;
+	msg_size_t ret;
 	unsigned long size = 0;
 	std::string data;
 	size_t headers_delimiter_pos = std::string::npos;
@@ -377,38 +475,53 @@ std::string HttpServer::_read_headers(const socket_t& client, std::string& body_
 
 void HttpServer::_start_listener()
 {
-	while (true)
+	bool running = true;
+	while (running)
 	{
-		socket_t connection = this->_socket.accept();
-		if (connection != INVALID_SOCKET)
+		try
 		{
-			this->_thread_pool->push(
-				[this, connection] { this->_thread_func(connection); }
-			);
+			socket_t connection = this->_socket.accept();
+			if (connection != INVALID_SOCKET)
+			{
+				this->_thread_pool->push(
+					[this, connection] { this->_thread_func(connection); }
+				);
+			}
+			else
+			{
+				this->_logger->error("Invalid socket connection", _ERROR_DETAILS_);
+				running = false;
+			}
 		}
-		else
+		catch (core::InterruptException&)
 		{
-			this->_logger->error("Invalid socket connection", _ERROR_DETAILS_);
+			running = false;
 		}
 	}
 }
 
 void HttpServer::_serve_connection(const socket_t& client)
 {
-	dt::Measure<std::chrono::milliseconds> measure;
+	Measure<std::chrono::milliseconds> measure;
 	if (this->_verbose)
 	{
 		measure.start();
 	}
 
-	http::HttpRequest* request = this->_handle_request(client);
-	this->_http_handler(request, client);
-	delete request;
-
-	if (this->_verbose)
+	auto request = std::unique_ptr<http::HttpRequest>(this->_handle_request(client));
+	if (request)
 	{
-		measure.end();
-		std::cout << '\n' << request->method() << " request took " << measure.elapsed() << " ms\n";
+		this->_http_handler(request.get(), client);
+		if (this->_verbose)
+		{
+			measure.end();
+			std::cout << '\n' << request->method() << " request took " << measure.elapsed() << " ms\n";
+		}
+	}
+
+	if (Socket::close_socket(client) == SOCKET_ERROR)
+	{
+		this->_logger->error("Failed to close client connection");
 	}
 }
 
@@ -492,10 +605,17 @@ void HttpServer::_send(const char* data, const socket_t& client)
 
 void HttpServer::_write(const char* data, size_t bytesToWrite, const socket_t& client)
 {
+#if defined(_WIN32) || defined(_WIN64)
+	if (::send(client, data, bytesToWrite, 0) == -1)
+	{
+		throw HttpError("Failed to send bytes to socket connection", _ERROR_DETAILS_);
+	}
+#else
 	if (::write(client, data, bytesToWrite) == -1)
 	{
 		throw HttpError("Failed to send bytes to socket connection", _ERROR_DETAILS_);
 	}
+#endif // _WIN32 || _WIN64
 }
 
 void HttpServer::_wsa_clean_up()

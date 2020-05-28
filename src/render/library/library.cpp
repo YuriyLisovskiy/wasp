@@ -1,0 +1,49 @@
+/*
+ * Copyright (c) 2020 Yuriy Lisovskiy
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**
+ * An implementation of render/library/library.h
+ */
+
+#include "./library.h"
+
+
+__LIB_BEGIN__
+
+Library::Library(conf::Settings* settings)
+{
+	if (!settings)
+	{
+		throw core::ImproperlyConfigured(
+			"Library: 'settings' parameter must be initialized"
+		);
+	}
+
+	this->settings = settings;
+}
+
+std::shared_ptr<Filters> Library::get_filters()
+{
+	return nullptr;
+}
+
+std::shared_ptr<Tags> Library::get_tags()
+{
+	return nullptr;
+}
+
+__LIB_END__

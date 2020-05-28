@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
  */
 
 /**
- * An implementation of redirect_view.h.
+ * An implementation of views/redirect_view.h
  */
 
 #include "./redirect_view.h"
@@ -25,9 +25,15 @@
 __VIEWS_BEGIN__
 
 RedirectView::RedirectView(
-	const std::string& url, bool permanent, bool query_string, core::ILogger* logger
+	conf::Settings* settings,
+	const std::string& url,
+	bool permanent,
+	bool query_string
 )
-	: View({"get", "post", "put", "patch", "delete", "head", "options"}, logger)
+	: View(
+		{"get", "post", "put", "patch", "delete", "head", "options"},
+		settings
+	)
 {
 	this->_url = url;
 	this->_permanent = permanent;
@@ -50,7 +56,7 @@ std::string RedirectView::get_redirect_url()
 	return url;
 }
 
-http::HttpResponse* RedirectView::get(http::HttpRequest* request, Args* args)
+std::unique_ptr<http::IHttpResponse> RedirectView::get(http::HttpRequest* request, Args* args)
 {
 	std::string url = this->get_redirect_url();
 	if (url.empty())
@@ -60,43 +66,43 @@ http::HttpResponse* RedirectView::get(http::HttpRequest* request, Args* args)
 			this->_logger->warning("Gone: " + request->path());
 		}
 
-		return new http::HttpResponseGone("");
+		return std::make_unique<http::HttpResponseGone>("");
 	}
 
 	if (this->_permanent)
 	{
-		return new http::HttpResponsePermanentRedirect(url);
+		return std::make_unique<http::HttpResponsePermanentRedirect>(url);
 	}
 
-	return new http::HttpResponseRedirect(url);
+	return std::make_unique<http::HttpResponseRedirect>(url);
 }
 
-http::HttpResponse* RedirectView::post(http::HttpRequest* request, Args* args)
+std::unique_ptr<http::IHttpResponse> RedirectView::post(http::HttpRequest* request, Args* args)
 {
 	return this->get(request, args);
 }
 
-http::HttpResponse* RedirectView::put(http::HttpRequest* request, Args* args)
+std::unique_ptr<http::IHttpResponse> RedirectView::put(http::HttpRequest* request, Args* args)
 {
 	return this->get(request, args);
 }
 
-http::HttpResponse* RedirectView::patch(http::HttpRequest* request, Args* args)
+std::unique_ptr<http::IHttpResponse> RedirectView::patch(http::HttpRequest* request, Args* args)
 {
 	return this->get(request, args);
 }
 
-http::HttpResponse* RedirectView::delete_(http::HttpRequest* request, Args* args)
+std::unique_ptr<http::IHttpResponse> RedirectView::delete_(http::HttpRequest* request, Args* args)
 {
 	return this->get(request, args);
 }
 
-http::HttpResponse* RedirectView::head(http::HttpRequest* request, Args* args)
+std::unique_ptr<http::IHttpResponse> RedirectView::head(http::HttpRequest* request, Args* args)
 {
 	return this->get(request, args);
 }
 
-http::HttpResponse* RedirectView::options(http::HttpRequest* request, Args* args)
+std::unique_ptr<http::IHttpResponse> RedirectView::options(http::HttpRequest* request, Args* args)
 {
 	return this->get(request, args);
 }

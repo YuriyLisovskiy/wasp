@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,17 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * An implementation of core/exceptions.h
+ */
+
 #include "./exceptions.h"
+
+// C++ libraries.
+#include <csignal>
 
 
 __CORE_BEGIN__
 
-
 // BaseException
-BaseException::BaseException(const char *message, int line, const char *function, const char *file, const char* exceptionType)
-	: _message(message), _line(line), _function(function), _file(file), _exceptionType(exceptionType)
+BaseException::BaseException(const char* message, int line, const char* function, const char* file, const char* exceptionType)
+	: _message(message), _line(line), _function(function), _file(file), _exception_type(exceptionType)
 {
-	this->init();
 }
 
 BaseException::BaseException(const char* message, int line, const char* function, const char* file)
@@ -33,14 +38,9 @@ BaseException::BaseException(const char* message, int line, const char* function
 {
 }
 
-void BaseException::init()
-{
-	this->_fullMessage = this->_exceptionType + ": " + std::string(this->_message);
-}
-
 const char* BaseException::what() const noexcept
 {
-	return this->_fullMessage.c_str();
+	return this->_message.c_str();
 }
 
 int BaseException::line() const noexcept
@@ -56,6 +56,11 @@ const char* BaseException::function() const noexcept
 const char* BaseException::file() const noexcept
 {
 	return this->_file;
+}
+
+std::string BaseException::get_message() const noexcept
+{
+	return this->_exception_type + ": " + this->_message;
 }
 
 
@@ -126,12 +131,20 @@ void InterruptException::handle_signal(int sig)
 
 void InterruptException::initialize()
 {
+#if defined(_WIN32) || defined(_WIN64)
+	signal(SIGINT, &InterruptException::handle_signal);
+	signal(SIGTERM, &InterruptException::handle_signal);
+#elif defined(__unix__) || defined(__linux__)
 	struct sigaction sig_int_handler{};
 	sig_int_handler.sa_handler = InterruptException::handle_signal;
 	sigemptyset(&sig_int_handler.sa_mask);
 	sig_int_handler.sa_flags = 0;
 	sigaction(SIGINT, &sig_int_handler, nullptr);
 	sigaction(SIGTERM, &sig_int_handler, nullptr);
+//	sigaction(SIGKILL, &sig_int_handler, nullptr);
+#else
+#error Library is not supported on this platform
+#endif
 }
 
 __CORE_END__

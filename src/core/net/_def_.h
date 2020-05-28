@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,20 +16,23 @@
  */
 
 /**
- * _def_.h
+ * core/net/_def_.h
+ *
  * Purpose: core/net module's definitions.
  */
+
+// TODO: refactor net/_def_.h
 
 #pragma once
 
 #include "../_def_.h"
 
 
-/// wasp::core::net
+// core::net
 #define __NET_BEGIN__ __CORE_BEGIN__ namespace net {
 #define __NET_END__ } __CORE_END__
 
-/// wasp::core::net::internal
+// core::net::internal
 #define __NET_INTERNAL_BEGIN__ __NET_BEGIN__ namespace internal {
 #define __NET_INTERNAL_END__ } __NET_END__
 
@@ -39,7 +42,9 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 
-#pragma comment (lib, "Ws2_32.lib")
+//#pragma comment (lib, "Ws2_32.lib")
+
+__NET_INTERNAL_BEGIN__
 
 typedef SOCKET socket_t;
 typedef int msg_size_t;
@@ -48,7 +53,12 @@ typedef int msg_size_t;
 #define SOCKET_SEND SD_SEND
 #define SOCKET_RECEIVE SD_RECEIVE
 
-static inline int poll(struct pollfd *pfd, int nfds, int timeout) { return WSAPoll (pfd, nfds, timeout); }
+//static inline int poll(struct pollfd* pfd, int nfds, int timeout)
+//{
+//    return WSAPoll(pfd, nfds, timeout);
+//}
+
+__NET_INTERNAL_END__
 
 #elif defined(__unix__) || defined(__linux__)
 

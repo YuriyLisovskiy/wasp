@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,22 +16,27 @@
  */
 
 /**
- * An implementation of url_parser.h
+ * An implementation of core/parsers/url_parser.h
  */
 
 #include "./url_parser.h"
+
+// Framework modules.
+#include "../string.h"
 
 
 __CORE_INTERNAL_BEGIN__
 
 url_parser::url_parser()
-	: is_parsed(false), last_err(""), err_line(-1), err_func(""), err_file("")
+	: is_parsed(false), last_err(""), err_line(-1), err_func(""), err_file(""), is_reset(true)
 {
 	this->integer_port = 0;
 }
 
 void url_parser::parse(const std::string& str)
 {
+	this->reset();
+	this->is_reset = false;
 	std::string username_or_hostname, port_or_password;
 	this->path = "/";
 	url_parser::state st = url_parser::state::s_scheme;
@@ -276,6 +281,32 @@ void url_parser::parse(const std::string& str)
 void url_parser::parse(const char* str)
 {
 	this->parse(std::string(str));
+}
+
+void url_parser::reset()
+{
+	if (this->is_reset)
+	{
+		return;
+	}
+
+	this->is_parsed = false;
+	this->last_err = "";
+	this->err_line = -1;
+	this->err_file = "";
+	this->err_func = "";
+
+	this->scheme.clear();
+	this->username.clear();
+	this->password.clear();
+	this->hostname.clear();
+	this->port.clear();
+	this->path.clear();
+	this->query.clear();
+	this->fragment.clear();
+	this->integer_port = 0;
+
+	this->is_reset = true;
 }
 
 bool url_parser::is_unreserved(char ch)

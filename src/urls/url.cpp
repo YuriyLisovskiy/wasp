@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,20 +16,27 @@
  */
 
 /**
- * An implementation of url.h.
+ * An implementation of urls/url.h
  */
 
 #include "./url.h"
 
+// Framework modules.
+#include "../core/string.h"
+
 
 __URLS_BEGIN__
 
-UrlPattern make_url(const std::string& rgx, const views::ViewHandler& handler, const std::string& name)
+std::shared_ptr<urls::UrlPattern> make_url(
+	const std::string& rgx,
+	const views::ViewHandler& handler,
+	const std::string& name
+)
 {
-	return UrlPattern(rgx, handler, name);
+	return std::make_shared<UrlPattern>(rgx, handler, name);
 }
 
-UrlPattern make_static(
+std::shared_ptr<urls::UrlPattern> make_static(
 	const std::string& static_url,
 	const std::string& static_root,
 	const std::string& name
@@ -43,21 +50,18 @@ UrlPattern make_static(
 	auto view_func = [static_root](
 		http::HttpRequest* request,
 		views::Args* args,
-		core::ILogger* logger
-	) -> http::HttpResponseBase*
+		conf::Settings* settings
+	) -> std::unique_ptr<http::IHttpResponse>
 	{
-		views::StaticView view(logger);
-		auto* kwargs = new collections::Dict(
+		views::StaticView view(settings);
+		auto kwargs = std::make_unique<collections::Dict<std::string, std::string>>(
 			std::map<std::string, std::string>{
 				{"document_root", static_root}
 			}
 		);
-		view.set_kwargs(kwargs);
+		view.set_kwargs(kwargs.get());
 		view.setup(request);
-		auto response = view.dispatch(args);
-		delete kwargs;
-
-		return response;
+		return view.dispatch(args);
 	};
 
 	return make_url(

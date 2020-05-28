@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,18 +16,17 @@
  */
 
 /**
- * thread_pool.h
- * Purpose: queued thread pool for executing functions in parallel.
+ * core/thread_pool.h
+ *
+ * Purpose:
+ * 	Queued thread pool for executing functions in parallel.
  */
 
 #pragma once
 
 // C++ libraries.
 #include <thread>
-#include <vector>
 #include <queue>
-#include <mutex>
-#include <string>
 #include <functional>
 #include <condition_variable>
 
@@ -41,7 +40,7 @@ class ThreadPool
 {
 private:
 	std::string _name;
-	std::mutex _lock;
+	std::mutex _lock_guard;
 	std::vector<std::thread> _threads;
 	size_t _threads_count;
 	std::queue<std::function<void(void)>> _queue;
@@ -60,10 +59,12 @@ public:
 	void push(std::function<void(void)>&& func);
 
 	/// Returns threads count.
-	size_t threads_count();
+	[[nodiscard]] size_t threads_count() const;
 
 	/// Waits until all threads finishes.
 	void wait();
+
+	void join();
 
 	/// Deleted constructors.
 	ThreadPool(const ThreadPool& other) = delete;
@@ -76,7 +77,7 @@ public:
 private:
 
 	/// Dispatches function from queue and executes it.
-	void _thread_handler();
+	void _thread_handler(int idx);
 };
 
 __CORE_INTERNAL_END__

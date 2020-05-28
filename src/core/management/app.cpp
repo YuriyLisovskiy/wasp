@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,22 +16,26 @@
  */
 
 /**
- * An implementation of app.h.
+ * An implementation of core/management/app.h
  */
 
 #include "./app.h"
 
+// Framework modules.
+#include "./commands/start_server.h"
+
 
 __CORE_INTERNAL_BEGIN__
 
-CoreManagementAppConfig::CoreManagementAppConfig(wasp::conf::Settings* settings)
-	: AppConfig(settings)
+CoreManagementAppConfig::CoreManagementAppConfig(conf::Settings* settings)
+	: AppConfig(__FILE__, settings)
 {
+	this->init(this->__type__());
 }
 
 void CoreManagementAppConfig::commands()
 {
-	this->command<cmd::RunserverCommand>();
+	this->command<cmd::StartServerCommand>();
 }
 
 __CORE_INTERNAL_END__

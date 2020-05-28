@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
  */
 
 /**
- * _def_.h
+ * collections/_def_.h
+ *
  * Purpose: collections module's definitions.
  */
 
@@ -25,6 +26,6 @@
 #include "../_def_.h"
 
 
-/// wasp::collections
-#define __COLLECTIONS_BEGIN__ __WASP_BEGIN__ namespace collections {
-#define __COLLECTIONS_END__ } __WASP_END__
+// collections
+#define __COLLECTIONS_BEGIN__ __MAIN_NAMESPACE_BEGIN__ namespace collections {
+#define __COLLECTIONS_END__ } __MAIN_NAMESPACE_END__

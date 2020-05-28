@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
  */
 
 /**
- * An implementation of thread_pool.h.
+ * An implementation of core/thread_pool.h
  */
 
 #include "./thread_pool.h"
@@ -28,43 +28,41 @@ ThreadPool::ThreadPool(size_t threads_count) : _threads(threads_count)
 {
 	this->_threads_count = threads_count;
 	this->_is_finished = false;
+	int idx = 0;
 	for (auto& thread : this->_threads)
 	{
-		thread = std::thread(&ThreadPool::_thread_handler, this);
+		thread = std::thread(&ThreadPool::_thread_handler, this, idx++);
 	}
 }
 
 ThreadPool::~ThreadPool()
 {
-	if (!this->_is_finished)
-	{
-		this->wait();
-	}
+	this->wait();
 }
 
 void ThreadPool::push(const std::function<void(void)>& func)
 {
-	std::unique_lock<std::mutex> lock(this->_lock);
+	std::unique_lock<std::mutex> lock(this->_lock_guard);
 	this->_queue.push(func);
 
 	// Manual unlocking is done before notifying, to avoid waking up
 	// the waiting thread only to block again (see notify_one for details)
 	lock.unlock();
-	this->_cond_var.notify_all();
+	this->_cond_var.notify_one();
 }
 
 void ThreadPool::push(std::function<void(void)>&& func)
 {
-	std::unique_lock<std::mutex> lock(this->_lock);
+	std::unique_lock<std::mutex> lock(this->_lock_guard);
 	this->_queue.push(std::move(func));
 
 	// Manual unlocking is done before notifying, to avoid waking up
 	// the waiting thread only to block again (see notify_one for details)
 	lock.unlock();
-	this->_cond_var.notify_all();
+	this->_cond_var.notify_one();
 }
 
-size_t ThreadPool::threads_count()
+size_t ThreadPool::threads_count() const
 {
 	return this->_threads_count;
 }
@@ -77,11 +75,20 @@ void ThreadPool::wait()
 	}
 
 	// Signal to dispatch threads that it's time to wrap up.
-	std::unique_lock<std::mutex> lock(this->_lock);
+	std::unique_lock<std::mutex> lock(this->_lock_guard);
 	this->_quit = true;
+
 	lock.unlock();
 	this->_cond_var.notify_all();
 
+	std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	this->join();
+
+	this->_is_finished = true;
+}
+
+void ThreadPool::join()
+{
 	// Wait for threads to finish before we exit.
 	for (auto& thread : this->_threads)
 	{
@@ -90,17 +97,15 @@ void ThreadPool::wait()
 			thread.join();
 		}
 	}
-
-	this->_is_finished = true;
 }
 
-void ThreadPool::_thread_handler()
+void ThreadPool::_thread_handler(int idx)
 {
-	std::unique_lock<std::mutex> lock(this->_lock);
+	std::unique_lock<std::mutex> guard(this->_lock_guard);
 	do
 	{
 		// Wait until we have data or a quit signal.
-		this->_cond_var.wait(lock, [this] {
+		this->_cond_var.wait(guard, [this] {
 			return (!this->_queue.empty() || this->_quit);
 		});
 
@@ -111,11 +116,9 @@ void ThreadPool::_thread_handler()
 			this->_queue.pop();
 
 			// Unlock now that we're done messing with the queue.
-			lock.unlock();
-
+			guard.unlock();
 			func();
-
-			lock.lock();
+			guard.lock();
 		}
 	} while (!this->_quit);
 }

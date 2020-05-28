@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
  */
 
 /**
- * An implementation of uploaded_file.h.
+ * An implementation of core/files/uploaded_file.h
  */
 
 #include "./uploaded_file.h"
@@ -73,37 +73,37 @@ UploadedFile& UploadedFile::operator=(const UploadedFile& copy)
 	return *this;
 }
 
-std::string UploadedFile::name()
+std::string UploadedFile::name() const
 {
 	return this->_name;
 }
 
-std::string UploadedFile::boundary()
+std::string UploadedFile::boundary() const
 {
 	return this->_boundary;
 }
 
-std::string UploadedFile::content_disposition()
+std::string UploadedFile::content_disposition() const
 {
 	return this->_content_disposition;
 }
 
-std::string UploadedFile::charset()
+std::string UploadedFile::charset() const
 {
 	return this->_charset;
 }
 
-std::string UploadedFile::content_type()
+std::string UploadedFile::content_type() const
 {
 	return this->_content_type;
 }
 
-size_t UploadedFile::size()
+size_t UploadedFile::size() const
 {
 	return this->_size;
 }
 
-bool UploadedFile::exists()
+bool UploadedFile::exists() const
 {
 	return this->_size != 0;
 }

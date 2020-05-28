@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,27 +16,19 @@
  */
 
 /**
- * request.h
+ * http/request.h
+ *
  * Purpose: represents an http request.
  */
 
 #pragma once
 
-// C++ libraries.
-#include <string>
-#include <vector>
-#include <map>
-
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
-#include "./headers.h"
-#include "./utility.h"
-#include "../collections/dict.h"
+// Framework modules.
 #include "../collections/multi_dict.h"
 #include "../core/files/uploaded_file.h"
-#include "../core/exceptions.h"
 
 
 __HTTP_BEGIN__
@@ -115,15 +107,15 @@ public:
 	collections::Dict<std::string, std::string> COOKIES;
 	HttpRequest::Parameters<std::string, core::UploadedFile> FILES;
 
-	std::string version();
+	std::string version() const;
 	std::string path();
 	std::string full_path(bool force_append_slash = false);
 	std::string query();
 	std::string method();
-	bool keep_alive();
+	bool keep_alive() const;
 	std::string body();
-	bool is_secure(std::pair<std::string, std::string>* secure_proxy_ssl_header);
-	std::string scheme(std::pair<std::string, std::string>* secure_proxy_ssl_header);
+	bool is_secure(std::pair<std::string, std::string>* secure_proxy_ssl_header) const;
+	std::string scheme(std::pair<std::string, std::string>* secure_proxy_ssl_header) const;
 
 	/// Return the HTTP host using the environment or request headers.
 	std::string get_host(
@@ -133,7 +125,7 @@ public:
 protected:
 	/// Return the HTTP host using the environment or request headers. Skip
 	/// allowed hosts protection, so may return an insecure host.
-	std::string get_raw_host(bool use_x_forwarded_host);
+	std::string get_raw_host(bool use_x_forwarded_host) const;
 
 private:
 	size_t _major_version;

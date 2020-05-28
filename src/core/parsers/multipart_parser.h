@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,28 +16,19 @@
  */
 
 /**
- * multipart_parser.h
+ * core/parsers/multipart_parser.h
+ *
  * Purpose: parses multipart/form-data http request.
  */
 
 #pragma once
 
-// C++ libraries.
-#include <string>
-#include <functional>
-#include <fstream>
-
 // Module definitions.
 #include "../_def_.h"
 
-// Wasp libraries.
-#include "../../core/string/str.h"
-#include "../../core/exceptions.h"
-#include "../../collections/dict.h"
+// Framework modules.
 #include "../../collections/multi_dict.h"
-#include "../../core/files/file.h"
 #include "../../core/files/uploaded_file.h"
-#include "../../http/request.h"
 
 
 __CORE_INTERNAL_BEGIN__
@@ -87,8 +78,6 @@ struct multipart_parser final
 
 	explicit multipart_parser(const std::string& mediaRoot = "");
 	void parse(const std::string& content_type, const std::string& body);
-	http::HttpRequest::Parameters<std::string, UploadedFile>* get_files_params();
-	http::HttpRequest::Parameters<std::string, std::string>* get_post_params();
 };
 
 __CORE_INTERNAL_END__

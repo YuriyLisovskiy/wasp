@@ -16,24 +16,21 @@
  */
 
 /**
- * hmac.h
+ * utils/crypto/hmac.h
+ *
  * Purpose: a collection of hmac functions.
  */
 
 #pragma once
 
 // C++ libraries.
-#include <string>
-#include <vector>
 #include <functional>
 
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
-#include "./interface.h"
-#include "./md5.h"
-#include "../../core/exceptions.h"
+// Framework modules.
+#include "./interfaces.h"
 
 
 __CRYPTO_BEGIN__
@@ -51,7 +48,7 @@ private:
 	void _prepare_outer();
 
 public:
-	Hmac(
+	explicit Hmac(
 		std::string key,
 		std::function<IHash*()> make_hash_func = nullptr
 	);
@@ -59,8 +56,8 @@ public:
 	void update(const unsigned char input[], unsigned int n);
 	void update(const char input[], unsigned int n);
 	void update(const std::string& input);
-	size_t size();
-	size_t block_size();
+	[[nodiscard]] size_t size() const;
+	[[nodiscard]] size_t block_size() const;
 	unsigned char* digest();
 	std::string hex_digest();
 };

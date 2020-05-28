@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,37 +16,36 @@
  */
 
 /**
- * view.h
- * Purpose: Intentionally simple parent class for all views. Only
- * 			implements dispatch-by-method and simple sanity checking.
+ * views/view.h
+ *
+ * Purpose:
+ * 	Intentionally simple parent class for all views. Only
+ * 	implements dispatch-by-method and simple sanity checking.
  */
 
 #pragma once
 
-// C++ libraries.
-#include <vector>
-#include <string>
-#include <cxxabi.h>
-#include <algorithm>
-#include <functional>
-
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
+// Framework modules.
 #include "./args.h"
 #include "../http/request.h"
 #include "../http/response.h"
-#include "../core/logger.h"
-#include "../core/string/str.h"
-#include "../core/exceptions.h"
-#include "../collections/dict.h"
+#include "../conf/settings.h"
+
+
+__CONF_BEGIN__
+
+struct Settings;
+
+__CONF_END__
 
 
 __VIEWS_BEGIN__
 
-typedef std::function<http::HttpResponseBase*(
-	http::HttpRequest*, views::Args*, core::ILogger*
+typedef std::function<std::unique_ptr<http::IHttpResponse>(
+	http::HttpRequest*, views::Args*, conf::Settings*
 )> ViewHandler;
 
 
@@ -54,6 +53,8 @@ class View
 {
 protected:
 	core::ILogger* _logger;
+
+	conf::Settings* _settings;
 
 	/// Holds pointer to client's request.
 	/// Caution: must be deleted outside!
@@ -68,7 +69,7 @@ protected:
 	std::vector<std::string> _allowed_methods_list;
 
 public:
-	explicit View(core::ILogger* logger = nullptr);
+	explicit View(conf::Settings* settings);
 
 	/// Processes http GET request.
 	/// Can be overridden in derived class, otherwise returns nullptr.
@@ -76,7 +77,7 @@ public:
 	/// @param request: pointer to http request.
 	/// @param args: pointer to requests's url arguments.
 	/// @return pointer to http response instance.
-	virtual http::HttpResponseBase* get(http::HttpRequest* request, Args* args);
+	virtual std::unique_ptr<http::IHttpResponse> get(http::HttpRequest* request, Args* args);
 
 	/// Processes http POST request.
 	/// Can be overridden in derived class, otherwise returns nullptr.
@@ -84,7 +85,7 @@ public:
 	/// @param request: pointer to http request.
 	/// @param args: pointer to requests's url arguments.
 	/// @return pointer to http response instance.
-	virtual http::HttpResponseBase* post(http::HttpRequest* request, Args* args);
+	virtual std::unique_ptr<http::IHttpResponse> post(http::HttpRequest* request, Args* args);
 
 	/// Processes http PUT request.
 	/// Can be overridden in derived class, otherwise returns nullptr.
@@ -92,7 +93,7 @@ public:
 	/// @param request: pointer to http request.
 	/// @param args: pointer to requests's url arguments.
 	/// @return pointer to http response instance.
-	virtual http::HttpResponseBase* put(http::HttpRequest* request, Args* args);
+	virtual std::unique_ptr<http::IHttpResponse> put(http::HttpRequest* request, Args* args);
 
 	/// Processes http PATCH request.
 	/// Can be overridden in derived class, otherwise returns nullptr.
@@ -100,7 +101,7 @@ public:
 	/// @param request: pointer to http request.
 	/// @param args: pointer to requests's url arguments.
 	/// @return pointer to http response instance.
-	virtual http::HttpResponseBase* patch(http::HttpRequest* request, Args* args);
+	virtual std::unique_ptr<http::IHttpResponse> patch(http::HttpRequest* request, Args* args);
 
 	/// Processes http DELETE request.
 	/// Can be overridden in derived class, otherwise returns nullptr.
@@ -108,7 +109,7 @@ public:
 	/// @param request: pointer to http request.
 	/// @param args: pointer to requests's url arguments.
 	/// @return pointer to http response instance.
-	virtual http::HttpResponseBase* delete_(http::HttpRequest* request, Args* args);
+	virtual std::unique_ptr<http::IHttpResponse> delete_(http::HttpRequest* request, Args* args);
 
 	/// Processes http HEAD request.
 	/// Can be overridden in derived class, otherwise returns nullptr.
@@ -116,7 +117,7 @@ public:
 	/// @param request: pointer to http request.
 	/// @param args: pointer to requests's url arguments.
 	/// @return pointer to http response instance.
-	virtual http::HttpResponseBase* head(http::HttpRequest* request, Args* args);
+	virtual std::unique_ptr<http::IHttpResponse> head(http::HttpRequest* request, Args* args);
 
 	/// Processes http OPTIONS request.
 	/// Can be overridden in derived class, otherwise returns nullptr.
@@ -124,7 +125,7 @@ public:
 	/// @param request: pointer to http request.
 	/// @param args: pointer to requests's url arguments.
 	/// @return pointer to http response instance.
-	virtual http::HttpResponseBase* options(http::HttpRequest* request, Args* args);
+	virtual std::unique_ptr<http::IHttpResponse> options(http::HttpRequest* request, Args* args);
 
 	/// Processes http TRACE request.
 	/// Can be overridden in derived class, otherwise returns nullptr.
@@ -132,7 +133,7 @@ public:
 	/// @param request: pointer to http request.
 	/// @param args: pointer to requests's url arguments.
 	/// @return pointer to http response instance.
-	virtual http::HttpResponseBase* trace(http::HttpRequest* request, Args* args);
+	virtual std::unique_ptr<http::IHttpResponse> trace(http::HttpRequest* request, Args* args);
 
 	/// Setups request before dispatch call.
 	/// Can be overridden in derived class, but requires
@@ -147,13 +148,13 @@ public:
 	///
 	/// @param request: an actual http request from client.
 	/// @return pointer to http response returned from handler.
-	virtual http::HttpResponseBase* dispatch(Args* args);
+	virtual std::unique_ptr<http::IHttpResponse> dispatch(Args* args);
 
 	/// Returns Http 405 (Method Not Allowed) response.
 	///
 	/// @param request: pointer to http request.
 	/// @return pointer to http response returned from handler.
-	http::HttpResponseBase* http_method_not_allowed(http::HttpRequest* request);
+	std::unique_ptr<http::IHttpResponse> http_method_not_allowed(http::HttpRequest* request);
 
 	/// Builds vector of allowed methods.
 	/// Used for http OPTIONS response.
@@ -165,7 +166,10 @@ public:
 	std::vector<std::string> allowed_methods();
 
 protected:
-	explicit View(const std::vector<std::string>& allowed_methods, core::ILogger* logger = nullptr);
+	explicit View(
+		const std::vector<std::string>& allowed_methods,
+		conf::Settings* settings
+	);
 };
 
 __VIEWS_END__

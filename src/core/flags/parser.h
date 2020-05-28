@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
  */
 
 /**
- * parser.h
+ * core/flags/parser.h
+ *
  * Purpose: parses command line arguments.
  */
 
@@ -24,14 +25,13 @@
 
 // C++ libraries.
 #include <map>
+
+#ifdef _MSC_VER
 #include <string>
-#include <iostream>
+#endif
 
 // Module definitions.
 #include "./_def_.h"
-
-// Wasp libraries.
-#include "../string/str.h"
 
 
 __FLAGS_INTERNAL_BEGIN__

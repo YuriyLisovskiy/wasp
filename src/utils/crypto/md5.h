@@ -31,7 +31,8 @@ documentation and/or software.
 */
 
 /**
- * md5.h
+ * utils/crypto/md5.h
+ *
  * Purpose:
  * 	Provides md5 hash function algorithm.
  */
@@ -40,13 +41,12 @@ documentation and/or software.
 
 // C++ libraries.
 #include <string>
-#include <cstring>
 
 // Module definitions.
 #include "./_def_.h"
 
-// Waps libraries.
-#include "./interface.h"
+// Framework modules.
+#include "./interfaces.h"
 
 
 __CRYPTO_BEGIN__
@@ -97,6 +97,7 @@ private:
 public:
 	MD5();
 	explicit MD5(const std::string& input);
+	MD5* clone() final;
 
 	// Continues an MD5 message-digest operation,
 	// processing another message block.

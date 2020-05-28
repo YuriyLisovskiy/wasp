@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,17 +16,17 @@
  */
 
 /**
- * app.h
+ * core/management/app.h
+ *
  * Purpose: core/management app config.
  */
 
 #pragma once
 
 // Module definitions.
-#include "./_def_.h"
+#include "../_def_.h"
 
-// Wasp libraries.
-#include "./commands/runserver.h"
+// Framework modules.
 #include "../../apps/config.h"
 
 
@@ -35,7 +35,7 @@ __CORE_INTERNAL_BEGIN__
 class CoreManagementAppConfig : public apps::AppConfig
 {
 public:
-	explicit CoreManagementAppConfig(wasp::conf::Settings* settings);
+	explicit CoreManagementAppConfig(conf::Settings* settings);
 	void commands() override;
 };
 

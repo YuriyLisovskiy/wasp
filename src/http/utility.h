@@ -16,23 +16,18 @@
  */
 
 /**
- * utility.h
- * Purpose: some http helpers.
+ * http/utility.h
+ *
+ * Purpose: useful http helpers.
  */
 
 #pragma once
 
-// C++ libraries.
-#include <string>
-
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
-#include "../core/regex.h"
+// Framework modules.
 #include "../core/signing/signer.h"
-#include "../core/string/str.h"
-#include "../core/datetime/datetime.h"
 
 
 __HTTP_BEGIN__
@@ -40,8 +35,15 @@ __HTTP_BEGIN__
 /// Converts std::string datetime to utc epoch in seconds.
 extern size_t parse_http_datetime(const std::string& http_datetime);
 
-/// Converts utc epoch seconds to std::string datetime.
-extern std::string format_http_datetime(size_t epoch_seconds);
+/// Format the time to match the RFC1123 date format as specified by HTTP
+/// RFC7231 section 7.1.1.1.
+///
+/// `epoch_seconds` is a floating point number expressed in seconds since the
+/// epoch, in UTC - such as that outputted by dt::internal::_time().
+/// If set to None, it defaults to the current time.
+///
+/// Output a string in the format 'Wdy, DD Mon YYYY HH:MM:SS GMT'.
+extern std::string http_date(size_t epoch_seconds);
 
 /// Writes domain and port from a given host.
 ///
@@ -82,7 +84,7 @@ extern void escape_leading_slashes(std::string& url);
 
 extern core::signing::Signer get_cookie_signer(
 	const std::string& secret_key,
-	const std::string& salt = "wasp.core.signing.get_cookie_signer"
+	const std::string& salt = "xalwart.core.signing.get_cookie_signer"
 );
 
 __HTTP_END__

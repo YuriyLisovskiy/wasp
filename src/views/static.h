@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,31 +16,20 @@
  */
 
 /**
- * static.h
- * Purpose: views and functions for serving static files. These are only to be used
-			during development, and SHOULD NOT be used in a production setting.
+ * views/static.h
+ *
+ * Purpose:
+ * 	Views and functions for serving static files. These are only to be used
+ * 	during development, and SHOULD NOT be used in a production setting.
  */
 
 #pragma once
 
-// C++ libraries.
-#include <regex>
-
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
-#include "./args.h"
+// Framework modules.
 #include "./view.h"
-#include "../http/headers.h"
-#include "../http/request.h"
-#include "../http/response.h"
-#include "../http/utility.h"
-#include "../core/logger.h"
-#include "../core/mime_types.h"
-#include "../core/files/file.h"
-#include "../core/datetime/datetime.h"
-#include "../core/exceptions.h"
 
 
 __VIEWS_BEGIN__
@@ -52,11 +41,11 @@ private:
 	collections::Dict<std::string, std::string>* _kwargs = nullptr;
 
 public:
-	explicit StaticView(core::ILogger* logger);
+	explicit StaticView(conf::Settings* settings);
 
 	void set_kwargs(collections::Dict<std::string, std::string>* kwargs);
 
-	http::HttpResponseBase* get(http::HttpRequest* request, wasp::views::Args* args) final;
+	std::unique_ptr<http::IHttpResponse> get(http::HttpRequest* request, Args* args) final;
 };
 
 __VIEWS_END__

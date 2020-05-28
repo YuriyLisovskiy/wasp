@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,10 +16,16 @@
  */
 
 /**
- * An implementation of http.h.
+ * An implementation of middleware/http.h
  */
 
 #include "./http.h"
+
+// Framework modules.
+#include "../utils/cache.h"
+#include "../utils/http.h"
+#include "../http/headers.h"
+#include "../core/string.h"
 
 
 __MIDDLEWARE_BEGIN__
@@ -30,8 +36,8 @@ ConditionalGetMiddleware::ConditionalGetMiddleware(
 {
 }
 
-http::HttpResponseBase* ConditionalGetMiddleware::process_response(
-	http::HttpRequest* request, http::HttpResponseBase* response
+std::unique_ptr<http::IHttpResponse> ConditionalGetMiddleware::process_response(
+	http::HttpRequest* request, http::IHttpResponse* response
 )
 {
 	/// It's too late to prevent an unsafe request with a 412 response, and
@@ -66,7 +72,7 @@ http::HttpResponseBase* ConditionalGetMiddleware::process_response(
 }
 
 bool ConditionalGetMiddleware::needs_etag(
-	http::HttpResponseBase* response
+	http::IHttpResponse* response
 )
 {
 	auto cache_control = core::str::split(

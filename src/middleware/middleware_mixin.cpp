@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
  */
 
 /**
- * An implementation of middleware_mixin.h.
+ * An implementation of middleware/middleware_mixin.h
  */
 
 #include "./middleware_mixin.h"
@@ -29,13 +29,13 @@ MiddlewareMixin::MiddlewareMixin(conf::Settings* settings)
 	this->settings = settings;
 }
 
-http::HttpResponseBase* MiddlewareMixin::process_request(http::HttpRequest* request)
+std::unique_ptr<http::IHttpResponse> MiddlewareMixin::process_request(http::HttpRequest* request)
 {
 	return nullptr;
 }
 
-http::HttpResponseBase* MiddlewareMixin::process_response(
-	http::HttpRequest* request, http::HttpResponseBase* response
+std::unique_ptr<http::IHttpResponse> MiddlewareMixin::process_response(
+	http::HttpRequest* request, http::IHttpResponse* response
 )
 {
 	return nullptr;

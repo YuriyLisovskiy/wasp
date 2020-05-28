@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,8 @@
  */
 
 /**
- * common.h
+ * middleware/common.h
+ *
  * Purpose:
  *  "Common" middleware takes care of some basic operations:
  * 		- Forbid access to User-Agents in settings.DISALLOWED_USER_AGENTS
@@ -37,16 +38,8 @@
 // Module definitions.
 #include "./_def_.h"
 
-// Wasp libraries.
+// Framework modules.
 #include "./middleware_mixin.h"
-#include "../core/string/str.h"
-#include "../core/utility.h"
-#include "../core/exceptions.h"
-#include "../http/request.h"
-#include "../http/response.h"
-#include "../http/headers.h"
-#include "../http/utility.h"
-#include "../urls/resolver.h"
 
 
 __MIDDLEWARE_BEGIN__
@@ -54,7 +47,7 @@ __MIDDLEWARE_BEGIN__
 class CommonMiddleware : public MiddlewareMixin
 {
 protected:
-	virtual http::HttpResponseRedirectBase* get_response_redirect(
+	virtual std::unique_ptr<http::IHttpResponse> get_response_redirect(
 		const std::string& redirect_to
 	);
 
@@ -72,12 +65,12 @@ public:
 
 	/// Check for denied User-Agents and rewrite the URL based on
 	/// settings.APPEND_SLASH and settings.PREPEND_WWW
-	http::HttpResponseBase* process_request(http::HttpRequest* request) override;
+	std::unique_ptr<http::IHttpResponse> process_request(http::HttpRequest* request) override;
 
 	/// When the status code of the response is 404, it may redirect to a path
 	/// with an appended slash if should_redirect_with_slash() returns true.
-	http::HttpResponseBase* process_response(
-		http::HttpRequest* request, http::HttpResponseBase* response
+	std::unique_ptr<http::IHttpResponse> process_response(
+		http::HttpRequest* request, http::IHttpResponse* response
 	) override;
 };
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,20 +16,33 @@
  */
 
 /**
- * An implementation of view.h.
+ * An implementation of views/view.h
  */
 
 #include "./view.h"
 
+// Framework modules.
+#include "../core/string.h"
+
 
 __VIEWS_BEGIN__
 
-View::View(core::ILogger* logger) : _request(nullptr), _allowed_methods_list({"options"})
+View::View(conf::Settings* settings)
+	: _request(nullptr), _allowed_methods_list({"options"})
 {
-	this->_logger = logger;
+	this->_settings = settings;
+	if (!this->_settings->LOGGER)
+	{
+		throw core::ImproperlyConfigured("View: LOGGER instance must be configured");
+	}
+
+	this->_logger = this->_settings->LOGGER.get();
 }
 
-View::View(const std::vector<std::string>& allowed_methods, core::ILogger* logger) : View(logger)
+View::View(
+	const std::vector<std::string>& allowed_methods,
+	conf::Settings* settings
+) : View(settings)
 {
 	this->_allowed_methods_list = allowed_methods;
 	if (std::find(allowed_methods.begin(), allowed_methods.end(), "options") == allowed_methods.end())
@@ -43,27 +56,20 @@ void View::setup(http::HttpRequest* request)
 	this->_request = request;
 }
 
-http::HttpResponseBase* View::dispatch(Args* args)
+std::unique_ptr<http::IHttpResponse> View::dispatch(Args* args)
 {
 	if (this->_request == nullptr)
 	{
-		int status;
-		std::string name = typeid(*this).name();
-		char* fullName = abi::__cxa_demangle(name.c_str(), nullptr, nullptr, &status);
-		if (status == 0)
-		{
-			name = fullName;
-		}
-
 		throw core::NullPointerException(
-			name + " instance has not initialized request."
+			core::utility::demangle(typeid(*this).name()) +
+			" instance has not initialized request."
 			" Did you override setup() and forget to call base method?",
 			_ERROR_DETAILS_
 		);
 	}
 
 	std::string method = core::str::lower(this->_request->method());
-	http::HttpResponseBase* result = nullptr;
+	std::unique_ptr<http::IHttpResponse> result = nullptr;
 	if (method == "get")
 	{
 		result = this->get(this->_request, args);
@@ -105,7 +111,7 @@ http::HttpResponseBase* View::dispatch(Args* args)
 	return result;
 }
 
-http::HttpResponseBase* View::http_method_not_allowed(http::HttpRequest* request)
+std::unique_ptr<http::IHttpResponse> View::http_method_not_allowed(http::HttpRequest* request)
 {
 	if (this->_logger != nullptr)
 	{
@@ -115,7 +121,7 @@ http::HttpResponseBase* View::http_method_not_allowed(http::HttpRequest* request
 		);
 	}
 
-	return new http::HttpResponseNotAllowed("", this->allowed_methods());
+	return std::make_unique<http::HttpResponseNotAllowed>("", this->allowed_methods());
 }
 
 std::vector<std::string> View::allowed_methods()
@@ -137,39 +143,39 @@ std::vector<std::string> View::allowed_methods()
 	return result;
 }
 
-http::HttpResponseBase* View::get(http::HttpRequest* request, Args* args)
+std::unique_ptr<http::IHttpResponse> View::get(http::HttpRequest* request, Args* args)
 {
 	return nullptr;
 }
 
-http::HttpResponseBase* View::post(http::HttpRequest* request, Args* args)
+std::unique_ptr<http::IHttpResponse> View::post(http::HttpRequest* request, Args* args)
 {
 	return nullptr;
 }
 
-http::HttpResponseBase* View::put(http::HttpRequest* request, Args* args)
+std::unique_ptr<http::IHttpResponse> View::put(http::HttpRequest* request, Args* args)
 {
 	return nullptr;
 }
 
-http::HttpResponseBase* View::patch(http::HttpRequest* request, Args* args)
+std::unique_ptr<http::IHttpResponse> View::patch(http::HttpRequest* request, Args* args)
 {
 	return nullptr;
 }
 
-http::HttpResponseBase* View::delete_(http::HttpRequest* request, Args* args)
+std::unique_ptr<http::IHttpResponse> View::delete_(http::HttpRequest* request, Args* args)
 {
 	return nullptr;
 }
 
-http::HttpResponseBase* View::head(http::HttpRequest* request, Args* args)
+std::unique_ptr<http::IHttpResponse> View::head(http::HttpRequest* request, Args* args)
 {
 	return this->get(request, args);
 }
 
-http::HttpResponseBase* View::options(http::HttpRequest* request, Args* args)
+std::unique_ptr<http::IHttpResponse> View::options(http::HttpRequest* request, Args* args)
 {
-	auto* response = new http::HttpResponse("");
+	auto response = std::make_unique<http::HttpResponse>("");
 	auto allowed_methods = this->allowed_methods();
 	response->set_header(
 		"Allow",
@@ -179,7 +185,7 @@ http::HttpResponseBase* View::options(http::HttpRequest* request, Args* args)
 	return response;
 }
 
-http::HttpResponseBase* View::trace(http::HttpRequest* request, Args* args)
+std::unique_ptr<http::IHttpResponse> View::trace(http::HttpRequest* request, Args* args)
 {
 	return nullptr;
 }

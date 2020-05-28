@@ -16,10 +16,15 @@
  */
 
 /**
- * An implementation of cookie.h.
+ * An implementation of http/cookie.h
  */
 
 #include "./cookie.h"
+
+// Framework modules.
+#include "../core/utility.h"
+#include "../core/string.h"
+#include "../core/exceptions.h"
 
 
 __HTTP_BEGIN__
@@ -47,18 +52,18 @@ std::string Cookie::_get_expires(long max_age) const
 		return "Thu, 01 Jan 1970 00:00:00 GMT";
 	}
 
-	auto now = core::dt::gmtnow();
-	return core::dt::DateTime(
-		now.timestamp() + max_age
+	auto now = core::dt::Datetime::utc_now();
+	return core::dt::Datetime::utc_from_timestamp(
+		now.timestamp() + (double)max_age
 	).strftime(this->DATE_TIME_FORMAT);
 }
 
 long Cookie::_get_max_age(const std::string& expires) const
 {
-	auto expires_gmt = core::dt::DateTime::strptime(
-		expires.c_str(), this->DATE_TIME_FORMAT
+	auto expires_gmt = core::dt::Datetime::strptime(
+		expires, this->DATE_TIME_FORMAT
 	).timestamp();
-	long max_age = (long)expires_gmt - (long)core::dt::gmtnow().timestamp();
+	long max_age = (long)expires_gmt - (long)core::dt::Datetime::utc_now().timestamp();
 	return max_age > 0 ? max_age : 0;
 }
 

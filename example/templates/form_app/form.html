@@ -1,0 +1,30 @@
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Make POST</title>
+</head>
+<body>
+    <h3>{{ user_info | rm_digits(digit = 8) | to_upper() }}</h3>
+    <h2>{{ "some string to process" | to_upper }}</h2>
+    <form method="post" enctype="multipart/form-data">
+        <input type="file" name="super_file" />
+        <label title="Email" for="mail">
+            <input type="email" name="mail" id="mail" />
+        </label>
+        <label title="Name" for="name">
+            <input type="text" name="name" id="name" />
+        </label>
+        <label title="Birth year" for="birth_year">
+            <input type="number" name="birth_year" id="birth_year" />
+        </label>
+        <input type="submit" value="send" />
+    </form>
+
+    {% url('Form::profile', 128, 'YourName') -> form_profile %}
+
+    <a href="{{ form_profile }}">Test Link 1</a>
+    <a href="{{ form_profile }}">Test Link 2</a>
+    <a href="{{ form_profile }}">Test Link 3</a>
+
+</body>
+</html>

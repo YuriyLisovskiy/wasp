@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,10 +16,16 @@
  */
 
 /**
- * An implementation of request.h.
+ * An implementation of http/request.h
  */
 
 #include "./request.h"
+
+// Framework modules.
+#include "./headers.h"
+#include "./utility.h"
+#include "../core/string.h"
+#include "../core/exceptions.h"
 
 
 __HTTP_BEGIN__
@@ -46,7 +52,7 @@ HttpRequest::HttpRequest(
 	this->FILES = files_params;
 }
 
-std::string HttpRequest::version()
+std::string HttpRequest::version() const
 {
 	return std::to_string(this->_major_version) + "." + std::to_string(this->_minor_version);
 }
@@ -73,7 +79,7 @@ std::string HttpRequest::method()
 	return this->_method;
 }
 
-bool HttpRequest::keep_alive()
+bool HttpRequest::keep_alive() const
 {
 	return this->_keep_alive;
 }
@@ -85,14 +91,14 @@ std::string HttpRequest::body()
 
 bool HttpRequest::is_secure(
 	std::pair<std::string, std::string>* secure_proxy_ssl_header
-)
+) const
 {
 	return this->scheme(secure_proxy_ssl_header) == "https";
 }
 
 std::string HttpRequest::scheme(
 	std::pair<std::string, std::string>* secure_proxy_ssl_header
-)
+) const
 {
 	if (secure_proxy_ssl_header)
 	{
@@ -116,7 +122,7 @@ std::string HttpRequest::get_host(
 	auto host = this->get_raw_host(use_x_forwarded_host);
 	if (debug && allowed_hosts.empty())
 	{
-		allowed_hosts = {".localhost", "127.0.0.1", "[::1]"};
+		allowed_hosts = {".localhost", "127.0.0.1", "::1"};
 	}
 
 	std::string domain, port;
@@ -141,7 +147,7 @@ std::string HttpRequest::get_host(
 	}
 }
 
-std::string HttpRequest::get_raw_host(bool use_x_forwarded_host)
+std::string HttpRequest::get_raw_host(bool use_x_forwarded_host) const
 {
 	std::string host;
 	if (use_x_forwarded_host && this->headers.contains(http::X_FORWARDED_HOST))

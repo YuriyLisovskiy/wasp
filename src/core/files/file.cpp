@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,10 +16,17 @@
  */
 
 /**
- * An implementation of file.h.
+ * An implementation of core/files/file.h
  */
 
 #include "./file.h"
+
+// C++ libraries.
+#include <cmath>
+
+// Framework modules.
+#include "../exceptions.h"
+#include "../string.h"
 
 
 __CORE_BEGIN__
@@ -348,11 +355,20 @@ size_t File::tell()
 	}
 }
 
-struct stat File::stat(const std::string& file_path)
+struct stat File::file_stat(const std::string& file_path)
 {
+#if defined(_WIN32) || defined(_WIN64)
+//	auto fp = core::str::replace(file_path, "/", "\\");
+	struct stat buf;
+	stat(file_path.c_str(), &buf);
+	return buf;
+#elif defined(__unix__) || defined(__linux__)
 	struct stat result{};
 	::stat(file_path.c_str(), &result);
 	return result;
+#else
+#error Library is not supported on this platform
+#endif
 }
 
 __CORE_END__
