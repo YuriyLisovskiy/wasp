@@ -28,10 +28,81 @@
 
 __YAML_BEGIN__
 
-std::string YAMLObject::_indent_string(const std::string& indent) const
+const std::string YAMLObject::DEFAULT_INDENT = "  ";
+
+std::string YAMLObject::indent_string(const std::string& indent) const
 {
-	// TODO: _indent_string(const std::string& indent)
-	return "TODO";
+	std::string res;
+	size_t i = 0;
+	for (const auto& obj : this->_objects)
+	{
+		if (i == 0)
+		{
+			res += " " + obj.first + ":" + obj.second->indent_string(indent + YAMLObject::DEFAULT_INDENT);
+		}
+		else
+		{
+			res += "\n" + indent + obj.first + ":" + obj.second->indent_string(indent + YAMLObject::DEFAULT_INDENT);
+		}
+
+		i++;
+	}
+
+	return res;
+}
+
+void YAMLObject::put(
+	const std::string& key,
+	const std::shared_ptr<YAMLValue>& val
+)
+{
+	this->_objects[key] = val;
+}
+
+void YAMLObject::put(
+	const std::string& key,
+	const std::shared_ptr<YAMLObject>& val
+)
+{
+	this->_objects[key] = val;
+}
+
+void YAMLObject::put(
+	const std::string& key,
+	const std::shared_ptr<YAMLArray>& val
+)
+{
+	this->_objects[key] = val;
+}
+
+void YAMLObject::put(const std::string& key, const std::string& val)
+{
+	this->_objects[key] = std::make_shared<YAMLValue>(val);
+}
+
+void YAMLObject::put(const std::string& key, const char* val)
+{
+	this->_objects[key] = std::make_shared<YAMLValue>(val);
+}
+
+void YAMLObject::remove(const std::string& key)
+{
+	if (this->_objects.find(key) != this->_objects.end())
+	{
+		this->_objects.erase(key);
+	}
+}
+
+std::shared_ptr<IYAMLObject> YAMLObject::pop(const std::string& key)
+{
+	if (this->_objects.find(key) != this->_objects.end())
+	{
+		auto obj = this->_objects[key];
+		this->_objects.erase(key);
+		return obj;
+	}
+
+	return nullptr;
 }
 
 YAMLObject* YAMLObject::get_object(const std::string& key)
@@ -46,7 +117,7 @@ YAMLArray* YAMLObject::get_array(const std::string& key)
 
 bool YAMLObject::get_bool(const std::string& key)
 {
-	auto val = this->_get_val<internal::YAMLValue>(key);
+	auto val = this->_get_val<YAMLValue>(key);
 	if (val)
 	{
 		auto str = val->get();
@@ -59,7 +130,7 @@ bool YAMLObject::get_bool(const std::string& key)
 char YAMLObject::get_char(const std::string& key)
 {
 	char res = '\0';
-	auto val = this->_get_val<internal::YAMLValue>(key);
+	auto val = this->_get_val<YAMLValue>(key);
 	if (val)
 	{
 		auto str = val->get();
@@ -74,7 +145,7 @@ char YAMLObject::get_char(const std::string& key)
 
 long YAMLObject::get_int(const std::string& key)
 {
-	auto val = this->_get_val<internal::YAMLValue>(key);
+	auto val = this->_get_val<YAMLValue>(key);
 	if (val)
 	{
 		return std::stol(val->get(), nullptr, 10);
@@ -85,7 +156,7 @@ long YAMLObject::get_int(const std::string& key)
 
 double YAMLObject::get_double(const std::string& key)
 {
-	auto val = this->_get_val<internal::YAMLValue>(key);
+	auto val = this->_get_val<YAMLValue>(key);
 	if (val)
 	{
 		return std::stod(val->get());
@@ -96,7 +167,7 @@ double YAMLObject::get_double(const std::string& key)
 
 std::string YAMLObject::get_string(const std::string& key)
 {
-	auto val = this->_get_val<internal::YAMLValue>(key);
+	auto val = this->_get_val<YAMLValue>(key);
 	if (val)
 	{
 		return val->get();
@@ -107,7 +178,22 @@ std::string YAMLObject::get_string(const std::string& key)
 
 std::string YAMLObject::to_string() const
 {
-	return "---\n" + this->_indent_string("");
+	return "---\n" + this->indent_string("");
+}
+
+size_t YAMLObject::size() const
+{
+	return this->_objects.size();
+}
+
+bool YAMLObject::is_empty() const
+{
+	return this->_objects.empty();
+}
+
+void YAMLObject::clear()
+{
+	this->_objects.clear();
 }
 
 __YAML_END__

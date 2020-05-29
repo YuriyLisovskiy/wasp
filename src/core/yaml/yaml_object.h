@@ -39,10 +39,10 @@ __YAML_BEGIN__
 
 class YAMLArray;
 
-class YAMLObject final : internal::IYAMLObject
+class YAMLObject final : public IYAMLObject
 {
 private:
-	std::map<std::string, std::shared_ptr<internal::IYAMLObject>> _objects;
+	std::map<std::string, std::shared_ptr<IYAMLObject>> _objects;
 
 	template <typename ValueT>
 	ValueT* _get_val(const std::string& key)
@@ -55,44 +55,41 @@ private:
 		return nullptr;
 	}
 
-	[[nodiscard]] std::string _indent_string(
+public:
+	const static std::string DEFAULT_INDENT;
+
+public:
+	[[nodiscard]] std::string indent_string(
 		const std::string& indent
 	) const override;
 
-public:
 	YAMLObject() = default;
 
-	template <typename ValueT, typename = std::enable_if<
-		std::is_same<YAMLObject, ValueT>::value ||
-		std::is_same<YAMLArray, ValueT>::value
-	>>
-	void put_object(
+	void put(
 		const std::string& key,
-		const std::shared_ptr<ValueT>& val
-	)
-	{
-		this->_objects[key] = val;
-	}
+		const std::shared_ptr<YAMLValue>& val
+	);
+	void put(
+		const std::string& key,
+		const std::shared_ptr<YAMLObject>& val
+	);
+	void put(
+		const std::string& key,
+		const std::shared_ptr<YAMLArray>& val
+	);
+	void put(const std::string& key, const std::string& val);
+	void put(const std::string& key, const char* val);
 
 	template <typename ValueT, typename = std::enable_if<
-		std::is_fundamental<ValueT>::value ||
-		std::is_same<std::string, ValueT>::value ||
-		std::is_same<const char*, ValueT>::value
+		std::is_fundamental<ValueT>::value
 	>>
-	void put(const std::string& key, const ValueT& val)
+	void put(const std::string& key, ValueT val)
 	{
-		if constexpr (
-			std::is_same<std::string, ValueT>::value ||
-			std::is_same<const char*, ValueT>::value
-		)
-		{
-			this->_objects[key] = std::make_shared<internal::YAMLValue>(val);
-		}
-		else
-		{
-			this->_objects[key] = std::make_shared<internal::YAMLValue>(std::to_string(val));
-		}
+		this->_objects[key] = std::make_shared<YAMLValue>(val);
 	}
+
+	void remove(const std::string& key);
+	std::shared_ptr<IYAMLObject> pop(const std::string& key);
 
 	YAMLObject* get_object(const std::string& key);
 	YAMLArray* get_array(const std::string& key);
@@ -103,7 +100,11 @@ public:
 	double get_double(const std::string& key);
 	std::string get_string(const std::string& key);
 
-	[[nodiscard]] std::string to_string() const;
+	[[nodiscard]] std::string to_string() const override;
+
+	[[nodiscard]] size_t size() const;
+	[[nodiscard]] bool is_empty() const;
+	void clear();
 };
 
 __YAML_END__

@@ -15,32 +15,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * core/yaml/interfaces.h
- *
- * Purpose:
- *  TODO: implement docs for core/yaml/interfaces.h
- */
+#include <gtest/gtest.h>
 
-#pragma once
+#include "../../../../../src/core/yaml/yaml_array.h"
 
-// C++ libraries.
-#include <string>
-
-// Module definitions.
-#include "./_def_.h"
+using namespace xw::core::yaml;
 
 
-__YAML_BEGIN__
-
-class IYAMLObject
+TEST(CoreTests_YamlTests_YamlArrayTests_IsEmptyTestCase, TestIsEmpty)
 {
-public:
-	virtual std::string indent_string(
-		const std::string& indent
-	) const = 0;
-	virtual std::string to_string() const = 0;
-	virtual ~IYAMLObject() = default;
-};
+	auto array = YAMLArray();
 
-__YAML_END__
+	ASSERT_TRUE(array.is_empty());
+}
+
+TEST(CoreTests_YamlTests_YamlArrayTests_IsEmptyTestCase, TestIsNotEmpty)
+{
+	auto array = YAMLArray();
+	array.add(std::make_shared<YAMLObject>());
+
+	ASSERT_FALSE(array.is_empty());
+}

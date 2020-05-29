@@ -1,6 +1,15 @@
 set(BINARY unittests)
 
-set(LIB_DLL ${PROJECT_SOURCE_DIR}/cmake-build-debug/src/lib${LIBRARY_NAME}.so)
+set(LIB_DIRECTORY ${CMAKE_BINARY_DIR}/src)
+if (WIN32)
+    set(LIB_DLL ${LIB_DIRECTORY}/${LIBRARY_NAME}.lib)
+else()
+    set(LIB_DLL ${LIB_DIRECTORY}/lib${LIBRARY_NAME}.so)
+endif()
+
+if (NOT MSVC)
+    set(CMAKE_CXX_FLAGS "-pthread")
+endif()
 
 function(add_tests SUB_DIR SUB_NAME)
 
@@ -11,6 +20,7 @@ function(add_tests SUB_DIR SUB_NAME)
         "${TESTS_DIR}*/main.cpp"
         "${TESTS_DIR}*/*/main.cpp"
         "${TESTS_DIR}*/*/*/main.cpp;"
+        "${TESTS_DIR}*/*/*/*/main.cpp;"
     )
 
     if (FILES_TO_REMOVE)
@@ -29,7 +39,10 @@ add_tests("" all)
 
 add_sub_tests(collections)
 add_sub_tests(conf)
+
 add_sub_tests(core)
+add_tests("core_tests/yaml_tests/" core-yaml)
+
 add_sub_tests(http)
 add_sub_tests(render)
 add_sub_tests(utils)

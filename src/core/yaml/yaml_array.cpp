@@ -22,16 +22,67 @@
 // Header.
 #include "./yaml_array.h"
 
-// Framework modules.
-// TODO:
-
 
 __YAML_BEGIN__
 
-std::string YAMLArray::_indent_string(const std::string& indent) const
+const std::string YAMLArray::DEFAULT_INDENT = "  ";
+
+std::string YAMLArray::indent_string(const std::string& indent) const
 {
-	// TODO: _indent_string(const std::string& indent)
-	return "TODO";
+	std::string res, curr_indent;
+	auto default_indent_size = YAMLArray::DEFAULT_INDENT.size();
+	if (indent.size() >= default_indent_size)
+	{
+		curr_indent = indent.substr(0, indent.size() - default_indent_size);
+	}
+	else
+	{
+		curr_indent = indent;
+	}
+
+	for (const auto& obj : this->_objects)
+	{
+		res += "\n" + curr_indent + "-" + obj->indent_string(curr_indent + YAMLArray::DEFAULT_INDENT);
+	}
+
+	return res;
+}
+
+void YAMLArray::add(const std::shared_ptr<YAMLValue>& val)
+{
+	this->_objects.push_back(val);
+}
+
+void YAMLArray::add(const std::shared_ptr<YAMLObject>& val)
+{
+	this->_objects.push_back(val);
+}
+
+void YAMLArray::add(const std::string& key, const std::shared_ptr<YAMLArray>& val)
+{
+	auto obj = std::make_shared<YAMLObject>();
+	obj->put(key, val);
+	this->_objects.push_back(obj);
+}
+
+void YAMLArray::remove_at(int idx)
+{
+	if (idx < this->_objects.size())
+	{
+		this->_objects.erase(this->_objects.begin() + idx);
+	}
+}
+
+std::shared_ptr<IYAMLObject> YAMLArray::pop_at(int idx)
+{
+	if (idx < this->_objects.size())
+	{
+		auto item = this->_objects.at(idx);
+		this->_objects.erase(this->_objects.begin() + idx);
+		return item;
+	}
+
+	return nullptr;
 }
 
 YAMLObject* YAMLArray::get_object(int idx)
@@ -46,7 +97,7 @@ YAMLArray* YAMLArray::get_array(int idx)
 
 bool YAMLArray::get_bool(int idx)
 {
-	auto val = this->_get_val<internal::YAMLValue>(idx);
+	auto val = this->_get_val<YAMLValue>(idx);
 	if (val)
 	{
 		auto str = val->get();
@@ -59,7 +110,7 @@ bool YAMLArray::get_bool(int idx)
 char YAMLArray::get_char(int idx)
 {
 	char res = '\0';
-	auto val = this->_get_val<internal::YAMLValue>(idx);
+	auto val = this->_get_val<YAMLValue>(idx);
 	if (val)
 	{
 		auto str = val->get();
@@ -74,7 +125,7 @@ char YAMLArray::get_char(int idx)
 
 long YAMLArray::get_int(int idx)
 {
-	auto val = this->_get_val<internal::YAMLValue>(idx);
+	auto val = this->_get_val<YAMLValue>(idx);
 	if (val)
 	{
 		return std::stol(val->get(), nullptr, 10);
@@ -85,7 +136,7 @@ long YAMLArray::get_int(int idx)
 
 double YAMLArray::get_double(int idx)
 {
-	auto val = this->_get_val<internal::YAMLValue>(idx);
+	auto val = this->_get_val<YAMLValue>(idx);
 	if (val)
 	{
 		return std::stod(val->get());
@@ -96,7 +147,7 @@ double YAMLArray::get_double(int idx)
 
 std::string YAMLArray::get_string(int idx)
 {
-	auto val = this->_get_val<internal::YAMLValue>(idx);
+	auto val = this->_get_val<YAMLValue>(idx);
 	if (val)
 	{
 		return val->get();
@@ -107,12 +158,22 @@ std::string YAMLArray::get_string(int idx)
 
 std::string YAMLArray::to_string() const
 {
-	return "---\n" + this->_indent_string("");
+	return "---\n" + this->indent_string("");
 }
 
 size_t YAMLArray::size() const
 {
 	return this->_objects.size();
+}
+
+bool YAMLArray::is_empty() const
+{
+	return this->_objects.empty();
+}
+
+void YAMLArray::clear()
+{
+	this->_objects.clear();
 }
 
 __YAML_END__

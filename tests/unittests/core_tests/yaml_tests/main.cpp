@@ -15,32 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * core/yaml/interfaces.h
- *
- * Purpose:
- *  TODO: implement docs for core/yaml/interfaces.h
- */
+#include <gtest/gtest.h>
 
-#pragma once
-
-// C++ libraries.
-#include <string>
-
-// Module definitions.
-#include "./_def_.h"
-
-
-__YAML_BEGIN__
-
-class IYAMLObject
+int main(int argc, char *argv[])
 {
-public:
-	virtual std::string indent_string(
-		const std::string& indent
-	) const = 0;
-	virtual std::string to_string() const = 0;
-	virtual ~IYAMLObject() = default;
-};
-
-__YAML_END__
+	::testing::InitGoogleTest(&argc, argv);
+	return RUN_ALL_TESTS();
+}

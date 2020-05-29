@@ -22,17 +22,48 @@
 // Header.
 #include "./yaml_value.h"
 
+// Framework modules.
+#include "../string.h"
 
-__YAML_INTERNAL_BEGIN__
 
-std::string YAMLValue::_indent_string(const std::string& indent) const
+__YAML_BEGIN__
+
+const std::string YAMLValue::DEFAULT_INDENT = "  ";
+
+std::string YAMLValue::indent_string(const std::string& indent) const
 {
-	return this->_value;
-}
+	std::string res;
+	if (this->_value.find('\n') != std::string::npos)
+	{
+		res = " |-";
+		auto parts = str::split(this->_value, '\n');
+		for (const auto& part : parts)
+		{
+			res.append("\n").append(indent).append(part);
+		}
+	}
+	else if (this->_value.find(' ') != std::string::npos)
+	{
+		if (this->_value.find('\'') == std::string::npos)
+		{
+			res = " \'" + this->_value + "\'";
+		}
+		else if (this->_value.find('"') == std::string::npos)
+		{
+			res = " \"" + this->_value + "\"";
+		}
+		else
+		{
+			auto new_value = str::replace(this->_value, "'", "\\'");
+			res = " \'" + new_value + "\'";
+		}
+	}
+	else
+	{
+		res = " " + this->_value;
+	}
 
-YAMLValue::YAMLValue(const std::string& val)
-{
-	this->_value = val;
+	return res;
 }
 
 std::string YAMLValue::get() const
@@ -40,4 +71,9 @@ std::string YAMLValue::get() const
 	return this->_value;
 }
 
-__YAML_INTERNAL_END__
+std::string YAMLValue::to_string() const
+{
+	return this->_value;
+}
+
+__YAML_END__

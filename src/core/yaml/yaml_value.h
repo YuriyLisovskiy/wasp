@@ -31,21 +31,56 @@
 #include "./interfaces.h"
 
 
-__YAML_INTERNAL_BEGIN__
+__YAML_BEGIN__
 
-class YAMLValue final : IYAMLObject
+class YAMLValue final : public IYAMLObject
 {
 private:
 	std::string _value;
 
-	[[nodiscard]] std::string _indent_string(
+public:
+	const static std::string DEFAULT_INDENT;
+
+public:
+	[[nodiscard]] std::string indent_string(
 		const std::string& indent
 	) const override;
 
-public:
-	explicit YAMLValue(const std::string& val);
+	YAMLValue() = default;
+
+	template <typename ValueT, typename = std::enable_if<
+		std::is_fundamental<ValueT>::value &&
+		!std::is_same<std::basic_string<char>, ValueT>::value
+	>>
+	explicit YAMLValue(ValueT val)
+	{
+		if constexpr (std::is_same<bool, ValueT>::value)
+		{
+			this->_value = val ? "true" : "false";
+		}
+		else if constexpr (std::is_same<char, ValueT>::value)
+		{
+			this->_value = std::string(1, val);
+		}
+		else
+		{
+			this->_value = std::to_string(val);
+		}
+	}
+
+	explicit YAMLValue(const std::string& val)
+	{
+		this->_value = val;
+	}
+
+	explicit YAMLValue(const char* val)
+	{
+		this->_value = val;
+	}
 
 	[[nodiscard]] std::string get() const;
+
+	[[nodiscard]] std::string to_string() const override;
 };
 
-__YAML_INTERNAL_END__
+__YAML_END__

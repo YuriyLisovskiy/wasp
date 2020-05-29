@@ -37,10 +37,10 @@
 
 __YAML_BEGIN__
 
-class YAMLArray final : internal::IYAMLObject
+class YAMLArray final : public IYAMLObject
 {
 private:
-	std::vector<std::shared_ptr<internal::IYAMLObject>> _objects;
+	std::vector<std::shared_ptr<IYAMLObject>> _objects;
 
 	template <typename ValueT>
 	ValueT* _get_val(int idx)
@@ -53,45 +53,32 @@ private:
 		return nullptr;
 	}
 
-	[[nodiscard]] std::string _indent_string(
+public:
+	const static std::string DEFAULT_INDENT;
+
+public:
+	[[nodiscard]] std::string indent_string(
 		const std::string& indent
 	) const override;
 
-public:
 	YAMLArray() = default;
 
-	template <typename ValueT, typename = std::enable_if<
-		std::is_same<YAMLObject, ValueT>::value ||
-		std::is_same<YAMLArray, ValueT>::value
-	>>
-	void add_object(
-		const std::shared_ptr<ValueT>& val
-	)
-	{
-		this->_objects.push_back(val);
-	}
+	void add(const std::shared_ptr<YAMLValue>& val);
+	void add(const std::shared_ptr<YAMLObject>& val);
+	void add(const std::string& key, const std::shared_ptr<YAMLArray>& val);
 
 	template <typename ValueT, typename = std::enable_if<
 		std::is_fundamental<ValueT>::value ||
-		std::is_same<std::string, ValueT>::value ||
+		std::is_same<std::basic_string<char>, ValueT>::value ||
 		std::is_same<const char*, ValueT>::value
 	>>
-	void add(const ValueT& val)
+	void add(ValueT val)
 	{
-		if constexpr (
-			std::is_same<std::string, ValueT>::value ||
-			std::is_same<const char*, ValueT>::value
-		)
-		{
-			this->_objects.push_back(std::make_shared<internal::YAMLValue>(val));
-		}
-		else
-		{
-			this->_objects.push_back(
-				std::make_shared<internal::YAMLValue>(std::to_string(val))
-			);
-		}
+		this->_objects.push_back(std::make_shared<YAMLValue>(val));
 	}
+
+	void remove_at(int idx);
+	std::shared_ptr<IYAMLObject> pop_at(int idx);
 
 	YAMLObject* get_object(int idx);
 	YAMLArray* get_array(int idx);
@@ -102,9 +89,11 @@ public:
 	double get_double(int idx);
 	std::string get_string(int idx);
 
-	[[nodiscard]] std::string to_string() const;
+	[[nodiscard]] std::string to_string() const override;
 
 	[[nodiscard]] size_t size() const;
+	[[nodiscard]] bool is_empty() const;
+	void clear();
 };
 
 __YAML_END__
