@@ -25,6 +25,7 @@ using namespace xw;
 class MultiValueDictErrorTestCase : public ::testing::Test
 {
 public:
+	const char* WhatErrorMessage = "Test error message from MultiValueDictErrorTestCase";
 	const char* FullErrorMessage = "MultiValueDictError: Test error message from MultiValueDictErrorTestCase";
 	const char* ErrorFunction = "testFunc";
 	const char* ErrorFile = "test_file.cpp";
@@ -42,8 +43,8 @@ public:
 
 TEST_F(MultiValueDictErrorTestCase, TestWhat)
 {
-	ASSERT_STREQ(this->ConstCharConstructorError.what(), this->FullErrorMessage);
-	ASSERT_STREQ(this->StringConstructorError.what(), this->FullErrorMessage);
+	ASSERT_STREQ(this->ConstCharConstructorError.what(), this->WhatErrorMessage);
+	ASSERT_STREQ(this->StringConstructorError.what(), this->WhatErrorMessage);
 }
 
 TEST_F(MultiValueDictErrorTestCase, TestLine)
@@ -62,4 +63,10 @@ TEST_F(MultiValueDictErrorTestCase, TestFile)
 {
 	ASSERT_EQ(this->ConstCharConstructorError.file(), this->ErrorFile);
 	ASSERT_EQ(this->StringConstructorError.file(), this->ErrorFile);
+}
+
+TEST_F(MultiValueDictErrorTestCase, TestGetMessage)
+{
+	ASSERT_EQ(this->ConstCharConstructorError.get_message(), this->FullErrorMessage);
+	ASSERT_EQ(this->StringConstructorError.get_message(), this->FullErrorMessage);
 }

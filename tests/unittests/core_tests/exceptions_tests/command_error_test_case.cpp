@@ -22,44 +22,51 @@
 using namespace xw;
 
 
-class FileErrorTestCase : public ::testing::Test
+class CommandErrorTestCase : public ::testing::Test
 {
 public:
-	const char* FullErrorMessage = "FileError: Test error message from FileErrorTestCase";
+	const char* WhatErrorMessage = "Test error message from CommandErrorTestCase";
+	const char* FullErrorMessage = "CommandError: Test error message from CommandErrorTestCase";
 	const char* ErrorFunction = "testFunc";
 	const char* ErrorFile = "test_file.cpp";
 	const size_t ErrorLine = 1;
 
-	core::FileError ConstCharConstructorError;
-	core::FileError StringConstructorError;
+	core::CommandError ConstCharConstructorError;
+	core::CommandError StringConstructorError;
 
-	explicit FileErrorTestCase()
-		: ConstCharConstructorError("Test error message from FileErrorTestCase", this->ErrorLine, this->ErrorFunction, this->ErrorFile),
-		  StringConstructorError(std::string("Test error message from FileErrorTestCase"), this->ErrorLine, this->ErrorFunction, this->ErrorFile)
+	explicit CommandErrorTestCase()
+		: ConstCharConstructorError("Test error message from CommandErrorTestCase", this->ErrorLine, this->ErrorFunction, this->ErrorFile),
+		  StringConstructorError(std::string("Test error message from CommandErrorTestCase"), this->ErrorLine, this->ErrorFunction, this->ErrorFile)
 	{
 	}
 };
 
-TEST_F(FileErrorTestCase, TestWhat)
+TEST_F(CommandErrorTestCase, TestWhat)
 {
-	ASSERT_STREQ(this->ConstCharConstructorError.what(), this->FullErrorMessage);
-	ASSERT_STREQ(this->StringConstructorError.what(), this->FullErrorMessage);
+	ASSERT_STREQ(this->ConstCharConstructorError.what(), this->WhatErrorMessage);
+	ASSERT_STREQ(this->StringConstructorError.what(), this->WhatErrorMessage);
 }
 
-TEST_F(FileErrorTestCase, TestLine)
+TEST_F(CommandErrorTestCase, TestLine)
 {
 	ASSERT_EQ(this->ConstCharConstructorError.line(), this->ErrorLine);
 	ASSERT_EQ(this->StringConstructorError.line(), this->ErrorLine);
 }
 
-TEST_F(FileErrorTestCase, TestFunction)
+TEST_F(CommandErrorTestCase, TestFunction)
 {
 	ASSERT_EQ(this->ConstCharConstructorError.function(), this->ErrorFunction);
 	ASSERT_EQ(this->StringConstructorError.function(), this->ErrorFunction);
 }
 
-TEST_F(FileErrorTestCase, TestFile)
+TEST_F(CommandErrorTestCase, TestFile)
 {
 	ASSERT_EQ(this->ConstCharConstructorError.file(), this->ErrorFile);
 	ASSERT_EQ(this->StringConstructorError.file(), this->ErrorFile);
+}
+
+TEST_F(CommandErrorTestCase, TestGetMessage)
+{
+	ASSERT_EQ(this->ConstCharConstructorError.get_message(), this->FullErrorMessage);
+	ASSERT_EQ(this->StringConstructorError.get_message(), this->FullErrorMessage);
 }

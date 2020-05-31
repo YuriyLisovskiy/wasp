@@ -26,42 +26,42 @@ TEST(CoreTests_YamlTests_YamlValueTests_IndentStringTestCase, TestSimpleValue)
 {
 	auto value = YAMLValue("hello_world");
 
-	ASSERT_EQ(value.indent_string(""), " hello_world");
+	ASSERT_EQ(value.indent_string("", true), " hello_world");
 }
 
 TEST(CoreTests_YamlTests_YamlValueTests_IndentStringTestCase, TestIntegerValue)
 {
 	auto value = YAMLValue("10");
 
-	ASSERT_EQ(value.indent_string(""), " 10");
+	ASSERT_EQ(value.indent_string("", true), " 10");
 }
 
 TEST(CoreTests_YamlTests_YamlValueTests_IndentStringTestCase, TestDoubleValue)
 {
 	auto value = YAMLValue("10.57");
 
-	ASSERT_EQ(value.indent_string(""), " 10.57");
+	ASSERT_EQ(value.indent_string("", true), " 10.57");
 }
 
 TEST(CoreTests_YamlTests_YamlValueTests_IndentStringTestCase, TestContainsSingleQuotesValue)
 {
 	auto value = YAMLValue("world's first test");
 
-	ASSERT_EQ(value.indent_string(""), " \"world's first test\"");
+	ASSERT_EQ(value.indent_string("", true), " world's first test");
 }
 
 TEST(CoreTests_YamlTests_YamlValueTests_IndentStringTestCase, TestContainsDoubleQuotesValue)
 {
 	auto value = YAMLValue("world\"s first test");
 
-	ASSERT_EQ(value.indent_string(""), " 'world\"s first test'");
+	ASSERT_EQ(value.indent_string("", true), " world\"s first test");
 }
 
 TEST(CoreTests_YamlTests_YamlValueTests_IndentStringTestCase, TestContainsMixedQuotesValue)
 {
 	auto value = YAMLValue("world's \"first\" test");
 
-	ASSERT_EQ(value.indent_string(""), " 'world\\'s \"first\" test'");
+	ASSERT_EQ(value.indent_string("", true), " world's \"first\" test");
 }
 
 TEST(CoreTests_YamlTests_YamlValueTests_IndentStringTestCase, TestMultilineStringValue)
@@ -70,7 +70,7 @@ TEST(CoreTests_YamlTests_YamlValueTests_IndentStringTestCase, TestMultilineStrin
 	auto value = YAMLValue("world's\nfirst\ntest");
 
 	ASSERT_EQ(
-		value.indent_string(idt),
+		value.indent_string(idt, true),
 		" |-\n" + idt + "world's\n" + idt + "first\n" + idt + "test"
 	);
 }

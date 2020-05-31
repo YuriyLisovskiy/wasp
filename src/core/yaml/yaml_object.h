@@ -25,7 +25,7 @@
 #pragma once
 
 // C++ libraries.
-#include <map>
+#include <vector>
 #include <memory>
 
 // Module definitions.
@@ -42,14 +42,17 @@ class YAMLArray;
 class YAMLObject final : public IYAMLObject
 {
 private:
-	std::map<std::string, std::shared_ptr<IYAMLObject>> _objects;
+	std::vector<std::pair<std::string, std::shared_ptr<IYAMLObject>>> _objects;
 
 	template <typename ValueT>
 	ValueT* _get_val(const std::string& key)
 	{
-		if (this->_objects.find(key) != this->_objects.end())
+		for (const auto& val : this->_objects)
 		{
-			return dynamic_cast<ValueT*>(this->_objects[key].get());
+			if (val.first == key)
+			{
+				return dynamic_cast<ValueT*>(val.second.get());
+			}
 		}
 
 		return nullptr;
@@ -60,7 +63,7 @@ public:
 
 public:
 	[[nodiscard]] std::string indent_string(
-		const std::string& indent
+		const std::string& indent, bool prepend_new_line
 	) const override;
 
 	YAMLObject() = default;
@@ -85,7 +88,7 @@ public:
 	>>
 	void put(const std::string& key, ValueT val)
 	{
-		this->_objects[key] = std::make_shared<YAMLValue>(val);
+		this->_objects.push_back({key, std::make_shared<YAMLValue>(val)});
 	}
 
 	void remove(const std::string& key);

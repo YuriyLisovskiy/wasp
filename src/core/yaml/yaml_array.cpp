@@ -27,22 +27,31 @@ __YAML_BEGIN__
 
 const std::string YAMLArray::DEFAULT_INDENT = "  ";
 
-std::string YAMLArray::indent_string(const std::string& indent) const
+std::string YAMLArray::indent_string(
+	const std::string& indent, bool prepend_new_line
+) const
 {
-	std::string res, curr_indent;
-	auto default_indent_size = YAMLArray::DEFAULT_INDENT.size();
-	if (indent.size() >= default_indent_size)
+	std::string res;
+	if (prepend_new_line)
 	{
-		curr_indent = indent.substr(0, indent.size() - default_indent_size);
-	}
-	else
-	{
-		curr_indent = indent;
+		res += "\n";
 	}
 
+	size_t i = 0, n_minus_1 = this->_objects.size() - 1;
 	for (const auto& obj : this->_objects)
 	{
-		res += "\n" + curr_indent + "-" + obj->indent_string(curr_indent + YAMLArray::DEFAULT_INDENT);
+		if (prepend_new_line)
+		{
+			res += indent;
+		}
+
+		res += "-" + obj->indent_string(
+			indent + YAMLArray::DEFAULT_INDENT, false
+		);
+		if (i++ < n_minus_1)
+		{
+			res += "\n";
+		}
 	}
 
 	return res;
@@ -158,7 +167,7 @@ std::string YAMLArray::get_string(int idx)
 
 std::string YAMLArray::to_string() const
 {
-	return "---\n" + this->indent_string("");
+	return "---\n" + this->indent_string("", true);
 }
 
 size_t YAMLArray::size() const

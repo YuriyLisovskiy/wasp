@@ -22,44 +22,51 @@
 using namespace xw;
 
 
-class SuspiciousOperationTestCase : public ::testing::Test
+class FileDoesNotExistErrorTestCase : public ::testing::Test
 {
 public:
-	const char* FullErrorMessage = "SuspiciousOperation: Test error message from SuspiciousOperationTestCase";
+	const char* WhatErrorMessage = "Test error message from FileDoesNotExistErrorTestCase";
+	const char* FullErrorMessage = "FileDoesNotExistError: Test error message from FileDoesNotExistErrorTestCase";
 	const char* ErrorFunction = "testFunc";
 	const char* ErrorFile = "test_file.cpp";
 	const size_t ErrorLine = 1;
 
-	core::SuspiciousOperation ConstCharConstructorError;
-	core::SuspiciousOperation StringConstructorError;
+	core::FileDoesNotExistError ConstCharConstructorError;
+	core::FileDoesNotExistError StringConstructorError;
 
-	explicit SuspiciousOperationTestCase()
-		: ConstCharConstructorError("Test error message from SuspiciousOperationTestCase", this->ErrorLine, this->ErrorFunction, this->ErrorFile),
-		  StringConstructorError(std::string("Test error message from SuspiciousOperationTestCase"), this->ErrorLine, this->ErrorFunction, this->ErrorFile)
+	explicit FileDoesNotExistErrorTestCase()
+		: ConstCharConstructorError("Test error message from FileDoesNotExistErrorTestCase", this->ErrorLine, this->ErrorFunction, this->ErrorFile),
+		  StringConstructorError(std::string("Test error message from FileDoesNotExistErrorTestCase"), this->ErrorLine, this->ErrorFunction, this->ErrorFile)
 	{
 	}
 };
 
-TEST_F(SuspiciousOperationTestCase, TestWhat)
+TEST_F(FileDoesNotExistErrorTestCase, TestWhat)
 {
-	ASSERT_STREQ(this->ConstCharConstructorError.what(), this->FullErrorMessage);
-	ASSERT_STREQ(this->StringConstructorError.what(), this->FullErrorMessage);
+	ASSERT_STREQ(this->ConstCharConstructorError.what(), this->WhatErrorMessage);
+	ASSERT_STREQ(this->StringConstructorError.what(), this->WhatErrorMessage);
 }
 
-TEST_F(SuspiciousOperationTestCase, TestLine)
+TEST_F(FileDoesNotExistErrorTestCase, TestLine)
 {
 	ASSERT_EQ(this->ConstCharConstructorError.line(), this->ErrorLine);
 	ASSERT_EQ(this->StringConstructorError.line(), this->ErrorLine);
 }
 
-TEST_F(SuspiciousOperationTestCase, TestFunction)
+TEST_F(FileDoesNotExistErrorTestCase, TestFunction)
 {
 	ASSERT_EQ(this->ConstCharConstructorError.function(), this->ErrorFunction);
 	ASSERT_EQ(this->StringConstructorError.function(), this->ErrorFunction);
 }
 
-TEST_F(SuspiciousOperationTestCase, TestFile)
+TEST_F(FileDoesNotExistErrorTestCase, TestFile)
 {
 	ASSERT_EQ(this->ConstCharConstructorError.file(), this->ErrorFile);
 	ASSERT_EQ(this->StringConstructorError.file(), this->ErrorFile);
+}
+
+TEST_F(FileDoesNotExistErrorTestCase, TestGetMessage)
+{
+	ASSERT_EQ(this->ConstCharConstructorError.get_message(), this->FullErrorMessage);
+	ASSERT_EQ(this->StringConstructorError.get_message(), this->FullErrorMessage);
 }

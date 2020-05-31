@@ -36,10 +36,10 @@ __YAML_BEGIN__
 class IYAMLObject
 {
 public:
-	virtual std::string indent_string(
-		const std::string& indent
+	[[nodiscard]] virtual std::string indent_string(
+		const std::string& indent, bool prepend_new_line
 	) const = 0;
-	virtual std::string to_string() const = 0;
+	[[nodiscard]] virtual std::string to_string() const = 0;
 	virtual ~IYAMLObject() = default;
 };
 

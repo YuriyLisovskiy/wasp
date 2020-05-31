@@ -12,7 +12,7 @@ endif()
 file(GLOB_RECURSE SOURCES LIST_DIRECTORIES true ./*/*.h ./*/*.cpp)
 set(SOURCES ${SOURCES})
 
-add_executable(${BINARY} ${LIB_SOURCES} ${SOURCES} "./main.cpp")
+add_executable(${BINARY} ${SOURCES} "./main.cpp")
 
 target_link_libraries(${BINARY} ${LIB_DLL})
 

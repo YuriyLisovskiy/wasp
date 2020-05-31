@@ -22,44 +22,51 @@
 using namespace xw;
 
 
-class FileDoesNotExistErrorTestCase : public ::testing::Test
+class DisallowedRedirectTestCase : public ::testing::Test
 {
 public:
-	const char* FullErrorMessage = "FileDoesNotExistError: Test error message from FileDoesNotExistErrorTestCase";
+	const char* WhatErrorMessage = "Test error message from DisallowedRedirectTestCase";
+	const char* FullErrorMessage = "DisallowedRedirect: Test error message from DisallowedRedirectTestCase";
 	const char* ErrorFunction = "testFunc";
 	const char* ErrorFile = "test_file.cpp";
 	const size_t ErrorLine = 1;
 
-	core::FileDoesNotExistError ConstCharConstructorError;
-	core::FileDoesNotExistError StringConstructorError;
+	core::DisallowedRedirect ConstCharConstructorError;
+	core::DisallowedRedirect StringConstructorError;
 
-	explicit FileDoesNotExistErrorTestCase()
-		: ConstCharConstructorError("Test error message from FileDoesNotExistErrorTestCase", this->ErrorLine, this->ErrorFunction, this->ErrorFile),
-		  StringConstructorError(std::string("Test error message from FileDoesNotExistErrorTestCase"), this->ErrorLine, this->ErrorFunction, this->ErrorFile)
+	explicit DisallowedRedirectTestCase()
+		: ConstCharConstructorError("Test error message from DisallowedRedirectTestCase", this->ErrorLine, this->ErrorFunction, this->ErrorFile),
+		  StringConstructorError(std::string("Test error message from DisallowedRedirectTestCase"), this->ErrorLine, this->ErrorFunction, this->ErrorFile)
 	{
 	}
 };
 
-TEST_F(FileDoesNotExistErrorTestCase, TestWhat)
+TEST_F(DisallowedRedirectTestCase, TestWhat)
 {
-	ASSERT_STREQ(this->ConstCharConstructorError.what(), this->FullErrorMessage);
-	ASSERT_STREQ(this->StringConstructorError.what(), this->FullErrorMessage);
+	ASSERT_STREQ(this->ConstCharConstructorError.what(), this->WhatErrorMessage);
+	ASSERT_STREQ(this->StringConstructorError.what(), this->WhatErrorMessage);
 }
 
-TEST_F(FileDoesNotExistErrorTestCase, TestLine)
+TEST_F(DisallowedRedirectTestCase, TestLine)
 {
 	ASSERT_EQ(this->ConstCharConstructorError.line(), this->ErrorLine);
 	ASSERT_EQ(this->StringConstructorError.line(), this->ErrorLine);
 }
 
-TEST_F(FileDoesNotExistErrorTestCase, TestFunction)
+TEST_F(DisallowedRedirectTestCase, TestFunction)
 {
 	ASSERT_EQ(this->ConstCharConstructorError.function(), this->ErrorFunction);
 	ASSERT_EQ(this->StringConstructorError.function(), this->ErrorFunction);
 }
 
-TEST_F(FileDoesNotExistErrorTestCase, TestFile)
+TEST_F(DisallowedRedirectTestCase, TestFile)
 {
 	ASSERT_EQ(this->ConstCharConstructorError.file(), this->ErrorFile);
 	ASSERT_EQ(this->StringConstructorError.file(), this->ErrorFile);
+}
+
+TEST_F(DisallowedRedirectTestCase, TestGetMessage)
+{
+	ASSERT_EQ(this->ConstCharConstructorError.get_message(), this->FullErrorMessage);
+	ASSERT_EQ(this->StringConstructorError.get_message(), this->FullErrorMessage);
 }

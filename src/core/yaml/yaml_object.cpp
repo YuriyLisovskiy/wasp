@@ -30,22 +30,35 @@ __YAML_BEGIN__
 
 const std::string YAMLObject::DEFAULT_INDENT = "  ";
 
-std::string YAMLObject::indent_string(const std::string& indent) const
+std::string YAMLObject::indent_string(
+	const std::string& indent, bool prepend_new_line
+) const
 {
 	std::string res;
-	size_t i = 0;
+	if (prepend_new_line)
+	{
+		res += "\n";
+	}
+
+	size_t i = 0, n_minus_1 = this->_objects.size() - 1;
 	for (const auto& obj : this->_objects)
 	{
-		if (i == 0)
+		if (!prepend_new_line && i == 0)
 		{
-			res += " " + obj.first + ":" + obj.second->indent_string(indent + YAMLObject::DEFAULT_INDENT);
+			res += " ";
 		}
 		else
 		{
-			res += "\n" + indent + obj.first + ":" + obj.second->indent_string(indent + YAMLObject::DEFAULT_INDENT);
+			res += indent;
 		}
 
-		i++;
+		res += obj.first + ":" + obj.second->indent_string(
+			indent + YAMLObject::DEFAULT_INDENT, true
+		);
+		if (i++ < n_minus_1)
+		{
+			res += "\n";
+		}
 	}
 
 	return res;
@@ -56,7 +69,7 @@ void YAMLObject::put(
 	const std::shared_ptr<YAMLValue>& val
 )
 {
-	this->_objects[key] = val;
+	this->_objects.emplace_back(key, val);
 }
 
 void YAMLObject::put(
@@ -64,7 +77,7 @@ void YAMLObject::put(
 	const std::shared_ptr<YAMLObject>& val
 )
 {
-	this->_objects[key] = val;
+	this->_objects.emplace_back(key, val);
 }
 
 void YAMLObject::put(
@@ -72,34 +85,41 @@ void YAMLObject::put(
 	const std::shared_ptr<YAMLArray>& val
 )
 {
-	this->_objects[key] = val;
+	this->_objects.emplace_back(key, val);
 }
 
 void YAMLObject::put(const std::string& key, const std::string& val)
 {
-	this->_objects[key] = std::make_shared<YAMLValue>(val);
+	this->_objects.emplace_back(key, std::make_shared<YAMLValue>(val));
 }
 
 void YAMLObject::put(const std::string& key, const char* val)
 {
-	this->_objects[key] = std::make_shared<YAMLValue>(val);
+	this->_objects.emplace_back(key, std::make_shared<YAMLValue>(val));
 }
 
 void YAMLObject::remove(const std::string& key)
 {
-	if (this->_objects.find(key) != this->_objects.end())
+	for (size_t i = 0; i < this->_objects.size(); i++)
 	{
-		this->_objects.erase(key);
+		if (this->_objects[i].first == key)
+		{
+			this->_objects.erase(this->_objects.begin() + i);
+			break;
+		}
 	}
 }
 
 std::shared_ptr<IYAMLObject> YAMLObject::pop(const std::string& key)
 {
-	if (this->_objects.find(key) != this->_objects.end())
+	for (size_t i = 0; i < this->_objects.size(); i++)
 	{
-		auto obj = this->_objects[key];
-		this->_objects.erase(key);
-		return obj;
+		if (this->_objects[i].first == key)
+		{
+			auto obj = this->_objects[i].second;
+			this->_objects.erase(this->_objects.begin() + i);
+			return obj;
+		}
 	}
 
 	return nullptr;
@@ -178,7 +198,7 @@ std::string YAMLObject::get_string(const std::string& key)
 
 std::string YAMLObject::to_string() const
 {
-	return "---\n" + this->indent_string("");
+	return "---\n" + this->indent_string("", true);
 }
 
 size_t YAMLObject::size() const

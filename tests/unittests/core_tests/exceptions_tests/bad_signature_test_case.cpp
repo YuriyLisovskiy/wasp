@@ -22,44 +22,51 @@
 using namespace xw;
 
 
-class NullPointerExceptionTestCase : public ::testing::Test
+class BadSignatureTestCase : public ::testing::Test
 {
 public:
-	const char* FullErrorMessage = "NullPointerException: Test error message from NullPointerExceptionTestCase";
+	const char* WhatErrorMessage = "Test error message from BadSignatureTestCase";
+	const char* FullErrorMessage = "BadSignature: Test error message from BadSignatureTestCase";
 	const char* ErrorFunction = "testFunc";
 	const char* ErrorFile = "test_file.cpp";
 	const size_t ErrorLine = 1;
 
-	core::NullPointerException ConstCharConstructorError;
-	core::NullPointerException StringConstructorError;
+	core::BadSignature ConstCharConstructorError;
+	core::BadSignature StringConstructorError;
 
-	explicit NullPointerExceptionTestCase()
-		: ConstCharConstructorError("Test error message from NullPointerExceptionTestCase", this->ErrorLine, this->ErrorFunction, this->ErrorFile),
-		  StringConstructorError(std::string("Test error message from NullPointerExceptionTestCase"), this->ErrorLine, this->ErrorFunction, this->ErrorFile)
+	explicit BadSignatureTestCase()
+		: ConstCharConstructorError("Test error message from BadSignatureTestCase", this->ErrorLine, this->ErrorFunction, this->ErrorFile),
+		  StringConstructorError(std::string("Test error message from BadSignatureTestCase"), this->ErrorLine, this->ErrorFunction, this->ErrorFile)
 	{
 	}
 };
 
-TEST_F(NullPointerExceptionTestCase, TestWhat)
+TEST_F(BadSignatureTestCase, TestWhat)
 {
-	ASSERT_STREQ(this->ConstCharConstructorError.what(), this->FullErrorMessage);
-	ASSERT_STREQ(this->StringConstructorError.what(), this->FullErrorMessage);
+	ASSERT_STREQ(this->ConstCharConstructorError.what(), this->WhatErrorMessage);
+	ASSERT_STREQ(this->StringConstructorError.what(), this->WhatErrorMessage);
 }
 
-TEST_F(NullPointerExceptionTestCase, TestLine)
+TEST_F(BadSignatureTestCase, TestLine)
 {
 	ASSERT_EQ(this->ConstCharConstructorError.line(), this->ErrorLine);
 	ASSERT_EQ(this->StringConstructorError.line(), this->ErrorLine);
 }
 
-TEST_F(NullPointerExceptionTestCase, TestFunction)
+TEST_F(BadSignatureTestCase, TestFunction)
 {
 	ASSERT_EQ(this->ConstCharConstructorError.function(), this->ErrorFunction);
 	ASSERT_EQ(this->StringConstructorError.function(), this->ErrorFunction);
 }
 
-TEST_F(NullPointerExceptionTestCase, TestFile)
+TEST_F(BadSignatureTestCase, TestFile)
 {
 	ASSERT_EQ(this->ConstCharConstructorError.file(), this->ErrorFile);
 	ASSERT_EQ(this->StringConstructorError.file(), this->ErrorFile);
+}
+
+TEST_F(BadSignatureTestCase, TestGetMessage)
+{
+	ASSERT_EQ(this->ConstCharConstructorError.get_message(), this->FullErrorMessage);
+	ASSERT_EQ(this->StringConstructorError.get_message(), this->FullErrorMessage);
 }

@@ -25,7 +25,6 @@
 #pragma once
 
 // C++ libraries.
-#include <vector>
 #include <memory>
 
 // Module definitions.
@@ -58,7 +57,7 @@ public:
 
 public:
 	[[nodiscard]] std::string indent_string(
-		const std::string& indent
+		const std::string& indent, bool prepend_new_line
 	) const override;
 
 	YAMLArray() = default;

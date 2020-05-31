@@ -50,11 +50,11 @@ TEST(CoreTests_YamlTests_YamlArrayTests_StringReprTestCase, TestToString)
 		ind + ind + "some text\n" +
 		ind + ind + "with\n" +
 		ind + ind + "newlines!\n" +
-	    "- 'Some single line text'\n" +
+	    "- Some single line text\n" +
 	    "- inner_array:\n" +
-		ind + "- 10\n" +
-		ind + "- c\n" +
-		ind + "- 'Hello, Home!'\n" +
+		ind + ind + "- 10\n" +
+		ind + ind + "- c\n" +
+		ind + ind + "- Hello, Home!\n" +
 		"- word\n" +
 	    "- 7\n" +
 		"- 20.145788";

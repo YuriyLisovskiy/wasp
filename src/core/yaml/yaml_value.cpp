@@ -30,7 +30,9 @@ __YAML_BEGIN__
 
 const std::string YAMLValue::DEFAULT_INDENT = "  ";
 
-std::string YAMLValue::indent_string(const std::string& indent) const
+std::string YAMLValue::indent_string(
+	const std::string& indent, bool /* ignored */
+) const
 {
 	std::string res;
 	if (this->_value.find('\n') != std::string::npos)
@@ -42,6 +44,7 @@ std::string YAMLValue::indent_string(const std::string& indent) const
 			res.append("\n").append(indent).append(part);
 		}
 	}
+	/*
 	else if (this->_value.find(' ') != std::string::npos)
 	{
 		if (this->_value.find('\'') == std::string::npos)
@@ -58,9 +61,13 @@ std::string YAMLValue::indent_string(const std::string& indent) const
 			res = " \'" + new_value + "\'";
 		}
 	}
+	*/
 	else
 	{
-		res = " " + this->_value;
+		if (!this->_value.empty())
+		{
+			res = " " + this->_value;
+		}
 	}
 
 	return res;

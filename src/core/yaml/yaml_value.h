@@ -43,7 +43,7 @@ public:
 
 public:
 	[[nodiscard]] std::string indent_string(
-		const std::string& indent
+		const std::string& indent, bool /* ignored */
 	) const override;
 
 	YAMLValue() = default;
