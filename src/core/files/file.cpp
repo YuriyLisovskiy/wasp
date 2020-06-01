@@ -26,7 +26,7 @@
 
 // Framework modules.
 #include "../exceptions.h"
-#include "../string.h"
+#include "../strings.h"
 
 
 __CORE_BEGIN__

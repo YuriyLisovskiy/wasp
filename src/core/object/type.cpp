@@ -22,7 +22,7 @@
 #include "./type.h"
 
 // Framework modules.
-#include "../string.h"
+#include "../strings.h"
 #include "./object.h"
 
 

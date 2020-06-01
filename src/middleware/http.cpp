@@ -25,7 +25,7 @@
 #include "../utils/cache.h"
 #include "../utils/http.h"
 #include "../http/headers.h"
-#include "../core/string.h"
+#include "../core/strings.h"
 
 
 __MIDDLEWARE_BEGIN__

@@ -29,7 +29,7 @@
 #include "../core/mime_types.h"
 #include "../core/datetime.h"
 #include "../core/path.h"
-#include "../core/string.h"
+#include "../core/strings.h"
 #include "../core/exceptions.h"
 
 

@@ -25,7 +25,7 @@
 #include "../urls/resolver.h"
 #include "../http/headers.h"
 #include "../http/utility.h"
-#include "../core/string.h"
+#include "../core/strings.h"
 
 
 __MIDDLEWARE_BEGIN__

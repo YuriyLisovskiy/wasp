@@ -31,7 +31,7 @@
 #endif
 
 // Framework modules.
-#include "./string.h"
+#include "./strings.h"
 
 
 __UTILITY_BEGIN__

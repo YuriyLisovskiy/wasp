@@ -39,10 +39,7 @@ add_tests("" all)
 
 add_sub_tests(collections)
 add_sub_tests(conf)
-
 add_sub_tests(core)
-add_tests("core_tests/yaml_tests/" core-yaml)
-
 add_sub_tests(http)
 add_sub_tests(render)
 add_sub_tests(utils)

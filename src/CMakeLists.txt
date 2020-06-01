@@ -1,5 +1,9 @@
 file(GLOB_RECURSE SOURCES LIST_DIRECTORIES true *.h *.cpp)
-set(SOURCES ${SOURCES})
+file(
+    GLOB_RECURSE
+    VENDOR_SOURCES
+    LIST_DIRECTORIES true "../vendor/*.h" "../vendor/*.cpp"
+)
 
 if (WIN32)
     set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
@@ -10,7 +14,7 @@ if (NOT MSVC)
 endif()
 
 # Build shared library.
-add_library(${LIBRARY_NAME} SHARED ${SOURCES})
+add_library(${LIBRARY_NAME} SHARED ${SOURCES} ${VENDOR_SOURCES})
 if (WIN32)
     target_link_libraries(${LIBRARY_NAME} wsock32 Ws2_32)
     add_custom_command(
@@ -20,3 +24,5 @@ if (WIN32)
         ${CMAKE_BINARY_DIR}/example/${LIBRARY_NAME}.dll
     )
 endif()
+
+target_include_directories(${LIBRARY_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/vendor/yaml)

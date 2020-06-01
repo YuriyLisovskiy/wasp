@@ -26,7 +26,7 @@
 #include "../http/headers.h"
 #include "./http.h"
 #include "../core/utility.h"
-#include "../core/string.h"
+#include "../core/strings.h"
 
 
 __CACHE_INTERNAL_BEGIN__

@@ -27,7 +27,7 @@
 
 // Framework modules.
 #include "../datetime.h"
-#include "../string.h"
+#include "../strings.h"
 #include "../parsers/request_parser.h"
 #include "../../http/headers.h"
 

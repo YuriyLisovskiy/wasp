@@ -22,7 +22,7 @@
 #include "./multipart_parser.h"
 
 // Framework modules.
-#include "../../core/string.h"
+#include "../../core/strings.h"
 #include "../../core/exceptions.h"
 
 

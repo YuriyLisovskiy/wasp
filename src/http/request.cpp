@@ -24,7 +24,7 @@
 // Framework modules.
 #include "./headers.h"
 #include "./utility.h"
-#include "../core/string.h"
+#include "../core/strings.h"
 #include "../core/exceptions.h"
 
 

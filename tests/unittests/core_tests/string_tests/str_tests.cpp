@@ -17,7 +17,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../../../../src/core/string.h"
+#include "../../../../src/core/strings.h"
 
 using namespace xw;
 
