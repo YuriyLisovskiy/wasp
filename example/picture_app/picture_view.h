@@ -6,7 +6,7 @@
 
 #include <string>
 
-#include "../../src/views/template_view.h"
+#include <xalwart/views/template_view.h>
 
 
 class PictureView : public xw::views::TemplateView

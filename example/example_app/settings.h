@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "../../src/conf/settings.h"
-#include "../../src/core/path.h"
+#include <xalwart/conf/settings.h>
+#include <xalwart/core/path.h>
 
 #include "../picture_app/app.h"
 #include "../form_app/app.h"

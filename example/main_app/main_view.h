@@ -6,9 +6,9 @@
 
 #include <string>
 
-#include "../../src/views/template_view.h"
-#include "../../src/views/redirect_view.h"
-#include "../../src/core/types/array.h"
+#include <xalwart/views/template_view.h>
+#include <xalwart/views/redirect_view.h>
+#include <xalwart/core/types/array.h>
 
 
 class MainView : public xw::views::TemplateView

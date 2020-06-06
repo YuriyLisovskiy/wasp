@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "../../../src/apps/interfaces.h"
-#include "../../../src/core/management/app_command.h"
+#include <xalwart/apps/interfaces.h>
+#include <xalwart/core/management/app_command.h>
 
 
 class HelloCommand : public xw::core::AppCommand

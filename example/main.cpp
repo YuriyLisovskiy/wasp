@@ -2,7 +2,7 @@
  * Copyright (c) 2019-2020 Yuriy Lisovskiy
  */
 
-#include "../src/apps/xalwart.h"
+#include <xalwart/apps/xalwart.h>
 
 #include "./example_app/settings.h"
 

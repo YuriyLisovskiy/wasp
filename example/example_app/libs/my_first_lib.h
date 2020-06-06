@@ -6,9 +6,9 @@
 
 #include <memory>
 
-#include "../../../src/core/object/object.h"
-#include "../../../src/core/types/value.h"
-#include "../../../src/render/library/library.h"
+#include <xalwart/core/object/object.h>
+#include <xalwart/core/types/value.h>
+#include <xalwart/render/library/library.h>
 
 
 using namespace xw::render;

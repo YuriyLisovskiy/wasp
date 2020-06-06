@@ -26,7 +26,6 @@
 #include <yaml-cpp/yaml.h>
 
 // Framework modules.
-#include "./settings_factory.h"
 #include "../core/path.h"
 #include "../render/env/default.h"
 #include "../render/library/builtin.h"
@@ -72,7 +71,8 @@ void Settings::_init_env(YAML::Node& env)
 		{
 			if (!it->IsNull())
 			{
-				dirs.push_back(it->as<std::string>());
+				// TODO: check if absolute path
+				dirs.push_back(core::path::join(this->BASE_DIR, it->as<std::string>()));
 			}
 		}
 	}
@@ -145,7 +145,7 @@ void Settings::_init_disallowed_user_agents(YAML::Node& agents)
 	{
 		if (!it->IsNull())
 		{
-			this->DISALLOWED_USER_AGENTS.push_back(core::rgx::Regex(it->as<std::string>()));
+			this->DISALLOWED_USER_AGENTS.emplace_back(it->as<std::string>());
 		}
 	}
 }
@@ -156,7 +156,7 @@ void Settings::_init_ignorable_404_urls(YAML::Node& urls)
 	{
 		if (!it->IsNull())
 		{
-			this->IGNORABLE_404_URLS.push_back(core::rgx::Regex(it->as<std::string>()));
+			this->IGNORABLE_404_URLS.emplace_back(it->as<std::string>());
 		}
 	}
 }
@@ -255,9 +255,11 @@ void Settings::_init_apps(YAML::Node& apps)
 	{
 		if (!it->IsNull())
 		{
-			this->INSTALLED_APPS.push_back(
-				this->_factory->get_app(it->as<std::string>())
-			);
+			auto item = this->_factory->get_app(it->as<std::string>());
+			if (item)
+			{
+				this->INSTALLED_APPS.push_back(item);
+			}
 		}
 	}
 }
@@ -268,9 +270,11 @@ void Settings::_init_middleware(YAML::Node& middleware)
 	{
 		if (!it->IsNull())
 		{
-			this->MIDDLEWARE.push_back(
-				this->_factory->get_middleware(it->as<std::string>())
-			);
+			auto item = this->_factory->get_middleware(it->as<std::string>());
+			if (item)
+			{
+				this->MIDDLEWARE.push_back(item);
+			}
 		}
 	}
 }
@@ -323,15 +327,17 @@ void Settings::init()
 	auto media = config["media"];
 	if (media && media.IsMap())
 	{
-		this->MEDIA_ROOT = media["root"].as<std::string>("media");
+		// TODO: check if absolute path
+		this->MEDIA_ROOT = core::path::join(this->BASE_DIR, media["root"].as<std::string>("media"));
 		this->MEDIA_URL = media["url"].as<std::string>("/media/");
 	}
 
-	auto static_ = config["media"];
+	auto static_ = config["static"];
 	if (static_ && static_.IsMap())
 	{
-		this->MEDIA_ROOT = static_["root"].as<std::string>("static");
-		this->MEDIA_URL = static_["url"].as<std::string>("/static/");
+		// TODO: check if absolute path
+		this->STATIC_ROOT = core::path::join(this->BASE_DIR, static_["root"].as<std::string>("static"));
+		this->STATIC_URL = static_["url"].as<std::string>("/static/");
 	}
 
 	this->FILE_UPLOAD_MAX_MEMORY_SIZE = config["file_upload_max_memory_size"].as<int>(2621440);
@@ -404,7 +410,7 @@ void Settings::init()
 
 void Settings::init_factory()
 {
-	this->_factory = new internal::SettingsFactory(this);
+	this->_factory = new internal::SettingsFactory(this, this->LOGGER.get());
 }
 
 void Settings::register_logger()
@@ -433,24 +439,6 @@ void Settings::prepare()
 	{
 		this->ROOT_APP = this->INSTALLED_APPS.front();
 	}
-}
-
-template <typename _T, typename>
-std::shared_ptr<apps::IAppConfig> Settings::app(const std::string& full_name)
-{
-	this->_factory->register_app<_T>(full_name);
-}
-
-template <typename _T, typename>
-std::shared_ptr<middleware::IMiddleware> Settings::middleware(const std::string& full_name)
-{
-	this->_factory->register_middleware<_T>(full_name);
-}
-
-template <typename _T, typename>
-std::shared_ptr<render::lib::ILibrary> Settings::library(const std::string& full_name)
-{
-	this->_factory->register_library<_T>(full_name);
 }
 
 __CONF_END__

@@ -34,9 +34,10 @@
 
 __CONF_INTERNAL_BEGIN__
 
-SettingsFactory::SettingsFactory(Settings* settings)
+SettingsFactory::SettingsFactory(Settings* settings, core::ILogger* logger)
 {
 	this->_settings = settings;
+	this->_logger = logger;
 
 	using namespace middleware;
 	this->_middleware = {
@@ -63,66 +64,6 @@ SettingsFactory::SettingsFactory(Settings* settings)
 			return std::make_shared<BuiltinLibrary>(settings);
 		}}
 	};
-}
-
-template <typename _T, typename>
-void SettingsFactory::register_app(const std::string& full_name)
-{
-	if (this->_apps.find(full_name) != this->_apps.end())
-	{
-		if (this->_settings->LOGGER)
-		{
-			this->_settings->LOGGER->warning(
-				"unable to register '" + full_name + "' app which already exists"
-			);
-		}
-	}
-	else
-	{
-		this->_apps[full_name] = [this]() -> std::shared_ptr<apps::IAppConfig> {
-			return std::make_shared<_T>(this->_settings);
-		};
-	}
-}
-
-template <typename _T, typename>
-void SettingsFactory::register_middleware(const std::string& full_name)
-{
-	if (this->_middleware.find(full_name) != this->_middleware.end())
-	{
-		if (this->_settings->LOGGER)
-		{
-			this->_settings->LOGGER->warning(
-				"unable to register '" + full_name + "' middleware which already exists"
-			);
-		}
-	}
-	else
-	{
-		this->_middleware[full_name] = [this]() -> std::shared_ptr<middleware::IMiddleware> {
-			return std::make_shared<_T>(this->_settings);
-		};
-	}
-}
-
-template <typename _T, typename>
-void SettingsFactory::register_library(const std::string& full_name)
-{
-	if (this->_libraries.find(full_name) != this->_libraries.end())
-	{
-		if (this->_settings->LOGGER)
-		{
-			this->_settings->LOGGER->warning(
-				"unable to register '" + full_name + "' library which already exists"
-			);
-		}
-	}
-	else
-	{
-		this->_libraries[full_name] = [this]() -> std::shared_ptr<render::lib::ILibrary> {
-			return std::make_shared<_T>(this->_settings);
-		};
-	}
 }
 
 std::shared_ptr<apps::IAppConfig> SettingsFactory::get_app(

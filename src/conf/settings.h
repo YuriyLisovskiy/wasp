@@ -30,6 +30,7 @@
 #include <yaml-cpp/yaml.h>
 
 // Framework modules.
+#include "./settings_factory.h"
 #include "../core/management/base.h"
 #include "../core/logger.h"
 #include "../middleware/interfaces.h"
@@ -52,10 +53,6 @@ __ENV_END__
 __LIB_BEGIN__
 class ILibrary;
 __LIB_END__
-
-__CONF_INTERNAL_BEGIN__
-class SettingsFactory;
-__CONF_INTERNAL_END__
 
 
 __CONF_BEGIN__
@@ -289,22 +286,22 @@ public:
 	void prepare();
 
 	template <typename _T, typename = std::enable_if<std::is_base_of<apps::IAppConfig, _T>::value>>
-	std::shared_ptr<apps::IAppConfig> app(const std::string& full_name);
-//	{
-//		return std::make_shared<_T>(this);
-//	}
+	std::shared_ptr<apps::IAppConfig> app(const std::string& full_name)
+	{
+		this->_factory->register_app<_T>(full_name);
+	}
 
 	template <typename _T, typename = std::enable_if<std::is_base_of<middleware::IMiddleware, _T>::value>>
-	std::shared_ptr<middleware::IMiddleware> middleware(const std::string& full_name);
-//	{
-//		this->_factory->register_middleware();
-//	}
+	std::shared_ptr<middleware::IMiddleware> middleware(const std::string& full_name)
+	{
+		this->_factory->register_middleware<_T>(full_name);
+	}
 
 	template <typename _T, typename = std::enable_if<std::is_base_of<render::lib::ILibrary, _T>::value>>
-	std::shared_ptr<render::lib::ILibrary> library(const std::string& full_name);
-//	{
-//		return std::make_shared<_T>(this);
-//	}
+	std::shared_ptr<render::lib::ILibrary> library(const std::string& full_name)
+	{
+		this->_factory->register_library<_T>(full_name);
+	}
 };
 
 __CONF_END__

@@ -7,9 +7,9 @@ application:
     - ::1
 
   installed_apps:
-    - MainAppConfig
-    - FormAppConfig
-    - PictureAppConfig
+    - MainApp
+    - FormApp
+    - PictureApp
 
   middleware:
     - xw::middleware::SecurityMiddleware

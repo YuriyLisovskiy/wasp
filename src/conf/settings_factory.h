@@ -32,9 +32,27 @@
 #include "./_def_.h"
 
 // Framework modules.
-#include "./settings.h"
-#include "../render/library/base.h"
-#include "../middleware/interfaces.h"
+#include "../core/logger.h"
+#include "../apps/_def_.h"
+#include "../middleware/_def_.h"
+#include "../render/library/_def_.h"
+
+
+__CONF_BEGIN__
+struct Settings;
+__CONF_END__
+
+__APPS_BEGIN__
+class IAppConfig;
+__APPS_END__
+
+__LIB_BEGIN__
+class ILibrary;
+__LIB_END__
+
+__MIDDLEWARE_BEGIN__
+class IMiddleware;
+__MIDDLEWARE_END__
 
 
 __CONF_INTERNAL_BEGIN__
@@ -57,19 +75,71 @@ private:
 	> _apps;
 
 	Settings* _settings;
+	core::ILogger* _logger;
 
 public:
 	SettingsFactory(nullptr_t) = delete;
-	SettingsFactory(Settings* settings);
+	SettingsFactory(Settings* settings, core::ILogger* logger);
 
-	template <typename _T, typename = std::enable_if<std::is_base_of<apps::IAppConfig, _T>::value>>
-	void register_app(const std::string& full_name);
+	template <typename T, typename = std::enable_if<std::is_base_of<apps::IAppConfig, T>::value>>
+	void register_app(const std::string& full_name)
+	{
+		if (this->_apps.find(full_name) != this->_apps.end())
+		{
+			if (this->_logger)
+			{
+				this->_logger->warning(
+					"unable to register '" + full_name + "' app which already exists"
+				);
+			}
+		}
+		else
+		{
+			this->_apps[full_name] = [this]() -> std::shared_ptr<apps::IAppConfig> {
+				return std::make_shared<T>(this->_settings);
+			};
+		}
+	}
 
-	template <typename _T, typename = std::enable_if<std::is_base_of<middleware::IMiddleware, _T>::value>>
-	void register_middleware(const std::string& full_name);
+	template <typename T, typename = std::enable_if<std::is_base_of<middleware::IMiddleware, T>::value>>
+	void register_middleware(const std::string& full_name)
+	{
+		if (this->_middleware.find(full_name) != this->_middleware.end())
+		{
+			if (this->_logger)
+			{
+				this->_logger->warning(
+					"unable to register '" + full_name + "' middleware which already exists"
+				);
+			}
+		}
+		else
+		{
+			this->_middleware[full_name] = [this]() -> std::shared_ptr<middleware::IMiddleware> {
+				return std::make_shared<T>(this->_settings);
+			};
+		}
+	}
 
-	template <typename _T, typename = std::enable_if<std::is_base_of<render::lib::ILibrary, _T>::value>>
-	void register_library(const std::string& full_name);
+	template <typename T, typename = std::enable_if<std::is_base_of<render::lib::ILibrary, T>::value>>
+	void register_library(const std::string& full_name)
+	{
+		if (this->_libraries.find(full_name) != this->_libraries.end())
+		{
+			if (this->_logger)
+			{
+				this->_logger->warning(
+					"unable to register '" + full_name + "' library which already exists"
+				);
+			}
+		}
+		else
+		{
+			this->_libraries[full_name] = [this]() -> std::shared_ptr<render::lib::ILibrary> {
+				return std::make_shared<T>(this->_settings);
+			};
+		}
+	}
 
 	std::shared_ptr<apps::IAppConfig> get_app(const std::string& full_name);
 	std::shared_ptr<middleware::IMiddleware> get_middleware(const std::string& full_name);
