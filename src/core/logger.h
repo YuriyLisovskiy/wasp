@@ -35,7 +35,7 @@
 
 __CORE_BEGIN__
 
-struct Config
+struct LoggerConfig
 {
 	bool enable_info = true;
 	bool enable_debug = true;
@@ -85,13 +85,13 @@ public:
 	virtual void error(const core::BaseException& exc) = 0;
 	virtual void fatal(const core::BaseException& exc) = 0;
 
-	virtual void set_config(const Config& config) = 0;
+	virtual void set_config(const LoggerConfig& config) = 0;
 };
 
 class Logger : public ILogger
 {
 public:
-	static std::shared_ptr<ILogger> get_instance(const Config& cfg);
+	static std::shared_ptr<ILogger> get_instance(const LoggerConfig& cfg);
 //	static void reset_instance();
 
 	void info(const std::string& msg, int line = 0, const char* function = "", const char* file = "") override;
@@ -136,16 +136,16 @@ private:
 		ll_info, ll_debug, ll_warning, ll_error, ll_fatal
 	};
 
-	Config _config;
+	LoggerConfig _config;
 
 	static std::shared_ptr<ILogger> _instance;
 
-	explicit Logger(const Config& cfg);
+	explicit Logger(const LoggerConfig& cfg);
 	void log(const std::string& msg, int line, const char* function, const char* file, Logger::log_level_enum level);
 	void write_to_stream(const std::string& msg, Color colour);
 	void flush();
 	void set_colour(Color colour);
-	void set_config(const Config& config) override;
+	void set_config(const LoggerConfig& config) override;
 };
 
 __CORE_END__

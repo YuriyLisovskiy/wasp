@@ -30,6 +30,8 @@
 
 __MIDDLEWARE_BEGIN__
 
+const std::string ConditionalGetMiddleware::FULL_NAME = "xw::middleware::ConditionalGetMiddleware";
+
 ConditionalGetMiddleware::ConditionalGetMiddleware(
 	conf::Settings* settings
 ) : MiddlewareMixin(settings)

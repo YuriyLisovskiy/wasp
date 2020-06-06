@@ -28,6 +28,8 @@
 
 __MIDDLEWARE_BEGIN__
 
+const std::string SecurityMiddleware::FULL_NAME = "xw::middleware::SecurityMiddleware";
+
 SecurityMiddleware::SecurityMiddleware(conf::Settings* settings)
 	: MiddlewareMixin(settings)
 {

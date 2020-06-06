@@ -36,6 +36,9 @@ __LIB_BEGIN__
 
 class BuiltinLibrary final : public ILibrary
 {
+public:
+	static const std::string FULL_NAME;
+
 private:
 	conf::Settings* _settings;
 

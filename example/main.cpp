@@ -6,8 +6,6 @@
 
 #include "./example_app/settings.h"
 
-//#include "../tests/mem_leak_check.h"
-
 
 int main(int argc, char** argv)
 {

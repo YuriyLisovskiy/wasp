@@ -1,0 +1,40 @@
+application:
+  debug: true
+  secret_key: +s6cv712&nw4gsk)1dmgpje+f#%^4lhp@!up+=p3ts+hxz(fr2
+
+  allowed_hosts:
+    - 127.0.0.1
+    - ::1
+
+  installed_apps:
+    - MainAppConfig
+    - FormAppConfig
+    - PictureAppConfig
+
+  middleware:
+    - xw::middleware::SecurityMiddleware
+    - xw::middleware::CommonMiddleware
+    - xw::middleware::XFrameOptionsMiddleware
+    - xw::middleware::CookieMiddleware
+
+  templates_env:
+    directories:
+      - templates
+    use_app_directories: true
+    auto_escape: true
+    libraries:
+      - MyFirstLib
+
+  logger:
+    out:
+      console: true
+
+  static:
+    root: static
+    url: /static/
+
+  media:
+    root: media
+    url: /media/
+
+  data_upload_max_memory_size: 20971520

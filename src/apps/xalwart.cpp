@@ -43,7 +43,6 @@ MainApplication::MainApplication(conf::Settings* settings)
 
 	this->_settings = settings;
 	this->_settings->init();
-	this->_settings->override();
 	this->_settings->prepare();
 	this->_perform_checks();
 

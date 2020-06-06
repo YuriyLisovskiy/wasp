@@ -31,6 +31,8 @@
 
 __LIB_BEGIN__
 
+const std::string BuiltinLibrary::FULL_NAME = "xw::render::lib::BuiltinLibrary";
+
 BuiltinLibrary::BuiltinLibrary(conf::Settings* settings)
 {
 	if (!settings)

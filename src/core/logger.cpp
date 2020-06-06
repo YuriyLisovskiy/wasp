@@ -33,7 +33,7 @@ __CORE_BEGIN__
 
 std::shared_ptr<ILogger> Logger::_instance = nullptr;
 
-std::shared_ptr<ILogger> Logger::get_instance(const Config& cfg)
+std::shared_ptr<ILogger> Logger::get_instance(const LoggerConfig& cfg)
 {
 	if (Logger::_instance == nullptr)
 	{
@@ -47,7 +47,7 @@ std::shared_ptr<ILogger> Logger::get_instance(const Config& cfg)
 	return Logger::_instance;
 }
 
-Logger::Logger(const Config& cfg)
+Logger::Logger(const LoggerConfig& cfg)
 {
 	this->_config = cfg;
 	if (cfg.streams.empty())
@@ -209,7 +209,7 @@ void Logger::set_colour(Color colour)
 #endif
 }
 
-void Logger::set_config(const Config& config)
+void Logger::set_config(const LoggerConfig& config)
 {
 	this->_config = config;
 }

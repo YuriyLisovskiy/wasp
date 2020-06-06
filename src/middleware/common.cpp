@@ -30,6 +30,8 @@
 
 __MIDDLEWARE_BEGIN__
 
+const std::string CommonMiddleware::FULL_NAME = "xw::middleware::CommonMiddleware";
+
 CommonMiddleware::CommonMiddleware(conf::Settings* settings)
 	: MiddlewareMixin(settings)
 {

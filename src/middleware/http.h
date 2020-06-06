@@ -37,6 +37,9 @@ __MIDDLEWARE_BEGIN__
 
 class ConditionalGetMiddleware : public MiddlewareMixin
 {
+public:
+	static const std::string FULL_NAME;
+
 protected:
 
 	/// Return true if an ETag header should be added to response.
@@ -44,6 +47,7 @@ protected:
 
 public:
 	explicit ConditionalGetMiddleware(conf::Settings* settings);
+	ConditionalGetMiddleware(nullptr_t) = delete;
 
 	std::unique_ptr<http::IHttpResponse> process_response(
 		http::HttpRequest* request, http::IHttpResponse* response

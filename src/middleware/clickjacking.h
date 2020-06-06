@@ -51,7 +51,10 @@ __MIDDLEWARE_BEGIN__
 class XFrameOptionsMiddleware : public MiddlewareMixin
 {
 public:
+	static const std::string FULL_NAME;
+
 	explicit XFrameOptionsMiddleware(conf::Settings* settings);
+	XFrameOptionsMiddleware(nullptr_t) = delete;
 
 	std::unique_ptr<http::IHttpResponse> process_response(
 		http::HttpRequest* request, http::IHttpResponse* response

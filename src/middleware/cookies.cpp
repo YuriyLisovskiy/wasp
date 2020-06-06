@@ -27,6 +27,8 @@
 
 __MIDDLEWARE_BEGIN__
 
+const std::string CookieMiddleware::FULL_NAME = "xw::middleware::CookieMiddleware";
+
 CookieMiddleware::CookieMiddleware(conf::Settings* settings)
 	: MiddlewareMixin(settings)
 {

@@ -40,6 +40,7 @@ protected:
 
 public:
 	explicit MiddlewareMixin(conf::Settings* settings);
+	MiddlewareMixin(nullptr_t) = delete;
 	~MiddlewareMixin() override = default;
 
 	std::unique_ptr<http::IHttpResponse> process_request(http::HttpRequest* request) override;

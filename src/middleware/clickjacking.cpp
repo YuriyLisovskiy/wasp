@@ -27,6 +27,8 @@
 
 __MIDDLEWARE_BEGIN__
 
+const std::string XFrameOptionsMiddleware::FULL_NAME = "xw::middleware::XFrameOptionsMiddleware";
+
 XFrameOptionsMiddleware::XFrameOptionsMiddleware(conf::Settings* settings)
 	: MiddlewareMixin(settings)
 {
