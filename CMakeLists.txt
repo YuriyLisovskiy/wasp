@@ -14,9 +14,9 @@ function(remove_dirs SRC_LIST)
     endforeach()
 endfunction(remove_dirs)
 
-function(filter_list SRC_LIST EXPR)
+function(list_exclude SRC_LIST EXPR)
     list(FILTER ${SRC_LIST} EXCLUDE REGEX ${EXPR})
-endfunction(filter_list)
+endfunction(list_exclude)
 
 function(print SRC_LIST)
     foreach(entry ${SRC_LIST})

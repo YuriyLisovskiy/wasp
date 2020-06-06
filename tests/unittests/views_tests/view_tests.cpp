@@ -31,11 +31,11 @@ using namespace xw;
 
 struct ViewTestSettings : public conf::Settings
 {
-	ViewTestSettings() : conf::Settings()
+	ViewTestSettings() : conf::Settings("./")
 	{
 	}
 
-	void init() final
+	void register_logger() final
 	{
 		this->LOGGER = core::Logger::get_instance({
 			false,

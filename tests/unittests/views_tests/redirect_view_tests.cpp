@@ -57,11 +57,11 @@ http::HttpRequest make_request(const std::string& method)
 
 struct RedirectViewTestSettings : public conf::Settings
 {
-	RedirectViewTestSettings() : conf::Settings()
+	RedirectViewTestSettings() : conf::Settings("./")
 	{
 	}
 
-	void init() final
+	void register_logger() final
 	{
 		this->LOGGER = core::Logger::get_instance({
 			false,

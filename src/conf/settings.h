@@ -275,7 +275,7 @@ public:
 	bool SECURE_SSL_REDIRECT;
 
 	Settings(const std::string& base_dir);
-	virtual ~Settings();
+	virtual ~Settings() = default;
 	void init();
 	void init_factory();
 	virtual void register_logger();

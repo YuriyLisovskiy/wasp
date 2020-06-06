@@ -12,23 +12,30 @@ if (NOT MSVC)
 endif()
 
 function(add_tests SUB_DIR SUB_NAME)
-
     set(TESTS_DIR ${PROJECT_SOURCE_DIR}/tests/unittests/${SUB_DIR})
     file(GLOB_RECURSE SOURCES LIST_DIRECTORIES true ${TESTS_DIR}*.cpp)
+    remove_dirs(SOURCES)
+    list(FILTER SOURCES EXCLUDE REGEX ".*main.cpp$")
 
-    file(GLOB FILES_TO_REMOVE
-        "${TESTS_DIR}*/main.cpp"
-        "${TESTS_DIR}*/*/main.cpp"
-        "${TESTS_DIR}*/*/*/main.cpp;"
-        "${TESTS_DIR}*/*/*/*/main.cpp;"
-    )
+    foreach(entry ${SOURCES})
+        message(${entry})
+    endforeach(entry)
 
-    if (FILES_TO_REMOVE)
-        list(REMOVE_ITEM SOURCES ${FILES_TO_REMOVE})
-    endif()
+#    file(GLOB FILES_TO_REMOVE
+#        "${TESTS_DIR}*/main.cpp"
+#        "${TESTS_DIR}*/*/main.cpp"
+#        "${TESTS_DIR}*/*/*/main.cpp;"
+#        "${TESTS_DIR}*/*/*/*/main.cpp;"
+#    )
 
-    add_executable(${BINARY}-${SUB_NAME} ${SOURCES})
-    target_link_libraries(${BINARY}-${SUB_NAME} PUBLIC ${LIB_DLL} gtest stdc++fs)
+#    if (FILES_TO_REMOVE)
+#        list(REMOVE_ITEM SOURCES ${FILES_TO_REMOVE})
+#    endif()
+
+    set(FULL_BIN ${BINARY}-${SUB_NAME})
+    add_executable(${FULL_BIN} ${SOURCES} ${TESTS_DIR}/main.cpp)
+    target_link_libraries(${FULL_BIN} PUBLIC ${LIB_DLL} gtest stdc++fs)
+    target_include_directories(${FULL_BIN} PUBLIC ${PROJECT_SOURCE_DIR}/vendor/yaml)
 endfunction()
 
 function(add_sub_tests SUB_NAME)
@@ -38,7 +45,6 @@ endfunction(add_sub_tests)
 add_tests("" all)
 
 add_sub_tests(collections)
-add_sub_tests(conf)
 add_sub_tests(core)
 add_sub_tests(http)
 add_sub_tests(render)

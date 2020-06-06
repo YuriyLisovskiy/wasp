@@ -35,30 +35,31 @@ __CONF_BEGIN__
 
 YAML::Node Settings::_load_config()
 {
-	auto config = YAML::LoadFile(core::path::join(this->BASE_DIR, this->CONFIG_NAME));
-	if (!config.IsMap())
+	auto config_path = core::path::join(this->BASE_DIR, this->CONFIG_NAME);
+	if (core::path::exists(config_path))
 	{
-		throw core::ValueError("configuration file must have map type");
+		auto config = YAML::LoadFile(config_path);
+		if (!config.IsMap())
+		{
+			throw core::ValueError("configuration file must have map type");
+		}
+
+		if (!config[this->CONFIG_ROOT])
+		{
+			throw core::ValueError(
+				"configuration file is not valid: missing '" + this->CONFIG_ROOT + "' which is root node"
+			);
+		}
+
+		return config[this->CONFIG_ROOT];
 	}
 
-	if (!config[this->CONFIG_ROOT])
-	{
-		throw core::ValueError(
-			"configuration file is not valid: missing '" + this->CONFIG_ROOT + "' which is root node"
-		);
-	}
-
-	return config[this->CONFIG_ROOT];
+	return YAML::Node();
 }
 
 Settings::Settings(const std::string& base_dir)
 {
 	this->BASE_DIR = base_dir;
-}
-
-Settings::~Settings()
-{
-	delete _factory;
 }
 
 void Settings::_init_env(YAML::Node& env)

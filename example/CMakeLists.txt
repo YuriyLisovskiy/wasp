@@ -12,7 +12,7 @@ file(
     LIST_DIRECTORIES true
     */*.h */*.cpp
 )
-filter_list(SOURCES "^.*/example/(include|lib)/?.*")
+list_exclude(SOURCES "^.*/example/(include|lib)/?.*")
 remove_dirs(SOURCES)
 
 add_executable(${BINARY} ${SOURCES} "./main.cpp")
