@@ -57,6 +57,11 @@ YAML::Node Settings::_load_config()
 	return YAML::Node();
 }
 
+void Settings::_override_config(YAML::Node& config)
+{
+	// TODO: load config.local.yml and override @config
+}
+
 Settings::Settings(const std::string& base_dir)
 {
 	this->BASE_DIR = base_dir;
@@ -72,8 +77,10 @@ void Settings::_init_env(YAML::Node& env)
 		{
 			if (!it->IsNull())
 			{
-				// TODO: check if absolute path
-				dirs.push_back(core::path::join(this->BASE_DIR, it->as<std::string>()));
+				auto p = it->as<std::string>();
+				dirs.push_back(
+					core::path::is_absolute(p) ? p : core::path::join(this->BASE_DIR, p)
+				);
 			}
 		}
 	}
@@ -283,6 +290,7 @@ void Settings::_init_middleware(YAML::Node& middleware)
 void Settings::init()
 {
 	auto config = this->_load_config();
+	this->_override_config(config);
 
 	this->DEBUG = config["debug"].as<bool>(false);
 
@@ -328,16 +336,16 @@ void Settings::init()
 	auto media = config["media"];
 	if (media && media.IsMap())
 	{
-		// TODO: check if absolute path
-		this->MEDIA_ROOT = core::path::join(this->BASE_DIR, media["root"].as<std::string>("media"));
+		auto p = media["root"].as<std::string>("media");
+		this->MEDIA_ROOT = core::path::is_absolute(p) ? p : core::path::join(this->BASE_DIR, p);
 		this->MEDIA_URL = media["url"].as<std::string>("/media/");
 	}
 
 	auto static_ = config["static"];
 	if (static_ && static_.IsMap())
 	{
-		// TODO: check if absolute path
-		this->STATIC_ROOT = core::path::join(this->BASE_DIR, static_["root"].as<std::string>("static"));
+		auto p = static_["root"].as<std::string>("static");
+		this->STATIC_ROOT = core::path::is_absolute(p) ? p : core::path::join(this->BASE_DIR, p);
 		this->STATIC_URL = static_["url"].as<std::string>("/static/");
 	}
 

@@ -148,6 +148,29 @@ std::string cwd()
 	return std::string(buffer);
 }
 
+bool is_absolute(const std::string& p)
+{
+#if defined(_WIN32) || defined(_WIN64)
+	auto pos = p.find(':');
+	if (pos != std::string::npos)
+	{
+		if (p.size() > pos + 1)
+		{
+			return p.substr(pos + 1)[0] == '\\';
+		}
+
+		return true;
+	}
+#else
+	if (!p.empty())
+	{
+		return p[0] == '/';
+	}
+#endif
+
+	return false;
+}
+
 __PATH_END__
 
 

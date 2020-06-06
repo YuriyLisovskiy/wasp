@@ -68,6 +68,9 @@ private:
 
 	YAML::Node _load_config();
 
+	// Loads local configuration file and overrides existing one.
+	void _override_config(YAML::Node& config);
+
 	void _init_env(YAML::Node& config);
 	void _init_logger(YAML::Node& logger);
 	void _init_allowed_hosts(YAML::Node& allowed_hosts);
