@@ -904,7 +904,7 @@ public:
 	//      auto ptr = std::make_shared<TimezoneDerived>(*this);
 	//      return {ptr, static_cast<Timezone*>(ptr.get())};
 	//  }
-	virtual std::shared_ptr<Timezone> ptr_copy() const;
+	[[nodiscard]] virtual std::shared_ptr<Timezone> ptr_copy() const;
 
 	Timezone& operator = (const Timezone& other);
 

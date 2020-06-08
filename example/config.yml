@@ -1,40 +1,44 @@
-application:
-  debug: true
-  secret_key: +s6cv712&nw4gsk)1dmgpje+f#%^4lhp@!up+=p3ts+hxz(fr2
+debug: true
+secret_key: +s6cv712&nw4gsk)1dmgpje+f#%^4lhp@!up+=p3ts+hxz(fr2
 
-  allowed_hosts:
-    - 127.0.0.1
-    - ::1
+allowed_hosts:
+  - 127.0.0.1
+  - ::1
 
-  installed_apps:
-    - MainApp
-    - FormApp
-    - PictureApp
+installed_apps:
+  - MainApp
+  - FormApp
+  - PictureApp
 
-  middleware:
-    - xw::middleware::SecurityMiddleware
-    - xw::middleware::CommonMiddleware
-    - xw::middleware::XFrameOptionsMiddleware
-    - xw::middleware::CookieMiddleware
+middleware:
+  - xw::middleware::SecurityMiddleware
+  - xw::middleware::CommonMiddleware
+  - xw::middleware::XFrameOptionsMiddleware
+  - xw::middleware::CookieMiddleware
 
-  templates_env:
-    directories:
-      - templates
-    use_app_directories: true
-    auto_escape: true
-    libraries:
-      - MyFirstLib
+templates_env:
+  directories:
+    - templates
+  use_app_directories: true
+  auto_escape: true
+  libraries:
+    - MyFirstLib
 
-  logger:
-    out:
-      console: true
+logger:
+  out:
+    console: true
 
-  static:
-    root: static
-    url: /static/
+timezone:
+  name: EET
+  offset:
+    hours: 3
 
-  media:
-    root: media
-    url: /media/
+static:
+  root: static
+  url: /static/
 
-  data_upload_max_memory_size: 20971520
+media:
+  root: media
+  url: /media/
+
+data_upload_max_memory_size: 20971520

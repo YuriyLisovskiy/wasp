@@ -21,7 +21,7 @@
 
 #include "./socket.h"
 
- // C++ libraries.
+// C++ libraries.
 #include <fcntl.h>
 
 // Framework modules.

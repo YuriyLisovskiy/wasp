@@ -100,6 +100,7 @@ public:
 	std::string read_str(size_t n = -1);
 	void write(std::vector<byte> bytes);
 	void write_str(const std::string& str);
+	void flush();
 	size_t size();
 	std::vector<std::vector<byte>> chunks(size_t chunk_size = -1);
 	bool multiple_chunks(size_t chunk_size = -1);

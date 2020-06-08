@@ -66,9 +66,15 @@ private:
 
 	internal::SettingsFactory* _factory;
 
-	YAML::Node _load_config();
+	YAML::Node _load_config(const std::string& file_name) const;
 
 	// Loads local configuration file and overrides existing one.
+	static void _override_scalar(
+		YAML::Node& config, YAML::Node& local, const std::string& key
+	);
+	static void _override_sequence(
+		YAML::Node& config, YAML::Node& local, const std::string& key
+	);
 	void _override_config(YAML::Node& config);
 
 	void _init_env(YAML::Node& config);
@@ -81,6 +87,13 @@ private:
 	void _init_secure(YAML::Node& config);
 	void _init_apps(YAML::Node& apps);
 	void _init_middleware(YAML::Node& middleware);
+
+protected:
+	virtual void register_logger();
+	virtual void register_apps();
+	virtual void register_middleware();
+	virtual void register_libraries();
+	virtual void register_templates_env();
 
 public:
 	bool DEBUG;
@@ -280,28 +293,22 @@ public:
 	Settings(const std::string& base_dir);
 	virtual ~Settings() = default;
 	void init();
-	void init_factory();
-	virtual void register_logger();
-	virtual void register_apps();
-	virtual void register_middleware();
-	virtual void register_libraries();
-	virtual void register_templates_env();
 	void prepare();
 
 	template <typename _T, typename = std::enable_if<std::is_base_of<apps::IAppConfig, _T>::value>>
-	std::shared_ptr<apps::IAppConfig> app(const std::string& full_name)
+	void app(const std::string& full_name)
 	{
 		this->_factory->register_app<_T>(full_name);
 	}
 
 	template <typename _T, typename = std::enable_if<std::is_base_of<middleware::IMiddleware, _T>::value>>
-	std::shared_ptr<middleware::IMiddleware> middleware(const std::string& full_name)
+	void middleware(const std::string& full_name)
 	{
 		this->_factory->register_middleware<_T>(full_name);
 	}
 
 	template <typename _T, typename = std::enable_if<std::is_base_of<render::lib::ILibrary, _T>::value>>
-	std::shared_ptr<render::lib::ILibrary> library(const std::string& full_name)
+	void library(const std::string& full_name)
 	{
 		this->_factory->register_library<_T>(full_name);
 	}

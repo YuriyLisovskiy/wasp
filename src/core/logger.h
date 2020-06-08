@@ -30,20 +30,64 @@
 #include "./_def_.h"
 
 // Framework modules.
-#include "../core/exceptions.h"
+#include "./exceptions.h"
+#include "./files/file.h"
+
+
+__CORE_INTERNAL_BEGIN__
+
+class LoggerStream
+{
+public:
+	virtual ~LoggerStream() = default;
+	virtual void write(const std::string& text) = 0;
+	virtual void flush() = 0;
+	virtual bool is_file();
+	virtual bool is_console();
+};
+
+class LoggerConsoleStream : public LoggerStream
+{
+public:
+	void write(const std::string& text) override;
+	void flush() override;
+	bool is_console() override;
+};
+
+class LoggerFileStream : public LoggerStream
+{
+private:
+	std::shared_ptr<File> _file;
+
+public:
+	explicit LoggerFileStream(const std::string& fp);
+	void write(const std::string& text) override;
+	bool is_file() override;
+	void flush() override;
+	bool is_valid();
+};
+
+__CORE_INTERNAL_END__
 
 
 __CORE_BEGIN__
 
-struct LoggerConfig
+class LoggerConfig
 {
+private:
+	bool _has_cout = false;
+
+public:
 	bool enable_info = true;
 	bool enable_debug = true;
 	bool enable_warning = true;
 	bool enable_error = true;
 	bool enable_fatal = true;
 	bool enable_print = true;
-	std::vector<std::ostream*> streams;
+	std::vector<std::shared_ptr<internal::LoggerStream>> streams;
+
+	void add_console_stream();
+	void add_file_stream(const std::string& fp);
 };
 
 class ILogger
@@ -108,6 +152,8 @@ public:
 	void error(const core::BaseException& exc) override;
 	void fatal(const core::BaseException& exc) override;
 
+	void set_config(const LoggerConfig& config) override;
+
 private:
 #if defined(__unix__) || defined(__linux__)
 	std::map<Color, const char*> _colors = {
@@ -141,11 +187,12 @@ private:
 	static std::shared_ptr<ILogger> _instance;
 
 	explicit Logger(const LoggerConfig& cfg);
-	void log(const std::string& msg, int line, const char* function, const char* file, Logger::log_level_enum level);
-	void write_to_stream(const std::string& msg, Color colour);
-	void flush();
-	void set_colour(Color colour);
-	void set_config(const LoggerConfig& config) override;
+	void _log(
+		const std::string& msg, int line, const char* function,
+		const char* file, Logger::log_level_enum level
+	);
+	void _write_to_stream(const std::string& msg, Color colour);
+	void _set_colour(Color colour);
 };
 
 __CORE_END__
