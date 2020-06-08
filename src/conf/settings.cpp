@@ -40,7 +40,7 @@ YAML::Node Settings::_load_config(const std::string& file_name) const
 	if (core::path::exists(config_path))
 	{
 		auto config = YAML::LoadFile(config_path);
-		if (!config.IsMap())
+		if (config && !config.IsNull() && !config.IsMap())
 		{
 			throw core::ValueError("'" + file_name + "' file must have map type");
 		}

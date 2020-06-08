@@ -132,6 +132,8 @@ Logger::Logger(const LoggerConfig& cfg)
 	{
 		this->_config.add_console_stream();
 	}
+
+	this->_thread_pool = std::make_shared<internal::ThreadPool>(1);
 }
 
 void Logger::info(const std::string& msg, int line, const char* function, const char* file)
@@ -209,58 +211,60 @@ void Logger::_log(
 	const char* file, Logger::log_level_enum level
 )
 {
-	std::string level_name;
-	bool is_enabled;
-	Color colour;
-	switch (level)
-	{
-		case Logger::log_level_enum::ll_warning:
-			level_name = "[warning]";
-			is_enabled = this->_config.enable_warning;
-			colour = Color::YELLOW;
-			break;
-		case Logger::log_level_enum::ll_error:
-			level_name = "[error]";
-			is_enabled = this->_config.enable_error;
-			colour = Color::RED;
-			break;
-		case Logger::log_level_enum::ll_debug:
-			level_name = "[debug]";
-			is_enabled = this->_config.enable_debug;
-			colour = Color::MAGENTA;
-			break;
-		case Logger::log_level_enum::ll_fatal:
-			level_name = "[fatal]";
-			is_enabled = this->_config.enable_fatal;
-			colour = Color::BOLD_RED;
-			break;
-		default:
-			level_name = "[info]";
-			is_enabled = this->_config.enable_info;
-			colour = Color::CYAN;
-			break;
-	}
+	this->_thread_pool->push([this, level, line, file, function, msg]() -> void {
+		std::string level_name;
+		bool is_enabled;
+		Color colour;
+		switch (level)
+		{
+			case Logger::log_level_enum::ll_warning:
+				level_name = "[warning]";
+				is_enabled = this->_config.enable_warning;
+				colour = Color::YELLOW;
+				break;
+			case Logger::log_level_enum::ll_error:
+				level_name = "[error]";
+				is_enabled = this->_config.enable_error;
+				colour = Color::RED;
+				break;
+			case Logger::log_level_enum::ll_debug:
+				level_name = "[debug]";
+				is_enabled = this->_config.enable_debug;
+				colour = Color::MAGENTA;
+				break;
+			case Logger::log_level_enum::ll_fatal:
+				level_name = "[fatal]";
+				is_enabled = this->_config.enable_fatal;
+				colour = Color::BOLD_RED;
+				break;
+			default:
+				level_name = "[info]";
+				is_enabled = this->_config.enable_info;
+				colour = Color::CYAN;
+				break;
+		}
 
-	if (!is_enabled)
-	{
-		return;
-	}
+		if (!is_enabled)
+		{
+			return;
+		}
 
-	std::string full_msg;
-	if (line != 0 && std::strlen(file) > 0 && std::strlen(function) > 0)
-	{
-		full_msg = "\n\tFile \"" + std::string(file) + "\", line "
-			+ std::to_string(line) + ", in "
-			+ std::string(function) + "\n" + msg;
-	}
-	else
-	{
-		full_msg = " " + msg;
-	}
+		std::string full_msg;
+		if (line != 0 && std::strlen(file) > 0 && std::strlen(function) > 0)
+		{
+			full_msg = "\n\tFile \"" + std::string(file) + "\", line "
+			           + std::to_string(line) + ", in "
+			           + std::string(function) + "\n" + msg;
+		}
+		else
+		{
+			full_msg = " " + msg;
+		}
 
-	std::string result = "[" + dt::Datetime::now().strftime("%F %T") +
-		"] " + level_name + ":" + full_msg;
-	this->_write_to_stream(result, colour);
+		std::string result = "[" + dt::Datetime::now().strftime("%F %T") +
+		                     "] " + level_name + ":" + full_msg;
+		this->_write_to_stream(result, colour);
+	});
 }
 
 void Logger::_write_to_stream(const std::string& msg, Color colour)

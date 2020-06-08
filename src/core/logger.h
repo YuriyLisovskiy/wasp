@@ -32,6 +32,7 @@
 // Framework modules.
 #include "./exceptions.h"
 #include "./files/file.h"
+#include "./thread_pool.h"
 
 
 __CORE_INTERNAL_BEGIN__
@@ -136,7 +137,6 @@ class Logger : public ILogger
 {
 public:
 	static std::shared_ptr<ILogger> get_instance(const LoggerConfig& cfg);
-//	static void reset_instance();
 
 	void info(const std::string& msg, int line = 0, const char* function = "", const char* file = "") override;
 	void debug(const std::string& msg, int line = 0, const char* function = "", const char* file = "") override;
@@ -183,6 +183,8 @@ private:
 	};
 
 	LoggerConfig _config;
+
+	std::shared_ptr<internal::ThreadPool> _thread_pool;
 
 	static std::shared_ptr<ILogger> _instance;
 
