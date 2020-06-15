@@ -15,6 +15,11 @@ middleware:
   - xw::middleware::CommonMiddleware
   - xw::middleware::XFrameOptionsMiddleware
   - xw::middleware::CookieMiddleware
+  - UsefulMiddleware
+
+logger:
+  out:
+    console: true
 
 templates_env:
   directories:
@@ -22,11 +27,7 @@ templates_env:
   use_app_directories: true
   auto_escape: true
   libraries:
-    - MyFirstLib
-
-logger:
-  out:
-    console: true
+    - MyLib
 
 timezone:
   name: EET

@@ -37,7 +37,7 @@ Socket::Socket() : _socket(-1), _closed(true), _use_ipv6(false)
 socket_t Socket::create_ipv4(const char* host, uint16_t port)
 {
 	this->_ipv4_socket.sin_family = AF_INET;
-	this->_ipv4_socket.sin_port = ::htons(port);
+	this->_ipv4_socket.sin_port = htons(port);
 	::inet_pton(AF_INET, host, (void*) &this->_ipv4_socket.sin_addr.s_addr);
 	return ::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 }
@@ -45,7 +45,7 @@ socket_t Socket::create_ipv4(const char* host, uint16_t port)
 socket_t Socket::create_ipv6(const char* host, uint16_t port)
 {
 	this->_ipv6_socket.sin6_family = AF_INET6;
-	this->_ipv6_socket.sin6_port = ::htons(port);
+	this->_ipv6_socket.sin6_port = htons(port);
 	::inet_pton(PF_INET6, host, (void*) &this->_ipv6_socket.sin6_addr.s6_addr);
 	return ::socket(PF_INET6, SOCK_STREAM, IPPROTO_TCP);
 }
