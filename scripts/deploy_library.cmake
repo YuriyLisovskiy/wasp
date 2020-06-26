@@ -2,6 +2,7 @@
 #   PROJECT_SOURCE_DIR
 #   CMAKE_BINARY_DIR
 #   LIBRARY_NAME
+#   LIBRARY_VERSION
 #   DEPLOY_DIR
 
 # Check if arguments were defined.
@@ -13,6 +14,9 @@ if (NOT DEFINED CMAKE_BINARY_DIR)
 endif()
 if (NOT DEFINED LIBRARY_NAME)
     message(SEND_ERROR "Missing LIBRARY_NAME")
+endif()
+if (NOT DEFINED LIBRARY_VERSION)
+    message(SEND_ERROR "Missing LIBRARY_VERSION")
 endif()
 if (NOT DEFINED DEPLOY_DIR)
     message(SEND_ERROR "Missing DEPLOY_DIR")
@@ -54,9 +58,9 @@ endif()
 
 # Get library file according to current OS.
 if (WIN32)
-    set(LIB_FILE ${LIBRARY_NAME}.lib)
+    set(LIB_FILE ${LIBRARY_NAME}-${LIBRARY_VERSION}.lib)
 else()
-    set(LIB_FILE lib${LIBRARY_NAME}.so)
+    set(LIB_FILE lib${LIBRARY_NAME}-${LIBRARY_VERSION}.so)
 endif()
 
 # Copy library.

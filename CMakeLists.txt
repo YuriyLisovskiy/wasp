@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 project(XalwartFramework)
 
 set(LIBRARY_NAME "xalwart")
+set(LIBRARY_VERSION "0.0.1")
 
 function(remove_dirs SRC_LIST)
     foreach(entry ${SRC_LIST})
