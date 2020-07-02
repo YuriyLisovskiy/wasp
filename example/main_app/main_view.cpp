@@ -11,7 +11,7 @@
 MainView::MainView(xw::conf::Settings* settings)
 	: TemplateView({"get"}, settings)
 {
-	this->_template_name = "main_app/index.html";
+	this->_template_name = "index.html";
 }
 
 std::shared_ptr<xw::render::IContext> MainView::get_context(

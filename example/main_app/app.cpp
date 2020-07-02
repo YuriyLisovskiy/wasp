@@ -13,7 +13,6 @@
 MainAppConfig::MainAppConfig(xw::conf::Settings* settings)
 	: AppConfig(__FILE__, settings)
 {
-	this->init(this->__type__());
 }
 
 void MainAppConfig::urlpatterns()

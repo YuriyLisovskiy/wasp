@@ -2,9 +2,9 @@ set(BINARY example)
 
 set(LIB_DIRECTORY ${PROJECT_SOURCE_DIR}/example/lib)
 if (WIN32)
-    set(DLL ${LIB_DIRECTORY}/${LIBRARY_NAME}.lib)
+    set(DLL ${LIB_DIRECTORY}/${LIBRARY_NAME}-${LIBRARY_VERSION}.lib)
 else()
-    set(DLL ${LIB_DIRECTORY}/lib${LIBRARY_NAME}.so)
+    set(DLL ${LIB_DIRECTORY}/lib${LIBRARY_NAME}-${LIBRARY_VERSION}.so)
 endif()
 
 file(

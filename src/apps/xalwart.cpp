@@ -202,6 +202,16 @@ void MainApplication::_perform_checks()
 		err_count++;
 	}
 
+	for (size_t i = 0; i < this->_settings->INSTALLED_APPS.size(); i++)
+	{
+		if (!this->_settings->INSTALLED_APPS[i]->is_initialized())
+		{
+			this->_settings->LOGGER->error("Application is not initialized.");
+			err_count++;
+			break;
+		}
+	}
+
 	if (err_count > 0)
 	{
 		throw core::ImproperlyConfigured(

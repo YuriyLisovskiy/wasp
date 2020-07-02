@@ -96,7 +96,9 @@ public:
 		else
 		{
 			this->_apps[full_name] = [this]() -> std::shared_ptr<apps::IAppConfig> {
-				return std::make_shared<T>(this->_settings);
+				auto app = std::make_shared<T>(this->_settings);
+				app->init(app->__type__());
+				return app;
 			};
 		}
 	}
