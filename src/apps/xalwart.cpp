@@ -43,7 +43,6 @@ MainApplication::MainApplication(conf::Settings* settings)
 
 	this->_settings = settings;
 	this->_settings->init();
-	this->_settings->override();
 	this->_settings->prepare();
 	this->_perform_checks();
 
@@ -201,6 +200,16 @@ void MainApplication::_perform_checks()
 			"SECRET_KEY must be set in order to use the application."
 		);
 		err_count++;
+	}
+
+	for (size_t i = 0; i < this->_settings->INSTALLED_APPS.size(); i++)
+	{
+		if (!this->_settings->INSTALLED_APPS[i]->is_initialized())
+		{
+			this->_settings->LOGGER->error("Application is not initialized.");
+			err_count++;
+			break;
+		}
 	}
 
 	if (err_count > 0)

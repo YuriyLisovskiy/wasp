@@ -23,7 +23,7 @@
 
 // Framework modules.
 #include "../core/utility.h"
-#include "../core/string.h"
+#include "../core/strings.h"
 
 
 __HTTP_INTERNAL_BEGIN__

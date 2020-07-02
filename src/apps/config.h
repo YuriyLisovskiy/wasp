@@ -32,7 +32,7 @@
 #include "../views/view.h"
 #include "../urls/url.h"
 #include "../core/management/app_command.h"
-#include "../core/string.h"
+#include "../core/strings.h"
 
 
 __APPS_BEGIN__
@@ -42,6 +42,8 @@ __APPS_BEGIN__
 class AppConfig : public IAppConfig, public core::object::Object
 {
 private:
+	bool _is_initialized;
+
 	std::vector<std::shared_ptr<urls::UrlPattern>> _urlpatterns;
 	std::vector<std::shared_ptr<core::BaseCommand>> _commands;
 
@@ -57,7 +59,10 @@ private:
 		);
 		if (app == this->settings->INSTALLED_APPS.end())
 		{
-			return std::make_shared<AppConfigT>(this->settings);
+			auto created_app = std::make_shared<AppConfigT>(this->settings);
+			created_app->init(created_app->__type__());
+			this->settings->INSTALLED_APPS.push_back(created_app);
+			return created_app;
 		}
 
 		return *app;
@@ -118,9 +123,10 @@ protected:
 	explicit AppConfig(
 		const std::string& app_path, conf::Settings* settings
 	);
-	void init(const core::object::Type& type);
 
 public:
+	void init(const core::object::Type& type);
+	[[nodiscard]] bool is_initialized() const override;
 	std::string get_name() final;
 	std::string get_app_path() final;
 	std::vector<std::shared_ptr<urls::UrlPattern>> get_urlpatterns() final;

@@ -26,7 +26,11 @@
 // Module definitions.
 #include "./_def_.h"
 
+// Vendor.
+#include <yaml-cpp/yaml.h>
+
 // Framework modules.
+#include "./settings_factory.h"
 #include "../core/management/base.h"
 #include "../core/logger.h"
 #include "../middleware/interfaces.h"
@@ -55,6 +59,43 @@ __CONF_BEGIN__
 
 struct Settings
 {
+private:
+	const std::string CONFIG_ROOT = "application";
+	const std::string CONFIG_NAME = "config.yml";
+	const std::string LOCAL_CONFIG_NAME = "config.local.yml";
+
+	internal::SettingsFactory* _factory;
+
+	YAML::Node _load_config(const std::string& file_name) const;
+
+	// Loads local configuration file and overrides existing one.
+	static void _override_scalar(
+		YAML::Node& config, YAML::Node& local, const std::string& key
+	);
+	static void _override_sequence(
+		YAML::Node& config, YAML::Node& local, const std::string& key
+	);
+	void _override_config(YAML::Node& config);
+
+	void _init_env(YAML::Node& config);
+	void _init_logger(YAML::Node& logger);
+	void _init_allowed_hosts(YAML::Node& allowed_hosts);
+	void _init_disallowed_user_agents(YAML::Node& agents);
+	void _init_ignorable_404_urls(YAML::Node& urls);
+	void _init_formats(YAML::Node& config);
+	void _init_csrf(YAML::Node& config);
+	void _init_secure(YAML::Node& config);
+	void _init_apps(YAML::Node& apps);
+	void _init_middleware(YAML::Node& middleware);
+
+protected:
+	virtual void register_logger();
+	virtual void register_apps();
+	virtual void register_middleware();
+	virtual void register_libraries();
+	virtual void register_templates_env();
+
+public:
 	bool DEBUG;
 
 	std::shared_ptr<core::ILogger> LOGGER;
@@ -249,35 +290,27 @@ struct Settings
 	std::string SECURE_SSL_HOST;
 	bool SECURE_SSL_REDIRECT;
 
-	Settings();
+	Settings(const std::string& base_dir);
 	virtual ~Settings() = default;
-	virtual void init() = 0;
-	virtual void override();
+	void init();
 	void prepare();
 
 	template <typename _T, typename = std::enable_if<std::is_base_of<apps::IAppConfig, _T>::value>>
-	std::shared_ptr<apps::IAppConfig> app()
+	void app(const std::string& full_name)
 	{
-		return std::make_shared<_T>(this);
+		this->_factory->register_app<_T>(full_name);
 	}
 
 	template <typename _T, typename = std::enable_if<std::is_base_of<middleware::IMiddleware, _T>::value>>
-	std::shared_ptr<middleware::IMiddleware> middleware()
+	void middleware(const std::string& full_name)
 	{
-		return std::make_shared<_T>(this);
-	}
-
-	template <typename _CommandT, typename = std::enable_if<std::is_base_of<core::BaseCommand, _CommandT>::value>>
-	std::pair<std::string, std::shared_ptr<core::BaseCommand>> command()
-	{
-		auto command = std::make_shared<_CommandT>(this);
-		return std::pair<std::string, std::shared_ptr<core::BaseCommand>>{command->name(), command};
+		this->_factory->register_middleware<_T>(full_name);
 	}
 
 	template <typename _T, typename = std::enable_if<std::is_base_of<render::lib::ILibrary, _T>::value>>
-	std::shared_ptr<render::lib::ILibrary> library()
+	void library(const std::string& full_name)
 	{
-		return std::make_shared<_T>(this);
+		this->_factory->register_library<_T>(full_name);
 	}
 };
 

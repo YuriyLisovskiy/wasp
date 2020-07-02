@@ -25,10 +25,12 @@
 #include "../utils/cache.h"
 #include "../utils/http.h"
 #include "../http/headers.h"
-#include "../core/string.h"
+#include "../core/strings.h"
 
 
 __MIDDLEWARE_BEGIN__
+
+const std::string ConditionalGetMiddleware::FULL_NAME = "xw::middleware::ConditionalGetMiddleware";
 
 ConditionalGetMiddleware::ConditionalGetMiddleware(
 	conf::Settings* settings

@@ -79,6 +79,12 @@ extern std::string join(const std::vector<std::string>& paths);
 /// Returns current working directory.
 extern std::string cwd();
 
+/// Checks if path is absolute or not.
+///
+/// @param p: path to check.
+/// @return true if path is absolute, otherwise returns false.
+extern bool is_absolute(const std::string& p);
+
 __PATH_END__
 
 

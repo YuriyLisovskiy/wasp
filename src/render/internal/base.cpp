@@ -23,7 +23,7 @@
 
 // Framework modules.
 #include "../../core/types/value.h"
-#include "../../core/string.h"
+#include "../../core/strings.h"
 
 
 __RENDER_INTERNAL_BEGIN__

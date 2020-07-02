@@ -46,6 +46,9 @@ __MIDDLEWARE_BEGIN__
 
 class CommonMiddleware : public MiddlewareMixin
 {
+public:
+	static const std::string FULL_NAME;
+
 protected:
 	virtual std::unique_ptr<http::IHttpResponse> get_response_redirect(
 		const std::string& redirect_to
@@ -62,6 +65,7 @@ protected:
 
 public:
 	explicit CommonMiddleware(conf::Settings* settings);
+	CommonMiddleware(nullptr_t) = delete;
 
 	/// Check for denied User-Agents and rewrite the URL based on
 	/// settings.APPEND_SLASH and settings.PREPEND_WWW

@@ -6,9 +6,9 @@
 
 #include <memory>
 
-#include "../../src/core/types/value.h"
-#include "../../src/views/template_view.h"
-#include "../../src/render/context.h"
+#include <xalwart/core/types/value.h>
+#include <xalwart/views/template_view.h>
+#include <xalwart/render/context.h>
 
 
 class FormView : public xw::views::TemplateView

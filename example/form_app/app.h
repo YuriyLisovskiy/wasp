@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include "../../src/apps/config.h"
-#include "../../src/views/view.h"
-#include "../../src/conf/settings.h"
+#include <xalwart/apps/config.h>
+#include <xalwart/views/view.h>
+#include <xalwart/conf/settings.h>
 
 #include "./form_view.h"
 
@@ -17,7 +17,6 @@ public:
 	explicit FormAppConfig(xw::conf::Settings* settings)
 		: AppConfig(__FILE__, settings)
 	{
-		this->init(this->__type__());
 	}
 
 	void urlpatterns() override

@@ -31,10 +31,17 @@
 *.out
 *.app
 
-# Other
+# Visual Studio
 .vs/
-.idea/
 out/
-cmake-build-*
-example/media/
 CMakeSettings.json
+
+# CLion
+.idea/
+cmake-build-*
+
+# Example project
+example/lib/
+example/include/
+example/media/
+example/config.local.yml

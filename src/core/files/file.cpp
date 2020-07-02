@@ -26,7 +26,7 @@
 
 // Framework modules.
 #include "../exceptions.h"
-#include "../string.h"
+#include "../strings.h"
 
 
 __CORE_BEGIN__
@@ -203,6 +203,11 @@ void File::write_str(const std::string& str)
 	this->write(std::vector<byte>(str.begin(), str.end()));
 }
 
+void File::flush()
+{
+	// TODO: call this->_file.flush()
+}
+
 size_t File::size()
 {
 	if (!this->is_open())
@@ -297,6 +302,16 @@ void File::_init_mode(const std::string& mode)
 	{
 		this->_file_mode = file_mode_enum::m_write_only;
 		this->_mode = std::ios::out | std::ios::binary;
+	}
+	else if (mode == "a")
+	{
+		this->_file_mode = file_mode_enum::m_write_only;
+		this->_mode = std::ios::out | std::ios::app;
+	}
+	else if (mode == "a+")
+	{
+		this->_file_mode = file_mode_enum::m_write_only;
+		this->_mode = std::ios::out | std::ios::in | std::ios::app;
 	}
 	else
 	{

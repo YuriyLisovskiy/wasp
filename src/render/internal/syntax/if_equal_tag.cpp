@@ -32,9 +32,12 @@ std::string if_equal_node::render(IContext* ctx)
 {
 	auto val1 = this->var1->resolve(ctx);
 	auto val2 = this->var2->resolve(ctx);
-	if ((this->negate && val1 != val2) || (!this->negate && val1 == val2))
+	if (val1 && val2)
 	{
-		return this->node_list_true->render(ctx);
+		if ((this->negate && *val1 != *val2) || (!this->negate && *val1 == *val2))
+		{
+			return this->node_list_true->render(ctx);
+		}
 	}
 
 	return this->node_list_false->render(ctx);

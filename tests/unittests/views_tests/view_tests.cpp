@@ -21,7 +21,7 @@
 
 #include "../../../src/views/view.h"
 #include "../../../src/conf/settings.h"
-#include "../../../src/core/string.h"
+#include "../../../src/core/strings.h"
 #include "../../../src/http/request.h"
 #include "../../../src/collections/dict.h"
 #include "../../../src/collections/multi_dict.h"
@@ -31,11 +31,11 @@ using namespace xw;
 
 struct ViewTestSettings : public conf::Settings
 {
-	ViewTestSettings() : conf::Settings()
+	ViewTestSettings() : conf::Settings("./")
 	{
 	}
 
-	void init() final
+	void register_logger() final
 	{
 		this->LOGGER = core::Logger::get_instance({
 			false,

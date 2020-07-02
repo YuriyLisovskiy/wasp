@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "../../src/apps/config.h"
-#include "../../src/conf/settings.h"
+#include <xalwart/apps/config.h>
+#include <xalwart/conf/settings.h>
 
 #include "./picture_view.h"
 
@@ -16,7 +16,6 @@ public:
 	explicit PictureAppConfig(xw::conf::Settings* settings)
 		: AppConfig(__FILE__, settings)
 	{
-		this->init(this->__type__());
 	}
 
 	void urlpatterns() override

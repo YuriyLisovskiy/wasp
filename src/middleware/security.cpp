@@ -23,10 +23,12 @@
 
 // Framework modules.
 #include "../http/headers.h"
-#include "../core/string.h"
+#include "../core/strings.h"
 
 
 __MIDDLEWARE_BEGIN__
+
+const std::string SecurityMiddleware::FULL_NAME = "xw::middleware::SecurityMiddleware";
 
 SecurityMiddleware::SecurityMiddleware(conf::Settings* settings)
 	: MiddlewareMixin(settings)

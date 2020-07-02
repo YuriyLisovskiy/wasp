@@ -1,20 +1,27 @@
-set(BINARY "${LIBRARY_NAME}-example")
+set(BINARY example)
 
-# Shared library.
-set(LIB_DIRECTORY ${CMAKE_BINARY_DIR}/src)
+set(LIB_DIRECTORY ${PROJECT_SOURCE_DIR}/example/lib)
 if (WIN32)
-    set(LIB_DLL ${LIB_DIRECTORY}/${LIBRARY_NAME}.lib)
+    set(DLL ${LIB_DIRECTORY}/${LIBRARY_NAME}-${LIBRARY_VERSION}.lib)
 else()
-    set(LIB_DLL ${LIB_DIRECTORY}/lib${LIBRARY_NAME}.so)
+    set(DLL ${LIB_DIRECTORY}/lib${LIBRARY_NAME}-${LIBRARY_VERSION}.so)
 endif()
 
-# Setup example app sources.
-file(GLOB_RECURSE SOURCES LIST_DIRECTORIES true ./*/*.h ./*/*.cpp)
-set(SOURCES ${SOURCES})
+file(
+    GLOB_RECURSE SOURCES
+    LIST_DIRECTORIES true
+    */*.h */*.cpp
+)
+list_exclude(SOURCES "^.*/example/(include|lib)/?.*")
+remove_dirs(SOURCES)
 
-add_executable(${BINARY} ${LIB_SOURCES} ${SOURCES} "./main.cpp")
+add_executable(${BINARY} ${SOURCES} "./main.cpp")
 
-target_link_libraries(${BINARY} ${LIB_DLL})
+set(INCLUDE_DIR ${PROJECT_SOURCE_DIR}/example/include)
+target_include_directories(${BINARY} PUBLIC ${INCLUDE_DIR}/${LIBRARY_NAME}/vendor/yaml)
+target_include_directories(${BINARY} PUBLIC ${INCLUDE_DIR})
+
+target_link_libraries(${BINARY} ${DLL})
 
 if (UNIX)
     target_link_libraries(${BINARY} stdc++fs)

@@ -22,7 +22,7 @@
 #include "./url_parser.h"
 
 // Framework modules.
-#include "../string.h"
+#include "../strings.h"
 
 
 __CORE_INTERNAL_BEGIN__

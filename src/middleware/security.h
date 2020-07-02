@@ -36,6 +36,9 @@ __MIDDLEWARE_BEGIN__
 
 class SecurityMiddleware : public MiddlewareMixin
 {
+public:
+	static const std::string FULL_NAME;
+
 protected:
 	size_t sts_seconds;
 	bool sts_include_subdomains;
@@ -49,6 +52,7 @@ protected:
 
 public:
 	explicit SecurityMiddleware(conf::Settings* settings);
+	SecurityMiddleware(nullptr_t) = delete;
 
 	std::unique_ptr<http::IHttpResponse> process_request(
 		http::HttpRequest* request
