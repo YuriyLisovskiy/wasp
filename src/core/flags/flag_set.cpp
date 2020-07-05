@@ -23,6 +23,7 @@
 
 // Framework modules.
 #include "./parser.h"
+#include "../exceptions.h"
 
 
 __FLAGS_BEGIN__
@@ -49,7 +50,13 @@ void FlagSet::parse(int argc, char** argv, size_t parse_from, bool is_verbose)
 		if (ap.exists(flag.first))
 		{
 			flag.second->_data = ap.get_arg(flag.first);
+			ap.remove_arg(flag.first);
 		}
+	}
+
+	if (!ap.flags.empty())
+	{
+		throw core::ArgumentError("flag provided but not defined: " + ap.flags.begin()->first);
 	}
 }
 

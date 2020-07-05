@@ -28,6 +28,7 @@
 #include "../../../urls/url.h"
 #include "../../../urls/resolver.h"
 #include "../../../core/parsers/url_parser.h"
+#include "../../../core/strings.h"
 
 
 __CORE_COMMANDS_BEGIN__
@@ -35,19 +36,19 @@ __CORE_COMMANDS_BEGIN__
 StartServerCommand::StartServerCommand(apps::IAppConfig* config, conf::Settings* settings)
 	: AppCommand(config, settings, "start-server", "Starts web server")
 {
-	this->_host_port_flag = nullptr;
+	this->_addr_port_flag = nullptr;
 	this->_threads_flag = nullptr;
-	this->_host_flag = nullptr;
+	this->_addr_flag = nullptr;
 	this->_port_flag = nullptr;
 	this->_use_ipv6_flag = nullptr;
 
 	std::string port = R"(\d+)";
 	this->_port_regex = new rgx::Regex(port);
 
-	std::string ipv4 = R"(\d{1,3}(?:\.\d{1,3}){3})";
+	std::string ipv4 = R"((\d{1,3}(?:\.\d{1,3}){3})|localhost)";
 	this->_ipv4_regex = new rgx::Regex(ipv4);
 
-	std::string ipv6 = R"(\[[a-fA-F0-9:]+\])";
+	std::string ipv6 = R"(\[([a-fA-F0-9:]+)\]|\[localhost\])";
 	this->_ipv6_regex = new rgx::Regex(ipv6);
 
 	std::string fqdn = R"([a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*)";
@@ -67,11 +68,11 @@ StartServerCommand::~StartServerCommand()
 
 void StartServerCommand::add_flags()
 {
-	this->_host_port_flag = this->_flag_set->make_string(
-		"host-port", "", "Server host and port formatted as ip_addr:port"
+	this->_addr_port_flag = this->_flag_set->make_string(
+		"addr-port", "", "Server address and port formatted as addr:port"
 	);
-	this->_host_flag = this->_flag_set->make_string(
-		"host", "", "Server host"
+	this->_addr_flag = this->_flag_set->make_string(
+		"addr", "", "Server address"
 	);
 	this->_port_flag = this->_flag_set->make_long(
 		"port", this->DEFAULT_PORT, "Server port"
@@ -89,7 +90,7 @@ void StartServerCommand::handle()
 	std::cout << "Performing checks...\n";
 	if (!this->settings->DEBUG && this->settings->ALLOWED_HOSTS.empty())
 	{
-		throw CommandError("You must set ALLOWED_HOSTS if DEBUG is false.");
+		throw CommandError("You must set 'allowed_hosts' if 'debug' is false.");
 	}
 
 	core::net::internal::HttpServer::context ctx{};
@@ -246,13 +247,13 @@ void StartServerCommand::build_app_patterns(std::vector<std::shared_ptr<urls::Ur
 
 void StartServerCommand::setup_server_ctx(core::net::internal::HttpServer::context& ctx)
 {
-	// Setup host and port.
-	auto host_port_str = this->_host_port_flag->get();
+	// Setup address and port.
+	auto host_port_str = this->_addr_port_flag->get();
 	if (!host_port_str.empty())
 	{
 		if (!this->_ipv4_ipv6_port_regex->match(host_port_str))
 		{
-			throw CommandError(host_port_str + " is not valid address:port pair");
+			throw CommandError(host_port_str + " is not valid addr:port pair");
 		}
 
 		auto groups = this->_ipv4_ipv6_port_regex->groups();
@@ -262,12 +263,20 @@ void StartServerCommand::setup_server_ctx(core::net::internal::HttpServer::conte
 			ctx.use_ipv6 = true;
 		}
 
+		auto trimmed_addr = address;
+		str::rtrim(trimmed_addr, "]");
+		str::ltrim(trimmed_addr, "[");
+		if (trimmed_addr == "localhost")
+		{
+			address = ctx.use_ipv6 ? this->DEFAULT_IPV6_HOST : this->DEFAULT_IPV4_HOST;
+		}
+
 		ctx.host = address;
-		ctx.port = groups[2].empty() ? this->DEFAULT_PORT : (uint16_t) std::stoi(groups[2]);
+		ctx.port = groups[4].empty() ? this->DEFAULT_PORT : (uint16_t) std::stoi(groups[4]);
 	}
 	else
 	{
-		auto address = this->_host_flag->get();
+		auto address = this->_addr_flag->get();
 		if (address.empty())
 		{
 			ctx.use_ipv6 = this->_use_ipv6_flag->get();
@@ -281,8 +290,16 @@ void StartServerCommand::setup_server_ctx(core::net::internal::HttpServer::conte
 			}
 			else if (!this->_ipv4_regex->match(address))
 			{
-				throw CommandError(this->_host_flag->get_raw() + " is invalid address");
+				throw CommandError(this->_addr_flag->get_raw() + " is invalid address");
 			}
+		}
+
+		auto trimmed_addr = address;
+		str::rtrim(trimmed_addr, "]");
+		str::ltrim(trimmed_addr, "[");
+		if (trimmed_addr == "localhost")
+		{
+			address = ctx.use_ipv6 ? this->DEFAULT_IPV6_HOST : this->DEFAULT_IPV4_HOST;
 		}
 
 		ctx.host = address;
