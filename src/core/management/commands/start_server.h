@@ -36,8 +36,8 @@ __CORE_COMMANDS_BEGIN__
 class StartServerCommand final: public AppCommand
 {
 private:
-	flags::StringFlag* _host_port_flag;
-	flags::StringFlag* _host_flag;
+	flags::StringFlag* _addr_port_flag;
+	flags::StringFlag* _addr_flag;
 	flags::LongIntFlag* _port_flag;
 	flags::LongIntFlag* _threads_flag;
 	flags::BoolFlag* _use_ipv6_flag;

@@ -21,6 +21,7 @@
  * 	- BaseException - main exception class
 
  * 	- AttributeError
+ * 	- ArgumentError
  * 	- BadSignature
  * 	- CommandError
  * 	- DictError
@@ -83,6 +84,7 @@ public:
 
 
 DEF_EXCEPTION_WITH_BASE(AttributeError, BaseException, "Attribute Error");
+DEF_EXCEPTION_WITH_BASE(ArgumentError, BaseException, "Argument Error");
 DEF_EXCEPTION_WITH_BASE(BadSignature, BaseException, "Bad Signature Error");
 DEF_EXCEPTION_WITH_BASE(CommandError, BaseException, "Command Error");
 DEF_EXCEPTION_WITH_BASE(DictError, BaseException, "Dict Error");

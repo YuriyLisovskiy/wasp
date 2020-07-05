@@ -98,4 +98,12 @@ std::string args_parser::get_arg(const std::string& label)
 	return this->flags[label];
 }
 
+void args_parser::remove_arg(const std::string& label)
+{
+	if (this->exists(label))
+	{
+		this->flags.erase(label);
+	}
+}
+
 __FLAGS_INTERNAL_END__

@@ -43,6 +43,7 @@ struct args_parser
 	explicit args_parser(int argc, char** argv, size_t parse_from = 1, bool is_verbose = false);
 	bool exists(const std::string& label);
 	std::string get_arg(const std::string& label);
+	void remove_arg(const std::string& label);
 };
 
 __FLAGS_INTERNAL_END__
