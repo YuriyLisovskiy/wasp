@@ -95,6 +95,16 @@ protected:
 	virtual void register_libraries();
 	virtual void register_templates_env();
 
+	struct EnvConfig
+	{
+		std::vector<std::string> dirs;
+		std::vector<std::shared_ptr<render::lib::ILibrary>> libs;
+		bool use_app_dirs;
+		bool auto_escape;
+	};
+
+	virtual void register_templates_env(EnvConfig* env);
+
 public:
 	bool DEBUG;
 

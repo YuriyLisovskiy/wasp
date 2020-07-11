@@ -51,8 +51,10 @@ public:
 		std::vector<std::string> dirs;
 		bool use_app_dirs;
 		std::vector<std::shared_ptr<apps::IAppConfig>> apps;
+		std::unique_ptr<IEngine> engine;
 
 		explicit Config(
+			std::unique_ptr<IEngine> engine,
 			std::vector<std::string> dirs = {},
 			bool use_app_dirs = true,
 			std::vector<std::shared_ptr<apps::IAppConfig>> apps = {},
@@ -71,6 +73,7 @@ public:
 			this->dirs = std::move(dirs);
 			this->use_app_dirs = use_app_dirs;
 			this->apps = std::move(apps);
+			this->engine = std::move(engine);
 		}
 
 		std::unique_ptr<IEnvironment> make_env()

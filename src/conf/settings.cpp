@@ -446,6 +446,7 @@ void Settings::_override_config(YAML::Node& config)
 				Settings::_override_sequence(env, local_env, "libraries");
 				Settings::_override_scalar(env, local_env, "use_app_directories");
 				Settings::_override_scalar(env, local_env, "auto_escape");
+				Settings::_override_scalar(env, local_env, "use_default_engine");
 			}
 		}
 	}
@@ -491,15 +492,32 @@ void Settings::_init_env(YAML::Node& env)
 
 	auto use_app_dirs = env["use_app_directories"];
 	auto auto_escape = env["auto_escape"];
-	this->TEMPLATES_ENV = render::env::DefaultEnvironment::Config(
-		dirs,
-		use_app_dirs ? use_app_dirs.as<bool>() : true,
-		this->INSTALLED_APPS,
-		this->DEBUG,
-		this->LOGGER.get(),
-		auto_escape ? auto_escape.as<bool>() : true,
-		libs
-	).make_env();
+	auto use_default_engine = env["use_default_engine"];
+	if (use_default_engine && use_default_engine.as<bool>())
+	{
+		auto* env_cfg = new EnvConfig();
+		env_cfg->dirs = dirs;
+		env_cfg->use_app_dirs = use_app_dirs ? use_app_dirs.as<bool>() : true;
+		env_cfg->auto_escape = auto_escape ? auto_escape.as<bool>() : true;
+		env_cfg->libs = libs;
+
+		this->register_templates_env(env_cfg);
+
+		delete env_cfg;
+	}
+	else
+	{
+		this->TEMPLATES_ENV = render::env::DefaultEnvironment::Config(
+			nullptr,
+			dirs,
+			use_app_dirs ? use_app_dirs.as<bool>() : true,
+			this->INSTALLED_APPS,
+			this->DEBUG,
+			this->LOGGER.get(),
+			auto_escape ? auto_escape.as<bool>() : true,
+			libs
+		).make_env();
+	}
 }
 
 void Settings::_init_logger(YAML::Node& logger)
@@ -893,6 +911,10 @@ void Settings::register_libraries()
 }
 
 void Settings::register_templates_env()
+{
+}
+
+void Settings::register_templates_env(EnvConfig* env)
 {
 }
 

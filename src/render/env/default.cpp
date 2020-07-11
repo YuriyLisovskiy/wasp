@@ -38,16 +38,23 @@ DefaultEnvironment::DefaultEnvironment(Config& config)
 	this->_use_app_dirs = config.use_app_dirs;
 	this->_dirs = std::move(config.dirs);
 	this->_dirs = this->template_dirs(config.apps);
-	this->_engine = std::move(std::unique_ptr<render::IEngine>(new render::Engine(
-		this,
-		this->_dirs,
-		this->_use_app_dirs,
-		config.debug,
-		config.auto_escape,
-		config.loaders,
-		config.libraries,
-		config.logger
-	)));
+	if (config.engine != nullptr)
+	{
+		this->_engine = std::move(config.engine);
+	}
+	else
+	{
+		this->_engine = std::move(std::make_unique<render::Engine>(
+			this,
+			this->_dirs,
+			this->_use_app_dirs,
+			config.debug,
+			config.auto_escape,
+			config.loaders,
+			config.libraries,
+			config.logger
+		));
+	}
 
 	this->_name = this->__type__().name();
 }
