@@ -5,6 +5,7 @@
 #include "./settings.h"
 
 #include <xalwart/core/path.h>
+//#include <xalwart/render/env/default.h>
 
 #include "../picture_app/app.h"
 #include "../form_app/app.h"
@@ -13,6 +14,9 @@
 #include "./libs/my_lib.h"
 
 #include "./middleware/useful_middleware.h"
+
+#include "./env/my_engine.h"
+#include "../../src/render/env/default.h"
 
 
 Settings::Settings() : xw::conf::Settings(
@@ -36,4 +40,9 @@ void Settings::register_middleware()
 void Settings::register_libraries()
 {
 	this->library<MyLib>("MyLib");
+}
+
+void Settings::register_templates_env(xw::render::env::Config* cfg)
+{
+	this->TEMPLATES_ENV = xw::render::env::DefaultEnvironment<MyEngine>::make(cfg);
 }

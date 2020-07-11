@@ -14,4 +14,5 @@ public:
 	void register_apps() override;
 	void register_middleware() override;
 	void register_libraries() override;
+	void register_templates_env(xw::render::env::Config* cfg) override;
 };

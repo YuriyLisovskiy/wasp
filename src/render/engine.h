@@ -29,6 +29,7 @@
 // Framework modules.
 #include "./base_engine.h"
 #include "./env/interfaces.h"
+#include "./env/config.h"
 
 
 __RENDER_BEGIN__
@@ -63,10 +64,12 @@ public:
 		bool use_app_dirs,
 		bool debug,
 		bool auto_escape,
-		std::vector<std::shared_ptr<ILoader>>& loaders,
-		std::vector<std::shared_ptr<lib::ILibrary>>& libs,
+		const std::vector<std::shared_ptr<ILoader>>& loaders,
+		const std::vector<std::shared_ptr<lib::ILibrary>>& libs,
 		core::ILogger* logger
 	);
+
+	explicit Engine(env::IEnvironment* env, env::Config* cfg);
 
 	std::shared_ptr<ITemplate> find_template(
 		const std::string& name,

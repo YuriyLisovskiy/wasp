@@ -28,74 +28,85 @@
 
 // Framework modules.
 #include "./interfaces.h"
+#include "./config.h"
+#include "../../core/path.h"
 
 
 __ENV_BEGIN__
 
-class DefaultEnvironment : public IEnvironment, public core::object::Object
+template <typename EngineT>
+class DefaultEnvironment : public IEnvironment
 {
 protected:
 	std::unique_ptr<IEngine> _engine;
-	std::string _name;
 	std::vector<std::string> _dirs;
 	bool _use_app_dirs;
 
 public:
-	struct Config final
+	explicit DefaultEnvironment(env::Config* cfg)
 	{
-		bool debug;
-		core::ILogger* logger;
-		std::vector<std::shared_ptr<ILoader>> loaders;
-		std::vector<std::shared_ptr<render::lib::ILibrary>> libraries;
-		bool auto_escape;
-		std::vector<std::string> dirs;
-		bool use_app_dirs;
-		std::vector<std::shared_ptr<apps::IAppConfig>> apps;
-		std::unique_ptr<IEngine> engine;
-
-		explicit Config(
-			std::unique_ptr<IEngine> engine,
-			std::vector<std::string> dirs = {},
-			bool use_app_dirs = true,
-			std::vector<std::shared_ptr<apps::IAppConfig>> apps = {},
-			bool debug = false,
-			core::ILogger* logger = nullptr,
-			bool auto_escape = true,
-			std::vector<std::shared_ptr<render::lib::ILibrary>> libraries = {},
-			std::vector<std::shared_ptr<ILoader>> loaders = {}
-		)
+		if (!cfg->logger)
 		{
-			this->debug = debug;
-			this->logger = logger;
-			this->loaders = std::move(loaders);
-			this->libraries = std::move(libraries);
-			this->auto_escape = auto_escape;
-			this->dirs = std::move(dirs);
-			this->use_app_dirs = use_app_dirs;
-			this->apps = std::move(apps);
-			this->engine = std::move(engine);
+			throw core::ImproperlyConfigured("DefaultEnvironment: logger must be instantiated.");
 		}
 
-		std::unique_ptr<IEnvironment> make_env()
-		{
-			return std::make_unique<env::DefaultEnvironment>(*this);
-		}
-	};
+		this->_use_app_dirs = cfg->use_app_dirs;
+		this->_dirs = cfg->dirs;
+		this->_dirs = this->template_dirs(cfg->apps);
+		cfg->dirs = this->_dirs;
+		this->_engine = std::move(std::make_unique<EngineT>(this, cfg));
+	}
 
-	explicit DefaultEnvironment(Config& config);
+	static std::unique_ptr<IEnvironment> make(env::Config* cfg)
+	{
+		return std::make_unique<env::DefaultEnvironment<EngineT>>(cfg);
+	}
 
-	std::string name() override;
+	std::string name() override
+	{
+		return "XalwartEngine";
+	}
 
-	std::shared_ptr<ITemplate> from_string(const std::string& template_code) override;
-	std::shared_ptr<ITemplate> get_template(const std::string& template_path) override;
-	std::string render(const std::string& src_code, IContext* ctx) override;
+	std::shared_ptr<ITemplate> from_string(const std::string& template_code) override
+	{
+		return this->_engine->from_string(template_code);
+	}
+
+	std::shared_ptr<ITemplate> get_template(const std::string& template_path) override
+	{
+		return this->_engine->get_template(template_path);
+	}
+
+	std::string render(const std::string& src_code, IContext* ctx) override
+	{
+		return this->_engine->from_string(src_code)->render(ctx);
+	}
 
 	/// Initializes a std::vector of directories to search for templates.
 	std::vector<std::string> template_dirs(
 		const std::vector<std::shared_ptr<apps::IAppConfig>>& apps
-	) override;
+	) override
+	{
+		if (this->_use_app_dirs)
+		{
+			auto dirs_copy = this->_dirs;
+			for (const auto &app : apps)
+			{
+				dirs_copy.push_back(core::path::dirname(app->get_app_path()));
+			}
 
-	void load_libs() override;
+			return dirs_copy;
+		}
+		else
+		{
+			return this->_dirs;
+		}
+	}
+
+	void load_libs() override
+	{
+		this->_engine->load_libraries();
+	}
 };
 
 __ENV_END__

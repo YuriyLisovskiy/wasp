@@ -38,8 +38,8 @@ Engine::Engine(
 	bool use_app_dirs,
 	bool debug,
 	bool auto_escape,
-	std::vector<std::shared_ptr<ILoader>>& loaders,
-	std::vector<std::shared_ptr<lib::ILibrary>>& libs,
+	const std::vector<std::shared_ptr<ILoader>>& loaders,
+	const std::vector<std::shared_ptr<lib::ILibrary>>& libs,
 	core::ILogger* logger
 )
 {
@@ -70,7 +70,7 @@ Engine::Engine(
 	}
 	else
 	{
-		this->_loaders = std::move(loaders);
+		this->_loaders = loaders;
 	}
 
 	this->_libraries = libs;
@@ -82,6 +82,19 @@ Engine::Engine(
 			this->_cached_templates.insert(templates.begin(), templates.end());
 		}
 	}
+}
+
+Engine::Engine(env::IEnvironment* env, env::Config* cfg) : Engine(
+	env,
+	cfg->dirs,
+	cfg->use_app_dirs,
+	cfg->debug,
+	cfg->auto_escape,
+	cfg->loaders,
+	cfg->libraries,
+	cfg->logger
+)
+{
 }
 
 std::shared_ptr<ITemplate> Engine::find_template(

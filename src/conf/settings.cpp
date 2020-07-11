@@ -28,6 +28,7 @@
 // Framework modules.
 #include "../core/path.h"
 #include "../core/strings.h"
+#include "../render/engine.h"
 #include "../render/env/default.h"
 #include "../render/library/builtin.h"
 
@@ -493,30 +494,23 @@ void Settings::_init_env(YAML::Node& env)
 	auto use_app_dirs = env["use_app_directories"];
 	auto auto_escape = env["auto_escape"];
 	auto use_default_engine = env["use_default_engine"];
-	if (use_default_engine && use_default_engine.as<bool>())
+
+	auto env_cfg = render::env::Config(
+		dirs,
+		use_app_dirs ? use_app_dirs.as<bool>() : true,
+		this->INSTALLED_APPS,
+		this->DEBUG,
+		this->LOGGER.get(),
+		auto_escape ? auto_escape.as<bool>() : true,
+		libs
+	);
+	if (use_default_engine && !use_default_engine.as<bool>())
 	{
-		auto* env_cfg = new EnvConfig();
-		env_cfg->dirs = dirs;
-		env_cfg->use_app_dirs = use_app_dirs ? use_app_dirs.as<bool>() : true;
-		env_cfg->auto_escape = auto_escape ? auto_escape.as<bool>() : true;
-		env_cfg->libs = libs;
-
-		this->register_templates_env(env_cfg);
-
-		delete env_cfg;
+		this->register_templates_env(&env_cfg);
 	}
 	else
 	{
-		this->TEMPLATES_ENV = render::env::DefaultEnvironment::Config(
-			nullptr,
-			dirs,
-			use_app_dirs ? use_app_dirs.as<bool>() : true,
-			this->INSTALLED_APPS,
-			this->DEBUG,
-			this->LOGGER.get(),
-			auto_escape ? auto_escape.as<bool>() : true,
-			libs
-		).make_env();
+		this->TEMPLATES_ENV = render::env::DefaultEnvironment<render::Engine>::make(&env_cfg);
 	}
 }
 
@@ -914,7 +908,7 @@ void Settings::register_templates_env()
 {
 }
 
-void Settings::register_templates_env(EnvConfig* env)
+void Settings::register_templates_env(render::env::Config* cfg)
 {
 }
 
