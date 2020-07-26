@@ -39,6 +39,6 @@ add_custom_command(
         -DCMAKE_BINARY_DIR=${CMAKE_BINARY_DIR}
         -DLIBRARY_NAME=${LIBRARY_NAME}
         -DLIBRARY_VERSION=${LIBRARY_VERSION}
-        -DDEPLOY_DIR=${PROJECT_SOURCE_DIR}/example
+        -DDEPLOY_DIR=${PROJECT_SOURCE_DIR}/../ExampleProject
         -P ${PROJECT_SOURCE_DIR}/scripts/deploy_library.cmake
 )
