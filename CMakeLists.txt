@@ -26,5 +26,4 @@ function(print SRC_LIST)
 endfunction(print)
 
 add_subdirectory(src)
-add_subdirectory(example)
 add_subdirectory(tests)
