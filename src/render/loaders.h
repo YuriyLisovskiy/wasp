@@ -31,6 +31,7 @@
 
 // Framework modules.
 #include "./base_engine.h"
+#include "../conf/settings.h"
 
 
 __RENDER_BEGIN__
@@ -38,6 +39,10 @@ __RENDER_BEGIN__
 class DefaultLoader : public ILoader
 {
 public:
+	static const std::string FULL_NAME;
+
+	explicit DefaultLoader(conf::Settings* settings);
+
 	std::shared_ptr<ITemplate> get_template(
 		const std::string& template_name,
 		const std::vector<std::string>& dirs,

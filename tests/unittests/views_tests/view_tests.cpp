@@ -37,14 +37,14 @@ struct ViewTestSettings : public conf::Settings
 
 	void register_logger() final
 	{
-		this->LOGGER = core::Logger::get_instance({
-			false,
-			false,
-			false,
-			false,
-			false,
-			false
-		});
+		auto lc = core::LoggerConfig();
+		lc.enable_info = false;
+		lc.enable_debug = false;
+		lc.enable_warning = false;
+		lc.enable_error = false;
+		lc.enable_fatal = false;
+		lc.enable_print = false;
+		this->LOGGER = core::Logger::get_instance(lc);
 	}
 };
 

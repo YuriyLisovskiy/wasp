@@ -36,6 +36,7 @@
 #include "../apps/_def_.h"
 #include "../middleware/_def_.h"
 #include "../render/library/_def_.h"
+#include "../render/base.h"
 
 
 __CONF_BEGIN__
@@ -64,6 +65,7 @@ private:
 		std::string,
 		std::function<std::shared_ptr<middleware::IMiddleware>()>
 	> _middleware;
+
 	std::map<
 		std::string,
 		std::function<std::shared_ptr<render::lib::ILibrary>()>
@@ -73,6 +75,11 @@ private:
 		std::string,
 		std::function<std::shared_ptr<apps::IAppConfig>()>
 	> _apps;
+
+	std::map<
+		std::string,
+		std::function<std::shared_ptr<render::ILoader>()>
+	> _loaders;
 
 	Settings* _settings;
 	core::ILogger* _logger;
@@ -143,9 +150,30 @@ public:
 		}
 	}
 
+	template <typename T, typename = std::enable_if<std::is_base_of<render::ILoader, T>::value>>
+	void register_loader(const std::string& full_name)
+	{
+		if (this->_loaders.find(full_name) != this->_loaders.end())
+		{
+			if (this->_logger)
+			{
+				this->_logger->warning(
+					"unable to register '" + full_name + "' loader which already exists"
+				);
+			}
+		}
+		else
+		{
+			this->_loaders[full_name] = [this]() -> std::shared_ptr<render::ILoader> {
+				return std::make_shared<T>(this->_settings);
+			};
+		}
+	}
+
 	std::shared_ptr<apps::IAppConfig> get_app(const std::string& full_name);
 	std::shared_ptr<middleware::IMiddleware> get_middleware(const std::string& full_name);
 	std::shared_ptr<render::lib::ILibrary> get_library(const std::string& full_name);
+	std::shared_ptr<render::ILoader> get_loader(const std::string& full_name);
 };
 
 __CONF_INTERNAL_END__

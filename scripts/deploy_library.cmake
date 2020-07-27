@@ -29,7 +29,7 @@ function(recreate_dir DIR_NAME)
     file(MAKE_DIRECTORY ${DIR_NAME})
 endfunction(recreate_dir)
 
-set(LIB_DIR ${DEPLOY_DIR}/lib)
+set(LIB_DIR ${DEPLOY_DIR}/lib/${LIBRARY_NAME})
 set(INCLUDE_DIR ${DEPLOY_DIR}/include/${LIBRARY_NAME})
 
 # Clean deploy directories if exists and recreate them.

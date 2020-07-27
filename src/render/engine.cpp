@@ -66,7 +66,7 @@ Engine::Engine(
 	this->_auto_escape = auto_escape;
 	if (loaders.empty())
 	{
-		this->_loaders.push_back(std::make_unique<DefaultLoader>());
+		this->_loaders.push_back(std::make_unique<DefaultLoader>(nullptr));
 	}
 	else
 	{

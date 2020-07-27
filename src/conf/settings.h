@@ -96,6 +96,7 @@ protected:
 	virtual void register_libraries();
 	virtual void register_templates_env();
 	virtual void register_templates_env(render::env::Config* cfg);
+	virtual void register_loaders();
 
 public:
 	bool DEBUG;
@@ -313,6 +314,12 @@ public:
 	void library(const std::string& full_name)
 	{
 		this->_factory->register_library<_T>(full_name);
+	}
+
+	template <typename _T, typename = std::enable_if<std::is_base_of<render::ILoader, _T>::value>>
+	void loader(const std::string& full_name)
+	{
+		this->_factory->register_loader<_T>(full_name);
 	}
 };
 
