@@ -480,13 +480,28 @@ void Settings::_init_env(YAML::Node& env)
 		this->_factory->get_library(xw::render::lib::BuiltinLibrary::FULL_NAME)
 	};
 	auto libraries = env["libraries"];
-	if (libraries && libraries.IsSequence())
+	if (libraries && libraries.IsSequence() && libraries.size() > 0)
 	{
+		this->register_libraries();
 		for (auto it = libraries.begin(); it != libraries.end(); it++)
 		{
 			if (!it->IsNull() && it->IsScalar())
 			{
 				libs.push_back(this->_factory->get_library(it->as<std::string>()));
+			}
+		}
+	}
+
+	std::vector<std::shared_ptr<render::ILoader>> loaders_vec;
+	auto loaders = env["loaders"];
+	if (loaders && loaders.IsSequence() && loaders.size() > 0)
+	{
+		this->register_loaders();
+		for (auto it = loaders.begin(); it != loaders.end(); it++)
+		{
+			if (!it->IsNull() && it->IsScalar())
+			{
+				loaders_vec.push_back(this->_factory->get_loader(it->as<std::string>()));
 			}
 		}
 	}
@@ -502,7 +517,8 @@ void Settings::_init_env(YAML::Node& env)
 		this->DEBUG,
 		this->LOGGER.get(),
 		auto_escape ? auto_escape.as<bool>() : true,
-		libs
+		libs,
+		loaders_vec
 	);
 	if (use_default_engine && !use_default_engine.as<bool>())
 	{
@@ -852,21 +868,34 @@ void Settings::init()
 
 	this->_factory = new internal::SettingsFactory(this, this->LOGGER.get());
 
-	this->register_apps();
 	auto apps = config["installed_apps"];
-	if (apps && apps.IsSequence())
+	if (apps && apps.IsSequence() && apps.size() > 0)
 	{
+		this->LOGGER->print(
+			"Loading installed apps...",
+			core::Logger::Color::DEFAULT, '\0'
+		);
+		this->register_apps();
 		this->_init_apps(apps);
+		this->LOGGER->print(" Done.");
 	}
 
-	this->register_middleware();
 	auto middleware = config["middleware"];
-	if (middleware && middleware.IsSequence())
+	if (middleware && middleware.IsSequence() && middleware.size() > 0)
 	{
+		this->LOGGER->print(
+			"Loading middleware...",
+			core::Logger::Color::DEFAULT, '\0'
+		);
+		this->register_middleware();
 		this->_init_middleware(middleware);
+		this->LOGGER->print(" Done.");
 	}
 
-	this->register_libraries();
+	this->LOGGER->print(
+		"Loading template environment...",
+		core::Logger::Color::DEFAULT, '\0'
+	);
 	auto env = config["templates_env"];
 	if (env && env.IsMap())
 	{
@@ -874,8 +903,12 @@ void Settings::init()
 	}
 	else
 	{
+		this->register_libraries();
+		this->register_loaders();
 		this->register_templates_env();
 	}
+
+	this->LOGGER->print(" Done.");
 
 	delete _factory;
 }
@@ -909,6 +942,10 @@ void Settings::register_templates_env()
 }
 
 void Settings::register_templates_env(render::env::Config* cfg)
+{
+}
+
+void Settings::register_loaders()
 {
 }
 

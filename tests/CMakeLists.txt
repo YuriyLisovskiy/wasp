@@ -2,9 +2,9 @@ set(BINARY unittests)
 
 set(LIB_DIRECTORY ${CMAKE_BINARY_DIR}/src)
 if (WIN32)
-    set(LIB_DLL ${LIB_DIRECTORY}/${LIBRARY_NAME}.lib)
+    set(LIB_DLL ${LIB_DIRECTORY}/${LIBRARY_NAME}-${LIBRARY_VERSION}.lib)
 else()
-    set(LIB_DLL ${LIB_DIRECTORY}/lib${LIBRARY_NAME}.so)
+    set(LIB_DLL ${LIB_DIRECTORY}/lib${LIBRARY_NAME}-${LIBRARY_VERSION}.so)
 endif()
 
 if (NOT MSVC)

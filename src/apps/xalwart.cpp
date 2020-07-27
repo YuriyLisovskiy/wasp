@@ -150,6 +150,7 @@ void MainApplication::_extend_settings_commands_or_error(
 
 void MainApplication::_perform_checks()
 {
+	std::cout << "Performing checks...";
 	if (!this->_settings->LOGGER)
 	{
 		throw core::ImproperlyConfigured("LOGGER instance must be configured");
@@ -219,6 +220,8 @@ void MainApplication::_perform_checks()
 			"System check identified " + std::to_string(err_count) + " issues."
 		);
 	}
+
+	this->_settings->LOGGER->print(" Done.");
 }
 
 __APPS_END__

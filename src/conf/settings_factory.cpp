@@ -31,6 +31,8 @@
 #include "../middleware/http.h"
 #include "../middleware/security.h"
 
+#include "../render/loaders.h"
+
 
 __CONF_INTERNAL_BEGIN__
 
@@ -62,6 +64,12 @@ SettingsFactory::SettingsFactory(Settings* settings, core::ILogger* logger)
 	this->_libraries = {
 		{BuiltinLibrary::FULL_NAME, [settings]() -> std::shared_ptr<ILibrary> {
 			return std::make_shared<BuiltinLibrary>(settings);
+		}}
+	};
+
+	this->_loaders = {
+		{render::DefaultLoader::FULL_NAME, [settings]() -> std::shared_ptr<render::DefaultLoader> {
+			return std::make_shared<render::DefaultLoader>(settings);
 		}}
 	};
 }
@@ -97,6 +105,18 @@ std::shared_ptr<render::lib::ILibrary> SettingsFactory::get_library(
 	if (this->_libraries.find(full_name) != this->_libraries.end())
 	{
 		return this->_libraries[full_name]();
+	}
+
+	return nullptr;
+}
+
+std::shared_ptr<render::ILoader> SettingsFactory::get_loader(
+	const std::string& full_name
+)
+{
+	if (this->_loaders.find(full_name) != this->_loaders.end())
+	{
+		return this->_loaders[full_name]();
 	}
 
 	return nullptr;

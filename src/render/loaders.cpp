@@ -37,6 +37,14 @@
 
 __RENDER_BEGIN__
 
+const std::string DefaultLoader::FULL_NAME = "xw::render::DefaultLoader";
+
+DefaultLoader::DefaultLoader(conf::Settings* settings)
+{
+	// Note: settings is set to nullptr
+	// when instantiating int xw::render::Engine
+}
+
 std::shared_ptr<ITemplate> DefaultLoader::get_template(
 	const std::string& template_name,
 	const std::vector<std::string>& dirs,
