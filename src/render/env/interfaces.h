@@ -18,10 +18,10 @@
 #pragma once
 
 // Module definitions.
-#include "../_def_.h"
+#include "./_def_.h"
 
 // Framework modules.
-#include "../base.h"
+#include <xalwart.render/base.h>
 #include "../../apps/interfaces.h"
 
 

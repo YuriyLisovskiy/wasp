@@ -16,19 +16,19 @@
  */
 
 /**
- * An implementation of render/library/syntax/static_tag.h
+ * An implementation of render/tags/static_tag.h
  */
 
 #include "./static_tag.h"
 
 // Framework modules.
-#include "./parse_var_name.h"
-#include "../utility.h"
-#include "../../../core/path.h"
-#include "../../../core/types/value.h"
+#include <xalwart.core/path.h>
+#include <xalwart.core/types/value.h>
+#include <xalwart.render/internal/syntax/parse_var_name.h>
+#include <xalwart.render/internal/utility.h>
 
 
-__SYNTAX_BEGIN__
+__TAGS_BEGIN__
 
 std::string static_node::render(IContext* ctx)
 {
@@ -75,7 +75,7 @@ std::function<std::shared_ptr<internal::node>(
 		std::string var_name;
 
 		// parse variable name after tag (function) call
-		if (!parse_var_name(token, var_name, curr_pos, false))
+		if (!syntax::parse_var_name(token, var_name, curr_pos, false))
 		{
 			parser::invalid_syntax(token, curr_pos - 1);
 		}
@@ -89,4 +89,4 @@ std::function<std::shared_ptr<internal::node>(
 	};
 }
 
-__SYNTAX_END__
+__TAGS_END__

@@ -28,7 +28,7 @@ __ENV_BEGIN__
 Config::Config(
 	std::vector<std::string> dirs,
 	bool use_app_dirs,
-	std::vector<std::shared_ptr<apps::IAppConfig>> apps,
+	const std::vector<std::shared_ptr<apps::IAppConfig>>& apps,
 	bool debug,
 	core::ILogger* logger,
 	bool auto_escape,

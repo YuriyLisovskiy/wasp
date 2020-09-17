@@ -29,6 +29,7 @@ if (WIN32)
     )
 endif()
 
+target_include_directories(${FULL_LIBRARY_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_include_directories(${FULL_LIBRARY_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/vendor/yaml)
 
 add_custom_command(

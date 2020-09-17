@@ -28,7 +28,7 @@
 #include "./_def_.h"
 
 // Framework modules.
-#include "../core/regex.h"
+#include <xalwart.core/regex.h>
 
 
 __UTILS_HTTP_BEGIN__

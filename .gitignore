@@ -40,8 +40,6 @@ CMakeSettings.json
 .idea/
 cmake-build-*
 
-# Example project
-example/lib/
-example/include/
-example/media/
-example/config.local.yml
+# Dependencies
+include/
+lib/

@@ -22,7 +22,7 @@
 #include "./response.h"
 
 // Framework modules.
-#include "./exceptions.h"
+#include <xalwart.render/exceptions.h>
 
 
 __RENDER_BEGIN__

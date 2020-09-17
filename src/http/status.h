@@ -33,7 +33,7 @@
 #include "./_def_.h"
 
 // Framework modules.
-#include "../collections/dict.h"
+#include <xalwart.core/collections/dict.h>
 
 
 __HTTP_INTERNAL_BEGIN__

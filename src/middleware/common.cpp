@@ -22,10 +22,11 @@
 #include "./common.h"
 
 // Framework modules.
+#include <xalwart.core/utility.h>
+#include <xalwart.core/strings.h>
 #include "../urls/resolver.h"
 #include "../http/headers.h"
 #include "../http/utility.h"
-#include "../core/strings.h"
 
 
 __MIDDLEWARE_BEGIN__

@@ -22,9 +22,9 @@
 #include "./cookie.h"
 
 // Framework modules.
-#include "../core/utility.h"
-#include "../core/strings.h"
-#include "../core/exceptions.h"
+#include <xalwart.core/utility.h>
+#include <xalwart.core/exceptions.h>
+#include <xalwart.core/strings.h>
 
 
 __HTTP_BEGIN__

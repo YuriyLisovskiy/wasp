@@ -22,59 +22,43 @@
 #include "./builtin.h"
 
 // Framework modules.
-#include "../internal/syntax/ignore.h"
-#include "../internal/syntax/static_tag.h"
-#include "../internal/syntax/url_tag.h"
-#include "../internal/syntax/if_equal_tag.h"
-#include "../internal/syntax/foreach_tag.h"
+#include "../tags/static_tag.h"
+#include "../tags/url_tag.h"
 
 
 __LIB_BEGIN__
 
-const std::string BuiltinLibrary::FULL_NAME = "xw::render::lib::BuiltinLibrary";
+const std::string DefaultLibrary::FULL_NAME = "xw::render::lib::DefaultLibrary";
 
-BuiltinLibrary::BuiltinLibrary(conf::Settings* settings)
+DefaultLibrary::DefaultLibrary(conf::Settings* settings)
+	: Library(DefaultLibrary::FULL_NAME, settings)
 {
-	if (!settings)
-	{
-		throw core::NullPointerException("BuiltinLibrary: 'settings' parameter is not initialized");
-	}
-
-	this->_settings = settings;
 }
 
-std::shared_ptr<Filters> BuiltinLibrary::get_filters()
+std::shared_ptr<Filters> DefaultLibrary::get_filters()
 {
 	return nullptr;
 }
 
-std::shared_ptr<Tags> BuiltinLibrary::get_tags()
+std::shared_ptr<Tags> DefaultLibrary::get_tags()
 {
 	using namespace internal;
 	return std::make_shared<Tags>(std::map<std::string, Tag>{
 
-		// Example: {% ignore %} content {% end_ignore %}
-		{syntax::TAG_NAME_IGNORE, syntax::make_ignore_tag()},
-
 		// Example: {% static('path/to/file.css') -> css_variable %}
-		{syntax::TAG_NAME_STATIC, syntax::make_static_tag("static", this->_settings->STATIC_URL)},
+		{tags::TAG_NAME_STATIC, tags::make_static_tag("static", this->settings->STATIC_URL)},
 
 		// Example: {% media('path/to/file.jpg') -> jpg_variable %}
-		{syntax::TAG_NAME_MEDIA, syntax::make_static_tag("media", this->_settings->MEDIA_URL)},
+		{tags::TAG_NAME_MEDIA, tags::make_static_tag("media", this->settings->MEDIA_URL)},
 
 		// Example: {% url('app_namespace::profile', 256) -> profile_256 %}
-		{syntax::TAG_NAME_URL, syntax::make_url_tag(this->_settings->ROOT_URLCONF)},
-
-		{syntax::TAG_NAME_IF_EQUAL, syntax::make_if_equal_tag()},
-		{syntax::TAG_NAME_IF_NOT_EQUAL, syntax::make_if_not_equal_tag()},
-
-		{syntax::TAG_NAME_FOREACH, syntax::make_foreach_tag()}
+		{tags::TAG_NAME_URL, tags::make_url_tag(this->settings->ROOT_URLCONF)}
 	});
 }
 
-std::string BuiltinLibrary::name()
+std::string DefaultLibrary::name()
 {
-	return "builtin";
+	return DefaultLibrary::FULL_NAME;
 }
 
 __LIB_END__

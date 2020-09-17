@@ -22,8 +22,8 @@
 #include "./multipart_parser.h"
 
 // Framework modules.
-#include "../../core/strings.h"
-#include "../../core/exceptions.h"
+#include <xalwart.core/exceptions.h>
+#include <xalwart.core/strings.h>
 
 
 __CORE_INTERNAL_BEGIN__

@@ -26,9 +26,9 @@
 #include <cstring>
 
 // Framework modules.
+#include <xalwart.core/exceptions.h>
 #include "./multipart_parser.h"
 #include "./query_parser.h"
-#include "../exceptions.h"
 
 #ifdef _MSC_VER
 #define strncasecmp _strnicmp

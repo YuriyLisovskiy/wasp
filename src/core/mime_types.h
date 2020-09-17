@@ -50,7 +50,7 @@
 #include "./_def_.h"
 
 // Framework modules.
-#include "../collections/dict.h"
+#include <xalwart.core/collections/dict.h>
 
 
 __MIME_BEGIN__

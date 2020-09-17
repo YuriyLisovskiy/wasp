@@ -22,8 +22,8 @@
 #include "./mime_types.h"
 
 // Framework modules.
-#include "./path.h"
-#include "./strings.h"
+#include <xalwart.core/path.h>
+#include <xalwart.core/strings.h>
 
 
 __MIME_BEGIN__

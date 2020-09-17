@@ -24,14 +24,13 @@
 #include "./settings_factory.h"
 
 // Framework modules.
+#include <xalwart.render/loaders.h>
 #include "../render/library/builtin.h"
 #include "../middleware/clickjacking.h"
 #include "../middleware/common.h"
 #include "../middleware/cookies.h"
 #include "../middleware/http.h"
 #include "../middleware/security.h"
-
-#include "../render/loaders.h"
 
 
 __CONF_INTERNAL_BEGIN__
@@ -62,14 +61,14 @@ SettingsFactory::SettingsFactory(Settings* settings, core::ILogger* logger)
 
 	using namespace render::lib;
 	this->_libraries = {
-		{BuiltinLibrary::FULL_NAME, [settings]() -> std::shared_ptr<ILibrary> {
-			return std::make_shared<BuiltinLibrary>(settings);
+		{DefaultLibrary::FULL_NAME, [settings]() -> std::shared_ptr<ILibrary> {
+			return std::make_shared<DefaultLibrary>(settings);
 		}}
 	};
 
 	this->_loaders = {
-		{render::DefaultLoader::FULL_NAME, [settings]() -> std::shared_ptr<render::DefaultLoader> {
-			return std::make_shared<render::DefaultLoader>(settings);
+		{render::DefaultLoader::FULL_NAME, []() -> std::shared_ptr<render::DefaultLoader> {
+			return std::make_shared<render::DefaultLoader>();
 		}}
 	};
 }

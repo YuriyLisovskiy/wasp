@@ -25,7 +25,7 @@
 #include <iomanip>
 
 // Framework modules.
-#include "../core/exceptions.h"
+#include <xalwart.core/exceptions.h>
 
 
 __ENCODING_BEGIN__

@@ -25,9 +25,10 @@
 #pragma once
 
 // Module definitions.
-#include "../_def_.h"
+#include "./_def_.h"
 
 // Framework modules.
+#include <xalwart.render/library/base.h>
 #include "../../apps/interfaces.h"
 
 
@@ -47,7 +48,7 @@ struct Config final
 	explicit Config(
 		std::vector<std::string> dirs = {},
 		bool use_app_dirs = true,
-		std::vector<std::shared_ptr<apps::IAppConfig>> apps = {},
+		const std::vector<std::shared_ptr<apps::IAppConfig>>& apps = {},
 		bool debug = false,
 		core::ILogger* logger = nullptr,
 		bool auto_escape = true,

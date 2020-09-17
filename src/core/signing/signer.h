@@ -27,7 +27,7 @@
 #include "./_def_.h"
 
 // Framework modules.
-#include "../regex.h"
+#include <xalwart.core/regex.h>
 
 
 __SIGNING_INTERNAL_BEGIN__

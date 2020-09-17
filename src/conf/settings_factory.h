@@ -32,11 +32,11 @@
 #include "./_def_.h"
 
 // Framework modules.
-#include "../core/logger.h"
+#include <xalwart.core/logger.h>
+#include <xalwart.render/library/_def_.h>
+#include <xalwart.render/base.h>
 #include "../apps/_def_.h"
 #include "../middleware/_def_.h"
-#include "../render/library/_def_.h"
-#include "../render/base.h"
 
 
 __CONF_BEGIN__

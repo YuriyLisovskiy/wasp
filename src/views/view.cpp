@@ -22,7 +22,8 @@
 #include "./view.h"
 
 // Framework modules.
-#include "../core/strings.h"
+#include <xalwart.core/utility.h>
+#include <xalwart.core/strings.h>
 
 
 __VIEWS_BEGIN__

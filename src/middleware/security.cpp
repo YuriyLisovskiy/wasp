@@ -22,8 +22,8 @@
 #include "./security.h"
 
 // Framework modules.
+#include <xalwart.core/strings.h>
 #include "../http/headers.h"
-#include "../core/strings.h"
 
 
 __MIDDLEWARE_BEGIN__

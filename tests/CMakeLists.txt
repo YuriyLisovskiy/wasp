@@ -34,7 +34,14 @@ function(add_tests SUB_DIR SUB_NAME)
 
     set(FULL_BIN ${BINARY}-${SUB_NAME})
     add_executable(${FULL_BIN} ${SOURCES} ${TESTS_DIR}/main.cpp)
+
+    # Link dependencies.
+    link_xw_library(${FULL_BIN} ${LIBRARY_NAME}.core 0.0.1)
+    link_xw_library(${FULL_BIN} ${LIBRARY_NAME}.render 0.0.1)
+
     target_link_libraries(${FULL_BIN} PUBLIC ${LIB_DLL} gtest stdc++fs)
+
+    target_include_directories(${FULL_BIN} PUBLIC ${PROJECT_SOURCE_DIR}/include)
     target_include_directories(${FULL_BIN} PUBLIC ${PROJECT_SOURCE_DIR}/vendor/yaml)
 endfunction()
 

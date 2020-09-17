@@ -24,12 +24,12 @@
 
 __LIB_BEGIN__
 
-Library::Library(conf::Settings* settings)
+Library::Library(const std::string& lib_name, conf::Settings* settings)
 {
 	if (!settings)
 	{
 		throw core::ImproperlyConfigured(
-			"Library: 'settings' parameter must be initialized"
+			lib_name + ": 'settings' parameter must be initialized"
 		);
 	}
 

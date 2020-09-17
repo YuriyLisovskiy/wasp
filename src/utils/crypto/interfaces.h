@@ -28,7 +28,7 @@
 #include "./_def_.h"
 
 // Framework modules.
-#include "../../core/object/interfaces.h"
+#include <xalwart.core/object/interfaces.h>
 
 
 __CRYPTO_BEGIN__
@@ -36,7 +36,7 @@ __CRYPTO_BEGIN__
 class IHash : public core::object::IClonable
 {
 public:
-	virtual IHash* clone() = 0;
+	IHash* clone() override = 0;
 
 	// Continues message-digest operation,
 	// processing another message block.

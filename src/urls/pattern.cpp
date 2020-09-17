@@ -22,7 +22,7 @@
 #include "./pattern.h"
 
 // Framework modules.
-#include "../core/strings.h"
+#include <xalwart.core/strings.h>
 
 
 __URLS_BEGIN__

@@ -25,5 +25,16 @@ function(print SRC_LIST)
     endforeach(entry)
 endfunction(print)
 
+set(XW_LIB_DIR ${PROJECT_SOURCE_DIR}/lib/${LIBRARY_NAME})
+
+function(link_xw_library TARGET LIB_NAME LIB_VER)
+    if (WIN32)
+        set(DLL ${XW_LIB_DIR}/${LIB_NAME}-${LIB_VER}.lib)
+    else()
+        set(DLL ${XW_LIB_DIR}/lib${LIB_NAME}-${LIB_VER}.so)
+    endif()
+    target_link_libraries(${TARGET} PUBLIC ${DLL})
+endfunction(link_xw_library)
+
 add_subdirectory(src)
 add_subdirectory(tests)

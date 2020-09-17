@@ -32,7 +32,7 @@
 #include "../_def_.h"
 
 // Framework modules.
-#include "../../collections/multi_dict.h"
+#include <xalwart.core/collections/multi_dict.h>
 
 
 __CORE_INTERNAL_BEGIN__

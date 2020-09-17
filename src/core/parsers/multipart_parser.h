@@ -27,8 +27,8 @@
 #include "../_def_.h"
 
 // Framework modules.
-#include "../../collections/multi_dict.h"
-#include "../../core/files/uploaded_file.h"
+#include <xalwart.core/collections/multi_dict.h>
+#include "../../core/uploaded_file.h"
 
 
 __CORE_INTERNAL_BEGIN__

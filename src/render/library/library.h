@@ -21,11 +21,8 @@
 
 #pragma once
 
-// Module definitions.
-#include "./_def_.h"
-
 // Framework modules.
-#include "./base.h"
+#include <xalwart.render/library/base.h>
 #include "../../conf/settings.h"
 
 
@@ -37,7 +34,7 @@ protected:
 	conf::Settings* settings;
 
 public:
-	explicit Library(conf::Settings* settings);
+	explicit Library(const std::string& lib_name, conf::Settings* settings);
 	std::shared_ptr<Filters> get_filters() override;
 	std::shared_ptr<Tags> get_tags() override;
 };

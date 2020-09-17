@@ -22,8 +22,8 @@
 #include "./http.h"
 
 // Framework modules.
-#include "../core/utility.h"
-#include "../core/strings.h"
+#include <xalwart.core/utility.h>
+#include <xalwart.core/strings.h>
 
 
 __UTILS_HTTP_INTERNAL_BEGIN__

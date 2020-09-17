@@ -15,46 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * render/env/_def_.h
+ *
+ * Purpose:{MODULE_NAME} module's definitions.
+ */
+
 #pragma once
 
-// Module definitions.
-#include "../_def_.h"
+#include <xalwart.render/_def_.h>
 
-// Framework modules.
-#include "./token.h"
-#include "./filter_expr.h"
-
-
-__RENDER_INTERNAL_BEGIN__
-
-struct node
-{
-	bool must_be_first;
-	token_t token;
-
-	bool is_text_node;
-
-	node();
-	virtual std::string render(IContext* ctx);
-};
-
-struct text_node : public node
-{
-	std::string text;
-
-	text_node();
-	explicit text_node(const std::string& s);
-	std::string render(IContext* ctx) override;
-};
-
-struct variable_node : public node
-{
-	std::shared_ptr<FilterExpression> filter_expr;
-
-	explicit variable_node(
-		std::shared_ptr<FilterExpression> filter_expr
-	);
-	std::string render(IContext* ctx) override;
-};
-
-__RENDER_INTERNAL_END__
+// render::env
+#define __ENV_BEGIN__ __RENDER_BEGIN__ namespace env {
+#define __ENV_END__ } __RENDER_END__

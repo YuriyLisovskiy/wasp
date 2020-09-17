@@ -26,8 +26,8 @@
 #include <yaml-cpp/yaml.h>
 
 // Framework modules.
-#include "../core/path.h"
-#include "../core/strings.h"
+#include <xalwart.core/path.h>
+#include <xalwart.core/strings.h>
 #include "../render/engine.h"
 #include "../render/env/default.h"
 #include "../render/library/builtin.h"
@@ -477,7 +477,7 @@ void Settings::_init_env(YAML::Node& env)
 	}
 
 	std::vector<std::shared_ptr<render::lib::ILibrary>> libs{
-		this->_factory->get_library(xw::render::lib::BuiltinLibrary::FULL_NAME)
+		this->_factory->get_library(xw::render::lib::DefaultLibrary::FULL_NAME)
 	};
 	auto libraries = env["libraries"];
 	if (libraries && libraries.IsSequence() && libraries.size() > 0)

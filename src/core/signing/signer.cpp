@@ -22,8 +22,8 @@
 #include "./signer.h"
 
 // Framework modules.
-#include "../strings.h"
-#include "../exceptions.h"
+#include <xalwart.core/exceptions.h>
+#include <xalwart.core/strings.h>
 #include "../../utils/crypto/hmac.h"
 
 

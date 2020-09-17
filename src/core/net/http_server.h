@@ -27,9 +27,9 @@
 #include "./_def_.h"
 
 // Framework modules.
+#include <xalwart.core/logger.h>
+#include <xalwart.core/thread_pool.h>
 #include "./socket.h"
-#include "../logger.h"
-#include "../thread_pool.h"
 #include "../../http/request.h"
 #include "../../http/response.h"
 

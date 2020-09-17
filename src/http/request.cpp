@@ -22,10 +22,10 @@
 #include "./request.h"
 
 // Framework modules.
+#include <xalwart.core/exceptions.h>
+#include <xalwart.core/strings.h>
 #include "./headers.h"
 #include "./utility.h"
-#include "../core/strings.h"
-#include "../core/exceptions.h"
 
 
 __HTTP_BEGIN__

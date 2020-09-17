@@ -22,8 +22,8 @@
 #include "./hmac.h"
 
 // Framework modules.
+#include <xalwart.core/exceptions.h>
 #include "./md5.h"
-#include "../../core/exceptions.h"
 
 
 __CRYPTO_BEGIN__

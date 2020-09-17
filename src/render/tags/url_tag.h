@@ -16,12 +16,10 @@
  */
 
 /**
- * render/loader.h
+ * render/tags/url_tag.h
  *
  * Purpose:
- * 	Default loader.
- * 	Searches for template using template name and a vector of
- * 	directories where given template can be located.
+ * TODO:
  */
 
 #pragma once
@@ -30,29 +28,25 @@
 #include "./_def_.h"
 
 // Framework modules.
-#include "./base_engine.h"
-#include "../conf/settings.h"
+#include <xalwart.render/internal/parser.h>
+#include "../../urls/pattern.h"
 
 
-__RENDER_BEGIN__
+__TAGS_BEGIN__
 
-class DefaultLoader : public ILoader
+const std::string TAG_NAME_URL = "url";
+
+struct url_node : public node
 {
-public:
-	static const std::string FULL_NAME;
+	std::shared_ptr<urls::UrlPattern> pattern;
+	std::vector<std::shared_ptr<FilterExpression>> params;
+	std::string var_name;
 
-	explicit DefaultLoader(conf::Settings* settings);
-
-	std::shared_ptr<ITemplate> get_template(
-		const std::string& template_name,
-		const std::vector<std::string>& dirs,
-		IEngine* engine
-	) override;
-
-	std::map<std::string, std::shared_ptr<ITemplate>> cache_templates(
-		const std::vector<std::string>& dirs,
-		IEngine* engine
-	) override;
+	std::string render(IContext* ctx) override;
 };
 
-__RENDER_END__
+extern std::function<std::shared_ptr<internal::node>(
+	internal::parser*, internal::token_t& token
+)> make_url_tag(const std::vector<std::shared_ptr<urls::UrlPattern>>& patterns);
+
+__TAGS_END__

@@ -29,7 +29,7 @@
 #include "../_def_.h"
 
 // Framework modules.
-#include "./file.h"
+#include <xalwart.core/file.h>
 
 
 __CORE_BEGIN__

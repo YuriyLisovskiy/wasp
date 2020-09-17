@@ -25,7 +25,7 @@
 #include <fcntl.h>
 
 // Framework modules.
-#include "../exceptions.h"
+#include <xalwart.core/exceptions.h>
 
 
 __NET_INTERNAL_BEGIN__

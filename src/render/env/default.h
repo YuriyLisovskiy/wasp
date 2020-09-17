@@ -24,12 +24,12 @@
 #pragma once
 
 // Module definitions.
-#include "../_def_.h"
+#include "./_def_.h"
 
 // Framework modules.
+#include <xalwart.core/path.h>
 #include "./interfaces.h"
 #include "./config.h"
-#include "../../core/path.h"
 
 
 __ENV_BEGIN__
@@ -47,14 +47,16 @@ public:
 	{
 		if (!cfg->logger)
 		{
-			throw core::ImproperlyConfigured("DefaultEnvironment: logger must be instantiated.");
+			throw core::ImproperlyConfigured(
+				"xw::render::env::DefaultEnvironment: logger must be instantiated."
+			);
 		}
 
 		this->_use_app_dirs = cfg->use_app_dirs;
 		this->_dirs = cfg->dirs;
 		this->_dirs = this->template_dirs(cfg->apps);
 		cfg->dirs = this->_dirs;
-		this->_engine = std::move(std::make_unique<EngineT>(this, cfg));
+		this->_engine = std::move(std::make_unique<EngineT>(cfg));
 	}
 
 	static std::unique_ptr<IEnvironment> make(env::Config* cfg)
@@ -64,7 +66,7 @@ public:
 
 	std::string name() override
 	{
-		return "XalwartEngine";
+		return "xw::render::env::DefaultEnvironment";
 	}
 
 	std::shared_ptr<ITemplate> from_string(const std::string& template_code) override

@@ -22,8 +22,8 @@
 #include "./flag_set.h"
 
 // Framework modules.
+#include <xalwart.core/exceptions.h>
 #include "./parser.h"
-#include "../exceptions.h"
 
 
 __FLAGS_BEGIN__

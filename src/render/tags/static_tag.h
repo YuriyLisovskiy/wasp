@@ -16,9 +16,10 @@
  */
 
 /**
- * render/context.h
+ * render/tags/static_tag.h
  *
- * Purpose: main context for Template.
+ * Purpose:
+ * TODO:
  */
 
 #pragma once
@@ -27,34 +28,25 @@
 #include "./_def_.h"
 
 // Framework modules.
-#include "./base.h"
+#include <xalwart.render/internal/parser.h>
 
 
-__RENDER_BEGIN__
+__TAGS_BEGIN__
 
-class Context : public IContext
+const std::string TAG_NAME_STATIC = "static";
+const std::string TAG_NAME_MEDIA = "media";
+
+struct static_node : public node
 {
-public:
-	typedef IContext::scope_t scope_t;
+	std::string prefix;
+	std::string var_name;
+	std::shared_ptr<FilterExpression> path;
 
-private:
-	std::vector<scope_t> _scopes;
-
-protected:
-	static std::shared_ptr<core::object::Object> find_in_scope(
-		scope_t& scope,
-		const std::string& key
-	);
-
-public:
-	explicit Context(const scope_t& global_scope);
-	std::shared_ptr<core::object::Object> find_var(const std::string& key) override;
-	void push_var(
-		const std::string& key,
-		const std::shared_ptr<core::object::Object>& val
-	) override;
-	void push_scope(const scope_t& scope) override;
-	void pop_scope() override;
+	std::string render(IContext* ctx) override;
 };
 
-__RENDER_END__
+extern std::function<std::shared_ptr<internal::node>(
+	internal::parser*, internal::token_t& token
+)> make_static_tag(const std::string& name, const std::string& prefix);
+
+__TAGS_END__

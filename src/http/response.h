@@ -34,7 +34,7 @@
 
 // Framework modules.
 #include "./interfaces.h"
-#include "../collections/dict.h"
+#include <xalwart.core/collections/dict.h>
 
 
 __HTTP_BEGIN__

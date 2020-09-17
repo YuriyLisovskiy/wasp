@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2020 Yuriy Lisovskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,16 +16,16 @@
  */
 
 /**
- * core/object/_def_.h
+ * render/tags/_def_.h
  *
- * Purpose: core/object module's definitions.
+ * Purpose: render/tags module's definitions.
  */
 
 #pragma once
 
-#include "../_def_.h"
+#include <xalwart.render/_def_.h>
 
 
-// core::object
-#define __OBJECT_BEGIN__ __CORE_BEGIN__ namespace object {
-#define __OBJECT_END__ } __CORE_END__
+/// render::internal::tags
+#define __TAGS_BEGIN__ __RENDER_INTERNAL_BEGIN__ namespace tags {
+#define __TAGS_END__ } __RENDER_INTERNAL_END__

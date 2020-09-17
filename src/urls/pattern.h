@@ -29,8 +29,8 @@
 #include "./_def_.h"
 
 // Framework modules.
+#include <xalwart.core/regex.h>
 #include "../views/args.h"
-#include "../core/regex.h"
 #include "../http/request.h"
 #include "../http/response.h"
 #include "../conf/settings.h"

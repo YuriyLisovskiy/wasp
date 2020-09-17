@@ -22,15 +22,15 @@
 #include "./response.h"
 
 // Framework modules.
+#include <xalwart.core/datetime.h>
+#include <xalwart.core/exceptions.h>
+#include <xalwart.core/path.h>
+#include <xalwart.core/strings.h>
 #include "./status.h"
 #include "./url.h"
 #include "./utility.h"
 #include "../core/encoding.h"
 #include "../core/mime_types.h"
-#include "../core/datetime.h"
-#include "../core/path.h"
-#include "../core/strings.h"
-#include "../core/exceptions.h"
 
 
 __HTTP_BEGIN__

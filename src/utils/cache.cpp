@@ -22,11 +22,11 @@
 #include "./cache.h"
 
 // Framework modules.
+#include <xalwart.core/utility.h>
+#include <xalwart.core/strings.h>
 #include "./crypto/md5.h"
 #include "../http/headers.h"
 #include "./http.h"
-#include "../core/utility.h"
-#include "../core/strings.h"
 
 
 __CACHE_INTERNAL_BEGIN__

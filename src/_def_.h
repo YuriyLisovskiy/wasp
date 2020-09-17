@@ -23,10 +23,7 @@
 #pragma once
 
 
-// xw
-#define __MAIN_NAMESPACE_BEGIN__ namespace xw {
-#define __MAIN_NAMESPACE_END__ }
-
+#include <xalwart.core/_def_.h>
 
 __MAIN_NAMESPACE_BEGIN__
 
@@ -34,15 +31,3 @@ const char* const LIB_NAME = "Xalwart";
 const char* const LIB_VERSION = "0.0.1-dev";
 
 __MAIN_NAMESPACE_END__
-
-
-// Required parameters for built-in logger.
-#ifdef _MSC_VER
-#define _ERROR_DETAILS_ __LINE__, __FUNCTION__, __FILE__
-#else
-#define _ERROR_DETAILS_ __LINE__, __PRETTY_FUNCTION__, __FILE__
-#endif
-
-#if defined(_WIN32) || defined(_WIN64)
-typedef unsigned int uint;
-#endif

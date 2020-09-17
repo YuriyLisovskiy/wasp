@@ -25,10 +25,10 @@
 #include <iostream>
 
 // Framework modules.
+#include <xalwart.core/strings.h>
 #include "../../../urls/url.h"
 #include "../../../urls/resolver.h"
 #include "../../../core/parsers/url_parser.h"
-#include "../../../core/strings.h"
 
 
 __CORE_COMMANDS_BEGIN__
