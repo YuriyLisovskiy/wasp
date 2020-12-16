@@ -17,7 +17,8 @@
 
 #include <gtest/gtest.h>
 
-#include "../../../../src/core/exceptions.h"
+#include <xalwart.core/exceptions.h>
+
 #include "../../../../src/core/parsers/url_parser.h"
 
 using namespace xw;

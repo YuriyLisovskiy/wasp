@@ -19,7 +19,8 @@
 
 #include <gtest/gtest.h>
 
-#include "../../../../src/core/logger.h"
+#include <xalwart.core/logger.h>
+
 #include "../../../../src/utils/crypto/hmac.h"
 
 using namespace xw;

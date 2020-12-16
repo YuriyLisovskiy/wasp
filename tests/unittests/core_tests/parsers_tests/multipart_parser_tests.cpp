@@ -19,9 +19,10 @@
 
 #include <gtest/gtest.h>
 
-#include "../../../../src/core/path.h"
-#include "../../../../src/core/exceptions.h"
-#include "../../../../src/core/strings.h"
+#include <xalwart.core/exceptions.h>
+#include <xalwart.core/strings.h>
+#include <xalwart.core/path.h>
+
 #include "../../../../src/core/parsers/multipart_parser.h"
 #include "../../../../src/http/request.h"
 

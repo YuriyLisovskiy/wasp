@@ -39,7 +39,10 @@ function(add_tests SUB_DIR SUB_NAME)
     link_xw_library(${FULL_BIN} ${LIBRARY_NAME}.core 0.0.1)
     link_xw_library(${FULL_BIN} ${LIBRARY_NAME}.render 0.0.1)
 
-    target_link_libraries(${FULL_BIN} PUBLIC ${LIB_DLL} gtest stdc++fs)
+    target_link_libraries(${FULL_BIN} PUBLIC ${LIB_DLL} gtest)
+    if (UNIX)
+        target_link_libraries(${FULL_BIN} PUBLIC stdc++fs)
+    endif()
 
     target_include_directories(${FULL_BIN} PUBLIC ${PROJECT_SOURCE_DIR}/include)
     target_include_directories(${FULL_BIN} PUBLIC ${PROJECT_SOURCE_DIR}/vendor/yaml)
@@ -51,9 +54,9 @@ endfunction(add_sub_tests)
 
 add_tests("" all)
 
-add_sub_tests(collections)
+#add_sub_tests(collections)
 add_sub_tests(core)
 add_sub_tests(http)
-add_sub_tests(render)
+#add_sub_tests(render)
 add_sub_tests(utils)
 add_sub_tests(views)

@@ -19,12 +19,13 @@
 
 #include <gtest/gtest.h>
 
+#include <xalwart.core/logger.h>
+#include <xalwart.core/collections/dict.h>
+#include <xalwart.core/collections/multi_dict.h>
+
 #include "../../../src/views/redirect_view.h"
 #include "../../../src/http/request.h"
 #include "../../../src/conf/settings.h"
-#include "../../../src/core/logger.h"
-#include "../../../src/collections/dict.h"
-#include "../../../src/collections/multi_dict.h"
 
 using namespace xw;
 
