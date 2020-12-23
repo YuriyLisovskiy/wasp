@@ -1,60 +1,32 @@
-/*
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 /**
  * conf/settings.h
+ *
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * Purpose: entire application's settings.
  */
 
 #pragma once
 
+// Core libraries.
+#include <xalwart.core/datetime.h>
+#include <xalwart.core/logger.h>
+
+// Vendor libraries.
+#include "../yaml/yaml-cpp/yaml.h"
+
 // Module definitions.
 #include "./_def_.h"
 
-// Vendor.
-#include <yaml-cpp/yaml.h>
-
-// Framework modules.
-#include <xalwart.core/datetime.h>
-#include <xalwart.core/logger.h>
-#include <xalwart.render/library/_def_.h>
-#include "./settings_factory.h"
-#include "../core/management/base.h"
+// Framework libraries.
+#include "../urls/url.h"
+#include "../apps/interfaces.h"
 #include "../middleware/interfaces.h"
-#include "../render/env/interfaces.h"
+#include "../render/library/library.h"
 
-
-__URLS_BEGIN__
-class UrlPattern;
-__URLS_END__
-
-__APPS_BEGIN__
-class IAppConfig;
-__APPS_END__
-
-__ENV_BEGIN__
-class IEnvironment;
-class Config;
-__ENV_END__
-
-__LIB_BEGIN__
-class ILibrary;
-__LIB_END__
+__CONF_INTERNAL_BEGIN__
+class SettingsFactory;
+__CONF_INTERNAL_END__
 
 
 __CONF_BEGIN__
@@ -65,8 +37,6 @@ private:
 	const std::string CONFIG_ROOT = "application";
 	const std::string CONFIG_NAME = "config.yml";
 	const std::string LOCAL_CONFIG_NAME = "config.local.yml";
-
-	internal::SettingsFactory* _factory;
 
 	YAML::Node _load_config(const std::string& file_name) const;
 
@@ -91,12 +61,15 @@ private:
 	void _init_middleware(YAML::Node& middleware);
 
 protected:
+	internal::SettingsFactory* factory;
+
+protected:
 	virtual void register_logger();
 	virtual void register_apps();
 	virtual void register_middleware();
 	virtual void register_libraries();
-	virtual void register_templates_env();
-	virtual void register_templates_env(render::env::Config* cfg);
+	virtual void register_templates_engine();
+	virtual void register_templates_engine(const YAML::Node& config);
 	virtual void register_loaders();
 
 public:
@@ -145,7 +118,7 @@ public:
 	std::map<std::string, std::shared_ptr<core::BaseCommand>> COMMANDS;
 
 	/// Backend for rendering templates.
-	std::unique_ptr<render::env::IEnvironment> TEMPLATES_ENV;
+	std::unique_ptr<render::IEngine> TEMPLATES_ENGINE;
 
 	/// Whether to append trailing slashes to URLs.
 	bool APPEND_SLASH;
@@ -299,29 +272,29 @@ public:
 	void init();
 	void prepare();
 
-	template <typename _T, typename = std::enable_if<std::is_base_of<apps::IAppConfig, _T>::value>>
-	void app(const std::string& full_name)
-	{
-		this->_factory->register_app<_T>(full_name);
-	}
-
-	template <typename _T, typename = std::enable_if<std::is_base_of<middleware::IMiddleware, _T>::value>>
-	void middleware(const std::string& full_name)
-	{
-		this->_factory->register_middleware<_T>(full_name);
-	}
-
-	template <typename _T, typename = std::enable_if<std::is_base_of<render::lib::ILibrary, _T>::value>>
-	void library(const std::string& full_name)
-	{
-		this->_factory->register_library<_T>(full_name);
-	}
-
-	template <typename _T, typename = std::enable_if<std::is_base_of<render::ILoader, _T>::value>>
-	void loader(const std::string& full_name)
-	{
-		this->_factory->register_loader<_T>(full_name);
-	}
+//	template <typename _T, typename = std::enable_if<std::is_base_of<apps::IAppConfig, _T>::value>>
+//	void app(const std::string& full_name)
+//	{
+//		this->_factory->register_app<_T>(full_name);
+//	}
+//
+//	template <typename _T, typename = std::enable_if<std::is_base_of<middleware::IMiddleware, _T>::value>>
+//	void middleware(const std::string& full_name)
+//	{
+//		this->_factory->register_middleware<_T>(full_name);
+//	}
+//
+//	template <typename _T, typename = std::enable_if<std::is_base_of<render::lib::ILibrary, _T>::value>>
+//	void library(const std::string& full_name)
+//	{
+//		this->_factory->register_library<_T>(full_name);
+//	}
+//
+//	template <typename _T, typename = std::enable_if<std::is_base_of<render::ILoader, _T>::value>>
+//	void loader(const std::string& full_name)
+//	{
+//		this->_factory->register_loader<_T>(full_name);
+//	}
 };
 
 __CONF_END__

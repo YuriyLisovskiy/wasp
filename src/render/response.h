@@ -26,11 +26,12 @@
 #pragma once
 
 // Module definitions.
-#include "./env/_def_.h"
+#include <xalwart.render/_def_.h>
 
-// Framework modules.
+// Render libraries.
 #include <xalwart.render/base.h>
-#include "./env/interfaces.h"
+
+#include "../http/response.h"
 
 
 __RENDER_BEGIN__
@@ -38,14 +39,14 @@ __RENDER_BEGIN__
 class TemplateResponse : public http::HttpResponse
 {
 protected:
-	std::string _template_name;
-	IContext* _context;
-	env::IEnvironment* _env;
-	bool _is_rendered;
+	std::string template_name;
+	IContext* context;
+	render::IEngine* engine;
+	bool is_rendered;
 
 public:
 	explicit TemplateResponse(
-		env::IEnvironment* env,
+		render::IEngine* engine,
 		const std::string& template_name,
 		IContext* context = nullptr,
 		unsigned short int status = 200,

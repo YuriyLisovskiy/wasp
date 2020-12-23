@@ -1,11 +1,12 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.12)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
-project(XalwartFramework)
-
-set(LIBRARY_NAME "xalwart")
+set(FRAMEWORK_NAME "xalwart")
+set(LIBRARY_NAME "${FRAMEWORK_NAME}")
 set(LIBRARY_VERSION "0.0.1")
+
+project(${LIBRARY_NAME})
 
 function(remove_dirs SRC_LIST)
     foreach(entry ${SRC_LIST})
@@ -25,16 +26,26 @@ function(print SRC_LIST)
     endforeach(entry)
 endfunction(print)
 
-set(XW_LIB_DIR ${PROJECT_SOURCE_DIR}/lib/${LIBRARY_NAME})
+set(LIB_SRC_DIR ${PROJECT_SOURCE_DIR}/src)
+file(GLOB_RECURSE SOURCES LIST_DIRECTORIES true ${LIB_SRC_DIR}/*.h ${LIB_SRC_DIR}/*.cpp)
+remove_dirs(SOURCES)
 
-function(link_xw_library TARGET LIB_NAME LIB_VER)
-    if (WIN32)
-        set(DLL ${XW_LIB_DIR}/${LIB_NAME}-${LIB_VER}.lib)
-    else()
-        set(DLL ${XW_LIB_DIR}/lib${LIB_NAME}-${LIB_VER}.so)
-    endif()
-    target_link_libraries(${TARGET} PUBLIC ${DLL})
-endfunction(link_xw_library)
+# Build shared library.
+set(FULL_LIBRARY_NAME ${LIBRARY_NAME}-${LIBRARY_VERSION})
+add_library(${FULL_LIBRARY_NAME} SHARED ${SOURCES})
 
-add_subdirectory(src)
-add_subdirectory(tests)
+# Install library.
+install(
+    TARGETS ${FULL_LIBRARY_NAME}
+    LIBRARY DESTINATION /usr/local/lib
+)
+
+add_custom_command(
+    TARGET ${FULL_LIBRARY_NAME}
+    POST_BUILD
+    COMMAND XW_ROOT_DIR=${PROJECT_SOURCE_DIR}/src XW_LIB_NAME=${LIBRARY_NAME} bash ${PROJECT_SOURCE_DIR}/scripts/install.sh
+)
+
+if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+    add_subdirectory(tests)
+endif()

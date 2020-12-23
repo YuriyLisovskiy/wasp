@@ -22,15 +22,15 @@
 // Header.
 #include "./settings.h"
 
-// Vendor.
-#include <yaml-cpp/yaml.h>
-
-// Framework modules.
+// Core libraries.
 #include <xalwart.core/path.h>
-#include <xalwart.core/strings.h>
-#include "../render/engine.h"
-#include "../render/env/default.h"
-#include "../render/library/builtin.h"
+#include <xalwart.core/string_utils.h>
+
+// Render libraries.
+#include <xalwart.render/engine.h>
+
+#include "./settings_factory.h"
+#include "../render/library/default.h"
 
 
 __CONF_BEGIN__
@@ -460,73 +460,77 @@ Settings::Settings(const std::string& base_dir)
 
 void Settings::_init_env(YAML::Node& env)
 {
-	std::vector<std::string> dirs;
-	auto directories = env["directories"];
-	if (directories && directories.IsSequence())
+	auto use_custom = env["use_custom"];
+	if (use_custom && use_custom.as<bool>())
 	{
-		for (auto it = directories.begin(); it != directories.end(); it++)
-		{
-			if (!it->IsNull() && it->IsScalar())
-			{
-				auto p = it->as<std::string>();
-				dirs.push_back(
-					core::path::is_absolute(p) ? p : core::path::join(this->BASE_DIR, p)
-				);
-			}
-		}
-	}
-
-	std::vector<std::shared_ptr<render::lib::ILibrary>> libs{
-		this->_factory->get_library(xw::render::lib::DefaultLibrary::FULL_NAME)
-	};
-	auto libraries = env["libraries"];
-	if (libraries && libraries.IsSequence() && libraries.size() > 0)
-	{
-		this->register_libraries();
-		for (auto it = libraries.begin(); it != libraries.end(); it++)
-		{
-			if (!it->IsNull() && it->IsScalar())
-			{
-				libs.push_back(this->_factory->get_library(it->as<std::string>()));
-			}
-		}
-	}
-
-	std::vector<std::shared_ptr<render::ILoader>> loaders_vec;
-	auto loaders = env["loaders"];
-	if (loaders && loaders.IsSequence() && loaders.size() > 0)
-	{
-		this->register_loaders();
-		for (auto it = loaders.begin(); it != loaders.end(); it++)
-		{
-			if (!it->IsNull() && it->IsScalar())
-			{
-				loaders_vec.push_back(this->_factory->get_loader(it->as<std::string>()));
-			}
-		}
-	}
-
-	auto use_app_dirs = env["use_app_directories"];
-	auto auto_escape = env["auto_escape"];
-	auto use_default_engine = env["use_default_engine"];
-
-	auto env_cfg = render::env::Config(
-		dirs,
-		use_app_dirs ? use_app_dirs.as<bool>() : true,
-		this->INSTALLED_APPS,
-		this->DEBUG,
-		this->LOGGER.get(),
-		auto_escape ? auto_escape.as<bool>() : true,
-		libs,
-		loaders_vec
-	);
-	if (use_default_engine && !use_default_engine.as<bool>())
-	{
-		this->register_templates_env(&env_cfg);
+		this->register_templates_engine(env);
 	}
 	else
 	{
-		this->TEMPLATES_ENV = render::env::DefaultEnvironment<render::Engine>::make(&env_cfg);
+		std::vector<std::string> dirs;
+		auto directories = env["directories"];
+		if (directories && directories.IsSequence())
+		{
+			for (auto it = directories.begin(); it != directories.end(); it++)
+			{
+				if (!it->IsNull() && it->IsScalar())
+				{
+					auto p = it->as<std::string>();
+					dirs.push_back(
+						core::path::is_absolute(p) ? p : core::path::join(this->BASE_DIR, p)
+					);
+				}
+			}
+		}
+
+		std::vector<std::shared_ptr<render::lib::ILibrary>> libs{
+			this->factory->get_library(xw::render::lib::DefaultLibrary::FULL_NAME)
+		};
+		auto libraries = env["libraries"];
+		if (libraries && libraries.IsSequence() && libraries.size() > 0)
+		{
+			this->register_libraries();
+			for (auto it = libraries.begin(); it != libraries.end(); it++)
+			{
+				if (!it->IsNull() && it->IsScalar())
+				{
+					libs.push_back(this->factory->get_library(it->as<std::string>()));
+				}
+			}
+		}
+
+		std::vector<std::shared_ptr<render::ILoader>> loaders_vec;
+		auto loaders = env["loaders"];
+		if (loaders && loaders.IsSequence() && loaders.size() > 0)
+		{
+			this->register_loaders();
+			for (auto it = loaders.begin(); it != loaders.end(); it++)
+			{
+				if (!it->IsNull() && it->IsScalar())
+				{
+					loaders_vec.push_back(this->factory->get_loader(it->as<std::string>()));
+				}
+			}
+		}
+
+		auto use_app_dirs = env["use_app_directories"];
+		if (use_app_dirs && use_app_dirs.IsScalar() && use_app_dirs.as<bool>())
+		{
+			for (const auto& app : this->INSTALLED_APPS)
+			{
+				dirs.push_back(core::path::dirname(app->get_app_path()));
+			}
+		}
+
+		auto auto_escape = env["auto_escape"];
+		this->TEMPLATES_ENGINE = std::make_unique<render::DefaultEngine>(
+			dirs,
+			this->DEBUG,
+			auto_escape && auto_escape.as<bool>(),
+			loaders_vec,
+			libs,
+			this->LOGGER.get()
+		);
 	}
 }
 
@@ -715,7 +719,7 @@ void Settings::_init_apps(YAML::Node& apps)
 	{
 		if (!it->IsNull() && it->IsScalar())
 		{
-			auto item = this->_factory->get_app(it->as<std::string>());
+			auto item = this->factory->get_app(it->as<std::string>());
 			if (item)
 			{
 				this->INSTALLED_APPS.push_back(item);
@@ -730,7 +734,7 @@ void Settings::_init_middleware(YAML::Node& middleware)
 	{
 		if (!it->IsNull() && it->IsScalar())
 		{
-			auto item = this->_factory->get_middleware(it->as<std::string>());
+			auto item = this->factory->get_middleware(it->as<std::string>());
 			if (item)
 			{
 				this->MIDDLEWARE.push_back(item);
@@ -866,7 +870,7 @@ void Settings::init()
 
 	this->_init_secure(config);
 
-	this->_factory = new internal::SettingsFactory(this, this->LOGGER.get());
+	this->factory = new internal::SettingsFactory(this, this->LOGGER.get());
 
 	auto apps = config["installed_apps"];
 	if (apps && apps.IsSequence() && apps.size() > 0)
@@ -896,21 +900,21 @@ void Settings::init()
 		"Loading template environment...",
 		core::Logger::Color::DEFAULT, '\0'
 	);
-	auto env = config["templates_env"];
+	this->register_libraries();
+	this->register_loaders();
+	auto env = config["templates_engine"];
 	if (env && env.IsMap())
 	{
 		this->_init_env(env);
 	}
 	else
 	{
-		this->register_libraries();
-		this->register_loaders();
-		this->register_templates_env();
+		this->register_templates_engine();
 	}
 
 	this->LOGGER->print(" Done.");
 
-	delete _factory;
+	delete factory;
 }
 
 void Settings::prepare()
@@ -937,11 +941,11 @@ void Settings::register_libraries()
 {
 }
 
-void Settings::register_templates_env()
+void Settings::register_templates_engine()
 {
 }
 
-void Settings::register_templates_env(render::env::Config* cfg)
+void Settings::register_templates_engine(const YAML::Node& config)
 {
 }
 

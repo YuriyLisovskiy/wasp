@@ -1,25 +1,9 @@
-/*
- * Copyright (c) 2020 Yuriy Lisovskiy
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 /**
  * conf/settings_factory.h
  *
- * Purpose:
- *  TODO: implement docs for conf/settings_factory.h
+ * Copyright (c) 2020 Yuriy Lisovskiy
+ *
+ * Purpose: TODO
  */
 
 #pragma once
@@ -28,33 +12,17 @@
 #include <memory>
 #include <functional>
 
+// Core libraries.
+#include <xalwart.core/logger.h>
+
 // Module definitions.
 #include "./_def_.h"
 
-// Framework modules.
-#include <xalwart.core/logger.h>
-#include <xalwart.render/library/_def_.h>
-#include <xalwart.render/base.h>
-#include "../apps/_def_.h"
-#include "../middleware/_def_.h"
-
-
-__CONF_BEGIN__
-struct Settings;
-__CONF_END__
-
-__APPS_BEGIN__
-class IAppConfig;
-__APPS_END__
-
-__LIB_BEGIN__
-class ILibrary;
-__LIB_END__
-
-__MIDDLEWARE_BEGIN__
-class IMiddleware;
-__MIDDLEWARE_END__
-
+// Framework libraries.
+#include "../apps/interfaces.h"
+#include "../middleware/interfaces.h"
+#include "../render/library/library.h"
+#include "./settings.h"
 
 __CONF_INTERNAL_BEGIN__
 
@@ -89,7 +57,7 @@ public:
 	SettingsFactory(Settings* settings, core::ILogger* logger);
 
 	template <typename T, typename = std::enable_if<std::is_base_of<apps::IAppConfig, T>::value>>
-	void register_app(const std::string& full_name)
+	void add_app(const std::string& full_name)
 	{
 		if (this->_apps.find(full_name) != this->_apps.end())
 		{
@@ -111,7 +79,7 @@ public:
 	}
 
 	template <typename T, typename = std::enable_if<std::is_base_of<middleware::IMiddleware, T>::value>>
-	void register_middleware(const std::string& full_name)
+	void add_middleware(const std::string& full_name)
 	{
 		if (this->_middleware.find(full_name) != this->_middleware.end())
 		{
@@ -130,8 +98,8 @@ public:
 		}
 	}
 
-	template <typename T, typename = std::enable_if<std::is_base_of<render::lib::ILibrary, T>::value>>
-	void register_library(const std::string& full_name)
+	template <typename T, typename = std::enable_if<std::is_base_of<render::lib::Library, T>::value>>
+	void add_library(const std::string& full_name)
 	{
 		if (this->_libraries.find(full_name) != this->_libraries.end())
 		{
@@ -151,7 +119,7 @@ public:
 	}
 
 	template <typename T, typename = std::enable_if<std::is_base_of<render::ILoader, T>::value>>
-	void register_loader(const std::string& full_name)
+	void add_loader(const std::string& full_name)
 	{
 		if (this->_loaders.find(full_name) != this->_loaders.end())
 		{

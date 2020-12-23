@@ -23,9 +23,10 @@
 // Header.
 #include "./settings_factory.h"
 
-// Framework modules.
+// Render libraries.
 #include <xalwart.render/loaders.h>
-#include "../render/library/builtin.h"
+
+#include "../render/library/default.h"
 #include "../middleware/clickjacking.h"
 #include "../middleware/common.h"
 #include "../middleware/cookies.h"

@@ -23,8 +23,9 @@
 
 // Framework modules.
 #include <xalwart.core/utility.h>
-#include <xalwart.core/strings.h>
+#include <xalwart.core/string_utils.h>
 
+#include "../conf/settings.h"
 
 __VIEWS_BEGIN__
 

@@ -23,25 +23,24 @@
 
 // Framework modules.
 #include "../render/response.h"
+#include "../conf/settings.h"
 
 
 __VIEWS_BEGIN__
 
-TemplateResponseMixin::TemplateResponseMixin(
-	render::env::IEnvironment* env
-)
+TemplateResponseMixin::TemplateResponseMixin(render::IEngine* engine)
 {
-	if (!env)
+	if (!engine)
 	{
 		throw core::ImproperlyConfigured(
-			"Environment must be initialized in order to use the application",
+			"Template engine must be initialized in order to use the application",
 			_ERROR_DETAILS_
 		);
 	}
 
-	this->_env = env;
-	this->_template_name = "";
-	this->_content_type = "";
+	this->engine = engine;
+	this->template_name = "";
+	this->content_type = "";
 }
 
 std::unique_ptr<http::IHttpResponse> TemplateResponseMixin::render(
@@ -54,7 +53,7 @@ std::unique_ptr<http::IHttpResponse> TemplateResponseMixin::render(
 )
 {
 	auto response = std::make_unique<render::TemplateResponse>(
-		this->_env,
+		this->engine,
 		template_name.empty() ? this->get_template_name() : template_name,
 		context.get(),
 		status,
@@ -67,7 +66,7 @@ std::unique_ptr<http::IHttpResponse> TemplateResponseMixin::render(
 
 std::string TemplateResponseMixin::get_template_name()
 {
-	if (this->_template_name.empty())
+	if (this->template_name.empty())
 	{
 		throw core::ImproperlyConfigured(
 			"TemplateResponseMixin requires either a definition of '_template_name' or an "
@@ -75,14 +74,14 @@ std::string TemplateResponseMixin::get_template_name()
 		);
 	}
 
-	return this->_template_name;
+	return this->template_name;
 }
 
 
 TemplateView::TemplateView(
 	conf::Settings* settings
 ) : views::View({"get", "options"}, settings),
-	TemplateResponseMixin(settings->TEMPLATES_ENV.get())
+	TemplateResponseMixin(settings->TEMPLATES_ENGINE.get())
 {
 }
 
@@ -92,10 +91,10 @@ TemplateView::TemplateView(
 	const std::string& template_name,
 	const std::string& content_type
 ) : views::View(allowed_methods, settings),
-    TemplateResponseMixin(settings->TEMPLATES_ENV.get())
+    TemplateResponseMixin(settings->TEMPLATES_ENGINE.get())
 {
-	this->_template_name = template_name;
-	this->_content_type = content_type;
+	this->template_name = template_name;
+	this->content_type = content_type;
 }
 
 std::shared_ptr<render::IContext> TemplateView::get_context(
@@ -109,10 +108,7 @@ std::unique_ptr<http::IHttpResponse> TemplateView::get(
 	http::HttpRequest* request, Args* args
 )
 {
-	return this->render(
-		request,
-		this->get_context(request, args)
-	);
+	return this->render(request, this->get_context(request, args));
 }
 
 __VIEWS_END__

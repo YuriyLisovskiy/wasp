@@ -23,7 +23,7 @@
 
 // Framework modules.
 #include <xalwart.core/exceptions.h>
-#include <xalwart.core/strings.h>
+#include <xalwart.core/string_utils.h>
 #include "../../utils/crypto/hmac.h"
 
 

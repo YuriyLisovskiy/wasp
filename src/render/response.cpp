@@ -21,14 +21,14 @@
 
 #include "./response.h"
 
-// Framework modules.
+// Render libraries.
 #include <xalwart.render/exceptions.h>
 
 
 __RENDER_BEGIN__
 
 TemplateResponse::TemplateResponse(
-	env::IEnvironment* env,
+	render::IEngine* engine,
 	const std::string& template_name,
 	IContext* context,
 	unsigned short int status,
@@ -36,27 +36,27 @@ TemplateResponse::TemplateResponse(
 	const std::string& charset
 ) : HttpResponse("", status, content_type, "", charset)
 {
-	this->_env = env;
-	this->_template_name = template_name;
-	this->_context = context;
-	this->_is_rendered = false;
+	this->engine = engine;
+	this->template_name = template_name;
+	this->context = context;
+	this->is_rendered = false;
 }
 
 void TemplateResponse::render()
 {
-	if (this->_is_rendered)
+	if (this->is_rendered)
 	{
 		return;
 	}
 
-	auto t = this->_env->get_template(this->_template_name);
-	this->_content = t->render(this->_context);
-	this->_is_rendered = true;
+	auto t = this->engine->get_template(this->template_name);
+	this->_content = t->render(this->context);
+	this->is_rendered = true;
 }
 
 std::string TemplateResponse::get_content()
 {
-	if (this->_is_rendered)
+	if (this->is_rendered)
 	{
 		return this->_content;
 	}

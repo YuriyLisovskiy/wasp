@@ -25,7 +25,7 @@
 #include <iostream>
 
 // Framework modules.
-#include <xalwart.core/strings.h>
+#include <xalwart.core/string_utils.h>
 
 
 __FLAGS_INTERNAL_BEGIN__

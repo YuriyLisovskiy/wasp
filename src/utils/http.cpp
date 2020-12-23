@@ -23,7 +23,7 @@
 
 // Framework modules.
 #include <xalwart.core/utility.h>
-#include <xalwart.core/strings.h>
+#include <xalwart.core/string_utils.h>
 
 
 __UTILS_HTTP_INTERNAL_BEGIN__

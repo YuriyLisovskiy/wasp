@@ -22,11 +22,11 @@
 #include "./start_server.h"
 
 // C++ libraries.
-#include <iostream>
+//#include <iostream>
 
 // Framework modules.
-#include <xalwart.core/strings.h>
-#include "../../../urls/url.h"
+#include <xalwart.core/string_utils.h>
+//#include "../../../urls/url.h"
 #include "../../../urls/resolver.h"
 #include "../../../core/parsers/url_parser.h"
 
@@ -130,7 +130,7 @@ StartServerCommand::get_handler()
 	this->build_app_patterns(this->settings->ROOT_URLCONF);
 
 	// Initialize template engine's libraries.
-	this->settings->TEMPLATES_ENV->load_libs();
+	this->settings->TEMPLATES_ENGINE->load_libraries();
 
 	auto handler = [this](
 		http::HttpRequest* request, const core::net::internal::socket_t& client

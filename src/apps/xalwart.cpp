@@ -157,7 +157,7 @@ void MainApplication::_perform_checks()
 	}
 
 	size_t err_count = 0;
-	if (!this->_settings->TEMPLATES_ENV)
+	if (!this->_settings->TEMPLATES_ENGINE)
 	{
 		this->_settings->LOGGER->error(
 			"TEMPLATES_ENV instance must be configured in order to use the application."

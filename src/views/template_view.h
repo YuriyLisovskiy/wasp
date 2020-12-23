@@ -27,8 +27,10 @@
 // Module definitions.
 #include "./_def_.h"
 
+// Render libraries.
+#include <xalwart.render/base.h>
+
 // Framework modules.
-#include "../render/env/interfaces.h"
 #include "../views/view.h"
 
 
@@ -38,14 +40,12 @@ __VIEWS_BEGIN__
 class TemplateResponseMixin
 {
 protected:
-	std::string _template_name;
-	std::string _content_type;
-	render::env::IEnvironment* _env;
+	std::string template_name;
+	std::string content_type;
+	render::IEngine* engine;
 
 public:
-	explicit TemplateResponseMixin(
-		render::env::IEnvironment* env
-	);
+	explicit TemplateResponseMixin(render::IEngine* engine);
 
 	/// Returns a response with a template rendered with
 	/// the given context.

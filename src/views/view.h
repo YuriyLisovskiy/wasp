@@ -25,14 +25,22 @@
 
 #pragma once
 
+// C++ libraries.
+#include <memory>
+#include <functional>
+
 // Module definitions.
 #include "./_def_.h"
+
+// Core libraries.
+#include <xalwart.core/logger.h>
 
 // Framework modules.
 #include "./args.h"
 #include "../http/request.h"
 #include "../http/response.h"
-#include "../conf/settings.h"
+//#include "../conf/settings.h"
+#include "../conf/_def_.h"
 
 
 __CONF_BEGIN__

@@ -23,7 +23,7 @@
 
 // Framework modules.
 #include <xalwart.core/path.h>
-#include <xalwart.core/strings.h>
+#include <xalwart.core/string_utils.h>
 
 
 __MIME_BEGIN__

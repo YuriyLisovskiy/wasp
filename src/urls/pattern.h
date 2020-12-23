@@ -30,10 +30,12 @@
 
 // Framework modules.
 #include <xalwart.core/regex.h>
+
 #include "../views/args.h"
 #include "../http/request.h"
 #include "../http/response.h"
-#include "../conf/settings.h"
+//#include "../conf/settings.h"
+#include "../conf/_def_.h"
 
 
 __CONF_BEGIN__
