@@ -1,5 +1,5 @@
 /**
- * core/management/commands/runserver.h
+ * management/commands/runserver.h
  *
  * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
@@ -12,25 +12,25 @@
 #include "./_def_.h"
 
 // Framework libraries.
-#include "../app_command.h"
-#include "../../../core/net/http_server.h"
+#include "../../commands/app_command.h"
+#include "../../core/net/http_server.h"
 
 
-__CORE_COMMANDS_BEGIN__
+__MANAGEMENT_COMMANDS_BEGIN__
 
 class StartServerCommand final: public AppCommand
 {
 private:
-	flags::StringFlag* _addr_port_flag;
-	flags::StringFlag* _addr_flag;
-	flags::LongIntFlag* _port_flag;
-	flags::LongIntFlag* _threads_flag;
-	flags::BoolFlag* _use_ipv6_flag;
+	core::flags::StringFlag* _addr_port_flag;
+	core::flags::StringFlag* _addr_flag;
+	core::flags::LongIntFlag* _port_flag;
+	core::flags::LongIntFlag* _threads_flag;
+	core::flags::BoolFlag* _use_ipv6_flag;
 
-	rgx::Regex* _ipv4_ipv6_port_regex;
-	rgx::Regex* _ipv4_regex;
-	rgx::Regex* _ipv6_regex;
-	rgx::Regex* _port_regex;
+	core::rgx::Regex* _ipv4_ipv6_port_regex;
+	core::rgx::Regex* _ipv4_regex;
+	core::rgx::Regex* _ipv6_regex;
+	core::rgx::Regex* _port_regex;
 
 	const std::string DEFAULT_IPV4_HOST = "127.0.0.1";
 	const std::string DEFAULT_IPV6_HOST = "[::1]";
@@ -76,4 +76,4 @@ public:
 	~StartServerCommand() final;
 };
 
-__CORE_COMMANDS_END__
+__MANAGEMENT_COMMANDS_END__

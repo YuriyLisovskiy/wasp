@@ -1,23 +1,22 @@
 /**
- * core/management/base.h
+ * commands/base.h
  *
  * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * Purpose:
- * 	The base class from which all management commands
- * 	ultimately derive.
+ * 	The base class from which all commands ultimately derive.
  */
 
 #pragma once
 
 // Module definitions.
-#include "../_def_.h"
+#include "./_def_.h"
 
 // Framework libraries.
-#include "../../core/flags/flag_set.h"
+#include "../core/flags/flag_set.h"
 
 
-__CORE_BEGIN__
+__COMMANDS_BEGIN__
 
 /// Use this class if you want access to all of the mechanisms which
 /// parse the command-line arguments and work out what code to call in
@@ -26,7 +25,7 @@ __CORE_BEGIN__
 class BaseCommand
 {
 protected:
-	flags::FlagSet* _flag_set;
+	core::flags::FlagSet* _flag_set;
 	bool _is_created;
 	size_t _parse_from;
 	std::string _help;
@@ -60,4 +59,4 @@ public:
 	void run_from_argv(int argc, char** argv, bool is_verbose = false);
 };
 
-__CORE_END__
+__COMMANDS_END__

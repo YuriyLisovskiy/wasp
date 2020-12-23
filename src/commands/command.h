@@ -1,5 +1,5 @@
 /**
- * core/management/command.h
+ * commands/command.h
  *
  * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
@@ -9,14 +9,14 @@
 #pragma once
 
 // Module definitions.
-#include "../_def_.h"
+#include "./_def_.h"
 
 // Framework libraries.
 #include "./base.h"
-#include "../../conf/settings.h"
+#include "../conf/settings.h"
 
 
-__CORE_BEGIN__
+__COMMANDS_BEGIN__
 
 class Command : public BaseCommand
 {
@@ -28,4 +28,4 @@ protected:
 	);
 };
 
-__CORE_END__
+__COMMANDS_END__

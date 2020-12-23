@@ -1,37 +1,20 @@
-/*
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 /**
- * An implementation of core/management/commands/runserver.h
+ * management/commands/runserver.cpp
+ *
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  */
 
 #include "./start_server.h"
 
-// C++ libraries.
-//#include <iostream>
-
-// Framework modules.
+// Core libraries.
 #include <xalwart.core/string_utils.h>
-//#include "../../../urls/url.h"
-#include "../../../urls/resolver.h"
-#include "../../../core/parsers/url_parser.h"
+
+// Framework libraries.
+#include "../../urls/resolver.h"
+#include "../../core/parsers/url_parser.h"
 
 
-__CORE_COMMANDS_BEGIN__
+__MANAGEMENT_COMMANDS_BEGIN__
 
 StartServerCommand::StartServerCommand(apps::IAppConfig* config, conf::Settings* settings)
 	: AppCommand(config, settings, "start-server", "Starts web server")
@@ -43,17 +26,17 @@ StartServerCommand::StartServerCommand(apps::IAppConfig* config, conf::Settings*
 	this->_use_ipv6_flag = nullptr;
 
 	std::string port = R"(\d+)";
-	this->_port_regex = new rgx::Regex(port);
+	this->_port_regex = new core::rgx::Regex(port);
 
 	std::string ipv4 = R"((\d{1,3}(?:\.\d{1,3}){3})|localhost)";
-	this->_ipv4_regex = new rgx::Regex(ipv4);
+	this->_ipv4_regex = new core::rgx::Regex(ipv4);
 
 	std::string ipv6 = R"(\[([a-fA-F0-9:]+)\]|\[localhost\])";
-	this->_ipv6_regex = new rgx::Regex(ipv6);
+	this->_ipv6_regex = new core::rgx::Regex(ipv6);
 
 	std::string fqdn = R"([a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*)";
 
-	this->_ipv4_ipv6_port_regex = new rgx::Regex(
+	this->_ipv4_ipv6_port_regex = new core::rgx::Regex(
 		R"((?:(()" + ipv4 + R"()|()" + ipv6 + R"()|()" + fqdn + R"()):)?()" + port + R"())"
 	);
 }
@@ -89,7 +72,7 @@ void StartServerCommand::handle()
 {
 	if (!this->settings->DEBUG && this->settings->ALLOWED_HOSTS.empty())
 	{
-		throw CommandError("You must set 'allowed_hosts' if 'debug' is false.");
+		throw core::CommandError("You must set 'allowed_hosts' if 'debug' is false.");
 	}
 
 	core::net::internal::HttpServer::context ctx{};
@@ -252,7 +235,7 @@ void StartServerCommand::setup_server_ctx(core::net::internal::HttpServer::conte
 	{
 		if (!this->_ipv4_ipv6_port_regex->match(host_port_str))
 		{
-			throw CommandError(host_port_str + " is not valid addr:port pair");
+			throw core::CommandError(host_port_str + " is not valid addr:port pair");
 		}
 
 		auto groups = this->_ipv4_ipv6_port_regex->groups();
@@ -263,8 +246,8 @@ void StartServerCommand::setup_server_ctx(core::net::internal::HttpServer::conte
 		}
 
 		auto trimmed_addr = address;
-		str::rtrim(trimmed_addr, "]");
-		str::ltrim(trimmed_addr, "[");
+		core::str::rtrim(trimmed_addr, "]");
+		core::str::ltrim(trimmed_addr, "[");
 		if (trimmed_addr == "localhost")
 		{
 			address = ctx.use_ipv6 ? this->DEFAULT_IPV6_HOST : this->DEFAULT_IPV4_HOST;
@@ -289,13 +272,13 @@ void StartServerCommand::setup_server_ctx(core::net::internal::HttpServer::conte
 			}
 			else if (!this->_ipv4_regex->match(address))
 			{
-				throw CommandError(this->_addr_flag->get_raw() + " is invalid address");
+				throw core::CommandError(this->_addr_flag->get_raw() + " is invalid address");
 			}
 		}
 
 		auto trimmed_addr = address;
-		str::rtrim(trimmed_addr, "]");
-		str::ltrim(trimmed_addr, "[");
+		core::str::rtrim(trimmed_addr, "]");
+		core::str::ltrim(trimmed_addr, "[");
 		if (trimmed_addr == "localhost")
 		{
 			address = ctx.use_ipv6 ? this->DEFAULT_IPV6_HOST : this->DEFAULT_IPV4_HOST;
@@ -311,7 +294,7 @@ void StartServerCommand::setup_server_ctx(core::net::internal::HttpServer::conte
 		{
 			if (!this->_port_regex->match(raw_port))
 			{
-				throw CommandError(raw_port + " is invalid port");
+				throw core::CommandError(raw_port + " is invalid port");
 			}
 
 			ctx.port = this->_port_flag->get();
@@ -324,7 +307,7 @@ void StartServerCommand::setup_server_ctx(core::net::internal::HttpServer::conte
 
 	if (std::regex_match(this->_threads_flag->get_raw(), std::regex(R"(\d+)")))
 	{
-		throw CommandError("threads count is not a number: " + this->_threads_flag->get_raw());
+		throw core::CommandError("threads count is not a number: " + this->_threads_flag->get_raw());
 	}
 
 	ctx.threads_count = this->_threads_flag->get();
@@ -426,10 +409,10 @@ void StartServerCommand::log_request(
 		}
 
 		settings->LOGGER->print(
-			"[" + dt::Datetime::now().strftime("%d/%b/%Y %T") + "] \"" +
+			"[" + core::dt::Datetime::now().strftime("%d/%b/%Y %T") + "] \"" +
 			info + "\" " + std::to_string(status_code)
 		, color);
 	}
 }
 
-__CORE_COMMANDS_END__
+__MANAGEMENT_COMMANDS_END__

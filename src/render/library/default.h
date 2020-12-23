@@ -1,5 +1,5 @@
 /**
- * render/library/builtin.h
+ * render/library/default.h
  *
  * Copyright (c) 2020 Yuriy Lisovskiy
  *

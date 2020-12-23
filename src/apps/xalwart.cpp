@@ -1,22 +1,7 @@
-/*
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 /**
- * An implementation of apps/xalwart.h
+ * apps/xalwart.cpp
+ *
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  */
 
 #include "./xalwart.h"
@@ -24,9 +9,11 @@
 // C++ libraries.
 #include <iostream>
 
-// Framework modules.
+// Core libraries.
 #include <xalwart.core/path.h>
-#include "../core/management/app.h"
+
+// Framework libraries.
+#include "../management/app.h"
 
 
 __APPS_BEGIN__
@@ -110,7 +97,7 @@ void MainApplication::_setup_commands()
 		);
 	}
 
-	auto default_commands = core::internal::CoreManagementAppConfig(
+	auto default_commands = management::CoreManagementAppConfig(
 		this->_settings
 	).get_commands();
 
@@ -125,7 +112,7 @@ void MainApplication::_setup_commands()
 }
 
 void MainApplication::_extend_settings_commands_or_error(
-	const std::vector<std::shared_ptr<core::BaseCommand>>& from,
+	const std::vector<std::shared_ptr<cmd::BaseCommand>>& from,
 	const std::function<std::string(const std::string& cmd_name)>& err_fn
 )
 {
@@ -135,7 +122,7 @@ void MainApplication::_extend_settings_commands_or_error(
 			this->_settings->COMMANDS.begin(),
 			this->_settings->COMMANDS.end(),
 			[command](const std::pair<
-				std::string, std::shared_ptr<core::BaseCommand>
+				std::string, std::shared_ptr<cmd::BaseCommand>
 			>& pair) -> bool {
 				return command->name() == pair.first;
 			}

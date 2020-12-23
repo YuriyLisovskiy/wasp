@@ -19,7 +19,7 @@
 // Framework libraries.
 #include "../views/view.h"
 #include "../urls/url.h"
-#include "../core/management/app_command.h"
+#include "../commands/app_command.h"
 
 
 __APPS_BEGIN__
@@ -32,7 +32,7 @@ private:
 	bool _is_initialized;
 
 	std::vector<std::shared_ptr<urls::UrlPattern>> _urlpatterns;
-	std::vector<std::shared_ptr<core::BaseCommand>> _commands;
+	std::vector<std::shared_ptr<cmd::BaseCommand>> _commands;
 
 	template <typename AppConfigT>
 	std::shared_ptr<apps::IAppConfig> find_or_create_app()
@@ -100,7 +100,7 @@ protected:
 		}
 	}
 
-	template <typename CommandT, typename = std::enable_if<std::is_base_of<core::AppCommand, CommandT>::value>>
+	template <typename CommandT, typename = std::enable_if<std::is_base_of<cmd::AppCommand, CommandT>::value>>
 	void command()
 	{
 		auto cmd = std::make_shared<CommandT>(this, this->settings);
@@ -117,7 +117,7 @@ public:
 	std::string get_name() final;
 	std::string get_app_path() final;
 	std::vector<std::shared_ptr<urls::UrlPattern>> get_urlpatterns() final;
-	std::vector<std::shared_ptr<core::BaseCommand>> get_commands() final;
+	std::vector<std::shared_ptr<cmd::BaseCommand>> get_commands() final;
 	virtual void urlpatterns();
 	virtual void commands();
 };

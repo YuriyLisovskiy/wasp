@@ -1,5 +1,5 @@
 /**
- * core/management/app_command.h
+ * commands/app_command.h
  *
  * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
@@ -9,13 +9,13 @@
 #pragma once
 
 // Module definitions.
-#include "../_def_.h"
+#include "./_def_.h"
 
 // Framework libraries.
 #include "./command.h"
 
 
-__CORE_BEGIN__
+__COMMANDS_BEGIN__
 
 /// Derived commands must have a constructor
 ///	with pointer to apps::IAppConfig and pointer
@@ -33,4 +33,4 @@ protected:
 	);
 };
 
-__CORE_END__
+__COMMANDS_END__

@@ -115,7 +115,7 @@ public:
 	std::vector<std::shared_ptr<apps::IAppConfig>> INSTALLED_APPS;
 
 	/// List of commands to run from command line.
-	std::map<std::string, std::shared_ptr<core::BaseCommand>> COMMANDS;
+	std::map<std::string, std::shared_ptr<cmd::BaseCommand>> COMMANDS;
 
 	/// Backend for rendering templates.
 	std::unique_ptr<render::IEngine> TEMPLATES_ENGINE;

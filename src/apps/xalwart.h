@@ -25,7 +25,7 @@ private:
 
 	void _setup_commands();
 	void _extend_settings_commands_or_error(
-		const std::vector<std::shared_ptr<core::BaseCommand>>& from,
+		const std::vector<std::shared_ptr<cmd::BaseCommand>>& from,
 		const std::function<std::string(const std::string& cmd_name)>& err_fn
 	);
 	void _perform_checks();
