@@ -102,7 +102,7 @@ void StartServerCommand::handle()
 }
 
 std::function<void(http::HttpRequest*, const core::net::internal::socket_t&)>
-StartServerCommand::get_handler()
+StartServerCommand::make_handler()
 {
 	// Check if static files can be served
 	// and create necessary urls.
@@ -119,75 +119,65 @@ StartServerCommand::get_handler()
 		http::HttpRequest* request, const core::net::internal::socket_t& client
 	) mutable -> void
 	{
-		std::unique_ptr<http::IHttpResponse> error_response = nullptr;
-		std::unique_ptr<http::IHttpResponse> response = nullptr;
+//		std::shared_ptr<http::IHttpResponse> error_response = nullptr;
+//		std::shared_ptr<http::IHttpResponse> response = nullptr;
+		http::Result<std::shared_ptr<http::IHttpResponse>> result;
 		try
 		{
-			response = StartServerCommand::process_request_middleware(
+			result = StartServerCommand::process_request_middleware(
 				request, this->settings
 			);
-			if (!response)
+			if (!result.catch_(http::HttpError) && !result.value)
 			{
-				response = StartServerCommand::process_urlpatterns(
+				result = StartServerCommand::process_urlpatterns(
 					request, this->settings->ROOT_URLCONF, this->settings
 				);
-				if (!response)
+				// TODO: check if it is required to process response middleware in case of view error.
+				if (!result.catch_(http::HttpError))
 				{
-					response = std::make_unique<http::HttpResponseNotFound>("<h2>404 - Not Found</h2>");
-				}
+					if (!result.value)
+					{
+						// If view returns empty result, return 204 - No Content.
+						result.value = std::make_shared<http::HttpResponse>(204);
+					}
 
-				auto new_response = StartServerCommand::process_response_middleware(
-					request, response.get(), this->settings
-				);
-				if (new_response)
-				{
-					send_response(request, new_response.get(), client, this->settings);
-					return;
+					result = StartServerCommand::process_response_middleware(
+						request, result.value.get(), this->settings
+					);
 				}
 			}
-		}
-		catch (const core::ErrorResponseException& exc)
-		{
-			this->settings->LOGGER->error(exc);
-			auto status_code = exc.status_code() < 400 ? 500 : exc.status_code();
-			auto err_msg = "<p style=\"font-size: 24px;\" >" + std::to_string(status_code) + "</p>"
-						   "<p>" + std::string(exc.what()) + "</p>";
-			error_response = std::make_unique<http::HttpResponse>(err_msg, status_code);
 		}
 		catch (const core::BaseException& exc)
 		{
 			this->settings->LOGGER->error(exc);
-			error_response = std::make_unique<http::HttpResponseServerError>(
+			result = http::raise<http::InternalServerError, std::shared_ptr<http::IHttpResponse>>(
 				"<p style=\"font-size: 24px;\" >Internal Server Error</p><p>" + std::string(exc.what()) + "</p>"
 			);
 		}
 		catch (const std::exception& exc)
 		{
 			this->settings->LOGGER->error(exc.what(), __LINE__, "request handler function", __FILE__);
-			error_response = std::make_unique<http::HttpResponseServerError>(
-				"<p style=\"font-size: 24px;\" >Internal Server Error</p>"
+			result = http::raise<http::InternalServerError, std::shared_ptr<http::IHttpResponse>>(
+				"<p style=\"font-size: 24px;\" >Internal Server Error</p><p>" + std::string(exc.what()) + "</p>"
 			);
 		}
 
-		if (!response)
+		std::shared_ptr<http::IHttpResponse> response;
+		if (result.catch_(http::HttpError))
 		{
-			// Response was not instantiated.
-			error_response = std::make_unique<http::HttpResponseServerError>(
-				"<h2>500 - Internal Server Error</h2>"
-			);
+			response = result.err.get_response();
 		}
-
-		if (error_response)
+		else if (!result.value)
 		{
-			// TODO: render error response;
-			//  if setting.DEBUG is true render detailed error,
-			//  otherwise render status code and reason phrase.
-			send_response(request, error_response.get(), client, this->settings);
+			// Response was not instantiated, so return 204 - No Content.
+			response = std::make_shared<http::HttpResponse>(204);
 		}
 		else
 		{
-			send_response(request, response.get(), client, this->settings);
+			response = result.value;
 		}
+
+		send_response(request, response.get(), client, this->settings);
 	};
 
 	return handler;
@@ -311,26 +301,26 @@ void StartServerCommand::setup_server_ctx(core::net::internal::HttpServer::conte
 	}
 
 	ctx.threads_count = this->_threads_flag->get();
-	ctx.handler = this->get_handler();
+	ctx.handler = this->make_handler();
 }
 
-std::unique_ptr<http::IHttpResponse> StartServerCommand::process_request_middleware(
+http::Result<std::shared_ptr<http::IHttpResponse>> StartServerCommand::process_request_middleware(
 	http::HttpRequest* request, conf::Settings* settings
 )
 {
 	for (auto& middleware : settings->MIDDLEWARE)
 	{
-		auto response = middleware->process_request(request);
-		if (response)
+		auto result = middleware->process_request(request);
+		if (result.err)
 		{
-			return response;
+			return result;
 		}
 	}
 
-	return nullptr;
+	return http::Result<std::shared_ptr<http::IHttpResponse>>();
 }
 
-std::unique_ptr<http::IHttpResponse> StartServerCommand::process_urlpatterns(
+http::Result<std::shared_ptr<http::IHttpResponse>> StartServerCommand::process_urlpatterns(
 	http::HttpRequest* request,
 	std::vector<std::shared_ptr<urls::UrlPattern>>& urlpatterns,
 	conf::Settings* settings
@@ -342,25 +332,26 @@ std::unique_ptr<http::IHttpResponse> StartServerCommand::process_urlpatterns(
 		return apply(request, settings);
 	}
 
-	return nullptr;
+	return http::raise<http::NotFound, std::shared_ptr<http::IHttpResponse>>("<h2>404 - Not Found</h2>");
 }
 
-std::unique_ptr<http::IHttpResponse> StartServerCommand::process_response_middleware(
+http::Result<std::shared_ptr<http::IHttpResponse>> StartServerCommand::process_response_middleware(
 	http::HttpRequest* request,
 	http::IHttpResponse* response,
 	conf::Settings* settings
 )
 {
-	for (long int i = (long int) settings->MIDDLEWARE.size() - 1; i >= 0; i--)
+	long long size = settings->MIDDLEWARE.size();
+	for (long long i = size - 1; i >= 0; i--)
 	{
-		auto curr_response = settings->MIDDLEWARE[i]->process_response(request, response);
-		if (curr_response)
+		auto result = settings->MIDDLEWARE[i]->process_response(request, response);
+		if (result.err)
 		{
-			return curr_response;
+			return result;
 		}
 	}
 
-	return nullptr;
+	return http::Result<std::shared_ptr<http::IHttpResponse>>();
 }
 
 void StartServerCommand::send_response(

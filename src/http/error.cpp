@@ -43,6 +43,12 @@ error::operator bool() const
 	return this->type != None;
 }
 
+std::shared_ptr<IHttpResponse> error::get_response()
+{
+	// TODO:
+	return nullptr;
+}
+
 __HTTP_END__
 
 std::ostream& operator<<(std::ostream& os, const xw::http::error_type& type)
@@ -70,6 +76,9 @@ std::ostream& operator<<(std::ostream& os, const xw::http::error_type& type)
 			break;
 		case xw::http::error_type::PermissionDenied:
 			repr = "PermissionDenied";
+			break;
+		case xw::http::error_type::NotFound:
+			repr = "NotFound";
 			break;
 		case xw::http::error_type::SuspiciousOperation:
 			repr = "SuspiciousOperation";

@@ -126,8 +126,8 @@ protected:
 
 public:
 	explicit HttpResponse(
-		const std::string& content,
 		unsigned short int status = 200,
+		const std::string& content = "",
 		const std::string& content_type = "",
 		const std::string& reason = "",
 		const std::string& charset = "utf-8"

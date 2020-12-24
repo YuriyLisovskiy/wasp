@@ -11,18 +11,22 @@
 // C++ libraries.
 #include <ostream>
 #include <string>
+#include <memory>
 
 // Module definitions.
 #include "./_def_.h"
+
+// Framework libraries.
+#include "./interfaces.h"
 
 
 __HTTP_INTERNAL_BEGIN__
 
 const short ERROR_T_HTTP_LOWER = 2;
-const short ERROR_T_HTTP_UPPER = 5;
+const short ERROR_T_HTTP_UPPER = 7;
 
-const short ERROR_T_SO_LOWER = 6;
-const short ERROR_T_SO_UPPER = 7;
+const short ERROR_T_SO_LOWER = 8;
+const short ERROR_T_SO_UPPER = 9;
 
 __HTTP_INTERNAL_END__
 
@@ -37,11 +41,13 @@ enum error_type
 	EntityTooLargeError = 2,
 	FileDoesNotExistError = 3,
 	PermissionDenied = 4,
-	SuspiciousOperation = 5,
+	NotFound = 5,
+	InternalServerError = 6,
+	SuspiciousOperation = 7,
 
 	// SuspiciousOperation-based exceptions.
-	DisallowedHost = 6,
-	DisallowedRedirect = 7
+	DisallowedHost = 8,
+	DisallowedRedirect = 9
 };
 
 struct error
@@ -69,6 +75,8 @@ struct error
 	static error none();
 
 	explicit operator bool() const;
+
+	std::shared_ptr<IHttpResponse> get_response();
 };
 
 __HTTP_END__

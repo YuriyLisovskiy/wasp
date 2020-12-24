@@ -12,6 +12,7 @@
 #include "./_def_.h"
 
 // Framework libraries.
+#include "./interfaces.h"
 #include "../conf/settings.h"
 
 
@@ -27,8 +28,8 @@ public:
 	MiddlewareMixin(nullptr_t) = delete;
 	~MiddlewareMixin() override = default;
 
-	std::unique_ptr<http::IHttpResponse> process_request(http::HttpRequest* request) override;
-	std::unique_ptr<http::IHttpResponse> process_response(
+	http::Result<std::shared_ptr<http::IHttpResponse>> process_request(http::HttpRequest* request) override;
+	http::Result<std::shared_ptr<http::IHttpResponse>> process_response(
 		http::HttpRequest* request, http::IHttpResponse* response
 	) override;
 };

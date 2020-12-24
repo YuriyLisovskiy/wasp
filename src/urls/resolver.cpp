@@ -6,10 +6,13 @@
 
 #include "./resolver.h"
 
+// Framework libraries.
+#include "../http/result.h"
+
 
 __URLS_BEGIN__
 
-std::function<std::unique_ptr<http::IHttpResponse>(
+std::function<http::Result<std::shared_ptr<http::IHttpResponse>>(
 	http::HttpRequest* request,
 	conf::Settings* settings
 )> resolve(

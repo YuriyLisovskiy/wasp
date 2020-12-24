@@ -280,8 +280,8 @@ std::string& HttpResponseBase::operator[] (const std::string& key)
 
 // HttpResponse implementation
 HttpResponse::HttpResponse(
-	const std::string& content,
 	unsigned short status,
+	const std::string& content,
 	const std::string& content_type,
 	const std::string& reason,
 	const std::string& charset
@@ -493,7 +493,7 @@ HttpResponseRedirectBase::HttpResponseRedirectBase(
 	const std::string& content_type,
 	const std::string& reason,
 	const std::string& charset
-) : HttpResponse("", status, content_type, reason, charset)
+) : HttpResponse(status, "", content_type, reason, charset)
 {
 	if (status < 300 || status > 399)
 	{
@@ -539,7 +539,7 @@ HttpResponseNotModified::HttpResponseNotModified(
 	const std::string& content,
 	const std::string& content_type,
 	const std::string& charset
-) : HttpResponse(content, 304, content_type, "", charset)
+) : HttpResponse(304, content, content_type, "", charset)
 {
 	this->remove_header("Content-Type");
 }
@@ -560,7 +560,7 @@ HttpResponseBadRequest::HttpResponseBadRequest(
 	const std::string& content,
 	const std::string& content_type,
 	const std::string& charset
-) : HttpResponse(content, 400, content_type, "", charset)
+) : HttpResponse(400, content, content_type, "", charset)
 {
 }
 
@@ -570,7 +570,7 @@ HttpResponseNotFound::HttpResponseNotFound(
 	const std::string& content,
 	const std::string& content_type,
 	const std::string& charset
-) : HttpResponse(content, 404, content_type, "", charset)
+) : HttpResponse(404, content, content_type, "", charset)
 {
 }
 
@@ -580,7 +580,7 @@ HttpResponseForbidden::HttpResponseForbidden(
 	const std::string& content,
 	const std::string& content_type,
 	const std::string& charset
-) : HttpResponse(content, 403, content_type, "", charset)
+) : HttpResponse(403, content, content_type, "", charset)
 {
 }
 
@@ -591,7 +591,7 @@ HttpResponseNotAllowed::HttpResponseNotAllowed(
 	const std::vector<std::string>& permitted_methods,
 	const std::string& content_type,
 	const std::string& charset
-) : HttpResponse(content, 405, content_type, "", charset)
+) : HttpResponse(405, content, content_type, "", charset)
 {
 	std::string methods;
 	for (size_t i = 0; i < permitted_methods.size(); i++)
@@ -612,7 +612,7 @@ HttpResponseGone::HttpResponseGone(
 	const std::string& content,
 	const std::string& content_type,
 	const std::string& charset
-) : HttpResponse(content, 410, content_type, "", charset)
+) : HttpResponse(410, content, content_type, "", charset)
 {
 }
 
@@ -622,7 +622,7 @@ HttpResponseEntityTooLarge::HttpResponseEntityTooLarge(
 	const std::string& content,
 	const std::string& content_type,
 	const std::string& charset
-) : HttpResponse(content, 413, content_type, "", charset)
+) : HttpResponse(413, content, content_type, "", charset)
 {
 }
 
@@ -632,7 +632,7 @@ HttpResponseServerError::HttpResponseServerError(
 	const std::string& content,
 	const std::string& content_type,
 	const std::string& charset
-) : HttpResponse(content, 500, content_type, "", charset)
+) : HttpResponse(500, content, content_type, "", charset)
 {
 }
 

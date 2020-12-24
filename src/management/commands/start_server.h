@@ -18,7 +18,7 @@
 
 __MANAGEMENT_COMMANDS_BEGIN__
 
-class StartServerCommand final: public AppCommand
+class StartServerCommand final: public xw::cmd::AppCommand
 {
 private:
 	core::flags::StringFlag* _addr_port_flag;
@@ -40,21 +40,21 @@ private:
 protected:
 	void add_flags() final;
 	void handle() final;
-	std::function<void(http::HttpRequest*, const core::net::internal::socket_t&)> get_handler();
+	std::function<void(http::HttpRequest*, const core::net::internal::socket_t&)> make_handler();
 	bool static_is_allowed(const std::string& static_url);
 	void build_static_patterns(std::vector<std::shared_ptr<urls::UrlPattern>>& patterns);
 	void build_app_patterns(std::vector<std::shared_ptr<urls::UrlPattern>>& patterns);
 	void setup_server_ctx(core::net::internal::HttpServer::context& ctx);
 
-	static std::unique_ptr<http::IHttpResponse> process_request_middleware(
+	static http::Result<std::shared_ptr<http::IHttpResponse>> process_request_middleware(
 		http::HttpRequest* request, conf::Settings* settings
 	);
-	static std::unique_ptr<http::IHttpResponse> process_response_middleware(
+	static http::Result<std::shared_ptr<http::IHttpResponse>> process_response_middleware(
 		http::HttpRequest* request,
 		http::IHttpResponse* response,
 		conf::Settings* settings
 	);
-	static std::unique_ptr<http::IHttpResponse> process_urlpatterns(
+	static http::Result<std::shared_ptr<http::IHttpResponse>> process_urlpatterns(
 		http::HttpRequest* request,
 		std::vector<std::shared_ptr<urls::UrlPattern>>& urlpatterns,
 		conf::Settings* settings
