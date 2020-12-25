@@ -1,5 +1,7 @@
 ## Xalwart
 
+![Continuous Integration](https://github.com/YuriyLisovskiy/xalwart/workflows/Continuous%20Integration/badge.svg)
+
 Inspired by [Django](https://github.com/django/django).
 
 ### Requirements

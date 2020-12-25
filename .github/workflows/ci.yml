@@ -44,7 +44,7 @@ jobs:
           sudo make && \
           sudo make install
 
-      - name: Install Core
+      - name: Install Core Library
         run: |
           cd /tmp && \
           git clone https://${{secrets.GH_ACCESS_TOKEN}}@github.com/YuriyLisovskiy/xalwart.core.git && \
@@ -59,7 +59,7 @@ jobs:
           sudo make && \
           sudo make install
 
-      - name: Install Render
+      - name: Install Render Library
         run: |
           cd /tmp && \
           git clone https://${{secrets.GH_ACCESS_TOKEN}}@github.com/YuriyLisovskiy/xalwart.render.git && \
@@ -86,4 +86,4 @@ jobs:
 
       - name: Run Tests
         run: |
-          sudo valgrind --leak-check=full ./build-debug/tests/unittests-all
+          sudo valgrind --leak-check=full ./build/tests/unittests-all
