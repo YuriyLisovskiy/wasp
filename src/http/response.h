@@ -41,6 +41,7 @@ protected:
 	std::string _charset;
 	std::string _reason_phrase;
 	bool _streaming;
+	error _err;
 
 	std::string serialize_headers();
 
@@ -115,6 +116,8 @@ public:
 	void write_lines(const std::vector<std::string>& lines) override;
 
 	std::string& operator[] (const std::string& key) override;
+
+	error err() final;
 };
 
 

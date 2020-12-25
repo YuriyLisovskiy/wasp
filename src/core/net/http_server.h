@@ -19,6 +19,7 @@
 #include "./socket.h"
 #include "../../http/request.h"
 #include "../../http/response.h"
+#include "../../http/result.h"
 
 
 __NET_INTERNAL_BEGIN__
@@ -103,21 +104,25 @@ private:
 	int _set_reuse_socket();
 	void _close_server_socket();
 	void _clean_up(const socket_t& client);
-	http::HttpRequest* _handle_request(const socket_t& client);
-	[[nodiscard]] std::string _read_body(
+	http::Result<std::shared_ptr<http::HttpRequest>> _handle_request(const socket_t& client);
+	[[nodiscard]] http::Result<std::string> _read_body(
 		const socket_t& client,
 		const std::string& body_beginning,
 		size_t body_length
 	) const;
 	[[nodiscard]] bool _wait_for_client(const socket_t& client) const;
-	static std::string _read_headers(const socket_t& client, std::string& body_beginning);
+	static http::Result<std::string> _read_headers(
+		const socket_t& client, std::string& body_beginning
+	);
 	void _start_listener();
 	void _serve_connection(const socket_t& client);
 	void _thread_func(const socket_t& client);
 
-	static read_result_enum _handle_error(char* buffer, int line, const char* function, const char* file);
-	static void _send(const char* data, const socket_t& client);
-	static void _write(const char* data, size_t bytes_to_write, const socket_t& client);
+	static http::Result<HttpServer::read_result_enum> _handle_error(
+		char* buffer, int line, const char* function, const char* file
+	);
+	static http::error _send(const char* data, const socket_t& client);
+	static http::error _write(const char* data, size_t bytes_to_write, const socket_t& client);
 	static void _wsa_clean_up();
 
 public:
@@ -140,8 +145,8 @@ public:
 	~HttpServer();
 	void finish();
 	void listen_and_serve();
-	static void send(http::IHttpResponse* response, const socket_t& client);
-	static void send(http::StreamingHttpResponse* response, const socket_t& client);
+	static http::error send(http::IHttpResponse* response, const socket_t& client);
+	static http::error send(http::StreamingHttpResponse* response, const socket_t& client);
 
 private:
 	static void _check_context(HttpServer::context& ctx);

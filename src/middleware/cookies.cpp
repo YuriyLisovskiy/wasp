@@ -19,12 +19,14 @@ CookieMiddleware::CookieMiddleware(conf::Settings* settings)
 {
 }
 
-std::unique_ptr<http::IHttpResponse> CookieMiddleware::process_request(http::HttpRequest* request)
+http::Result<std::shared_ptr<http::IHttpResponse>> CookieMiddleware::process_request(
+	http::HttpRequest* request
+)
 {
 	core::internal::cookie_parser cp;
 	cp.parse(request->headers.get("Cookie", ""));
 	request->COOKIES = collections::Dict(cp.result);
-	return nullptr;
+	return this->none();
 }
 
 __MIDDLEWARE_END__

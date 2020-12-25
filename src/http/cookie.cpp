@@ -72,12 +72,12 @@ Cookie::Cookie(
 {
 	if (this->_name.empty())
 	{
-		throw core::HttpError("cookie's name can not be empty", _ERROR_DETAILS_);
+		throw core::ValueError("cookie's name can not be empty", _ERROR_DETAILS_);
 	}
 
 	if (this->_max_age < 0)
 	{
-		throw core::HttpError("cookie's Max-age can not be less than zero", _ERROR_DETAILS_);
+		throw core::ValueError("cookie's Max-age can not be less than zero", _ERROR_DETAILS_);
 	}
 
 	if (!this->_expires.empty())

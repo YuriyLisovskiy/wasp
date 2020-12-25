@@ -19,18 +19,18 @@ XFrameOptionsMiddleware::XFrameOptionsMiddleware(conf::Settings* settings)
 {
 }
 
-std::unique_ptr<http::IHttpResponse> XFrameOptionsMiddleware::process_response(
+http::Result<std::shared_ptr<http::IHttpResponse>> XFrameOptionsMiddleware::process_response(
 	http::HttpRequest* request, http::IHttpResponse* response
 )
 {
 	// Don't set it if it's already in the response.
 	if (response->has_header(http::X_FRAME_OPTIONS))
 	{
-		return nullptr;
+		return this->none();
 	}
 
 	response->set_header(http::X_FRAME_OPTIONS, this->get_x_frame_options_value(request, response));
-	return nullptr;
+	return this->none();
 }
 
 std::string XFrameOptionsMiddleware::get_x_frame_options_value(

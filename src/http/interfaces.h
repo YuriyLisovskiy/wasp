@@ -16,6 +16,7 @@
 
 // Framework libraries.
 #include "./cookie.h"
+#include "./result.h"
 
 
 __HTTP_BEGIN__
@@ -89,6 +90,8 @@ public:
 	virtual std::string serialize() = 0;
 
 	virtual std::string& operator[] (const std::string& key) = 0;
+
+	virtual error err() = 0;
 };
 
 __HTTP_END__

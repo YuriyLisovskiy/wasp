@@ -17,8 +17,9 @@ __MIDDLEWARE_BEGIN__
 
 const std::string SecurityMiddleware::FULL_NAME = "xw::middleware::SecurityMiddleware";
 
-SecurityMiddleware::SecurityMiddleware(conf::Settings* settings)
-	: MiddlewareMixin(settings)
+SecurityMiddleware::SecurityMiddleware(
+	conf::Settings* settings
+) : MiddlewareMixin(settings)
 {
 	this->sts_seconds = settings->SECURE_HSTS_SECONDS;
 	this->sts_include_subdomains = settings->SECURE_HSTS_INCLUDE_SUBDOMAINS;
@@ -34,7 +35,9 @@ SecurityMiddleware::SecurityMiddleware(conf::Settings* settings)
 	}
 }
 
-std::unique_ptr<http::IHttpResponse> SecurityMiddleware::process_request(http::HttpRequest* request)
+http::Result<std::shared_ptr<http::IHttpResponse>> SecurityMiddleware::process_request(
+	http::HttpRequest* request
+)
 {
 	auto path = core::str::ltrim(request->path(), "/");
 	bool matched = false;
@@ -53,21 +56,35 @@ std::unique_ptr<http::IHttpResponse> SecurityMiddleware::process_request(http::H
 		!matched
 	)
 	{
-		auto host = this->redirect_host.empty() ?
-			request->get_host(
+		std::string host;
+		if (this->redirect_host.empty())
+		{
+			auto result = request->get_host(
 				this->settings->USE_X_FORWARDED_HOST,
 				this->settings->DEBUG,
 				this->settings->ALLOWED_HOSTS
-			) : this->redirect_host;
-		return std::make_unique<http::HttpResponsePermanentRedirect>(
+			);
+			if (result.err)
+			{
+				return result.forward<std::shared_ptr<http::IHttpResponse>>();
+			}
+
+			host = result.value;
+		}
+		else
+		{
+			host = this->redirect_host;
+		}
+
+		return this->result<http::HttpResponsePermanentRedirect, std::string>(
 			"https://" + host + request->full_path()
 		);
 	}
 
-	return nullptr;
+	return this->none();
 }
 
-std::unique_ptr<http::IHttpResponse> SecurityMiddleware::process_response(
+http::Result<std::shared_ptr<http::IHttpResponse>> SecurityMiddleware::process_response(
 	http::HttpRequest* request, http::IHttpResponse* response
 )
 {
@@ -116,7 +133,7 @@ std::unique_ptr<http::IHttpResponse> SecurityMiddleware::process_response(
 		);
 	}
 
-	return nullptr;
+	return this->none();
 }
 
 __MIDDLEWARE_END__

@@ -25,11 +25,13 @@ CommonMiddleware::CommonMiddleware(conf::Settings* settings)
 {
 }
 
-std::unique_ptr<http::IHttpResponse> CommonMiddleware::get_response_redirect(
+http::Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::get_response_redirect(
 	const std::string& redirect_to
 )
 {
-	return std::make_unique<http::HttpResponsePermanentRedirect>(redirect_to);
+	return http::Result<std::shared_ptr<http::IHttpResponse>>(
+		std::make_shared<http::HttpResponsePermanentRedirect>(redirect_to)
+	);
 }
 
 bool CommonMiddleware::should_redirect_with_slash(http::HttpRequest* request)
@@ -44,7 +46,7 @@ bool CommonMiddleware::should_redirect_with_slash(http::HttpRequest* request)
 	return false;
 }
 
-std::string CommonMiddleware::get_full_path_with_slash(http::HttpRequest* request)
+http::Result<std::string> CommonMiddleware::get_full_path_with_slash(http::HttpRequest* request)
 {
 	auto new_path = request->full_path(true);
 
@@ -55,24 +57,30 @@ std::string CommonMiddleware::get_full_path_with_slash(http::HttpRequest* reques
 	))
 	{
 		auto method = request->method();
-		auto host = request->get_host(
+		auto result = request->get_host(
 			this->settings->USE_X_FORWARDED_HOST,
 			this->settings->DEBUG,
 			this->settings->ALLOWED_HOSTS
 		);
+		if (result.err)
+		{
+			return result;
+		}
+
+		auto host = result.value;
 		throw core::RuntimeError(
 			"You called this URL via " + method + "s, but the URL doesn't end "
-			"in a slash and you have APPEND_SLASH set. Django can't "
+			"in a slash and you have APPEND_SLASH set. Xalwart can't "
 			"redirect to the slash URL while maintaining " + method + "s data. "
 			"Change your form to point to " + host + new_path + "s (note the trailing "
-			"slash), or set APPEND_SLASH=False in your Django settings."
+			"slash), or set APPEND_SLASH=False in your Xalwart settings."
 		);
 	}
 
-	return new_path;
+	return http::Result(new_path);
 }
 
-std::unique_ptr<http::IHttpResponse> CommonMiddleware::process_request(
+http::Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::process_request(
 	http::HttpRequest* request
 )
 {
@@ -83,17 +91,25 @@ std::unique_ptr<http::IHttpResponse> CommonMiddleware::process_request(
 		{
 			if (rgx.search(user_agent))
 			{
-				throw core::PermissionDenied("Forbidden user agent", _ERROR_DETAILS_);
+				return this->raise<http::PermissionDenied>(
+					"Forbidden user agent", _ERROR_DETAILS_
+				);
 			}
 		}
 	}
 
 	// Check for a redirect based on settings.PREPEND_WWW
-	auto host = request->get_host(
+	auto result = request->get_host(
 		this->settings->USE_X_FORWARDED_HOST,
 		this->settings->DEBUG,
 		this->settings->ALLOWED_HOSTS
 	);
+	if (result.err)
+	{
+		return result.forward<std::shared_ptr<http::IHttpResponse>>();
+	}
+
+	auto host = result.value;
 	bool must_prepend = this->settings->PREPEND_WWW &&
 		!host.empty() &&
 		!core::str::starts_with(host, "www.");
@@ -105,7 +121,13 @@ std::unique_ptr<http::IHttpResponse> CommonMiddleware::process_request(
 	std::string path;
 	if (this->should_redirect_with_slash(request))
 	{
-		path = this->get_full_path_with_slash(request);
+		result = this->get_full_path_with_slash(request);
+		if (result.err)
+		{
+			return result.forward<std::shared_ptr<http::IHttpResponse>>();
+		}
+
+		path = result.value;
 	}
 	else
 	{
@@ -119,10 +141,10 @@ std::unique_ptr<http::IHttpResponse> CommonMiddleware::process_request(
 		return this->get_response_redirect(redirect_url);
 	}
 
-	return nullptr;
+	return this->none();
 }
 
-std::unique_ptr<http::IHttpResponse> CommonMiddleware::process_response(
+http::Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::process_response(
 	http::HttpRequest* request, http::IHttpResponse* response
 )
 {
@@ -132,9 +154,13 @@ std::unique_ptr<http::IHttpResponse> CommonMiddleware::process_response(
 	{
 		if (this->should_redirect_with_slash(request))
 		{
-			return this->get_response_redirect(
-				this->get_full_path_with_slash(request)
-			);
+			auto result = this->get_full_path_with_slash(request);
+			if (result.err)
+			{
+				return result.forward<std::shared_ptr<http::IHttpResponse>>();
+			}
+
+			return this->get_response_redirect(result.value);
 		}
 	}
 
@@ -147,7 +173,7 @@ std::unique_ptr<http::IHttpResponse> CommonMiddleware::process_response(
 		);
 	}
 
-	return nullptr;
+	return this->none();
 }
 
 __MIDDLEWARE_END__

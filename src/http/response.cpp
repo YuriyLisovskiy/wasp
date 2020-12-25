@@ -213,7 +213,7 @@ void HttpResponseBase::close()
 
 void HttpResponseBase::write(const std::string& content)
 {
-	throw core::HttpError("This HttpResponseBase instance is not writable", _ERROR_DETAILS_);
+	throw core::RuntimeError("This HttpResponseBase instance is not writable", _ERROR_DETAILS_);
 }
 
 void HttpResponseBase::flush()
@@ -222,7 +222,7 @@ void HttpResponseBase::flush()
 
 unsigned long int HttpResponseBase::tell()
 {
-	throw core::HttpError("This HttpResponseBase instance cannot tell its position", _ERROR_DETAILS_);
+	throw core::RuntimeError("This HttpResponseBase instance cannot tell its position", _ERROR_DETAILS_);
 }
 
 bool HttpResponseBase::readable()
@@ -242,7 +242,7 @@ bool HttpResponseBase::writable()
 
 void HttpResponseBase::write_lines(const std::vector<std::string>& lines)
 {
-	throw core::HttpError("This HttpResponseBase instance is not writable", _ERROR_DETAILS_);
+	throw core::RuntimeError("This HttpResponseBase instance is not writable", _ERROR_DETAILS_);
 }
 
 std::string HttpResponseBase::serialize_headers()
@@ -275,6 +275,11 @@ std::string HttpResponseBase::serialize_headers()
 std::string& HttpResponseBase::operator[] (const std::string& key)
 {
 	return this->_headers[key];
+}
+
+error HttpResponseBase::err()
+{
+	return this->_err;
 }
 
 
@@ -361,7 +366,9 @@ StreamingHttpResponse::StreamingHttpResponse(
 
 std::string StreamingHttpResponse::serialize()
 {
-	throw core::HttpError("This StreamingHttpResponse or its child instance cannot be serialized", _ERROR_DETAILS_);
+	throw core::RuntimeError(
+		"This StreamingHttpResponse or its child instance cannot be serialized", _ERROR_DETAILS_
+	);
 }
 
 
@@ -382,15 +389,17 @@ FileResponse::FileResponse(
 {
 	if (!core::path::exists(this->_file_path))
 	{
-		throw core::FileDoesNotExistError(
-			"file '" + this->_file_path + "' does not exist", _ERROR_DETAILS_
+		this->_err = error(
+			FileDoesNotExistError, "file '" + this->_file_path + "' does not exist", _ERROR_DETAILS_
 		);
 	}
-
-	// Initializing file stream.
-	this->_file_stream = std::ifstream(this->_file_path, std::ifstream::binary | std::ios::ate);
-	this->_file_size = this->_file_stream.tellg();
-	this->_file_stream.seekg(0);
+	else
+	{
+		// Initializing file stream.
+		this->_file_stream = std::ifstream(this->_file_path, std::ifstream::binary | std::ios::ate);
+		this->_file_size = this->_file_stream.tellg();
+		this->_file_stream.seekg(0);
+	}
 }
 
 std::string FileResponse::get_chunk()
@@ -504,7 +513,9 @@ HttpResponseRedirectBase::HttpResponseRedirectBase(
 	Url url(redirect_to);
 	if (!url.scheme().empty() && this->_allowed_schemes.find(url.scheme()) == this->_allowed_schemes.end())
 	{
-		throw core::DisallowedRedirect("Unsafe redirect to URL with protocol " + url.scheme(), _ERROR_DETAILS_);
+		this->_err = error(
+			DisallowedRedirect, "Unsafe redirect to URL with protocol " + url.scheme(), _ERROR_DETAILS_
+		);
 	}
 }
 

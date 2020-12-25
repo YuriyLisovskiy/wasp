@@ -11,16 +11,22 @@
 // C++ libraries.
 #include <ostream>
 
+// Core libraries.
+#include <type_traits>
+
 // Module definitions.
 #include "./_def_.h"
 
-// Core libraries.
+// Framework libraries.
 #include "./error.h"
 
 
 __HTTP_BEGIN__
 
-template <typename ValueT>
+template <typename T>
+concept ResultValue = std::is_default_constructible_v<T> && !std::is_pointer_v<T>;
+
+template <ResultValue ValueT>
 class Result
 {
 private:
@@ -37,6 +43,7 @@ private:
 public:
 	error err;
 	ValueT value;
+	bool is_nullptr = false;
 
 	Result() = default;
 
@@ -46,6 +53,15 @@ public:
 
 	explicit Result(const error& err) : err(err)
 	{
+	}
+
+	explicit Result(nullptr_t) : is_nullptr(true)
+	{
+	}
+
+	explicit operator bool () const
+	{
+		return !this->is_nullptr;
 	}
 
 	[[nodiscard]] bool catch_(error_type expected = HttpError) const
@@ -64,6 +80,17 @@ public:
 		}
 
 		return this->err.type != None && expected == HttpError;
+	}
+
+	template<typename NewType>
+	Result<NewType> forward()
+	{
+		return Result<NewType>(this->err);
+	}
+
+	static Result<ValueT> null()
+	{
+		return Result<ValueT>(nullptr);
 	}
 };
 

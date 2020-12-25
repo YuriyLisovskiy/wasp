@@ -93,12 +93,12 @@ bool _if_unmodified_since_passes(
 	return last_modified != -1 && last_modified <= if_unmodified_since;
 }
 
-std::unique_ptr<http::IHttpResponse> _precondition_failed(http::HttpRequest* request)
+std::shared_ptr<http::IHttpResponse> _precondition_failed(http::HttpRequest* request)
 {
-	return std::make_unique<http::HttpResponse>("", 412);
+	return std::make_shared<http::HttpResponse>(412);
 }
 
-std::unique_ptr<http::IHttpResponse> _not_modified(
+std::shared_ptr<http::IHttpResponse> _not_modified(
 	http::HttpRequest* request, http::IHttpResponse* response
 )
 {
@@ -152,7 +152,7 @@ void set_response_etag(http::IHttpResponse* response)
 	}
 }
 
-std::unique_ptr<http::IHttpResponse> get_conditional_response(
+std::shared_ptr<http::IHttpResponse> get_conditional_response(
 	http::HttpRequest* request,
 	const std::string& etag,
 	long last_modified,

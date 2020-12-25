@@ -15,6 +15,7 @@
 #include "./_def_.h"
 
 // Framework libraries.
+#include "./result.h"
 #include "../core/uploaded_file.h"
 
 
@@ -105,7 +106,7 @@ public:
 	std::string scheme(std::pair<std::string, std::string>* secure_proxy_ssl_header) const;
 
 	/// Return the HTTP host using the environment or request headers.
-	std::string get_host(
+	Result<std::string> get_host(
 		bool use_x_forwarded_host, bool debug, std::vector<std::string> allowed_hosts
 	);
 

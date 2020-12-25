@@ -119,8 +119,6 @@ StartServerCommand::make_handler()
 		http::HttpRequest* request, const core::net::internal::socket_t& client
 	) mutable -> void
 	{
-//		std::shared_ptr<http::IHttpResponse> error_response = nullptr;
-//		std::shared_ptr<http::IHttpResponse> response = nullptr;
 		http::Result<std::shared_ptr<http::IHttpResponse>> result;
 		try
 		{
@@ -141,9 +139,12 @@ StartServerCommand::make_handler()
 						result.value = std::make_shared<http::HttpResponse>(204);
 					}
 
-					result = StartServerCommand::process_response_middleware(
-						request, result.value.get(), this->settings
-					);
+					if (!result.value->err())
+					{
+						result = StartServerCommand::process_response_middleware(
+							request, result.value.get(), this->settings
+						);
+					}
 				}
 			}
 		}
@@ -174,7 +175,15 @@ StartServerCommand::make_handler()
 		}
 		else
 		{
-			response = result.value;
+			auto err = result.value->err();
+			if (err)
+			{
+				response = err.get_response();
+			}
+			else
+			{
+				response = result.value;
+			}
 		}
 
 		send_response(request, response.get(), client, this->settings);
@@ -317,7 +326,7 @@ http::Result<std::shared_ptr<http::IHttpResponse>> StartServerCommand::process_r
 		}
 	}
 
-	return http::Result<std::shared_ptr<http::IHttpResponse>>();
+	return http::Result<std::shared_ptr<http::IHttpResponse>>::null();
 }
 
 http::Result<std::shared_ptr<http::IHttpResponse>> StartServerCommand::process_urlpatterns(
@@ -351,7 +360,7 @@ http::Result<std::shared_ptr<http::IHttpResponse>> StartServerCommand::process_r
 		}
 	}
 
-	return http::Result<std::shared_ptr<http::IHttpResponse>>();
+	return http::Result<std::shared_ptr<http::IHttpResponse>>::null();
 }
 
 void StartServerCommand::send_response(

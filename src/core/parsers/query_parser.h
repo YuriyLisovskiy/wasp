@@ -8,10 +8,8 @@
 
 #pragma once
 
-#ifdef _MSC_VER
 // C++ libraries.
 #include <string>
-#endif
 
 // Core libraries.
 #include <xalwart.core/collections/multi_dict.h>

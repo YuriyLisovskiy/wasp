@@ -14,16 +14,28 @@ MiddlewareMixin::MiddlewareMixin(conf::Settings* settings)
 	this->settings = settings;
 }
 
-http::Result<std::shared_ptr<http::IHttpResponse>> MiddlewareMixin::process_request(http::HttpRequest* request)
+http::Result<std::shared_ptr<http::IHttpResponse>> MiddlewareMixin::none()
 {
 	return http::Result<std::shared_ptr<http::IHttpResponse>>();
+}
+
+http::Result<std::shared_ptr<http::IHttpResponse>> MiddlewareMixin::result(
+	const std::shared_ptr<http::IHttpResponse>& response
+)
+{
+	return http::Result<std::shared_ptr<http::IHttpResponse>>(response);
+}
+
+http::Result<std::shared_ptr<http::IHttpResponse>> MiddlewareMixin::process_request(http::HttpRequest* request)
+{
+	return this->none();
 }
 
 http::Result<std::shared_ptr<http::IHttpResponse>> MiddlewareMixin::process_response(
 	http::HttpRequest* request, http::IHttpResponse* response
 )
 {
-	return http::Result<std::shared_ptr<http::IHttpResponse>>();
+	return this->none();
 }
 
 __MIDDLEWARE_END__

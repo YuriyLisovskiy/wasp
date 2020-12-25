@@ -19,7 +19,7 @@ TemplateResponse::TemplateResponse(
 	unsigned short int status,
 	const std::string& content_type,
 	const std::string& charset
-) : HttpResponse("", status, content_type, "", charset)
+) : HttpResponse(status, "", content_type, "", charset)
 {
 	this->engine = engine;
 	this->template_name = template_name;

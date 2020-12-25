@@ -102,7 +102,7 @@ std::string HttpRequest::scheme(
 	return "http";
 }
 
-std::string HttpRequest::get_host(
+Result<std::string> HttpRequest::get_host(
 	bool use_x_forwarded_host, bool debug, std::vector<std::string> allowed_hosts
 )
 {
@@ -116,7 +116,7 @@ std::string HttpRequest::get_host(
 	split_domain_port(host, domain, port);
 	if (!domain.empty() && validate_host(domain, allowed_hosts))
 	{
-		return host;
+		return Result(host);
 	}
 	else
 	{
@@ -130,7 +130,7 @@ std::string HttpRequest::get_host(
 			msg += " The domain name provided is not valid according to RFC 1034/1035.";
 		}
 
-		throw core::DisallowedHost(msg);
+		return raise<DisallowedHost, std::string>(msg);
 	}
 }
 

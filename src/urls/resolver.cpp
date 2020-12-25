@@ -19,7 +19,7 @@ std::function<http::Result<std::shared_ptr<http::IHttpResponse>>(
 	const std::string& path, std::vector<std::shared_ptr<UrlPattern>>& urlpatterns
 )
 {
-	std::function<std::unique_ptr<http::IHttpResponse>(
+	std::function<http::Result<std::shared_ptr<http::IHttpResponse>>(
 		http::HttpRequest* request,
 		conf::Settings* settings
 	)> fn = nullptr;
@@ -31,7 +31,7 @@ std::function<http::Result<std::shared_ptr<http::IHttpResponse>>(
 			fn = [url_pattern, args_map](
 				http::HttpRequest* request,
 				conf::Settings* settings
-			) mutable -> std::unique_ptr<http::IHttpResponse>
+			) mutable -> http::Result<std::shared_ptr<http::IHttpResponse>>
 			{
 				auto args = std::make_unique<views::Args>(args_map);
 				return url_pattern->apply(request, settings, args.get());

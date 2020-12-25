@@ -109,20 +109,25 @@ void HttpServer::listen_and_serve()
 	this->_start_listener();
 }
 
-void HttpServer::send(http::IHttpResponse* response, const socket_t& client)
+http::error HttpServer::send(http::IHttpResponse* response, const socket_t& client)
 {
-	HttpServer::_send(response->serialize().c_str(), client);
+	return HttpServer::_send(response->serialize().c_str(), client);
 }
 
-void HttpServer::send(http::StreamingHttpResponse* response, const socket_t& client)
+http::error HttpServer::send(http::StreamingHttpResponse* response, const socket_t& client)
 {
 	std::string chunk;
 	while (!(chunk = response->get_chunk()).empty())
 	{
-		HttpServer::_write(chunk.c_str(), chunk.size(), client);
+		auto err = HttpServer::_write(chunk.c_str(), chunk.size(), client);
+		if (err)
+		{
+			return err;
+		}
 	}
 
 	response->close();
+	return http::error::none();
 }
 
 // Private methods.
@@ -271,18 +276,23 @@ void HttpServer::_clean_up(const socket_t& client)
 	HttpServer::_wsa_clean_up();
 }
 
-http::HttpRequest* HttpServer::_handle_request(const socket_t& client)
+http::Result<std::shared_ptr<http::HttpRequest>> HttpServer::_handle_request(const socket_t& client)
 {
 	if (!this->_wait_for_client(client))
 	{
-		return nullptr;
+		return http::Result<std::shared_ptr<http::HttpRequest>>::null();
 	}
 
 	core::internal::request_parser rp;
 	std::string body_beginning;
 
-	auto headers_str = HttpServer::_read_headers(client, body_beginning);
-	rp.parse_headers(headers_str);
+	auto result = HttpServer::_read_headers(client, body_beginning);
+	if (result.err)
+	{
+		return result.forward<std::shared_ptr<http::HttpRequest>>();
+	}
+
+	rp.parse_headers(result.value);
 	if (rp.headers.find(http::CONTENT_LENGTH) != rp.headers.end())
 	{
 		size_t body_length = std::strtol(rp.headers[http::CONTENT_LENGTH].c_str(), nullptr, 10);
@@ -293,13 +303,19 @@ http::HttpRequest* HttpServer::_handle_request(const socket_t& client)
 		}
 		else
 		{
-			body = this->_read_body(client, body_beginning, body_length);
+			result = this->_read_body(client, body_beginning, body_length);
+			if (result.err)
+			{
+				return result.forward<std::shared_ptr<http::HttpRequest>>();
+			}
+
+			body = result.value;
 		}
 
 		rp.parse_body(body, this->_media_root);
 	}
 
-	auto* request = new http::HttpRequest(
+	return http::Result(std::make_shared<http::HttpRequest>(
 		rp.method,
 		rp.path,
 		rp.major_v,
@@ -311,24 +327,23 @@ http::HttpRequest* HttpServer::_handle_request(const socket_t& client)
 		rp.get_parameters,
 		rp.post_parameters,
 		rp.files_parameters
-	);
-	return request;
+	));
 }
 
-std::string HttpServer::_read_body(
+http::Result<std::string> HttpServer::_read_body(
 	const socket_t& client, const std::string& body_beginning, size_t body_length
 ) const
 {
 	std::string data;
 	if (body_length <= 0)
 	{
-		return data;
+		return http::Result(data);
 	}
 
 	size_t size = body_beginning.size();
 	if (size == body_length)
 	{
-		return body_beginning;
+		return http::Result(body_beginning);
 	}
 
 	msg_size_t ret;
@@ -344,17 +359,25 @@ std::string HttpServer::_read_body(
 			size += ret;
 			if (size > this->_max_body_size)
 			{
-				throw EntityTooLargeError("Request data is too big", _ERROR_DETAILS_);
+				return http::raise<http::EntityTooLargeError, std::string>(
+					"Request data is too big", _ERROR_DETAILS_
+				);
 			}
 		}
 		else if (ret == -1)
 		{
-			HttpServer::read_result_enum status = HttpServer::_handle_error(buffer, _ERROR_DETAILS_);
-			if (status == HttpServer::read_result_enum::rr_continue)
+			auto result = HttpServer::_handle_error(buffer, _ERROR_DETAILS_);
+			if (result.err)
+			{
+				return result.forward<std::string>();
+			}
+
+			read_result_enum status = result.value;
+			if (status == read_result_enum::rr_continue)
 			{
 				continue;
 			}
-			else if (status == HttpServer::read_result_enum::rr_break)
+			else if (status == read_result_enum::rr_break)
 			{
 				break;
 			}
@@ -365,10 +388,12 @@ std::string HttpServer::_read_body(
 	data = body_beginning + data;
 	if (data.size() != body_length)
 	{
-		throw HttpError("Actual body size is not equal to header's value", _ERROR_DETAILS_);
+		return http::raise<http::HttpError, std::string>(
+			"Actual body size is not equal to header's value", _ERROR_DETAILS_
+		);
 	}
 
-	return data;
+	return http::Result(data);
 }
 
 bool HttpServer::_wait_for_client(const socket_t& client) const
@@ -409,7 +434,9 @@ bool HttpServer::_wait_for_client(const socket_t& client) const
 	return false;
 }
 
-std::string HttpServer::_read_headers(const socket_t& client, std::string& body_beginning)
+http::Result<std::string> HttpServer::_read_headers(
+	const socket_t& client, std::string& body_beginning
+)
 {
 	msg_size_t ret;
 	unsigned long size = 0;
@@ -429,17 +456,25 @@ std::string HttpServer::_read_headers(const socket_t& client, std::string& body_
 			// Maybe it is better to check each header value's size.
 			if (size > MAX_HEADERS_SIZE)
 			{
-				throw EntityTooLargeError("Request data is too big", _ERROR_DETAILS_);
+				return http::raise<http::EntityTooLargeError, std::string>(
+					"Request data is too big", _ERROR_DETAILS_
+				);
 			}
 		}
 		else if (ret == -1)
 		{
-			HttpServer::read_result_enum status = HttpServer::_handle_error(buffer, _ERROR_DETAILS_);
-			if (status == HttpServer::read_result_enum::rr_continue)
+			auto result = HttpServer::_handle_error(buffer, _ERROR_DETAILS_);
+			if (result.err)
+			{
+				return result.forward<std::string>();
+			}
+
+			read_result_enum status = result.value;
+			if (status == read_result_enum::rr_continue)
 			{
 				continue;
 			}
-			else if (status == HttpServer::read_result_enum::rr_break)
+			else if (status == read_result_enum::rr_break)
 			{
 				break;
 			}
@@ -452,12 +487,14 @@ std::string HttpServer::_read_headers(const socket_t& client, std::string& body_
 	free(buffer);
 	if (headers_delimiter_pos == std::string::npos)
 	{
-		throw HttpError("Invalid http request has been received", _ERROR_DETAILS_);
+		return http::raise<http::HttpError, std::string>(
+			"Invalid http request has been received", _ERROR_DETAILS_
+		);
 	}
 
 	headers_delimiter_pos += delimiter.size();
 	body_beginning = data.substr(headers_delimiter_pos);
-	return data.substr(0, headers_delimiter_pos);
+	return http::Result(data.substr(0, headers_delimiter_pos));
 }
 
 void HttpServer::_start_listener()
@@ -495,14 +532,22 @@ void HttpServer::_serve_connection(const socket_t& client)
 		measure.start();
 	}
 
-	auto request = std::unique_ptr<http::HttpRequest>(this->_handle_request(client));
-	if (request)
+	auto result = this->_handle_request(client);
+	if (result)
 	{
-		this->_http_handler(request.get(), client);
-		if (this->_verbose)
+		if (result.catch_(http::HttpError))
 		{
-			measure.end();
-			std::cout << '\n' << request->method() << " request took " << measure.elapsed() << " ms\n";
+			this->_logger->error(result.err.msg);
+		}
+		else
+		{
+			auto request = result.value;
+			this->_http_handler(request.get(), client);
+			if (this->_verbose)
+			{
+				measure.end();
+				std::cout << '\n' << request->method() << " request took " << measure.elapsed() << " ms\n";
+			}
 		}
 	}
 
@@ -519,7 +564,7 @@ void HttpServer::_thread_func(const socket_t& client)
 }
 
 // Private static functions.
-HttpServer::read_result_enum HttpServer::_handle_error(
+http::Result<HttpServer::read_result_enum> HttpServer::_handle_error(
 	char* buffer, int line, const char *function, const char *file
 )
 {
@@ -531,28 +576,34 @@ HttpServer::read_result_enum HttpServer::_handle_error(
 		case ENXIO:
 			// Fatal error.
 			free(buffer);
-			throw HttpError("Critical error: " + std::to_string(errno), line, function, file);
+			return http::raise<http::HttpError, read_result_enum>(
+				"Critical error: " + std::to_string(errno), line, function, file
+			);
 		case EIO:
 		case ENOBUFS:
 		case ENOMEM:
 			// Resource acquisition failure or device error.
 			free(buffer);
-			throw HttpError("Resource failure: " + std::to_string(errno), line, function, file);
+			http::raise<http::HttpError, read_result_enum>(
+				"Resource failure: " + std::to_string(errno), line, function, file
+			);
 		case EINTR:
 			// TODO: Check for user interrupt flags.
 		case ETIMEDOUT:
 		case EAGAIN:
 			// Temporary error.
-			return HttpServer::read_result_enum::rr_continue;
+			return http::Result(HttpServer::read_result_enum::rr_continue);
 		case ECONNRESET:
 		case ENOTCONN:
 			// Connection broken.
 			// Return the data we have available and exit
 			// as if the connection was closed correctly.
-			return HttpServer::read_result_enum::rr_break;
+			return http::Result(HttpServer::read_result_enum::rr_break);
 		default:
 			free(buffer);
-			throw HttpError("Returned -1: " + std::to_string(errno), line, function, file);
+			return http::raise<http::HttpError, read_result_enum>(
+				"Returned -1: " + std::to_string(errno), line, function, file
+			);
 	}
 }
 
@@ -582,27 +633,28 @@ void HttpServer::_check_context(HttpServer::context& ctx)
 	str::rtrim(ctx.media_root, "\\");
 }
 
-void HttpServer::_send(const char* data, const socket_t& client)
+http::error HttpServer::_send(const char* data, const socket_t& client)
 {
 	if (::send(client, data, std::strlen(data), 0) == SOCKET_ERROR)
 	{
-		throw HttpError("Failed to send bytes to socket connection", _ERROR_DETAILS_);
+		return http::error(
+			http::HttpError, "Failed to send bytes to socket connection", _ERROR_DETAILS_
+		);
 	}
+
+	return http::error::none();
 }
 
-void HttpServer::_write(const char* data, size_t bytesToWrite, const socket_t& client)
+http::error HttpServer::_write(const char* data, size_t bytesToWrite, const socket_t& client)
 {
-#if defined(_WIN32) || defined(_WIN64)
-	if (::send(client, data, bytesToWrite, 0) == -1)
-	{
-		throw HttpError("Failed to send bytes to socket connection", _ERROR_DETAILS_);
-	}
-#else
 	if (::write(client, data, bytesToWrite) == -1)
 	{
-		throw HttpError("Failed to send bytes to socket connection", _ERROR_DETAILS_);
+		return http::error(
+			http::HttpError, "Failed to send bytes to socket connection", _ERROR_DETAILS_
+		);
 	}
-#endif // _WIN32 || _WIN64
+
+	return http::error::none();
 }
 
 void HttpServer::_wsa_clean_up()

@@ -23,6 +23,29 @@ class MiddlewareMixin : public IMiddleware
 protected:
 	conf::Settings* settings;
 
+protected:
+	http::Result<std::shared_ptr<http::IHttpResponse>> none();
+
+	template<typename ResponseT, typename ...Args>
+	http::Result<std::shared_ptr<http::IHttpResponse>> result(Args&& ...args)
+	{
+		return http::Result<std::shared_ptr<http::IHttpResponse>>(
+			std::make_shared<ResponseT>(std::forward<Args>(args)...)
+		);
+	}
+
+	http::Result<std::shared_ptr<http::IHttpResponse>> result(
+		const std::shared_ptr<http::IHttpResponse>& response
+	);
+
+	template<http::error_type ErrorType, typename ...Args>
+	http::Result<std::shared_ptr<http::IHttpResponse>> raise(Args&& ...args)
+	{
+		return http::raise<ErrorType, std::shared_ptr<http::IHttpResponse>>(
+			std::forward<Args>(args)...
+		);
+	}
+
 public:
 	explicit MiddlewareMixin(conf::Settings* settings);
 	MiddlewareMixin(nullptr_t) = delete;

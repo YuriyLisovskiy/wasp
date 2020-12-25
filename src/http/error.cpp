@@ -6,6 +6,9 @@
 
 #include "./error.h"
 
+// Framework libraries.
+#include "./response.h"
+
 
 __HTTP_BEGIN__
 
@@ -45,8 +48,7 @@ error::operator bool() const
 
 std::shared_ptr<IHttpResponse> error::get_response()
 {
-	// TODO:
-	return nullptr;
+	return std::make_shared<http::HttpResponse>(this->type, this->msg);
 }
 
 __HTTP_END__

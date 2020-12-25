@@ -10,9 +10,8 @@
 
 #pragma once
 
-#ifdef _MSC_VER
+// C++ libraries.
 #include <string>
-#endif
 
 // Core modules.
 #include <xalwart.core/collections/dict.h>

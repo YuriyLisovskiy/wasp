@@ -25,7 +25,7 @@ ConditionalGetMiddleware::ConditionalGetMiddleware(
 {
 }
 
-std::unique_ptr<http::IHttpResponse> ConditionalGetMiddleware::process_response(
+http::Result<std::shared_ptr<http::IHttpResponse>> ConditionalGetMiddleware::process_response(
 	http::HttpRequest* request, http::IHttpResponse* response
 )
 {
@@ -34,7 +34,7 @@ std::unique_ptr<http::IHttpResponse> ConditionalGetMiddleware::process_response(
 	/// an accurate ETag isn't possible.
 	if (request->method() != "GET")
 	{
-		return nullptr;
+		return this->none();
 	}
 
 	if (needs_etag(response) && !response->has_header(http::E_TAG))
@@ -53,11 +53,11 @@ std::unique_ptr<http::IHttpResponse> ConditionalGetMiddleware::process_response(
 		);
 		if (conditional_response)
 		{
-			return conditional_response;
+			return this->result(conditional_response);
 		}
 	}
 
-	return nullptr;
+	return this->none();
 }
 
 bool ConditionalGetMiddleware::needs_etag(

@@ -17,7 +17,7 @@
 #include "./_def_.h"
 
 // Framework libraries.
-#include "./interfaces.h"
+//#include "./interfaces.h"
 
 
 __HTTP_INTERNAL_BEGIN__
@@ -31,6 +31,8 @@ const short ERROR_T_SO_UPPER = 9;
 __HTTP_INTERNAL_END__
 
 __HTTP_BEGIN__
+
+class IHttpResponse;
 
 enum error_type
 {

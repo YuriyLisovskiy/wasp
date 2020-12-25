@@ -42,11 +42,11 @@ extern bool _if_unmodified_since_passes(
 	long last_modified, long if_unmodified_since
 );
 
-extern std::unique_ptr<http::IHttpResponse> _precondition_failed(
+extern std::shared_ptr<http::IHttpResponse> _precondition_failed(
 	http::HttpRequest* request
 );
 
-extern std::unique_ptr<http::IHttpResponse> _not_modified(
+extern std::shared_ptr<http::IHttpResponse> _not_modified(
 	http::HttpRequest* request, http::IHttpResponse* response
 );
 
@@ -57,7 +57,7 @@ __CACHE_BEGIN__
 
 extern void set_response_etag(http::IHttpResponse* response);
 
-extern std::unique_ptr<http::IHttpResponse> get_conditional_response(
+extern std::shared_ptr<http::IHttpResponse> get_conditional_response(
 	http::HttpRequest* request,
 	const std::string& etag,
 	long last_modified,
