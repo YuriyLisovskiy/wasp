@@ -52,7 +52,7 @@ std::string UrlPattern::get_name() const
 	return this->_name;
 }
 
-std::unique_ptr<http::IHttpResponse> UrlPattern::apply(
+http::Result<std::shared_ptr<http::IHttpResponse>> UrlPattern::apply(
 	http::HttpRequest* request,
 	conf::Settings* settings,
 	views::Args* args

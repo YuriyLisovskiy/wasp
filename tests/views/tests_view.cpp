@@ -87,42 +87,42 @@ TEST_F(ViewTestCase, GetTestReturnsNullptr)
 	auto request = ViewTestCase::make_request("get");
 	auto response = this->view->get(&request, nullptr);
 
-	ASSERT_EQ(response, nullptr);
+	ASSERT_EQ(response.value, nullptr);
 }
 
 TEST_F(ViewTestCase, PostTestReturnsNullptr)
 {
 	auto request = ViewTestCase::make_request("post");
-	ASSERT_EQ(this->view->post(&request, nullptr), nullptr);
+	ASSERT_EQ(this->view->post(&request, nullptr).value, nullptr);
 }
 
 TEST_F(ViewTestCase, PutTestReturnsNullptr)
 {
 	auto request = ViewTestCase::make_request("put");
-	ASSERT_EQ(this->view->put(&request, nullptr), nullptr);
+	ASSERT_EQ(this->view->put(&request, nullptr).value, nullptr);
 }
 
 TEST_F(ViewTestCase, PatchTestReturnsNullptr)
 {
 	auto request = ViewTestCase::make_request("patch");
-	ASSERT_EQ(this->view->patch(&request, nullptr), nullptr);
+	ASSERT_EQ(this->view->patch(&request, nullptr).value, nullptr);
 }
 
 TEST_F(ViewTestCase, DeleteTestReturnsNullptr)
 {
 	auto request = ViewTestCase::make_request("delete");
-	ASSERT_EQ(this->view->delete_(&request, nullptr), nullptr);
+	ASSERT_EQ(this->view->delete_(&request, nullptr).value, nullptr);
 }
 
 TEST_F(ViewTestCase, HeadTestReturnsNullptr)
 {
 	auto request = ViewTestCase::make_request("head");
-	ASSERT_EQ(this->view->head(&request, nullptr), nullptr);
+	ASSERT_EQ(this->view->head(&request, nullptr).value, nullptr);
 }
 
 TEST_F(ViewTestCase, OptionsTest)
 {
-	auto expected_response = http::HttpResponse("");
+	auto expected_response = http::HttpResponse();
 	auto vec = std::vector<std::string>{"get", "post", "head", "options"};
 	expected_response.set_header(
 		"Allow",
@@ -133,15 +133,15 @@ TEST_F(ViewTestCase, OptionsTest)
 	auto request = ViewTestCase::make_request("options");
 	auto actual_response = this->view->options(&request, nullptr);
 
-	ASSERT_EQ(actual_response->content_type(), expected_response.content_type());
-	ASSERT_EQ(actual_response->status(), expected_response.status());
-	ASSERT_EQ(actual_response->charset(), expected_response.charset());
+	ASSERT_EQ(actual_response.value->content_type(), expected_response.content_type());
+	ASSERT_EQ(actual_response.value->status(), expected_response.status());
+	ASSERT_EQ(actual_response.value->charset(), expected_response.charset());
 }
 
 TEST_F(ViewTestCase, TraceTestReturnsNullptr)
 {
 	auto request = ViewTestCase::make_request("trace");
-	ASSERT_EQ(this->view->trace(&request, nullptr), nullptr);
+	ASSERT_EQ(this->view->trace(&request, nullptr).value, nullptr);
 }
 
 TEST_F(ViewTestCase, AllowedMethodsTest)
@@ -166,7 +166,7 @@ TEST_F(ViewTestCase, SetupAndDispatchAllowedTest)
 	this->view->setup(&request);
 	auto response = this->view->dispatch(nullptr);
 
-	ASSERT_EQ(response->status(), 200);
+	ASSERT_EQ(response.value->status(), 200);
 }
 
 TEST_F(ViewTestCase, DispatchNotAllowedTest)
@@ -176,5 +176,5 @@ TEST_F(ViewTestCase, DispatchNotAllowedTest)
 
 	auto response = this->view->dispatch(nullptr);
 
-	ASSERT_EQ(response->status(), 405);
+	ASSERT_EQ(response.value->status(), 405);
 }

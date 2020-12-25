@@ -30,7 +30,7 @@ public:
 
 	void set_kwargs(collections::Dict<std::string, std::string>* kwargs);
 
-	std::unique_ptr<http::IHttpResponse> get(http::HttpRequest* request, Args* args) final;
+	http::Result<std::shared_ptr<http::IHttpResponse>> get(http::HttpRequest* request, Args* args) final;
 };
 
 __VIEWS_END__

@@ -8,6 +8,9 @@
 
 #pragma once
 
+// C++ libraries.
+#include <string>
+
 // Core libraries.
 #include <xalwart.core/object/interfaces.h>
 

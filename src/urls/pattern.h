@@ -30,7 +30,7 @@ __CONF_END__
 
 __URLS_BEGIN__
 
-typedef std::function<std::unique_ptr<http::IHttpResponse>(
+typedef std::function<http::Result<std::shared_ptr<http::IHttpResponse>>(
 	http::HttpRequest*, views::Args*, conf::Settings*
 )> ViewHandler;
 
@@ -57,7 +57,7 @@ public:
 	);
 
 	[[nodiscard]] std::string get_name() const;
-	std::unique_ptr<http::IHttpResponse> apply(
+	http::Result<std::shared_ptr<http::IHttpResponse>> apply(
 		http::HttpRequest* request,
 		conf::Settings* settings,
 		views::Args* args = nullptr

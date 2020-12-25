@@ -27,6 +27,11 @@ View::View(conf::Settings* settings)
 	this->_logger = this->_settings->LOGGER.get();
 }
 
+http::Result<std::shared_ptr<http::IHttpResponse>> View::null()
+{
+	return http::Result<std::shared_ptr<http::IHttpResponse>>::null();
+}
+
 View::View(
 	const std::vector<std::string>& allowed_methods,
 	conf::Settings* settings
@@ -44,7 +49,7 @@ void View::setup(http::HttpRequest* request)
 	this->_request = request;
 }
 
-std::unique_ptr<http::IHttpResponse> View::dispatch(Args* args)
+http::Result<std::shared_ptr<http::IHttpResponse>> View::dispatch(Args* args)
 {
 	if (this->_request == nullptr)
 	{
@@ -57,7 +62,7 @@ std::unique_ptr<http::IHttpResponse> View::dispatch(Args* args)
 	}
 
 	std::string method = core::str::lower(this->_request->method());
-	std::unique_ptr<http::IHttpResponse> result = nullptr;
+	auto result = http::Result<std::shared_ptr<http::IHttpResponse>>::null();
 	if (method == "get")
 	{
 		result = this->get(this->_request, args);
@@ -99,17 +104,13 @@ std::unique_ptr<http::IHttpResponse> View::dispatch(Args* args)
 	return result;
 }
 
-std::unique_ptr<http::IHttpResponse> View::http_method_not_allowed(http::HttpRequest* request)
+http::Result<std::shared_ptr<http::IHttpResponse>> View::http_method_not_allowed(http::HttpRequest* request)
 {
-	if (this->_logger != nullptr)
-	{
-		this->_logger->warning(
-			"Method Not Allowed (" + request->method() + "): " + request->path(),
-			_ERROR_DETAILS_
-		);
-	}
-
-	return std::make_unique<http::HttpResponseNotAllowed>("", this->allowed_methods());
+	this->_logger->warning(
+		"Method Not Allowed (" + request->method() + "): " + request->path(),
+		_ERROR_DETAILS_
+	);
+	return this->response<http::HttpResponseNotAllowed>("", this->allowed_methods());
 }
 
 std::vector<std::string> View::allowed_methods()
@@ -131,51 +132,51 @@ std::vector<std::string> View::allowed_methods()
 	return result;
 }
 
-std::unique_ptr<http::IHttpResponse> View::get(http::HttpRequest* request, Args* args)
+http::Result<std::shared_ptr<http::IHttpResponse>> View::get(http::HttpRequest* request, Args* args)
 {
-	return nullptr;
+	return this->null();
 }
 
-std::unique_ptr<http::IHttpResponse> View::post(http::HttpRequest* request, Args* args)
+http::Result<std::shared_ptr<http::IHttpResponse>> View::post(http::HttpRequest* request, Args* args)
 {
-	return nullptr;
+	return this->null();
 }
 
-std::unique_ptr<http::IHttpResponse> View::put(http::HttpRequest* request, Args* args)
+http::Result<std::shared_ptr<http::IHttpResponse>> View::put(http::HttpRequest* request, Args* args)
 {
-	return nullptr;
+	return this->null();
 }
 
-std::unique_ptr<http::IHttpResponse> View::patch(http::HttpRequest* request, Args* args)
+http::Result<std::shared_ptr<http::IHttpResponse>> View::patch(http::HttpRequest* request, Args* args)
 {
-	return nullptr;
+	return this->null();
 }
 
-std::unique_ptr<http::IHttpResponse> View::delete_(http::HttpRequest* request, Args* args)
+http::Result<std::shared_ptr<http::IHttpResponse>> View::delete_(http::HttpRequest* request, Args* args)
 {
-	return nullptr;
+	return this->null();
 }
 
-std::unique_ptr<http::IHttpResponse> View::head(http::HttpRequest* request, Args* args)
+http::Result<std::shared_ptr<http::IHttpResponse>> View::head(http::HttpRequest* request, Args* args)
 {
 	return this->get(request, args);
 }
 
-std::unique_ptr<http::IHttpResponse> View::options(http::HttpRequest* request, Args* args)
+http::Result<std::shared_ptr<http::IHttpResponse>> View::options(http::HttpRequest* request, Args* args)
 {
-	auto response = std::make_unique<http::HttpResponse>("");
+	auto response = std::make_shared<http::HttpResponse>(200);
 	auto allowed_methods = this->allowed_methods();
 	response->set_header(
 		"Allow",
 		core::str::join(allowed_methods.begin(), allowed_methods.end(), ", ")
 	);
 	response->set_header("Content-Length", "0");
-	return response;
+	return this->response(response);
 }
 
-std::unique_ptr<http::IHttpResponse> View::trace(http::HttpRequest* request, Args* args)
+http::Result<std::shared_ptr<http::IHttpResponse>> View::trace(http::HttpRequest* request, Args* args)
 {
-	return nullptr;
+	return this->null();
 }
 
 __VIEWS_END__

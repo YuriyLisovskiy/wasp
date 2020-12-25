@@ -33,7 +33,7 @@ public:
 
 	/// Returns a response with a template rendered with
 	/// the given context.
-	virtual std::unique_ptr<http::IHttpResponse> render(
+	virtual http::Result<std::shared_ptr<http::IHttpResponse>> render(
 		http::HttpRequest* request,
 		const std::shared_ptr<render::IContext>& context = nullptr,
 		const std::string& template_name = "",
@@ -60,7 +60,7 @@ public:
 		http::HttpRequest* request, Args* args
 	);
 
-	std::unique_ptr<http::IHttpResponse> get(
+	http::Result<std::shared_ptr<http::IHttpResponse>> get(
 		http::HttpRequest* request, Args* args
 	) override;
 

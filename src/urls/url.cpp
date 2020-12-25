@@ -12,7 +12,7 @@
 
 __URLS_BEGIN__
 
-std::shared_ptr<urls::UrlPattern> make_url(
+std::shared_ptr<UrlPattern> make_url(
 	const std::string& rgx,
 	const views::ViewHandler& handler,
 	const std::string& name
@@ -36,7 +36,7 @@ std::shared_ptr<urls::UrlPattern> make_static(
 		http::HttpRequest* request,
 		views::Args* args,
 		conf::Settings* settings
-	) -> std::unique_ptr<http::IHttpResponse>
+	) -> http::Result<std::shared_ptr<http::IHttpResponse>>
 	{
 		views::StaticView view(settings);
 		auto kwargs = std::make_unique<collections::Dict<std::string, std::string>>(

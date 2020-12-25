@@ -27,7 +27,7 @@ void StaticView::set_kwargs(collections::Dict<std::string, std::string>* kwargs)
 	this->_kwargs = kwargs;
 }
 
-std::unique_ptr<http::IHttpResponse> StaticView::get(http::HttpRequest* request, Args* args)
+http::Result<std::shared_ptr<http::IHttpResponse>> StaticView::get(http::HttpRequest* request, Args* args)
 {
 	if (!this->_kwargs)
 	{
@@ -45,27 +45,20 @@ std::unique_ptr<http::IHttpResponse> StaticView::get(http::HttpRequest* request,
 
 	if (!args)
 	{
-		if (this->_logger)
-		{
-			this->_logger->warning(
-				"unable to retrieve \"path\" argument from url while serving static file",
-				_ERROR_DETAILS_
-			);
-		}
+		this->_logger->warning(
+			"unable to retrieve \"path\" argument from url while serving static file",
+			_ERROR_DETAILS_
+		);
 
 		// TODO: add default http 404 error content!
-		return std::make_unique<http::HttpResponseNotFound>(
-			this->_kwargs->get("http_404", "404 Not Found")
-		);
+		return this->response<http::HttpResponseNotFound>(this->_kwargs->get("http_404", "404 Not Found"));
 	}
 
 	auto full_path = core::path::join(this->_kwargs->get("document_root", ""), args->get_str("path", ""));
 	if (!core::path::exists(full_path))
 	{
 		// TODO: add default http 404 error content!
-		return std::make_unique<http::HttpResponseNotFound>(
-			this->_kwargs->get("http_404", "404 Not Found")
-		);
+		return this->response<http::HttpResponseNotFound>(this->_kwargs->get("http_404", "404 Not Found"));
 	}
 
 	auto stat_info = core::File::file_stat(full_path);
@@ -74,7 +67,7 @@ std::unique_ptr<http::IHttpResponse> StaticView::get(http::HttpRequest* request,
 		stat_info.st_mtime, stat_info.st_size)
 	)
 	{
-		return std::make_unique<http::HttpResponseNotModified>("");
+		return this->response<http::HttpResponseNotModified>("");
 	}
 
 	std::string content_type, encoding;
@@ -84,7 +77,7 @@ std::unique_ptr<http::IHttpResponse> StaticView::get(http::HttpRequest* request,
 		content_type = "application/octet-stream";
 	}
 
-	auto response = std::make_unique<http::FileResponse>(
+	auto response = std::make_shared<http::FileResponse>(
 		full_path, false, 0, content_type
 	);
 	response->set_header(
@@ -96,7 +89,7 @@ std::unique_ptr<http::IHttpResponse> StaticView::get(http::HttpRequest* request,
 		response->set_header(http::CONTENT_ENCODING, encoding);
 	}
 
-	return response;
+	return this->response(response);
 }
 
 __VIEWS_END__

@@ -28,7 +28,7 @@ TemplateResponseMixin::TemplateResponseMixin(render::IEngine* engine)
 	this->content_type = "";
 }
 
-std::unique_ptr<http::IHttpResponse> TemplateResponseMixin::render(
+http::Result<std::shared_ptr<http::IHttpResponse>> TemplateResponseMixin::render(
 	http::HttpRequest* request,
 	const std::shared_ptr<render::IContext>& context,
 	const std::string& template_name,
@@ -37,7 +37,7 @@ std::unique_ptr<http::IHttpResponse> TemplateResponseMixin::render(
 	const std::string& charset
 )
 {
-	auto response = std::make_unique<render::TemplateResponse>(
+	auto response = std::make_shared<render::TemplateResponse>(
 		this->engine,
 		template_name.empty() ? this->get_template_name() : template_name,
 		context.get(),
@@ -46,7 +46,7 @@ std::unique_ptr<http::IHttpResponse> TemplateResponseMixin::render(
 		charset
 	);
 	response->render();
-	return response;
+	return http::Result<std::shared_ptr<http::IHttpResponse>>(response);
 }
 
 std::string TemplateResponseMixin::get_template_name()
@@ -89,7 +89,7 @@ std::shared_ptr<render::IContext> TemplateView::get_context(
 	return nullptr;
 }
 
-std::unique_ptr<http::IHttpResponse> TemplateView::get(
+http::Result<std::shared_ptr<http::IHttpResponse>> TemplateView::get(
 	http::HttpRequest* request, Args* args
 )
 {

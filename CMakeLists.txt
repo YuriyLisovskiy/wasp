@@ -8,17 +8,8 @@ set(LIBRARY_VERSION "0.0.1")
 
 project(${LIBRARY_NAME})
 
-function(remove_dirs SRC_LIST)
-    foreach(entry ${SRC_LIST})
-        if (IS_DIRECTORY ${entry})
-            list(REMOVE_ITEM SRC_LIST ${entry})
-        endif()
-    endforeach()
-endfunction(remove_dirs)
-
-function(list_exclude SRC_LIST EXPR)
-    list(FILTER ${SRC_LIST} EXCLUDE REGEX ${EXPR})
-endfunction(list_exclude)
+include(GNUInstallDirs)
+set(GNU_INCLUDE_DIR /usr/local/include)
 
 function(print SRC_LIST)
     foreach(entry ${SRC_LIST})
@@ -28,7 +19,13 @@ endfunction(print)
 
 set(LIB_SRC_DIR ${PROJECT_SOURCE_DIR}/src)
 file(GLOB_RECURSE SOURCES LIST_DIRECTORIES true ${LIB_SRC_DIR}/*.h ${LIB_SRC_DIR}/*.cpp)
-remove_dirs(SOURCES)
+foreach(entry ${SOURCES})
+    if (IS_DIRECTORY ${entry})
+        list(REMOVE_ITEM SOURCES ${entry})
+    endif()
+endforeach()
+list(LENGTH SOURCES SOURCES_COUNT)
+message(STATUS "[INFO] Sources found: ${SOURCES_COUNT}")
 
 # Build shared library.
 set(FULL_LIBRARY_NAME ${LIBRARY_NAME}-${LIBRARY_VERSION})
@@ -37,13 +34,16 @@ add_library(${FULL_LIBRARY_NAME} SHARED ${SOURCES})
 # Install library.
 install(
     TARGETS ${FULL_LIBRARY_NAME}
-    LIBRARY DESTINATION /usr/local/lib
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
-add_custom_command(
-    TARGET ${FULL_LIBRARY_NAME}
-    POST_BUILD
-    COMMAND XW_ROOT_DIR=${PROJECT_SOURCE_DIR}/src XW_LIB_NAME=${LIBRARY_NAME} bash ${PROJECT_SOURCE_DIR}/scripts/install.sh
+install(
+    DIRECTORY "${LIB_SRC_DIR}/"
+    DESTINATION ${GNU_INCLUDE_DIR}/${LIBRARY_NAME}
+    FILES_MATCHING
+    PATTERN "*.h"
 )
 
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
