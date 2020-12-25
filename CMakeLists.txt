@@ -30,6 +30,7 @@ message(STATUS "[INFO] Sources found: ${SOURCES_COUNT}")
 # Build shared library.
 set(FULL_LIBRARY_NAME ${LIBRARY_NAME}-${LIBRARY_VERSION})
 add_library(${FULL_LIBRARY_NAME} SHARED ${SOURCES})
+target_include_directories(${FULL_LIBRARY_NAME} PUBLIC ${GNU_INCLUDE_DIR})
 
 # Install library.
 install(
