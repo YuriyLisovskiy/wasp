@@ -2,10 +2,6 @@ name: "Continuous Integration"
 
 on: [push]
 
-env:
-  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
-  BUILD_TYPE: Debug
-
 jobs:
   build:
     name: ${{ matrix.os }} [gcc-${{ matrix.compiler_version }}, g++-${{ matrix.compiler_version }}]
@@ -16,9 +12,10 @@ jobs:
         name: [Ubuntu]
         os: [ubuntu-18.04]
         compiler_version: [10]
+    env:
+      BUILD_TYPE: 'Debug'
     steps:
       - uses: actions/checkout@v2
-
       - name: Install Compiler and Check Version
         run: |
           sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test && \
@@ -33,7 +30,6 @@ jobs:
           sudo update-alternatives --set c++ /usr/bin/g++ && \
           gcc --version && \
           g++ --version
-
       - name: Build and Install Google Test Framework
         run: |
           git clone -q https://github.com/google/googletest.git && \
@@ -43,7 +39,6 @@ jobs:
                      -DCMAKE_C_COMPILER=gcc-${{ matrix.compiler_version }} .. && \
           sudo make && \
           sudo make install
-
       - name: Install Core Library
         run: |
           cd /tmp && \
@@ -58,7 +53,6 @@ jobs:
                      .. && \
           sudo make && \
           sudo make install
-
       - name: Install Render Library
         run: |
           cd /tmp && \
@@ -73,7 +67,9 @@ jobs:
                      .. && \
           sudo make && \
           sudo make install
-
+      - name: Update Links and Cache of Linker
+        run: |
+          sudo ldconfig
       - name: Build Tests
         run: |
           sudo mkdir build && \
@@ -83,7 +79,6 @@ jobs:
                      -DCMAKE_C_COMPILER=gcc-${{ matrix.compiler_version }} \
                      -DCMAKE_BUILD_TYPE=$BUILD_TYPE .. && \
           sudo make
-
       - name: Run Tests
         run: |
           sudo valgrind --leak-check=full ./build/tests/unittests-all
