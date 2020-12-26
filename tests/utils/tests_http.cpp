@@ -35,7 +35,7 @@ bool assert_vector(const std::vector<_T>& actual, const std::vector<_T>& expecte
 TEST(ParseHttpDateTestCase, ParseGMTDate)
 {
 	auto actual = utils_http::parse_http_date("Fri, 15 Nov 2019 12:45:26 GMT");
-	long expected = 1573814726;
+	long expected = 1573821926;
 	ASSERT_EQ(actual, expected);
 }
 
