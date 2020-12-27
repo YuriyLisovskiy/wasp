@@ -48,7 +48,34 @@ error::operator bool() const
 
 std::shared_ptr<IHttpResponse> error::get_response()
 {
-	return std::make_shared<http::HttpResponse>(this->type, this->msg);
+	unsigned short code;
+	switch (this->type)
+	{
+		case EntityTooLargeError:
+			code = 413;
+			break;
+		case PermissionDenied:
+			code = 403;
+			break;
+		case NotFound:
+		case FileDoesNotExistError:
+			code = 404;
+			break;
+		case InternalServerError:
+			code = 500;
+			break;
+		case SuspiciousOperation:
+		case DisallowedHost:
+		case DisallowedRedirect:
+			code = 400;
+			break;
+		case HttpError:
+		default:
+			code = 500;
+			break;
+	}
+
+	return std::make_shared<http::HttpResponse>(code, this->msg);
 }
 
 __HTTP_END__

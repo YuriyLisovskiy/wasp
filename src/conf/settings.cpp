@@ -12,10 +12,15 @@
 
 // Render libraries.
 #include <xalwart.render/engine.h>
+#include <xalwart.render/loaders.h>
 
 // Framework modules.
-#include "./settings_factory.h"
 #include "../render/library/default.h"
+#include "../middleware/clickjacking.h"
+#include "../middleware/common.h"
+#include "../middleware/cookies.h"
+#include "../middleware/http.h"
+#include "../middleware/security.h"
 
 
 __CONF_BEGIN__
@@ -441,6 +446,37 @@ void Settings::_override_config(YAML::Node& config)
 Settings::Settings(const std::string& base_dir)
 {
 	this->BASE_DIR = base_dir;
+	using namespace middleware;
+	this->_middleware = {
+		{XFrameOptionsMiddleware::FULL_NAME, [this]() -> std::shared_ptr<middleware::IMiddleware> {
+			return std::make_shared<XFrameOptionsMiddleware>(this);
+		}},
+		{CommonMiddleware::FULL_NAME, [this]() -> std::shared_ptr<middleware::IMiddleware> {
+			return std::make_shared<CommonMiddleware>(this);
+		}},
+		{CookieMiddleware::FULL_NAME, [this]() -> std::shared_ptr<middleware::IMiddleware> {
+			return std::make_shared<CookieMiddleware>(this);
+		}},
+		{ConditionalGetMiddleware::FULL_NAME, [this]() -> std::shared_ptr<middleware::IMiddleware> {
+			return std::make_shared<ConditionalGetMiddleware>(this);
+		}},
+		{SecurityMiddleware::FULL_NAME, [this]() -> std::shared_ptr<middleware::IMiddleware> {
+			return std::make_shared<SecurityMiddleware>(this);
+		}}
+	};
+
+	using namespace render::lib;
+	this->_libraries = {
+		{DefaultLibrary::FULL_NAME, [this]() -> std::shared_ptr<ILibrary> {
+			return std::make_shared<DefaultLibrary>(this);
+		}}
+	};
+
+	this->_loaders = {
+		{render::DefaultLoader::FULL_NAME, []() -> std::shared_ptr<render::DefaultLoader> {
+			return std::make_shared<render::DefaultLoader>();
+		}}
+	};
 }
 
 void Settings::_init_env(YAML::Node& env)
@@ -469,7 +505,7 @@ void Settings::_init_env(YAML::Node& env)
 		}
 
 		std::vector<std::shared_ptr<render::lib::ILibrary>> libs{
-			this->factory->get_library(xw::render::lib::DefaultLibrary::FULL_NAME)
+			this->_get_library(xw::render::lib::DefaultLibrary::FULL_NAME)
 		};
 		auto libraries = env["libraries"];
 		if (libraries && libraries.IsSequence() && libraries.size() > 0)
@@ -479,7 +515,7 @@ void Settings::_init_env(YAML::Node& env)
 			{
 				if (!it->IsNull() && it->IsScalar())
 				{
-					libs.push_back(this->factory->get_library(it->as<std::string>()));
+					libs.push_back(this->_get_library(it->as<std::string>()));
 				}
 			}
 		}
@@ -493,7 +529,7 @@ void Settings::_init_env(YAML::Node& env)
 			{
 				if (!it->IsNull() && it->IsScalar())
 				{
-					loaders_vec.push_back(this->factory->get_loader(it->as<std::string>()));
+					loaders_vec.push_back(this->_get_loader(it->as<std::string>()));
 				}
 			}
 		}
@@ -704,7 +740,7 @@ void Settings::_init_apps(YAML::Node& apps)
 	{
 		if (!it->IsNull() && it->IsScalar())
 		{
-			auto item = this->factory->get_app(it->as<std::string>());
+			auto item = this->_get_app(it->as<std::string>());
 			if (item)
 			{
 				this->INSTALLED_APPS.push_back(item);
@@ -719,7 +755,7 @@ void Settings::_init_middleware(YAML::Node& middleware)
 	{
 		if (!it->IsNull() && it->IsScalar())
 		{
-			auto item = this->factory->get_middleware(it->as<std::string>());
+			auto item = this->_get_middleware(it->as<std::string>());
 			if (item)
 			{
 				this->MIDDLEWARE.push_back(item);
@@ -855,7 +891,7 @@ void Settings::init()
 
 	this->_init_secure(config);
 
-	this->factory = new internal::SettingsFactory(this, this->LOGGER.get());
+//	this->factory = new SettingsFactory(this, this->LOGGER.get());
 
 	auto apps = config["installed_apps"];
 	if (apps && apps.IsSequence() && apps.size() > 0)
@@ -885,8 +921,6 @@ void Settings::init()
 		"Loading template environment...",
 		core::Logger::Color::DEFAULT, '\0'
 	);
-	this->register_libraries();
-	this->register_loaders();
 	auto env = config["templates_engine"];
 	if (env && env.IsMap())
 	{
@@ -894,12 +928,14 @@ void Settings::init()
 	}
 	else
 	{
+		this->register_libraries();
+		this->register_loaders();
 		this->register_templates_engine();
 	}
 
 	this->LOGGER->print(" Done.");
 
-	delete factory;
+//	delete factory;
 }
 
 void Settings::prepare()
@@ -936,6 +972,54 @@ void Settings::register_templates_engine(const YAML::Node& config)
 
 void Settings::register_loaders()
 {
+}
+
+std::shared_ptr<apps::IAppConfig> Settings::_get_app(
+	const std::string& full_name
+) const
+{
+	if (this->_apps.find(full_name) != this->_apps.end())
+	{
+		return this->_apps.at(full_name)();
+	}
+
+	return nullptr;
+}
+
+std::shared_ptr<middleware::IMiddleware> Settings::_get_middleware(
+	const std::string& full_name
+) const
+{
+	if (this->_middleware.find(full_name) != this->_middleware.end())
+	{
+		return this->_middleware.at(full_name)();
+	}
+
+	return nullptr;
+}
+
+std::shared_ptr<render::lib::ILibrary> Settings::_get_library(
+	const std::string& full_name
+) const
+{
+	if (this->_libraries.find(full_name) != this->_libraries.end())
+	{
+		return this->_libraries.at(full_name)();
+	}
+
+	return nullptr;
+}
+
+std::shared_ptr<render::ILoader> Settings::_get_loader(
+	const std::string& full_name
+) const
+{
+	if (this->_loaders.find(full_name) != this->_loaders.end())
+	{
+		return this->_loaders.at(full_name)();
+	}
+
+	return nullptr;
 }
 
 __CONF_END__

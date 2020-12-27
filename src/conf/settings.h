@@ -12,6 +12,9 @@
 #include <xalwart.core/datetime.h>
 #include <xalwart.core/logger.h>
 
+// Render libraries.
+#include <xalwart.render/library/base.h>
+
 // Vendor libraries.
 #include "../yaml/yaml-cpp/yaml.h"
 
@@ -22,11 +25,10 @@
 #include "../urls/url.h"
 #include "../apps/interfaces.h"
 #include "../middleware/interfaces.h"
-#include "../render/library/library.h"
 
-__CONF_INTERNAL_BEGIN__
-class SettingsFactory;
-__CONF_INTERNAL_END__
+//__CONF_BEGIN__
+//class SettingsFactory;
+//__CONF_END__
 
 
 __CONF_BEGIN__
@@ -60,8 +62,8 @@ private:
 	void _init_apps(YAML::Node& apps);
 	void _init_middleware(YAML::Node& middleware);
 
-protected:
-	internal::SettingsFactory* factory;
+//protected:
+//	const SettingsFactory* factory;
 
 protected:
 	virtual void register_logger();
@@ -267,34 +269,126 @@ public:
 	std::string SECURE_SSL_HOST;
 	bool SECURE_SSL_REDIRECT;
 
-	Settings(const std::string& base_dir);
+	explicit Settings(const std::string& base_dir);
 	virtual ~Settings() = default;
 	void init();
 	void prepare();
 
-//	template <typename _T, typename = std::enable_if<std::is_base_of<apps::IAppConfig, _T>::value>>
-//	void app(const std::string& full_name)
-//	{
-//		this->_factory->register_app<_T>(full_name);
-//	}
-//
-//	template <typename _T, typename = std::enable_if<std::is_base_of<middleware::IMiddleware, _T>::value>>
-//	void middleware(const std::string& full_name)
-//	{
-//		this->_factory->register_middleware<_T>(full_name);
-//	}
-//
-//	template <typename _T, typename = std::enable_if<std::is_base_of<render::lib::ILibrary, _T>::value>>
-//	void library(const std::string& full_name)
-//	{
-//		this->_factory->register_library<_T>(full_name);
-//	}
-//
-//	template <typename _T, typename = std::enable_if<std::is_base_of<render::ILoader, _T>::value>>
-//	void loader(const std::string& full_name)
-//	{
-//		this->_factory->register_loader<_T>(full_name);
-//	}
+protected:
+	template <typename T, typename = std::enable_if<std::is_base_of<apps::IAppConfig, T>::value>>
+	void app(const std::string& full_name)
+	{
+		if (this->_apps.find(full_name) != this->_apps.end())
+		{
+			if (this->LOGGER)
+			{
+				this->LOGGER->warning(
+					"unable to register '" + full_name + "' app which already exists"
+				);
+			}
+		}
+		else
+		{
+			this->_apps[full_name] = [this]() -> std::shared_ptr<apps::IAppConfig> {
+				auto app = std::make_shared<T>(this);
+				app->init(app->__type__());
+				return app;
+			};
+		}
+	}
+
+	template <typename T, typename = std::enable_if<std::is_base_of<middleware::IMiddleware, T>::value>>
+	void middleware(const std::string& full_name)
+	{
+		if (this->_middleware.find(full_name) != this->_middleware.end())
+		{
+			if (this->LOGGER)
+			{
+				this->LOGGER->warning(
+					"unable to register '" + full_name + "' middleware which already exists"
+				);
+			}
+		}
+		else
+		{
+			this->_middleware[full_name] = [this]() -> std::shared_ptr<middleware::IMiddleware> {
+				return std::make_shared<T>(this);
+			};
+		}
+	}
+
+	template <typename T, typename = std::enable_if<std::is_base_of<render::lib::ILibrary, T>::value>>
+	void library(const std::string& full_name)
+	{
+		if (this->_libraries.find(full_name) != this->_libraries.end())
+		{
+			if (this->LOGGER)
+			{
+				this->LOGGER->warning(
+					"unable to register '" + full_name + "' library which already exists"
+				);
+			}
+		}
+		else
+		{
+			this->_libraries[full_name] = [this]() -> std::shared_ptr<render::lib::ILibrary> {
+				return std::make_shared<T>(this);
+			};
+		}
+	}
+
+	template <typename T, typename = std::enable_if<std::is_base_of<render::ILoader, T>::value>>
+	void loader(const std::string& full_name)
+	{
+		if (this->_loaders.find(full_name) != this->_loaders.end())
+		{
+			if (this->LOGGER)
+			{
+				this->LOGGER->warning(
+					"unable to register '" + full_name + "' loader which already exists"
+				);
+			}
+		}
+		else
+		{
+			this->_loaders[full_name] = [this]() -> std::shared_ptr<render::ILoader> {
+				return std::make_shared<T>(this);
+			};
+		}
+	}
+
+private:
+	std::map<
+		std::string,
+		std::function<std::shared_ptr<middleware::IMiddleware>()>
+	> _middleware;
+
+	std::map<
+		std::string,
+		std::function<std::shared_ptr<render::lib::ILibrary>()>
+	> _libraries;
+
+	std::map<
+		std::string,
+		std::function<std::shared_ptr<apps::IAppConfig>()>
+	> _apps;
+
+	std::map<
+		std::string,
+		std::function<std::shared_ptr<render::ILoader>()>
+	> _loaders;
+
+	[[nodiscard]]
+	std::shared_ptr<apps::IAppConfig> _get_app(const std::string& full_name) const;
+
+	[[nodiscard]]
+	std::shared_ptr<middleware::IMiddleware> _get_middleware(const std::string& full_name) const;
+
+	[[nodiscard]]
+	std::shared_ptr<render::lib::ILibrary> _get_library(const std::string& full_name) const;
+
+	[[nodiscard]]
+	std::shared_ptr<render::ILoader> _get_loader(const std::string& full_name) const;
 };
 
 __CONF_END__

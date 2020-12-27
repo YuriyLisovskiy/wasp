@@ -138,12 +138,18 @@ StartServerCommand::make_handler()
 						// If view returns empty result, return 204 - No Content.
 						result.value = std::make_shared<http::HttpResponse>(204);
 					}
-
-					if (!result.value->err())
+					else
 					{
-						result = StartServerCommand::process_response_middleware(
-							request, result.value.get(), this->settings
-						);
+						if (!result.value->err())
+						{
+							auto middleware_result = StartServerCommand::process_response_middleware(
+								request, result.value.get(), this->settings
+							);
+							if (middleware_result.catch_(http::HttpError) || middleware_result.value)
+							{
+								result = middleware_result;
+							}
+						}
 					}
 				}
 			}

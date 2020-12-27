@@ -66,7 +66,7 @@ public:
 
 	[[nodiscard]] bool catch_(error_type expected = HttpError) const
 	{
-		// Process HttpError-based errors
+		// Process SuspiciousOperation-based errors
 		if (this->err.type >= internal::ERROR_T_SO_LOWER && this->err.type <= internal::ERROR_T_SO_UPPER)
 		{
 			return this->err.type != None && this->_check_nested(
