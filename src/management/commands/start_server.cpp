@@ -20,36 +20,20 @@ __MANAGEMENT_COMMANDS_BEGIN__
 
 StartServerCommand::StartServerCommand(
 	apps::IAppConfig* config, conf::Settings* settings
-) : AppCommand(config, settings, "start-server", "Starts web server")
+) : AppCommand(config, settings, "start-server", "Starts a web application")
 {
-	this->_addr_port_flag = nullptr;
-	this->_threads_flag = nullptr;
-	this->_addr_flag = nullptr;
-	this->_port_flag = nullptr;
-	this->_use_ipv6_flag = nullptr;
-
-	std::string port = R"(\d+)";
-	this->_port_regex = new core::rgx::Regex(port);
-
 	std::string ipv4 = R"((\d{1,3}(?:\.\d{1,3}){3})|localhost)";
-	this->_ipv4_regex = new core::rgx::Regex(ipv4);
+	this->_ipv4_regex = core::rgx::Regex(ipv4);
 
 	std::string ipv6 = R"(\[([a-fA-F0-9:]+)\]|\[localhost\])";
-	this->_ipv6_regex = new core::rgx::Regex(ipv6);
+	this->_ipv6_regex = core::rgx::Regex(ipv6);
 
 	std::string fqdn = R"([a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*)";
 
-	this->_ipv4_ipv6_port_regex = new core::rgx::Regex(
+	std::string port = R"(\d+)";
+	this->_ipv4_ipv6_port_regex = core::rgx::Regex(
 		R"((?:(()" + ipv4 + R"()|()" + ipv6 + R"()|()" + fqdn + R"()):)?()" + port + R"())"
 	);
-}
-
-StartServerCommand::~StartServerCommand()
-{
-	delete this->_ipv4_ipv6_port_regex;
-	delete this->_ipv4_regex;
-	delete this->_ipv6_regex;
-	delete this->_port_regex;
 }
 
 collections::Dict<std::string, std::string> StartServerCommand::get_kwargs()
@@ -65,19 +49,19 @@ collections::Dict<std::string, std::string> StartServerCommand::get_kwargs()
 
 void StartServerCommand::add_flags()
 {
-	this->_addr_port_flag = this->_flag_set->make_string(
+	this->_addr_port_flag = this->flag_set->make_string(
 		"bind", "", "Server address and port formatted as host:port"
 	);
-	this->_addr_flag = this->_flag_set->make_string(
+	this->_addr_flag = this->flag_set->make_string(
 		"host", "", "Server address"
 	);
-	this->_port_flag = this->_flag_set->make_long(
+	this->_port_flag = this->flag_set->make_uint16(
 		"port", this->DEFAULT_PORT, "Server port"
 	);
-	this->_threads_flag = this->_flag_set->make_long(
+	this->_threads_flag = this->flag_set->make_unsigned_long(
 		"threads", this->DEFAULT_THREADS, "Threads count"
 	);
-	this->_use_ipv6_flag = this->_flag_set->make_bool(
+	this->_use_ipv6_flag = this->flag_set->make_bool(
 		"use-ipv6", false, "Use IPv6 address or not (used in case when host is set to 'localhost')"
 	);
 }
@@ -252,18 +236,14 @@ void StartServerCommand::retrieve_args(
 	auto host_port_str = this->_addr_port_flag->get();
 	if (!host_port_str.empty())
 	{
-		if (!this->_ipv4_ipv6_port_regex->match(host_port_str))
+		if (!this->_ipv4_ipv6_port_regex.match(host_port_str))
 		{
 			throw core::CommandError(host_port_str + " is not valid host:port pair");
 		}
 
-		auto groups = this->_ipv4_ipv6_port_regex->groups();
+		auto groups = this->_ipv4_ipv6_port_regex.groups();
 		auto address = (groups[1].empty() ? this->DEFAULT_IPV4_HOST : groups[1]);
-		if (this->_ipv6_regex->match(address))
-		{
-			use_ipv6 = true;
-		}
-
+		use_ipv6 = this->_ipv6_regex.match(address);
 		auto trimmed_addr = address;
 		core::str::rtrim(trimmed_addr, "]");
 		core::str::ltrim(trimmed_addr, "[");
@@ -285,11 +265,11 @@ void StartServerCommand::retrieve_args(
 		}
 		else
 		{
-			if (this->_ipv6_regex->match(address))
+			if (this->_ipv6_regex.match(address))
 			{
 				use_ipv6 = true;
 			}
-			else if (!this->_ipv4_regex->match(address))
+			else if (!this->_ipv4_regex.match(address))
 			{
 				throw core::CommandError(this->_addr_flag->get_raw() + " is invalid address");
 			}
@@ -304,25 +284,19 @@ void StartServerCommand::retrieve_args(
 		}
 
 		host = address;
-		auto raw_port = this->_port_flag->get_raw();
-		if (raw_port.empty())
+		if (this->_port_flag->valid())
 		{
-			port = this->DEFAULT_PORT;
+			port = this->_port_flag->get();
 		}
 		else
 		{
-			if (!this->_port_regex->match(raw_port))
-			{
-				throw core::CommandError(raw_port + " is invalid port");
-			}
-
-			port = this->_port_flag->get();
+			throw core::CommandError(this->_port_flag->get_raw() + " is invalid port");
 		}
 	}
 
-	if (std::regex_match(this->_threads_flag->get_raw(), std::regex(R"(\d+)")))
+	if (!this->_threads_flag->valid())
 	{
-		throw core::CommandError("threads count is not a number: " + this->_threads_flag->get_raw());
+		throw core::CommandError("threads count is not a valid positive integer: " + this->_threads_flag->get_raw());
 	}
 
 	threads_count = this->_threads_flag->get();

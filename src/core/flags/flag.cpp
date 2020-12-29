@@ -15,6 +15,11 @@ Flag::Flag(const std::string& label, const std::string& help)
 	this->_label = label;
 }
 
+bool Flag::empty()
+{
+	return this->_data.empty();
+}
+
 std::string Flag::label()
 {
 	return this->_label;

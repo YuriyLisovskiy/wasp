@@ -35,7 +35,7 @@ MainApplication::MainApplication(conf::Settings* settings)
 
 	this->_setup_commands();
 
-	for (auto& command : this->_settings->COMMANDS)
+	for (auto& command : this->_commands)
 	{
 		this->_help_message += command.second->usage() + '\n';
 	}
@@ -56,9 +56,9 @@ void MainApplication::execute(int argc, char** argv)
 	{
 		try
 		{
-			if (this->_settings->COMMANDS.find(argv[1]) != this->_settings->COMMANDS.end())
+			if (this->_commands.find(argv[1]) != this->_commands.end())
 			{
-				this->_settings->COMMANDS[argv[1]]->run_from_argv(argc, argv);
+				this->_commands[argv[1]]->run_from_argv(argc, argv);
 			}
 			else
 			{
@@ -106,7 +106,7 @@ void MainApplication::_setup_commands()
 	this->_extend_settings_commands_or_error(
 		default_commands,
 		[](const std::string& cmd_name) -> std::string {
-			return "Attempting to override '" + cmd_name + "' command which is forbidden.";
+			return "Attempting to override '" + cmd_name + "' command which may produce an undefined behaviour.";
 		}
 	);
 }
@@ -119,19 +119,19 @@ void MainApplication::_extend_settings_commands_or_error(
 	for (auto& command : from)
 	{
 		if (std::find_if(
-			this->_settings->COMMANDS.begin(),
-			this->_settings->COMMANDS.end(),
+			this->_commands.begin(),
+			this->_commands.end(),
 			[command](const std::pair<
 				std::string, std::shared_ptr<cmd::BaseCommand>
 			>& pair) -> bool {
 				return command->name() == pair.first;
 			}
-		) != this->_settings->COMMANDS.end())
+		) != this->_commands.end())
 		{
-			throw core::ImproperlyConfigured(err_fn(command->name()), _ERROR_DETAILS_);
+			this->_settings->LOGGER->warning(err_fn(command->name()));
 		}
 
-		this->_settings->COMMANDS[command->name()] = command;
+		this->_commands[command->name()] = command;
 	}
 }
 

@@ -79,9 +79,6 @@ public:
 	/// main application configuration.
 	std::vector<std::shared_ptr<apps::IAppConfig>> INSTALLED_APPS;
 
-	/// List of commands to run from command line.
-	std::map<std::string, std::shared_ptr<cmd::BaseCommand>> COMMANDS;
-
 	/// Backend for rendering templates.
 	std::unique_ptr<render::IEngine> TEMPLATES_ENGINE;
 
@@ -339,14 +336,15 @@ private:
 	const std::string CONFIG_NAME = "config.yml";
 	const std::string LOCAL_CONFIG_NAME = "config.local.yml";
 
-	[[nodiscard]] YAML::Node _load_config(const std::string& file_name) const;
+	[[nodiscard]]
+	YAML::Node _load_config(const std::string& file_name) const;
 
 	// Loads local configuration file and overrides existing one.
 	static void _override_scalar(
-			YAML::Node& config, YAML::Node& local, const std::string& key
+		YAML::Node& config, YAML::Node& local, const std::string& key
 	);
 	static void _override_sequence(
-			YAML::Node& config, YAML::Node& local, const std::string& key
+		YAML::Node& config, YAML::Node& local, const std::string& key
 	);
 	void _override_config(YAML::Node& config);
 

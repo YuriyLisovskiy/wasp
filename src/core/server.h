@@ -25,10 +25,10 @@ typedef std::function<
 	Result<std::shared_ptr<http::IHttpResponse>>(http::HttpRequest*, const int&)
 > HttpHandlerFunc;
 
-class DefaultServer : server::HTTPServer
+class DefaultServer : public server::HTTPServer
 {
 public:
-	DefaultServer(const server::Context& ctx, HttpHandlerFunc  handler);
+	explicit DefaultServer(const server::Context& ctx, HttpHandlerFunc  handler);
 
 private:
 	HttpHandlerFunc _http_handler;

@@ -10,7 +10,6 @@
 #include <xalwart.core/datetime.h>
 
 // Framework libraries.
-#include "../http/response.h"
 #include "../core/parsers/query_parser.h"
 #include "../core/parsers/multipart_parser.h"
 

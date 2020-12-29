@@ -12,28 +12,59 @@
 
 __FLAGS_BEGIN__
 
-LongIntFlag::LongIntFlag(const std::string& label, const std::string& help, long default_val)
-	: TemplateFlag<long>(label, help)
+Uint16Flag::Uint16Flag(const std::string& label, const std::string& help, uint16_t default_val)
+	: TemplateFlag<uint16_t>(label, help, default_val)
 {
-	this->_default_val = default_val;
 }
 
-long LongIntFlag::from_string()
+uint16_t Uint16Flag::from_string()
+{
+	return std::stol(this->_data);
+}
+
+bool Uint16Flag::valid()
+{
+	return this->_data.empty() || std::regex_match(this->_data, internal::UINT16_TYPE);
+}
+
+
+UnsignedLongFlag::UnsignedLongFlag(
+	const std::string& label, const std::string& help, unsigned long default_val
+) : TemplateFlag<unsigned long>(label, help, default_val)
+{
+}
+
+unsigned long UnsignedLongFlag::from_string()
+{
+	return std::stol(this->_data);
+}
+
+bool UnsignedLongFlag::valid()
+{
+	return this->_data.empty() || std::regex_match(this->_data, internal::UNSIGNED_LONG_INT_TYPE);
+}
+
+
+LongIntFlag::LongIntFlag(const std::string& label, const std::string& help, long default_val)
+	: TemplateFlag<long>(label, help, default_val)
+{
+}
+
+long int LongIntFlag::from_string()
 {
 	return std::stol(this->_data);
 }
 
 bool LongIntFlag::valid()
 {
-	return this->_data.empty() || std::regex_match(this->_data, internal::INT_TYPE);
+	return this->_data.empty() || std::regex_match(this->_data, internal::LONG_INT_TYPE);
 }
 
 
 DoubleFlag::DoubleFlag(
 	const std::string& label, const std::string& help, double default_val
-) : TemplateFlag<double>(label, help)
+) : TemplateFlag<double>(label, help, default_val)
 {
-	this->_default_val = default_val;
 }
 
 double DoubleFlag::from_string()
@@ -49,9 +80,8 @@ bool DoubleFlag::valid()
 
 StringFlag::StringFlag(
 	const std::string& label, const std::string& help, const std::string& default_val
-) : TemplateFlag<std::string>(label, help)
+) : TemplateFlag<std::basic_string<char>>(label, help, default_val)
 {
-	this->_default_val = default_val;
 }
 
 std::string StringFlag::from_string()
@@ -67,9 +97,8 @@ bool StringFlag::valid()
 
 BoolFlag::BoolFlag(
 	const std::string& label, const std::string& help, bool default_val
-) : TemplateFlag<bool>(label, help)
+) : TemplateFlag<bool>(label, help, default_val)
 {
-	this->_default_val = default_val;
 }
 
 bool BoolFlag::from_string()

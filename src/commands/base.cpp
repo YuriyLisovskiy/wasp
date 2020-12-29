@@ -11,16 +11,11 @@ __COMMANDS_BEGIN__
 
 BaseCommand::BaseCommand(const std::string& cmd_name, const std::string& help)
 {
-	this->_flag_set = new core::flags::FlagSet(cmd_name);
-	this->_is_created = false;
-	this->_parse_from = 2;
-	this->_help = help;
-	this->_name = cmd_name;
-}
-
-BaseCommand::~BaseCommand()
-{
-	delete this->_flag_set;
+	this->flag_set = std::make_shared<core::flags::FlagSet>(cmd_name);
+	this->is_created = false;
+	this->parse_from = 2;
+	this->help = help;
+	this->label = cmd_name;
 }
 
 collections::Dict<std::string, std::string> BaseCommand::get_kwargs()
@@ -31,20 +26,20 @@ collections::Dict<std::string, std::string> BaseCommand::get_kwargs()
 std::string BaseCommand::usage()
 {
 	this->create_flags();
-	return this->_name + ":\n" + this->_help + "\n" + this->_flag_set->usage("  ");
+	return this->label + ":\n" + this->help + "\n" + this->flag_set->usage("  ");
 }
 
 std::string BaseCommand::name()
 {
-	return this->_name;
+	return this->label;
 }
 
 void BaseCommand::create_flags()
 {
-	if (!this->_is_created)
+	if (!this->is_created)
 	{
 		this->add_flags();
-		this->_is_created = true;
+		this->is_created = true;
 	}
 }
 
@@ -59,7 +54,7 @@ void BaseCommand::validate()
 void BaseCommand::run_from_argv(int argc, char** argv, bool is_verbose)
 {
 	this->create_flags();
-	this->_flag_set->parse(argc, argv, this->_parse_from, is_verbose);
+	this->flag_set->parse(argc, argv, this->parse_from, is_verbose);
 	this->handle();
 }
 

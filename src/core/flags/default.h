@@ -22,24 +22,48 @@
 __FLAGS_INTERNAL_BEGIN__
 
 const std::regex BOOL_TYPE("true|TRUE|false|FALSE|yes|YES|no|NO|1|0");
-const std::regex INT_TYPE("[+-]?[0-9]+");
-const std::regex UNSIGNED_INT_TYPE("[+]?[0-9]+");
+const std::regex LONG_INT_TYPE("[+-]?[0-9]{1,10}");
+const std::regex UNSIGNED_LONG_INT_TYPE("[+]?[0-9]{1,10}");
+const std::regex UINT16_TYPE("[+-]?[0-9]{1,5}");
 const std::regex DOUBLE_TYPE("[+-]?[0-9]+[.]?[0-9]+");
-const std::regex UNSIGNED_DOUBLE_TYPE("[+]?[0-9]+[.]?[0-9]+");
 
 __FLAGS_INTERNAL_END__
 
 
 __FLAGS_BEGIN__
 
-class LongIntFlag final : public TemplateFlag<long>
+class UnsignedLongFlag final : public TemplateFlag<unsigned long>
 {
 protected:
-	long from_string() override;
+	unsigned long from_string() override;
+
+public:
+	UnsignedLongFlag(
+		const std::string& label, const std::string& help, unsigned long default_val
+	);
+	bool valid() final;
+};
+
+class Uint16Flag final : public TemplateFlag<uint16_t>
+{
+protected:
+	uint16_t from_string() override;
+
+public:
+	Uint16Flag(
+		const std::string& label, const std::string& help, uint16_t default_val
+	);
+	bool valid() final;
+};
+
+class LongIntFlag final : public TemplateFlag<long int>
+{
+protected:
+	long int from_string() override;
 
 public:
 	LongIntFlag(
-		const std::string& label, const std::string& help, long default_val
+			const std::string& label, const std::string& help, long default_val
 	);
 	bool valid() final;
 };
@@ -56,14 +80,14 @@ public:
 	bool valid() final;
 };
 
-class StringFlag final : public TemplateFlag<std::string>
+class StringFlag final : public TemplateFlag<std::basic_string<char>>
 {
 protected:
 	std::string from_string() override;
 
 public:
 	StringFlag(
-		const std::string& label, const std::string& help, const std::string& default_val
+		const std::string& label, const std::string& help, const std::basic_string<char>& default_val
 	);
 	bool valid() final;
 };

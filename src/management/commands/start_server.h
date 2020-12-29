@@ -26,16 +26,15 @@ private:
 	bool _use_ipv6 = false;
 	size_t _threads_count = DEFAULT_THREADS;
 
-	core::flags::StringFlag* _addr_port_flag;
-	core::flags::StringFlag* _addr_flag;
-	core::flags::LongIntFlag* _port_flag;
-	core::flags::LongIntFlag* _threads_flag;
-	core::flags::BoolFlag* _use_ipv6_flag;
+	std::shared_ptr<core::flags::StringFlag> _addr_port_flag;
+	std::shared_ptr<core::flags::StringFlag> _addr_flag;
+	std::shared_ptr<core::flags::Uint16Flag> _port_flag;
+	std::shared_ptr<core::flags::UnsignedLongFlag> _threads_flag;
+	std::shared_ptr<core::flags::BoolFlag> _use_ipv6_flag;
 
-	core::rgx::Regex* _ipv4_ipv6_port_regex;
-	core::rgx::Regex* _ipv4_regex;
-	core::rgx::Regex* _ipv6_regex;
-	core::rgx::Regex* _port_regex;
+	core::rgx::Regex _ipv4_ipv6_port_regex;
+	core::rgx::Regex _ipv4_regex;
+	core::rgx::Regex _ipv6_regex;
 
 	const std::string DEFAULT_IPV4_HOST = "127.0.0.1";
 	const std::string DEFAULT_IPV6_HOST = "[::1]";
@@ -71,7 +70,6 @@ protected:
 
 public:
 	explicit StartServerCommand(apps::IAppConfig* config, conf::Settings* settings);
-	~StartServerCommand() final;
 	collections::Dict<std::string, std::string> get_kwargs() override;
 };
 

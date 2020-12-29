@@ -9,6 +9,7 @@
 #pragma once
 
 // C++ libraries.
+#include <string>
 #include <type_traits>
 
 // Module definitions.
@@ -31,6 +32,7 @@ protected:
 
 public:
 	virtual ~Flag() = default;
+	bool empty();
 	virtual std::string label();
 	virtual std::string usage();
 	virtual std::string get_raw();
@@ -38,8 +40,14 @@ public:
 	virtual std::pair<std::string, std::string> kwarg() = 0;
 };
 
+template<class T>
+concept Stringifiable = requires(T x) {
+	std::to_string(x);
+};
 
-template <class FlagT, class = std::enable_if<std::is_fundamental_v<FlagT> || std::is_same_v<FlagT, std::string>>>
+template <class FlagT, class = std::enable_if<
+	std::is_fundamental_v<FlagT> || std::is_same_v<FlagT, std::basic_string<char>>
+>>
 class TemplateFlag : public Flag
 {
 protected:
@@ -73,7 +81,14 @@ public:
 			return {this->_label, this->_data};
 		}
 
-		return {this->_label, std::to_string(this->_default_val)};
+		if constexpr (Stringifiable<FlagT>)
+		{
+			return {this->_label, std::to_string(this->_default_val)};
+		}
+		else
+		{
+			return {this->_label, this->_default_val};
+		}
 	}
 };
 

@@ -31,11 +31,14 @@ __COMMANDS_BEGIN__
 class BaseCommand
 {
 protected:
-	core::flags::FlagSet* _flag_set;
-	bool _is_created;
-	size_t _parse_from;
-	std::string _help;
-	std::string _name;
+	std::shared_ptr<core::flags::FlagSet> flag_set;
+	bool is_created;
+
+	// Index of item in argv to parse from.
+	size_t parse_from;
+
+	std::string help;
+	std::string label;
 
 	explicit BaseCommand(const std::string& cmd_name, const std::string& help);
 
@@ -52,8 +55,6 @@ protected:
 	virtual void handle() = 0;
 
 public:
-	virtual ~BaseCommand();
-
 	virtual collections::Dict<std::string, std::string> get_kwargs();
 
 	/// Returns usage based on flag_set.

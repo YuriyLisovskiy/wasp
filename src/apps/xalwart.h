@@ -23,6 +23,9 @@ private:
 	conf::Settings* _settings;
 	std::string _help_message;
 
+	// List of commands to run from command line.
+	std::map<std::string, std::shared_ptr<cmd::BaseCommand>> _commands;
+
 	void _setup_commands();
 	void _extend_settings_commands_or_error(
 		const std::vector<std::shared_ptr<cmd::BaseCommand>>& from,

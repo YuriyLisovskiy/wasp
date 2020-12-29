@@ -55,6 +55,24 @@ std::string FlagSet::usage(const std::string& indent)
 	return usage;
 }
 
+std::shared_ptr<Uint16Flag> FlagSet::make_uint16(
+	const std::string& label, uint16_t default_val, const std::string& help
+)
+{
+	auto flag = std::make_shared<Uint16Flag>(label, help, default_val);
+	this->_flags[label] = flag;
+	return flag;
+}
+
+std::shared_ptr<UnsignedLongFlag> FlagSet::make_unsigned_long(
+	const std::string& label, unsigned long default_val, const std::string& help
+)
+{
+	auto flag = std::make_shared<UnsignedLongFlag>(label, help, default_val);
+	this->_flags[label] = flag;
+	return flag;
+}
+
 std::shared_ptr<LongIntFlag> FlagSet::make_long(
 	const std::string& label, long default_val, const std::string& help
 )

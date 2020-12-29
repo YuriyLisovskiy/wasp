@@ -12,7 +12,8 @@
 #include "./_def_.h"
 
 // Framework libraries.
-#include "./command.h"
+#include "./base.h"
+#include "../conf/settings.h"
 
 
 __COMMANDS_BEGIN__
@@ -20,10 +21,11 @@ __COMMANDS_BEGIN__
 /// Derived commands must have a constructor
 ///	with pointer to apps::IAppConfig and pointer
 /// to conf::Settings parameters.
-class AppCommand : public Command
+class AppCommand : public BaseCommand
 {
 protected:
 	apps::IAppConfig* app_config;
+	conf::Settings* settings;
 
 	AppCommand(
 		apps::IAppConfig* app_cfg,
