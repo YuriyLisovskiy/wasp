@@ -27,7 +27,7 @@ void StaticView::set_kwargs(collections::Dict<std::string, std::string>* kwargs)
 	this->_kwargs = kwargs;
 }
 
-http::Result<std::shared_ptr<http::IHttpResponse>> StaticView::get(http::HttpRequest* request, Args* args)
+core::Result<std::shared_ptr<http::IHttpResponse>> StaticView::get(http::HttpRequest* request, Args* args)
 {
 	if (!this->_kwargs)
 	{

@@ -36,7 +36,7 @@ std::shared_ptr<urls::UrlPattern> make_static(
 		http::HttpRequest* request,
 		views::Args* args,
 		conf::Settings* settings
-	) -> http::Result<std::shared_ptr<http::IHttpResponse>>
+	) -> core::Result<std::shared_ptr<http::IHttpResponse>>
 	{
 		views::StaticView view(settings);
 		auto kwargs = std::make_unique<collections::Dict<std::string, std::string>>(

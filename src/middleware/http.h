@@ -34,7 +34,7 @@ public:
 	explicit ConditionalGetMiddleware(conf::Settings* settings);
 	ConditionalGetMiddleware(nullptr_t) = delete;
 
-	http::Result<std::shared_ptr<http::IHttpResponse>> process_response(
+	core::Result<std::shared_ptr<http::IHttpResponse>> process_response(
 		http::HttpRequest* request, http::IHttpResponse* response
 	) override;
 };

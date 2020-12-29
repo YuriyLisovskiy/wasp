@@ -13,7 +13,7 @@
 
 __CORE_INTERNAL_BEGIN__
 
-void multipart_parser::append_parameter(const std::string& key, const std::string& value)
+void multipart_parser::append_parameter(const std::string& key, const xw::string& value)
 {
 	if (!this->post_values.contains(key))
 	{
@@ -93,7 +93,7 @@ multipart_parser::multipart_parser(const std::string& media_root)
 	this->media_root = str::rtrim(media_root, "/");
 }
 
-void multipart_parser::parse(const std::string& content_type, const std::string& body)
+void multipart_parser::parse(const std::string& content_type, const xw::string& body)
 {
 	std::string boundary = multipart_parser::get_boundary(content_type);
 	std::string current_boundary, content_disposition, key, value, file_content_type, file_name;

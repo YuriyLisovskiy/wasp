@@ -24,24 +24,24 @@ protected:
 	conf::Settings* settings;
 
 protected:
-	http::Result<std::shared_ptr<http::IHttpResponse>> none();
+	core::Result<std::shared_ptr<http::IHttpResponse>> none();
 
 	template<typename ResponseT, typename ...Args>
-	http::Result<std::shared_ptr<http::IHttpResponse>> result(Args&& ...args)
+	core::Result<std::shared_ptr<http::IHttpResponse>> result(Args&& ...args)
 	{
-		return http::Result<std::shared_ptr<http::IHttpResponse>>(
+		return core::Result<std::shared_ptr<http::IHttpResponse>>(
 			std::make_shared<ResponseT>(std::forward<Args>(args)...)
 		);
 	}
 
-	http::Result<std::shared_ptr<http::IHttpResponse>> result(
+	core::Result<std::shared_ptr<http::IHttpResponse>> result(
 		const std::shared_ptr<http::IHttpResponse>& response
 	);
 
-	template<http::error_type ErrorType, typename ...Args>
-	http::Result<std::shared_ptr<http::IHttpResponse>> raise(Args&& ...args)
+	template<core::error_type ErrorType, typename ...Args>
+	core::Result<std::shared_ptr<http::IHttpResponse>> raise(Args&& ...args)
 	{
-		return http::raise<ErrorType, std::shared_ptr<http::IHttpResponse>>(
+		return core::raise<ErrorType, std::shared_ptr<http::IHttpResponse>>(
 			std::forward<Args>(args)...
 		);
 	}
@@ -51,8 +51,8 @@ public:
 	MiddlewareMixin(nullptr_t) = delete;
 	~MiddlewareMixin() override = default;
 
-	http::Result<std::shared_ptr<http::IHttpResponse>> process_request(http::HttpRequest* request) override;
-	http::Result<std::shared_ptr<http::IHttpResponse>> process_response(
+	core::Result<std::shared_ptr<http::IHttpResponse>> process_request(http::HttpRequest* request) override;
+	core::Result<std::shared_ptr<http::IHttpResponse>> process_response(
 		http::HttpRequest* request, http::IHttpResponse* response
 	) override;
 };

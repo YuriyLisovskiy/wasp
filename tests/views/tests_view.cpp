@@ -42,9 +42,9 @@ class ViewTestCase : public ::testing::Test
 public:
 	static http::HttpRequest make_request(const std::string& method)
 	{
-		auto empty_parameters = http::HttpRequest::Parameters<std::string, std::string>(
-			collections::Dict<std::string, std::string>(),
-			collections::MultiValueDict<std::string, std::string>()
+		auto empty_parameters = http::HttpRequest::Parameters<std::string, xw::string>(
+			collections::Dict<std::string, xw::string>(),
+			collections::MultiValueDict<std::string, xw::string>()
 		);
 		auto empty_map = std::map<std::string, std::string>();
 		return http::HttpRequest(

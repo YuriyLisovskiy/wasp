@@ -11,6 +11,7 @@
 // Core libraries.
 #include <xalwart.core/datetime.h>
 #include <xalwart.core/logger.h>
+#include <xalwart.core/result.h>
 
 // Render libraries.
 #include <xalwart.render/library/base.h>
@@ -26,54 +27,16 @@
 #include "../apps/interfaces.h"
 #include "../middleware/interfaces.h"
 
-//__CONF_BEGIN__
-//class SettingsFactory;
-//__CONF_END__
+
+__CORE_BEGIN__
+class IServer;
+__CORE_END__
 
 
 __CONF_BEGIN__
 
 struct Settings
 {
-private:
-	const std::string CONFIG_ROOT = "application";
-	const std::string CONFIG_NAME = "config.yml";
-	const std::string LOCAL_CONFIG_NAME = "config.local.yml";
-
-	YAML::Node _load_config(const std::string& file_name) const;
-
-	// Loads local configuration file and overrides existing one.
-	static void _override_scalar(
-		YAML::Node& config, YAML::Node& local, const std::string& key
-	);
-	static void _override_sequence(
-		YAML::Node& config, YAML::Node& local, const std::string& key
-	);
-	void _override_config(YAML::Node& config);
-
-	void _init_env(YAML::Node& config);
-	void _init_logger(YAML::Node& logger);
-	void _init_allowed_hosts(YAML::Node& allowed_hosts);
-	void _init_disallowed_user_agents(YAML::Node& agents);
-	void _init_ignorable_404_urls(YAML::Node& urls);
-	void _init_formats(YAML::Node& config);
-	void _init_csrf(YAML::Node& config);
-	void _init_secure(YAML::Node& config);
-	void _init_apps(YAML::Node& apps);
-	void _init_middleware(YAML::Node& middleware);
-
-//protected:
-//	const SettingsFactory* factory;
-
-protected:
-	virtual void register_logger();
-	virtual void register_apps();
-	virtual void register_middleware();
-	virtual void register_libraries();
-	virtual void register_templates_engine();
-	virtual void register_templates_engine(const YAML::Node& config);
-	virtual void register_loaders();
-
 public:
 	bool DEBUG;
 
@@ -273,8 +236,25 @@ public:
 	virtual ~Settings() = default;
 	void init();
 	void prepare();
+	virtual std::shared_ptr<core::IServer> use_server(
+		bool verbose,
+		size_t threads_count,
+		size_t max_body_size,
+		const std::shared_ptr<core::ILogger>& logger,
+		const std::function<core::Result<std::shared_ptr<http::IHttpResponse>>(
+			http::HttpRequest* request, const int& client
+		)>& handler
+	);
 
 protected:
+	virtual void register_logger();
+	virtual void register_apps();
+	virtual void register_middleware();
+	virtual void register_libraries();
+	virtual void register_templates_engine();
+	virtual void register_templates_engine(const YAML::Node& config);
+	virtual void register_loaders();
+
 	template <typename T, typename = std::enable_if<std::is_base_of<apps::IAppConfig, T>::value>>
 	void app(const std::string& full_name)
 	{
@@ -283,7 +263,7 @@ protected:
 			if (this->LOGGER)
 			{
 				this->LOGGER->warning(
-					"unable to register '" + full_name + "' app which already exists"
+						"unable to register '" + full_name + "' app which already exists"
 				);
 			}
 		}
@@ -305,7 +285,7 @@ protected:
 			if (this->LOGGER)
 			{
 				this->LOGGER->warning(
-					"unable to register '" + full_name + "' middleware which already exists"
+						"unable to register '" + full_name + "' middleware which already exists"
 				);
 			}
 		}
@@ -325,7 +305,7 @@ protected:
 			if (this->LOGGER)
 			{
 				this->LOGGER->warning(
-					"unable to register '" + full_name + "' library which already exists"
+						"unable to register '" + full_name + "' library which already exists"
 				);
 			}
 		}
@@ -345,7 +325,7 @@ protected:
 			if (this->LOGGER)
 			{
 				this->LOGGER->warning(
-					"unable to register '" + full_name + "' loader which already exists"
+						"unable to register '" + full_name + "' loader which already exists"
 				);
 			}
 		}
@@ -356,6 +336,33 @@ protected:
 			};
 		}
 	}
+
+private:
+	const std::string CONFIG_ROOT = "application";
+	const std::string CONFIG_NAME = "config.yml";
+	const std::string LOCAL_CONFIG_NAME = "config.local.yml";
+
+	[[nodiscard]] YAML::Node _load_config(const std::string& file_name) const;
+
+	// Loads local configuration file and overrides existing one.
+	static void _override_scalar(
+			YAML::Node& config, YAML::Node& local, const std::string& key
+	);
+	static void _override_sequence(
+			YAML::Node& config, YAML::Node& local, const std::string& key
+	);
+	void _override_config(YAML::Node& config);
+
+	void _init_env(YAML::Node& config);
+	void _init_logger(YAML::Node& logger);
+	void _init_allowed_hosts(YAML::Node& allowed_hosts);
+	void _init_disallowed_user_agents(YAML::Node& agents);
+	void _init_ignorable_404_urls(YAML::Node& urls);
+	void _init_formats(YAML::Node& config);
+	void _init_csrf(YAML::Node& config);
+	void _init_secure(YAML::Node& config);
+	void _init_apps(YAML::Node& apps);
+	void _init_middleware(YAML::Node& middleware);
 
 private:
 	std::map<

@@ -6,20 +6,17 @@
 
 #include "./resolver.h"
 
-// Framework libraries.
-#include "../http/result.h"
-
 
 __URLS_BEGIN__
 
-std::function<http::Result<std::shared_ptr<http::IHttpResponse>>(
+std::function<core::Result<std::shared_ptr<http::IHttpResponse>>(
 	http::HttpRequest* request,
 	conf::Settings* settings
 )> resolve(
 	const std::string& path, std::vector<std::shared_ptr<UrlPattern>>& urlpatterns
 )
 {
-	std::function<http::Result<std::shared_ptr<http::IHttpResponse>>(
+	std::function<core::Result<std::shared_ptr<http::IHttpResponse>>(
 		http::HttpRequest* request,
 		conf::Settings* settings
 	)> fn = nullptr;
@@ -31,7 +28,7 @@ std::function<http::Result<std::shared_ptr<http::IHttpResponse>>(
 			fn = [url_pattern, args_map](
 				http::HttpRequest* request,
 				conf::Settings* settings
-			) mutable -> http::Result<std::shared_ptr<http::IHttpResponse>>
+			) mutable -> core::Result<std::shared_ptr<http::IHttpResponse>>
 			{
 				auto args = std::make_unique<views::Args>(args_map);
 				return url_pattern->apply(request, settings, args.get());

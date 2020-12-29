@@ -8,19 +8,21 @@
 
 #pragma once
 
+// Core libraries.
+#include <xalwart.core/result.h>
+
 // Module definitions.
 #include "./_def_.h"
 
 // Framework libraries.
 #include "./pattern.h"
-#include "../http/result.h"
 
 
 __URLS_BEGIN__
 
 /// Searches path in urlpatterns and returns an expression
 /// to process request if path is found, otherwise returns nullptr.
-extern std::function<http::Result<std::shared_ptr<http::IHttpResponse>>(
+extern std::function<core::Result<std::shared_ptr<http::IHttpResponse>>(
 	http::HttpRequest* request,
 	conf::Settings* settings
 )> resolve(

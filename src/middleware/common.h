@@ -35,7 +35,7 @@ public:
 	static const std::string FULL_NAME;
 
 protected:
-	virtual http::Result<std::shared_ptr<http::IHttpResponse>> get_response_redirect(
+	virtual core::Result<std::shared_ptr<http::IHttpResponse>> get_response_redirect(
 		const std::string& redirect_to
 	);
 
@@ -46,7 +46,7 @@ protected:
 	/// Return the full path of the request with a trailing slash appended.
 	/// Raise a RuntimeError if settings.DEBUG is true and request method is
 	/// POST, PUT, or PATCH.
-	http::Result<std::string> get_full_path_with_slash(http::HttpRequest* request);
+	core::Result<std::string> get_full_path_with_slash(http::HttpRequest* request);
 
 public:
 	explicit CommonMiddleware(conf::Settings* settings);
@@ -54,11 +54,11 @@ public:
 
 	/// Check for denied User-Agents and rewrite the URL based on
 	/// settings.APPEND_SLASH and settings.PREPEND_WWW
-	http::Result<std::shared_ptr<http::IHttpResponse>> process_request(http::HttpRequest* request) override;
+	core::Result<std::shared_ptr<http::IHttpResponse>> process_request(http::HttpRequest* request) override;
 
 	/// When the status code of the response is 404, it may redirect to a path
 	/// with an appended slash if should_redirect_with_slash() returns true.
-	http::Result<std::shared_ptr<http::IHttpResponse>> process_response(
+	core::Result<std::shared_ptr<http::IHttpResponse>> process_response(
 		http::HttpRequest* request, http::IHttpResponse* response
 	) override;
 };

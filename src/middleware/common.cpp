@@ -25,11 +25,11 @@ CommonMiddleware::CommonMiddleware(conf::Settings* settings)
 {
 }
 
-http::Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::get_response_redirect(
+core::Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::get_response_redirect(
 	const std::string& redirect_to
 )
 {
-	return http::Result<std::shared_ptr<http::IHttpResponse>>(
+	return core::Result<std::shared_ptr<http::IHttpResponse>>(
 		std::make_shared<http::HttpResponsePermanentRedirect>(redirect_to)
 	);
 }
@@ -46,7 +46,7 @@ bool CommonMiddleware::should_redirect_with_slash(http::HttpRequest* request)
 	return false;
 }
 
-http::Result<std::string> CommonMiddleware::get_full_path_with_slash(http::HttpRequest* request)
+core::Result<std::string> CommonMiddleware::get_full_path_with_slash(http::HttpRequest* request)
 {
 	auto new_path = request->full_path(true);
 
@@ -77,10 +77,10 @@ http::Result<std::string> CommonMiddleware::get_full_path_with_slash(http::HttpR
 		);
 	}
 
-	return http::Result(new_path);
+	return core::Result(new_path);
 }
 
-http::Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::process_request(
+core::Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::process_request(
 	http::HttpRequest* request
 )
 {
@@ -91,7 +91,7 @@ http::Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::process_req
 		{
 			if (rgx.search(user_agent))
 			{
-				return this->raise<http::PermissionDenied>(
+				return this->raise<core::PermissionDenied>(
 					"Forbidden user agent", _ERROR_DETAILS_
 				);
 			}
@@ -144,7 +144,7 @@ http::Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::process_req
 	return this->none();
 }
 
-http::Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::process_response(
+core::Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::process_response(
 	http::HttpRequest* request, http::IHttpResponse* response
 )
 {

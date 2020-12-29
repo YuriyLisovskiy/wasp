@@ -25,6 +25,7 @@ function(add_tests SUB_DIR SUB_NAME)
     target_link_libraries(
         ${FULL_BIN} PUBLIC gtest stdc++fs ${FRAMEWORK_NAME}.core-0.0.1
     )
+    target_link_libraries(${FULL_BIN} PUBLIC ${FRAMEWORK_NAME}.server-0.0.1)
     target_link_libraries(${FULL_BIN} PUBLIC ${FRAMEWORK_NAME}.render-0.0.1)
 endfunction()
 

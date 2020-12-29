@@ -14,24 +14,24 @@ MiddlewareMixin::MiddlewareMixin(conf::Settings* settings)
 	this->settings = settings;
 }
 
-http::Result<std::shared_ptr<http::IHttpResponse>> MiddlewareMixin::none()
+core::Result<std::shared_ptr<http::IHttpResponse>> MiddlewareMixin::none()
 {
-	return http::Result<std::shared_ptr<http::IHttpResponse>>();
+	return core::Result<std::shared_ptr<http::IHttpResponse>>();
 }
 
-http::Result<std::shared_ptr<http::IHttpResponse>> MiddlewareMixin::result(
+core::Result<std::shared_ptr<http::IHttpResponse>> MiddlewareMixin::result(
 	const std::shared_ptr<http::IHttpResponse>& response
 )
 {
-	return http::Result<std::shared_ptr<http::IHttpResponse>>(response);
+	return core::Result<std::shared_ptr<http::IHttpResponse>>(response);
 }
 
-http::Result<std::shared_ptr<http::IHttpResponse>> MiddlewareMixin::process_request(http::HttpRequest* request)
+core::Result<std::shared_ptr<http::IHttpResponse>> MiddlewareMixin::process_request(http::HttpRequest* request)
 {
 	return this->none();
 }
 
-http::Result<std::shared_ptr<http::IHttpResponse>> MiddlewareMixin::process_response(
+core::Result<std::shared_ptr<http::IHttpResponse>> MiddlewareMixin::process_response(
 	http::HttpRequest* request, http::IHttpResponse* response
 )
 {

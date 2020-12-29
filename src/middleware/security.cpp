@@ -35,7 +35,7 @@ SecurityMiddleware::SecurityMiddleware(
 	}
 }
 
-http::Result<std::shared_ptr<http::IHttpResponse>> SecurityMiddleware::process_request(
+core::Result<std::shared_ptr<http::IHttpResponse>> SecurityMiddleware::process_request(
 	http::HttpRequest* request
 )
 {
@@ -84,7 +84,7 @@ http::Result<std::shared_ptr<http::IHttpResponse>> SecurityMiddleware::process_r
 	return this->none();
 }
 
-http::Result<std::shared_ptr<http::IHttpResponse>> SecurityMiddleware::process_response(
+core::Result<std::shared_ptr<http::IHttpResponse>> SecurityMiddleware::process_response(
 	http::HttpRequest* request, http::IHttpResponse* response
 )
 {

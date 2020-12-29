@@ -10,13 +10,13 @@
 
 // Core libraries.
 #include <xalwart.core/collections/dict.h>
+#include <xalwart.core/result.h>
 
 // Module definitions.
 #include "./_def_.h"
 
 // Framework libraries.
 #include "./cookie.h"
-#include "./result.h"
 
 
 __HTTP_BEGIN__
@@ -91,7 +91,7 @@ public:
 
 	virtual std::string& operator[] (const std::string& key) = 0;
 
-	virtual error err() = 0;
+	virtual core::Error err() = 0;
 };
 
 __HTTP_END__

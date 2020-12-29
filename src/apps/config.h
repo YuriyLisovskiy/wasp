@@ -67,7 +67,7 @@ protected:
 			http::HttpRequest* request,
 			views::Args* args,
 			conf::Settings* settings_ptr
-		) -> http::Result<std::shared_ptr<http::IHttpResponse>>
+		) -> core::Result<std::shared_ptr<http::IHttpResponse>>
 		{
 			ViewT view(settings_ptr);
 			view.setup(request);

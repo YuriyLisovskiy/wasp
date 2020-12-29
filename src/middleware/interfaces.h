@@ -8,13 +8,15 @@
 
 #pragma once
 
+// Core libraries.
+#include <xalwart.core/result.h>
+
 // Module definitions.
 #include "./_def_.h"
 
 // Framework libraries.
 #include "../http/request.h"
 #include "../http/response.h"
-#include "../http/result.h"
 
 
 __MIDDLEWARE_BEGIN__
@@ -25,12 +27,12 @@ public:
 	virtual ~IMiddleware() = default;
 
 	/// An input http request before processing in views::View.
-	virtual http::Result<std::shared_ptr<http::IHttpResponse>> process_request(
+	virtual core::Result<std::shared_ptr<http::IHttpResponse>> process_request(
 		http::HttpRequest* request
 	) = 0;
 
 	/// An output http request and response after processing in views::View.
-	virtual http::Result<std::shared_ptr<http::IHttpResponse>> process_response(
+	virtual core::Result<std::shared_ptr<http::IHttpResponse>> process_response(
 		http::HttpRequest* request, http::IHttpResponse* response
 	) = 0;
 };

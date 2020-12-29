@@ -8,6 +8,8 @@
 
 // Core libraries.
 #include <xalwart.core/string_utils.h>
+#include <xalwart.core/result.h>
+#include <xalwart.core/datetime.h>
 
 // Framework libraries.
 #include "../../urls/resolver.h"
@@ -75,17 +77,46 @@ void StartServerCommand::handle()
 		throw core::CommandError("You must set 'allowed_hosts' if 'debug' is false.");
 	}
 
-	core::net::internal::HttpServer::context ctx{};
-
 	// TODO: remove http server's verbose setting
-	ctx.verbose = true;
+	bool verbose = true;
 
-	this->setup_server_ctx(ctx);
+	std::string host;
+	uint16_t port;
+	bool use_ipv6;
+	size_t threads_count;
+	this->setup_server_ctx(host, port, use_ipv6, threads_count);
 
-	core::net::internal::HttpServer server(ctx);
+	auto server = this->settings->use_server(
+		verbose,
+		threads_count,
+		this->settings->DATA_UPLOAD_MAX_MEMORY_SIZE,
+		this->settings->LOGGER,
+		this->make_handler()
+	);
+	if (!server)
+	{
+		throw core::ImproperlyConfigured("You must initialize server in order to use the application.");
+	}
+
 	try
 	{
-		server.listen_and_serve();
+		if (server->bind(host.c_str(), port, use_ipv6))
+		{
+			xw::core::InterruptException::initialize();
+			try
+			{
+				std::string message = core::dt::Datetime::now().strftime("%B %d, %Y - %T") + "\n" +
+				                      LIB_NAME + " version " + LIB_VERSION + "\n" +
+				                      "Starting development server at " +
+				                      "http://" + host + ":" + std::to_string(port) + "/\n" +
+				                      "Quit the server with CONTROL-C.\n";
+				server->listen(message);
+			}
+			catch (const xw::core::InterruptException& exc)
+			{
+				// skip
+			}
+		}
 	}
 	catch (const core::InterruptException& exc)
 	{
@@ -99,10 +130,13 @@ void StartServerCommand::handle()
 	{
 		this->settings->LOGGER->error(exc.what(), _ERROR_DETAILS_);
 	}
+
+	server->close();
 }
 
-std::function<void(http::HttpRequest*, const core::net::internal::socket_t&)>
-StartServerCommand::make_handler()
+std::function<
+	core::Result<std::shared_ptr<http::IHttpResponse>>(http::HttpRequest*, const int&)
+> StartServerCommand::make_handler()
 {
 	// Check if static files can be served
 	// and create necessary urls.
@@ -116,22 +150,22 @@ StartServerCommand::make_handler()
 	this->settings->TEMPLATES_ENGINE->load_libraries();
 
 	auto handler = [this](
-		http::HttpRequest* request, const core::net::internal::socket_t& client
-	) mutable -> void
+		http::HttpRequest* request, const int& client
+	) mutable -> core::Result<std::shared_ptr<http::IHttpResponse>>
 	{
-		http::Result<std::shared_ptr<http::IHttpResponse>> result;
+		core::Result<std::shared_ptr<http::IHttpResponse>> result;
 		try
 		{
 			result = StartServerCommand::process_request_middleware(
 				request, this->settings
 			);
-			if (!result.catch_(http::HttpError) && !result.value)
+			if (!result.catch_(core::HttpError) && !result.value)
 			{
 				result = StartServerCommand::process_urlpatterns(
 					request, this->settings->ROOT_URLCONF, this->settings
 				);
 				// TODO: check if it is required to process response middleware in case of view error.
-				if (!result.catch_(http::HttpError))
+				if (!result.catch_(core::HttpError))
 				{
 					if (!result.value)
 					{
@@ -145,7 +179,7 @@ StartServerCommand::make_handler()
 							auto middleware_result = StartServerCommand::process_response_middleware(
 								request, result.value.get(), this->settings
 							);
-							if (middleware_result.catch_(http::HttpError) || middleware_result.value)
+							if (middleware_result.catch_(core::HttpError) || middleware_result.value)
 							{
 								result = middleware_result;
 							}
@@ -157,42 +191,19 @@ StartServerCommand::make_handler()
 		catch (const core::BaseException& exc)
 		{
 			this->settings->LOGGER->error(exc);
-			result = http::raise<http::InternalServerError, std::shared_ptr<http::IHttpResponse>>(
+			result = core::raise<core::InternalServerError, std::shared_ptr<http::IHttpResponse>>(
 				"<p style=\"font-size: 24px;\" >Internal Server Error</p><p>" + std::string(exc.what()) + "</p>"
 			);
 		}
 		catch (const std::exception& exc)
 		{
 			this->settings->LOGGER->error(exc.what(), __LINE__, "request handler function", __FILE__);
-			result = http::raise<http::InternalServerError, std::shared_ptr<http::IHttpResponse>>(
+			result = core::raise<core::InternalServerError, std::shared_ptr<http::IHttpResponse>>(
 				"<p style=\"font-size: 24px;\" >Internal Server Error</p><p>" + std::string(exc.what()) + "</p>"
 			);
 		}
 
-		std::shared_ptr<http::IHttpResponse> response;
-		if (result.catch_(http::HttpError))
-		{
-			response = result.err.get_response();
-		}
-		else if (!result.value)
-		{
-			// Response was not instantiated, so return 204 - No Content.
-			response = std::make_shared<http::HttpResponse>(204);
-		}
-		else
-		{
-			auto err = result.value->err();
-			if (err)
-			{
-				response = err.get_response();
-			}
-			else
-			{
-				response = result.value;
-			}
-		}
-
-		send_response(request, response.get(), client, this->settings);
+		return result;
 	};
 
 	return handler;
@@ -232,7 +243,9 @@ void StartServerCommand::build_app_patterns(std::vector<std::shared_ptr<urls::Ur
 	}
 }
 
-void StartServerCommand::setup_server_ctx(core::net::internal::HttpServer::context& ctx)
+void StartServerCommand::setup_server_ctx(
+	std::string& host, uint16_t& port, bool& use_ipv6, size_t& threads_count
+)
 {
 	// Setup address and port.
 	auto host_port_str = this->_addr_port_flag->get();
@@ -247,7 +260,7 @@ void StartServerCommand::setup_server_ctx(core::net::internal::HttpServer::conte
 		auto address = (groups[1].empty() ? this->DEFAULT_IPV4_HOST : groups[1]);
 		if (this->_ipv6_regex->match(address))
 		{
-			ctx.use_ipv6 = true;
+			use_ipv6 = true;
 		}
 
 		auto trimmed_addr = address;
@@ -255,25 +268,25 @@ void StartServerCommand::setup_server_ctx(core::net::internal::HttpServer::conte
 		core::str::ltrim(trimmed_addr, "[");
 		if (trimmed_addr == "localhost")
 		{
-			address = ctx.use_ipv6 ? this->DEFAULT_IPV6_HOST : this->DEFAULT_IPV4_HOST;
+			address = use_ipv6 ? this->DEFAULT_IPV6_HOST : this->DEFAULT_IPV4_HOST;
 		}
 
-		ctx.host = address;
-		ctx.port = groups[4].empty() ? this->DEFAULT_PORT : (uint16_t) std::stoi(groups[4]);
+		host = address;
+		port = groups[4].empty() ? this->DEFAULT_PORT : (uint16_t) std::stoi(groups[4]);
 	}
 	else
 	{
 		auto address = this->_addr_flag->get();
 		if (address.empty())
 		{
-			ctx.use_ipv6 = this->_use_ipv6_flag->get();
-			address = ctx.use_ipv6 ? this->DEFAULT_IPV6_HOST : this->DEFAULT_IPV4_HOST;
+			use_ipv6 = this->_use_ipv6_flag->get();
+			address = use_ipv6 ? this->DEFAULT_IPV6_HOST : this->DEFAULT_IPV4_HOST;
 		}
 		else
 		{
 			if (this->_ipv6_regex->match(address))
 			{
-				ctx.use_ipv6 = true;
+				use_ipv6 = true;
 			}
 			else if (!this->_ipv4_regex->match(address))
 			{
@@ -286,14 +299,14 @@ void StartServerCommand::setup_server_ctx(core::net::internal::HttpServer::conte
 		core::str::ltrim(trimmed_addr, "[");
 		if (trimmed_addr == "localhost")
 		{
-			address = ctx.use_ipv6 ? this->DEFAULT_IPV6_HOST : this->DEFAULT_IPV4_HOST;
+			address = use_ipv6 ? this->DEFAULT_IPV6_HOST : this->DEFAULT_IPV4_HOST;
 		}
 
-		ctx.host = address;
+		host = address;
 		auto raw_port = this->_port_flag->get_raw();
 		if (raw_port.empty())
 		{
-			ctx.port = this->DEFAULT_PORT;
+			port = this->DEFAULT_PORT;
 		}
 		else
 		{
@@ -302,24 +315,19 @@ void StartServerCommand::setup_server_ctx(core::net::internal::HttpServer::conte
 				throw core::CommandError(raw_port + " is invalid port");
 			}
 
-			ctx.port = this->_port_flag->get();
+			port = this->_port_flag->get();
 		}
 	}
-
-	ctx.max_body_size = this->settings->DATA_UPLOAD_MAX_MEMORY_SIZE;
-	ctx.media_root = this->settings->MEDIA_ROOT;
-	ctx.logger = this->settings->LOGGER.get();
 
 	if (std::regex_match(this->_threads_flag->get_raw(), std::regex(R"(\d+)")))
 	{
 		throw core::CommandError("threads count is not a number: " + this->_threads_flag->get_raw());
 	}
 
-	ctx.threads_count = this->_threads_flag->get();
-	ctx.handler = this->make_handler();
+	threads_count = this->_threads_flag->get();
 }
 
-http::Result<std::shared_ptr<http::IHttpResponse>> StartServerCommand::process_request_middleware(
+core::Result<std::shared_ptr<http::IHttpResponse>> StartServerCommand::process_request_middleware(
 	http::HttpRequest* request, conf::Settings* settings
 )
 {
@@ -332,10 +340,10 @@ http::Result<std::shared_ptr<http::IHttpResponse>> StartServerCommand::process_r
 		}
 	}
 
-	return http::Result<std::shared_ptr<http::IHttpResponse>>::null();
+	return core::Result<std::shared_ptr<http::IHttpResponse>>::null();
 }
 
-http::Result<std::shared_ptr<http::IHttpResponse>> StartServerCommand::process_urlpatterns(
+core::Result<std::shared_ptr<http::IHttpResponse>> StartServerCommand::process_urlpatterns(
 	http::HttpRequest* request,
 	std::vector<std::shared_ptr<urls::UrlPattern>>& urlpatterns,
 	conf::Settings* settings
@@ -347,10 +355,10 @@ http::Result<std::shared_ptr<http::IHttpResponse>> StartServerCommand::process_u
 		return apply(request, settings);
 	}
 
-	return http::raise<http::NotFound, std::shared_ptr<http::IHttpResponse>>("<h2>404 - Not Found</h2>");
+	return core::raise<core::NotFound, std::shared_ptr<http::IHttpResponse>>("<h2>404 - Not Found</h2>");
 }
 
-http::Result<std::shared_ptr<http::IHttpResponse>> StartServerCommand::process_response_middleware(
+core::Result<std::shared_ptr<http::IHttpResponse>> StartServerCommand::process_response_middleware(
 	http::HttpRequest* request,
 	http::IHttpResponse* response,
 	conf::Settings* settings
@@ -366,59 +374,7 @@ http::Result<std::shared_ptr<http::IHttpResponse>> StartServerCommand::process_r
 		}
 	}
 
-	return http::Result<std::shared_ptr<http::IHttpResponse>>::null();
-}
-
-void StartServerCommand::send_response(
-	http::HttpRequest* request,
-	http::IHttpResponse* response,
-	const core::net::internal::socket_t& client,
-	conf::Settings* settings
-)
-{
-	if (response->is_streaming())
-	{
-		auto* streaming_response = dynamic_cast<http::StreamingHttpResponse*>(response);
-		core::net::internal::HttpServer::send(streaming_response, client);
-	}
-	else
-	{
-		core::net::internal::HttpServer::send(response, client);
-	}
-
-	log_request(
-		request->method() + " " +
-		request->path() + " " +
-		"HTTP" + (settings->USE_SSL ? "S/" : "/") +
-		request->version(),
-		response->status(),
-		settings
-	);
-}
-
-void StartServerCommand::log_request(
-	const std::string& info,
-	unsigned short status_code,
-	conf::Settings* settings
-)
-{
-	if (settings->LOGGER)
-	{
-		core::Logger::Color color = core::Logger::Color::GREEN;
-		if (status_code >= 400)
-		{
-			color = core::Logger::Color::YELLOW;
-		}
-		else if (status_code >= 500)
-		{
-			color = core::Logger::Color::RED;
-		}
-
-		settings->LOGGER->print(
-			"[" + core::dt::Datetime::now().strftime("%d/%b/%Y %T") + "] \"" +
-			info + "\" " + std::to_string(status_code)
-		, color);
-	}
+	return core::Result<std::shared_ptr<http::IHttpResponse>>::null();
 }
 
 __MANAGEMENT_COMMANDS_END__

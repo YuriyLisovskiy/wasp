@@ -19,10 +19,10 @@ __HTTP_BEGIN__
 
 HttpRequest::HttpRequest(
 	const std::string& method, std::string path, size_t major_v, size_t minor_v,
-	std::string query, bool keep_alive, std::string content,
+	std::string query, bool keep_alive, xw::string content,
 	const std::map<std::string, std::string>& headers,
-	const HttpRequest::Parameters<std::string, std::string>& get_params,
-	const HttpRequest::Parameters<std::string, std::string>& post_params,
+	const HttpRequest::Parameters<std::string, xw::string>& get_params,
+	const HttpRequest::Parameters<std::string, xw::string>& post_params,
 	const HttpRequest::Parameters<std::string, core::UploadedFile>& files_params
 )
 :   _path(std::move(path)),
@@ -71,7 +71,7 @@ bool HttpRequest::keep_alive() const
 	return this->_keep_alive;
 }
 
-std::string HttpRequest::body()
+xw::string HttpRequest::body()
 {
 	return this->_body;
 }
@@ -102,7 +102,7 @@ std::string HttpRequest::scheme(
 	return "http";
 }
 
-Result<std::string> HttpRequest::get_host(
+core::Result<std::string> HttpRequest::get_host(
 	bool use_x_forwarded_host, bool debug, std::vector<std::string> allowed_hosts
 )
 {
@@ -116,7 +116,7 @@ Result<std::string> HttpRequest::get_host(
 	split_domain_port(host, domain, port);
 	if (!domain.empty() && validate_host(domain, allowed_hosts))
 	{
-		return Result(host);
+		return core::Result(host);
 	}
 	else
 	{
@@ -130,7 +130,7 @@ Result<std::string> HttpRequest::get_host(
 			msg += " The domain name provided is not valid according to RFC 1034/1035.";
 		}
 
-		return raise<DisallowedHost, std::string>(msg);
+		return core::raise<core::DisallowedHost, std::string>(msg);
 	}
 }
 

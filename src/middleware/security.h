@@ -41,10 +41,10 @@ public:
 	explicit SecurityMiddleware(conf::Settings* settings);
 	SecurityMiddleware(nullptr_t) = delete;
 
-	http::Result<std::shared_ptr<http::IHttpResponse>> process_request(
+	core::Result<std::shared_ptr<http::IHttpResponse>> process_request(
 		http::HttpRequest* request
 	) override;
-	http::Result<std::shared_ptr<http::IHttpResponse>> process_response(
+	core::Result<std::shared_ptr<http::IHttpResponse>> process_response(
 		http::HttpRequest* request, http::IHttpResponse* response
 	) override;
 };

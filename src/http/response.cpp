@@ -277,7 +277,7 @@ std::string& HttpResponseBase::operator[] (const std::string& key)
 	return this->_headers[key];
 }
 
-error HttpResponseBase::err()
+core::Error HttpResponseBase::err()
 {
 	return this->_err;
 }
@@ -389,8 +389,8 @@ FileResponse::FileResponse(
 {
 	if (!core::path::exists(this->_file_path))
 	{
-		this->_err = error(
-			FileDoesNotExistError, "file '" + this->_file_path + "' does not exist", _ERROR_DETAILS_
+		this->_err = core::Error(
+			core::FileDoesNotExistError, "file '" + this->_file_path + "' does not exist", _ERROR_DETAILS_
 		);
 	}
 	else
@@ -513,8 +513,8 @@ HttpResponseRedirectBase::HttpResponseRedirectBase(
 	Url url(redirect_to);
 	if (!url.scheme().empty() && this->_allowed_schemes.find(url.scheme()) == this->_allowed_schemes.end())
 	{
-		this->_err = error(
-			DisallowedRedirect, "Unsafe redirect to URL with protocol " + url.scheme(), _ERROR_DETAILS_
+		this->_err = core::Error(
+			core::DisallowedRedirect, "Unsafe redirect to URL with protocol " + url.scheme(), _ERROR_DETAILS_
 		);
 	}
 }

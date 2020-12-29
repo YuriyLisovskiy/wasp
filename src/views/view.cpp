@@ -27,9 +27,9 @@ View::View(conf::Settings* settings)
 	this->_logger = this->_settings->LOGGER.get();
 }
 
-http::Result<std::shared_ptr<http::IHttpResponse>> View::null()
+core::Result<std::shared_ptr<http::IHttpResponse>> View::null()
 {
-	return http::Result<std::shared_ptr<http::IHttpResponse>>::null();
+	return core::Result<std::shared_ptr<http::IHttpResponse>>::null();
 }
 
 View::View(
@@ -49,7 +49,7 @@ void View::setup(http::HttpRequest* request)
 	this->_request = request;
 }
 
-http::Result<std::shared_ptr<http::IHttpResponse>> View::dispatch(Args* args)
+core::Result<std::shared_ptr<http::IHttpResponse>> View::dispatch(Args* args)
 {
 	if (this->_request == nullptr)
 	{
@@ -62,7 +62,7 @@ http::Result<std::shared_ptr<http::IHttpResponse>> View::dispatch(Args* args)
 	}
 
 	std::string method = core::str::lower(this->_request->method());
-	auto result = http::Result<std::shared_ptr<http::IHttpResponse>>::null();
+	auto result = core::Result<std::shared_ptr<http::IHttpResponse>>::null();
 	if (method == "get")
 	{
 		result = this->get(this->_request, args);
@@ -104,7 +104,7 @@ http::Result<std::shared_ptr<http::IHttpResponse>> View::dispatch(Args* args)
 	return result;
 }
 
-http::Result<std::shared_ptr<http::IHttpResponse>> View::http_method_not_allowed(http::HttpRequest* request)
+core::Result<std::shared_ptr<http::IHttpResponse>> View::http_method_not_allowed(http::HttpRequest* request)
 {
 	this->_logger->warning(
 		"Method Not Allowed (" + request->method() + "): " + request->path(),
@@ -132,37 +132,37 @@ std::vector<std::string> View::allowed_methods()
 	return result;
 }
 
-http::Result<std::shared_ptr<http::IHttpResponse>> View::get(http::HttpRequest* request, Args* args)
+core::Result<std::shared_ptr<http::IHttpResponse>> View::get(http::HttpRequest* request, Args* args)
 {
 	return this->null();
 }
 
-http::Result<std::shared_ptr<http::IHttpResponse>> View::post(http::HttpRequest* request, Args* args)
+core::Result<std::shared_ptr<http::IHttpResponse>> View::post(http::HttpRequest* request, Args* args)
 {
 	return this->null();
 }
 
-http::Result<std::shared_ptr<http::IHttpResponse>> View::put(http::HttpRequest* request, Args* args)
+core::Result<std::shared_ptr<http::IHttpResponse>> View::put(http::HttpRequest* request, Args* args)
 {
 	return this->null();
 }
 
-http::Result<std::shared_ptr<http::IHttpResponse>> View::patch(http::HttpRequest* request, Args* args)
+core::Result<std::shared_ptr<http::IHttpResponse>> View::patch(http::HttpRequest* request, Args* args)
 {
 	return this->null();
 }
 
-http::Result<std::shared_ptr<http::IHttpResponse>> View::delete_(http::HttpRequest* request, Args* args)
+core::Result<std::shared_ptr<http::IHttpResponse>> View::delete_(http::HttpRequest* request, Args* args)
 {
 	return this->null();
 }
 
-http::Result<std::shared_ptr<http::IHttpResponse>> View::head(http::HttpRequest* request, Args* args)
+core::Result<std::shared_ptr<http::IHttpResponse>> View::head(http::HttpRequest* request, Args* args)
 {
 	return this->get(request, args);
 }
 
-http::Result<std::shared_ptr<http::IHttpResponse>> View::options(http::HttpRequest* request, Args* args)
+core::Result<std::shared_ptr<http::IHttpResponse>> View::options(http::HttpRequest* request, Args* args)
 {
 	auto response = std::make_shared<http::HttpResponse>(200);
 	auto allowed_methods = this->allowed_methods();
@@ -174,7 +174,7 @@ http::Result<std::shared_ptr<http::IHttpResponse>> View::options(http::HttpReque
 	return this->response(response);
 }
 
-http::Result<std::shared_ptr<http::IHttpResponse>> View::trace(http::HttpRequest* request, Args* args)
+core::Result<std::shared_ptr<http::IHttpResponse>> View::trace(http::HttpRequest* request, Args* args)
 {
 	return this->null();
 }

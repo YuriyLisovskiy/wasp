@@ -13,12 +13,12 @@
 
 // Framework libraries.
 #include "../../commands/app_command.h"
-#include "../../core/net/http_server.h"
+#include "../../core/server.h"
 
 
 __MANAGEMENT_COMMANDS_BEGIN__
 
-class StartServerCommand final: public xw::cmd::AppCommand
+class StartServerCommand final : public xw::cmd::AppCommand
 {
 private:
 	core::flags::StringFlag* _addr_port_flag;
@@ -40,34 +40,27 @@ private:
 protected:
 	void add_flags() final;
 	void handle() final;
-	std::function<void(http::HttpRequest*, const core::net::internal::socket_t&)> make_handler();
+	std::function<
+		core::Result<std::shared_ptr<http::IHttpResponse>>(http::HttpRequest*, const int&)
+	> make_handler();
 	bool static_is_allowed(const std::string& static_url);
 	void build_static_patterns(std::vector<std::shared_ptr<urls::UrlPattern>>& patterns);
 	void build_app_patterns(std::vector<std::shared_ptr<urls::UrlPattern>>& patterns);
-	void setup_server_ctx(core::net::internal::HttpServer::context& ctx);
+	void setup_server_ctx(
+		std::string& host, uint16_t& port, bool& use_ipv6, size_t& threads_count
+	);
 
-	static http::Result<std::shared_ptr<http::IHttpResponse>> process_request_middleware(
+	static core::Result<std::shared_ptr<http::IHttpResponse>> process_request_middleware(
 		http::HttpRequest* request, conf::Settings* settings
 	);
-	static http::Result<std::shared_ptr<http::IHttpResponse>> process_response_middleware(
+	static core::Result<std::shared_ptr<http::IHttpResponse>> process_response_middleware(
 		http::HttpRequest* request,
 		http::IHttpResponse* response,
 		conf::Settings* settings
 	);
-	static http::Result<std::shared_ptr<http::IHttpResponse>> process_urlpatterns(
+	static core::Result<std::shared_ptr<http::IHttpResponse>> process_urlpatterns(
 		http::HttpRequest* request,
 		std::vector<std::shared_ptr<urls::UrlPattern>>& urlpatterns,
-		conf::Settings* settings
-	);
-	static void send_response(
-		http::HttpRequest* request,
-		http::IHttpResponse* response,
-		const core::net::internal::socket_t& client,
-		conf::Settings* settings
-	);
-	static void log_request(
-		const std::string& info,
-		unsigned short status_code,
 		conf::Settings* settings
 	);
 

@@ -196,7 +196,7 @@ TEST_F(MultipartParserTestCase, ParseSingleParameterTest)
 
 	ASSERT_EQ(params.size(), 1);
 	ASSERT_TRUE(params.contains("mail"));
-	ASSERT_EQ(params.get("mail"), "some_mail@gmail.com");
+	ASSERT_EQ(params.get("mail").cpp_str(), "some_mail@gmail.com");
 
 	auto file_params = http::HttpRequest::Parameters(
 		this->parser->file_values, this->parser->multi_file_value
@@ -213,11 +213,11 @@ TEST_F(MultipartParserTestCase, ParseMultipleParametersWithoutFilesTest)
 
 	ASSERT_EQ(params.size(), 3);
 	ASSERT_TRUE(params.contains("mail"));
-	ASSERT_EQ(params.get("mail"), "some_mail@gmail.com");
+	ASSERT_EQ(params.get("mail").cpp_str(), "some_mail@gmail.com");
 	ASSERT_TRUE(params.contains("name"));
-	ASSERT_EQ(params.get("name"), "Xavier");
+	ASSERT_EQ(params.get("name").cpp_str(), "Xavier");
 	ASSERT_TRUE(params.contains("birth_year"));
-	ASSERT_EQ(params.get("birth_year"), "2000");
+	ASSERT_EQ(params.get("birth_year").cpp_str(), "2000");
 
 	auto file_params = http::HttpRequest::Parameters(
 		this->parser->file_values, this->parser->multi_file_value
@@ -234,11 +234,11 @@ TEST_F(MultipartParserTestCase, ParseMultipleParametersWithFilesTest)
 
 	ASSERT_EQ(post.size(), 3);
 	ASSERT_TRUE(post.contains("mail"));
-	ASSERT_EQ(post.get("mail"), "some_mail@gmail.com");
+	ASSERT_EQ(post.get("mail").cpp_str(), "some_mail@gmail.com");
 	ASSERT_TRUE(post.contains("name"));
-	ASSERT_EQ(post.get("name"), "Xavier");
+	ASSERT_EQ(post.get("name").cpp_str(), "Xavier");
 	ASSERT_TRUE(post.contains("birth_year"));
-	ASSERT_EQ(post.get("birth_year"), "2000");
+	ASSERT_EQ(post.get("birth_year").cpp_str(), "2000");
 
 	auto files = http::HttpRequest::Parameters(
 		this->parser->file_values, this->parser->multi_file_value

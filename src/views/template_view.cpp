@@ -28,7 +28,7 @@ TemplateResponseMixin::TemplateResponseMixin(render::IEngine* engine)
 	this->content_type = "";
 }
 
-http::Result<std::shared_ptr<http::IHttpResponse>> TemplateResponseMixin::render(
+core::Result<std::shared_ptr<http::IHttpResponse>> TemplateResponseMixin::render(
 	http::HttpRequest* request,
 	const std::shared_ptr<render::IContext>& context,
 	const std::string& template_name,
@@ -46,7 +46,7 @@ http::Result<std::shared_ptr<http::IHttpResponse>> TemplateResponseMixin::render
 		charset
 	);
 	response->render();
-	return http::Result<std::shared_ptr<http::IHttpResponse>>(response);
+	return core::Result<std::shared_ptr<http::IHttpResponse>>(response);
 }
 
 std::string TemplateResponseMixin::get_template_name()
@@ -89,7 +89,7 @@ std::shared_ptr<render::IContext> TemplateView::get_context(
 	return nullptr;
 }
 
-http::Result<std::shared_ptr<http::IHttpResponse>> TemplateView::get(
+core::Result<std::shared_ptr<http::IHttpResponse>> TemplateView::get(
 	http::HttpRequest* request, Args* args
 )
 {

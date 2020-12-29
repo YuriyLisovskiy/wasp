@@ -155,10 +155,6 @@ void MainApplication::_perform_checks()
 	if (this->_settings->MIDDLEWARE.empty())
 	{
 		this->_settings->LOGGER->warning("You have not added any middleware.");
-//		this->_settings->LOGGER->error(
-//			"MIDDLEWARE must be configured in order to use the application."
-//		);
-//		err_count++;
 	}
 
 	if (this->_settings->BASE_DIR.empty())
