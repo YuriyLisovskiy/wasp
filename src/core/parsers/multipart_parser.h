@@ -19,7 +19,7 @@
 #include "../../core/uploaded_file.h"
 
 
-__CORE_INTERNAL_BEGIN__
+__PARSERS_BEGIN__
 
 struct multipart_parser final
 {
@@ -28,8 +28,8 @@ struct multipart_parser final
 	collections::Dict<std::string, xw::string> post_values;
 	collections::MultiValueDict<std::string, xw::string> multi_post_value;
 
-	collections::Dict<std::string, UploadedFile> file_values;
-	collections::MultiValueDict<std::string, UploadedFile> multi_file_value;
+	collections::Dict<std::string, files::UploadedFile> file_values;
+	collections::MultiValueDict<std::string, files::UploadedFile> multi_file_value;
 
 	enum state
 	{
@@ -58,7 +58,7 @@ struct multipart_parser final
 		const std::string& content_type,
 		const std::string& boundary,
 		const std::string& content_disposition,
-		const std::vector<byte>& data
+		const std::vector<core::byte>& data
 	);
 
 	static std::string get_boundary(const std::string& content_type);
@@ -68,4 +68,4 @@ struct multipart_parser final
 	void parse(const std::string& content_type, const xw::string& body);
 };
 
-__CORE_INTERNAL_END__
+__PARSERS_END__

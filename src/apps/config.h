@@ -26,7 +26,7 @@ __APPS_BEGIN__
 
 /// Derived class must contain constructor with
 /// pointer to conf::Settings parameter.
-class AppConfig : public IAppConfig, public core::object::Object
+class AppConfig : public IAppConfig, public object::Object
 {
 private:
 	bool _is_initialized;
@@ -75,7 +75,7 @@ protected:
 		};
 
 		this->_urlpatterns.push_back(urls::make_url(
-			core::str::starts_with(pattern, "/") ? pattern : "/" + pattern,
+			str::starts_with(pattern, "/") ? pattern : "/" + pattern,
 			view_handler,
 			name
 		));
@@ -90,8 +90,8 @@ protected:
 		for (const auto& pattern : included_urlpatterns)
 		{
 			this->_urlpatterns.push_back(std::make_shared<urls::UrlPattern>(
-				core::str::rtrim(
-					core::str::starts_with(prefix, "/") ? prefix : "/" + prefix,
+				str::rtrim(
+					str::starts_with(prefix, "/") ? prefix : "/" + prefix,
 					"/"
 				),
 				pattern,
@@ -112,7 +112,7 @@ protected:
 	);
 
 public:
-	void init(const core::object::Type& type);
+	void init(const object::Type& type);
 	[[nodiscard]] bool is_initialized() const override;
 	std::string get_name() final;
 	std::string get_app_path() final;

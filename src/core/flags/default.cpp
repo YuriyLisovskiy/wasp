@@ -103,7 +103,7 @@ BoolFlag::BoolFlag(
 
 bool BoolFlag::from_string()
 {
-	auto lower = core::str::lower(this->_data);
+	auto lower = str::lower(this->_data);
 	return lower == "true" || lower == "yes" || lower == "1";
 }
 

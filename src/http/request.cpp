@@ -23,7 +23,7 @@ HttpRequest::HttpRequest(
 	const std::map<std::string, std::string>& headers,
 	const HttpRequest::Parameters<std::string, xw::string>& get_params,
 	const HttpRequest::Parameters<std::string, xw::string>& post_params,
-	const HttpRequest::Parameters<std::string, core::UploadedFile>& files_params
+	const HttpRequest::Parameters<std::string, files::UploadedFile>& files_params
 )
 :   _path(std::move(path)),
 	_major_version(major_v),
@@ -32,7 +32,7 @@ HttpRequest::HttpRequest(
 	_keep_alive(keep_alive),
 	_body(std::move(content))
 {
-	this->_method = core::str::upper(method);
+	this->_method = str::upper(method);
 	this->headers = collections::Dict<std::string, std::string>(headers);
 	this->GET = get_params;
 	this->POST = post_params;
@@ -52,7 +52,7 @@ std::string HttpRequest::path()
 std::string HttpRequest::full_path(bool force_append_slash)
 {
 	return this->_path +
-		(force_append_slash && !core::str::ends_with(this->_path, "/") ? "/" : "") +
+		(force_append_slash && !str::ends_with(this->_path, "/") ? "/" : "") +
 		(this->_query.empty() ? "" : "?" + this->_query);
 }
 

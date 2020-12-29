@@ -16,7 +16,7 @@
 #include "../_def_.h"
 
 
-__CORE_INTERNAL_BEGIN__
+__PARSERS_BEGIN__
 
 struct cookie_parser final
 {
@@ -31,4 +31,4 @@ struct cookie_parser final
 	void parse(const std::string& content);
 };
 
-__CORE_INTERNAL_END__
+__PARSERS_END__

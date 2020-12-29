@@ -7,12 +7,12 @@
 #include "./uploaded_file.h"
 
 
-__CORE_BEGIN__
+__FILES_BEGIN__
 
 UploadedFile::UploadedFile(
 	const std::string& name,
 	size_t size,
-	File& file,
+	core::File& file,
 	const std::string& content_type,
 	const std::string& charset,
 	const std::string& boundary,
@@ -25,7 +25,7 @@ UploadedFile::UploadedFile(
 	this->_content_type = content_type;
 	this->_charset = charset;
 	this->_size = size;
-	this->_file = File(file);
+	this->_file = core::File(file);
 }
 
 UploadedFile::UploadedFile(const UploadedFile& copy)
@@ -101,4 +101,4 @@ void UploadedFile::save()
 	}
 }
 
-__CORE_END__
+__FILES_END__

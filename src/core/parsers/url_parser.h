@@ -15,7 +15,7 @@
 #include "../_def_.h"
 
 
-__CORE_INTERNAL_BEGIN__
+__PARSERS_BEGIN__
 
 struct url_parser final
 {
@@ -63,4 +63,4 @@ struct url_parser final
 	void set_err(const char* err, int line, const char* func, const char* file);
 };
 
-__CORE_INTERNAL_END__
+__PARSERS_END__

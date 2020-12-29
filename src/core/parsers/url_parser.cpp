@@ -10,7 +10,7 @@
 #include <xalwart.core/string_utils.h>
 
 
-__CORE_INTERNAL_BEGIN__
+__PARSERS_BEGIN__
 
 url_parser::url_parser()
 	: is_parsed(false), last_err(""), err_line(-1), err_func(""), err_file(""), is_reset(true)
@@ -313,4 +313,4 @@ void url_parser::set_err(const char* err, int line, const char* func, const char
 	this->err_file = file;
 }
 
-__CORE_INTERNAL_END__
+__PARSERS_END__

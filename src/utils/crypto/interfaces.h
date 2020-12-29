@@ -20,7 +20,7 @@
 
 __CRYPTO_BEGIN__
 
-class IHash : public core::object::ICloneable
+class IHash : public object::ICloneable
 {
 public:
 	IHash* clone() override = 0;

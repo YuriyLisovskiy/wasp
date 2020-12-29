@@ -41,7 +41,7 @@ private:
 	std::vector<std::string> _pattern_parts;
 	ViewHandler _handler;
 	std::string _name;
-	core::rgx::ArgRegex _regex;
+	rgx::ArgRegex _regex;
 	std::string _namespace;
 
 public:

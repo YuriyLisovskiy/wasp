@@ -1,5 +1,5 @@
 /**
- * core/server.cpp
+ * core/server/server.cpp
  *
  * Copyright (c) 2020 Yuriy Lisovskiy
  */
@@ -10,21 +10,21 @@
 #include <xalwart.core/datetime.h>
 
 // Framework libraries.
-#include "../core/parsers/query_parser.h"
-#include "../core/parsers/multipart_parser.h"
+#include "../parsers/query_parser.h"
+#include "../parsers/multipart_parser.h"
 
 
-__CORE_BEGIN__
+__SERVER_BEGIN__
 
 DefaultServer::DefaultServer(
 	const server::Context& ctx, HttpHandlerFunc handler
-) : server::HTTPServer(ctx, this->_make_handler()), _http_handler(std::move(handler))
+) : server::HTTPServer(ctx, this->_make_handler()), _http_handler(handler)
 {
 }
 
 server::HandlerFunc DefaultServer::_make_handler()
 {
-	return [&](int sock, server::internal::request_parser* parser, core::Error* err)
+	return [&](int sock, parsers::request_parser* parser, core::Error* err)
 	{
 		if (err)
 		{
@@ -66,12 +66,12 @@ server::HandlerFunc DefaultServer::_make_handler()
 	};
 }
 
-std::shared_ptr<http::HttpRequest> DefaultServer::_process_request(server::internal::request_parser* parser)
+std::shared_ptr<http::HttpRequest> DefaultServer::_process_request(parsers::request_parser* parser)
 {
-	core::internal::query_parser qp;
+	parsers::query_parser qp;
 	http::HttpRequest::Parameters<std::string, xw::string> get_params, post_params;
-	http::HttpRequest::Parameters<std::string, UploadedFile> files_params;
-	if (!std::strlen(parser->content.c_str()))
+	http::HttpRequest::Parameters<std::string, files::UploadedFile> files_params;
+	if (parser->content.empty())
 	{
 		qp.parse(parser->query);
 		if (parser->method == "GET")
@@ -85,10 +85,10 @@ std::shared_ptr<http::HttpRequest> DefaultServer::_process_request(server::inter
 	}
 	else
 	{
-		core::internal::multipart_parser mp(this->ctx.media_root);
+		parsers::multipart_parser mp(this->ctx.media_root);
 		switch (parser->content_type)
 		{
-			case server::internal::request_parser::content_type_enum::ct_application_x_www_form_url_encoded:
+			case parsers::request_parser::content_type_enum::ct_application_x_www_form_url_encoded:
 				qp.parse(parser->content);
 				if (parser->method == "GET")
 				{
@@ -99,9 +99,9 @@ std::shared_ptr<http::HttpRequest> DefaultServer::_process_request(server::inter
 					post_params = http::HttpRequest::Parameters(qp.dict, qp.multi_dict);
 				}
 				break;
-			case server::internal::request_parser::content_type_enum::ct_application_json:
+			case parsers::request_parser::content_type_enum::ct_application_json:
 				break;
-			case server::internal::request_parser::content_type_enum::ct_multipart_form_data:
+			case parsers::request_parser::content_type_enum::ct_multipart_form_data:
 				mp.parse(parser->headers["Content-Type"], parser->content);
 				post_params = http::HttpRequest::Parameters(
 					mp.post_values, mp.multi_post_value
@@ -110,10 +110,10 @@ std::shared_ptr<http::HttpRequest> DefaultServer::_process_request(server::inter
 					mp.file_values, mp.multi_file_value
 				);
 				break;
-			case server::internal::request_parser::content_type_enum::ct_other:
+			case parsers::request_parser::content_type_enum::ct_other:
 				break;
 			default:
-				throw ParseError("Unknown content type", _ERROR_DETAILS_);
+				throw core::ParseError("Unknown content type", _ERROR_DETAILS_);
 		}
 	}
 
@@ -137,25 +137,25 @@ std::shared_ptr<http::IHttpResponse> DefaultServer::_from_error(core::Error* err
 	unsigned short code;
 	switch (err->type)
 	{
-		case EntityTooLargeError:
+		case core::EntityTooLargeError:
 			code = 413;
 			break;
-		case PermissionDenied:
+		case core::PermissionDenied:
 			code = 403;
 			break;
-		case NotFound:
-		case FileDoesNotExistError:
+		case core::NotFound:
+		case core::FileDoesNotExistError:
 			code = 404;
 			break;
-		case InternalServerError:
+		case core::InternalServerError:
 			code = 500;
 			break;
-		case SuspiciousOperation:
-		case DisallowedHost:
-		case DisallowedRedirect:
+		case core::SuspiciousOperation:
+		case core::DisallowedHost:
+		case core::DisallowedRedirect:
 			code = 400;
 			break;
-		case HttpError:
+		case core::HttpError:
 		default:
 			code = 500;
 			break;
@@ -186,7 +186,7 @@ core::Error DefaultServer::_send(http::StreamingHttpResponse* response, const in
 }
 
 void DefaultServer::_send_response(
-	http::HttpRequest* request, http::IHttpResponse* response, const int& client, ILogger* logger
+	http::HttpRequest* request, http::IHttpResponse* response, const int& client, core::ILogger* logger
 )
 {
 	if (response->is_streaming())
@@ -209,7 +209,7 @@ void DefaultServer::_send_response(
 }
 
 void DefaultServer::_log_request(
-	const std::string& info, unsigned short status_code, ILogger* logger
+	const std::string& info, unsigned short status_code, core::ILogger* logger
 )
 {
 	if (logger)
@@ -225,11 +225,11 @@ void DefaultServer::_log_request(
 		}
 
 		logger->print(
-			"[" + core::dt::Datetime::now().strftime("%d/%b/%Y %T") + "] \"" +
+			"[" + dt::Datetime::now().strftime("%d/%b/%Y %T") + "] \"" +
 			info + "\" " + std::to_string(status_code),
 			color
 		);
 	}
 }
 
-__CORE_END__
+__SERVER_END__

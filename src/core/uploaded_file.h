@@ -13,10 +13,10 @@
 #include <xalwart.core/file.h>
 
 // Module definitions.
-#include "../_def_.h"
+#include "./_def_.h"
 
 
-__CORE_BEGIN__
+__FILES_BEGIN__
 
 class UploadedFile
 {
@@ -27,14 +27,14 @@ private:
 	std::string _charset;
 	std::string _content_type;
 	size_t _size{};
-	File _file;
+	core::File _file;
 
 public:
 	UploadedFile() = default;
 	UploadedFile(
 		const std::string& name,
 		size_t size,
-		File& file,
+		core::File& file,
 		const std::string& content_type = "",
 		const std::string& charset = "",
 		const std::string& boundary = "",
@@ -53,4 +53,4 @@ public:
 	void save();
 };
 
-__CORE_END__
+__FILES_END__

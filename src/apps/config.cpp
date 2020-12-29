@@ -16,17 +16,17 @@ AppConfig::AppConfig(const std::string& app_path, conf::Settings* settings)
 	this->app_path = app_path;
 }
 
-void AppConfig::init(const core::object::Type& type)
+void AppConfig::init(const object::Type& type)
 {
 	if (!this->_is_initialized)
 	{
 		std::string name = type.name();
-		core::str::rtrim(name, "Config");
-		core::str::rtrim(name, "config");
-		core::str::rtrim(name, "_");
-		core::str::rtrim(name, "App");
-		core::str::rtrim(name, "app");
-		core::str::rtrim(name, "_");
+		str::rtrim(name, "Config");
+		str::rtrim(name, "config");
+		str::rtrim(name, "_");
+		str::rtrim(name, "App");
+		str::rtrim(name, "app");
+		str::rtrim(name, "_");
 		this->app_name = name;
 		this->_is_initialized = true;
 	}

@@ -27,8 +27,8 @@ __CONF_BEGIN__
 
 YAML::Node Settings::_load_config(const std::string& file_name) const
 {
-	auto config_path = core::path::join(this->BASE_DIR, file_name);
-	if (core::path::exists(config_path))
+	auto config_path = path::join(this->BASE_DIR, file_name);
+	if (path::exists(config_path))
 	{
 		auto config = YAML::LoadFile(config_path);
 		if (config && !config.IsNull() && !config.IsMap())
@@ -498,7 +498,7 @@ void Settings::_init_env(YAML::Node& env)
 				{
 					auto p = it->as<std::string>();
 					dirs.push_back(
-						core::path::is_absolute(p) ? p : core::path::join(this->BASE_DIR, p)
+						path::is_absolute(p) ? p : path::join(this->BASE_DIR, p)
 					);
 				}
 			}
@@ -539,7 +539,7 @@ void Settings::_init_env(YAML::Node& env)
 		{
 			for (const auto& app : this->INSTALLED_APPS)
 			{
-				dirs.push_back(core::path::dirname(app->get_app_path()));
+				dirs.push_back(path::dirname(app->get_app_path()));
 			}
 		}
 
@@ -581,7 +581,7 @@ void Settings::_init_logger(YAML::Node& logger)
 		if (file_out && file_out.IsScalar())
 		{
 			auto f_path = file_out.as<std::string>();
-			auto full_path = core::path::is_absolute(f_path) ? f_path : core::path::join(this->BASE_DIR, f_path);
+			auto full_path = path::is_absolute(f_path) ? f_path : path::join(this->BASE_DIR, f_path);
 			logger_config.add_file_stream(full_path);
 		}
 		else
@@ -594,7 +594,7 @@ void Settings::_init_logger(YAML::Node& logger)
 					if (!it->IsNull() && it->IsScalar())
 					{
 						auto f_path = it->as<std::string>();
-						auto full_path = core::path::is_absolute(f_path) ? f_path : core::path::join(this->BASE_DIR, f_path);
+						auto full_path = path::is_absolute(f_path) ? f_path : path::join(this->BASE_DIR, f_path);
 						logger_config.add_file_stream(full_path);
 					}
 				}
@@ -790,22 +790,22 @@ void Settings::init()
 	auto timezone = config["timezone"];
 	if (!timezone || !timezone.IsMap())
 	{
-		this->TIME_ZONE = std::make_shared<core::dt::Timezone>(core::dt::Timezone::UTC);
+		this->TIME_ZONE = std::make_shared<dt::Timezone>(dt::Timezone::UTC);
 	}
 	else
 	{
-		auto timezone_name = core::str::upper(timezone["name"].as<std::string>("UTC"));
+		auto timezone_name = str::upper(timezone["name"].as<std::string>("UTC"));
 		if (timezone_name == "UTC")
 		{
-			this->TIME_ZONE = std::make_shared<core::dt::Timezone>(core::dt::Timezone::UTC);
+			this->TIME_ZONE = std::make_shared<dt::Timezone>(dt::Timezone::UTC);
 		}
 		else
 		{
 			auto timezone_offset = timezone["offset"];
 			if (timezone_offset && timezone_offset.IsMap())
 			{
-				this->TIME_ZONE = std::make_shared<core::dt::Timezone>(
-					core::dt::Timedelta(
+				this->TIME_ZONE = std::make_shared<dt::Timezone>(
+					dt::Timedelta(
 						timezone_offset["days"].as<long>(0),
 						timezone_offset["seconds"].as<long>(0),
 						timezone_offset["microseconds"].as<long>(0),
@@ -819,8 +819,8 @@ void Settings::init()
 			}
 			else
 			{
-				this->TIME_ZONE = std::make_shared<core::dt::Timezone>(
-					core::dt::Timedelta(), timezone_name
+				this->TIME_ZONE = std::make_shared<dt::Timezone>(
+					dt::Timedelta(), timezone_name
 				);
 			}
 		}
@@ -850,7 +850,7 @@ void Settings::init()
 	if (media && media.IsMap())
 	{
 		auto p = media["root"].as<std::string>("media");
-		this->MEDIA_ROOT = core::path::is_absolute(p) ? p : core::path::join(this->BASE_DIR, p);
+		this->MEDIA_ROOT = path::is_absolute(p) ? p : path::join(this->BASE_DIR, p);
 		this->MEDIA_URL = media["url"].as<std::string>("/media/");
 	}
 
@@ -858,7 +858,7 @@ void Settings::init()
 	if (static_ && static_.IsMap())
 	{
 		auto p = static_["root"].as<std::string>("static");
-		this->STATIC_ROOT = core::path::is_absolute(p) ? p : core::path::join(this->BASE_DIR, p);
+		this->STATIC_ROOT = path::is_absolute(p) ? p : path::join(this->BASE_DIR, p);
 		this->STATIC_URL = static_["url"].as<std::string>("/static/");
 	}
 

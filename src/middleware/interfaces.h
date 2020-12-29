@@ -8,6 +8,9 @@
 
 #pragma once
 
+// C++ libraries.
+#include <memory>
+
 // Core libraries.
 #include <xalwart.core/result.h>
 

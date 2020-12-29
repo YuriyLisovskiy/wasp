@@ -27,24 +27,24 @@ args_parser::args_parser(int argc, char** argv, size_t parse_from, bool is_verbo
 	for (size_t i = parse_from; i < argc; i++)
 	{
 		std::string token = argv[i];
-		if (core::str::starts_with(token, "--"))
+		if (str::starts_with(token, "--"))
 		{
 			if (!is_received)
 			{
 				this->flags[last_arg] = "true";
 			}
 
-			auto param = core::str::split(token, '=');
+			auto param = str::split(token, '=');
 			if (param.size() > 1)
 			{
-				core::str::ltrim(param[0], "-");
-				auto val = core::str::join(param.begin() + 1, param.end(), "");
+				str::ltrim(param[0], "-");
+				auto val = str::join(param.begin() + 1, param.end(), "");
 				this->flags[param[0]] = val;
 			}
 			else
 			{
 				last_arg = token;
-				core::str::ltrim(last_arg, "-");
+				str::ltrim(last_arg, "-");
 				is_received = false;
 			}
 		}

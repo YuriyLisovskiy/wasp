@@ -7,7 +7,7 @@
 #include "./query_parser.h"
 
 
-__CORE_INTERNAL_BEGIN__
+__PARSERS_BEGIN__
 
 void query_parser::parse(const xw::string& content)
 {
@@ -64,4 +64,4 @@ void query_parser::append_parameter(const std::string& key, const xw::string& va
 	this->multi_dict.append(key, value);
 }
 
-__CORE_INTERNAL_END__
+__PARSERS_END__

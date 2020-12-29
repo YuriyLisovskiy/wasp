@@ -19,7 +19,7 @@
 #include "../_def_.h"
 
 
-__CORE_INTERNAL_BEGIN__
+__PARSERS_BEGIN__
 
 struct query_parser final
 {
@@ -37,4 +37,4 @@ struct query_parser final
 	void parse(const xw::string& data);
 };
 
-__CORE_INTERNAL_END__
+__PARSERS_END__

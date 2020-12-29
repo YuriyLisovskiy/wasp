@@ -1,5 +1,5 @@
 /**
- * core/server.h
+ * core/server/server.h
  *
  * Copyright (c) 2020 Yuriy Lisovskiy
  *
@@ -8,21 +8,19 @@
 
 #pragma once
 
-// Server libraries.
-#include <xalwart.server/server.h>
-
 // Module definitions.
 #include "./_def_.h"
 
 // Framework libraries.
-#include "../http/request.h"
-#include "../http/response.h"
+#include "./base_server.h"
+#include "../../http/request.h"
+#include "../../http/response.h"
 
 
-__CORE_BEGIN__
+__SERVER_BEGIN__
 
 typedef std::function<
-	Result<std::shared_ptr<http::IHttpResponse>>(http::HttpRequest*, const int&)
+	core::Result<std::shared_ptr<http::IHttpResponse>>(http::HttpRequest*, const int&)
 > HttpHandlerFunc;
 
 class DefaultServer : public server::HTTPServer
@@ -38,17 +36,17 @@ private:
 
 	static std::shared_ptr<http::IHttpResponse> _from_error(core::Error* err);
 
-	std::shared_ptr<http::HttpRequest> _process_request(server::internal::request_parser* parser);
+	std::shared_ptr<http::HttpRequest> _process_request(parsers::request_parser* parser);
 
 	core::Error _send(http::IHttpResponse* response, const int& client);
 	core::Error _send(http::StreamingHttpResponse* response, const int& client);
 
 	void _send_response(
-		http::HttpRequest* request, http::IHttpResponse* response, const int& client, ILogger* logger
+		http::HttpRequest* request, http::IHttpResponse* response, const int& client, core::ILogger* logger
 	);
 	static void _log_request(
-		const std::string& info, unsigned short status_code, ILogger* logger
+		const std::string& info, unsigned short status_code, core::ILogger* logger
 	);
 };
 
-__CORE_END__
+__SERVER_END__

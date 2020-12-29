@@ -164,7 +164,7 @@ void MainApplication::_perform_checks()
 		);
 		err_count++;
 	}
-	else if (!core::path::exists(this->_settings->BASE_DIR))
+	else if (!path::exists(this->_settings->BASE_DIR))
 	{
 		this->_settings->LOGGER->error(
 			"BASE_DIR must exist in order to use the application."

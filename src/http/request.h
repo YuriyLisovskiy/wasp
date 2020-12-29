@@ -87,14 +87,14 @@ public:
 		const std::map<std::string, std::string>& headers,
 		const HttpRequest::Parameters<std::string, xw::string>& get_params,
 		const HttpRequest::Parameters<std::string, xw::string>& post_params,
-		const HttpRequest::Parameters<std::string, core::UploadedFile>& files_params
+		const HttpRequest::Parameters<std::string, files::UploadedFile>& files_params
 	);
 
 	collections::Dict<std::string, std::string> headers;
 	HttpRequest::Parameters<std::string, xw::string> GET;
 	HttpRequest::Parameters<std::string, xw::string> POST;
 	collections::Dict<std::string, std::string> COOKIES;
-	HttpRequest::Parameters<std::string, core::UploadedFile> FILES;
+	HttpRequest::Parameters<std::string, files::UploadedFile> FILES;
 
 	[[nodiscard]]
 	std::string version() const;

@@ -54,7 +54,7 @@ public:
 	/// https://en.wikipedia.org/wiki/List_of_tz_zones_by_name (although not all
 	/// systems may support all possibilities). When USE_TZ is true, this is
 	/// interpreted as the default user time zone.
-	std::shared_ptr<core::dt::Timezone> TIME_ZONE;
+	std::shared_ptr<dt::Timezone> TIME_ZONE;
 
 	/// If you set this to True, Django will use timezone-aware datetimes.
 	bool USE_TZ;
@@ -96,7 +96,7 @@ public:
 	///         core::rgx::Regex(R"(SiteSucker.*)"),
 	///         core::rgx::Regex(R"(sohu-search.*)")
 	///     };
-	std::vector<core::rgx::Regex> DISALLOWED_USER_AGENTS;
+	std::vector<rgx::Regex> DISALLOWED_USER_AGENTS;
 
 	/// List of compiled regular expression objects representing URLs that need not
 	/// be reported by BrokenLinkEmailsMiddleware.
@@ -109,7 +109,7 @@ public:
 	///        core::rgx::Regex(R"(/phpmyadmin/)"),
 	///        core::rgx::Regex(R"(/apple-touch-icon.*\.png)")
 	///    };
-	std::vector<core::rgx::Regex> IGNORABLE_404_URLS;
+	std::vector<rgx::Regex> IGNORABLE_404_URLS;
 
 	/// A secret key for this particular installation. Used in secret-key
 	/// hashing algorithms. Set this in your settings.
