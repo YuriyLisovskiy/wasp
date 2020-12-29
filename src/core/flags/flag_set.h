@@ -15,7 +15,7 @@
 #include "./_def_.h"
 
 // Framework libraries.
-#include "./flags.h"
+#include "./default.h"
 
 
 __FLAGS_BEGIN__
@@ -25,23 +25,24 @@ class FlagSet final
 private:
 	std::string _name;
 	std::string _usage;
-	std::map<std::string, Flag*> _flags;
+	std::map<std::string, std::shared_ptr<Flag>> _flags;
 
 public:
 	explicit FlagSet(const std::string& name, const std::string& usage = "");
-	~FlagSet();
 	void parse(int argc, char** argv, size_t parse_from = 1, bool is_verbose = false);
 	std::string usage(const std::string& indent = "");
-	LongIntFlag* make_long(
+	std::shared_ptr<LongIntFlag> make_long(
 		const std::string& label, long default_val, const std::string& help
 	);
-	DoubleFlag* make_double(
+	std::shared_ptr<DoubleFlag> make_double(
 		const std::string& label, double default_val, const std::string& help
 	);
-	StringFlag* make_string(
+	std::shared_ptr<StringFlag> make_string(
 		const std::string& label, const std::string& default_val, const std::string& help
 	);
-	BoolFlag* make_bool(const std::string& label, bool default_val, const std::string& help);
+	std::shared_ptr<BoolFlag> make_bool(
+		const std::string& label, bool default_val, const std::string& help
+	);
 };
 
 __FLAGS_END__

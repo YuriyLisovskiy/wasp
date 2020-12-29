@@ -18,8 +18,9 @@
 
 __MANAGEMENT_COMMANDS_BEGIN__
 
-StartServerCommand::StartServerCommand(apps::IAppConfig* config, conf::Settings* settings)
-	: AppCommand(config, settings, "start-server", "Starts web server")
+StartServerCommand::StartServerCommand(
+	apps::IAppConfig* config, conf::Settings* settings
+) : AppCommand(config, settings, "start-server", "Starts web server")
 {
 	this->_addr_port_flag = nullptr;
 	this->_threads_flag = nullptr;
@@ -51,22 +52,33 @@ StartServerCommand::~StartServerCommand()
 	delete this->_port_regex;
 }
 
+collections::Dict<std::string, std::string> StartServerCommand::get_kwargs()
+{
+	auto kwargs = AppCommand::get_kwargs();
+	kwargs["bind"] = this->_host + ":" + std::to_string(this->_port);
+	kwargs["host"] = this->_host;
+	kwargs["port"] = std::to_string(this->_port);
+	kwargs["threads"] = std::to_string(this->_threads_count);
+	kwargs["use-ipv6"] = std::to_string(this->_use_ipv6);
+	return kwargs;
+}
+
 void StartServerCommand::add_flags()
 {
 	this->_addr_port_flag = this->_flag_set->make_string(
-		"addr-port", "", "Server address and port formatted as addr:port"
+		"bind", "", "Server address and port formatted as host:port"
 	);
 	this->_addr_flag = this->_flag_set->make_string(
-		"addr", "", "Server address"
+		"host", "", "Server address"
 	);
 	this->_port_flag = this->_flag_set->make_long(
 		"port", this->DEFAULT_PORT, "Server port"
 	);
 	this->_threads_flag = this->_flag_set->make_long(
-		"threads", this->DEFAULT_THREADS, "Tells framework how many threads to use"
+		"threads", this->DEFAULT_THREADS, "Threads count"
 	);
 	this->_use_ipv6_flag = this->_flag_set->make_bool(
-		"use-ipv6", false, "Detect if use IPv6 or not"
+		"use-ipv6", false, "Use IPv6 address or not (used in case when host is set to 'localhost')"
 	);
 }
 
@@ -77,21 +89,10 @@ void StartServerCommand::handle()
 		throw core::CommandError("You must set 'allowed_hosts' if 'debug' is false.");
 	}
 
-	// TODO: remove http server's verbose setting
-	bool verbose = true;
-
-	std::string host;
-	uint16_t port;
-	bool use_ipv6;
-	size_t threads_count;
-	this->setup_server_ctx(host, port, use_ipv6, threads_count);
-
+	this->retrieve_args(this->_host, this->_port, this->_use_ipv6, this->_threads_count);
 	auto server = this->settings->use_server(
-		verbose,
-		threads_count,
-		this->settings->DATA_UPLOAD_MAX_MEMORY_SIZE,
-		this->settings->LOGGER,
-		this->make_handler()
+		this->make_handler(),
+		this->get_kwargs()
 	);
 	if (!server)
 	{
@@ -100,7 +101,7 @@ void StartServerCommand::handle()
 
 	try
 	{
-		if (server->bind(host.c_str(), port, use_ipv6))
+		if (server->bind(this->_host.c_str(), this->_port, this->_use_ipv6))
 		{
 			xw::core::InterruptException::initialize();
 			try
@@ -108,7 +109,7 @@ void StartServerCommand::handle()
 				std::string message = core::dt::Datetime::now().strftime("%B %d, %Y - %T") + "\n" +
 				                      LIB_NAME + " version " + LIB_VERSION + "\n" +
 				                      "Starting development server at " +
-				                      "http://" + host + ":" + std::to_string(port) + "/\n" +
+				                      "http://" + this->_host + ":" + std::to_string(this->_port) + "/\n" +
 				                      "Quit the server with CONTROL-C.\n";
 				server->listen(message);
 			}
@@ -243,7 +244,7 @@ void StartServerCommand::build_app_patterns(std::vector<std::shared_ptr<urls::Ur
 	}
 }
 
-void StartServerCommand::setup_server_ctx(
+void StartServerCommand::retrieve_args(
 	std::string& host, uint16_t& port, bool& use_ipv6, size_t& threads_count
 )
 {
@@ -253,7 +254,7 @@ void StartServerCommand::setup_server_ctx(
 	{
 		if (!this->_ipv4_ipv6_port_regex->match(host_port_str))
 		{
-			throw core::CommandError(host_port_str + " is not valid addr:port pair");
+			throw core::CommandError(host_port_str + " is not valid host:port pair");
 		}
 
 		auto groups = this->_ipv4_ipv6_port_regex->groups();

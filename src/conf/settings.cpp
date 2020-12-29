@@ -947,13 +947,10 @@ void Settings::prepare()
 }
 
 std::shared_ptr<core::IServer> Settings::use_server(
-	bool verbose,
-	size_t threads_count,
-	size_t max_body_size,
-	const std::shared_ptr<core::ILogger>& logger,
 	const std::function<core::Result<std::shared_ptr<http::IHttpResponse>>(
 		http::HttpRequest* request, const int& client
-	)>& handler
+	)>& handler,
+	const collections::Dict<std::string, std::string>& kwargs
 )
 {
 	return nullptr;

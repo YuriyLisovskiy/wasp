@@ -21,6 +21,11 @@ __MANAGEMENT_COMMANDS_BEGIN__
 class StartServerCommand final : public xw::cmd::AppCommand
 {
 private:
+	std::string _host;
+	uint16_t _port = DEFAULT_PORT;
+	bool _use_ipv6 = false;
+	size_t _threads_count = DEFAULT_THREADS;
+
 	core::flags::StringFlag* _addr_port_flag;
 	core::flags::StringFlag* _addr_flag;
 	core::flags::LongIntFlag* _port_flag;
@@ -46,7 +51,7 @@ protected:
 	bool static_is_allowed(const std::string& static_url);
 	void build_static_patterns(std::vector<std::shared_ptr<urls::UrlPattern>>& patterns);
 	void build_app_patterns(std::vector<std::shared_ptr<urls::UrlPattern>>& patterns);
-	void setup_server_ctx(
+	void retrieve_args(
 		std::string& host, uint16_t& port, bool& use_ipv6, size_t& threads_count
 	);
 
@@ -67,6 +72,7 @@ protected:
 public:
 	explicit StartServerCommand(apps::IAppConfig* config, conf::Settings* settings);
 	~StartServerCommand() final;
+	collections::Dict<std::string, std::string> get_kwargs() override;
 };
 
 __MANAGEMENT_COMMANDS_END__

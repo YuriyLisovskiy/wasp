@@ -23,6 +23,11 @@ BaseCommand::~BaseCommand()
 	delete this->_flag_set;
 }
 
+collections::Dict<std::string, std::string> BaseCommand::get_kwargs()
+{
+	return collections::Dict<std::string, std::string>();
+}
+
 std::string BaseCommand::usage()
 {
 	this->create_flags();

@@ -9,6 +9,12 @@
 
 #pragma once
 
+// C++ libraries.
+#include <string>
+
+// Core libraries.
+#include <xalwart.core/collections/dict.h>
+
 // Module definitions.
 #include "./_def_.h"
 
@@ -47,6 +53,8 @@ protected:
 
 public:
 	virtual ~BaseCommand();
+
+	virtual collections::Dict<std::string, std::string> get_kwargs();
 
 	/// Returns usage based on flag_set.
 	std::string usage();
