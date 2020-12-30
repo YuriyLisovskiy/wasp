@@ -166,11 +166,39 @@ std::function<
 							);
 							if (middleware_result.catch_(core::HttpError) || middleware_result.value)
 							{
+								if (middleware_result.catch_(core::HttpError))
+								{
+									this->settings->LOGGER->error(
+										middleware_result.err.msg, middleware_result.err.line, middleware_result.err.func, middleware_result.err.file
+									);
+									this->settings->LOGGER->error(middleware_result.err.msg, _ERROR_DETAILS_);
+								}
+
 								result = middleware_result;
 							}
 						}
+						else
+						{
+							auto e = result.value->err();
+							this->settings->LOGGER->error(e.msg, e.line, e.func, e.file);
+							this->settings->LOGGER->error(e.msg, _ERROR_DETAILS_);
+						}
 					}
 				}
+				else
+				{
+					this->settings->LOGGER->error(result.err.msg, result.err.line, result.err.func, result.err.file);
+					this->settings->LOGGER->error(result.err.msg, _ERROR_DETAILS_);
+				}
+			}
+			else if (!result.value)
+			{
+				this->settings->LOGGER->error(std::to_string(result.value->status()), _ERROR_DETAILS_);
+			}
+			else
+			{
+				this->settings->LOGGER->error(result.err.msg, result.err.line, result.err.func, result.err.file);
+				this->settings->LOGGER->error(result.err.msg, _ERROR_DETAILS_);
 			}
 		}
 		catch (const core::BaseException& exc)
