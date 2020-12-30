@@ -1,6 +1,6 @@
 ## Xalwart
 
-![Continuous Integration](https://github.com/YuriyLisovskiy/xalwart/workflows/Continuous%20Integration/badge.svg)
+![Continuous Integration](https://github.com/YuriyLisovskiy/xalwart/workflows/tests/badge.svg)
 
 Inspired by [Django](https://github.com/django/django).
 
