@@ -57,9 +57,9 @@ public:
 			empty_map,
 			empty_parameters,
 			empty_parameters,
-			http::HttpRequest::Parameters<std::string, core::UploadedFile>(
-				collections::Dict<std::string, core::UploadedFile>(),
-				collections::MultiValueDict<std::string, core::UploadedFile>()
+			http::HttpRequest::Parameters<std::string, files::UploadedFile>(
+				collections::Dict<std::string, files::UploadedFile>(),
+				collections::MultiValueDict<std::string, files::UploadedFile>()
 			)
 		);
 	}
@@ -126,7 +126,7 @@ TEST_F(ViewTestCase, OptionsTest)
 	auto vec = std::vector<std::string>{"get", "post", "head", "options"};
 	expected_response.set_header(
 		"Allow",
-		core::str::join(vec.cbegin(), vec.cend(), ", ")
+		str::join(vec.cbegin(), vec.cend(), ", ")
 	);
 	expected_response.set_header("Content-Length", "0");
 

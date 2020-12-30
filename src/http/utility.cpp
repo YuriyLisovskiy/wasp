@@ -13,7 +13,7 @@
 
 __HTTP_INTERNAL_BEGIN__
 
-core::rgx::Regex host_validation_regex = core::rgx::Regex(
+rgx::Regex host_validation_regex = rgx::Regex(
 	R"(([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(:\d+)?)"
 );
 
@@ -24,21 +24,21 @@ __HTTP_BEGIN__
 
 size_t parse_http_datetime(const std::string& http_datetime)
 {
-	return core::dt::Datetime::strptime(
+	return dt::Datetime::strptime(
 		http_datetime, "%a, %d %b %Y %H:%M:%S GMT"
 	).timestamp();
 }
 
 std::string http_date(size_t epoch_seconds)
 {
-	return core::utility::format_date(epoch_seconds, false, true);
+	return utility::format_date(epoch_seconds, false, true);
 }
 
 void split_domain_port(
 	const std::string& host, std::string& domain, std::string& port
 )
 {
-	auto host_lower = core::str::lower(host);
+	auto host_lower = str::lower(host);
 	if (!internal::host_validation_regex.match(host_lower))
 	{
 		return;
@@ -50,7 +50,7 @@ void split_domain_port(
 	}
 	else
 	{
-		auto split = core::str::rsplit(host_lower, ':', 1);
+		auto split = str::rsplit(host_lower, ':', 1);
 		domain = split[0];
 		if (split.size() == 2)
 		{
@@ -58,14 +58,14 @@ void split_domain_port(
 		}
 
 		// Remove a trailing dot (if present) from the domain.
-		if (core::str::ends_with(domain, "."))
+		if (str::ends_with(domain, "."))
 		{
 			domain.pop_back();
 		}
 	}
 
-	core::str::rtrim(domain, "]");
-	core::str::ltrim(domain, "[");
+	str::rtrim(domain, "]");
+	str::ltrim(domain, "[");
 }
 
 bool validate_host(
@@ -92,15 +92,15 @@ bool is_same_domain(const std::string& host, const std::string& pattern)
 		return false;
 	}
 
-	auto lc_pattern  = core::str::lower(pattern);
+	auto lc_pattern  = str::lower(pattern);
 	return (lc_pattern[0] == '.' && (
-		core::str::ends_with(host, lc_pattern) || host == lc_pattern.substr(1, lc_pattern.size() - 1)
+		str::ends_with(host, lc_pattern) || host == lc_pattern.substr(1, lc_pattern.size() - 1)
 	)) || lc_pattern == host;
 }
 
 void escape_leading_slashes(std::string& url)
 {
-	if (core::str::starts_with(url, "//"))
+	if (str::starts_with(url, "//"))
 	{
 		url = "/%2F" + url.substr(2);
 	}

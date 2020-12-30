@@ -9,6 +9,8 @@
 // Core libraries.
 #include <xalwart.core/datetime.h>
 
+#include <utility>
+
 // Framework libraries.
 #include "../parsers/query_parser.h"
 #include "../parsers/multipart_parser.h"
@@ -17,12 +19,12 @@
 __SERVER_BEGIN__
 
 DefaultServer::DefaultServer(
-	const server::Context& ctx, HttpHandlerFunc handler
-) : server::HTTPServer(ctx, this->_make_handler()), _http_handler(handler)
+	const Context& ctx, HttpHandlerFunc handler
+) : HTTPServer(ctx, this->_make_handler()), _http_handler(std::move(handler))
 {
 }
 
-server::HandlerFunc DefaultServer::_make_handler()
+HandlerFunc DefaultServer::_make_handler()
 {
 	return [&](int sock, parsers::request_parser* parser, core::Error* err)
 	{

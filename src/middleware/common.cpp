@@ -36,7 +36,7 @@ core::Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::get_respons
 
 bool CommonMiddleware::should_redirect_with_slash(http::HttpRequest* request)
 {
-	if (this->settings->APPEND_SLASH && !core::str::ends_with(request->path(), "/"))
+	if (this->settings->APPEND_SLASH && !str::ends_with(request->path(), "/"))
 	{
 		auto path = request->path();
 		return !urls::is_valid_path(path, this->settings->ROOT_URLCONF) &&
@@ -52,7 +52,7 @@ core::Result<std::string> CommonMiddleware::get_full_path_with_slash(http::HttpR
 
 	// Prevent construction of scheme relative urls.
 	http::escape_leading_slashes(new_path);
-	if (this->settings->DEBUG && core::utility::contains(
+	if (this->settings->DEBUG && utility::contains(
 		request->method(), {"POST", "PUT", "PATCH"}
 	))
 	{
@@ -112,7 +112,7 @@ core::Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::process_req
 	auto host = result.value;
 	bool must_prepend = this->settings->PREPEND_WWW &&
 		!host.empty() &&
-		!core::str::starts_with(host, "www.");
+		!str::starts_with(host, "www.");
 	auto redirect_url = must_prepend ? (
 		request->scheme(this->settings->SECURE_PROXY_SSL_HEADER.get()) + "://www." + host
 	) : "";

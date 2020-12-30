@@ -50,7 +50,7 @@ std::shared_ptr<urls::UrlPattern> make_static(
 	};
 
 	return make_url(
-		core::str::rtrim(static_url, "/") + "/" + "<path>(.*)",
+		str::rtrim(static_url, "/") + "/" + "<path>(.*)",
 		view_func,
 		name.empty() ? "static" : name
 	);

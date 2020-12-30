@@ -64,13 +64,13 @@ bool ConditionalGetMiddleware::needs_etag(
 	http::IHttpResponse* response
 )
 {
-	auto cache_control = core::str::split(
+	auto cache_control = str::split(
 		response->get_header(http::CACHE_CONTROL, ""), ','
 	);
 	bool result = true;
 	for (const auto& directive : cache_control)
 	{
-		if (core::str::lower(core::str::trim(directive)) == "no-store")
+		if (str::lower(str::trim(directive)) == "no-store")
 		{
 			result = false;
 			break;

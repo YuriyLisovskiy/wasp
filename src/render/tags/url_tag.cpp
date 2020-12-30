@@ -36,7 +36,7 @@ std::string url_node::render(IContext* ctx)
 	{
 		ctx->push_var(
 			this->var_name,
-			std::make_shared<core::types::Value<std::string>>(built_url)
+			std::make_shared<types::Value<std::string>>(built_url)
 		);
 		return "";
 	}

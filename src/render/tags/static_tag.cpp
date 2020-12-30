@@ -23,14 +23,14 @@ std::string static_node::render(IContext* ctx)
 	if (this->path)
 	{
 		auto path_var = this->path->resolve(ctx);
-		result = core::path::join(this->prefix, path_var ? path_var->__str__() : "");
+		result = path::join(this->prefix, path_var ? path_var->__str__() : "");
 	}
 
 	if (!this->var_name.empty())
 	{
 		ctx->push_var(
 			this->var_name,
-			std::make_shared<core::types::Value<std::string>>(result)
+			std::make_shared<types::Value<std::string>>(result)
 		);
 		result = "";
 	}

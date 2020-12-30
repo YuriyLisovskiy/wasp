@@ -23,9 +23,10 @@
 #include "./_def_.h"
 
 // Framework libraries.
-#include "../urls/url.h"
 #include "../apps/interfaces.h"
+#include "../core/server/interfaces.h"
 #include "../middleware/interfaces.h"
+#include "../urls/url.h"
 
 
 __CORE_BEGIN__
@@ -233,7 +234,7 @@ public:
 	virtual ~Settings() = default;
 	void init();
 	void prepare();
-	virtual std::shared_ptr<core::IServer> use_server(
+	virtual std::shared_ptr<server::IServer> use_server(
 		const std::function<core::Result<std::shared_ptr<http::IHttpResponse>>(
 			http::HttpRequest* request, const int& client
 		)>& handler,

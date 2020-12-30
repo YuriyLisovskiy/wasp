@@ -23,12 +23,12 @@ UrlPattern::UrlPattern(
 	this->_pattern_parts = this->_regex.parts();
 	if (!this->_pattern_parts.empty())
 	{
-		if (core::str::ends_with(this->_pattern_parts.back(), "?"))
+		if (str::ends_with(this->_pattern_parts.back(), "?"))
 		{
 			this->_pattern_parts.back().pop_back();
 		}
 
-		core::str::rtrim(this->_pattern_parts.back(), "/");
+		str::rtrim(this->_pattern_parts.back(), "/");
 	}
 
 	this->_handler = handler;

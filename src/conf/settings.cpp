@@ -946,9 +946,9 @@ void Settings::prepare()
 	}
 }
 
-std::shared_ptr<core::IServer> Settings::use_server(
+std::shared_ptr<server::IServer> Settings::use_server(
 	const std::function<core::Result<std::shared_ptr<http::IHttpResponse>>(
-		http::HttpRequest* request, const int& client
+		http::HttpRequest*, const int&
 	)>& handler,
 	const collections::Dict<std::string, std::string>& kwargs
 )

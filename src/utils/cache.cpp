@@ -34,7 +34,7 @@ bool _if_match_passes(
 		// so there is a match to '*'.
 		return true;
 	}
-	else if (core::str::starts_with(target_etag, "W/"))
+	else if (str::starts_with(target_etag, "W/"))
 	{
 		// A weak ETag can never strongly match another ETag.
 		return false;
@@ -43,7 +43,7 @@ bool _if_match_passes(
 	{
 		// Since the ETag is strong, this will only return True
 		// if there's a strong match.
-		return core::utility::contains(target_etag, etags);
+		return utility::contains(target_etag, etags);
 	}
 }
 
@@ -66,10 +66,10 @@ bool _if_none_match_passes(
 	{
 		// The comparison should be weak, so look for a match after stripping
 		// off any weak indicators.
-		auto target_etag_copy = core::str::trim(target_etag, "W/");
+		auto target_etag_copy = str::trim(target_etag, "W/");
 		for (const auto& etag : etags)
 		{
-			if (core::str::trim(etag, "W/") == target_etag_copy)
+			if (str::trim(etag, "W/") == target_etag_copy)
 			{
 				return false;
 			}

@@ -39,7 +39,7 @@ __UTILS_HTTP_END__
 
 __UTILS_HTTP_INTERNAL_BEGIN__
 
-extern core::rgx::Regex ETAG_REGEX;
+extern rgx::Regex ETAG_REGEX;
 
 extern const std::string _D;
 extern const std::string _D2;
@@ -48,9 +48,9 @@ extern const std::string _Y;
 extern const std::string _Y2;
 extern const std::string _T;
 
-extern core::rgx::ArgRegex RFC1123_DATE;
-extern core::rgx::ArgRegex RFC850_DATE;
-extern core::rgx::ArgRegex ASCTIME_DATE;
+extern rgx::ArgRegex RFC1123_DATE;
+extern rgx::ArgRegex RFC850_DATE;
+extern rgx::ArgRegex ASCTIME_DATE;
 
 extern const std::vector<std::string> MONTHS;
 

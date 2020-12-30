@@ -23,16 +23,16 @@ typedef std::function<
 	core::Result<std::shared_ptr<http::IHttpResponse>>(http::HttpRequest*, const int&)
 > HttpHandlerFunc;
 
-class DefaultServer : public server::HTTPServer
+class DefaultServer : public HTTPServer
 {
 public:
-	explicit DefaultServer(const server::Context& ctx, HttpHandlerFunc  handler);
+	explicit DefaultServer(const Context& ctx, HttpHandlerFunc  handler);
 
 private:
 	HttpHandlerFunc _http_handler;
 
 private:
-	server::HandlerFunc _make_handler();
+	HandlerFunc _make_handler();
 
 	static std::shared_ptr<http::IHttpResponse> _from_error(core::Error* err);
 

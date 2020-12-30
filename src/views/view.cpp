@@ -54,14 +54,14 @@ core::Result<std::shared_ptr<http::IHttpResponse>> View::dispatch(Args* args)
 	if (this->_request == nullptr)
 	{
 		throw core::NullPointerException(
-			core::utility::demangle(typeid(*this).name()) +
+			utility::demangle(typeid(*this).name()) +
 			" instance has not initialized request."
 			" Did you override setup() and forget to call base method?",
 			_ERROR_DETAILS_
 		);
 	}
 
-	std::string method = core::str::lower(this->_request->method());
+	std::string method = str::lower(this->_request->method());
 	auto result = core::Result<std::shared_ptr<http::IHttpResponse>>::null();
 	if (method == "get")
 	{
@@ -121,11 +121,11 @@ std::vector<std::string> View::allowed_methods()
 		bool found = std::find(
 			this->_http_method_names.begin(),
 			this->_http_method_names.end(),
-			core::str::lower(method)
+			str::lower(method)
 		) != this->_http_method_names.end();
 		if (found)
 		{
-			result.push_back(core::str::upper(method));
+			result.push_back(str::upper(method));
 		}
 	}
 
@@ -168,7 +168,7 @@ core::Result<std::shared_ptr<http::IHttpResponse>> View::options(http::HttpReque
 	auto allowed_methods = this->allowed_methods();
 	response->set_header(
 		"Allow",
-		core::str::join(allowed_methods.begin(), allowed_methods.end(), ", ")
+		str::join(allowed_methods.begin(), allowed_methods.end(), ", ")
 	);
 	response->set_header("Content-Length", "0");
 	return this->response(response);

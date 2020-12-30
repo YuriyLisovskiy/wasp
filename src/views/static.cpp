@@ -54,8 +54,8 @@ core::Result<std::shared_ptr<http::IHttpResponse>> StaticView::get(http::HttpReq
 		return this->response<http::HttpResponseNotFound>(this->_kwargs->get("http_404", "404 Not Found"));
 	}
 
-	auto full_path = core::path::join(this->_kwargs->get("document_root", ""), args->get_str("path", ""));
-	if (!core::path::exists(full_path))
+	auto full_path = path::join(this->_kwargs->get("document_root", ""), args->get_str("path", ""));
+	if (!path::exists(full_path))
 	{
 		// TODO: add default http 404 error content!
 		return this->response<http::HttpResponseNotFound>(this->_kwargs->get("http_404", "404 Not Found"));
@@ -106,7 +106,7 @@ bool was_modified_since(const std::string& header, size_t time, size_t size)
 	}
 	else
 	{
-		auto rgx = core::rgx::Regex("([^;]+)(; length=([0-9]+))?", std::regex_constants::icase);
+		auto rgx = rgx::Regex("([^;]+)(; length=([0-9]+))?", std::regex_constants::icase);
 		if (rgx.search(header))
 		{
 			auto header_time = http::parse_http_datetime(rgx.group(1));

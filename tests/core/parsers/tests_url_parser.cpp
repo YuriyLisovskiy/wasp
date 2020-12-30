@@ -16,7 +16,7 @@ using namespace xw;
 class UrlParserIPv4TestCase : public ::testing::Test
 {
 protected:
-	core::internal::url_parser parser;
+	parsers::url_parser parser;
 
 	const char* STR_URL = "http://username:password@example.com/hello/world?hello=world&user=pass#someFragment";
 	const char* HOST_EXPECTED = "example.com";
@@ -80,7 +80,7 @@ TEST_F(UrlParserIPv4TestCase, QueryTest)
 class UrlParserIPv6TestCase : public ::testing::Test
 {
 protected:
-	core::internal::url_parser parser;
+	parsers::url_parser parser;
 
 	const char* STR_URL = "https://[2605:2700:0:3::4713:93e3]:8000/hello/world?hello=world&user=pass#someFragment";
 	const char* HOST_EXPECTED = "2605:2700:0:3::4713:93e3";
@@ -144,7 +144,7 @@ TEST_F(UrlParserIPv6TestCase, QueryTest)
 class UrlParserErrorsTestCase : public ::testing::Test
 {
 protected:
-	core::internal::url_parser parser;
+	parsers::url_parser parser;
 };
 
 TEST_F(UrlParserErrorsTestCase, InvalidSchemeTest)

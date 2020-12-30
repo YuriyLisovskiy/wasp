@@ -53,20 +53,6 @@ jobs:
                      .. && \
           sudo make && \
           sudo make install
-      - name: Install Server Library
-        run: |
-          cd /tmp && \
-          git clone https://${{secrets.GH_ACCESS_TOKEN}}@github.com/YuriyLisovskiy/xalwart.server.git && \
-          cd xalwart.server && \
-          git checkout dev && \
-          sudo mkdir build && \
-          cd build && \
-          sudo cmake -DCMAKE_BUILD_TYPE=Release \
-                     -DCMAKE_CXX_COMPILER=g++-${{ matrix.compiler_version }} \
-                     -DCMAKE_C_COMPILER=gcc-${{ matrix.compiler_version }} \
-                     .. && \
-          sudo make && \
-          sudo make install
       - name: Install Render Library
         run: |
           cd /tmp && \

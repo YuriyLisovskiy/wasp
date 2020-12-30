@@ -27,7 +27,7 @@ protected:
 
 	void SetUp() override
 	{
-		auto parser = core::internal::cookie_parser();
+		auto parser = parsers::cookie_parser();
 		parser.parse(COOKIES);
 		this->parsedMap = parser.result;
 	}

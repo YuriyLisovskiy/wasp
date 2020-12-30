@@ -36,9 +36,9 @@ http::HttpRequest make_request(const std::string& method)
 		empty_map,
 		empty_parameters,
 		empty_parameters,
-		http::HttpRequest::Parameters<std::string, core::UploadedFile>(
-			collections::Dict<std::string, core::UploadedFile>(),
-			collections::MultiValueDict<std::string, core::UploadedFile>()
+		http::HttpRequest::Parameters<std::string, files::UploadedFile>(
+			collections::Dict<std::string, files::UploadedFile>(),
+			collections::MultiValueDict<std::string, files::UploadedFile>()
 		)
 	);
 }
@@ -301,9 +301,9 @@ TEST_F(RedirectViewPermanentAndQueryStringTestCase, GetRedirectUrlTest)
 		empty_map,
 		empty_parameters,
 		empty_parameters,
-		http::HttpRequest::Parameters<std::string, core::UploadedFile>(
-			collections::Dict<std::string, core::UploadedFile>(),
-			collections::MultiValueDict<std::string, core::UploadedFile>()
+		http::HttpRequest::Parameters<std::string, files::UploadedFile>(
+			collections::Dict<std::string, files::UploadedFile>(),
+			collections::MultiValueDict<std::string, files::UploadedFile>()
 		)
 	);
 	this->view->setup(request);

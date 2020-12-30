@@ -39,7 +39,7 @@ core::Result<std::shared_ptr<http::IHttpResponse>> SecurityMiddleware::process_r
 	http::HttpRequest* request
 )
 {
-	auto path = core::str::ltrim(request->path(), "/");
+	auto path = str::ltrim(request->path(), "/");
 	bool matched = false;
 	for (auto& pattern : this->redirect_exempt)
 	{
@@ -122,14 +122,14 @@ core::Result<std::shared_ptr<http::IHttpResponse>> SecurityMiddleware::process_r
 	{
 		// Support a comma-separated string or iterable of
 		// values to allow fallback.
-		auto split = core::str::split(this->referrer_policy, ',');
+		auto split = str::split(this->referrer_policy, ',');
 		for (auto& item : split)
 		{
-			core::str::trim(item);
+			str::trim(item);
 		}
 
 		response->set_header(
-			http::REFERRER_POLICY, core::str::join(split.begin(), split.end(), ",")
+			http::REFERRER_POLICY, str::join(split.begin(), split.end(), ",")
 		);
 	}
 

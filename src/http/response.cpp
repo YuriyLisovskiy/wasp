@@ -104,7 +104,7 @@ void HttpResponseBase::set_cookie(
 	std::string same_site_;
 	if (!same_site.empty())
 	{
-		auto ss_lower = core::str::lower(same_site_);
+		auto ss_lower = str::lower(same_site_);
 		if (ss_lower != "lax" && ss_lower != "strict")
 		{
 			throw core::ValueError(R"(samesite must be "lax" or "strict".)");
@@ -338,7 +338,7 @@ std::string HttpResponse::serialize()
 {
 	this->set_header(
 		"Date",
-		core::dt::Datetime::utc_now().strftime("%a, %d %b %Y %T GMT")
+		dt::Datetime::utc_now().strftime("%a, %d %b %Y %T GMT")
 	);
 	this->set_header(
 		"Content-Length",
@@ -387,7 +387,7 @@ FileResponse::FileResponse(
 	_file_path(std::move(file_path)),
 	_headers_is_got(false)
 {
-	if (!core::path::exists(this->_file_path))
+	if (!path::exists(this->_file_path))
 	{
 		this->_err = core::Error(
 			core::FileDoesNotExistError, "file '" + this->_file_path + "' does not exist", _ERROR_DETAILS_
@@ -442,8 +442,8 @@ void FileResponse::_set_headers()
 		{"gzip", "application/gzip"},
 		{"xz", "application/x-xz"}
 	});
-	this->set_header("Content-Length", std::to_string(core::path::get_size(this->_file_path)));
-	if (core::str::starts_with(this->_headers.get("Content-Type", ""), "text/html"))
+	this->set_header("Content-Length", std::to_string(path::get_size(this->_file_path)));
+	if (str::starts_with(this->_headers.get("Content-Type", ""), "text/html"))
 	{
 		std::string content_type, encoding;
 		core::mime::guess_content_type(this->_file_path, content_type, encoding);
@@ -453,7 +453,7 @@ void FileResponse::_set_headers()
 
 	std::string disposition = this->_as_attachment ? "attachment" : "inline";
 	std::string file_expr;
-	std::string file_name = core::path::basename(this->_file_path);
+	std::string file_name = path::basename(this->_file_path);
 	try
 	{
 		file_expr = "filename=\"" + core::encoding::encode(file_name, core::encoding::ASCII) + "\"";
@@ -470,10 +470,7 @@ std::string FileResponse::_get_headers_chunk()
 {
 	auto reason_phrase = this->get_reason_phrase();
 	this->_set_headers();
-	this->set_header(
-		"Date",
-		core::dt::Datetime::utc_now().strftime("%a, %d %b %Y %T GMT")
-	);
+	this->set_header("Date", dt::Datetime::utc_now().strftime("%a, %d %b %Y %T GMT"));
 	auto headers = this->serialize_headers();
 
 	std::string headers_chunk = "HTTP/1.1 " + std::to_string(this->_status) + " " + reason_phrase + "\r\n"

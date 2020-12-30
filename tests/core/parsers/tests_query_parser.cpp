@@ -29,7 +29,7 @@ TEST(QueryParserTestCase, get)
 		std::pair<std::string, std::string>("hello_key", "hello_value"),
 		std::pair<std::string, std::string>("world_key", "world_value"),
 	};
-	core::internal::query_parser parser;
+	parsers::query_parser parser;
 	parser.parse("hello=world&world=hello&hello_key=hello_value&world_key=world_value");
 
 	http::HttpRequest::Parameters<std::string, xw::string> actual(parser.dict, parser.multi_dict);
@@ -37,7 +37,7 @@ TEST(QueryParserTestCase, get)
 	for (const auto& item : expected)
 	{
 		ASSERT_TRUE(actual.contains(item.first));
-		ASSERT_EQ(item.second, actual.get(item.first).cpp_str());
+		ASSERT_EQ(item.second, actual.get(item.first));
 	}
 }
 
@@ -47,7 +47,7 @@ TEST(QueryParserTestCase, getList)
 	auto expected = std::vector<std::string> {
 		"world", "hello", "hello_value"
 	};
-	core::internal::query_parser parser;
+	parsers::query_parser parser;
 	parser.parse("hello=world&hello=hello&hello=hello_value");
 	http::HttpRequest::Parameters<std::string, xw::string> parameters(parser.dict, parser.multi_dict);
 
@@ -59,7 +59,7 @@ TEST(QueryParserTestCase, getList)
 
 	for (size_t i = 0; i < expected.size(); i++)
 	{
-		ASSERT_EQ(expected[i], actual[i].cpp_str());
+		ASSERT_EQ(expected[i], actual[i]);
 	}
 }
 
@@ -71,7 +71,7 @@ TEST(QueryParserTestCase, keys)
 		"world",
 		"world_key",
 	};
-	core::internal::query_parser parser;
+	parsers::query_parser parser;
 	parser.parse("hello=world&world=hello&hello_key=hello_value&world_key=world_value");
 	http::HttpRequest::Parameters<std::string, xw::string> parsed(parser.dict, parser.multi_dict);
 	auto actual = parsed.keys();
@@ -82,7 +82,7 @@ TEST(QueryParserTestCase, keys)
 TEST(QueryParserTestCase, size)
 {
 	auto expected = 4;
-	core::internal::query_parser parser;
+	parsers::query_parser parser;
 	parser.parse("hello=world&world=hello&hello_key=hello_value&world_key=world_value");
 	http::HttpRequest::Parameters<std::string, xw::string> parsed(parser.dict, parser.multi_dict);
 	auto actual = parsed.size();
@@ -92,7 +92,7 @@ TEST(QueryParserTestCase, size)
 
 TEST(QueryParserTestCase, empty)
 {
-	core::internal::query_parser parser;
+	parsers::query_parser parser;
 	parser.parse("");
 	http::HttpRequest::Parameters<std::string, xw::string> parsed(parser.dict, parser.multi_dict);
 

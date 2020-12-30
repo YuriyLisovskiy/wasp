@@ -23,15 +23,15 @@ StartServerCommand::StartServerCommand(
 ) : AppCommand(config, settings, "start-server", "Starts a web application")
 {
 	std::string ipv4 = R"((\d{1,3}(?:\.\d{1,3}){3})|localhost)";
-	this->_ipv4_regex = core::rgx::Regex(ipv4);
+	this->_ipv4_regex = rgx::Regex(ipv4);
 
 	std::string ipv6 = R"(\[([a-fA-F0-9:]+)\]|\[localhost\])";
-	this->_ipv6_regex = core::rgx::Regex(ipv6);
+	this->_ipv6_regex = rgx::Regex(ipv6);
 
 	std::string fqdn = R"([a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*)";
 
 	std::string port = R"(\d+)";
-	this->_ipv4_ipv6_port_regex = core::rgx::Regex(
+	this->_ipv4_ipv6_port_regex = rgx::Regex(
 		R"((?:(()" + ipv4 + R"()|()" + ipv6 + R"()|()" + fqdn + R"()):)?()" + port + R"())"
 	);
 }
@@ -90,7 +90,7 @@ void StartServerCommand::handle()
 			xw::core::InterruptException::initialize();
 			try
 			{
-				std::string message = core::dt::Datetime::now().strftime("%B %d, %Y - %T") + "\n" +
+				std::string message = dt::Datetime::now().strftime("%B %d, %Y - %T") + "\n" +
 				                      LIB_NAME + " version " + LIB_VERSION + "\n" +
 				                      "Starting development server at " +
 				                      "http://" + this->_host + ":" + std::to_string(this->_port) + "/\n" +
@@ -196,7 +196,7 @@ std::function<
 
 bool StartServerCommand::static_is_allowed(const std::string& static_url)
 {
-	auto parser = core::internal::url_parser();
+	auto parser = parsers::url_parser();
 	parser.parse(static_url);
 
 	// Allow serving local static files if debug and
@@ -245,8 +245,8 @@ void StartServerCommand::retrieve_args(
 		auto address = (groups[1].empty() ? this->DEFAULT_IPV4_HOST : groups[1]);
 		use_ipv6 = this->_ipv6_regex.match(address);
 		auto trimmed_addr = address;
-		core::str::rtrim(trimmed_addr, "]");
-		core::str::ltrim(trimmed_addr, "[");
+		str::rtrim(trimmed_addr, "]");
+		str::ltrim(trimmed_addr, "[");
 		if (trimmed_addr == "localhost")
 		{
 			address = use_ipv6 ? this->DEFAULT_IPV6_HOST : this->DEFAULT_IPV4_HOST;
@@ -276,8 +276,8 @@ void StartServerCommand::retrieve_args(
 		}
 
 		auto trimmed_addr = address;
-		core::str::rtrim(trimmed_addr, "]");
-		core::str::ltrim(trimmed_addr, "[");
+		str::rtrim(trimmed_addr, "]");
+		str::ltrim(trimmed_addr, "[");
 		if (trimmed_addr == "localhost")
 		{
 			address = use_ipv6 ? this->DEFAULT_IPV6_HOST : this->DEFAULT_IPV4_HOST;

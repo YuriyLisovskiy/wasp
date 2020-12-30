@@ -23,7 +23,7 @@ core::Result<std::shared_ptr<http::IHttpResponse>> CookieMiddleware::process_req
 	http::HttpRequest* request
 )
 {
-	core::internal::cookie_parser cp;
+	parsers::cookie_parser cp;
 	cp.parse(request->headers.get("Cookie", ""));
 	request->COOKIES = collections::Dict(cp.result);
 	return this->none();
