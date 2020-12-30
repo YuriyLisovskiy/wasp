@@ -1,34 +1,19 @@
-/*
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 /**
- * An implementation of utils/http.h
+ * utils/http.cpp
+ *
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  */
 
 #include "./http.h"
 
-// Framework modules.
-#include "../core/utility.h"
-#include "../core/strings.h"
+// Core libraries.
+#include <xalwart.core/utility.h>
+#include <xalwart.core/string_utils.h>
 
 
 __UTILS_HTTP_INTERNAL_BEGIN__
 
-core::rgx::Regex ETAG_REGEX = core::rgx::Regex(R"(((?:W\/)?"[^"]*"))");
+rgx::Regex ETAG_REGEX = rgx::Regex(R"(((?:W\/)?"[^"]*"))");
 
 const std::string _D = R"(<day>(\d{2}))";
 const std::string _D2 = R"(<day>([ \d]\d))";
@@ -37,13 +22,13 @@ const std::string _Y = R"(<year>(\d{4}))";
 const std::string _Y2 = R"(<year>(\d{2}))";
 const std::string _T = R"(<hour>(\d{2}):<min>(\d{2}):<sec>(\d{2}))";
 
-core::rgx::ArgRegex RFC1123_DATE = core::rgx::ArgRegex(
+rgx::ArgRegex RFC1123_DATE = rgx::ArgRegex(
 	R"(\w{3}, )" + _D + R"( )" + _M + R"( )" + _Y + R"( )" + _T + R"( GMT)"
 );
-core::rgx::ArgRegex RFC850_DATE = core::rgx::ArgRegex(
+rgx::ArgRegex RFC850_DATE = rgx::ArgRegex(
 	R"(w{6,9}, )" + _D + R"(-)" + _M + R"(-)" + _Y2 + R"( )" + _T + R"( GMT)"
 );
-core::rgx::ArgRegex ASCTIME_DATE = core::rgx::ArgRegex(
+rgx::ArgRegex ASCTIME_DATE = rgx::ArgRegex(
 	R"(w{3} )" + _M + R"( )" + _D2 + R"( )" + _T + R"( )" + _Y + R"()"
 );
 
@@ -87,7 +72,7 @@ long parse_http_date(const std::string& date)
 	int year = std::stoi(match["year"]);
 	if (year < 100)
 	{
-		int current_year = core::dt::Datetime::utc_now().date().year();
+		int current_year = dt::Datetime::utc_now().date().year();
 		int current_century = current_year - (current_year % 100);
 		if (year - (current_year % 100) > 50)
 		{
@@ -101,17 +86,17 @@ long parse_http_date(const std::string& date)
 		}
 	}
 
-	int month = (int) core::utility::index_of(
+	int month = (int) utility::index_of(
 		internal::MONTHS.begin(),
 		internal::MONTHS.end(),
-		core::str::lower(match["mon"])
+		str::lower(match["mon"])
 	) + 1;
 	int day = std::stoi(match["day"]);
 	int hour = std::stoi(match["hour"]);
 	int min = std::stoi(match["min"]);
 	int sec = std::stoi(match["sec"]);
 
-	auto date_time = core::dt::Datetime(year, month, day, hour, min, sec);
+	auto date_time = dt::Datetime(year, month, day, hour, min, sec);
 	return (long)date_time.timestamp();
 }
 
@@ -128,18 +113,18 @@ std::string quote_etag(const std::string& e_tag)
 
 std::vector<std::string> parse_etags(const std::string& etag_str)
 {
-	if (core::str::trim(etag_str) == "*")
+	if (str::trim(etag_str) == "*")
 	{
 		return {"*"};
 	}
 
 	// Parse each ETag individually, and return any that are valid.
-	auto etags = core::str::split(etag_str, ',');
+	auto etags = str::split(etag_str, ',');
 	std::vector<std::string> result;
 	auto e_tag_regex = internal::ETAG_REGEX;
 	for (const auto& etag : etags)
 	{
-		if (e_tag_regex.search(core::str::trim(etag)))
+		if (e_tag_regex.search(str::trim(etag)))
 		{
 			result.push_back(e_tag_regex.group(1));
 		}

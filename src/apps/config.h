@@ -1,22 +1,7 @@
-/*
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 /**
  * apps/config.h
+ *
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * Purpose:
  * 	Represents application configuration
@@ -25,27 +10,29 @@
 
 #pragma once
 
+// Core libraries.
+#include <xalwart.core/string_utils.h>
+
 // Module definitions.
 #include "./_def_.h"
 
-// Framework modules.
+// Framework libraries.
 #include "../views/view.h"
 #include "../urls/url.h"
-#include "../core/management/app_command.h"
-#include "../core/strings.h"
+#include "../commands/app_command.h"
 
 
 __APPS_BEGIN__
 
 /// Derived class must contain constructor with
 /// pointer to conf::Settings parameter.
-class AppConfig : public IAppConfig, public core::object::Object
+class AppConfig : public IAppConfig, public object::Object
 {
 private:
 	bool _is_initialized;
 
 	std::vector<std::shared_ptr<urls::UrlPattern>> _urlpatterns;
-	std::vector<std::shared_ptr<core::BaseCommand>> _commands;
+	std::vector<std::shared_ptr<cmd::BaseCommand>> _commands;
 
 	template <typename AppConfigT>
 	std::shared_ptr<apps::IAppConfig> find_or_create_app()
@@ -80,7 +67,7 @@ protected:
 			http::HttpRequest* request,
 			views::Args* args,
 			conf::Settings* settings_ptr
-		) -> std::unique_ptr<http::IHttpResponse>
+		) -> core::Result<std::shared_ptr<http::IHttpResponse>>
 		{
 			ViewT view(settings_ptr);
 			view.setup(request);
@@ -88,7 +75,7 @@ protected:
 		};
 
 		this->_urlpatterns.push_back(urls::make_url(
-			core::str::starts_with(pattern, "/") ? pattern : "/" + pattern,
+			str::starts_with(pattern, "/") ? pattern : "/" + pattern,
 			view_handler,
 			name
 		));
@@ -103,8 +90,8 @@ protected:
 		for (const auto& pattern : included_urlpatterns)
 		{
 			this->_urlpatterns.push_back(std::make_shared<urls::UrlPattern>(
-				core::str::rtrim(
-					core::str::starts_with(prefix, "/") ? prefix : "/" + prefix,
+				str::rtrim(
+					str::starts_with(prefix, "/") ? prefix : "/" + prefix,
 					"/"
 				),
 				pattern,
@@ -113,7 +100,7 @@ protected:
 		}
 	}
 
-	template <typename CommandT, typename = std::enable_if<std::is_base_of<core::AppCommand, CommandT>::value>>
+	template <typename CommandT, typename = std::enable_if<std::is_base_of<cmd::AppCommand, CommandT>::value>>
 	void command()
 	{
 		auto cmd = std::make_shared<CommandT>(this, this->settings);
@@ -125,12 +112,12 @@ protected:
 	);
 
 public:
-	void init(const core::object::Type& type);
+	void init(const object::Type& type);
 	[[nodiscard]] bool is_initialized() const override;
 	std::string get_name() final;
 	std::string get_app_path() final;
 	std::vector<std::shared_ptr<urls::UrlPattern>> get_urlpatterns() final;
-	std::vector<std::shared_ptr<core::BaseCommand>> get_commands() final;
+	std::vector<std::shared_ptr<cmd::BaseCommand>> get_commands() final;
 	virtual void urlpatterns();
 	virtual void commands();
 };

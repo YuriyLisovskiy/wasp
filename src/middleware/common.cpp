@@ -1,31 +1,19 @@
-/*
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 /**
- * An implementation of middleware/common.h
+ * middleware/common.cpp
+ *
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  */
 
 #include "./common.h"
 
-// Framework modules.
+// Core libraries.
+#include <xalwart.core/utility.h>
+#include <xalwart.core/string_utils.h>
+
+// Framework libraries.
 #include "../urls/resolver.h"
 #include "../http/headers.h"
 #include "../http/utility.h"
-#include "../core/strings.h"
 
 
 __MIDDLEWARE_BEGIN__
@@ -37,16 +25,18 @@ CommonMiddleware::CommonMiddleware(conf::Settings* settings)
 {
 }
 
-std::unique_ptr<http::IHttpResponse> CommonMiddleware::get_response_redirect(
+core::Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::get_response_redirect(
 	const std::string& redirect_to
 )
 {
-	return std::make_unique<http::HttpResponsePermanentRedirect>(redirect_to);
+	return core::Result<std::shared_ptr<http::IHttpResponse>>(
+		std::make_shared<http::HttpResponsePermanentRedirect>(redirect_to)
+	);
 }
 
 bool CommonMiddleware::should_redirect_with_slash(http::HttpRequest* request)
 {
-	if (this->settings->APPEND_SLASH && !core::str::ends_with(request->path(), "/"))
+	if (this->settings->APPEND_SLASH && !str::ends_with(request->path(), "/"))
 	{
 		auto path = request->path();
 		return !urls::is_valid_path(path, this->settings->ROOT_URLCONF) &&
@@ -56,35 +46,41 @@ bool CommonMiddleware::should_redirect_with_slash(http::HttpRequest* request)
 	return false;
 }
 
-std::string CommonMiddleware::get_full_path_with_slash(http::HttpRequest* request)
+core::Result<std::string> CommonMiddleware::get_full_path_with_slash(http::HttpRequest* request)
 {
 	auto new_path = request->full_path(true);
 
 	// Prevent construction of scheme relative urls.
 	http::escape_leading_slashes(new_path);
-	if (this->settings->DEBUG && core::utility::contains(
+	if (this->settings->DEBUG && utility::contains(
 		request->method(), {"POST", "PUT", "PATCH"}
 	))
 	{
 		auto method = request->method();
-		auto host = request->get_host(
+		auto result = request->get_host(
 			this->settings->USE_X_FORWARDED_HOST,
 			this->settings->DEBUG,
 			this->settings->ALLOWED_HOSTS
 		);
+		if (result.err)
+		{
+			return result;
+		}
+
+		auto host = result.value;
 		throw core::RuntimeError(
 			"You called this URL via " + method + "s, but the URL doesn't end "
-			"in a slash and you have APPEND_SLASH set. Django can't "
+			"in a slash and you have APPEND_SLASH set. Xalwart can't "
 			"redirect to the slash URL while maintaining " + method + "s data. "
 			"Change your form to point to " + host + new_path + "s (note the trailing "
-			"slash), or set APPEND_SLASH=False in your Django settings."
+			"slash), or set APPEND_SLASH=False in your Xalwart settings."
 		);
 	}
 
-	return new_path;
+	return core::Result(new_path);
 }
 
-std::unique_ptr<http::IHttpResponse> CommonMiddleware::process_request(
+core::Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::process_request(
 	http::HttpRequest* request
 )
 {
@@ -95,20 +91,28 @@ std::unique_ptr<http::IHttpResponse> CommonMiddleware::process_request(
 		{
 			if (rgx.search(user_agent))
 			{
-				throw core::PermissionDenied("Forbidden user agent", _ERROR_DETAILS_);
+				return this->raise<core::PermissionDenied>(
+					"Forbidden user agent", _ERROR_DETAILS_
+				);
 			}
 		}
 	}
 
 	// Check for a redirect based on settings.PREPEND_WWW
-	auto host = request->get_host(
+	auto result = request->get_host(
 		this->settings->USE_X_FORWARDED_HOST,
 		this->settings->DEBUG,
 		this->settings->ALLOWED_HOSTS
 	);
+	if (result.err)
+	{
+		return result.forward<std::shared_ptr<http::IHttpResponse>>();
+	}
+
+	auto host = result.value;
 	bool must_prepend = this->settings->PREPEND_WWW &&
 		!host.empty() &&
-		!core::str::starts_with(host, "www.");
+		!str::starts_with(host, "www.");
 	auto redirect_url = must_prepend ? (
 		request->scheme(this->settings->SECURE_PROXY_SSL_HEADER.get()) + "://www." + host
 	) : "";
@@ -117,7 +121,13 @@ std::unique_ptr<http::IHttpResponse> CommonMiddleware::process_request(
 	std::string path;
 	if (this->should_redirect_with_slash(request))
 	{
-		path = this->get_full_path_with_slash(request);
+		result = this->get_full_path_with_slash(request);
+		if (result.err)
+		{
+			return result.forward<std::shared_ptr<http::IHttpResponse>>();
+		}
+
+		path = result.value;
 	}
 	else
 	{
@@ -131,10 +141,10 @@ std::unique_ptr<http::IHttpResponse> CommonMiddleware::process_request(
 		return this->get_response_redirect(redirect_url);
 	}
 
-	return nullptr;
+	return this->none();
 }
 
-std::unique_ptr<http::IHttpResponse> CommonMiddleware::process_response(
+core::Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::process_response(
 	http::HttpRequest* request, http::IHttpResponse* response
 )
 {
@@ -144,9 +154,13 @@ std::unique_ptr<http::IHttpResponse> CommonMiddleware::process_response(
 	{
 		if (this->should_redirect_with_slash(request))
 		{
-			return this->get_response_redirect(
-				this->get_full_path_with_slash(request)
-			);
+			auto result = this->get_full_path_with_slash(request);
+			if (result.err)
+			{
+				return result.forward<std::shared_ptr<http::IHttpResponse>>();
+			}
+
+			return this->get_response_redirect(result.value);
 		}
 	}
 
@@ -159,7 +173,7 @@ std::unique_ptr<http::IHttpResponse> CommonMiddleware::process_response(
 		);
 	}
 
-	return nullptr;
+	return this->none();
 }
 
 __MIDDLEWARE_END__

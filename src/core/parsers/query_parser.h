@@ -1,41 +1,25 @@
-/*
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 /**
  * core/parsers/query_parser.h
  *
- * Purpose: parses url's query.
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ *
+ * Purpose: parses URL's query.
  */
 
 #pragma once
 
-#ifdef _MSC_VER
 // C++ libraries.
 #include <string>
-#endif
+
+// Core libraries.
+#include <xalwart.core/string.h>
+#include <xalwart.core/collections/multi_dict.h>
 
 // Module definitions.
 #include "../_def_.h"
 
-// Framework modules.
-#include "../../collections/multi_dict.h"
 
-
-__CORE_INTERNAL_BEGIN__
+__PARSERS_BEGIN__
 
 struct query_parser final
 {
@@ -45,12 +29,12 @@ struct query_parser final
 		s_val
 	};
 
-	collections::Dict<std::string, std::string> dict;
-	collections::MultiValueDict<std::string, std::string> multi_dict;
+	collections::Dict<std::string, xw::string> dict;
+	collections::MultiValueDict<std::string, xw::string> multi_dict;
 
 	query_parser() = default;
-	void append_parameter(const std::string& key, const std::string& value);
-	void parse(const std::string& data);
+	void append_parameter(const std::string& key, const xw::string& value);
+	void parse(const xw::string& data);
 };
 
-__CORE_INTERNAL_END__
+__PARSERS_END__

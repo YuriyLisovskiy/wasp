@@ -1,31 +1,17 @@
-/*
- * Copyright (c) 2020 Yuriy Lisovskiy
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 /**
  * render/library/library.h
+ *
+ * Copyright (c) 2020 Yuriy Lisovskiy
+ *
+ * Purpose: TODO
  */
 
 #pragma once
 
-// Module definitions.
-#include "./_def_.h"
+// Render libraries.
+#include <xalwart.render/library/base.h>
 
-// Framework modules.
-#include "./base.h"
+// Framework libraries.
 #include "../../conf/settings.h"
 
 
@@ -37,7 +23,7 @@ protected:
 	conf::Settings* settings;
 
 public:
-	explicit Library(conf::Settings* settings);
+	explicit Library(const std::string& lib_name, conf::Settings* settings);
 	std::shared_ptr<Filters> get_filters() override;
 	std::shared_ptr<Tags> get_tags() override;
 };

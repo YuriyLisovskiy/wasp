@@ -1,22 +1,7 @@
-/*
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 /**
  * views/static.h
+ *
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * Purpose:
  * 	Views and functions for serving static files. These are only to be used
@@ -28,7 +13,7 @@
 // Module definitions.
 #include "./_def_.h"
 
-// Framework modules.
+// Framework libraries.
 #include "./view.h"
 
 
@@ -45,7 +30,7 @@ public:
 
 	void set_kwargs(collections::Dict<std::string, std::string>* kwargs);
 
-	std::unique_ptr<http::IHttpResponse> get(http::HttpRequest* request, Args* args) final;
+	core::Result<std::shared_ptr<http::IHttpResponse>> get(http::HttpRequest* request, Args* args) final;
 };
 
 __VIEWS_END__

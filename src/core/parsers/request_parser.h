@@ -1,36 +1,25 @@
-/*
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 /**
  * core/parsers/request_parser.h
+ *
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * Purpose: parses an http request from given stream.
  */
 
 #pragma once
 
+// C++ libraries.
+#include <string>
+#include <map>
+
+// Core libraries.
+#include <xalwart.core/string.h>
+
 // Module definitions.
 #include "../_def_.h"
 
-// Framework modules.
-#include "../../http/request.h"
 
-
-__CORE_INTERNAL_BEGIN__
+__PARSERS_BEGIN__
 
 /// Http request parser structure.
 struct request_parser final
@@ -55,19 +44,10 @@ struct request_parser final
 	bool keep_alive{};
 
 	/// Contains body of http request.
-	std::string content;
+	xw::string content;
 
 	/// Accumulates request's headers.
 	std::map<std::string, std::string> headers;
-
-	/// Contains get request's parameters.
-	http::HttpRequest::Parameters<std::string, std::string> get_parameters;
-
-	/// Contains post request's parameters.
-	http::HttpRequest::Parameters<std::string, std::string> post_parameters;
-
-	/// Contains request's files when request was sent as application/form-data.
-	http::HttpRequest::Parameters<std::string, UploadedFile> files_parameters;
 
 	/// Contains the size of request's content.
 	unsigned long long content_size{};
@@ -92,7 +72,7 @@ struct request_parser final
 		ct_multipart_form_data,
 		ct_other
 
-	/// Request's content type.
+		/// Request's content type.
 	} content_type{};
 
 	/// Available parser states.
@@ -139,7 +119,7 @@ struct request_parser final
 		s_chunk_data_new_line_2,
 		s_chunk_data
 
-	/// Current parser state.
+		/// Current parser state.
 	} state{};
 
 	/// Parses 'HTTP' word from http request's head line.
@@ -149,18 +129,10 @@ struct request_parser final
 	/// @param new_state: new parser's state will be set if 'input' equals 'expected'.
 	void parse_http_word(char input, char expected, request_parser::state_enum new_state);
 
-	/// Sets parameters according to http request method.
-	///
-	/// @param params: parsed get/post parameters.
-	void set_parameters(
-		collections::Dict<std::string, std::string>& dict,
-		collections::MultiValueDict<std::string, std::string>& multi_dict
-	);
-
 	/// Parses chunks from http request body if request is chunked.
 	///
 	/// @param data: chunked http request body.
-	void parse_chunks(const std::string& data);
+	void parse_chunks(const xw::string& data);
 
 	/// Checks if a byte is an HTTP character.
 	///
@@ -194,12 +166,12 @@ struct request_parser final
 	/// @param data: http request body as std::string.
 	/// @param media_root: path to media folder, where files will be saved;
 	///	if this parameter is empty-string, files will not be saved.
-	void parse_body(const std::string& data, const std::string& media_root);
+	void parse_body(const xw::string& data, const xw::string& media_root);
 
 	/// Parses http request headers from given stream.
 	///
 	/// @param data: http request headers as std::string.
-	void parse_headers(const std::string& data);
+	void parse_headers(const xw::string& data);
 };
 
-__CORE_INTERNAL_END__
+__PARSERS_END__

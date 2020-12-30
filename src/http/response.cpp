@@ -1,36 +1,23 @@
-/*
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 /**
- * An implementation of http/response.h
+ * http/response.cpp
+ *
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  */
 
 #include "./response.h"
 
-// Framework modules.
+// Core libraries.
+#include <xalwart.core/datetime.h>
+#include <xalwart.core/exceptions.h>
+#include <xalwart.core/path.h>
+#include <xalwart.core/string_utils.h>
+
+// Framework libraries.
 #include "./status.h"
 #include "./url.h"
 #include "./utility.h"
 #include "../core/encoding.h"
 #include "../core/mime_types.h"
-#include "../core/datetime.h"
-#include "../core/path.h"
-#include "../core/strings.h"
-#include "../core/exceptions.h"
 
 
 __HTTP_BEGIN__
@@ -117,7 +104,7 @@ void HttpResponseBase::set_cookie(
 	std::string same_site_;
 	if (!same_site.empty())
 	{
-		auto ss_lower = core::str::lower(same_site_);
+		auto ss_lower = str::lower(same_site_);
 		if (ss_lower != "lax" && ss_lower != "strict")
 		{
 			throw core::ValueError(R"(samesite must be "lax" or "strict".)");
@@ -226,7 +213,7 @@ void HttpResponseBase::close()
 
 void HttpResponseBase::write(const std::string& content)
 {
-	throw core::HttpError("This HttpResponseBase instance is not writable", _ERROR_DETAILS_);
+	throw core::RuntimeError("This HttpResponseBase instance is not writable", _ERROR_DETAILS_);
 }
 
 void HttpResponseBase::flush()
@@ -235,7 +222,7 @@ void HttpResponseBase::flush()
 
 unsigned long int HttpResponseBase::tell()
 {
-	throw core::HttpError("This HttpResponseBase instance cannot tell its position", _ERROR_DETAILS_);
+	throw core::RuntimeError("This HttpResponseBase instance cannot tell its position", _ERROR_DETAILS_);
 }
 
 bool HttpResponseBase::readable()
@@ -255,7 +242,7 @@ bool HttpResponseBase::writable()
 
 void HttpResponseBase::write_lines(const std::vector<std::string>& lines)
 {
-	throw core::HttpError("This HttpResponseBase instance is not writable", _ERROR_DETAILS_);
+	throw core::RuntimeError("This HttpResponseBase instance is not writable", _ERROR_DETAILS_);
 }
 
 std::string HttpResponseBase::serialize_headers()
@@ -290,11 +277,16 @@ std::string& HttpResponseBase::operator[] (const std::string& key)
 	return this->_headers[key];
 }
 
+core::Error HttpResponseBase::err()
+{
+	return this->_err;
+}
+
 
 // HttpResponse implementation
 HttpResponse::HttpResponse(
-	const std::string& content,
 	unsigned short status,
+	const std::string& content,
 	const std::string& content_type,
 	const std::string& reason,
 	const std::string& charset
@@ -346,7 +338,7 @@ std::string HttpResponse::serialize()
 {
 	this->set_header(
 		"Date",
-		core::dt::Datetime::utc_now().strftime("%a, %d %b %Y %T GMT")
+		dt::Datetime::utc_now().strftime("%a, %d %b %Y %T GMT")
 	);
 	this->set_header(
 		"Content-Length",
@@ -374,7 +366,9 @@ StreamingHttpResponse::StreamingHttpResponse(
 
 std::string StreamingHttpResponse::serialize()
 {
-	throw core::HttpError("This StreamingHttpResponse or its child instance cannot be serialized", _ERROR_DETAILS_);
+	throw core::RuntimeError(
+		"This StreamingHttpResponse or its child instance cannot be serialized", _ERROR_DETAILS_
+	);
 }
 
 
@@ -393,17 +387,19 @@ FileResponse::FileResponse(
 	_file_path(std::move(file_path)),
 	_headers_is_got(false)
 {
-	if (!core::path::exists(this->_file_path))
+	if (!path::exists(this->_file_path))
 	{
-		throw core::FileDoesNotExistError(
-			"file '" + this->_file_path + "' does not exist", _ERROR_DETAILS_
+		this->_err = core::Error(
+			core::FileDoesNotExistError, "file '" + this->_file_path + "' does not exist", _ERROR_DETAILS_
 		);
 	}
-
-	// Initializing file stream.
-	this->_file_stream = std::ifstream(this->_file_path, std::ifstream::binary | std::ios::ate);
-	this->_file_size = this->_file_stream.tellg();
-	this->_file_stream.seekg(0);
+	else
+	{
+		// Initializing file stream.
+		this->_file_stream = std::ifstream(this->_file_path, std::ifstream::binary | std::ios::ate);
+		this->_file_size = this->_file_stream.tellg();
+		this->_file_stream.seekg(0);
+	}
 }
 
 std::string FileResponse::get_chunk()
@@ -446,8 +442,8 @@ void FileResponse::_set_headers()
 		{"gzip", "application/gzip"},
 		{"xz", "application/x-xz"}
 	});
-	this->set_header("Content-Length", std::to_string(core::path::get_size(this->_file_path)));
-	if (core::str::starts_with(this->_headers.get("Content-Type", ""), "text/html"))
+	this->set_header("Content-Length", std::to_string(path::get_size(this->_file_path)));
+	if (str::starts_with(this->_headers.get("Content-Type", ""), "text/html"))
 	{
 		std::string content_type, encoding;
 		core::mime::guess_content_type(this->_file_path, content_type, encoding);
@@ -457,7 +453,7 @@ void FileResponse::_set_headers()
 
 	std::string disposition = this->_as_attachment ? "attachment" : "inline";
 	std::string file_expr;
-	std::string file_name = core::path::basename(this->_file_path);
+	std::string file_name = path::basename(this->_file_path);
 	try
 	{
 		file_expr = "filename=\"" + core::encoding::encode(file_name, core::encoding::ASCII) + "\"";
@@ -474,10 +470,7 @@ std::string FileResponse::_get_headers_chunk()
 {
 	auto reason_phrase = this->get_reason_phrase();
 	this->_set_headers();
-	this->set_header(
-		"Date",
-		core::dt::Datetime::utc_now().strftime("%a, %d %b %Y %T GMT")
-	);
+	this->set_header("Date", dt::Datetime::utc_now().strftime("%a, %d %b %Y %T GMT"));
 	auto headers = this->serialize_headers();
 
 	std::string headers_chunk = "HTTP/1.1 " + std::to_string(this->_status) + " " + reason_phrase + "\r\n"
@@ -506,7 +499,7 @@ HttpResponseRedirectBase::HttpResponseRedirectBase(
 	const std::string& content_type,
 	const std::string& reason,
 	const std::string& charset
-) : HttpResponse("", status, content_type, reason, charset)
+) : HttpResponse(status, "", content_type, reason, charset)
 {
 	if (status < 300 || status > 399)
 	{
@@ -517,7 +510,9 @@ HttpResponseRedirectBase::HttpResponseRedirectBase(
 	Url url(redirect_to);
 	if (!url.scheme().empty() && this->_allowed_schemes.find(url.scheme()) == this->_allowed_schemes.end())
 	{
-		throw core::DisallowedRedirect("Unsafe redirect to URL with protocol " + url.scheme(), _ERROR_DETAILS_);
+		this->_err = core::Error(
+			core::DisallowedRedirect, "Unsafe redirect to URL with protocol " + url.scheme(), _ERROR_DETAILS_
+		);
 	}
 }
 
@@ -552,7 +547,7 @@ HttpResponseNotModified::HttpResponseNotModified(
 	const std::string& content,
 	const std::string& content_type,
 	const std::string& charset
-) : HttpResponse(content, 304, content_type, "", charset)
+) : HttpResponse(304, content, content_type, "", charset)
 {
 	this->remove_header("Content-Type");
 }
@@ -573,7 +568,7 @@ HttpResponseBadRequest::HttpResponseBadRequest(
 	const std::string& content,
 	const std::string& content_type,
 	const std::string& charset
-) : HttpResponse(content, 400, content_type, "", charset)
+) : HttpResponse(400, content, content_type, "", charset)
 {
 }
 
@@ -583,7 +578,7 @@ HttpResponseNotFound::HttpResponseNotFound(
 	const std::string& content,
 	const std::string& content_type,
 	const std::string& charset
-) : HttpResponse(content, 404, content_type, "", charset)
+) : HttpResponse(404, content, content_type, "", charset)
 {
 }
 
@@ -593,7 +588,7 @@ HttpResponseForbidden::HttpResponseForbidden(
 	const std::string& content,
 	const std::string& content_type,
 	const std::string& charset
-) : HttpResponse(content, 403, content_type, "", charset)
+) : HttpResponse(403, content, content_type, "", charset)
 {
 }
 
@@ -604,7 +599,7 @@ HttpResponseNotAllowed::HttpResponseNotAllowed(
 	const std::vector<std::string>& permitted_methods,
 	const std::string& content_type,
 	const std::string& charset
-) : HttpResponse(content, 405, content_type, "", charset)
+) : HttpResponse(405, content, content_type, "", charset)
 {
 	std::string methods;
 	for (size_t i = 0; i < permitted_methods.size(); i++)
@@ -625,7 +620,7 @@ HttpResponseGone::HttpResponseGone(
 	const std::string& content,
 	const std::string& content_type,
 	const std::string& charset
-) : HttpResponse(content, 410, content_type, "", charset)
+) : HttpResponse(410, content, content_type, "", charset)
 {
 }
 
@@ -635,7 +630,7 @@ HttpResponseEntityTooLarge::HttpResponseEntityTooLarge(
 	const std::string& content,
 	const std::string& content_type,
 	const std::string& charset
-) : HttpResponse(content, 413, content_type, "", charset)
+) : HttpResponse(413, content, content_type, "", charset)
 {
 }
 
@@ -645,7 +640,7 @@ HttpResponseServerError::HttpResponseServerError(
 	const std::string& content,
 	const std::string& content_type,
 	const std::string& charset
-) : HttpResponse(content, 500, content_type, "", charset)
+) : HttpResponse(500, content, content_type, "", charset)
 {
 }
 

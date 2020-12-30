@@ -1,22 +1,7 @@
-/*
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 /**
- * An implementation of core/flags/parser.h
+ * core/flags/parser.cpp
+ *
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  */
 
 #include "./parser.h"
@@ -24,8 +9,8 @@
 // C++ libraries.
 #include <iostream>
 
-// Framework modules.
-#include "../strings.h"
+// Core libraries.
+#include <xalwart.core/string_utils.h>
 
 
 __FLAGS_INTERNAL_BEGIN__
@@ -42,24 +27,24 @@ args_parser::args_parser(int argc, char** argv, size_t parse_from, bool is_verbo
 	for (size_t i = parse_from; i < argc; i++)
 	{
 		std::string token = argv[i];
-		if (core::str::starts_with(token, "--"))
+		if (str::starts_with(token, "--"))
 		{
 			if (!is_received)
 			{
 				this->flags[last_arg] = "true";
 			}
 
-			auto param = core::str::split(token, '=');
+			auto param = str::split(token, '=');
 			if (param.size() > 1)
 			{
-				core::str::ltrim(param[0], "-");
-				auto val = core::str::join(param.begin() + 1, param.end(), "");
+				str::ltrim(param[0], "-");
+				auto val = str::join(param.begin() + 1, param.end(), "");
 				this->flags[param[0]] = val;
 			}
 			else
 			{
 				last_arg = token;
-				core::str::ltrim(last_arg, "-");
+				str::ltrim(last_arg, "-");
 				is_received = false;
 			}
 		}

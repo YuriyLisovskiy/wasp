@@ -1,30 +1,15 @@
-/*
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 /**
- * An implementation of http/cookie.h
+ * http/cookie.cpp
+ *
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  */
 
 #include "./cookie.h"
 
-// Framework modules.
-#include "../core/utility.h"
-#include "../core/strings.h"
-#include "../core/exceptions.h"
+// Core libraries.
+#include <xalwart.core/utility.h>
+#include <xalwart.core/exceptions.h>
+#include <xalwart.core/string_utils.h>
 
 
 __HTTP_BEGIN__
@@ -52,18 +37,18 @@ std::string Cookie::_get_expires(long max_age) const
 		return "Thu, 01 Jan 1970 00:00:00 GMT";
 	}
 
-	auto now = core::dt::Datetime::utc_now();
-	return core::dt::Datetime::utc_from_timestamp(
+	auto now = dt::Datetime::utc_now();
+	return dt::Datetime::utc_from_timestamp(
 		now.timestamp() + (double)max_age
 	).strftime(this->DATE_TIME_FORMAT);
 }
 
 long Cookie::_get_max_age(const std::string& expires) const
 {
-	auto expires_gmt = core::dt::Datetime::strptime(
+	auto expires_gmt = dt::Datetime::strptime(
 		expires, this->DATE_TIME_FORMAT
 	).timestamp();
-	long max_age = (long)expires_gmt - (long)core::dt::Datetime::utc_now().timestamp();
+	long max_age = (long)expires_gmt - (long)dt::Datetime::utc_now().timestamp();
 	return max_age > 0 ? max_age : 0;
 }
 
@@ -87,12 +72,12 @@ Cookie::Cookie(
 {
 	if (this->_name.empty())
 	{
-		throw core::HttpError("cookie's name can not be empty", _ERROR_DETAILS_);
+		throw core::ValueError("cookie's name can not be empty", _ERROR_DETAILS_);
 	}
 
 	if (this->_max_age < 0)
 	{
-		throw core::HttpError("cookie's Max-age can not be less than zero", _ERROR_DETAILS_);
+		throw core::ValueError("cookie's Max-age can not be less than zero", _ERROR_DETAILS_);
 	}
 
 	if (!this->_expires.empty())
@@ -155,9 +140,7 @@ std::string Cookie::to_string() const
 	if (!this->_same_site.empty())
 	{
 		std::vector<std::string> allowed_same_site_values = {"lax", "none", "strict"};
-		if (!core::utility::contains(
-			core::str::lower(this->_same_site), allowed_same_site_values
-		))
+		if (!utility::contains(str::lower(this->_same_site), allowed_same_site_values))
 		{
 			throw core::ValueError(R"(samesite must be "lax", "none", or "strict".)");
 		}

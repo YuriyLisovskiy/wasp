@@ -1,31 +1,16 @@
-/*
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 /**
- * An implementation of core/parsers/url_parser.h
+ * core/parsers/url_parser.cpp
+ *
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  */
 
 #include "./url_parser.h"
 
-// Framework modules.
-#include "../strings.h"
+// Core libraries.
+#include <xalwart.core/string_utils.h>
 
 
-__CORE_INTERNAL_BEGIN__
+__PARSERS_BEGIN__
 
 url_parser::url_parser()
 	: is_parsed(false), last_err(""), err_line(-1), err_func(""), err_file(""), is_reset(true)
@@ -328,4 +313,4 @@ void url_parser::set_err(const char* err, int line, const char* func, const char
 	this->err_file = file;
 }
 
-__CORE_INTERNAL_END__
+__PARSERS_END__

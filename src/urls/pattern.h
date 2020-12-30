@@ -1,39 +1,26 @@
-/*
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 /**
  * urls/pattern.h
  *
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ *
  * Purpose: used for mapping url pattern to it's handler.
  *
- * Pattern example: /profile/<user_id>(\d+)/?
+ * 	Pattern example: /profile/<user_id>(\d+)/?
  */
 
 #pragma once
 
+// Core libraries.
+#include <xalwart.core/regex.h>
+
 // Module definitions.
 #include "./_def_.h"
 
-// Framework modules.
+// Framework libraries.
 #include "../views/args.h"
-#include "../core/regex.h"
 #include "../http/request.h"
 #include "../http/response.h"
-#include "../conf/settings.h"
+#include "../conf/_def_.h"
 
 
 __CONF_BEGIN__
@@ -43,7 +30,7 @@ __CONF_END__
 
 __URLS_BEGIN__
 
-typedef std::function<std::unique_ptr<http::IHttpResponse>(
+typedef std::function<core::Result<std::shared_ptr<http::IHttpResponse>>(
 	http::HttpRequest*, views::Args*, conf::Settings*
 )> ViewHandler;
 
@@ -54,7 +41,7 @@ private:
 	std::vector<std::string> _pattern_parts;
 	ViewHandler _handler;
 	std::string _name;
-	core::rgx::ArgRegex _regex;
+	rgx::ArgRegex _regex;
 	std::string _namespace;
 
 public:
@@ -70,7 +57,7 @@ public:
 	);
 
 	[[nodiscard]] std::string get_name() const;
-	std::unique_ptr<http::IHttpResponse> apply(
+	core::Result<std::shared_ptr<http::IHttpResponse>> apply(
 		http::HttpRequest* request,
 		conf::Settings* settings,
 		views::Args* args = nullptr

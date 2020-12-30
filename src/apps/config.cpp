@@ -1,22 +1,7 @@
-/*
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 /**
- * An implementation of apps/config.h
+ * apps/config.cpp
+ *
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  */
 
 #include "./config.h"
@@ -31,17 +16,17 @@ AppConfig::AppConfig(const std::string& app_path, conf::Settings* settings)
 	this->app_path = app_path;
 }
 
-void AppConfig::init(const core::object::Type& type)
+void AppConfig::init(const object::Type& type)
 {
 	if (!this->_is_initialized)
 	{
 		std::string name = type.name();
-		core::str::rtrim(name, "Config");
-		core::str::rtrim(name, "config");
-		core::str::rtrim(name, "_");
-		core::str::rtrim(name, "App");
-		core::str::rtrim(name, "app");
-		core::str::rtrim(name, "_");
+		str::rtrim(name, "Config");
+		str::rtrim(name, "config");
+		str::rtrim(name, "_");
+		str::rtrim(name, "App");
+		str::rtrim(name, "app");
+		str::rtrim(name, "_");
 		this->app_name = name;
 		this->_is_initialized = true;
 	}
@@ -72,7 +57,7 @@ std::vector<std::shared_ptr<urls::UrlPattern>> AppConfig::get_urlpatterns()
 	return this->_urlpatterns;
 }
 
-std::vector<std::shared_ptr<core::BaseCommand>> AppConfig::get_commands()
+std::vector<std::shared_ptr<cmd::BaseCommand>> AppConfig::get_commands()
 {
 	if (this->_commands.empty())
 	{

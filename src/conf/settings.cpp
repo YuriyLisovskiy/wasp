@@ -1,44 +1,34 @@
-/*
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 /**
- * An implementation of conf/settings.h
+ * conf/settings.cpp
+ *
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  */
 
-// Header.
 #include "./settings.h"
 
-// Vendor.
-#include <yaml-cpp/yaml.h>
+// Core libraries.
+#include <xalwart.core/path.h>
+#include <xalwart.core/string_utils.h>
+
+// Render libraries.
+#include <xalwart.render/engine.h>
+#include <xalwart.render/loaders.h>
 
 // Framework modules.
-#include "../core/path.h"
-#include "../core/strings.h"
-#include "../render/engine.h"
-#include "../render/env/default.h"
-#include "../render/library/builtin.h"
+#include "../render/library/default.h"
+#include "../middleware/clickjacking.h"
+#include "../middleware/common.h"
+#include "../middleware/cookies.h"
+#include "../middleware/http.h"
+#include "../middleware/security.h"
 
 
 __CONF_BEGIN__
 
 YAML::Node Settings::_load_config(const std::string& file_name) const
 {
-	auto config_path = core::path::join(this->BASE_DIR, file_name);
-	if (core::path::exists(config_path))
+	auto config_path = path::join(this->BASE_DIR, file_name);
+	if (path::exists(config_path))
 	{
 		auto config = YAML::LoadFile(config_path);
 		if (config && !config.IsNull() && !config.IsMap())
@@ -456,77 +446,112 @@ void Settings::_override_config(YAML::Node& config)
 Settings::Settings(const std::string& base_dir)
 {
 	this->BASE_DIR = base_dir;
+	using namespace middleware;
+	this->_middleware = {
+		{XFrameOptionsMiddleware::FULL_NAME, [this]() -> std::shared_ptr<middleware::IMiddleware> {
+			return std::make_shared<XFrameOptionsMiddleware>(this);
+		}},
+		{CommonMiddleware::FULL_NAME, [this]() -> std::shared_ptr<middleware::IMiddleware> {
+			return std::make_shared<CommonMiddleware>(this);
+		}},
+		{CookieMiddleware::FULL_NAME, [this]() -> std::shared_ptr<middleware::IMiddleware> {
+			return std::make_shared<CookieMiddleware>(this);
+		}},
+		{ConditionalGetMiddleware::FULL_NAME, [this]() -> std::shared_ptr<middleware::IMiddleware> {
+			return std::make_shared<ConditionalGetMiddleware>(this);
+		}},
+		{SecurityMiddleware::FULL_NAME, [this]() -> std::shared_ptr<middleware::IMiddleware> {
+			return std::make_shared<SecurityMiddleware>(this);
+		}}
+	};
+
+	using namespace render::lib;
+	this->_libraries = {
+		{DefaultLibrary::FULL_NAME, [this]() -> std::shared_ptr<ILibrary> {
+			return std::make_shared<DefaultLibrary>(this);
+		}}
+	};
+
+	this->_loaders = {
+		{render::DefaultLoader::FULL_NAME, []() -> std::shared_ptr<render::DefaultLoader> {
+			return std::make_shared<render::DefaultLoader>();
+		}}
+	};
 }
 
 void Settings::_init_env(YAML::Node& env)
 {
-	std::vector<std::string> dirs;
-	auto directories = env["directories"];
-	if (directories && directories.IsSequence())
+	auto use_custom = env["use_custom"];
+	if (use_custom && use_custom.as<bool>())
 	{
-		for (auto it = directories.begin(); it != directories.end(); it++)
-		{
-			if (!it->IsNull() && it->IsScalar())
-			{
-				auto p = it->as<std::string>();
-				dirs.push_back(
-					core::path::is_absolute(p) ? p : core::path::join(this->BASE_DIR, p)
-				);
-			}
-		}
-	}
-
-	std::vector<std::shared_ptr<render::lib::ILibrary>> libs{
-		this->_factory->get_library(xw::render::lib::BuiltinLibrary::FULL_NAME)
-	};
-	auto libraries = env["libraries"];
-	if (libraries && libraries.IsSequence() && libraries.size() > 0)
-	{
-		this->register_libraries();
-		for (auto it = libraries.begin(); it != libraries.end(); it++)
-		{
-			if (!it->IsNull() && it->IsScalar())
-			{
-				libs.push_back(this->_factory->get_library(it->as<std::string>()));
-			}
-		}
-	}
-
-	std::vector<std::shared_ptr<render::ILoader>> loaders_vec;
-	auto loaders = env["loaders"];
-	if (loaders && loaders.IsSequence() && loaders.size() > 0)
-	{
-		this->register_loaders();
-		for (auto it = loaders.begin(); it != loaders.end(); it++)
-		{
-			if (!it->IsNull() && it->IsScalar())
-			{
-				loaders_vec.push_back(this->_factory->get_loader(it->as<std::string>()));
-			}
-		}
-	}
-
-	auto use_app_dirs = env["use_app_directories"];
-	auto auto_escape = env["auto_escape"];
-	auto use_default_engine = env["use_default_engine"];
-
-	auto env_cfg = render::env::Config(
-		dirs,
-		use_app_dirs ? use_app_dirs.as<bool>() : true,
-		this->INSTALLED_APPS,
-		this->DEBUG,
-		this->LOGGER.get(),
-		auto_escape ? auto_escape.as<bool>() : true,
-		libs,
-		loaders_vec
-	);
-	if (use_default_engine && !use_default_engine.as<bool>())
-	{
-		this->register_templates_env(&env_cfg);
+		this->register_templates_engine(env);
 	}
 	else
 	{
-		this->TEMPLATES_ENV = render::env::DefaultEnvironment<render::Engine>::make(&env_cfg);
+		std::vector<std::string> dirs;
+		auto directories = env["directories"];
+		if (directories && directories.IsSequence())
+		{
+			for (auto it = directories.begin(); it != directories.end(); it++)
+			{
+				if (!it->IsNull() && it->IsScalar())
+				{
+					auto p = it->as<std::string>();
+					dirs.push_back(
+						path::is_absolute(p) ? p : path::join(this->BASE_DIR, p)
+					);
+				}
+			}
+		}
+
+		std::vector<std::shared_ptr<render::lib::ILibrary>> libs{
+			this->_get_library(xw::render::lib::DefaultLibrary::FULL_NAME)
+		};
+		auto libraries = env["libraries"];
+		if (libraries && libraries.IsSequence() && libraries.size() > 0)
+		{
+			this->register_libraries();
+			for (auto it = libraries.begin(); it != libraries.end(); it++)
+			{
+				if (!it->IsNull() && it->IsScalar())
+				{
+					libs.push_back(this->_get_library(it->as<std::string>()));
+				}
+			}
+		}
+
+		std::vector<std::shared_ptr<render::ILoader>> loaders_vec;
+		auto loaders = env["loaders"];
+		if (loaders && loaders.IsSequence() && loaders.size() > 0)
+		{
+			this->register_loaders();
+			for (auto it = loaders.begin(); it != loaders.end(); it++)
+			{
+				if (!it->IsNull() && it->IsScalar())
+				{
+					loaders_vec.push_back(this->_get_loader(it->as<std::string>()));
+				}
+			}
+		}
+
+		auto use_app_dirs = env["use_app_directories"];
+		if (use_app_dirs && use_app_dirs.IsScalar() && use_app_dirs.as<bool>())
+		{
+			for (const auto& app : this->INSTALLED_APPS)
+			{
+				dirs.push_back(path::dirname(app->get_app_path()));
+			}
+		}
+
+		auto auto_escape = env["auto_escape"];
+		this->TEMPLATES_ENGINE = std::make_unique<render::DefaultEngine>(
+			dirs,
+			this->DEBUG,
+			auto_escape && auto_escape.as<bool>(),
+			loaders_vec,
+			libs,
+			this->LOGGER.get()
+		);
 	}
 }
 
@@ -556,7 +581,7 @@ void Settings::_init_logger(YAML::Node& logger)
 		if (file_out && file_out.IsScalar())
 		{
 			auto f_path = file_out.as<std::string>();
-			auto full_path = core::path::is_absolute(f_path) ? f_path : core::path::join(this->BASE_DIR, f_path);
+			auto full_path = path::is_absolute(f_path) ? f_path : path::join(this->BASE_DIR, f_path);
 			logger_config.add_file_stream(full_path);
 		}
 		else
@@ -569,7 +594,7 @@ void Settings::_init_logger(YAML::Node& logger)
 					if (!it->IsNull() && it->IsScalar())
 					{
 						auto f_path = it->as<std::string>();
-						auto full_path = core::path::is_absolute(f_path) ? f_path : core::path::join(this->BASE_DIR, f_path);
+						auto full_path = path::is_absolute(f_path) ? f_path : path::join(this->BASE_DIR, f_path);
 						logger_config.add_file_stream(full_path);
 					}
 				}
@@ -715,7 +740,7 @@ void Settings::_init_apps(YAML::Node& apps)
 	{
 		if (!it->IsNull() && it->IsScalar())
 		{
-			auto item = this->_factory->get_app(it->as<std::string>());
+			auto item = this->_get_app(it->as<std::string>());
 			if (item)
 			{
 				this->INSTALLED_APPS.push_back(item);
@@ -730,7 +755,7 @@ void Settings::_init_middleware(YAML::Node& middleware)
 	{
 		if (!it->IsNull() && it->IsScalar())
 		{
-			auto item = this->_factory->get_middleware(it->as<std::string>());
+			auto item = this->_get_middleware(it->as<std::string>());
 			if (item)
 			{
 				this->MIDDLEWARE.push_back(item);
@@ -765,22 +790,22 @@ void Settings::init()
 	auto timezone = config["timezone"];
 	if (!timezone || !timezone.IsMap())
 	{
-		this->TIME_ZONE = std::make_shared<core::dt::Timezone>(core::dt::Timezone::UTC);
+		this->TIME_ZONE = std::make_shared<dt::Timezone>(dt::Timezone::UTC);
 	}
 	else
 	{
-		auto timezone_name = core::str::upper(timezone["name"].as<std::string>("UTC"));
+		auto timezone_name = str::upper(timezone["name"].as<std::string>("UTC"));
 		if (timezone_name == "UTC")
 		{
-			this->TIME_ZONE = std::make_shared<core::dt::Timezone>(core::dt::Timezone::UTC);
+			this->TIME_ZONE = std::make_shared<dt::Timezone>(dt::Timezone::UTC);
 		}
 		else
 		{
 			auto timezone_offset = timezone["offset"];
 			if (timezone_offset && timezone_offset.IsMap())
 			{
-				this->TIME_ZONE = std::make_shared<core::dt::Timezone>(
-					core::dt::Timedelta(
+				this->TIME_ZONE = std::make_shared<dt::Timezone>(
+					dt::Timedelta(
 						timezone_offset["days"].as<long>(0),
 						timezone_offset["seconds"].as<long>(0),
 						timezone_offset["microseconds"].as<long>(0),
@@ -794,8 +819,8 @@ void Settings::init()
 			}
 			else
 			{
-				this->TIME_ZONE = std::make_shared<core::dt::Timezone>(
-					core::dt::Timedelta(), timezone_name
+				this->TIME_ZONE = std::make_shared<dt::Timezone>(
+					dt::Timedelta(), timezone_name
 				);
 			}
 		}
@@ -825,7 +850,7 @@ void Settings::init()
 	if (media && media.IsMap())
 	{
 		auto p = media["root"].as<std::string>("media");
-		this->MEDIA_ROOT = core::path::is_absolute(p) ? p : core::path::join(this->BASE_DIR, p);
+		this->MEDIA_ROOT = path::is_absolute(p) ? p : path::join(this->BASE_DIR, p);
 		this->MEDIA_URL = media["url"].as<std::string>("/media/");
 	}
 
@@ -833,7 +858,7 @@ void Settings::init()
 	if (static_ && static_.IsMap())
 	{
 		auto p = static_["root"].as<std::string>("static");
-		this->STATIC_ROOT = core::path::is_absolute(p) ? p : core::path::join(this->BASE_DIR, p);
+		this->STATIC_ROOT = path::is_absolute(p) ? p : path::join(this->BASE_DIR, p);
 		this->STATIC_URL = static_["url"].as<std::string>("/static/");
 	}
 
@@ -866,7 +891,7 @@ void Settings::init()
 
 	this->_init_secure(config);
 
-	this->_factory = new internal::SettingsFactory(this, this->LOGGER.get());
+//	this->factory = new SettingsFactory(this, this->LOGGER.get());
 
 	auto apps = config["installed_apps"];
 	if (apps && apps.IsSequence() && apps.size() > 0)
@@ -896,7 +921,7 @@ void Settings::init()
 		"Loading template environment...",
 		core::Logger::Color::DEFAULT, '\0'
 	);
-	auto env = config["templates_env"];
+	auto env = config["templates_engine"];
 	if (env && env.IsMap())
 	{
 		this->_init_env(env);
@@ -905,12 +930,12 @@ void Settings::init()
 	{
 		this->register_libraries();
 		this->register_loaders();
-		this->register_templates_env();
+		this->register_templates_engine();
 	}
 
 	this->LOGGER->print(" Done.");
 
-	delete _factory;
+//	delete factory;
 }
 
 void Settings::prepare()
@@ -919,6 +944,16 @@ void Settings::prepare()
 	{
 		this->ROOT_APP = this->INSTALLED_APPS.front();
 	}
+}
+
+std::shared_ptr<server::IServer> Settings::use_server(
+	const std::function<core::Result<std::shared_ptr<http::IHttpResponse>>(
+		http::HttpRequest*, const int&
+	)>& handler,
+	const collections::Dict<std::string, std::string>& kwargs
+)
+{
+	return nullptr;
 }
 
 void Settings::register_logger()
@@ -937,16 +972,64 @@ void Settings::register_libraries()
 {
 }
 
-void Settings::register_templates_env()
+void Settings::register_templates_engine()
 {
 }
 
-void Settings::register_templates_env(render::env::Config* cfg)
+void Settings::register_templates_engine(const YAML::Node& config)
 {
 }
 
 void Settings::register_loaders()
 {
+}
+
+std::shared_ptr<apps::IAppConfig> Settings::_get_app(
+	const std::string& full_name
+) const
+{
+	if (this->_apps.find(full_name) != this->_apps.end())
+	{
+		return this->_apps.at(full_name)();
+	}
+
+	return nullptr;
+}
+
+std::shared_ptr<middleware::IMiddleware> Settings::_get_middleware(
+	const std::string& full_name
+) const
+{
+	if (this->_middleware.find(full_name) != this->_middleware.end())
+	{
+		return this->_middleware.at(full_name)();
+	}
+
+	return nullptr;
+}
+
+std::shared_ptr<render::lib::ILibrary> Settings::_get_library(
+	const std::string& full_name
+) const
+{
+	if (this->_libraries.find(full_name) != this->_libraries.end())
+	{
+		return this->_libraries.at(full_name)();
+	}
+
+	return nullptr;
+}
+
+std::shared_ptr<render::ILoader> Settings::_get_loader(
+	const std::string& full_name
+) const
+{
+	if (this->_loaders.find(full_name) != this->_loaders.end())
+	{
+		return this->_loaders.at(full_name)();
+	}
+
+	return nullptr;
 }
 
 __CONF_END__

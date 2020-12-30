@@ -1,22 +1,7 @@
-/*
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 /**
- * An implementation of middleware/middleware_mixin.h
+ * middleware/middleware_mixin.cpp
+ *
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  */
 
 #include "./middleware_mixin.h"
@@ -29,16 +14,28 @@ MiddlewareMixin::MiddlewareMixin(conf::Settings* settings)
 	this->settings = settings;
 }
 
-std::unique_ptr<http::IHttpResponse> MiddlewareMixin::process_request(http::HttpRequest* request)
+core::Result<std::shared_ptr<http::IHttpResponse>> MiddlewareMixin::none()
 {
-	return nullptr;
+	return core::Result<std::shared_ptr<http::IHttpResponse>>();
 }
 
-std::unique_ptr<http::IHttpResponse> MiddlewareMixin::process_response(
+core::Result<std::shared_ptr<http::IHttpResponse>> MiddlewareMixin::result(
+	const std::shared_ptr<http::IHttpResponse>& response
+)
+{
+	return core::Result<std::shared_ptr<http::IHttpResponse>>(response);
+}
+
+core::Result<std::shared_ptr<http::IHttpResponse>> MiddlewareMixin::process_request(http::HttpRequest* request)
+{
+	return this->none();
+}
+
+core::Result<std::shared_ptr<http::IHttpResponse>> MiddlewareMixin::process_response(
 	http::HttpRequest* request, http::IHttpResponse* response
 )
 {
-	return nullptr;
+	return this->none();
 }
 
 __MIDDLEWARE_END__

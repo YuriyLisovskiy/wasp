@@ -1,37 +1,25 @@
-/*
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 /**
- * An implementation of middleware/security.h
+ * middleware/security.cpp
+ *
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  */
 
 #include "./security.h"
 
-// Framework modules.
+// Core libraries.
+#include <xalwart.core/string_utils.h>
+
+// Framework libraries.
 #include "../http/headers.h"
-#include "../core/strings.h"
 
 
 __MIDDLEWARE_BEGIN__
 
 const std::string SecurityMiddleware::FULL_NAME = "xw::middleware::SecurityMiddleware";
 
-SecurityMiddleware::SecurityMiddleware(conf::Settings* settings)
-	: MiddlewareMixin(settings)
+SecurityMiddleware::SecurityMiddleware(
+	conf::Settings* settings
+) : MiddlewareMixin(settings)
 {
 	this->sts_seconds = settings->SECURE_HSTS_SECONDS;
 	this->sts_include_subdomains = settings->SECURE_HSTS_INCLUDE_SUBDOMAINS;
@@ -47,9 +35,11 @@ SecurityMiddleware::SecurityMiddleware(conf::Settings* settings)
 	}
 }
 
-std::unique_ptr<http::IHttpResponse> SecurityMiddleware::process_request(http::HttpRequest* request)
+core::Result<std::shared_ptr<http::IHttpResponse>> SecurityMiddleware::process_request(
+	http::HttpRequest* request
+)
 {
-	auto path = core::str::ltrim(request->path(), "/");
+	auto path = str::ltrim(request->path(), "/");
 	bool matched = false;
 	for (auto& pattern : this->redirect_exempt)
 	{
@@ -66,21 +56,35 @@ std::unique_ptr<http::IHttpResponse> SecurityMiddleware::process_request(http::H
 		!matched
 	)
 	{
-		auto host = this->redirect_host.empty() ?
-			request->get_host(
+		std::string host;
+		if (this->redirect_host.empty())
+		{
+			auto result = request->get_host(
 				this->settings->USE_X_FORWARDED_HOST,
 				this->settings->DEBUG,
 				this->settings->ALLOWED_HOSTS
-			) : this->redirect_host;
-		return std::make_unique<http::HttpResponsePermanentRedirect>(
+			);
+			if (result.err)
+			{
+				return result.forward<std::shared_ptr<http::IHttpResponse>>();
+			}
+
+			host = result.value;
+		}
+		else
+		{
+			host = this->redirect_host;
+		}
+
+		return this->result<http::HttpResponsePermanentRedirect, std::string>(
 			"https://" + host + request->full_path()
 		);
 	}
 
-	return nullptr;
+	return this->none();
 }
 
-std::unique_ptr<http::IHttpResponse> SecurityMiddleware::process_response(
+core::Result<std::shared_ptr<http::IHttpResponse>> SecurityMiddleware::process_response(
 	http::HttpRequest* request, http::IHttpResponse* response
 )
 {
@@ -118,18 +122,18 @@ std::unique_ptr<http::IHttpResponse> SecurityMiddleware::process_response(
 	{
 		// Support a comma-separated string or iterable of
 		// values to allow fallback.
-		auto split = core::str::split(this->referrer_policy, ',');
+		auto split = str::split(this->referrer_policy, ',');
 		for (auto& item : split)
 		{
-			core::str::trim(item);
+			str::trim(item);
 		}
 
 		response->set_header(
-			http::REFERRER_POLICY, core::str::join(split.begin(), split.end(), ",")
+			http::REFERRER_POLICY, str::join(split.begin(), split.end(), ",")
 		);
 	}
 
-	return nullptr;
+	return this->none();
 }
 
 __MIDDLEWARE_END__

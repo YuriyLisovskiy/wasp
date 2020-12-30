@@ -1,103 +1,43 @@
-/*
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 /**
  * conf/settings.h
+ *
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * Purpose: entire application's settings.
  */
 
 #pragma once
 
+// Core libraries.
+#include <xalwart.core/datetime.h>
+#include <xalwart.core/logger.h>
+#include <xalwart.core/result.h>
+
+// Render libraries.
+#include <xalwart.render/library/base.h>
+
+// Vendor libraries.
+#include "../yaml/yaml-cpp/yaml.h"
+
 // Module definitions.
 #include "./_def_.h"
 
-// Vendor.
-#include <yaml-cpp/yaml.h>
-
-// Framework modules.
-#include "./settings_factory.h"
-#include "../core/management/base.h"
-#include "../core/logger.h"
+// Framework libraries.
+#include "../apps/interfaces.h"
+#include "../core/server/interfaces.h"
 #include "../middleware/interfaces.h"
-#include "../render/env/interfaces.h"
-#include "../render/library/_def_.h"
+#include "../urls/url.h"
 
 
-__URLS_BEGIN__
-class UrlPattern;
-__URLS_END__
-
-__APPS_BEGIN__
-class IAppConfig;
-__APPS_END__
-
-__ENV_BEGIN__
-class IEnvironment;
-class Config;
-__ENV_END__
-
-__LIB_BEGIN__
-class ILibrary;
-__LIB_END__
+__CORE_BEGIN__
+class IServer;
+__CORE_END__
 
 
 __CONF_BEGIN__
 
 struct Settings
 {
-private:
-	const std::string CONFIG_ROOT = "application";
-	const std::string CONFIG_NAME = "config.yml";
-	const std::string LOCAL_CONFIG_NAME = "config.local.yml";
-
-	internal::SettingsFactory* _factory;
-
-	YAML::Node _load_config(const std::string& file_name) const;
-
-	// Loads local configuration file and overrides existing one.
-	static void _override_scalar(
-		YAML::Node& config, YAML::Node& local, const std::string& key
-	);
-	static void _override_sequence(
-		YAML::Node& config, YAML::Node& local, const std::string& key
-	);
-	void _override_config(YAML::Node& config);
-
-	void _init_env(YAML::Node& config);
-	void _init_logger(YAML::Node& logger);
-	void _init_allowed_hosts(YAML::Node& allowed_hosts);
-	void _init_disallowed_user_agents(YAML::Node& agents);
-	void _init_ignorable_404_urls(YAML::Node& urls);
-	void _init_formats(YAML::Node& config);
-	void _init_csrf(YAML::Node& config);
-	void _init_secure(YAML::Node& config);
-	void _init_apps(YAML::Node& apps);
-	void _init_middleware(YAML::Node& middleware);
-
-protected:
-	virtual void register_logger();
-	virtual void register_apps();
-	virtual void register_middleware();
-	virtual void register_libraries();
-	virtual void register_templates_env();
-	virtual void register_templates_env(render::env::Config* cfg);
-	virtual void register_loaders();
-
 public:
 	bool DEBUG;
 
@@ -115,7 +55,7 @@ public:
 	/// https://en.wikipedia.org/wiki/List_of_tz_zones_by_name (although not all
 	/// systems may support all possibilities). When USE_TZ is true, this is
 	/// interpreted as the default user time zone.
-	std::shared_ptr<core::dt::Timezone> TIME_ZONE;
+	std::shared_ptr<dt::Timezone> TIME_ZONE;
 
 	/// If you set this to True, Django will use timezone-aware datetimes.
 	bool USE_TZ;
@@ -140,11 +80,8 @@ public:
 	/// main application configuration.
 	std::vector<std::shared_ptr<apps::IAppConfig>> INSTALLED_APPS;
 
-	/// List of commands to run from command line.
-	std::map<std::string, std::shared_ptr<core::BaseCommand>> COMMANDS;
-
 	/// Backend for rendering templates.
-	std::unique_ptr<render::env::IEnvironment> TEMPLATES_ENV;
+	std::unique_ptr<render::IEngine> TEMPLATES_ENGINE;
 
 	/// Whether to append trailing slashes to URLs.
 	bool APPEND_SLASH;
@@ -160,7 +97,7 @@ public:
 	///         core::rgx::Regex(R"(SiteSucker.*)"),
 	///         core::rgx::Regex(R"(sohu-search.*)")
 	///     };
-	std::vector<core::rgx::Regex> DISALLOWED_USER_AGENTS;
+	std::vector<rgx::Regex> DISALLOWED_USER_AGENTS;
 
 	/// List of compiled regular expression objects representing URLs that need not
 	/// be reported by BrokenLinkEmailsMiddleware.
@@ -173,7 +110,7 @@ public:
 	///        core::rgx::Regex(R"(/phpmyadmin/)"),
 	///        core::rgx::Regex(R"(/apple-touch-icon.*\.png)")
 	///    };
-	std::vector<core::rgx::Regex> IGNORABLE_404_URLS;
+	std::vector<rgx::Regex> IGNORABLE_404_URLS;
 
 	/// A secret key for this particular installation. Used in secret-key
 	/// hashing algorithms. Set this in your settings.
@@ -293,34 +230,168 @@ public:
 	std::string SECURE_SSL_HOST;
 	bool SECURE_SSL_REDIRECT;
 
-	Settings(const std::string& base_dir);
+	explicit Settings(const std::string& base_dir);
 	virtual ~Settings() = default;
 	void init();
 	void prepare();
+	virtual std::shared_ptr<server::IServer> use_server(
+		const std::function<core::Result<std::shared_ptr<http::IHttpResponse>>(
+			http::HttpRequest* request, const int& client
+		)>& handler,
+		const collections::Dict<std::string, std::string>& kwargs
+	);
 
-	template <typename _T, typename = std::enable_if<std::is_base_of<apps::IAppConfig, _T>::value>>
+protected:
+	virtual void register_logger();
+	virtual void register_apps();
+	virtual void register_middleware();
+	virtual void register_libraries();
+	virtual void register_templates_engine();
+	virtual void register_templates_engine(const YAML::Node& config);
+	virtual void register_loaders();
+
+	template <typename T, typename = std::enable_if<std::is_base_of<apps::IAppConfig, T>::value>>
 	void app(const std::string& full_name)
 	{
-		this->_factory->register_app<_T>(full_name);
+		if (this->_apps.find(full_name) != this->_apps.end())
+		{
+			if (this->LOGGER)
+			{
+				this->LOGGER->warning(
+						"unable to register '" + full_name + "' app which already exists"
+				);
+			}
+		}
+		else
+		{
+			this->_apps[full_name] = [this]() -> std::shared_ptr<apps::IAppConfig> {
+				auto app = std::make_shared<T>(this);
+				app->init(app->__type__());
+				return app;
+			};
+		}
 	}
 
-	template <typename _T, typename = std::enable_if<std::is_base_of<middleware::IMiddleware, _T>::value>>
+	template <typename T, typename = std::enable_if<std::is_base_of<middleware::IMiddleware, T>::value>>
 	void middleware(const std::string& full_name)
 	{
-		this->_factory->register_middleware<_T>(full_name);
+		if (this->_middleware.find(full_name) != this->_middleware.end())
+		{
+			if (this->LOGGER)
+			{
+				this->LOGGER->warning(
+						"unable to register '" + full_name + "' middleware which already exists"
+				);
+			}
+		}
+		else
+		{
+			this->_middleware[full_name] = [this]() -> std::shared_ptr<middleware::IMiddleware> {
+				return std::make_shared<T>(this);
+			};
+		}
 	}
 
-	template <typename _T, typename = std::enable_if<std::is_base_of<render::lib::ILibrary, _T>::value>>
+	template <typename T, typename = std::enable_if<std::is_base_of<render::lib::ILibrary, T>::value>>
 	void library(const std::string& full_name)
 	{
-		this->_factory->register_library<_T>(full_name);
+		if (this->_libraries.find(full_name) != this->_libraries.end())
+		{
+			if (this->LOGGER)
+			{
+				this->LOGGER->warning(
+						"unable to register '" + full_name + "' library which already exists"
+				);
+			}
+		}
+		else
+		{
+			this->_libraries[full_name] = [this]() -> std::shared_ptr<render::lib::ILibrary> {
+				return std::make_shared<T>(this);
+			};
+		}
 	}
 
-	template <typename _T, typename = std::enable_if<std::is_base_of<render::ILoader, _T>::value>>
+	template <typename T, typename = std::enable_if<std::is_base_of<render::ILoader, T>::value>>
 	void loader(const std::string& full_name)
 	{
-		this->_factory->register_loader<_T>(full_name);
+		if (this->_loaders.find(full_name) != this->_loaders.end())
+		{
+			if (this->LOGGER)
+			{
+				this->LOGGER->warning(
+						"unable to register '" + full_name + "' loader which already exists"
+				);
+			}
+		}
+		else
+		{
+			this->_loaders[full_name] = [this]() -> std::shared_ptr<render::ILoader> {
+				return std::make_shared<T>(this);
+			};
+		}
 	}
+
+private:
+	const std::string CONFIG_ROOT = "application";
+	const std::string CONFIG_NAME = "config.yml";
+	const std::string LOCAL_CONFIG_NAME = "config.local.yml";
+
+	[[nodiscard]]
+	YAML::Node _load_config(const std::string& file_name) const;
+
+	// Loads local configuration file and overrides existing one.
+	static void _override_scalar(
+		YAML::Node& config, YAML::Node& local, const std::string& key
+	);
+	static void _override_sequence(
+		YAML::Node& config, YAML::Node& local, const std::string& key
+	);
+	void _override_config(YAML::Node& config);
+
+	void _init_env(YAML::Node& config);
+	void _init_logger(YAML::Node& logger);
+	void _init_allowed_hosts(YAML::Node& allowed_hosts);
+	void _init_disallowed_user_agents(YAML::Node& agents);
+	void _init_ignorable_404_urls(YAML::Node& urls);
+	void _init_formats(YAML::Node& config);
+	void _init_csrf(YAML::Node& config);
+	void _init_secure(YAML::Node& config);
+	void _init_apps(YAML::Node& apps);
+	void _init_middleware(YAML::Node& middleware);
+
+private:
+	std::map<
+		std::string,
+		std::function<std::shared_ptr<middleware::IMiddleware>()>
+	> _middleware;
+
+	std::map<
+		std::string,
+		std::function<std::shared_ptr<render::lib::ILibrary>()>
+	> _libraries;
+
+	std::map<
+		std::string,
+		std::function<std::shared_ptr<apps::IAppConfig>()>
+	> _apps;
+
+	std::map<
+		std::string,
+		std::function<std::shared_ptr<render::ILoader>()>
+	> _loaders;
+
+	[[nodiscard]]
+	std::shared_ptr<apps::IAppConfig> _get_app(const std::string& full_name) const;
+
+	[[nodiscard]]
+	std::shared_ptr<middleware::IMiddleware> _get_middleware(const std::string& full_name) const;
+
+	[[nodiscard]]
+	std::shared_ptr<render::lib::ILibrary> _get_library(const std::string& full_name) const;
+
+	[[nodiscard]]
+	std::shared_ptr<render::ILoader> _get_loader(const std::string& full_name) const;
 };
 
 __CONF_END__

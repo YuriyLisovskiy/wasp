@@ -1,32 +1,19 @@
-/*
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 /**
- * An implementation of utils/cache.h
+ * utils/cache.cpp
+ *
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  */
 
 #include "./cache.h"
 
-// Framework modules.
+// Core libraries.
+#include <xalwart.core/utility.h>
+#include <xalwart.core/string_utils.h>
+
+// Framework libraries.
 #include "./crypto/md5.h"
 #include "../http/headers.h"
 #include "./http.h"
-#include "../core/utility.h"
-#include "../core/strings.h"
 
 
 __CACHE_INTERNAL_BEGIN__
@@ -47,7 +34,7 @@ bool _if_match_passes(
 		// so there is a match to '*'.
 		return true;
 	}
-	else if (core::str::starts_with(target_etag, "W/"))
+	else if (str::starts_with(target_etag, "W/"))
 	{
 		// A weak ETag can never strongly match another ETag.
 		return false;
@@ -56,7 +43,7 @@ bool _if_match_passes(
 	{
 		// Since the ETag is strong, this will only return True
 		// if there's a strong match.
-		return core::utility::contains(target_etag, etags);
+		return utility::contains(target_etag, etags);
 	}
 }
 
@@ -79,10 +66,10 @@ bool _if_none_match_passes(
 	{
 		// The comparison should be weak, so look for a match after stripping
 		// off any weak indicators.
-		auto target_etag_copy = core::str::trim(target_etag, "W/");
+		auto target_etag_copy = str::trim(target_etag, "W/");
 		for (const auto& etag : etags)
 		{
-			if (core::str::trim(etag, "W/") == target_etag_copy)
+			if (str::trim(etag, "W/") == target_etag_copy)
 			{
 				return false;
 			}
@@ -106,12 +93,12 @@ bool _if_unmodified_since_passes(
 	return last_modified != -1 && last_modified <= if_unmodified_since;
 }
 
-std::unique_ptr<http::IHttpResponse> _precondition_failed(http::HttpRequest* request)
+std::shared_ptr<http::IHttpResponse> _precondition_failed(http::HttpRequest* request)
 {
-	return std::make_unique<http::HttpResponse>("", 412);
+	return std::make_shared<http::HttpResponse>(412);
 }
 
-std::unique_ptr<http::IHttpResponse> _not_modified(
+std::shared_ptr<http::IHttpResponse> _not_modified(
 	http::HttpRequest* request, http::IHttpResponse* response
 )
 {
@@ -165,7 +152,7 @@ void set_response_etag(http::IHttpResponse* response)
 	}
 }
 
-std::unique_ptr<http::IHttpResponse> get_conditional_response(
+std::shared_ptr<http::IHttpResponse> get_conditional_response(
 	http::HttpRequest* request,
 	const std::string& etag,
 	long last_modified,

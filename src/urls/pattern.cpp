@@ -1,28 +1,14 @@
-/*
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 /**
- * An implementation of urls/pattern.h
+ * urls/pattern.cpp
+ *
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  */
 
 #include "./pattern.h"
 
-// Framework modules.
-#include "../core/strings.h"
+// Core libraries.
+#include <xalwart.core/exceptions.h>
+#include <xalwart.core/string_utils.h>
 
 
 __URLS_BEGIN__
@@ -37,12 +23,12 @@ UrlPattern::UrlPattern(
 	this->_pattern_parts = this->_regex.parts();
 	if (!this->_pattern_parts.empty())
 	{
-		if (core::str::ends_with(this->_pattern_parts.back(), "?"))
+		if (str::ends_with(this->_pattern_parts.back(), "?"))
 		{
 			this->_pattern_parts.back().pop_back();
 		}
 
-		core::str::rtrim(this->_pattern_parts.back(), "/");
+		str::rtrim(this->_pattern_parts.back(), "/");
 	}
 
 	this->_handler = handler;
@@ -66,7 +52,7 @@ std::string UrlPattern::get_name() const
 	return this->_name;
 }
 
-std::unique_ptr<http::IHttpResponse> UrlPattern::apply(
+core::Result<std::shared_ptr<http::IHttpResponse>> UrlPattern::apply(
 	http::HttpRequest* request,
 	conf::Settings* settings,
 	views::Args* args

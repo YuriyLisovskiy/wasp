@@ -1,34 +1,20 @@
-/*
- * Copyright (c) 2020 Yuriy Lisovskiy
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 /**
  * views/template_view.h
  *
- * Purpose:
- * 	Classes for working with template responses.
+ * Copyright (c) 2020 Yuriy Lisovskiy
+ *
+ * Purpose: classes for working with template responses.
  */
 
 #pragma once
 
+// Render libraries.
+#include <xalwart.render/base.h>
+
 // Module definitions.
 #include "./_def_.h"
 
-// Framework modules.
-#include "../render/env/interfaces.h"
+// Framework libraries.
 #include "../views/view.h"
 
 
@@ -38,18 +24,16 @@ __VIEWS_BEGIN__
 class TemplateResponseMixin
 {
 protected:
-	std::string _template_name;
-	std::string _content_type;
-	render::env::IEnvironment* _env;
+	std::string template_name;
+	std::string content_type;
+	render::IEngine* engine;
 
 public:
-	explicit TemplateResponseMixin(
-		render::env::IEnvironment* env
-	);
+	explicit TemplateResponseMixin(render::IEngine* engine);
 
 	/// Returns a response with a template rendered with
 	/// the given context.
-	virtual std::unique_ptr<http::IHttpResponse> render(
+	virtual core::Result<std::shared_ptr<http::IHttpResponse>> render(
 		http::HttpRequest* request,
 		const std::shared_ptr<render::IContext>& context = nullptr,
 		const std::string& template_name = "",
@@ -76,7 +60,7 @@ public:
 		http::HttpRequest* request, Args* args
 	);
 
-	std::unique_ptr<http::IHttpResponse> get(
+	core::Result<std::shared_ptr<http::IHttpResponse>> get(
 		http::HttpRequest* request, Args* args
 	) override;
 

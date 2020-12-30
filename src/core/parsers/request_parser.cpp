@@ -1,34 +1,16 @@
-/*
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 /**
- * An implementation of core/parsers/request_parser.h
+ * core/parsers/request_parser.cpp
+ *
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  */
 
 #include "./request_parser.h"
 
 // C++ libraries.
-#include <algorithm>
 #include <cstring>
 
-// Framework modules.
-#include "./multipart_parser.h"
-#include "./query_parser.h"
-#include "../exceptions.h"
+// Core libraries.
+#include <xalwart.core/exceptions.h>
 
 #ifdef _MSC_VER
 #define strncasecmp _strnicmp
@@ -36,24 +18,22 @@
 #endif
 
 
-__CORE_INTERNAL_BEGIN__
+__PARSERS_BEGIN__
 
 // Parses http request headers from given stream.
-void request_parser::parse_headers(const std::string& data)
+void request_parser::parse_headers(const xw::string& data)
 {
 	std::string new_header_name;
 	std::string new_header_value;
-
-	std::map<std::string, std::string>::iterator connectionIt;
-
-	for (const char& input : data)
+	std::map<std::string, std::string>::iterator connection_it;
+	for (const auto& input : data)
 	{
 		switch (this->state)
 		{
 			case request_parser::state_enum::s_method_begin:
 				if (!request_parser::is_char(input) || request_parser::is_control(input) || request_parser::is_special(input))
 				{
-					throw ParseError("unable to parse method type", _ERROR_DETAILS_);
+					throw core::ParseError("unable to parse method type", _ERROR_DETAILS_);
 				}
 				else
 				{
@@ -68,7 +48,7 @@ void request_parser::parse_headers(const std::string& data)
 				}
 				else if (!request_parser::is_char(input) || request_parser::is_control(input) || request_parser::is_special(input))
 				{
-					throw ParseError("unable to parse http method type", _ERROR_DETAILS_);
+					throw core::ParseError("unable to parse http method type", _ERROR_DETAILS_);
 				}
 				else
 				{
@@ -78,7 +58,7 @@ void request_parser::parse_headers(const std::string& data)
 			case request_parser::state_enum::s_path_begin:
 				if (request_parser::is_control(input))
 				{
-					throw ParseError("unable to parse http url path", _ERROR_DETAILS_);
+					throw core::ParseError("unable to parse http url path", _ERROR_DETAILS_);
 				}
 				else
 				{
@@ -103,7 +83,7 @@ void request_parser::parse_headers(const std::string& data)
 				}
 				else if (request_parser::is_control(input))
 				{
-					throw ParseError("unable to parse http url path", _ERROR_DETAILS_);
+					throw core::ParseError("unable to parse http url path", _ERROR_DETAILS_);
 				}
 				else
 				{
@@ -128,7 +108,7 @@ void request_parser::parse_headers(const std::string& data)
 				}
 				else if (request_parser::is_control(input))
 				{
-					throw ParseError("unable to parse http url query", _ERROR_DETAILS_);
+					throw core::ParseError("unable to parse http url query", _ERROR_DETAILS_);
 				}
 				else
 				{
@@ -163,7 +143,7 @@ void request_parser::parse_headers(const std::string& data)
 				}
 				else
 				{
-					throw ParseError("unable to parse http protocol version", _ERROR_DETAILS_);
+					throw core::ParseError("unable to parse http protocol version", _ERROR_DETAILS_);
 				}
 				break;
 			case request_parser::state_enum::s_http_version_major_begin:
@@ -174,7 +154,7 @@ void request_parser::parse_headers(const std::string& data)
 				}
 				else
 				{
-					throw ParseError("unable to parse major part of http protocol version", _ERROR_DETAILS_);
+					throw core::ParseError("unable to parse major part of http protocol version", _ERROR_DETAILS_);
 				}
 				break;
 			case request_parser::state_enum::s_http_version_major:
@@ -188,7 +168,7 @@ void request_parser::parse_headers(const std::string& data)
 				}
 				else
 				{
-					throw ParseError("unable to parse major part of http protocol version", _ERROR_DETAILS_);
+					throw core::ParseError("unable to parse major part of http protocol version", _ERROR_DETAILS_);
 				}
 				break;
 			case request_parser::state_enum::s_http_version_minor_begin:
@@ -199,7 +179,7 @@ void request_parser::parse_headers(const std::string& data)
 				}
 				else
 				{
-					throw ParseError("unable to parse minor part of http protocol version", _ERROR_DETAILS_);
+					throw core::ParseError("unable to parse minor part of http protocol version", _ERROR_DETAILS_);
 				}
 				break;
 			case request_parser::state_enum::s_http_version_minor:
@@ -213,7 +193,7 @@ void request_parser::parse_headers(const std::string& data)
 				}
 				else
 				{
-					throw ParseError("unable to parse minor part of http protocol version", _ERROR_DETAILS_);
+					throw core::ParseError("unable to parse minor part of http protocol version", _ERROR_DETAILS_);
 				}
 				break;
 			case request_parser::state_enum::s_http_version_new_line:
@@ -223,7 +203,7 @@ void request_parser::parse_headers(const std::string& data)
 				}
 				else
 				{
-					throw ParseError("unable to parse http protocol main data", _ERROR_DETAILS_);
+					throw core::ParseError("unable to parse http protocol main data", _ERROR_DETAILS_);
 				}
 				break;
 			case request_parser::state_enum::s_header_line_start:
@@ -237,7 +217,7 @@ void request_parser::parse_headers(const std::string& data)
 				}
 				else if(!request_parser::is_char(input) || request_parser::is_control(input) || request_parser::is_special(input))
 				{
-					throw ParseError("unable to parse http request header", _ERROR_DETAILS_);
+					throw core::ParseError("unable to parse http request header", _ERROR_DETAILS_);
 				}
 				else
 				{
@@ -257,7 +237,7 @@ void request_parser::parse_headers(const std::string& data)
 				}
 				else if (request_parser::is_control(input))
 				{
-					throw ParseError("unable to parse http request", _ERROR_DETAILS_);
+					throw core::ParseError("unable to parse http request", _ERROR_DETAILS_);
 				}
 				else
 				{
@@ -272,7 +252,7 @@ void request_parser::parse_headers(const std::string& data)
 				}
 				else if (!request_parser::is_char(input) || request_parser::is_control(input) || request_parser::is_special(input))
 				{
-					throw ParseError("unable to parse http request header name", _ERROR_DETAILS_);
+					throw core::ParseError("unable to parse http request header name", _ERROR_DETAILS_);
 				}
 				else
 				{
@@ -286,7 +266,7 @@ void request_parser::parse_headers(const std::string& data)
 				}
 				else
 				{
-					throw ParseError("unable to parse http request header", _ERROR_DETAILS_);
+					throw core::ParseError("unable to parse http request header", _ERROR_DETAILS_);
 				}
 				break;
 			case request_parser::state_enum::s_header_value:
@@ -295,7 +275,7 @@ void request_parser::parse_headers(const std::string& data)
 					if (strcasecmp(new_header_name.c_str(), "Content-Length") == 0)
 					{
 						this->content_size = strtol(new_header_value.c_str(), nullptr, 0);
-						this->content.reserve(this->content_size);
+//						this->content.reserve(this->content_size);
 					}
 					else if (strcasecmp(new_header_name.c_str(), "Transfer-Encoding") == 0)
 					{
@@ -312,7 +292,7 @@ void request_parser::parse_headers(const std::string& data)
 				}
 				else if (request_parser::is_control(input))
 				{
-					throw ParseError("unable to parse http request header value", _ERROR_DETAILS_);
+					throw core::ParseError("unable to parse http request header value", _ERROR_DETAILS_);
 				}
 				else
 				{
@@ -326,21 +306,21 @@ void request_parser::parse_headers(const std::string& data)
 				}
 				else
 				{
-					throw ParseError("unable to parse http request", _ERROR_DETAILS_);
+					throw core::ParseError("unable to parse http request", _ERROR_DETAILS_);
 				}
 				break;
 			case request_parser::state_enum::s_expecting_new_line_3:
-				connectionIt = std::find_if(
-					this->headers.begin(),
-					this->headers.end(),
-					[](const std::pair<std::string, std::string>& item) -> bool
-					{
-						return strcasecmp(item.first.c_str(), "Connection") == 0;
-					}
+				connection_it = std::find_if(
+						this->headers.begin(),
+						this->headers.end(),
+						[](const std::pair<std::string, std::string>& item) -> bool
+						{
+							return strcasecmp(item.first.c_str(), "Connection") == 0;
+						}
 				);
-				if (connectionIt != this->headers.end())
+				if (connection_it != this->headers.end())
 				{
-					this->keep_alive = strcasecmp((*connectionIt).second.c_str(), "Keep-Alive") == 0;
+					this->keep_alive = strcasecmp((*connection_it).second.c_str(), "Keep-Alive") == 0;
 				}
 				else
 				{
@@ -358,7 +338,7 @@ void request_parser::parse_headers(const std::string& data)
 				{
 					if (input != '\n')
 					{
-						throw ParseError("unable to parse http request", _ERROR_DETAILS_);
+						throw core::ParseError("unable to parse http request", _ERROR_DETAILS_);
 					}
 				}
 				else
@@ -384,24 +364,17 @@ void request_parser::parse_headers(const std::string& data)
 				}
 				return;
 			default:
-				throw ParseError("unable to parse http request", _ERROR_DETAILS_);
+				throw core::ParseError("unable to parse http request", _ERROR_DETAILS_);
 		}
 	}
 
-	throw ParseError("unable to parse http request", _ERROR_DETAILS_);
+	throw core::ParseError("unable to parse http request", _ERROR_DETAILS_);
 }
 
 // Parses http request body from given stream.
-void request_parser::parse_body(const std::string& data, const std::string& media_root)
+void request_parser::parse_body(const xw::string& data, const xw::string& media_root)
 {
-	query_parser qp;
-	multipart_parser mp(media_root);
-	if (data.empty())
-	{
-		qp.parse(this->query);
-		this->set_parameters(qp.dict, qp.multi_dict);
-	}
-	else
+	if (strlen(data.c_str()))
 	{
 		if (this->state == request_parser::state_enum::s_request_body)
 		{
@@ -410,32 +383,6 @@ void request_parser::parse_body(const std::string& data, const std::string& medi
 		else
 		{
 			this->parse_chunks(data);
-		}
-
-		if (!this->content.empty())
-		{
-			switch (this->content_type)
-			{
-				case request_parser::content_type_enum::ct_application_x_www_form_url_encoded:
-					qp.parse(this->content);
-					this->set_parameters(qp.dict, qp.multi_dict);
-					break;
-				case request_parser::content_type_enum::ct_application_json:
-					break;
-				case request_parser::content_type_enum::ct_multipart_form_data:
-					mp.parse(this->headers["Content-Type"], this->content);
-					this->post_parameters = http::HttpRequest::Parameters(
-						mp.post_values, mp.multi_post_value
-					);
-					this->files_parameters = http::HttpRequest::Parameters(
-						mp.file_values, mp.multi_file_value
-					);
-					break;
-				case request_parser::content_type_enum::ct_other:
-					break;
-				default:
-					throw ParseError("Unknown content type", _ERROR_DETAILS_);
-			}
 		}
 	}
 }
@@ -449,31 +396,15 @@ void request_parser::parse_http_word(char input, char expected, request_parser::
 	}
 	else
 	{
-		throw ParseError("unable to parse http protocol version", _ERROR_DETAILS_);
-	}
-}
-
-// Sets parameters according to http request method.
-void request_parser::set_parameters(
-	collections::Dict<std::string, std::string>& dict,
-    collections::MultiValueDict<std::string, std::string>& multi_dict
-)
-{
-	if (this->method == "GET")
-	{
-		this->get_parameters = http::HttpRequest::Parameters(dict, multi_dict);
-	}
-	else if (this->method == "POST")
-	{
-		this->post_parameters = http::HttpRequest::Parameters(dict, multi_dict);
+		throw core::ParseError("unable to parse http protocol version", _ERROR_DETAILS_);
 	}
 }
 
 // Parses chunks from http request body if request is chunked.
 // TODO: check if parse_chunks parses chunked request properly.
-void request_parser::parse_chunks(const std::string& data)
+void request_parser::parse_chunks(const xw::string& data)
 {
-	for (const char& input : data)
+	for (const auto& input : data)
 	{
 		switch (this->state)
 		{
@@ -492,7 +423,7 @@ void request_parser::parse_chunks(const std::string& data)
 				}
 				else
 				{
-					throw ParseError("unable to parse http request", _ERROR_DETAILS_);
+					throw core::ParseError("unable to parse http request", _ERROR_DETAILS_);
 				}
 				break;
 			case request_parser::state_enum::s_chunk_extension_name:
@@ -510,7 +441,7 @@ void request_parser::parse_chunks(const std::string& data)
 				}
 				else
 				{
-					throw ParseError("unable to parse http request", _ERROR_DETAILS_);
+					throw core::ParseError("unable to parse http request", _ERROR_DETAILS_);
 				}
 				break;
 			case request_parser::state_enum::s_chunk_extension_value:
@@ -524,7 +455,7 @@ void request_parser::parse_chunks(const std::string& data)
 				}
 				else
 				{
-					throw ParseError("unable to parse http request", _ERROR_DETAILS_);
+					throw core::ParseError("unable to parse http request", _ERROR_DETAILS_);
 				}
 				break;
 			case request_parser::state_enum::s_chunk_size_new_line:
@@ -532,7 +463,7 @@ void request_parser::parse_chunks(const std::string& data)
 				{
 					this->chunk_size = strtol(this->chunk_size_str.c_str(), nullptr, 16);
 					this->chunk_size_str.clear();
-					this->content.reserve(this->content.size() + this->chunk_size);
+//					this->content.reserve(this->content.size() + this->chunk_size);
 
 					if (this->chunk_size == 0)
 					{
@@ -545,7 +476,7 @@ void request_parser::parse_chunks(const std::string& data)
 				}
 				else
 				{
-					throw ParseError("unable to parse http request", _ERROR_DETAILS_);
+					throw core::ParseError("unable to parse http request", _ERROR_DETAILS_);
 				}
 				break;
 			case request_parser::state_enum::s_chunk_size_new_line_2:
@@ -559,7 +490,7 @@ void request_parser::parse_chunks(const std::string& data)
 				}
 				else
 				{
-					throw ParseError("unable to parse http request", _ERROR_DETAILS_);
+					throw core::ParseError("unable to parse http request", _ERROR_DETAILS_);
 				}
 				break;
 			case request_parser::state_enum::s_chunk_size_new_line_3:
@@ -569,7 +500,7 @@ void request_parser::parse_chunks(const std::string& data)
 				}
 				else
 				{
-					throw ParseError("unable to parse http request", _ERROR_DETAILS_);
+					throw core::ParseError("unable to parse http request", _ERROR_DETAILS_);
 				}
 			case request_parser::state_enum::s_chunk_trailer_name:
 				if (std::isalnum(input))
@@ -582,7 +513,7 @@ void request_parser::parse_chunks(const std::string& data)
 				}
 				else
 				{
-					throw ParseError("unable to parse http request", _ERROR_DETAILS_);
+					throw core::ParseError("unable to parse http request", _ERROR_DETAILS_);
 				}
 				break;
 			case request_parser::state_enum::s_chunk_trailer_value:
@@ -596,7 +527,7 @@ void request_parser::parse_chunks(const std::string& data)
 				}
 				else
 				{
-					throw ParseError("unable to parse http request", _ERROR_DETAILS_);
+					throw core::ParseError("unable to parse http request", _ERROR_DETAILS_);
 				}
 				break;
 			case request_parser::state_enum::s_chunk_data:
@@ -613,7 +544,7 @@ void request_parser::parse_chunks(const std::string& data)
 				}
 				else
 				{
-					throw ParseError("unable to parse http request", _ERROR_DETAILS_);
+					throw core::ParseError("unable to parse http request", _ERROR_DETAILS_);
 				}
 				break;
 			case request_parser::state_enum::s_chunk_data_new_line_2:
@@ -623,15 +554,15 @@ void request_parser::parse_chunks(const std::string& data)
 				}
 				else
 				{
-					throw ParseError("unable to parse http request", _ERROR_DETAILS_);
+					throw core::ParseError("unable to parse http request", _ERROR_DETAILS_);
 				}
 				break;
 			default:
-				throw ParseError("unable to parse http request", _ERROR_DETAILS_);
+				throw core::ParseError("unable to parse http request", _ERROR_DETAILS_);
 		}
 	}
 
-	throw ParseError("unable to parse http request", _ERROR_DETAILS_);
+	throw core::ParseError("unable to parse http request", _ERROR_DETAILS_);
 }
 
 // Checks if a byte is an HTTP character.
@@ -682,4 +613,4 @@ bool request_parser::is_digit(uint c)
 	return c >= '0' && c <= '9';
 }
 
-__CORE_INTERNAL_END__
+__PARSERS_END__

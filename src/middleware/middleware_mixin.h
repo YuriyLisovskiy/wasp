@@ -1,25 +1,9 @@
-/*
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 /**
  * middleware/middleware_mixin.h
  *
- * Purpose:
- * 	Base middleware class.
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ *
+ * Purpose: base middleware class.
  */
 
 #pragma once
@@ -27,7 +11,8 @@
 // Module definitions.
 #include "./_def_.h"
 
-// Framework modules.
+// Framework libraries.
+#include "./interfaces.h"
 #include "../conf/settings.h"
 
 
@@ -38,13 +23,36 @@ class MiddlewareMixin : public IMiddleware
 protected:
 	conf::Settings* settings;
 
+protected:
+	core::Result<std::shared_ptr<http::IHttpResponse>> none();
+
+	template<typename ResponseT, typename ...Args>
+	core::Result<std::shared_ptr<http::IHttpResponse>> result(Args&& ...args)
+	{
+		return core::Result<std::shared_ptr<http::IHttpResponse>>(
+			std::make_shared<ResponseT>(std::forward<Args>(args)...)
+		);
+	}
+
+	core::Result<std::shared_ptr<http::IHttpResponse>> result(
+		const std::shared_ptr<http::IHttpResponse>& response
+	);
+
+	template<core::error_type ErrorType, typename ...Args>
+	core::Result<std::shared_ptr<http::IHttpResponse>> raise(Args&& ...args)
+	{
+		return core::raise<ErrorType, std::shared_ptr<http::IHttpResponse>>(
+			std::forward<Args>(args)...
+		);
+	}
+
 public:
 	explicit MiddlewareMixin(conf::Settings* settings);
 	MiddlewareMixin(nullptr_t) = delete;
 	~MiddlewareMixin() override = default;
 
-	std::unique_ptr<http::IHttpResponse> process_request(http::HttpRequest* request) override;
-	std::unique_ptr<http::IHttpResponse> process_response(
+	core::Result<std::shared_ptr<http::IHttpResponse>> process_request(http::HttpRequest* request) override;
+	core::Result<std::shared_ptr<http::IHttpResponse>> process_response(
 		http::HttpRequest* request, http::IHttpResponse* response
 	) override;
 };

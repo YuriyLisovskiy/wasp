@@ -1,42 +1,29 @@
-/*
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 /**
- * An implementation of http/request.h
+ * http/request.cpp
+ *
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  */
 
 #include "./request.h"
 
-// Framework modules.
+// Core libraries.
+#include <xalwart.core/exceptions.h>
+#include <xalwart.core/string_utils.h>
+
+// Framework libraries.
 #include "./headers.h"
 #include "./utility.h"
-#include "../core/strings.h"
-#include "../core/exceptions.h"
 
 
 __HTTP_BEGIN__
 
 HttpRequest::HttpRequest(
 	const std::string& method, std::string path, size_t major_v, size_t minor_v,
-	std::string query, bool keep_alive, std::string content,
+	std::string query, bool keep_alive, xw::string content,
 	const std::map<std::string, std::string>& headers,
-	const HttpRequest::Parameters<std::string, std::string>& get_params,
-	const HttpRequest::Parameters<std::string, std::string>& post_params,
-	const HttpRequest::Parameters<std::string, core::UploadedFile>& files_params
+	const HttpRequest::Parameters<std::string, xw::string>& get_params,
+	const HttpRequest::Parameters<std::string, xw::string>& post_params,
+	const HttpRequest::Parameters<std::string, files::UploadedFile>& files_params
 )
 :   _path(std::move(path)),
 	_major_version(major_v),
@@ -45,7 +32,7 @@ HttpRequest::HttpRequest(
 	_keep_alive(keep_alive),
 	_body(std::move(content))
 {
-	this->_method = core::str::upper(method);
+	this->_method = str::upper(method);
 	this->headers = collections::Dict<std::string, std::string>(headers);
 	this->GET = get_params;
 	this->POST = post_params;
@@ -65,7 +52,7 @@ std::string HttpRequest::path()
 std::string HttpRequest::full_path(bool force_append_slash)
 {
 	return this->_path +
-		(force_append_slash && !core::str::ends_with(this->_path, "/") ? "/" : "") +
+		(force_append_slash && !str::ends_with(this->_path, "/") ? "/" : "") +
 		(this->_query.empty() ? "" : "?" + this->_query);
 }
 
@@ -84,7 +71,7 @@ bool HttpRequest::keep_alive() const
 	return this->_keep_alive;
 }
 
-std::string HttpRequest::body()
+xw::string HttpRequest::body()
 {
 	return this->_body;
 }
@@ -115,7 +102,7 @@ std::string HttpRequest::scheme(
 	return "http";
 }
 
-std::string HttpRequest::get_host(
+core::Result<std::string> HttpRequest::get_host(
 	bool use_x_forwarded_host, bool debug, std::vector<std::string> allowed_hosts
 )
 {
@@ -129,7 +116,7 @@ std::string HttpRequest::get_host(
 	split_domain_port(host, domain, port);
 	if (!domain.empty() && validate_host(domain, allowed_hosts))
 	{
-		return host;
+		return core::Result(host);
 	}
 	else
 	{
@@ -143,7 +130,7 @@ std::string HttpRequest::get_host(
 			msg += " The domain name provided is not valid according to RFC 1034/1035.";
 		}
 
-		throw core::DisallowedHost(msg);
+		return core::raise<core::DisallowedHost, std::string>(msg);
 	}
 }
 

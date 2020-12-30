@@ -1,22 +1,7 @@
-/*
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 /**
  * middleware/common.h
+ *
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  *
  * Purpose:
  *  "Common" middleware takes care of some basic operations:
@@ -38,7 +23,7 @@
 // Module definitions.
 #include "./_def_.h"
 
-// Framework modules.
+// Framework libraries.
 #include "./middleware_mixin.h"
 
 
@@ -50,7 +35,7 @@ public:
 	static const std::string FULL_NAME;
 
 protected:
-	virtual std::unique_ptr<http::IHttpResponse> get_response_redirect(
+	virtual core::Result<std::shared_ptr<http::IHttpResponse>> get_response_redirect(
 		const std::string& redirect_to
 	);
 
@@ -61,7 +46,7 @@ protected:
 	/// Return the full path of the request with a trailing slash appended.
 	/// Raise a RuntimeError if settings.DEBUG is true and request method is
 	/// POST, PUT, or PATCH.
-	std::string get_full_path_with_slash(http::HttpRequest* request);
+	core::Result<std::string> get_full_path_with_slash(http::HttpRequest* request);
 
 public:
 	explicit CommonMiddleware(conf::Settings* settings);
@@ -69,11 +54,11 @@ public:
 
 	/// Check for denied User-Agents and rewrite the URL based on
 	/// settings.APPEND_SLASH and settings.PREPEND_WWW
-	std::unique_ptr<http::IHttpResponse> process_request(http::HttpRequest* request) override;
+	core::Result<std::shared_ptr<http::IHttpResponse>> process_request(http::HttpRequest* request) override;
 
 	/// When the status code of the response is 404, it may redirect to a path
 	/// with an appended slash if should_redirect_with_slash() returns true.
-	std::unique_ptr<http::IHttpResponse> process_response(
+	core::Result<std::shared_ptr<http::IHttpResponse>> process_response(
 		http::HttpRequest* request, http::IHttpResponse* response
 	) override;
 };

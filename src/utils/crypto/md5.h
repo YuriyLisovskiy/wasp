@@ -1,40 +1,38 @@
 /* MD5
- converted to C++ class by Frank Thilo (thilo@unix-ag.org)
- for bzflag (http://www.bzflag.org)
-
-   based on:
-
-   md5.h and md5.c
-   reference implementation of RFC 1321
-
-   Copyright (C) 1991-2, RSA Data Security, Inc. Created 1991. All rights reserved.
-   Copyright (C) 2020 Yuriy Lisovskiy
-
-License to copy and use this software is granted provided that it
-is identified as the "RSA Data Security, Inc. MD5 Message-Digest
-Algorithm" in all material mentioning or referencing this software
-or this function.
-
-License is also granted to make and use derivative works provided
-that such works are identified as "derived from the RSA Data
-Security, Inc. MD5 Message-Digest Algorithm" in all material
-mentioning or referencing the derived work.
-
-RSA Data Security, Inc. makes no representations concerning either
-the merchantability of this software or the suitability of this
-software for any particular purpose. It is provided "as is"
-without express or implied warranty of any kind.
-
-These notices must be retained in any copies of any part of this
-documentation and/or software.
-
-*/
+ * converted to C++ class by Frank Thilo (thilo@unix-ag.org)
+ * for bzflag (http://www.bzflag.org)
+ *
+ *    based on:
+ *
+ *    md5.h and md5.c
+ *    reference implementation of RFC 1321
+ *
+ *    Copyright (C) 1991-2, RSA Data Security, Inc. Created 1991. All rights reserved.
+ *    Copyright (C) 2020 Yuriy Lisovskiy
+ *
+ * License to copy and use this software is granted provided that it
+ * is identified as the "RSA Data Security, Inc. MD5 Message-Digest
+ * Algorithm" in all material mentioning or referencing this software
+ * or this function.
+ *
+ * License is also granted to make and use derivative works provided
+ * that such works are identified as "derived from the RSA Data
+ * Security, Inc. MD5 Message-Digest Algorithm" in all material
+ * mentioning or referencing the derived work.
+ *
+ * RSA Data Security, Inc. makes no representations concerning either
+ * the merchantability of this software or the suitability of this
+ * software for any particular purpose. It is provided "as is"
+ * without express or implied warranty of any kind.
+ *
+ * These notices must be retained in any copies of any part of this
+ * documentation and/or software.
+ */
 
 /**
  * utils/crypto/md5.h
  *
- * Purpose:
- * 	Provides md5 hash function algorithm.
+ * Purpose: Provides md5 hash function algorithm.
  */
 
 #pragma once
@@ -45,7 +43,7 @@ documentation and/or software.
 // Module definitions.
 #include "./_def_.h"
 
-// Framework modules.
+// Framework libraries.
 #include "./interfaces.h"
 
 

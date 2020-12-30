@@ -1,22 +1,7 @@
-/*
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 /**
- * An implementation of apps/xalwart.h
+ * apps/xalwart.cpp
+ *
+ * Copyright (c) 2019-2020 Yuriy Lisovskiy
  */
 
 #include "./xalwart.h"
@@ -24,9 +9,11 @@
 // C++ libraries.
 #include <iostream>
 
-// Framework modules.
-#include "../core/path.h"
-#include "../core/management/app.h"
+// Core libraries.
+#include <xalwart.core/path.h>
+
+// Framework libraries.
+#include "../management/app.h"
 
 
 __APPS_BEGIN__
@@ -48,7 +35,7 @@ MainApplication::MainApplication(conf::Settings* settings)
 
 	this->_setup_commands();
 
-	for (auto& command : this->_settings->COMMANDS)
+	for (auto& command : this->_commands)
 	{
 		this->_help_message += command.second->usage() + '\n';
 	}
@@ -69,9 +56,9 @@ void MainApplication::execute(int argc, char** argv)
 	{
 		try
 		{
-			if (this->_settings->COMMANDS.find(argv[1]) != this->_settings->COMMANDS.end())
+			if (this->_commands.find(argv[1]) != this->_commands.end())
 			{
-				this->_settings->COMMANDS[argv[1]]->run_from_argv(argc, argv);
+				this->_commands[argv[1]]->run_from_argv(argc, argv);
 			}
 			else
 			{
@@ -110,7 +97,7 @@ void MainApplication::_setup_commands()
 		);
 	}
 
-	auto default_commands = core::internal::CoreManagementAppConfig(
+	auto default_commands = management::CoreManagementAppConfig(
 		this->_settings
 	).get_commands();
 
@@ -119,32 +106,32 @@ void MainApplication::_setup_commands()
 	this->_extend_settings_commands_or_error(
 		default_commands,
 		[](const std::string& cmd_name) -> std::string {
-			return "Attempting to override '" + cmd_name + "' command which is forbidden.";
+			return "Attempting to override '" + cmd_name + "' command which may produce an undefined behaviour.";
 		}
 	);
 }
 
 void MainApplication::_extend_settings_commands_or_error(
-	const std::vector<std::shared_ptr<core::BaseCommand>>& from,
+	const std::vector<std::shared_ptr<cmd::BaseCommand>>& from,
 	const std::function<std::string(const std::string& cmd_name)>& err_fn
 )
 {
 	for (auto& command : from)
 	{
 		if (std::find_if(
-			this->_settings->COMMANDS.begin(),
-			this->_settings->COMMANDS.end(),
+			this->_commands.begin(),
+			this->_commands.end(),
 			[command](const std::pair<
-				std::string, std::shared_ptr<core::BaseCommand>
+				std::string, std::shared_ptr<cmd::BaseCommand>
 			>& pair) -> bool {
 				return command->name() == pair.first;
 			}
-		) != this->_settings->COMMANDS.end())
+		) != this->_commands.end())
 		{
-			throw core::ImproperlyConfigured(err_fn(command->name()), _ERROR_DETAILS_);
+			this->_settings->LOGGER->warning(err_fn(command->name()));
 		}
 
-		this->_settings->COMMANDS[command->name()] = command;
+		this->_commands[command->name()] = command;
 	}
 }
 
@@ -157,10 +144,10 @@ void MainApplication::_perform_checks()
 	}
 
 	size_t err_count = 0;
-	if (!this->_settings->TEMPLATES_ENV)
+	if (!this->_settings->TEMPLATES_ENGINE)
 	{
 		this->_settings->LOGGER->error(
-			"TEMPLATES_ENV instance must be configured in order to use the application."
+			"TEMPLATES_ENGINE instance must be configured in order to use the application."
 		);
 		err_count++;
 	}
@@ -168,10 +155,6 @@ void MainApplication::_perform_checks()
 	if (this->_settings->MIDDLEWARE.empty())
 	{
 		this->_settings->LOGGER->warning("You have not added any middleware.");
-//		this->_settings->LOGGER->error(
-//			"MIDDLEWARE must be configured in order to use the application."
-//		);
-//		err_count++;
 	}
 
 	if (this->_settings->BASE_DIR.empty())
@@ -181,7 +164,7 @@ void MainApplication::_perform_checks()
 		);
 		err_count++;
 	}
-	else if (!core::path::exists(this->_settings->BASE_DIR))
+	else if (!path::exists(this->_settings->BASE_DIR))
 	{
 		this->_settings->LOGGER->error(
 			"BASE_DIR must exist in order to use the application."
