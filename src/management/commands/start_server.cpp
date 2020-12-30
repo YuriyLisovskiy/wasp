@@ -166,11 +166,8 @@ std::function<
 							);
 							if (middleware_result.catch_(core::HttpError) || middleware_result.value)
 							{
-								if (middleware_result.catch_(core::HttpError))
+								if (middleware_result.err)
 								{
-									this->settings->LOGGER->error(
-										middleware_result.err.msg, middleware_result.err.line, middleware_result.err.func, middleware_result.err.file
-									);
 									this->settings->LOGGER->error(middleware_result.err.msg, _ERROR_DETAILS_);
 								}
 
@@ -180,15 +177,27 @@ std::function<
 						else
 						{
 							auto e = result.value->err();
-							this->settings->LOGGER->error(e.msg, e.line, e.func, e.file);
-							this->settings->LOGGER->error(e.msg, _ERROR_DETAILS_);
+							if (e)
+							{
+								this->settings->LOGGER->error(e.msg, e.line, e.func, e.file);
+								this->settings->LOGGER->error(e.msg, _ERROR_DETAILS_);
+							}
+
+							this->settings->LOGGER->error("e is nullptr", _ERROR_DETAILS_);
 						}
 					}
 				}
 				else
 				{
-					this->settings->LOGGER->error(result.err.msg, result.err.line, result.err.func, result.err.file);
-					this->settings->LOGGER->error(result.err.msg, _ERROR_DETAILS_);
+					if (result.err)
+					{
+						this->settings->LOGGER->error(result.err.msg, result.err.line, result.err.func, result.err.file);
+						this->settings->LOGGER->error(result.err.msg, _ERROR_DETAILS_);
+					}
+					else
+					{
+						this->settings->LOGGER->error("result.err.msg is nullptr", _ERROR_DETAILS_);
+					}
 				}
 			}
 			else if (!result.value)
@@ -197,8 +206,15 @@ std::function<
 			}
 			else
 			{
-				this->settings->LOGGER->error(result.err.msg, result.err.line, result.err.func, result.err.file);
-				this->settings->LOGGER->error(result.err.msg, _ERROR_DETAILS_);
+				if (result.err)
+				{
+					this->settings->LOGGER->error(result.err.msg, result.err.line, result.err.func, result.err.file);
+					this->settings->LOGGER->error(result.err.msg, _ERROR_DETAILS_);
+				}
+				else
+				{
+					this->settings->LOGGER->error("result.err.msg is nullptr", _ERROR_DETAILS_);
+				}
 			}
 		}
 		catch (const core::BaseException& exc)
