@@ -184,10 +184,6 @@ std::function<
 					std::cerr << result.err << '\n';
 				}
 			}
-			else if (!result.value)
-			{
-				this->settings->LOGGER->error(std::to_string(result.value->status()), _ERROR_DETAILS_);
-			}
 			else
 			{
 				std::cerr << result.err << '\n';
