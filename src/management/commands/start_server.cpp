@@ -6,6 +6,8 @@
 
 #include "./start_server.h"
 
+#include <iostream>
+
 // Core libraries.
 #include <xalwart.core/string_utils.h>
 #include <xalwart.core/result.h>
@@ -166,38 +168,20 @@ std::function<
 							);
 							if (middleware_result.catch_(core::HttpError) || middleware_result.value)
 							{
-								if (middleware_result.err)
-								{
-									this->settings->LOGGER->error(middleware_result.err.msg, _ERROR_DETAILS_);
-								}
-
+								std::cerr << middleware_result.err << '\n';
 								result = middleware_result;
 							}
 						}
 						else
 						{
 							auto e = result.value->err();
-							if (e)
-							{
-								this->settings->LOGGER->error(e.msg, e.line, e.func, e.file);
-								this->settings->LOGGER->error(e.msg, _ERROR_DETAILS_);
-							}
-
-							this->settings->LOGGER->error("e is nullptr", _ERROR_DETAILS_);
+							std::cerr << e << '\n';
 						}
 					}
 				}
 				else
 				{
-					if (result.err)
-					{
-						this->settings->LOGGER->error(result.err.msg, result.err.line, result.err.func, result.err.file);
-						this->settings->LOGGER->error(result.err.msg, _ERROR_DETAILS_);
-					}
-					else
-					{
-						this->settings->LOGGER->error("result.err.msg is nullptr", _ERROR_DETAILS_);
-					}
+					std::cerr << result.err << '\n';
 				}
 			}
 			else if (!result.value)
@@ -206,15 +190,7 @@ std::function<
 			}
 			else
 			{
-				if (result.err)
-				{
-					this->settings->LOGGER->error(result.err.msg, result.err.line, result.err.func, result.err.file);
-					this->settings->LOGGER->error(result.err.msg, _ERROR_DETAILS_);
-				}
-				else
-				{
-					this->settings->LOGGER->error("result.err.msg is nullptr", _ERROR_DETAILS_);
-				}
+				std::cerr << result.err << '\n';
 			}
 		}
 		catch (const core::BaseException& exc)
