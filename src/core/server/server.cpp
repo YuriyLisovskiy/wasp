@@ -31,7 +31,11 @@ HandlerFunc DefaultServer::_make_handler()
 		if (err)
 		{
 			xw::core::Error fail;
-			if ((fail = this->send(sock, _from_error(err)->serialize().c_str())))
+			auto err_resp = _from_error(err)->serialize();
+
+			this->ctx.logger->warning(err_resp, _ERROR_DETAILS_);
+
+			if ((fail = this->send(sock, err_resp.c_str())))
 			{
 				this->ctx.logger->error(fail.msg);
 			}
@@ -44,17 +48,20 @@ HandlerFunc DefaultServer::_make_handler()
 			if (result.catch_(core::HttpError))
 			{
 				response = _from_error(&result.err);
+				this->ctx.logger->warning(result.err.msg, _ERROR_DETAILS_);
 			}
 			else if (!result.value)
 			{
 				// Response was not instantiated, so return 204 - No Content.
 				response = std::make_shared<http::HttpResponse>(204);
+				this->ctx.logger->warning(std::to_string(response->status()), _ERROR_DETAILS_);
 			}
 			else
 			{
 				auto error = result.value->err();
 				if (error)
 				{
+					this->ctx.logger->warning(error.msg, _ERROR_DETAILS_);
 					response = _from_error(&error);
 				}
 				else
