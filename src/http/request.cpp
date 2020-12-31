@@ -141,9 +141,18 @@ std::string HttpRequest::get_raw_host(bool use_x_forwarded_host) const
 	{
 		host = this->headers.get(http::X_FORWARDED_HOST);
 	}
-	else
+	else if (this->headers.contains(http::HOST))
 	{
 		host = this->headers.get(http::HOST);
+	}
+	else
+	{
+		// TODO:
+		// # Reconstruct the host using the algorithm from PEP 333.
+		// host = self.META['SERVER_NAME']
+		// server_port = self.get_port()
+		// if server_port != ('443' if self.is_secure() else '80'):
+		// host = '%s:%s' % (host, server_port)
 	}
 
 	return host;

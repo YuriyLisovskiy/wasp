@@ -6,10 +6,10 @@
 
 #include "./server.h"
 
+#include <iostream>
+
 // Core libraries.
 #include <xalwart.core/datetime.h>
-
-#include <utility>
 
 // Framework libraries.
 #include "../parsers/query_parser.h"
@@ -31,11 +31,11 @@ HandlerFunc DefaultServer::_make_handler()
 		if (err)
 		{
 			xw::core::Error fail;
-			auto err_resp = _from_error(err)->serialize();
+			auto err_resp = _from_error(err);
 
-			this->ctx.logger->warning(err_resp, _ERROR_DETAILS_);
+			std::cerr << err_resp->status() << ", Line: " << __LINE__ << ", File: " << __FILE__ << '\n';
 
-			if ((fail = this->send(sock, err_resp.c_str())))
+			if ((fail = this->send(sock, err_resp->serialize().c_str())))
 			{
 				this->ctx.logger->error(fail.msg);
 			}
@@ -48,7 +48,7 @@ HandlerFunc DefaultServer::_make_handler()
 			if (result.catch_(core::HttpError))
 			{
 				response = _from_error(&result.err);
-				this->ctx.logger->warning(result.err.msg, _ERROR_DETAILS_);
+				std::cerr << result.err.msg << ", Line: " << __LINE__ << ", File: " << __FILE__ << '\n';
 			}
 			else if (!result.value)
 			{
@@ -61,7 +61,7 @@ HandlerFunc DefaultServer::_make_handler()
 				auto error = result.value->err();
 				if (error)
 				{
-					this->ctx.logger->warning(error.msg, _ERROR_DETAILS_);
+					std::cerr << error.msg << ", Line: " << __LINE__ << ", File: " << __FILE__ << '\n';
 					response = _from_error(&error);
 				}
 				else

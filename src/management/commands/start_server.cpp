@@ -168,24 +168,24 @@ std::function<
 							);
 							if (middleware_result.catch_(core::HttpError) || middleware_result.value)
 							{
-								std::cerr << middleware_result.err << __LINE__ << '\n';
+								std::cerr << middleware_result.err << ", Line: " << __LINE__ << ", File: " << __FILE__ << '\n';
 								result = middleware_result;
 							}
 						}
 						else
 						{
-							std::cerr << result.value->err() << __LINE__ << '\n';
+							std::cerr << result.value->err() << ", Line: " << __LINE__ << ", File: " << __FILE__ << '\n';
 						}
 					}
 				}
 				else
 				{
-					std::cerr << result.err << __LINE__ << '\n';
+					std::cerr << result.err << ", Line: " << __LINE__ << ", File: " << __FILE__ << '\n';
 				}
 			}
 			else
 			{
-				std::cerr << result.err << __LINE__ << '\n';
+				std::cerr << result.err << ", Line: " << __LINE__ << ", File: " << __FILE__ << '\n';
 			}
 		}
 		catch (const core::BaseException& exc)
