@@ -17,7 +17,13 @@
 #include "./_def_.h"
 
 // Framework libraries.
+#include "../conf/_def_.h"
 #include "../core/uploaded_file.h"
+
+
+__CONF_BEGIN__
+struct Settings;
+__CONF_END__
 
 
 __HTTP_BEGIN__
@@ -80,14 +86,16 @@ public:
 		}
 	};
 
-	HttpRequest() : _major_version(0), _minor_version(0), _keep_alive(false) {};
+//	HttpRequest() : _major_version(0), _minor_version(0), _keep_alive(false) {};
 	explicit HttpRequest(
+		const conf::Settings* settings,
 		const std::string& method, std::string path, size_t major_v, size_t minor_v,
 		std::string query, bool keep_alive, xw::string content,
 		const std::map<std::string, std::string>& headers,
 		const HttpRequest::Parameters<std::string, xw::string>& get_params,
 		const HttpRequest::Parameters<std::string, xw::string>& post_params,
-		const HttpRequest::Parameters<std::string, files::UploadedFile>& files_params
+		const HttpRequest::Parameters<std::string, files::UploadedFile>& files_params,
+		const collections::Dict<std::string, std::string>& meta_params
 	);
 
 	collections::Dict<std::string, std::string> headers;
@@ -95,6 +103,7 @@ public:
 	HttpRequest::Parameters<std::string, xw::string> POST;
 	collections::Dict<std::string, std::string> COOKIES;
 	HttpRequest::Parameters<std::string, files::UploadedFile> FILES;
+	collections::Dict<std::string, std::string> META;
 
 	[[nodiscard]]
 	std::string version() const;
@@ -111,14 +120,23 @@ public:
 
 	/// Return the HTTP host using the environment or request headers.
 	core::Result<std::string> get_host(
-		bool use_x_forwarded_host, bool debug, std::vector<std::string> allowed_hosts
+		bool use_x_forwarded_host, bool use_x_forwarded_port,
+		bool debug, std::vector<std::string> allowed_hosts
 	);
 
 protected:
-	/// Return the HTTP host using the environment or request headers. Skip
-	/// allowed hosts protection, so may return an insecure host.
+	// Return the HTTP host using the environment or request headers. Skip
+	// allowed hosts protection, so may return an insecure host.
 	[[nodiscard]]
-	std::string get_raw_host(bool use_x_forwarded_host) const;
+	std::string get_raw_host(
+		bool use_x_forwarded_host, bool use_x_forwarded_port
+	) const;
+
+	[[nodiscard]]
+	std::string get_port(bool use_x_forwarded_port) const;
+
+protected:
+	const conf::Settings* settings;
 
 private:
 	size_t _major_version;

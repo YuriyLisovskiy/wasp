@@ -39,6 +39,8 @@ private:
 	HandlerFunc _handler;
 
 protected:
+	const char* host;
+	uint16_t port;
 	Context ctx;
 
 public:

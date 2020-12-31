@@ -50,6 +50,8 @@ const std::string STRICT_TRANSPORT_SECURITY = "Strict-Transport-Security";
 
 const std::string X_FRAME_OPTIONS = "X-Frame-Options";
 const std::string X_FORWARDED_HOST = "X-Forwarded-Host";
+const std::string X_FORWARDED_PORT = "X-Forwarded-Port";
+const std::string X_FORWARDED_PROTO = "X-Forwarded-Proto";
 const std::string X_XSS_PROTECTION = "X-XSS-Protection";
 const std::string X_CONTENT_TYPE_OPTIONS = "X-Content-Type-Options";
 

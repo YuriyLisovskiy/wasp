@@ -61,6 +61,7 @@ core::Result<std::shared_ptr<http::IHttpResponse>> SecurityMiddleware::process_r
 		{
 			auto result = request->get_host(
 				this->settings->USE_X_FORWARDED_HOST,
+				this->settings->USE_X_FORWARDED_PORT,
 				this->settings->DEBUG,
 				this->settings->ALLOWED_HOSTS
 			);

@@ -18,7 +18,7 @@
 using namespace xw;
 
 
-http::HttpRequest make_request(const std::string& method)
+http::HttpRequest make_request(const conf::Settings* settings, const std::string& method)
 {
 	auto empty_parameters = http::HttpRequest::Parameters<std::string, xw::string>(
 		collections::Dict<std::string, xw::string>(),
@@ -27,6 +27,7 @@ http::HttpRequest make_request(const std::string& method)
 
 	auto empty_map = std::map<std::string, std::string>();
 	return http::HttpRequest(
+		settings,
 		method,
 		"/hello",
 		1, 1,
@@ -39,7 +40,8 @@ http::HttpRequest make_request(const std::string& method)
 		http::HttpRequest::Parameters<std::string, files::UploadedFile>(
 			collections::Dict<std::string, files::UploadedFile>(),
 			collections::MultiValueDict<std::string, files::UploadedFile>()
-		)
+		),
+		{}
 	);
 }
 
@@ -86,7 +88,7 @@ protected:
 
 TEST_F(RedirectViewWithDefaultParamsTestCase, GetTest)
 {
-	auto request = make_request("get");
+	auto request = make_request(this->settings, "get");
 	this->view->setup(&request);
 	auto response = this->view->get(&request, nullptr);
 
@@ -95,7 +97,7 @@ TEST_F(RedirectViewWithDefaultParamsTestCase, GetTest)
 
 TEST_F(RedirectViewWithDefaultParamsTestCase, PostTest)
 {
-	auto request = make_request("post");
+	auto request = make_request(this->settings, "post");
 	this->view->setup(&request);
 	auto response = this->view->post(&request, nullptr);
 
@@ -104,7 +106,7 @@ TEST_F(RedirectViewWithDefaultParamsTestCase, PostTest)
 
 TEST_F(RedirectViewWithDefaultParamsTestCase, PutTest)
 {
-	auto request = make_request("put");
+	auto request = make_request(this->settings, "put");
 	this->view->setup(&request);
 	auto response = this->view->put(&request, nullptr);
 
@@ -113,7 +115,7 @@ TEST_F(RedirectViewWithDefaultParamsTestCase, PutTest)
 
 TEST_F(RedirectViewWithDefaultParamsTestCase, PatchTest)
 {
-	auto request = make_request("patch");
+	auto request = make_request(this->settings, "patch");
 	this->view->setup(&request);
 	auto response = this->view->patch(&request, nullptr);
 
@@ -122,7 +124,7 @@ TEST_F(RedirectViewWithDefaultParamsTestCase, PatchTest)
 
 TEST_F(RedirectViewWithDefaultParamsTestCase, DeleteTest)
 {
-	auto request = make_request("delete");
+	auto request = make_request(this->settings, "delete");
 	this->view->setup(&request);
 	auto response = this->view->delete_(&request, nullptr);
 
@@ -131,7 +133,7 @@ TEST_F(RedirectViewWithDefaultParamsTestCase, DeleteTest)
 
 TEST_F(RedirectViewWithDefaultParamsTestCase, HeadTest)
 {
-	auto request = make_request("head");
+	auto request = make_request(this->settings, "head");
 	this->view->setup(&request);
 	auto response = this->view->head(&request, nullptr);
 
@@ -140,7 +142,7 @@ TEST_F(RedirectViewWithDefaultParamsTestCase, HeadTest)
 
 TEST_F(RedirectViewWithDefaultParamsTestCase, OptionsTest)
 {
-	auto request = make_request("options");
+	auto request = make_request(this->settings, "options");
 	this->view->setup(&request);
 	auto response = this->view->options(&request, nullptr);
 
@@ -149,7 +151,7 @@ TEST_F(RedirectViewWithDefaultParamsTestCase, OptionsTest)
 
 TEST_F(RedirectViewWithDefaultParamsTestCase, TraceTest)
 {
-	auto request = make_request("trace");
+	auto request = make_request(this->settings, "trace");
 	auto response = this->view->trace(&request, nullptr);
 
 	ASSERT_EQ(response.value, nullptr);
@@ -170,7 +172,7 @@ TEST_F(RedirectViewWithDefaultParamsTestCase, AllowedMethodsTest)
 
 TEST_F(RedirectViewWithDefaultParamsTestCase, SetupAndDispatchAllowedTest)
 {
-	auto request = make_request("get");
+	auto request = make_request(this->settings, "get");
 
 	ASSERT_THROW(this->view->dispatch(nullptr), core::NullPointerException);
 
@@ -183,7 +185,7 @@ TEST_F(RedirectViewWithDefaultParamsTestCase, SetupAndDispatchAllowedTest)
 
 TEST_F(RedirectViewWithDefaultParamsTestCase, DispatchTraceNotAllowedTest)
 {
-	auto request = make_request("trace");
+	auto request = make_request(this->settings, "trace");
 	this->view->setup(&request);
 
 	auto response = this->view->dispatch(nullptr);
@@ -193,7 +195,7 @@ TEST_F(RedirectViewWithDefaultParamsTestCase, DispatchTraceNotAllowedTest)
 
 TEST_F(RedirectViewWithDefaultParamsTestCase, GetRedirectUrlTest)
 {
-	auto request = make_request("get");
+	auto request = make_request(this->settings, "get");
 	this->view->setup(&request);
 	ASSERT_EQ(this->view->get_redirect_url(), "/hello");
 }
@@ -223,7 +225,7 @@ protected:
 
 TEST_F(RedirectViewPermanentAndQueryStringTestCase, GetTest)
 {
-	auto request = make_request("get");
+	auto request = make_request(this->settings, "get");
 	this->view->setup(&request);
 	auto response = this->view->get(&request, nullptr);
 
@@ -232,7 +234,7 @@ TEST_F(RedirectViewPermanentAndQueryStringTestCase, GetTest)
 
 TEST_F(RedirectViewPermanentAndQueryStringTestCase, PostTest)
 {
-	auto request = make_request("post");
+	auto request = make_request(this->settings, "post");
 	this->view->setup(&request);
 	auto response = this->view->post(&request, nullptr);
 
@@ -241,7 +243,7 @@ TEST_F(RedirectViewPermanentAndQueryStringTestCase, PostTest)
 
 TEST_F(RedirectViewPermanentAndQueryStringTestCase, PutTest)
 {
-	auto request = make_request("put");
+	auto request = make_request(this->settings, "put");
 	this->view->setup(&request);
 	auto response = this->view->put(&request, nullptr);
 
@@ -250,7 +252,7 @@ TEST_F(RedirectViewPermanentAndQueryStringTestCase, PutTest)
 
 TEST_F(RedirectViewPermanentAndQueryStringTestCase, PatchTest)
 {
-	auto request = make_request("patch");
+	auto request = make_request(this->settings, "patch");
 	this->view->setup(&request);
 	auto response = this->view->patch(&request, nullptr);
 
@@ -259,7 +261,7 @@ TEST_F(RedirectViewPermanentAndQueryStringTestCase, PatchTest)
 
 TEST_F(RedirectViewPermanentAndQueryStringTestCase, DeleteTest)
 {
-	auto request = make_request("delete");
+	auto request = make_request(this->settings, "delete");
 	this->view->setup(&request);
 	auto response = this->view->delete_(&request, nullptr);
 
@@ -268,7 +270,7 @@ TEST_F(RedirectViewPermanentAndQueryStringTestCase, DeleteTest)
 
 TEST_F(RedirectViewPermanentAndQueryStringTestCase, HeadTest)
 {
-	auto request = make_request("head");
+	auto request = make_request(this->settings, "head");
 	this->view->setup(&request);
 	auto response = this->view->head(&request, nullptr);
 
@@ -277,7 +279,7 @@ TEST_F(RedirectViewPermanentAndQueryStringTestCase, HeadTest)
 
 TEST_F(RedirectViewPermanentAndQueryStringTestCase, OptionsTest)
 {
-	auto request = make_request("options");
+	auto request = make_request(this->settings, "options");
 	this->view->setup(&request);
 	auto response = this->view->options(&request, nullptr);
 
@@ -292,6 +294,7 @@ TEST_F(RedirectViewPermanentAndQueryStringTestCase, GetRedirectUrlTest)
 	);
 	auto empty_map = std::map<std::string, std::string>();
 	auto* request = new http::HttpRequest(
+		this->settings,
 		"get",
 		"/hello",
 		1, 1,
@@ -304,7 +307,8 @@ TEST_F(RedirectViewPermanentAndQueryStringTestCase, GetRedirectUrlTest)
 		http::HttpRequest::Parameters<std::string, files::UploadedFile>(
 			collections::Dict<std::string, files::UploadedFile>(),
 			collections::MultiValueDict<std::string, files::UploadedFile>()
-		)
+		),
+		{}
 	);
 	this->view->setup(request);
 
@@ -336,7 +340,7 @@ protected:
 
 TEST_F(RedirectViewEmptyUrlTestCase, GetTest)
 {
-	auto request = make_request("get");
+	auto request = make_request(this->settings, "get");
 	this->view->setup(&request);
 	auto response = this->view->get(&request, nullptr);
 
@@ -345,7 +349,7 @@ TEST_F(RedirectViewEmptyUrlTestCase, GetTest)
 
 TEST_F(RedirectViewEmptyUrlTestCase, PostTest)
 {
-	auto request = make_request("post");
+	auto request = make_request(this->settings, "post");
 	this->view->setup(&request);
 	auto response = this->view->post(&request, nullptr);
 
@@ -354,7 +358,7 @@ TEST_F(RedirectViewEmptyUrlTestCase, PostTest)
 
 TEST_F(RedirectViewEmptyUrlTestCase, PutTest)
 {
-	auto request = make_request("put");
+	auto request = make_request(this->settings, "put");
 	this->view->setup(&request);
 	auto response = this->view->put(&request, nullptr);
 
@@ -363,7 +367,7 @@ TEST_F(RedirectViewEmptyUrlTestCase, PutTest)
 
 TEST_F(RedirectViewEmptyUrlTestCase, PatchTest)
 {
-	auto request = make_request("patch");
+	auto request = make_request(this->settings, "patch");
 	this->view->setup(&request);
 	auto response = this->view->patch(&request, nullptr);
 
@@ -372,7 +376,7 @@ TEST_F(RedirectViewEmptyUrlTestCase, PatchTest)
 
 TEST_F(RedirectViewEmptyUrlTestCase, DeleteTest)
 {
-	auto request = make_request("delete");
+	auto request = make_request(this->settings, "delete");
 	this->view->setup(&request);
 	auto response = this->view->delete_(&request, nullptr);
 
@@ -381,7 +385,7 @@ TEST_F(RedirectViewEmptyUrlTestCase, DeleteTest)
 
 TEST_F(RedirectViewEmptyUrlTestCase, HeadTest)
 {
-	auto request = make_request("head");
+	auto request = make_request(this->settings, "head");
 	this->view->setup(&request);
 	auto response = this->view->head(&request, nullptr);
 
@@ -390,7 +394,7 @@ TEST_F(RedirectViewEmptyUrlTestCase, HeadTest)
 
 TEST_F(RedirectViewEmptyUrlTestCase, OptionsTest)
 {
-	auto request = make_request("options");
+	auto request = make_request(this->settings, "options");
 	this->view->setup(&request);
 	auto response = this->view->options(&request, nullptr);
 
@@ -399,7 +403,7 @@ TEST_F(RedirectViewEmptyUrlTestCase, OptionsTest)
 
 TEST_F(RedirectViewEmptyUrlTestCase, GetRedirectUrlTest)
 {
-	auto request = make_request("get");
+	auto request = make_request(this->settings, "get");
 	this->view->setup(&request);
 
 	ASSERT_EQ(this->view->get_redirect_url(), "");

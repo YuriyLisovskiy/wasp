@@ -947,6 +947,7 @@ void Settings::prepare()
 }
 
 std::shared_ptr<server::IServer> Settings::use_server(
+	const Settings* settings,
 	const std::function<core::Result<std::shared_ptr<http::IHttpResponse>>(
 		http::HttpRequest*, const int&
 	)>& handler,

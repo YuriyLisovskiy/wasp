@@ -15,6 +15,7 @@
 #include "./base_server.h"
 #include "../../http/request.h"
 #include "../../http/response.h"
+#include "../../conf/settings.h"
 
 
 __SERVER_BEGIN__
@@ -26,7 +27,14 @@ typedef std::function<
 class DefaultServer : public HTTPServer
 {
 public:
-	explicit DefaultServer(const Context& ctx, HttpHandlerFunc  handler);
+	explicit DefaultServer(
+		const Context& ctx,
+		HttpHandlerFunc handler,
+		const conf::Settings* settings
+	);
+
+protected:
+	const conf::Settings* settings;
 
 private:
 	HttpHandlerFunc _http_handler;

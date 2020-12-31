@@ -235,6 +235,7 @@ public:
 	void init();
 	void prepare();
 	virtual std::shared_ptr<server::IServer> use_server(
+		const Settings* settings,
 		const std::function<core::Result<std::shared_ptr<http::IHttpResponse>>(
 			http::HttpRequest* request, const int& client
 		)>& handler,

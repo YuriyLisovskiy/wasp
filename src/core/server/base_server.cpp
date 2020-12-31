@@ -96,6 +96,8 @@ bool HTTPServer::_bind(uint16_t port)
 
 bool HTTPServer::_bind(const char* address, uint16_t port)
 {
+	this->host = address;
+	this->port = port;
 	this->use_ipv6 = false;
 	if (inet_pton(AF_INET, address, &this->addr.sin_addr) <= 0)
 	{
@@ -123,6 +125,8 @@ bool HTTPServer::_bind6(uint16_t port)
 
 bool HTTPServer::_bind6(const char* address, uint16_t port)
 {
+	this->host = address;
+	this->port = port;
 	this->use_ipv6 = true;
 	if (inet_pton(AF_INET6, address, &this->addr6.sin6_addr) <= 0)
 	{

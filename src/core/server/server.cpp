@@ -12,6 +12,7 @@
 #include <xalwart.core/datetime.h>
 
 // Framework libraries.
+#include "../../http/meta.h"
 #include "../parsers/query_parser.h"
 #include "../parsers/multipart_parser.h"
 
@@ -19,8 +20,8 @@
 __SERVER_BEGIN__
 
 DefaultServer::DefaultServer(
-	const Context& ctx, HttpHandlerFunc handler
-) : HTTPServer(ctx, this->_make_handler()), _http_handler(std::move(handler))
+	const Context& ctx, HttpHandlerFunc handler, const conf::Settings* settings
+) : HTTPServer(ctx, this->_make_handler()), _http_handler(std::move(handler)), settings(settings)
 {
 }
 
@@ -127,6 +128,7 @@ std::shared_ptr<http::HttpRequest> DefaultServer::_process_request(parsers::requ
 	}
 
 	return std::make_shared<http::HttpRequest>(
+		this->settings,
 		parser->method,
 		parser->path,
 		parser->major_v,
@@ -137,7 +139,11 @@ std::shared_ptr<http::HttpRequest> DefaultServer::_process_request(parsers::requ
 		parser->headers,
 		get_params,
 		post_params,
-		files_params
+		files_params,
+		collections::Dict<std::string, std::string>{{
+			{meta::SERVER_HOST, this->host},
+			{meta::SERVER_PORT, std::to_string(this->port)},
+		}}
 	);
 }
 

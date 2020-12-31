@@ -40,7 +40,7 @@ struct ViewTestSettings : public conf::Settings
 class ViewTestCase : public ::testing::Test
 {
 public:
-	static http::HttpRequest make_request(const std::string& method)
+	static http::HttpRequest make_request(const conf::Settings* settings, const std::string& method)
 	{
 		auto empty_parameters = http::HttpRequest::Parameters<std::string, xw::string>(
 			collections::Dict<std::string, xw::string>(),
@@ -48,6 +48,7 @@ public:
 		);
 		auto empty_map = std::map<std::string, std::string>();
 		return http::HttpRequest(
+			settings,
 			method,
 			"/hello",
 			1, 1,
@@ -60,7 +61,8 @@ public:
 			http::HttpRequest::Parameters<std::string, files::UploadedFile>(
 				collections::Dict<std::string, files::UploadedFile>(),
 				collections::MultiValueDict<std::string, files::UploadedFile>()
-			)
+			),
+			{}
 		);
 	}
 
@@ -84,7 +86,7 @@ protected:
 
 TEST_F(ViewTestCase, GetTestReturnsNullptr)
 {
-	auto request = ViewTestCase::make_request("get");
+	auto request = ViewTestCase::make_request(this->settings, "get");
 	auto response = this->view->get(&request, nullptr);
 
 	ASSERT_EQ(response.value, nullptr);
@@ -92,31 +94,31 @@ TEST_F(ViewTestCase, GetTestReturnsNullptr)
 
 TEST_F(ViewTestCase, PostTestReturnsNullptr)
 {
-	auto request = ViewTestCase::make_request("post");
+	auto request = ViewTestCase::make_request(this->settings, "post");
 	ASSERT_EQ(this->view->post(&request, nullptr).value, nullptr);
 }
 
 TEST_F(ViewTestCase, PutTestReturnsNullptr)
 {
-	auto request = ViewTestCase::make_request("put");
+	auto request = ViewTestCase::make_request(this->settings, "put");
 	ASSERT_EQ(this->view->put(&request, nullptr).value, nullptr);
 }
 
 TEST_F(ViewTestCase, PatchTestReturnsNullptr)
 {
-	auto request = ViewTestCase::make_request("patch");
+	auto request = ViewTestCase::make_request(this->settings, "patch");
 	ASSERT_EQ(this->view->patch(&request, nullptr).value, nullptr);
 }
 
 TEST_F(ViewTestCase, DeleteTestReturnsNullptr)
 {
-	auto request = ViewTestCase::make_request("delete");
+	auto request = ViewTestCase::make_request(this->settings, "delete");
 	ASSERT_EQ(this->view->delete_(&request, nullptr).value, nullptr);
 }
 
 TEST_F(ViewTestCase, HeadTestReturnsNullptr)
 {
-	auto request = ViewTestCase::make_request("head");
+	auto request = ViewTestCase::make_request(this->settings, "head");
 	ASSERT_EQ(this->view->head(&request, nullptr).value, nullptr);
 }
 
@@ -130,7 +132,7 @@ TEST_F(ViewTestCase, OptionsTest)
 	);
 	expected_response.set_header("Content-Length", "0");
 
-	auto request = ViewTestCase::make_request("options");
+	auto request = ViewTestCase::make_request(this->settings, "options");
 	auto actual_response = this->view->options(&request, nullptr);
 
 	ASSERT_EQ(actual_response.value->content_type(), expected_response.content_type());
@@ -140,7 +142,7 @@ TEST_F(ViewTestCase, OptionsTest)
 
 TEST_F(ViewTestCase, TraceTestReturnsNullptr)
 {
-	auto request = ViewTestCase::make_request("trace");
+	auto request = ViewTestCase::make_request(this->settings, "trace");
 	ASSERT_EQ(this->view->trace(&request, nullptr).value, nullptr);
 }
 
@@ -159,7 +161,7 @@ TEST_F(ViewTestCase, AllowedMethodsTest)
 
 TEST_F(ViewTestCase, SetupAndDispatchAllowedTest)
 {
-	auto request = ViewTestCase::make_request("options");
+	auto request = ViewTestCase::make_request(this->settings, "options");
 
 	ASSERT_THROW(this->view->dispatch(nullptr), core::NullPointerException);
 
@@ -171,7 +173,7 @@ TEST_F(ViewTestCase, SetupAndDispatchAllowedTest)
 
 TEST_F(ViewTestCase, DispatchNotAllowedTest)
 {
-	auto request = ViewTestCase::make_request("get");
+	auto request = ViewTestCase::make_request(this->settings, "get");
 	this->view->setup(&request);
 
 	auto response = this->view->dispatch(nullptr);

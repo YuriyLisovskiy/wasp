@@ -59,6 +59,7 @@ core::Result<std::string> CommonMiddleware::get_full_path_with_slash(http::HttpR
 		auto method = request->method();
 		auto result = request->get_host(
 			this->settings->USE_X_FORWARDED_HOST,
+			this->settings->USE_X_FORWARDED_PORT,
 			this->settings->DEBUG,
 			this->settings->ALLOWED_HOSTS
 		);
@@ -101,6 +102,7 @@ core::Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::process_req
 	// Check for a redirect based on settings.PREPEND_WWW
 	auto result = request->get_host(
 		this->settings->USE_X_FORWARDED_HOST,
+		this->settings->USE_X_FORWARDED_PORT,
 		this->settings->DEBUG,
 		this->settings->ALLOWED_HOSTS
 	);

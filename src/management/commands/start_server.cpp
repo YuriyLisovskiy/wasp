@@ -77,6 +77,7 @@ void StartServerCommand::handle()
 
 	this->retrieve_args(this->_host, this->_port, this->_use_ipv6, this->_threads_count);
 	auto server = this->settings->use_server(
+		this->settings,
 		this->make_handler(),
 		this->get_kwargs()
 	);

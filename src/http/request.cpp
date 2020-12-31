@@ -11,21 +11,26 @@
 #include <xalwart.core/string_utils.h>
 
 // Framework libraries.
+#include "./meta.h"
 #include "./headers.h"
 #include "./utility.h"
+#include "../conf/settings.h"
 
 
 __HTTP_BEGIN__
 
 HttpRequest::HttpRequest(
+	const conf::Settings* settings,
 	const std::string& method, std::string path, size_t major_v, size_t minor_v,
 	std::string query, bool keep_alive, xw::string content,
 	const std::map<std::string, std::string>& headers,
 	const HttpRequest::Parameters<std::string, xw::string>& get_params,
 	const HttpRequest::Parameters<std::string, xw::string>& post_params,
-	const HttpRequest::Parameters<std::string, files::UploadedFile>& files_params
+	const HttpRequest::Parameters<std::string, files::UploadedFile>& files_params,
+	const collections::Dict<std::string, std::string>& meta_params
 )
-:   _path(std::move(path)),
+:   settings(settings),
+	_path(std::move(path)),
 	_major_version(major_v),
 	_minor_version(minor_v),
 	_query(std::move(query)),
@@ -103,10 +108,11 @@ std::string HttpRequest::scheme(
 }
 
 core::Result<std::string> HttpRequest::get_host(
-	bool use_x_forwarded_host, bool debug, std::vector<std::string> allowed_hosts
+	bool use_x_forwarded_host, bool use_x_forwarded_port,
+	bool debug, std::vector<std::string> allowed_hosts
 )
 {
-	auto host = this->get_raw_host(use_x_forwarded_host);
+	auto host = this->get_raw_host(use_x_forwarded_host, use_x_forwarded_port);
 	if (debug && allowed_hosts.empty())
 	{
 		allowed_hosts = {".localhost", "127.0.0.1", "::1"};
@@ -134,7 +140,9 @@ core::Result<std::string> HttpRequest::get_host(
 	}
 }
 
-std::string HttpRequest::get_raw_host(bool use_x_forwarded_host) const
+std::string HttpRequest::get_raw_host(
+	bool use_x_forwarded_host, bool use_x_forwarded_port
+) const
 {
 	std::string host;
 	if (use_x_forwarded_host && this->headers.contains(http::X_FORWARDED_HOST))
@@ -147,15 +155,30 @@ std::string HttpRequest::get_raw_host(bool use_x_forwarded_host) const
 	}
 	else
 	{
-		// TODO:
-		// # Reconstruct the host using the algorithm from PEP 333.
-		// host = self.META['SERVER_NAME']
-		// server_port = self.get_port()
-		// if server_port != ('443' if self.is_secure() else '80'):
-		// host = '%s:%s' % (host, server_port)
+		host = this->META.get(meta::SERVER_HOST);
+		auto port = this->get_port(use_x_forwarded_port);
+		if (port != (this->is_secure(this->settings->SECURE_PROXY_SSL_HEADER.get()) ? "443" : "80"))
+		{
+			host = host + ":" + port;
+		}
 	}
 
 	return host;
+}
+
+std::string HttpRequest::get_port(bool use_x_forwarded_port) const
+{
+	std::string port;
+	if (use_x_forwarded_port && this->headers.contains(http::X_FORWARDED_PORT))
+	{
+		port = this->headers.get(http::X_FORWARDED_PORT);
+	}
+	else
+	{
+		port = this->META.get(meta::SERVER_PORT);
+	}
+
+	return port;
 }
 
 __HTTP_END__
