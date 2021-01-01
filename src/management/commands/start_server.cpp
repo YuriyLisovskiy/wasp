@@ -6,8 +6,6 @@
 
 #include "./start_server.h"
 
-#include <iostream>
-
 // Core libraries.
 #include <xalwart.core/string_utils.h>
 #include <xalwart.core/result.h>
@@ -144,12 +142,12 @@ std::function<
 		core::Result<std::shared_ptr<http::IHttpResponse>> result;
 		try
 		{
-			result = StartServerCommand::process_request_middleware(
+			result = this->process_request_middleware(
 				request, this->settings
 			);
 			if (!result.catch_(core::HttpError) && !result.value)
 			{
-				result = StartServerCommand::process_urlpatterns(
+				result = this->process_urlpatterns(
 					request, this->settings->ROOT_URLCONF, this->settings
 				);
 				// TODO: check if it is required to process response middleware in case of view error.
@@ -159,46 +157,66 @@ std::function<
 					{
 						// If view returns empty result, return 204 - No Content.
 						result.value = std::make_shared<http::HttpResponse>(204);
+						this->settings->LOGGER->warning(
+							"Response was not instantiated, returned 204",
+							_ERROR_DETAILS_
+						);
 					}
 					else
 					{
 						if (!result.value->err())
 						{
-							auto middleware_result = StartServerCommand::process_response_middleware(
+							auto middleware_result = this->process_response_middleware(
 								request, result.value.get(), this->settings
 							);
 							if (middleware_result.catch_(core::HttpError) || middleware_result.value)
 							{
-								std::cerr << middleware_result.err << ", Line: " << __LINE__ << ", File: " << __FILE__ << '\n';
+								if (middleware_result.err)
+								{
+									this->settings->LOGGER->trace(
+										"Method 'process_response_middleware' returned an error", _ERROR_DETAILS_
+									);
+								}
+
 								result = middleware_result;
 							}
 						}
 						else
 						{
-							std::cerr << result.value->err() << ", Line: " << __LINE__ << ", File: " << __FILE__ << '\n';
+							this->settings->LOGGER->trace(
+								"IHttpResponse contains error", _ERROR_DETAILS_
+							);
 						}
 					}
 				}
 				else
 				{
-					std::cerr << result.err << ", Line: " << __LINE__ << ", File: " << __FILE__ << '\n';
+					this->settings->LOGGER->trace(
+						"Function 'process_urlpatterns' returned an error", _ERROR_DETAILS_
+					);
 				}
 			}
 			else
 			{
-				std::cerr << result.err << ", Line: " << __LINE__ << ", File: " << __FILE__ << '\n';
+				this->settings->LOGGER->trace(
+					"Method 'process_request_middleware' returned an error", _ERROR_DETAILS_
+				);
 			}
 		}
 		catch (const core::BaseException& exc)
 		{
-			this->settings->LOGGER->error(exc);
+			this->settings->LOGGER->trace(
+				"An error was caught as core::BaseException", _ERROR_DETAILS_
+			);
 			result = core::raise<core::InternalServerError, std::shared_ptr<http::IHttpResponse>>(
 				"<p style=\"font-size: 24px;\" >Internal Server Error</p><p>" + std::string(exc.what()) + "</p>"
 			);
 		}
 		catch (const std::exception& exc)
 		{
-			this->settings->LOGGER->error(exc.what(), __LINE__, "request handler function", __FILE__);
+			this->settings->LOGGER->trace(
+				"An error was caught as std::exception", _ERROR_DETAILS_
+			);
 			result = core::raise<core::InternalServerError, std::shared_ptr<http::IHttpResponse>>(
 				"<p style=\"font-size: 24px;\" >Internal Server Error</p><p>" + std::string(exc.what()) + "</p>"
 			);
@@ -327,6 +345,10 @@ core::Result<std::shared_ptr<http::IHttpResponse>> StartServerCommand::process_r
 		auto result = middleware->process_request(request);
 		if (result.err)
 		{
+			// TODO: print middleware name.
+			this->settings->LOGGER->trace(
+				"Method 'process_request' of 'unknown' middleware returned an error", _ERROR_DETAILS_
+			);
 			return result;
 		}
 	}
@@ -346,6 +368,9 @@ core::Result<std::shared_ptr<http::IHttpResponse>> StartServerCommand::process_u
 		return apply(request, settings);
 	}
 
+	this->settings->LOGGER->trace(
+		"The requested resource was not found", _ERROR_DETAILS_
+	);
 	return core::raise<core::NotFound, std::shared_ptr<http::IHttpResponse>>("<h2>404 - Not Found</h2>");
 }
 
@@ -361,6 +386,10 @@ core::Result<std::shared_ptr<http::IHttpResponse>> StartServerCommand::process_r
 		auto result = settings->MIDDLEWARE[i]->process_response(request, response);
 		if (result.err)
 		{
+			// TODO: print middleware name.
+			this->settings->LOGGER->trace(
+				"Method 'process_response' of 'unknown' middleware returned an error", _ERROR_DETAILS_
+			);
 			return result;
 		}
 	}

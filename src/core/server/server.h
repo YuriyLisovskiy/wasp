@@ -49,7 +49,7 @@ private:
 	core::Error _send(http::IHttpResponse* response, const int& client);
 	core::Error _send(http::StreamingHttpResponse* response, const int& client);
 
-	void _send_response(
+	core::Error _send_response(
 		http::HttpRequest* request, http::IHttpResponse* response, const int& client, core::ILogger* logger
 	);
 	static void _log_request(

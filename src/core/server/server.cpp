@@ -6,8 +6,6 @@
 
 #include "./server.h"
 
-#include <iostream>
-
 // Core libraries.
 #include <xalwart.core/datetime.h>
 
@@ -34,7 +32,7 @@ HandlerFunc DefaultServer::_make_handler()
 			xw::core::Error fail;
 			auto err_resp = _from_error(err);
 
-			std::cerr << err_resp->status() << ", Line: " << __LINE__ << ", File: " << __FILE__ << '\n';
+			this->ctx.logger->trace(err->msg, _ERROR_DETAILS_);
 
 			if ((fail = this->send(sock, err_resp->serialize().c_str())))
 			{
@@ -48,21 +46,24 @@ HandlerFunc DefaultServer::_make_handler()
 			std::shared_ptr<http::IHttpResponse> response;
 			if (result.catch_(core::HttpError))
 			{
+				this->ctx.logger->trace(result.err.msg, _ERROR_DETAILS_);
 				response = _from_error(&result.err);
-				std::cerr << result.err.msg << ", Line: " << __LINE__ << ", File: " << __FILE__ << '\n';
 			}
 			else if (!result.value)
 			{
 				// Response was not instantiated, so return 204 - No Content.
 				response = std::make_shared<http::HttpResponse>(204);
-				this->ctx.logger->warning(std::to_string(response->status()), _ERROR_DETAILS_);
+				this->ctx.logger->warning(
+					"Response was not instantiated, returned 204",
+					_ERROR_DETAILS_
+				);
 			}
 			else
 			{
 				auto error = result.value->err();
 				if (error)
 				{
-					std::cerr << error.msg << ", Line: " << __LINE__ << ", File: " << __FILE__ << '\n';
+					this->ctx.logger->trace(error.msg, _ERROR_DETAILS_);
 					response = _from_error(&error);
 				}
 				else
@@ -192,6 +193,7 @@ core::Error DefaultServer::_send(http::StreamingHttpResponse* response, const in
 		auto err = this->write(client, chunk.c_str(), chunk.size());
 		if (err)
 		{
+			this->ctx.logger->trace("Method 'write' returned an error", _ERROR_DETAILS_);
 			return err;
 		}
 	}
@@ -200,18 +202,28 @@ core::Error DefaultServer::_send(http::StreamingHttpResponse* response, const in
 	return core::Error::none();
 }
 
-void DefaultServer::_send_response(
+core::Error DefaultServer::_send_response(
 	http::HttpRequest* request, http::IHttpResponse* response, const int& client, core::ILogger* logger
 )
 {
 	if (response->is_streaming())
 	{
 		auto* streaming_response = dynamic_cast<http::StreamingHttpResponse*>(response);
-		this->_send(streaming_response, client);
+		auto err = this->_send(streaming_response, client);
+		if (err)
+		{
+			this->ctx.logger->trace("Method '_send' returned an error", _ERROR_DETAILS_);
+			return err;
+		}
 	}
 	else
 	{
-		this->_send(response, client);
+		auto err = this->_send(response, client);
+		if (err)
+		{
+			this->ctx.logger->trace("Method '_send' returned an error", _ERROR_DETAILS_);
+			return err;
+		}
 	}
 
 	_log_request(
@@ -221,6 +233,7 @@ void DefaultServer::_send_response(
 		response->status(),
 		logger
 	);
+	return core::Error::none();
 }
 
 void DefaultServer::_log_request(

@@ -67,6 +67,9 @@ core::Result<std::shared_ptr<http::IHttpResponse>> SecurityMiddleware::process_r
 			);
 			if (result.err)
 			{
+				this->settings->LOGGER->trace(
+					"Method 'get_host' returned an error", _ERROR_DETAILS_
+				);
 				return result.forward<std::shared_ptr<http::IHttpResponse>>();
 			}
 

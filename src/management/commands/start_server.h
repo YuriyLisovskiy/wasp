@@ -54,15 +54,15 @@ protected:
 		std::string& host, uint16_t& port, bool& use_ipv6, size_t& threads_count
 	);
 
-	static core::Result<std::shared_ptr<http::IHttpResponse>> process_request_middleware(
+	core::Result<std::shared_ptr<http::IHttpResponse>> process_request_middleware(
 		http::HttpRequest* request, conf::Settings* settings
 	);
-	static core::Result<std::shared_ptr<http::IHttpResponse>> process_response_middleware(
+	core::Result<std::shared_ptr<http::IHttpResponse>> process_response_middleware(
 		http::HttpRequest* request,
 		http::IHttpResponse* response,
 		conf::Settings* settings
 	);
-	static core::Result<std::shared_ptr<http::IHttpResponse>> process_urlpatterns(
+	core::Result<std::shared_ptr<http::IHttpResponse>> process_urlpatterns(
 		http::HttpRequest* request,
 		std::vector<std::shared_ptr<urls::UrlPattern>>& urlpatterns,
 		conf::Settings* settings

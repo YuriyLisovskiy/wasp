@@ -229,6 +229,7 @@ void HTTPServer::_handleConnection(const int& sock)
 			auto result = _read_headers(sock, body_beginning);
 			if (result.err)
 			{
+				this->ctx.logger->trace("Method '_read_headers' returned an error", _ERROR_DETAILS_);
 				this->_handler(sock, &rp, &result.err);
 			}
 			else
@@ -247,6 +248,7 @@ void HTTPServer::_handleConnection(const int& sock)
 						result = _read_body(sock, body_beginning, body_length);
 						if (result.err)
 						{
+							this->ctx.logger->trace("Method '_read_body' returned an error", _ERROR_DETAILS_);
 							this->_handler(sock, &rp, &result.err);
 	//						return result.forward<std::shared_ptr<http::HttpRequest>>();
 						}
@@ -328,6 +330,7 @@ core::Result<xw::string> HTTPServer::_read_headers(
 			// Maybe it is better to check each header value's size.
 			if (size > MAX_HEADERS_SIZE)
 			{
+				this->ctx.logger->trace("Request size is greater than expected", _ERROR_DETAILS_);
 				return core::raise<core::EntityTooLargeError, xw::string>(
 					"Request data is too big", _ERROR_DETAILS_
 				);
@@ -346,6 +349,9 @@ core::Result<xw::string> HTTPServer::_read_headers(
 			}
 			else
 			{
+				this->ctx.logger->trace(
+					"An error occurred during a receiving of the request", _ERROR_DETAILS_
+				);
 				return core::raise<core::HttpError, xw::string>(
 					"request finished with error code " + std::to_string(status), _ERROR_DETAILS_
 				);
@@ -358,6 +364,7 @@ core::Result<xw::string> HTTPServer::_read_headers(
 
 	if (headers_delimiter_pos == xw::string::npos)
 	{
+		this->ctx.logger->trace("Received an incorrect request", _ERROR_DETAILS_);
 		return core::raise<core::HttpError, xw::string>(
 			"invalid http request has been received", _ERROR_DETAILS_
 		);
@@ -398,6 +405,7 @@ core::Result<xw::string> HTTPServer::_read_body(
 			// Maybe it is better to check each header value's size.
 			if (size > MAX_HEADERS_SIZE)
 			{
+				this->ctx.logger->trace("Request size is greater than expected", _ERROR_DETAILS_);
 				return core::raise<core::EntityTooLargeError, xw::string>(
 					"Request data is too big", _ERROR_DETAILS_
 				);
@@ -416,6 +424,9 @@ core::Result<xw::string> HTTPServer::_read_body(
 			}
 			else
 			{
+				this->ctx.logger->trace(
+					"An error occurred during a receiving of the request", _ERROR_DETAILS_
+				);
 				return core::raise<core::HttpError, xw::string>(
 					"request finished with error code " + std::to_string(status), _ERROR_DETAILS_
 				);
@@ -426,6 +437,7 @@ core::Result<xw::string> HTTPServer::_read_body(
 	data = body_beginning + data;
 	if (data.size() != body_length)
 	{
+		this->ctx.logger->trace("Received an incorrect request", _ERROR_DETAILS_);
 		return core::raise<core::HttpError, xw::string>(
 			"actual body size is not equal to header's value", _ERROR_DETAILS_
 		);

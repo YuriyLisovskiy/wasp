@@ -65,6 +65,7 @@ core::Result<std::string> CommonMiddleware::get_full_path_with_slash(http::HttpR
 		);
 		if (result.err)
 		{
+			this->settings->LOGGER->trace("Method 'get_host' returned an error", _ERROR_DETAILS_);
 			return result;
 		}
 
@@ -92,6 +93,9 @@ core::Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::process_req
 		{
 			if (rgx.search(user_agent))
 			{
+				this->settings->LOGGER->trace(
+					"Found user agent which is not allowed: '" + user_agent + "'", _ERROR_DETAILS_
+				);
 				return this->raise<core::PermissionDenied>(
 					"Forbidden user agent", _ERROR_DETAILS_
 				);
@@ -108,6 +112,7 @@ core::Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::process_req
 	);
 	if (result.err)
 	{
+		this->settings->LOGGER->trace("Method 'get_host' returned an error", _ERROR_DETAILS_);
 		return result.forward<std::shared_ptr<http::IHttpResponse>>();
 	}
 
@@ -126,6 +131,9 @@ core::Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::process_req
 		result = this->get_full_path_with_slash(request);
 		if (result.err)
 		{
+			this->settings->LOGGER->trace(
+				"Method 'get_full_path_with_slash' returned an error", _ERROR_DETAILS_
+			);
 			return result.forward<std::shared_ptr<http::IHttpResponse>>();
 		}
 
@@ -159,6 +167,9 @@ core::Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::process_res
 			auto result = this->get_full_path_with_slash(request);
 			if (result.err)
 			{
+				this->settings->LOGGER->trace(
+					"Method 'get_full_path_with_slash' returned an error", _ERROR_DETAILS_
+				);
 				return result.forward<std::shared_ptr<http::IHttpResponse>>();
 			}
 

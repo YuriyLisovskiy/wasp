@@ -70,8 +70,8 @@ private:
 	void _handleConnection(const int& sock);
 
 	static int _error();
-	static core::Result<xw::string> _read_headers(size_t sock, xw::string& body_beginning);
-	static core::Result<xw::string> _read_body(
+	core::Result<xw::string> _read_headers(size_t sock, xw::string& body_beginning);
+	core::Result<xw::string> _read_body(
 		size_t sock, const xw::string& body_beginning, size_t body_length
 	);
 };

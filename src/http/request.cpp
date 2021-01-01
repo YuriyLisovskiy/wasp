@@ -6,6 +6,8 @@
 
 #include "./request.h"
 
+#include <iostream>
+
 // Core libraries.
 #include <xalwart.core/exceptions.h>
 #include <xalwart.core/string_utils.h>
@@ -42,6 +44,7 @@ HttpRequest::HttpRequest(
 	this->GET = get_params;
 	this->POST = post_params;
 	this->FILES = files_params;
+	this->META = meta_params;
 }
 
 std::string HttpRequest::version() const
@@ -119,6 +122,11 @@ core::Result<std::string> HttpRequest::get_host(
 	}
 
 	std::string domain, port;
+
+	std::cerr << "HOST: " << host << '\n';
+
+	std::cerr << "DOMAIN: " << domain << " | PORT: " << port << '\n';
+
 	split_domain_port(host, domain, port);
 	if (!domain.empty() && validate_host(domain, allowed_hosts))
 	{
@@ -135,6 +143,8 @@ core::Result<std::string> HttpRequest::get_host(
 		{
 			msg += " The domain name provided is not valid according to RFC 1034/1035.";
 		}
+
+		std::cerr << msg << '\n';
 
 		return core::raise<core::DisallowedHost, std::string>(msg);
 	}
