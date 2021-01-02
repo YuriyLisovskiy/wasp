@@ -39,7 +39,7 @@ private:
 	HandlerFunc _handler;
 
 protected:
-	const char* host;
+	std::string host;
 	uint16_t port;
 	Context ctx;
 

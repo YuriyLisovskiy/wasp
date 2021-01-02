@@ -168,11 +168,18 @@ bool HTTPServer::_init_host()
 	auto ret = getnameinfo(
 		sa, sa_size, host_buf, NI_MAXHOST, serv_buf, NI_MAXSERV, NI_NAMEREQD
 	);
+
+	std::cerr << "HOST [before]: " << host_buf << '\n';
+	std::cerr << "SERVICE [before]: " << serv_buf << '\n';
+
 	if (ret != 0)
 	{
-		this->ctx.on_error(ret, "could not get numeric hostname");
+		this->ctx.on_error(ret, gai_strerror(ret));
 		return false;
 	}
+
+	std::cerr << "HOST [after]: " << host_buf << '\n';
+	std::cerr << "SERVICE [after]: " << serv_buf << '\n';
 
 	this->host = host_buf;
 	return true;
