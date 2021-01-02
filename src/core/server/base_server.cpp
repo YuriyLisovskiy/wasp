@@ -96,7 +96,7 @@ bool HTTPServer::_bind(uint16_t port)
 
 bool HTTPServer::_bind(const char* address, uint16_t port)
 {
-	this->host = address;
+//	this->host = address;
 	this->port = port;
 	this->use_ipv6 = false;
 	if (inet_pton(AF_INET, address, &this->addr.sin_addr) <= 0)
@@ -114,6 +114,7 @@ bool HTTPServer::_bind(const char* address, uint16_t port)
 		return false;
 	}
 
+	this->_init_host();
 	return true;
 }
 
@@ -125,7 +126,7 @@ bool HTTPServer::_bind6(uint16_t port)
 
 bool HTTPServer::_bind6(const char* address, uint16_t port)
 {
-	this->host = address;
+//	this->host = address;
 	this->port = port;
 	this->use_ipv6 = true;
 	if (inet_pton(AF_INET6, address, &this->addr6.sin6_addr) <= 0)
@@ -143,6 +144,37 @@ bool HTTPServer::_bind6(const char* address, uint16_t port)
 		return false;
 	}
 
+	this->_init_host();
+	return true;
+}
+
+bool HTTPServer::_init_host()
+{
+	char host_buf[NI_MAXHOST], serv_buf[NI_MAXSERV];
+
+	sockaddr* sa;
+	size_t sa_size;
+	if (this->use_ipv6)
+	{
+		sa = (struct sockaddr*) &this->addr6;
+		sa_size = sizeof(this->addr6);
+	}
+	else
+	{
+		sa = (struct sockaddr*) &this->addr;
+		sa_size = sizeof(this->addr);
+	}
+
+	auto ret = getnameinfo(
+		sa, sa_size, host_buf, NI_MAXHOST, serv_buf, NI_MAXSERV, NI_NAMEREQD
+	);
+	if (ret != 0)
+	{
+		this->ctx.on_error(ret, "could not get numeric hostname");
+		return false;
+	}
+
+	this->host = host_buf;
 	return true;
 }
 

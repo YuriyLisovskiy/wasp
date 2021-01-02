@@ -61,6 +61,8 @@ private:
 	bool _bind(const char* host, uint16_t port);
 	bool _bind6(uint16_t port);
 	bool _bind6(const char* host, uint16_t port);
+	bool _init_host();
+
 	static bool _accept(HTTPServer* s);
 
 	enum read_result_enum
