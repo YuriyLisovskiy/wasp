@@ -1,7 +1,7 @@
 /**
  * core/server/server.h
  *
- * Copyright (c) 2020 Yuriy Lisovskiy
+ * Copyright (c) 2020-2021 Yuriy Lisovskiy
  *
  * Purpose: TODO
  */
@@ -20,8 +20,12 @@
 
 __SERVER_BEGIN__
 
+typedef std::function<void(
+	const http::HttpRequest*, const core::Result<std::shared_ptr<http::IHttpResponse>>&
+)> StartResponseFunc;
+
 typedef std::function<
-	core::Result<std::shared_ptr<http::IHttpResponse>>(http::HttpRequest*, const int&)
+	void(http::HttpRequest*, const StartResponseFunc&)
 > HttpHandlerFunc;
 
 class DefaultServer : public HTTPServer
@@ -42,15 +46,24 @@ private:
 private:
 	HandlerFunc _make_handler();
 
-	static std::shared_ptr<http::IHttpResponse> _from_error(core::Error* err);
+	static std::shared_ptr<http::IHttpResponse> _from_error(const core::Error* err);
 
-	std::shared_ptr<http::HttpRequest> _process_request(parsers::request_parser* parser);
+	std::shared_ptr<http::HttpRequest> _request(parsers::request_parser* parser);
 
 	core::Error _send(http::IHttpResponse* response, const int& client);
 	core::Error _send(http::StreamingHttpResponse* response, const int& client);
 
+	void _start_response(
+		const int& client,
+		const http::HttpRequest* request,
+		const core::Result<std::shared_ptr<http::IHttpResponse>>& response
+	);
+
 	core::Error _send_response(
-		http::HttpRequest* request, http::IHttpResponse* response, const int& client, core::ILogger* logger
+		const http::HttpRequest* request,
+		http::IHttpResponse* response,
+		const int& client,
+		core::ILogger* logger
 	);
 	static void _log_request(
 		const std::string& info, unsigned short status_code, core::ILogger* logger

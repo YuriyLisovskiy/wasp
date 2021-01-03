@@ -1,7 +1,7 @@
 /**
  * http/request.h
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
  * Purpose: represents an http request.
  */
@@ -107,10 +107,10 @@ public:
 
 	[[nodiscard]]
 	std::string version() const;
-	std::string path();
-	std::string full_path(bool force_append_slash = false);
-	std::string query();
-	std::string method();
+	std::string path() const;
+	std::string full_path(bool force_append_slash = false) const;
+	std::string query() const;
+	std::string method() const;
 
 	[[nodiscard]]
 	bool keep_alive() const;

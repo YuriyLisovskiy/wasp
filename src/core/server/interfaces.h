@@ -1,7 +1,7 @@
 /**
  * server/interfaces.h
  *
- * Copyright (c) 2020 Yuriy Lisovskiy
+ * Copyright (c) 2020-2021 Yuriy Lisovskiy
  *
  * Purpose: TODO
  */
@@ -18,11 +18,10 @@ class IServer
 {
 public:
 	// Bind socket.
-	virtual bool bind(uint16_t port, bool use_ipv6) = 0;
-	virtual bool bind(const char* host, uint16_t port, bool use_ipv6) = 0;
+	virtual void bind(const std::string& address, uint16_t port) = 0;
 
 	// Listen the socket.
-	virtual bool listen(const std::string& startup_message) = 0;
+	virtual void listen(const std::string& startup_message) = 0;
 
 	// Shutdown and close server socket.
 	virtual void close() = 0;

@@ -1,7 +1,7 @@
 /**
  * core/server/server.cpp
  *
- * Copyright (c) 2020 Yuriy Lisovskiy
+ * Copyright (c) 2020-2021 Yuriy Lisovskiy
  */
 
 #include "./server.h"
@@ -46,43 +46,81 @@ HandlerFunc DefaultServer::_make_handler()
 		}
 		else
 		{
-			auto request = this->_process_request(parser);
-			auto result = this->_http_handler(request.get(), sock);
-			std::shared_ptr<http::IHttpResponse> response;
-			if (result.catch_(core::HttpError))
-			{
-				this->ctx.logger->trace(result.err.msg, _ERROR_DETAILS_);
-				response = _from_error(&result.err);
-			}
-			else if (!result.value)
-			{
-				// Response was not instantiated, so return 204 - No Content.
-				response = std::make_shared<http::HttpResponse>(204);
-				this->ctx.logger->warning(
-					"Response was not instantiated, returned 204",
-					_ERROR_DETAILS_
-				);
-			}
-			else
-			{
-				auto error = result.value->err();
-				if (error)
-				{
-					this->ctx.logger->trace(error.msg, _ERROR_DETAILS_);
-					response = _from_error(&error);
+			auto request = this->_request(parser);
+			this->_http_handler(
+				request.get(),
+				[this, sock](const http::HttpRequest* req, const core::Result<std::shared_ptr<http::IHttpResponse>>& res) {
+					this->_start_response(sock, req, res);
 				}
-				else
-				{
-					response = result.value;
-				}
-			}
-
-			this->_send_response(request.get(), response.get(), sock, this->ctx.logger.get());
+			);
+//			auto result = this->_http_handler(request.get(), sock);
+//			std::shared_ptr<http::IHttpResponse> response;
+//			if (result.catch_(core::HttpError))
+//			{
+//				this->ctx.logger->trace(result.err.msg, _ERROR_DETAILS_);
+//				response = _from_error(&result.err);
+//			}
+//			else if (!result.value)
+//			{
+//				// Response was not instantiated, so return 204 - No Content.
+//				response = std::make_shared<http::HttpResponse>(204);
+//				this->ctx.logger->warning(
+//					"Response was not instantiated, returned 204",
+//					_ERROR_DETAILS_
+//				);
+//			}
+//			else
+//			{
+//				auto error = result.value->err();
+//				if (error)
+//				{
+//					this->ctx.logger->trace(error.msg, _ERROR_DETAILS_);
+//					response = _from_error(&error);
+//				}
+//				else
+//				{
+//					response = result.value;
+//				}
+//			}
+//
+//			this->_send_response(request.get(), response.get(), sock, this->ctx.logger.get());
 		}
 	};
 }
 
-std::shared_ptr<http::HttpRequest> DefaultServer::_process_request(parsers::request_parser* parser)
+std::shared_ptr<http::IHttpResponse> DefaultServer::_from_error(const core::Error* err)
+{
+	unsigned short code;
+	switch (err->type)
+	{
+		case core::EntityTooLargeError:
+			code = 413;
+			break;
+		case core::PermissionDenied:
+			code = 403;
+			break;
+		case core::NotFound:
+		case core::FileDoesNotExistError:
+			code = 404;
+			break;
+		case core::InternalServerError:
+			code = 500;
+			break;
+		case core::SuspiciousOperation:
+		case core::DisallowedHost:
+		case core::DisallowedRedirect:
+			code = 400;
+			break;
+		case core::HttpError:
+		default:
+			code = 500;
+			break;
+	}
+
+	return std::make_shared<http::HttpResponse>(code, err->msg);
+}
+
+std::shared_ptr<http::HttpRequest> DefaultServer::_request(parsers::request_parser* parser)
 {
 	parsers::query_parser qp;
 	http::HttpRequest::Parameters<std::string, xw::string> get_params, post_params;
@@ -148,41 +186,9 @@ std::shared_ptr<http::HttpRequest> DefaultServer::_process_request(parsers::requ
 		files_params,
 		collections::Dict<std::string, std::string>{{
 			{meta::SERVER_HOST, this->host},
-			{meta::SERVER_PORT, std::to_string(this->port)},
+			{meta::SERVER_PORT, this->port},
 		}}
 	);
-}
-
-std::shared_ptr<http::IHttpResponse> DefaultServer::_from_error(core::Error* err)
-{
-	unsigned short code;
-	switch (err->type)
-	{
-		case core::EntityTooLargeError:
-			code = 413;
-			break;
-		case core::PermissionDenied:
-			code = 403;
-			break;
-		case core::NotFound:
-		case core::FileDoesNotExistError:
-			code = 404;
-			break;
-		case core::InternalServerError:
-			code = 500;
-			break;
-		case core::SuspiciousOperation:
-		case core::DisallowedHost:
-		case core::DisallowedRedirect:
-			code = 400;
-			break;
-		case core::HttpError:
-		default:
-			code = 500;
-			break;
-	}
-
-	return std::make_shared<http::HttpResponse>(code, err->msg);
 }
 
 core::Error DefaultServer::_send(http::IHttpResponse* response, const int& client)
@@ -207,8 +213,46 @@ core::Error DefaultServer::_send(http::StreamingHttpResponse* response, const in
 	return core::Error::none();
 }
 
+void DefaultServer::_start_response(
+	const int& client,
+	const http::HttpRequest* request,
+	const core::Result<std::shared_ptr<http::IHttpResponse>>& result
+)
+{
+	std::shared_ptr<http::IHttpResponse> response;
+	if (result.catch_(core::HttpError))
+	{
+		this->ctx.logger->trace(result.err.msg, _ERROR_DETAILS_);
+		response = _from_error(&result.err);
+	}
+	else if (!result.value)
+	{
+		// Response was not instantiated, so return 204 - No Content.
+		response = std::make_shared<http::HttpResponse>(204);
+		this->ctx.logger->warning(
+			"Response was not instantiated, returned 204",
+			_ERROR_DETAILS_
+		);
+	}
+	else
+	{
+		auto error = result.value->err();
+		if (error)
+		{
+			this->ctx.logger->trace(error.msg, _ERROR_DETAILS_);
+			response = _from_error(&error);
+		}
+		else
+		{
+			response = result.value;
+		}
+	}
+
+	this->_send_response(request, response.get(), client, this->ctx.logger.get());
+}
+
 core::Error DefaultServer::_send_response(
-	http::HttpRequest* request, http::IHttpResponse* response, const int& client, core::ILogger* logger
+	const http::HttpRequest* request, http::IHttpResponse* response, const int& client, core::ILogger* logger
 )
 {
 	if (response->is_streaming())

@@ -1,68 +1,55 @@
 /**
- * tcp_server.cpp
+ * core/server/base_server.cpp
  *
- * Copyright (c) 2020 Yuriy Lisovskiy
+ * Copyright (c) 2020-2021 Yuriy Lisovskiy
  */
 
 #include "./server.h"
 
 // C++ libraries.
-#include <iostream>
 #include <cstring>
+
+// Framework libraries.
+#include "./util.h"
 
 
 __SERVER_BEGIN__
 
-HTTPServer::HTTPServer(
-	const Context& ctx, HandlerFunc handler
-) : BaseSocket(ctx.on_error, TCP, -1), ctx(ctx), _handler(std::move(handler))
+HTTPServer::HTTPServer(Context ctx, HandlerFunc handler)
+	: ctx(std::move(ctx)), _handler(std::move(handler))
 {
-	int opt = 1;
-	setsockopt(this->sock, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(int));
-	setsockopt(this->sock, SOL_SOCKET, SO_REUSEPORT, &opt, sizeof(int));
 	this->ctx.normalize();
-	this->_threadPool = std::make_shared<core::ThreadPool>(this->ctx.threads_count);
+	this->_threadPool = std::make_shared<core::ThreadPool>(this->ctx.workers);
 	if (!this->_handler)
 	{
-		this->_handler = [](const int, parsers::request_parser*, core::Error*)
+		this->_handler = [this](const int, parsers::request_parser*, core::Error*)
 		{
-			std::cerr << "request handler is not specified";
+			this->ctx.logger->print("request handler is not specified", core::Logger::Color::RED);
 		};
 	}
 }
 
-bool HTTPServer::bind(uint16_t port, bool useIPv6)
+void HTTPServer::bind(const std::string& address, uint16_t port)
 {
-	return useIPv6 ? this->_bind6(port) : this->_bind(port);
+	this->_socket = util::create_socket(address, port, 5, this->ctx.logger.get());
+	this->_socket->set_options();
 }
 
-bool HTTPServer::bind(const char* host, uint16_t port, bool useIPv6)
+void HTTPServer::listen(const std::string& message)
 {
-	return useIPv6 ? this->_bind6(host, port) : this->_bind(host, port);
-}
-
-bool HTTPServer::listen(const std::string& startup_message)
-{
-	if (::listen(this->sock, SOMAXCONN) < 0)
+	this->_socket->listen();
+	if (!message.empty())
 	{
-		this->ctx.on_error(errno, "server can't listen the socket");
-		return false;
+		this->ctx.logger->print(message);
 	}
 
-	if (!startup_message.empty())
-	{
-		std::cout << startup_message;
-		std::cout.flush();
-	}
-
-	return _accept(this);
+	this->_accept();
 }
 
 void HTTPServer::close()
 {
 	this->_threadPool->wait();
-	::shutdown(this->sock, SHUT_RDWR);
-	BaseSocket::close();
+	util::close_socket(this->_socket, this->ctx.logger.get());
 }
 
 core::Error HTTPServer::send(int sock, const char* data)
@@ -89,174 +76,44 @@ core::Error HTTPServer::write(int sock, const char* data, size_t n)
 	return core::Error::none();
 }
 
-bool HTTPServer::_bind(uint16_t port)
+void HTTPServer::_accept()
 {
-	return this->_bind("0.0.0.0", port);
-}
-
-bool HTTPServer::_bind(const char* address, uint16_t port)
-{
-//	this->host = address;
-	this->port = port;
-	this->use_ipv6 = false;
-	if (inet_pton(AF_INET, address, &this->addr.sin_addr) <= 0)
+//	sockaddr_in6 newSocketInfo{};
+//	socklen_t newSocketInfoLength = sizeof(newSocketInfo);
+	int new_sock;
+	while (!this->_socket->is_closed())
 	{
-		this->ctx.on_error(errno, "invalid address, address type is not supported");
-		return false;
-	}
-
-	this->addr.sin_family = AF_INET;
-	this->addr.sin_port = htons(port);
-
-	if (::bind(this->sock, (const sockaddr *)&this->addr, sizeof(this->addr)) < 0)
-	{
-		this->ctx.on_error(errno, "cannot bind the socket");
-		return false;
-	}
-
-	this->_init_host();
-	return true;
-}
-
-bool HTTPServer::_bind6(uint16_t port)
-{
-	this->use_ipv6 = true;
-	return this->_bind6("::1", port);
-}
-
-bool HTTPServer::_bind6(const char* address, uint16_t port)
-{
-//	this->host = address;
-	this->port = port;
-	this->use_ipv6 = true;
-	if (inet_pton(AF_INET6, address, &this->addr6.sin6_addr) <= 0)
-	{
-		this->ctx.on_error(errno, "invalid address, address type not supported");
-		return false;
-	}
-
-	this->addr6.sin6_family = AF_INET6;
-	this->addr6.sin6_port = htons(port);
-
-	if (::bind(this->sock, (const sockaddr *)&this->addr6, sizeof(this->addr6)) < 0)
-	{
-		this->ctx.on_error(errno, "cannot bind the socket");
-		return false;
-	}
-
-	this->_init_host();
-	return true;
-}
-
-bool HTTPServer::_init_host()
-{
-	char host_buf[NI_MAXHOST], serv_buf[NI_MAXSERV];
-
-	sockaddr* sa;
-	size_t sa_size;
-	if (this->use_ipv6)
-	{
-		sa = (struct sockaddr*) &this->addr6;
-		sa_size = sizeof(this->addr6);
-	}
-	else
-	{
-		sa = (struct sockaddr*) &this->addr;
-		sa_size = sizeof(this->addr);
-	}
-
-	auto ret = getnameinfo(
-		sa, sa_size, host_buf, NI_MAXHOST, serv_buf, NI_MAXSERV, NI_NAMEREQD
-	);
-
-	std::cerr << "HOST [before]: " << host_buf << '\n';
-	std::cerr << "SERVICE [before]: " << serv_buf << '\n';
-
-	if (ret != 0)
-	{
-		this->ctx.on_error(ret, gai_strerror(ret));
-		return false;
-	}
-
-	std::cerr << "HOST [after]: " << host_buf << '\n';
-	std::cerr << "SERVICE [after]: " << serv_buf << '\n';
-
-	this->host = host_buf;
-	return true;
-}
-
-bool HTTPServer::_accept(HTTPServer* s)
-{
-	if (s->use_ipv6)
-	{
-		sockaddr_in6 newSocketInfo{};
-		socklen_t newSocketInfoLength = sizeof(newSocketInfo);
-
-		int newSock;
-		while (!s->is_closed)
+		while ((new_sock = ::accept(this->_socket->fd(), nullptr, nullptr)) < 0)
 		{
-			while ((newSock = ::accept(s->sock, (sockaddr*)&newSocketInfo, &newSocketInfoLength)) < 0)
+			if (errno == EBADF || errno == EINVAL)
 			{
-				if (errno == EBADF || errno == EINVAL)
-				{
-					return false;
-				}
-
-				if (errno == EMFILE)
-				{
-					std::this_thread::sleep_for(std::chrono::milliseconds(300));
-					newSock = -1;
-					break;
-				}
-
-				s->ctx.on_error(errno, "error while accepting a new connection");
-				return false;
+				throw core::SocketError(
+					errno, "'accept' call failed: " + std::to_string(errno), _ERROR_DETAILS_
+				);
 			}
 
-			if (!s->is_closed && newSock >= 0)
+			if (errno == EMFILE)
 			{
-				s->_handleConnection(newSock);
+				std::this_thread::sleep_for(std::chrono::milliseconds(300));
+				new_sock = -1;
+				break;
 			}
+
+			throw core::SocketError(
+				errno,
+				"'accept' call failed while accepting a new connection: " + std::to_string(errno),
+				_ERROR_DETAILS_
+			);
+		}
+
+		if (!this->_socket->is_closed() && new_sock >= 0)
+		{
+			this->_handle(new_sock);
 		}
 	}
-	else
-	{
-		sockaddr_in newSocketInfo{};
-		socklen_t newSocketInfoLength = sizeof(newSocketInfo);
-
-		int newSock;
-		while (!s->is_closed)
-		{
-			while ((newSock = ::accept(s->sock, (sockaddr*)&newSocketInfo, &newSocketInfoLength)) < 0)
-			{
-				if (errno == EBADF || errno == EINVAL)
-				{
-					return false;
-				}
-
-				if (errno == EMFILE)
-				{
-					sleep(1);
-					newSock = -1;
-					break;
-				}
-
-				s->ctx.on_error(errno, "error while accepting a new connection");
-				return false;
-			}
-
-			if (!s->is_closed && newSock >= 0)
-			{
-				int set = 1;
-				s->_handleConnection(newSock);
-			}
-		}
-	}
-
-	return true;
 }
 
-void HTTPServer::_handleConnection(const int& sock)
+void HTTPServer::_handle(const int& sock)
 {
 	this->_threadPool->push([this, sock](){
 		try
@@ -440,13 +297,11 @@ core::Result<xw::string> HTTPServer::_read_body(
 		{
 			data.append(buffer);
 			size += message_len;
-
-			// Maybe it is better to check each header value's size.
-			if (size > MAX_HEADERS_SIZE)
+			if (size > this->ctx.max_body_size)
 			{
-				this->ctx.logger->trace("Request size is greater than expected", _ERROR_DETAILS_);
+				this->ctx.logger->trace("Body size is greater than expected", _ERROR_DETAILS_);
 				return core::raise<core::EntityTooLargeError, xw::string>(
-					"Request data is too big", _ERROR_DETAILS_
+					"Request body is too big", _ERROR_DETAILS_
 				);
 			}
 		}

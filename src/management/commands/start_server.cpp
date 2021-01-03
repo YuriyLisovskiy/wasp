@@ -1,7 +1,7 @@
 /**
  * management/commands/runserver.cpp
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  */
 
 #include "./start_server.h"
@@ -86,22 +86,20 @@ void StartServerCommand::handle()
 
 	try
 	{
-		if (server->bind(this->_host.c_str(), this->_port, this->_use_ipv6))
+		server->bind(this->_host, this->_port);
+		xw::core::InterruptException::initialize();
+		try
 		{
-			xw::core::InterruptException::initialize();
-			try
-			{
-				std::string message = dt::Datetime::now().strftime("%B %d, %Y - %T") + "\n" +
-				                      LIB_NAME + " version " + LIB_VERSION + "\n" +
-				                      "Starting development server at " +
-				                      "http://" + this->_host + ":" + std::to_string(this->_port) + "/\n" +
-				                      "Quit the server with CONTROL-C.\n";
-				server->listen(message);
-			}
-			catch (const xw::core::InterruptException& exc)
-			{
-				// skip
-			}
+			std::string message = dt::Datetime::now().strftime("%B %d, %Y - %T") + "\n" +
+			                      LIB_NAME + " version " + LIB_VERSION + "\n" +
+			                      "Starting development server at " +
+			                      "http://" + this->_host + ":" + std::to_string(this->_port) + "/\n" +
+			                      "Quit the server with CONTROL-C.";
+			server->listen(message);
+		}
+		catch (const xw::core::InterruptException& exc)
+		{
+			// skip
 		}
 	}
 	catch (const core::InterruptException& exc)

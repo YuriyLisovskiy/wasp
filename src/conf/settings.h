@@ -1,7 +1,7 @@
 /**
  * conf/settings.h
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
  * Purpose: entire application's settings.
  */
@@ -12,12 +12,10 @@
 #include <xalwart.core/datetime.h>
 #include <xalwart.core/logger.h>
 #include <xalwart.core/result.h>
+#include <xalwart.core/yaml/yaml-cpp/yaml.h>
 
 // Render libraries.
 #include <xalwart.render/library/base.h>
-
-// Vendor libraries.
-#include "../yaml/yaml-cpp/yaml.h"
 
 // Module definitions.
 #include "./_def_.h"
@@ -29,9 +27,9 @@
 #include "../urls/url.h"
 
 
-__CORE_BEGIN__
+__SERVER_BEGIN__
 class IServer;
-__CORE_END__
+__SERVER_END__
 
 
 __CONF_BEGIN__

@@ -1,7 +1,7 @@
 /**
  * http/request.cpp
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  */
 
 #include "./request.h"
@@ -52,24 +52,24 @@ std::string HttpRequest::version() const
 	return std::to_string(this->_major_version) + "." + std::to_string(this->_minor_version);
 }
 
-std::string HttpRequest::path()
+std::string HttpRequest::path() const
 {
 	return this->_path;
 }
 
-std::string HttpRequest::full_path(bool force_append_slash)
+std::string HttpRequest::full_path(bool force_append_slash) const
 {
 	return this->_path +
 		(force_append_slash && !str::ends_with(this->_path, "/") ? "/" : "") +
 		(this->_query.empty() ? "" : "?" + this->_query);
 }
 
-std::string HttpRequest::query()
+std::string HttpRequest::query() const
 {
 	return this->_query;
 }
 
-std::string HttpRequest::method()
+std::string HttpRequest::method() const
 {
 	return this->_method;
 }
