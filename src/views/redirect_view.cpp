@@ -1,7 +1,7 @@
 /**
  * views/redirect_view.cpp
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  */
 
 #include "./redirect_view.h"
@@ -35,7 +35,7 @@ std::string RedirectView::get_redirect_url()
 
 	if (this->_query_string)
 	{
-		url += "?" + this->_request->query();
+		url += "?" + this->request->query();
 	}
 
 	return url;
@@ -46,9 +46,9 @@ core::Result<std::shared_ptr<http::IHttpResponse>> RedirectView::get(http::HttpR
 	std::string url = this->get_redirect_url();
 	if (url.empty())
 	{
-		if (this->_logger != nullptr)
+		if (this->logger != nullptr)
 		{
-			this->_logger->warning("Gone: " + request->path());
+			this->logger->warning("Gone: " + request->path());
 		}
 
 		return this->response<http::HttpResponseGone>("");

@@ -1,7 +1,7 @@
 /**
  * views/args.cpp
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  */
 
 #include "./args.h"
@@ -9,45 +9,56 @@
 
 __VIEWS_BEGIN__
 
-Args::Args(const std::map<std::string, std::string>& src)
+Args::Args(std::map<std::string, std::string> src) : _map(std::move(src))
 {
-	this->_map = src;
 }
 
-int Args::get_int(const std::string& key, int _default)
+int Args::get_int(const std::string& key, int _default) const
 {
 	if (this->contains(key))
 	{
-		std::string value = this->_map[key];
-		if (Args::is_number(value))
+		std::string value = this->_map.at(key);
+		if (_is_number(value))
 		{
-			return std::stoi(this->_map[key]);
+			return std::stoi(this->_map.at(key));
 		}
 	}
 
 	return _default;
 }
 
-std::string Args::get_str(const std::string& key, const std::string& _default)
+std::string Args::get_str(const std::string& key, const std::string& _default) const
 {
 	if (this->contains(key))
 	{
-		return this->_map[key];
+		return this->_map.at(key);
 	}
 
 	return _default;
 }
 
-bool Args::contains(const std::string& key)
+bool Args::contains(const std::string& key) const
 {
 	return this->_map.find(key) != this->_map.end();
 }
 
-bool Args::is_number(const std::string& val)
+bool Args::_is_number(const std::string& val)
 {
-	int dot_found = false;
-	for (char ch : val)
+	if (val.empty())
 	{
+		return false;
+	}
+
+	int dot_found = false;
+	size_t i = 0;
+	if (val[0] == '-' || val[0] == '+')
+	{
+		i++;
+	}
+
+	while (i < val.size())
+	{
+		char ch = val[i++];
 		if (ch == '.')
 		{
 			if (dot_found)

@@ -1,7 +1,7 @@
 /**
  * views/view.h
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
  * Purpose:
  * 	Intentionally simple parent class for all views. Only
@@ -43,25 +43,25 @@ typedef std::function<core::Result<std::shared_ptr<http::IHttpResponse>>(
 
 class View
 {
-protected:
-	core::ILogger* _logger;
+private:
+	core::Result<std::shared_ptr<http::IHttpResponse>> null();
 
-	conf::Settings* _settings;
+protected:
+	core::ILogger* logger;
+
+	conf::Settings* settings;
 
 	/// Holds pointer to client's request.
 	/// Caution: must be deleted outside!
-	http::HttpRequest* _request;
+	http::HttpRequest* request;
 
 	/// Contains all possible http methods which view can handle.
-	const std::vector<std::string> _http_method_names = {
+	const std::vector<std::string> http_method_names = {
 		"get", "post", "put", "patch", "delete", "head", "options", "trace"
 	};
 
 	/// List of methods witch will be returned when OPTIONS is request.
-	std::vector<std::string> _allowed_methods_list;
-
-private:
-	core::Result<std::shared_ptr<http::IHttpResponse>> null();
+	std::vector<std::string> allowed_methods_list;
 
 protected:
 	explicit View(

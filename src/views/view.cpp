@@ -1,7 +1,7 @@
 /**
  * views/view.cpp
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  */
 
 #include "./view.h"
@@ -16,15 +16,14 @@
 __VIEWS_BEGIN__
 
 View::View(conf::Settings* settings)
-	: _request(nullptr), _allowed_methods_list({"options"})
+	: request(nullptr), allowed_methods_list({"options"}), settings(settings)
 {
-	this->_settings = settings;
-	if (!this->_settings->LOGGER)
+	if (!this->settings->LOGGER)
 	{
 		throw core::ImproperlyConfigured("View: LOGGER instance must be configured");
 	}
 
-	this->_logger = this->_settings->LOGGER.get();
+	this->logger = this->settings->LOGGER.get();
 }
 
 core::Result<std::shared_ptr<http::IHttpResponse>> View::null()
@@ -37,21 +36,21 @@ View::View(
 	conf::Settings* settings
 ) : View(settings)
 {
-	this->_allowed_methods_list = allowed_methods;
+	this->allowed_methods_list = allowed_methods;
 	if (std::find(allowed_methods.begin(), allowed_methods.end(), "options") == allowed_methods.end())
 	{
-		this->_allowed_methods_list.emplace_back("options");
+		this->allowed_methods_list.emplace_back("options");
 	}
 }
 
 void View::setup(http::HttpRequest* request)
 {
-	this->_request = request;
+	this->request = request;
 }
 
 core::Result<std::shared_ptr<http::IHttpResponse>> View::dispatch(Args* args)
 {
-	if (this->_request == nullptr)
+	if (this->request == nullptr)
 	{
 		throw core::NullPointerException(
 			utility::demangle(typeid(*this).name()) +
@@ -61,44 +60,44 @@ core::Result<std::shared_ptr<http::IHttpResponse>> View::dispatch(Args* args)
 		);
 	}
 
-	std::string method = str::lower(this->_request->method());
+	std::string method = str::lower(this->request->method());
 	auto result = core::Result<std::shared_ptr<http::IHttpResponse>>::null();
 	if (method == "get")
 	{
-		result = this->get(this->_request, args);
+		result = this->get(this->request, args);
 	}
 	else if (method == "post")
 	{
-		result = this->post(this->_request, args);
+		result = this->post(this->request, args);
 	}
 	else if (method == "put")
 	{
-		result = this->put(this->_request, args);
+		result = this->put(this->request, args);
 	}
 	else if (method == "patch")
 	{
-		result = this->patch(this->_request, args);
+		result = this->patch(this->request, args);
 	}
 	else if (method == "delete")
 	{
-		result = this->delete_(this->_request, args);
+		result = this->delete_(this->request, args);
 	}
 	else if (method == "head")
 	{
-		result = this->head(this->_request, args);
+		result = this->head(this->request, args);
 	}
 	else if (method == "options")
 	{
-		result = this->options(this->_request, args);
+		result = this->options(this->request, args);
 	}
 	else if (method == "trace")
 	{
-		result = this->trace(this->_request, args);
+		result = this->trace(this->request, args);
 	}
 
 	if (!result)
 	{
-		result = this->http_method_not_allowed(this->_request);
+		result = this->http_method_not_allowed(this->request);
 	}
 
 	return result;
@@ -106,7 +105,7 @@ core::Result<std::shared_ptr<http::IHttpResponse>> View::dispatch(Args* args)
 
 core::Result<std::shared_ptr<http::IHttpResponse>> View::http_method_not_allowed(http::HttpRequest* request)
 {
-	this->_logger->warning(
+	this->logger->warning(
 		"Method Not Allowed (" + request->method() + "): " + request->path(),
 		_ERROR_DETAILS_
 	);
@@ -116,13 +115,13 @@ core::Result<std::shared_ptr<http::IHttpResponse>> View::http_method_not_allowed
 std::vector<std::string> View::allowed_methods()
 {
 	std::vector<std::string> result;
-	for (const auto& method : this->_allowed_methods_list)
+	for (const auto& method : this->allowed_methods_list)
 	{
 		bool found = std::find(
-			this->_http_method_names.begin(),
-			this->_http_method_names.end(),
+			this->http_method_names.begin(),
+			this->http_method_names.end(),
 			str::lower(method)
-		) != this->_http_method_names.end();
+		) != this->http_method_names.end();
 		if (found)
 		{
 			result.push_back(str::upper(method));

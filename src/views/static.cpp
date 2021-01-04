@@ -1,7 +1,7 @@
 /**
  * views/static.cpp
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  */
 
 #include "./static.h"
@@ -45,7 +45,7 @@ core::Result<std::shared_ptr<http::IHttpResponse>> StaticView::get(http::HttpReq
 
 	if (!args)
 	{
-		this->_logger->warning(
+		this->logger->warning(
 			"unable to retrieve \"path\" argument from url while serving static file",
 			_ERROR_DETAILS_
 		);
