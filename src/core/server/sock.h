@@ -34,8 +34,10 @@ private:
 private:
 	bool _set_blocking(bool blocking);
 
-protected:
+public:
 	int sock;
+
+protected:
 	int family;
 	const char* address;
 	uint16_t port;

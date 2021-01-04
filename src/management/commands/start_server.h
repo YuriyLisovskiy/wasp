@@ -1,7 +1,7 @@
 /**
  * management/commands/runserver.h
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
  * Purpose: runs server from command line.
  */
@@ -14,6 +14,7 @@
 // Framework libraries.
 #include "../../commands/app_command.h"
 #include "../../core/server/interfaces.h"
+#include "../../core/server/func.h"
 
 
 __MANAGEMENT_COMMANDS_BEGIN__
@@ -44,9 +45,7 @@ private:
 protected:
 	void add_flags() final;
 	void handle() final;
-	std::function<
-		core::Result<std::shared_ptr<http::IHttpResponse>>(http::HttpRequest*, const int&)
-	> make_handler();
+	server::HttpHandlerFunc make_handler();
 	bool static_is_allowed(const std::string& static_url);
 	void build_static_patterns(std::vector<std::shared_ptr<urls::UrlPattern>>& patterns);
 	void build_app_patterns(std::vector<std::shared_ptr<urls::UrlPattern>>& patterns);

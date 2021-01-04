@@ -6,11 +6,6 @@
 
 #include "./server.h"
 
-// C++ libraries.
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
-
 // Core libraries.
 #include <xalwart.core/datetime.h>
 

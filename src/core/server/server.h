@@ -13,20 +13,13 @@
 
 // Framework libraries.
 #include "./base_server.h"
+#include "./func.h"
 #include "../../http/request.h"
 #include "../../http/response.h"
 #include "../../conf/settings.h"
 
 
 __SERVER_BEGIN__
-
-typedef std::function<void(
-	const http::HttpRequest*, const core::Result<std::shared_ptr<http::IHttpResponse>>&
-)> StartResponseFunc;
-
-typedef std::function<
-	void(http::HttpRequest*, const StartResponseFunc&)
-> HttpHandlerFunc;
 
 class DefaultServer : public HTTPServer
 {

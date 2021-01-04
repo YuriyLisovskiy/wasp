@@ -118,9 +118,7 @@ void StartServerCommand::handle()
 	server->close();
 }
 
-std::function<
-	core::Result<std::shared_ptr<http::IHttpResponse>>(http::HttpRequest*, const int&)
-> StartServerCommand::make_handler()
+server::HttpHandlerFunc StartServerCommand::make_handler()
 {
 	// Check if static files can be served
 	// and create necessary urls.
@@ -134,8 +132,8 @@ std::function<
 	this->settings->TEMPLATES_ENGINE->load_libraries();
 
 	auto handler = [this](
-		http::HttpRequest* request, const int& client
-	) mutable -> core::Result<std::shared_ptr<http::IHttpResponse>>
+		http::HttpRequest* request, const server::StartResponseFunc& start_response
+	) mutable -> void
 	{
 		core::Result<std::shared_ptr<http::IHttpResponse>> result;
 		try
@@ -220,7 +218,7 @@ std::function<
 			);
 		}
 
-		return result;
+		start_response(request, result);
 	};
 
 	return handler;

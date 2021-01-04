@@ -23,6 +23,7 @@
 // Framework libraries.
 #include "../apps/interfaces.h"
 #include "../core/server/interfaces.h"
+#include "../core/server/func.h"
 #include "../middleware/interfaces.h"
 #include "../urls/url.h"
 
@@ -234,9 +235,7 @@ public:
 	void prepare();
 	virtual std::shared_ptr<server::IServer> use_server(
 		const Settings* settings,
-		const std::function<core::Result<std::shared_ptr<http::IHttpResponse>>(
-			http::HttpRequest* request, const int& client
-		)>& handler,
+		const server::HttpHandlerFunc& handler,
 		const collections::Dict<std::string, std::string>& kwargs
 	);
 

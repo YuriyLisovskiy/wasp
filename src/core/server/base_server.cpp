@@ -78,7 +78,7 @@ core::Error HTTPServer::write(int sock, const char* data, size_t n)
 
 void HTTPServer::_accept()
 {
-//	sockaddr_in6 newSocketInfo{};
+//	sockaddr_in newSocketInfo{};
 //	socklen_t newSocketInfoLength = sizeof(newSocketInfo);
 	int new_sock;
 	while (!this->_socket->is_closed())

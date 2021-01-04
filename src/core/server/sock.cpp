@@ -67,7 +67,7 @@ void BaseSocket::set_options()
 	}
 
 	this->bind();
-	this->_set_blocking(false);
+//	this->_set_blocking(false);
 }
 
 void BaseSocket::listen()
@@ -138,7 +138,7 @@ TCPSocket::TCPSocket(const char* address, uint16_t port)
 void TCPSocket::set_options()
 {
 	int opt = 1;
-	setsockopt(this->sock, IPPROTO_TCP, TCP_NODELAY, &opt, sizeof(opt));
+//	setsockopt(this->sock, IPPROTO_TCP, TCP_NODELAY, &opt, sizeof(opt));
 	BaseSocket::set_options();
 }
 

@@ -9,10 +9,8 @@
 #pragma once
 
 #include <chrono>
-#include <functional>
-#include <string>
 
-#include <xalwart.core/_def_.h>
+#include "../_def_.h"
 
 
 // xw::server
@@ -23,12 +21,6 @@
 #define __SERVER_UTIL_BEGIN__ __SERVER_BEGIN__ namespace util {
 #define __SERVER_UTIL_END__ } __SERVER_END__
 
-
-__SERVER_BEGIN__
-
-typedef std::function<void(int, const std::string&)> OnErrorFunc;
-
-__SERVER_END__
 
 template <typename TimeT = std::chrono::milliseconds>
 class Measure

@@ -1,7 +1,7 @@
 /**
  * conf/settings.cpp
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  */
 
 #include "./settings.h"
@@ -948,9 +948,7 @@ void Settings::prepare()
 
 std::shared_ptr<server::IServer> Settings::use_server(
 	const Settings* settings,
-	const std::function<core::Result<std::shared_ptr<http::IHttpResponse>>(
-		http::HttpRequest*, const int&
-	)>& handler,
+	const server::HttpHandlerFunc& handler,
 	const collections::Dict<std::string, std::string>& kwargs
 )
 {
