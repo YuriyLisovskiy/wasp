@@ -23,6 +23,13 @@ DefaultServer::DefaultServer(
 {
 }
 
+void DefaultServer::init_environ()
+{
+	HTTPServer::init_environ();
+	this->base_environ[http::meta::SERVER_NAME] = this->server_name;
+	this->base_environ[http::meta::SERVER_PORT] = std::to_string(this->server_port);
+}
+
 HandlerFunc DefaultServer::_make_handler()
 {
 	return [&](int sock, parsers::request_parser* parser, core::Error* err)
@@ -48,37 +55,6 @@ HandlerFunc DefaultServer::_make_handler()
 					this->_start_response(sock, req, res);
 				}
 			);
-//			auto result = this->_http_handler(request.get(), sock);
-//			std::shared_ptr<http::IHttpResponse> response;
-//			if (result.catch_(core::HttpError))
-//			{
-//				this->ctx.logger->trace(result.err.msg, _ERROR_DETAILS_);
-//				response = _from_error(&result.err);
-//			}
-//			else if (!result.value)
-//			{
-//				// Response was not instantiated, so return 204 - No Content.
-//				response = std::make_shared<http::HttpResponse>(204);
-//				this->ctx.logger->warning(
-//					"Response was not instantiated, returned 204",
-//					_ERROR_DETAILS_
-//				);
-//			}
-//			else
-//			{
-//				auto error = result.value->err();
-//				if (error)
-//				{
-//					this->ctx.logger->trace(error.msg, _ERROR_DETAILS_);
-//					response = _from_error(&error);
-//				}
-//				else
-//				{
-//					response = result.value;
-//				}
-//			}
-//
-//			this->_send_response(request.get(), response.get(), sock, this->ctx.logger.get());
 		}
 	};
 }
@@ -179,10 +155,7 @@ std::shared_ptr<http::HttpRequest> DefaultServer::_request(parsers::request_pars
 		get_params,
 		post_params,
 		files_params,
-		collections::Dict<std::string, std::string>{{
-			{meta::SERVER_HOST, this->host},
-			{meta::SERVER_PORT, this->port},
-		}}
+		this->base_environ
 	);
 }
 

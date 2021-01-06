@@ -8,6 +8,9 @@
 
 #pragma once
 
+// Core libraries.
+#include <xalwart.core/collections/dict.h>
+
 // Module definitions.
 #include "./_def_.h"
 
@@ -29,6 +32,8 @@ public:
 		HttpHandlerFunc handler,
 		const conf::Settings* settings
 	);
+
+	void init_environ() override;
 
 protected:
 	const conf::Settings* settings;

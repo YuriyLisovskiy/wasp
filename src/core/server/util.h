@@ -38,4 +38,14 @@ extern void close_socket(
 	std::shared_ptr<BaseSocket>& socket, core::ILogger* logger
 );
 
+// Wrapper for standard gethostname(char *__name, size_t __len) function.
+extern std::string get_host_name();
+
+// Wrapper for standard gethostbyaddr(const void *__addr, __socklen_t __len, int __type) function.
+extern struct hostent* get_host_by_addr(const std::string& address);
+
+// Get fully qualified domain name from name.
+// An empty argument is interpreted as meaning the local host.
+extern std::string fqdn(const std::string& name="");
+
 __SERVER_UTIL_END__

@@ -11,6 +11,7 @@
 
 // Core libraries.
 #include <xalwart.core/exceptions.h>
+#include <xalwart.core/string_utils.h>
 
 
 __SERVER_UTIL_BEGIN__
@@ -108,6 +109,78 @@ void close_socket(
 	{
 		logger->error("Error while closing socket: " + std::string(exc.what()));
 	}
+}
+
+std::string get_host_name()
+{
+	char host_buffer[256];
+	if (gethostname(host_buffer, sizeof(host_buffer)))
+	{
+		throw core::SocketError(
+			errno, "'gethostname' call failed: " + std::to_string(errno), _ERROR_DETAILS_
+		);
+	}
+
+	return host_buffer;
+}
+
+struct hostent* get_host_by_addr(const std::string& address)
+{
+	struct in_addr ip{};
+	struct hostent* hp;
+	if (!inet_aton(address.c_str(), &ip))
+	{
+		throw core::SocketError(
+			1, "can't parse IP address " + address, _ERROR_DETAILS_
+		);
+	}
+
+	if ((hp = gethostbyaddr((const char *) &ip, sizeof(ip), INADDR_ANY)) == nullptr)
+	{
+		throw core::SocketError(
+			1, "no name associated with " + address, _ERROR_DETAILS_
+		);
+	}
+
+	return hp;
+}
+
+std::string fqdn(const std::string& name)
+{
+	auto nm = str::trim(name);
+	if (nm.empty() || nm == "0.0.0.0")
+	{
+		nm = get_host_name();
+	}
+
+	try
+	{
+		auto ht = get_host_by_addr(nm);
+		if (ht->h_name && str::contains(ht->h_name, '.'))
+		{
+			return nm;
+		}
+
+		bool is_broke = false;
+		for (int i = 0; i < ht->h_length; i++)
+		{
+			if (ht->h_aliases[i] && str::contains(ht->h_aliases[i], '.'))
+			{
+				is_broke = true;
+				break;
+			}
+		}
+
+		if (!is_broke && ht->h_name)
+		{
+			nm = ht->h_name;
+		}
+	}
+	catch (const core::SocketError&)
+	{
+	}
+
+	return nm;
 }
 
 __SERVER_UTIL_END__

@@ -53,10 +53,17 @@ public:
 
 	core::Error write(int sock, const char* data, size_t n) override;
 
+	void init_environ() override;
+
+	[[nodiscard]]
+	collections::Dict<std::string, std::string> environ() const override;
+
 protected:
 	std::string host;
-	std::string port;
+	std::string server_name;
+	uint16_t server_port = 0;
 	Context ctx;
+	collections::Dict<std::string, std::string> base_environ;
 
 private:
 	std::shared_ptr<core::ThreadPool> _threadPool;

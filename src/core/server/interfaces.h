@@ -8,6 +8,12 @@
 
 #pragma once
 
+// C++ libraries.
+#include <string>
+
+// Core libraries.
+#include <xalwart.core/collections/dict.h>
+
 // Module definitions.
 #include "./_def_.h"
 
@@ -31,6 +37,10 @@ public:
 
 	// Write n bytes from data array.
 	virtual core::Error write(int sock, const char* data, size_t n) = 0;
+
+	virtual void init_environ() = 0;
+
+	virtual collections::Dict<std::string, std::string> environ() const = 0;
 };
 
 __SERVER_END__

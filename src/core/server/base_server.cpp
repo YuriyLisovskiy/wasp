@@ -33,6 +33,10 @@ void HTTPServer::bind(const std::string& address, uint16_t port)
 {
 	this->_socket = util::create_socket(address, port, 5, this->ctx.logger.get());
 	this->_socket->set_options();
+	this->host = address;
+	this->server_port = port;
+	this->server_name = util::fqdn(this->host);
+	this->init_environ();
 }
 
 void HTTPServer::listen(const std::string& message)
@@ -74,6 +78,15 @@ core::Error HTTPServer::write(int sock, const char* data, size_t n)
 	}
 
 	return core::Error::none();
+}
+
+void HTTPServer::init_environ()
+{
+}
+
+collections::Dict<std::string, std::string> HTTPServer::environ() const
+{
+	return this->base_environ;
 }
 
 void HTTPServer::_accept()

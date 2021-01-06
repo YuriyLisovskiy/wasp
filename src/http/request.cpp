@@ -174,7 +174,7 @@ std::string HttpRequest::get_raw_host(
 	}
 	else
 	{
-		host = this->META.get(meta::SERVER_HOST);
+		host = this->META.get(meta::SERVER_NAME);
 		auto port = this->get_port(use_x_forwarded_port);
 		if (port != (this->is_secure(this->settings->SECURE_PROXY_SSL_HEADER.get()) ? "443" : "80"))
 		{
