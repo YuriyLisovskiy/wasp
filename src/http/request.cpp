@@ -168,9 +168,9 @@ std::string HttpRequest::get_raw_host(
 	{
 		host = this->headers.get(http::X_FORWARDED_HOST);
 	}
-	else if (this->headers.contains(http::HOST))
+	else if (this->META.contains("HTTP_HOST"))
 	{
-		host = this->headers.get(http::HOST);
+		host = this->META.get("HTTP_HOST");
 	}
 	else
 	{
