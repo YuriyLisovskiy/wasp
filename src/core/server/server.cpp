@@ -8,6 +8,7 @@
 
 // Core libraries.
 #include <xalwart.core/datetime.h>
+#include <xalwart.core/string_utils.h>
 
 // Framework libraries.
 #include "../../http/meta.h"
@@ -142,6 +143,13 @@ std::shared_ptr<http::HttpRequest> DefaultServer::_request(parsers::request_pars
 		}
 	}
 
+	auto env_copy = this->base_environ;
+	for (const auto& header : parser->headers)
+	{
+		auto key = str::replace(header.first, "-", "_");
+		env_copy["HTTP_" + str::upper(key)] = header.second;
+	}
+
 	return std::make_shared<http::HttpRequest>(
 		this->settings,
 		parser->method,
@@ -155,7 +163,7 @@ std::shared_ptr<http::HttpRequest> DefaultServer::_request(parsers::request_pars
 		get_params,
 		post_params,
 		files_params,
-		this->base_environ
+		env_copy
 	);
 }
 
