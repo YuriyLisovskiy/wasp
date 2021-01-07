@@ -121,22 +121,8 @@ core::Result<std::string> HttpRequest::get_host(
 		allowed_hosts = {".localhost", "127.0.0.1", "::1"};
 	}
 
-	std::cerr << "==========================\n";
-	for (const auto& allowed_host : allowed_hosts)
-	{
-		std::cerr << allowed_host << '\n';
-	}
-
-	std::cerr << "==========================\n";
-
 	std::string domain, port;
-
-	std::cerr << "HOST: " << host << '\n';
-
 	split_domain_port(host, domain, port);
-
-	std::cerr << "DOMAIN: " << domain << " | PORT: " << port << '\n';
-
 	if (!domain.empty() && validate_host(domain, allowed_hosts))
 	{
 		return core::Result(host);
@@ -152,8 +138,6 @@ core::Result<std::string> HttpRequest::get_host(
 		{
 			msg += " The domain name provided is not valid according to RFC 1034/1035.";
 		}
-
-		std::cerr << msg << '\n';
 
 		return core::raise<core::DisallowedHost, std::string>(msg);
 	}

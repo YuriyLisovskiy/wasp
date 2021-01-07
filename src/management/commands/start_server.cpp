@@ -68,6 +68,7 @@ void StartServerCommand::add_flags()
 
 void StartServerCommand::handle()
 {
+	core::InterruptException::initialize();
 	if (!this->settings->DEBUG && this->settings->ALLOWED_HOSTS.empty())
 	{
 		throw core::CommandError("You must set 'allowed_hosts' if 'debug' is false.");
@@ -87,20 +88,19 @@ void StartServerCommand::handle()
 	try
 	{
 		server->bind(this->_host, this->_port);
-		xw::core::InterruptException::initialize();
-		try
-		{
+//		try
+//		{
 			std::string message = dt::Datetime::now().strftime("%B %d, %Y - %T") + "\n" +
 			                      LIB_NAME + " version " + LIB_VERSION + "\n" +
 			                      "Starting development server at " +
 			                      "http://" + this->_host + ":" + std::to_string(this->_port) + "/\n" +
 			                      "Quit the server with CONTROL-C.";
 			server->listen(message);
-		}
-		catch (const xw::core::InterruptException& exc)
-		{
+//		}
+//		catch (const xw::core::InterruptException& exc)
+//		{
 			// skip
-		}
+//		}
 	}
 	catch (const core::InterruptException& exc)
 	{

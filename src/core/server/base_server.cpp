@@ -8,6 +8,7 @@
 
 // C++ libraries.
 #include <cstring>
+#include <iostream>
 
 // Framework libraries.
 #include "./util.h"
@@ -19,7 +20,7 @@ HTTPServer::HTTPServer(Context ctx, HandlerFunc handler)
 	: ctx(std::move(ctx)), _handler(std::move(handler))
 {
 	this->ctx.normalize();
-	this->_threadPool = std::make_shared<core::ThreadPool>(this->ctx.workers);
+	this->_threadPool = std::make_shared<core::ThreadPool>("server", this->ctx.workers);
 	if (!this->_handler)
 	{
 		this->_handler = [this](const int, parsers::request_parser*, core::Error*)
@@ -93,6 +94,65 @@ void HTTPServer::_accept()
 {
 //	sockaddr_in newSocketInfo{};
 //	socklen_t newSocketInfoLength = sizeof(newSocketInfo);
+
+//	auto fd = this->_socket->fd();
+//	fd_set read_fds;
+//	FD_ZERO(&read_fds);
+//	FD_SET(fd, &read_fds);
+//
+//	// TODO: move tv_sec to class field.
+//	struct timeval timeout{};
+//	timeout.tv_sec = 1;  // 1s timeout
+//	timeout.tv_usec = 0;
+//
+//	int ret;
+//	while (!this->_socket->is_closed())
+//	{
+//		std::cerr << "SELECTING...\n";
+//		ret = select(fd + 1, &read_fds, nullptr, nullptr, &timeout);
+//		if (ret == -1)
+//		{
+//			// ERROR: do something
+//			throw core::SocketError(
+//				errno, "'select' call failed: " + std::to_string(errno), _ERROR_DETAILS_
+//			);
+//		}
+//		else if (ret > 0)
+//		{
+//			// we have data, we can accept now
+//			int new_sock;
+//			if ((new_sock = ::accept(fd + 1, nullptr, nullptr)) < 0)
+//			{
+//				if (errno == EBADF || errno == EINVAL)
+//				{
+//					throw core::SocketError(
+//						errno, "'accept' call failed: " + std::to_string(errno), _ERROR_DETAILS_
+//					);
+//				}
+//
+//				if (errno == EMFILE)
+//				{
+//					std::this_thread::sleep_for(std::chrono::milliseconds(300));
+//					new_sock = -1;
+//					continue;
+//				}
+//
+//				throw core::SocketError(
+//					errno,
+//					"'accept' call failed while accepting a new connection: " + std::to_string(errno),
+//					_ERROR_DETAILS_
+//				);
+//			}
+//
+//			if (!this->_socket->is_closed() && new_sock >= 0)
+//			{
+//				this->_handle(new_sock);
+//			}
+//		}
+//
+//		// otherwise (i.e. select_status==0) timeout, continue
+//	}
+
 	int new_sock;
 	while (!this->_socket->is_closed())
 	{
