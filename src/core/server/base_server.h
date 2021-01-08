@@ -86,9 +86,13 @@ private:
 	};
 
 private:
-	void _accept();
+	int _get_request();
+
+	void _handle_request(int sock);
 
 	void _handle(const int& sock);
+
+	void _shutdown_request(int sock);
 
 	core::Result<xw::string> _read_headers(size_t sock, xw::string& body_beginning);
 

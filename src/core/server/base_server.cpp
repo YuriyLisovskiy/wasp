@@ -4,7 +4,7 @@
  * Copyright (c) 2020-2021 Yuriy Lisovskiy
  */
 
-#include "./server.h"
+#include "./base_server.h"
 
 // C++ libraries.
 #include <cstring>
@@ -12,6 +12,7 @@
 
 // Framework libraries.
 #include "./util.h"
+#include "./selectors.h"
 
 
 __SERVER_BEGIN__
@@ -48,22 +49,18 @@ void HTTPServer::listen(const std::string& message)
 		this->ctx.logger->print(message);
 	}
 
-//	this->_accept();
+	SelectSelector selector(this->_socket->fd(), this->ctx.logger.get());
 	while (!this->_socket->is_closed())
 	{
-		this->_accept();
-//		try
-//		{
-//			switch (this->_select(this->_socket->fd()))
-//			{
-//				case select_enum::s_continue:
-//					continue;
-//			}
-//		}
-//		catch (const core::InterruptException&)
-//		{
-//			this->close();
-//		}
+		auto ready = selector.select(this->ctx.timeout_sec);
+		if (ready)
+		{
+			auto conn = this->_get_request();
+			if (conn >= 0)
+			{
+				this->_handle(conn);
+			}
+		}
 	}
 }
 
@@ -170,7 +167,12 @@ bool HTTPServer::wait_for_client(int fd) const
 	fd_set fds;
 	FD_ZERO(&fds);
 	FD_SET(fd, &fds);
-	int ret = select(fd + 1, &fds, nullptr, nullptr, &timeout);
+
+	fd_set read_fds;
+	FD_ZERO(&read_fds);
+	FD_SET(fd, &read_fds);
+
+	int ret = select(fd + 1, &fds, &read_fds, nullptr, &timeout);
 	if (ret == -1)
 	{
 		this->ctx.logger->error(
@@ -193,7 +195,7 @@ bool HTTPServer::wait_for_client(int fd) const
 	return false;
 }
 
-void HTTPServer::_accept()
+int HTTPServer::_get_request()
 {
 	int new_sock;
 	if ((new_sock = ::accept(this->_socket->fd(), nullptr, nullptr)) < 0)
@@ -209,7 +211,7 @@ void HTTPServer::_accept()
 		{
 			std::this_thread::sleep_for(std::chrono::milliseconds(300));
 //			new_sock = -1;
-			return;
+			return -1;
 		}
 
 		throw core::SocketError(
@@ -221,8 +223,10 @@ void HTTPServer::_accept()
 
 	if (!this->_socket->is_closed() && new_sock >= 0)
 	{
-		this->_handle(new_sock);
+		return new_sock;
 	}
+
+	return -1;
 
 //	sockaddr_in newSocketInfo{};
 //	socklen_t newSocketInfoLength = sizeof(newSocketInfo);
@@ -287,6 +291,50 @@ void HTTPServer::_accept()
 //	}
 }
 
+void HTTPServer::_handle_request(int sock)
+{
+	parsers::request_parser rp;
+	xw::string body_beginning;
+	auto result = _read_headers(sock, body_beginning);
+	if (result.err)
+	{
+		this->ctx.logger->trace("Method '_read_headers' returned an error", _ERROR_DETAILS_);
+		this->_handler(sock, &rp, &result.err);
+	}
+	else
+	{
+		rp.parse_headers(result.value);
+		if (rp.headers.find("Content-Length") != rp.headers.end())
+		{
+			size_t body_length = std::strtol(rp.headers["Content-Length"].c_str(), nullptr, 10);
+			xw::string body;
+			if (body_length == body_beginning.size())
+			{
+				body = body_beginning;
+			}
+			else
+			{
+				result = _read_body(sock, body_beginning, body_length);
+				if (result.err)
+				{
+					this->ctx.logger->trace("Method '_read_body' returned an error", _ERROR_DETAILS_);
+					this->_handler(sock, &rp, &result.err);
+					return;
+//  				return result.forward<std::shared_ptr<http::HttpRequest>>();
+				}
+				else
+				{
+					body = result.value;
+				}
+			}
+
+			rp.parse_body(body, this->ctx.media_root);
+		}
+
+		this->_handler(sock, &rp, nullptr);
+	}
+}
+
 void HTTPServer::_handle(const int& sock)
 {
 	this->_threadPool->push([this, sock](){
@@ -294,56 +342,29 @@ void HTTPServer::_handle(const int& sock)
 		{
 			Measure measure;
 			measure.start();
-			parsers::request_parser rp;
-			xw::string body_beginning;
-			auto result = _read_headers(sock, body_beginning);
-			if (result.err)
-			{
-				this->ctx.logger->trace("Method '_read_headers' returned an error", _ERROR_DETAILS_);
-				this->_handler(sock, &rp, &result.err);
-			}
-			else
-			{
-				rp.parse_headers(result.value);
-				if (rp.headers.find("Content-Length") != rp.headers.end())
-				{
-					size_t body_length = std::strtol(rp.headers["Content-Length"].c_str(), nullptr, 10);
-					xw::string body;
-					if (body_length == body_beginning.size())
-					{
-						body = body_beginning;
-					}
-					else
-					{
-						result = _read_body(sock, body_beginning, body_length);
-						if (result.err)
-						{
-							this->ctx.logger->trace("Method '_read_body' returned an error", _ERROR_DETAILS_);
-							this->_handler(sock, &rp, &result.err);
-							return;
-	//						return result.forward<std::shared_ptr<http::HttpRequest>>();
-						}
-						else
-						{
-							body = result.value;
-						}
-					}
-
-					rp.parse_body(body, this->ctx.media_root);
-				}
-
-				this->_handler(sock, &rp, nullptr);
-			}
-
-			::close(sock);
+			this->_handle_request(sock);
+			this->_shutdown_request(sock);
 			measure.end();
 			this->ctx.logger->debug("Time elapsed: " + std::to_string(measure.elapsed()) + " milliseconds");
 		}
 		catch (const core::ParseError& exc)
 		{
+			this->_shutdown_request(sock);
 			this->ctx.logger->error(exc);
 		}
 	});
+}
+
+void HTTPServer::_shutdown_request(int sock)
+{
+	if (shutdown(sock, SHUT_RDWR))
+	{
+		this->ctx.logger->error(
+			"'shutdown' call failed: " + std::to_string(errno), _ERROR_DETAILS_
+		);
+	}
+
+	::close(sock);
 }
 
 int HTTPServer::_error()
@@ -391,14 +412,6 @@ core::Result<xw::string> HTTPServer::_read_headers(
 	long long message_len;
 	do
 	{
-//		if (!this->wait_for_client(sock))
-//		{
-//			this->ctx.logger->trace("Request Timeout", _ERROR_DETAILS_);
-//			return core::raise<core::RequestTimeout, xw::string>(
-//				"Request Timeout", _ERROR_DETAILS_
-//			);
-//		}
-
 		message_len = recv(sock, buffer, MAX_BUFF_SIZE, 0);
 		buffer[message_len] = '\0';
 		if (message_len > 0)
@@ -429,7 +442,7 @@ core::Result<xw::string> HTTPServer::_read_headers(
 			else
 			{
 				this->ctx.logger->trace(
-					"An error occurred during a receiving of the request", _ERROR_DETAILS_
+					"An error occurred during a receiving the request", _ERROR_DETAILS_
 				);
 				return core::raise<core::HttpError, xw::string>(
 					"request finished with error code " + std::to_string(status), _ERROR_DETAILS_
@@ -474,14 +487,6 @@ core::Result<xw::string> HTTPServer::_read_body(
 	char buffer[MAX_BUFF_SIZE];
 	while (size < body_length)
 	{
-//		if (!this->wait_for_client(sock))
-//		{
-//			this->ctx.logger->trace("Request Timeout", _ERROR_DETAILS_);
-//			return core::raise<core::RequestTimeout, xw::string>(
-//				"Request Timeout", _ERROR_DETAILS_
-//			);
-//		}
-
 		message_len = recv(sock, buffer, MAX_BUFF_SIZE, 0);
 		buffer[message_len] = '\0';
 		if (message_len > 0)
