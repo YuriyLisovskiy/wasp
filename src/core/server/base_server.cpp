@@ -48,12 +48,28 @@ void HTTPServer::listen(const std::string& message)
 		this->ctx.logger->print(message);
 	}
 
-	this->_accept();
+//	this->_accept();
+	while (!this->_socket->is_closed())
+	{
+		this->_accept();
+//		try
+//		{
+//			switch (this->_select(this->_socket->fd()))
+//			{
+//				case select_enum::s_continue:
+//					continue;
+//			}
+//		}
+//		catch (const core::InterruptException&)
+//		{
+//			this->close();
+//		}
+	}
 }
 
 void HTTPServer::close()
 {
-	this->_threadPool->wait();
+	this->_threadPool->close();
 	util::close_socket(this->_socket, this->ctx.logger.get());
 }
 
@@ -90,8 +106,124 @@ collections::Dict<std::string, std::string> HTTPServer::environ() const
 	return this->base_environ;
 }
 
+//HTTPServer::select_enum HTTPServer::_select(int fd)
+//{
+//	fd_set read_fds;
+//	FD_ZERO(&read_fds);
+//	FD_SET(fd, &read_fds);
+//
+//	struct timeval timeout{};
+//	timeout.tv_sec = 5;  // 1s timeout
+//	timeout.tv_usec = 0;
+//
+//	int ret = select(fd + 1, &read_fds, nullptr, nullptr, &timeout);
+//	if (ret == -1)
+//	{
+//		// ERROR: do something
+//		throw core::SocketError(
+//			errno, "'select' call failed: " + std::to_string(errno), _ERROR_DETAILS_
+//		);
+//	}
+//	else if (ret > 0)
+//	{
+//		std::cerr << "FDS READY: " << ret << '\n';
+//		// we have data, we can accept now
+//		int new_sock;
+//		if ((new_sock = ::accept(fd, nullptr, nullptr)) < 0)
+//		{
+//			if (errno == EBADF || errno == EINVAL)
+//			{
+//				throw core::SocketError(
+//					errno, "'accept' call failed: " + std::to_string(errno), _ERROR_DETAILS_
+//				);
+//			}
+//
+//			if (errno == EMFILE)
+//			{
+//				std::this_thread::sleep_for(std::chrono::milliseconds(300));
+//				new_sock = -1;
+//				return select_enum::s_continue;
+//			}
+//
+//			throw core::SocketError(
+//				errno,
+//				"'accept' call failed while accepting a new connection: " + std::to_string(errno),
+//				_ERROR_DETAILS_
+//			);
+//		}
+//
+//		if (!this->_socket->is_closed() && new_sock >= 0)
+//		{
+//			this->_handle(new_sock);
+//		}
+//	}
+//
+//	// otherwise (i.e. select_status==0) timeout, continue
+//	return select_enum::s_continue;
+//}
+
+bool HTTPServer::wait_for_client(int fd) const
+{
+	struct timeval timeout{this->ctx.timeout_sec, this->ctx.timeout_usec};
+//	tv.tv_sec = this->ctx.timeout_sec;
+//	tv.tv_usec = this->ctx.timeout_usec;
+	fd_set fds;
+	FD_ZERO(&fds);
+	FD_SET(fd, &fds);
+	int ret = select(fd + 1, &fds, nullptr, nullptr, &timeout);
+	if (ret == -1)
+	{
+		this->ctx.logger->error(
+			"'select' call failed: " + std::string(strerror(errno)), _ERROR_DETAILS_
+		);
+	}
+	else if (ret == 0)
+	{
+		// timeout, just skip
+	}
+	else if (!FD_ISSET(fd, &fds))
+	{
+		this->ctx.logger->error("file descriptor is not set", _ERROR_DETAILS_);
+	}
+	else
+	{
+		return true;
+	}
+
+	return false;
+}
+
 void HTTPServer::_accept()
 {
+	int new_sock;
+	if ((new_sock = ::accept(this->_socket->fd(), nullptr, nullptr)) < 0)
+	{
+		if (errno == EBADF || errno == EINVAL)
+		{
+			throw core::SocketError(
+				errno, "'accept' call failed: " + std::to_string(errno), _ERROR_DETAILS_
+			);
+		}
+
+		if (errno == EMFILE)
+		{
+			std::this_thread::sleep_for(std::chrono::milliseconds(300));
+//			new_sock = -1;
+			return;
+		}
+
+		throw core::SocketError(
+			errno,
+			"'accept' call failed while accepting a new connection: " + std::to_string(errno),
+			_ERROR_DETAILS_
+		);
+	}
+
+	if (!this->_socket->is_closed() && new_sock >= 0)
+	{
+		this->_handle(new_sock);
+	}
+
 //	sockaddr_in newSocketInfo{};
 //	socklen_t newSocketInfoLength = sizeof(newSocketInfo);
 
@@ -99,91 +231,60 @@ void HTTPServer::_accept()
 //	fd_set read_fds;
 //	FD_ZERO(&read_fds);
 //	FD_SET(fd, &read_fds);
-//
-//	// TODO: move tv_sec to class field.
+
+	// TODO: move tv_sec to class field.
 //	struct timeval timeout{};
-//	timeout.tv_sec = 1;  // 1s timeout
+//	timeout.tv_sec = 5;  // 1s timeout
 //	timeout.tv_usec = 0;
-//
-//	int ret;
+
 //	while (!this->_socket->is_closed())
 //	{
-//		std::cerr << "SELECTING...\n";
-//		ret = select(fd + 1, &read_fds, nullptr, nullptr, &timeout);
-//		if (ret == -1)
+//		try
 //		{
-//			// ERROR: do something
-//			throw core::SocketError(
-//				errno, "'select' call failed: " + std::to_string(errno), _ERROR_DETAILS_
-//			);
-//		}
-//		else if (ret > 0)
-//		{
-//			// we have data, we can accept now
-//			int new_sock;
-//			if ((new_sock = ::accept(fd + 1, nullptr, nullptr)) < 0)
+//			std::cerr << "SELECTING...\n";
+//			switch (this->_select(this->_socket->fd()))
 //			{
-//				if (errno == EBADF || errno == EINVAL)
-//				{
-//					throw core::SocketError(
-//						errno, "'accept' call failed: " + std::to_string(errno), _ERROR_DETAILS_
-//					);
-//				}
-//
-//				if (errno == EMFILE)
-//				{
-//					std::this_thread::sleep_for(std::chrono::milliseconds(300));
-//					new_sock = -1;
+//				case select_enum::s_continue:
 //					continue;
-//				}
-//
+//			}
+//		}
+//		catch (const core::InterruptException&)
+//		{
+//			this->close();
+//		}
+//	}
+
+//	int new_sock;
+//	while (!this->_socket->is_closed())
+//	{
+//		while ((new_sock = ::accept(this->_socket->fd(), nullptr, nullptr)) < 0)
+//		{
+//			if (errno == EBADF || errno == EINVAL)
+//			{
 //				throw core::SocketError(
-//					errno,
-//					"'accept' call failed while accepting a new connection: " + std::to_string(errno),
-//					_ERROR_DETAILS_
+//					errno, "'accept' call failed: " + std::to_string(errno), _ERROR_DETAILS_
 //				);
 //			}
 //
-//			if (!this->_socket->is_closed() && new_sock >= 0)
+//			if (errno == EMFILE)
 //			{
-//				this->_handle(new_sock);
+//				std::this_thread::sleep_for(std::chrono::milliseconds(300));
+//				new_sock = -1;
+//				break;
 //			}
+//
+//			throw core::SocketError(
+//				errno,
+//				"'accept' call failed while accepting a new connection: " + std::to_string(errno),
+//				_ERROR_DETAILS_
+//			);
 //		}
 //
-//		// otherwise (i.e. select_status==0) timeout, continue
+//		if (!this->_socket->is_closed() && new_sock >= 0)
+//		{
+//			this->_handle(new_sock);
+//		}
 //	}
-
-	int new_sock;
-	while (!this->_socket->is_closed())
-	{
-		while ((new_sock = ::accept(this->_socket->fd(), nullptr, nullptr)) < 0)
-		{
-			if (errno == EBADF || errno == EINVAL)
-			{
-				throw core::SocketError(
-					errno, "'accept' call failed: " + std::to_string(errno), _ERROR_DETAILS_
-				);
-			}
-
-			if (errno == EMFILE)
-			{
-				std::this_thread::sleep_for(std::chrono::milliseconds(300));
-				new_sock = -1;
-				break;
-			}
-
-			throw core::SocketError(
-				errno,
-				"'accept' call failed while accepting a new connection: " + std::to_string(errno),
-				_ERROR_DETAILS_
-			);
-		}
-
-		if (!this->_socket->is_closed() && new_sock >= 0)
-		{
-			this->_handle(new_sock);
-		}
-	}
 }
 
 void HTTPServer::_handle(const int& sock)
@@ -219,6 +320,7 @@ void HTTPServer::_handle(const int& sock)
 						{
 							this->ctx.logger->trace("Method '_read_body' returned an error", _ERROR_DETAILS_);
 							this->_handler(sock, &rp, &result.err);
+							return;
 	//						return result.forward<std::shared_ptr<http::HttpRequest>>();
 						}
 						else
@@ -289,6 +391,14 @@ core::Result<xw::string> HTTPServer::_read_headers(
 	long long message_len;
 	do
 	{
+//		if (!this->wait_for_client(sock))
+//		{
+//			this->ctx.logger->trace("Request Timeout", _ERROR_DETAILS_);
+//			return core::raise<core::RequestTimeout, xw::string>(
+//				"Request Timeout", _ERROR_DETAILS_
+//			);
+//		}
+
 		message_len = recv(sock, buffer, MAX_BUFF_SIZE, 0);
 		buffer[message_len] = '\0';
 		if (message_len > 0)
@@ -364,6 +474,14 @@ core::Result<xw::string> HTTPServer::_read_body(
 	char buffer[MAX_BUFF_SIZE];
 	while (size < body_length)
 	{
+//		if (!this->wait_for_client(sock))
+//		{
+//			this->ctx.logger->trace("Request Timeout", _ERROR_DETAILS_);
+//			return core::raise<core::RequestTimeout, xw::string>(
+//				"Request Timeout", _ERROR_DETAILS_
+//			);
+//		}
+
 		message_len = recv(sock, buffer, MAX_BUFF_SIZE, 0);
 		buffer[message_len] = '\0';
 		if (message_len > 0)

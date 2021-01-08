@@ -75,6 +75,9 @@ std::shared_ptr<http::IHttpResponse> DefaultServer::_from_error(const core::Erro
 		case core::FileDoesNotExistError:
 			code = 404;
 			break;
+		case core::RequestTimeout:
+			code = 408;
+			break;
 		case core::InternalServerError:
 			code = 500;
 			break;

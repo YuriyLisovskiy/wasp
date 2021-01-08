@@ -115,6 +115,7 @@ void StartServerCommand::handle()
 		this->settings->LOGGER->error(exc.what(), _ERROR_DETAILS_);
 	}
 
+	core::Logger::finalize();
 	server->close();
 }
 

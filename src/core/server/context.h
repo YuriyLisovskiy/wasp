@@ -26,6 +26,8 @@ struct Context
 	size_t max_body_size = 0;
 	std::string media_root;
 	size_t workers = 0;
+	time_t timeout_sec = 0;
+	time_t timeout_usec = 0;
 
 	void normalize();
 };

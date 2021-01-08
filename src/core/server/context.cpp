@@ -15,6 +15,11 @@ void Context::normalize()
 	{
 		this->logger = core::Logger::get_instance({});
 	}
+
+	if (!this->timeout_sec)
+	{
+		this->timeout_sec = 3;
+	}
 }
 
 __SERVER_END__
