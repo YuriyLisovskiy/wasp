@@ -65,11 +65,6 @@ protected:
 	Context ctx;
 	collections::Dict<std::string, std::string> base_environ;
 
-protected:
-
-	[[nodiscard]]
-	bool wait_for_client(int fd) const;
-
 private:
 	std::shared_ptr<core::ThreadPool> _threadPool;
 	HandlerFunc _handler;
@@ -78,11 +73,6 @@ private:
 	enum read_result_enum
 	{
 		rr_continue = -1, rr_break = -2, rr_none = -3
-	};
-
-	enum select_enum
-	{
-		s_continue = 0
 	};
 
 private:

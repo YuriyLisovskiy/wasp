@@ -11,41 +11,41 @@
 #include <string>
 #include <cstring>
 
-// Framework libraries.
-// TODO
-
 
 __SERVER_BEGIN__
 
-SelectSelector::SelectSelector(
-	int file_descriptor, core::ILogger* logger
-) : fd(file_descriptor), logger(logger)
+SelectSelector::SelectSelector(core::ILogger* logger) : logger(logger)
 {
-	FD_ZERO(&this->readers);
-	FD_ZERO(&this->writers);
+	this->fd = -1;
+	this->events = -1;
 }
 
-void SelectSelector::register_(int events)
+void SelectSelector::register_(uint fd, int events)
 {
-	if (events & EVENT_READ)
+	this->fd = fd;
+	this->events = events;
+
+	if (this->events & EVENT_READ)
 	{
 		FD_ZERO(&this->readers);
 		FD_SET(this->fd, &this->readers);
 	}
 
-	if (events & EVENT_WRITE)
+	if (this->events & EVENT_WRITE)
 	{
 		FD_ZERO(&this->writers);
 		FD_SET(this->fd, &this->writers);
 	}
 }
 
-bool SelectSelector::select(int timeout)
+bool SelectSelector::select(uint timeout)
 {
+	auto fd_writers = this->writers;
+	auto fd_readers = this->readers;
 	struct timeval t_val{};
 	t_val.tv_sec = timeout;
 	t_val.tv_usec = 0;
-	int ret = ::select(this->fd + 1, &this->readers, &this->writers, nullptr, &t_val);
+	int ret = ::select(this->fd + 1, &fd_readers, &fd_writers, nullptr, &t_val);
 	if (ret == -1)
 	{
 		this->logger->error(

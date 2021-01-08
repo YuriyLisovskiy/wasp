@@ -67,7 +67,7 @@ void BaseSocket::set_options()
 	}
 
 	this->bind();
-//	this->_set_blocking(false);
+	this->_set_blocking(false);
 }
 
 void BaseSocket::listen()

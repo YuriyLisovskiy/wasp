@@ -49,7 +49,8 @@ void HTTPServer::listen(const std::string& message)
 		this->ctx.logger->print(message);
 	}
 
-	SelectSelector selector(this->_socket->fd(), this->ctx.logger.get());
+	SelectSelector selector(this->ctx.logger.get());
+	selector.register_(this->_socket->fd(), EVENT_READ);
 	while (!this->_socket->is_closed())
 	{
 		auto ready = selector.select(this->ctx.timeout_sec);
@@ -158,42 +159,6 @@ collections::Dict<std::string, std::string> HTTPServer::environ() const
 //	// otherwise (i.e. select_status==0) timeout, continue
 //	return select_enum::s_continue;
 //}
-
-bool HTTPServer::wait_for_client(int fd) const
-{
-	struct timeval timeout{this->ctx.timeout_sec, this->ctx.timeout_usec};
-//	tv.tv_sec = this->ctx.timeout_sec;
-//	tv.tv_usec = this->ctx.timeout_usec;
-	fd_set fds;
-	FD_ZERO(&fds);
-	FD_SET(fd, &fds);
-
-	fd_set read_fds;
-	FD_ZERO(&read_fds);
-	FD_SET(fd, &read_fds);
-
-	int ret = select(fd + 1, &fds, &read_fds, nullptr, &timeout);
-	if (ret == -1)
-	{
-		this->ctx.logger->error(
-			"'select' call failed: " + std::string(strerror(errno)), _ERROR_DETAILS_
-		);
-	}
-	else if (ret == 0)
-	{
-		// timeout, just skip
-	}
-	else if (!FD_ISSET(fd, &fds))
-	{
-		this->ctx.logger->error("file descriptor is not set", _ERROR_DETAILS_);
-	}
-	else
-	{
-		return true;
-	}
-
-	return false;
-}
 
 int HTTPServer::_get_request()
 {
@@ -408,11 +373,25 @@ core::Result<xw::string> HTTPServer::_read_headers(
 	size_t headers_delimiter_pos = xw::string::npos;
 	xw::string delimiter = "\r\n\r\n";
 
+	SelectSelector s(this->ctx.logger.get());
+	s.register_(sock, EVENT_READ);
+
 	char buffer[MAX_BUFF_SIZE];
 	long long message_len;
 	do
 	{
+//		std::cerr << "[recv started, " << __LINE__ << "] " << sock << '\n';
+		if (!s.select(3))
+		{
+			// TODO: perform more checks.
+			this->ctx.logger->trace("Request timed out", _ERROR_DETAILS_);
+			return core::raise<core::RequestTimeout, xw::string>(
+				"Request timed out", _ERROR_DETAILS_
+			);
+		}
+
 		message_len = recv(sock, buffer, MAX_BUFF_SIZE, 0);
+//		std::cerr << "[recv ended, " << __LINE__ << "]   " << sock << '\n';
 		buffer[message_len] = '\0';
 		if (message_len > 0)
 		{
