@@ -383,7 +383,7 @@ core::Result<xw::string> HTTPServer::_read_headers(
 //		std::cerr << "[recv started, " << __LINE__ << "] " << sock << '\n';
 		if (!s.select(3))
 		{
-			// TODO: perform more checks.
+//			 TODO: perform more checks.
 			this->ctx.logger->trace("Request timed out", _ERROR_DETAILS_);
 			return core::raise<core::RequestTimeout, xw::string>(
 				"Request timed out", _ERROR_DETAILS_
