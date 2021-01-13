@@ -8,20 +8,28 @@
 
 // Core libraries.
 #include <xalwart.core/string_utils.h>
-#include <xalwart.core/result.h>
 #include <xalwart.core/datetime.h>
-
-// Framework libraries.
-#include "../../urls/resolver.h"
-#include "../../core/parsers/url_parser.h"
 
 
 __MANAGEMENT_COMMANDS_BEGIN__
 
 StartServerCommand::StartServerCommand(
-	apps::IAppConfig* config, conf::Settings* settings
-) : AppCommand(config, settings, "start-server", "Starts a web application")
+	apps::IAppConfig* config,
+	conf::Settings* settings,
+	std::function<std::shared_ptr<net::IServer>(
+		core::ILogger*,
+		collections::Dict<std::string, std::string>
+	)> make_server
+) : AppCommand(config, settings, "start-server", "Starts a web application"), make_server(std::move(make_server))
 {
+	if (!this->make_server)
+	{
+		throw core::ImproperlyConfigured(
+			"StartServerCommand: server initializer must be instantiated in order to use the application",
+			_ERROR_DETAILS_
+		);
+	}
+
 	std::string ipv4 = R"((\d{1,3}(?:\.\d{1,3}){3})|localhost)";
 	this->_ipv4_regex = rgx::Regex(ipv4);
 
@@ -39,11 +47,12 @@ StartServerCommand::StartServerCommand(
 collections::Dict<std::string, std::string> StartServerCommand::get_kwargs()
 {
 	auto kwargs = AppCommand::get_kwargs();
-	kwargs["bind"] = this->_host + ":" + std::to_string(this->_port);
-	kwargs["host"] = this->_host;
-	kwargs["port"] = std::to_string(this->_port);
-	kwargs["threads"] = std::to_string(this->_threads_count);
-	kwargs["use-ipv6"] = std::to_string(this->_use_ipv6);
+	kwargs["xw.workers"] = std::to_string(this->_threads_count);
+	kwargs["xw.max_body_size"] = std::to_string(this->settings->DATA_UPLOAD_MAX_MEMORY_SIZE);
+
+	// TODO: add timeout to command args!
+	kwargs["xw.timeout_sec"] = std::to_string(5);
+	kwargs["xw.timeout_usec"] = std::to_string(0);
 	return kwargs;
 }
 
@@ -74,17 +83,10 @@ void StartServerCommand::handle()
 		throw core::CommandError("You must set 'allowed_hosts' if 'debug' is false.");
 	}
 
-	this->retrieve_args(this->_host, this->_port, this->_use_ipv6, this->_threads_count);
-	auto server = this->settings->use_server(
-		this->settings,
-		this->make_handler(),
-		this->get_kwargs()
+	this->retrieve_args(
+		this->_host, this->_port, this->_use_ipv6, this->_threads_count
 	);
-	if (!server)
-	{
-		throw core::ImproperlyConfigured("You must initialize server in order to use the application.");
-	}
-
+	auto server = this->make_server(this->settings->LOGGER.get(), this->get_kwargs());
 	try
 	{
 		server->bind(this->_host, this->_port);
@@ -117,146 +119,6 @@ void StartServerCommand::handle()
 
 	core::Logger::finalize();
 	server->close();
-}
-
-server::HttpHandlerFunc StartServerCommand::make_handler()
-{
-	// Check if static files can be served
-	// and create necessary urls.
-	this->build_static_patterns(this->settings->ROOT_URLCONF);
-
-	// Retrieve main app patterns and append them
-	// to result.
-	this->build_app_patterns(this->settings->ROOT_URLCONF);
-
-	// Initialize template engine's libraries.
-	this->settings->TEMPLATES_ENGINE->load_libraries();
-
-	auto handler = [this](
-		http::HttpRequest* request, const server::StartResponseFunc& start_response
-	) mutable -> void
-	{
-		core::Result<std::shared_ptr<http::IHttpResponse>> result;
-		try
-		{
-			result = this->process_request_middleware(
-				request, this->settings
-			);
-			if (!result.catch_(core::HttpError) && !result.value)
-			{
-				result = this->process_urlpatterns(
-					request, this->settings->ROOT_URLCONF, this->settings
-				);
-				// TODO: check if it is required to process response middleware in case of view error.
-				if (!result.catch_(core::HttpError))
-				{
-					if (!result.value)
-					{
-						// If view returns empty result, return 204 - No Content.
-						result.value = std::make_shared<http::HttpResponse>(204);
-						this->settings->LOGGER->warning(
-							"Response was not instantiated, returned 204",
-							_ERROR_DETAILS_
-						);
-					}
-					else
-					{
-						if (!result.value->err())
-						{
-							auto middleware_result = this->process_response_middleware(
-								request, result.value.get(), this->settings
-							);
-							if (middleware_result.catch_(core::HttpError) || middleware_result.value)
-							{
-								if (middleware_result.err)
-								{
-									this->settings->LOGGER->trace(
-										"Method 'process_response_middleware' returned an error", _ERROR_DETAILS_
-									);
-								}
-
-								result = middleware_result;
-							}
-						}
-						else
-						{
-							this->settings->LOGGER->trace(
-								"IHttpResponse contains error", _ERROR_DETAILS_
-							);
-						}
-					}
-				}
-				else
-				{
-					this->settings->LOGGER->trace(
-						"Function 'process_urlpatterns' returned an error", _ERROR_DETAILS_
-					);
-				}
-			}
-			else
-			{
-				this->settings->LOGGER->trace(
-					"Method 'process_request_middleware' returned an error", _ERROR_DETAILS_
-				);
-			}
-		}
-		catch (const core::BaseException& exc)
-		{
-			this->settings->LOGGER->trace(
-				"An error was caught as core::BaseException", _ERROR_DETAILS_
-			);
-			result = core::raise<core::InternalServerError, std::shared_ptr<http::IHttpResponse>>(
-				"<p style=\"font-size: 24px;\" >Internal Server Error</p><p>" + std::string(exc.what()) + "</p>"
-			);
-		}
-		catch (const std::exception& exc)
-		{
-			this->settings->LOGGER->trace(
-				"An error was caught as std::exception", _ERROR_DETAILS_
-			);
-			result = core::raise<core::InternalServerError, std::shared_ptr<http::IHttpResponse>>(
-				"<p style=\"font-size: 24px;\" >Internal Server Error</p><p>" + std::string(exc.what()) + "</p>"
-			);
-		}
-
-		start_response(request, result);
-	};
-
-	return handler;
-}
-
-bool StartServerCommand::static_is_allowed(const std::string& static_url)
-{
-	auto parser = parsers::url_parser();
-	parser.parse(static_url);
-
-	// Allow serving local static files if debug and
-	// static url is local.
-	return this->settings->DEBUG && parser.hostname.empty();
-}
-
-void StartServerCommand::build_static_patterns(std::vector<std::shared_ptr<urls::UrlPattern>>& patterns)
-{
-	if (!this->settings->STATIC_ROOT.empty() && this->static_is_allowed(this->settings->STATIC_URL))
-	{
-		patterns.push_back(urls::make_static(this->settings->STATIC_URL, this->settings->STATIC_ROOT));
-	}
-
-	if (!this->settings->MEDIA_ROOT.empty() && this->static_is_allowed(this->settings->MEDIA_URL))
-	{
-		patterns.push_back(
-			urls::make_static(this->settings->MEDIA_URL, this->settings->MEDIA_ROOT, "media")
-		);
-	}
-}
-
-void StartServerCommand::build_app_patterns(std::vector<std::shared_ptr<urls::UrlPattern>>& patterns)
-{
-	if (this->settings->ROOT_APP)
-	{
-		auto apps_patterns = this->settings->ROOT_APP->get_urlpatterns();
-		patterns.insert(patterns.end(), apps_patterns.begin(), apps_patterns.end());
-	}
 }
 
 void StartServerCommand::retrieve_args(
@@ -327,71 +189,12 @@ void StartServerCommand::retrieve_args(
 
 	if (!this->_threads_flag->valid())
 	{
-		throw core::CommandError("threads count is not a valid positive integer: " + this->_threads_flag->get_raw());
+		throw core::CommandError(
+			"threads count is not a valid positive integer: " + this->_threads_flag->get_raw()
+		);
 	}
 
 	threads_count = this->_threads_flag->get();
-}
-
-core::Result<std::shared_ptr<http::IHttpResponse>> StartServerCommand::process_request_middleware(
-	http::HttpRequest* request, conf::Settings* settings
-)
-{
-	for (auto& middleware : settings->MIDDLEWARE)
-	{
-		auto result = middleware->process_request(request);
-		if (result.err)
-		{
-			// TODO: print middleware name.
-			this->settings->LOGGER->trace(
-				"Method 'process_request' of 'unknown' middleware returned an error", _ERROR_DETAILS_
-			);
-			return result;
-		}
-	}
-
-	return core::Result<std::shared_ptr<http::IHttpResponse>>::null();
-}
-
-core::Result<std::shared_ptr<http::IHttpResponse>> StartServerCommand::process_urlpatterns(
-	http::HttpRequest* request,
-	std::vector<std::shared_ptr<urls::UrlPattern>>& urlpatterns,
-	conf::Settings* settings
-)
-{
-	auto apply = urls::resolve(request->path(), settings->ROOT_URLCONF);
-	if (apply)
-	{
-		return apply(request, settings);
-	}
-
-	this->settings->LOGGER->trace(
-		"The requested resource was not found", _ERROR_DETAILS_
-	);
-	return core::raise<core::NotFound, std::shared_ptr<http::IHttpResponse>>("<h2>404 - Not Found</h2>");
-}
-
-core::Result<std::shared_ptr<http::IHttpResponse>> StartServerCommand::process_response_middleware(
-	http::HttpRequest* request,
-	http::IHttpResponse* response,
-	conf::Settings* settings
-)
-{
-	long long size = settings->MIDDLEWARE.size();
-	for (long long i = size - 1; i >= 0; i--)
-	{
-		auto result = settings->MIDDLEWARE[i]->process_response(request, response);
-		if (result.err)
-		{
-			// TODO: print middleware name.
-			this->settings->LOGGER->trace(
-				"Method 'process_response' of 'unknown' middleware returned an error", _ERROR_DETAILS_
-			);
-			return result;
-		}
-	}
-
-	return core::Result<std::shared_ptr<http::IHttpResponse>>::null();
 }
 
 __MANAGEMENT_COMMANDS_END__

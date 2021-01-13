@@ -8,6 +8,9 @@
 
 #pragma once
 
+// Core libraries.
+#include <xalwart.core/net/server.h>
+
 // Module definitions.
 #include "./_def_.h"
 
@@ -19,8 +22,20 @@ __MANAGEMENT_BEGIN__
 
 class CoreManagementAppConfig final : public apps::AppConfig
 {
+private:
+	std::function<std::shared_ptr<net::IServer>(
+		core::ILogger*,
+		collections::Dict<std::string, std::string>
+	)> _make_server;
+
 public:
-	explicit CoreManagementAppConfig(conf::Settings* settings);
+	explicit CoreManagementAppConfig(
+		conf::Settings* settings,
+		std::function<std::shared_ptr<net::IServer>(
+			core::ILogger*,
+			collections::Dict<std::string, std::string>
+		)> make_server
+	);
 	void commands() override;
 };
 
