@@ -946,15 +946,6 @@ void Settings::prepare()
 	}
 }
 
-std::shared_ptr<server::IServer> Settings::use_server(
-	const Settings* settings,
-	const server::HttpHandlerFunc& handler,
-	const collections::Dict<std::string, std::string>& kwargs
-)
-{
-	return nullptr;
-}
-
 void Settings::register_logger()
 {
 }

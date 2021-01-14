@@ -239,10 +239,10 @@ net::HandlerFunc MainApplication::make_handler()
 	this->settings->TEMPLATES_ENGINE->load_libraries();
 
 	auto handler = [this](
-		net::RequestContext* ctx, const collections::Dict<std::string, std::string>& kwargs
+		net::RequestContext* ctx, const collections::Dict<std::string, std::string>& env
 	) -> uint
 	{
-		auto request = this->make_request(ctx).get();
+		auto request = this->make_request(ctx, env).get();
 		core::Result<std::shared_ptr<http::IHttpResponse>> result;
 		try
 		{
@@ -419,12 +419,48 @@ core::Result<std::shared_ptr<http::IHttpResponse>> MainApplication::process_resp
 	return core::Result<std::shared_ptr<http::IHttpResponse>>::null();
 }
 
-std::shared_ptr<http::HttpRequest> MainApplication::make_request(net::RequestContext* ctx)
+// | METHOD     | Contains request body? | Contains response body? |
+// +------------+------------------------+-------------------------+
+// | OPTIONS    |                        |                         |
+// | GET        |                        |                         |
+// | HEAD       |                        |                         |
+// | POST       |                        |                         |
+// | PUT        |                        |                         |
+// | DELETE     |                        |                         |
+// | TRACE      |                        |                         |
+// | CONNECT    |                        |                         |
+// | PATCH      |                        |                         |
+std::shared_ptr<http::HttpRequest> MainApplication::make_request(
+	net::RequestContext* ctx, collections::Dict<std::string, std::string> env
+)
 {
 	parsers::query_parser qp;
 	http::HttpRequest::Parameters<std::string, xw::string> get_params, post_params;
 	http::HttpRequest::Parameters<std::string, files::UploadedFile> files_params;
-	if (ctx->content.empty())
+	if (ctx->content_size)
+	{
+		auto cont_type = str::lower(ctx->headers.get("Content-Type"));
+		if (cont_type == "application/x-www-form-urlencoded")
+		{
+			qp.parse(ctx->content);
+			if (ctx->method == "GET")
+			{
+				get_params = http::HttpRequest::Parameters(qp.dict, qp.multi_dict);
+			}
+			else if (ctx->method == "POST")
+			{
+				post_params = http::HttpRequest::Parameters(qp.dict, qp.multi_dict);
+			}
+		}
+		else if (cont_type == "multipart/form-data")
+		{
+			parsers::multipart_parser mp(this->settings->MEDIA_ROOT);
+			mp.parse(ctx->headers["Content-Type"], ctx->content);
+			post_params = http::HttpRequest::Parameters(mp.post_values, mp.multi_post_value);
+			files_params = http::HttpRequest::Parameters(mp.file_values, mp.multi_file_value);
+		}
+	}
+	else
 	{
 		qp.parse(ctx->query);
 		if (ctx->method == "GET")
@@ -436,45 +472,11 @@ std::shared_ptr<http::HttpRequest> MainApplication::make_request(net::RequestCon
 			post_params = http::HttpRequest::Parameters(qp.dict, qp.multi_dict);
 		}
 	}
-	else
-	{
-		parsers::multipart_parser mp(this->settings->MEDIA_ROOT);
-		switch (ctx->content_type)
-		{
-			case parsers::request_parser::content_type_enum::ct_application_x_www_form_url_encoded:
-				qp.parse(parser->content);
-				if (ctx->method == "GET")
-				{
-					get_params = http::HttpRequest::Parameters(qp.dict, qp.multi_dict);
-				}
-				else if (ctx->method == "POST")
-				{
-					post_params = http::HttpRequest::Parameters(qp.dict, qp.multi_dict);
-				}
-				break;
-			case parsers::request_parser::content_type_enum::ct_application_json:
-				break;
-			case parsers::request_parser::content_type_enum::ct_multipart_form_data:
-				mp.parse(ctx->headers["Content-Type"], parser->content);
-				post_params = http::HttpRequest::Parameters(
-					mp.post_values, mp.multi_post_value
-				);
-				files_params = http::HttpRequest::Parameters(
-					mp.file_values, mp.multi_file_value
-				);
-				break;
-			case parsers::request_parser::content_type_enum::ct_other:
-				break;
-			default:
-				throw core::ParseError("Unknown content type", _ERROR_DETAILS_);
-		}
-	}
 
-	auto env_copy = this->base_environ;
 	for (const auto& header : ctx->headers)
 	{
 		auto key = str::replace(header.first, "-", "_");
-		env_copy["HTTP_" + str::upper(key)] = header.second;
+		env["HTTP_" + str::upper(key)] = header.second;
 	}
 
 	return std::make_shared<http::HttpRequest>(
@@ -490,7 +492,7 @@ std::shared_ptr<http::HttpRequest> MainApplication::make_request(net::RequestCon
 		get_params,
 		post_params,
 		files_params,
-		env_copy
+		env
 	);
 }
 

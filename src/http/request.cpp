@@ -11,9 +11,9 @@
 // Core libraries.
 #include <xalwart.core/exceptions.h>
 #include <xalwart.core/string_utils.h>
+#include <xalwart.core/net/meta.h>
 
 // Framework libraries.
-#include "./meta.h"
 #include "./headers.h"
 #include "./utility.h"
 #include "../conf/settings.h"
@@ -23,28 +23,28 @@ __HTTP_BEGIN__
 
 HttpRequest::HttpRequest(
 	const conf::Settings* settings,
-	const std::string& method, std::string path, size_t major_v, size_t minor_v,
+	std::string method, std::string path, size_t major_v, size_t minor_v,
 	std::string query, bool keep_alive, xw::string content,
-	const std::map<std::string, std::string>& headers,
-	const HttpRequest::Parameters<std::string, xw::string>& get_params,
-	const HttpRequest::Parameters<std::string, xw::string>& post_params,
-	const HttpRequest::Parameters<std::string, files::UploadedFile>& files_params,
-	const collections::Dict<std::string, std::string>& meta_params
+	collections::Dict<std::string, std::string> headers,
+	HttpRequest::Parameters<std::string, xw::string> get_params,
+	HttpRequest::Parameters<std::string, xw::string> post_params,
+	HttpRequest::Parameters<std::string, files::UploadedFile> files_params,
+	collections::Dict<std::string, std::string> meta_params
 )
 :   settings(settings),
+    _method(std::move(method)),
 	_path(std::move(path)),
 	_major_version(major_v),
 	_minor_version(minor_v),
 	_query(std::move(query)),
 	_keep_alive(keep_alive),
-	_body(std::move(content))
+	_body(std::move(content)),
+	headers(std::move(headers)),
+	GET(std::move(get_params)),
+	POST(std::move(post_params)),
+	FILES(std::move(files_params)),
+	META(std::move(meta_params))
 {
-	this->_method = str::upper(method);
-	this->headers = collections::Dict<std::string, std::string>(headers);
-	this->GET = get_params;
-	this->POST = post_params;
-	this->FILES = files_params;
-	this->META = meta_params;
 }
 
 std::string HttpRequest::version() const
@@ -158,7 +158,7 @@ std::string HttpRequest::get_raw_host(
 	}
 	else
 	{
-		host = this->META.get(meta::SERVER_NAME);
+		host = this->META.get(net::meta::SERVER_NAME);
 		auto port = this->get_port(use_x_forwarded_port);
 		if (port != (this->is_secure(this->settings->SECURE_PROXY_SSL_HEADER.get()) ? "443" : "80"))
 		{
@@ -178,7 +178,7 @@ std::string HttpRequest::get_port(bool use_x_forwarded_port) const
 	}
 	else
 	{
-		port = this->META.get(meta::SERVER_PORT);
+		port = this->META.get(net::meta::SERVER_PORT);
 	}
 
 	return port;

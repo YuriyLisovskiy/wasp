@@ -13,6 +13,7 @@
 #include <xalwart.core/logger.h>
 #include <xalwart.core/result.h>
 #include <xalwart.core/yaml/yaml-cpp/yaml.h>
+#include <xalwart.core/net/server.h>
 
 // Render libraries.
 #include <xalwart.render/library/base.h>
@@ -22,15 +23,8 @@
 
 // Framework libraries.
 #include "../apps/interfaces.h"
-#include "../core/server/interfaces.h"
-#include "../core/server/func.h"
 #include "../middleware/interfaces.h"
 #include "../urls/url.h"
-
-
-__SERVER_BEGIN__
-class IServer;
-__SERVER_END__
 
 
 __CONF_BEGIN__
@@ -233,11 +227,6 @@ public:
 	virtual ~Settings() = default;
 	void init();
 	void prepare();
-	virtual std::shared_ptr<server::IServer> use_server(
-		const Settings* settings,
-		const server::HttpHandlerFunc& handler,
-		const collections::Dict<std::string, std::string>& kwargs
-	);
 
 protected:
 	virtual void register_logger();

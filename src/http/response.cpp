@@ -11,12 +11,12 @@
 #include <xalwart.core/exceptions.h>
 #include <xalwart.core/path.h>
 #include <xalwart.core/string_utils.h>
+#include <xalwart.core/encoding.h>
 
 // Framework libraries.
 #include "./status.h"
 #include "./url.h"
 #include "./utility.h"
-#include "../core/encoding.h"
 #include "../core/mime_types.h"
 
 
@@ -456,11 +456,11 @@ void FileResponse::_set_headers()
 	std::string file_name = path::basename(this->_file_path);
 	try
 	{
-		file_expr = "filename=\"" + core::encoding::encode(file_name, core::encoding::ASCII) + "\"";
+		file_expr = "filename=\"" + encoding::encode(file_name, encoding::ascii) + "\"";
 	}
 	catch (const core::EncodingError& e)
 	{
-		file_expr = "filename*=utf-8''" + core::encoding::quote(file_name);
+		file_expr = "filename*=utf-8''" + encoding::quote(file_name);
 	}
 
 	this->_headers.set("Content-Disposition", disposition + "; " + file_expr);
@@ -506,7 +506,7 @@ HttpResponseRedirectBase::HttpResponseRedirectBase(
 		throw core::ValueError("invalid status", _ERROR_DETAILS_);
 	}
 
-	this->set_header("Location", core::encoding::encode_url(redirect_to));
+	this->set_header("Location", encoding::encode_url(redirect_to));
 	Url url(redirect_to);
 	if (!url.scheme().empty() && this->_allowed_schemes.find(url.scheme()) == this->_allowed_schemes.end())
 	{

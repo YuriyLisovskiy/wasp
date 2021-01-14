@@ -48,7 +48,10 @@ protected:
 		std::vector<std::shared_ptr<urls::UrlPattern>>& urlpatterns
 	);
 
-	std::shared_ptr<http::HttpRequest> make_request(net::RequestContext* ctx);
+	std::shared_ptr<http::HttpRequest> make_request(
+		net::RequestContext* ctx,
+		collections::Dict<std::string, std::string> env
+	);
 
 	static std::shared_ptr<http::IHttpResponse> error_to_response(const core::Error* err);
 
