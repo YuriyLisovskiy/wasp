@@ -46,7 +46,7 @@ public:
 			collections::Dict<std::string, xw::string>(),
 			collections::MultiValueDict<std::string, xw::string>()
 		);
-		auto empty_map = std::map<std::string, std::string>();
+		auto empty_map = collections::Dict<std::string, std::string>();
 		return http::HttpRequest(
 			settings,
 			method,
