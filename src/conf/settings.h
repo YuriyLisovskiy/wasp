@@ -74,7 +74,7 @@ public:
 	std::vector<std::shared_ptr<apps::IAppConfig>> INSTALLED_APPS;
 
 	/// Backend for rendering templates.
-	std::unique_ptr<render::IEngine> TEMPLATES_ENGINE;
+	std::unique_ptr<render::IEngine> TEMPLATE_ENGINE;
 
 	/// Whether to append trailing slashes to URLs.
 	bool APPEND_SLASH;

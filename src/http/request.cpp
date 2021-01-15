@@ -29,10 +29,9 @@ HttpRequest::HttpRequest(
 	HttpRequest::Parameters<std::string, xw::string> get_params,
 	HttpRequest::Parameters<std::string, xw::string> post_params,
 	HttpRequest::Parameters<std::string, files::UploadedFile> files_params,
-	collections::Dict<std::string, std::string> meta_params
-)
-:   settings(settings),
-    _method(std::move(method)),
+	collections::Dict<std::string, std::string> env
+) : settings(settings),
+	_method(std::move(method)),
 	_path(std::move(path)),
 	_major_version(major_v),
 	_minor_version(minor_v),
@@ -43,7 +42,7 @@ HttpRequest::HttpRequest(
 	GET(std::move(get_params)),
 	POST(std::move(post_params)),
 	FILES(std::move(files_params)),
-	META(std::move(meta_params))
+	META(std::move(env))
 {
 }
 
@@ -60,8 +59,8 @@ std::string HttpRequest::path() const
 std::string HttpRequest::full_path(bool force_append_slash) const
 {
 	return this->_path +
-		(force_append_slash && !str::ends_with(this->_path, "/") ? "/" : "") +
-		(this->_query.empty() ? "" : "?" + this->_query);
+	       (force_append_slash && !str::ends_with(this->_path, "/") ? "/" : "") +
+	       (this->_query.empty() ? "" : "?" + this->_query);
 }
 
 std::string HttpRequest::query() const

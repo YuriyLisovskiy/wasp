@@ -37,14 +37,14 @@ protected:
 	void build_app_patterns(std::vector<std::shared_ptr<urls::UrlPattern>>& patterns);
 
 	core::Result<std::shared_ptr<http::IHttpResponse>> process_request_middleware(
-		http::HttpRequest* request
+		std::shared_ptr<http::HttpRequest>& request
 	);
 	core::Result<std::shared_ptr<http::IHttpResponse>> process_response_middleware(
-		http::HttpRequest* request,
-		http::IHttpResponse* response
+		std::shared_ptr<http::HttpRequest>& request,
+		std::shared_ptr<http::IHttpResponse>& response
 	);
 	core::Result<std::shared_ptr<http::IHttpResponse>> process_urlpatterns(
-		http::HttpRequest* request,
+		std::shared_ptr<http::HttpRequest>& request,
 		std::vector<std::shared_ptr<urls::UrlPattern>>& urlpatterns
 	);
 
@@ -55,7 +55,7 @@ protected:
 
 	static std::shared_ptr<http::IHttpResponse> error_to_response(const core::Error* err);
 
-	void start_response(
+	uint start_response(
 		net::RequestContext* ctx,
 		const core::Result<std::shared_ptr<http::IHttpResponse>>& result
 	);

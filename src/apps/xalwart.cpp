@@ -102,7 +102,7 @@ void MainApplication::_setup_commands()
 			installed_app->get_commands(),
 			[installed_app](const std::string& cmd_name) -> std::string {
 				return "App with name '" + installed_app->get_name() +
-					"' overrides commands with '" + cmd_name + "' command";
+				       "' overrides commands with '" + cmd_name + "' command";
 			}
 		);
 	}
@@ -162,7 +162,7 @@ void MainApplication::_perform_checks()
 	}
 
 	size_t err_count = 0;
-	if (!this->settings->TEMPLATES_ENGINE)
+	if (!this->settings->TEMPLATE_ENGINE)
 	{
 		this->settings->LOGGER->error(
 			"TEMPLATES_ENGINE instance must be configured in order to use the application."
@@ -205,11 +205,11 @@ void MainApplication::_perform_checks()
 		err_count++;
 	}
 
-	for (size_t i = 0; i < this->settings->INSTALLED_APPS.size(); i++)
+	for (auto& module : this->settings->INSTALLED_APPS)
 	{
-		if (!this->settings->INSTALLED_APPS[i]->is_initialized())
+		if (!module->is_initialized())
 		{
-			this->settings->LOGGER->error("Application is not initialized.");
+			this->settings->LOGGER->error("Module '" + module->get_name() + "' is not initialized.");
 			err_count++;
 			break;
 		}
@@ -236,13 +236,13 @@ net::HandlerFunc MainApplication::make_handler()
 	this->build_app_patterns(this->settings->ROOT_URLCONF);
 
 	// Initialize template engine's libraries.
-	this->settings->TEMPLATES_ENGINE->load_libraries();
+	this->settings->TEMPLATE_ENGINE->load_libraries();
 
 	auto handler = [this](
 		net::RequestContext* ctx, const collections::Dict<std::string, std::string>& env
 	) -> uint
 	{
-		auto request = this->make_request(ctx, env).get();
+		auto request = this->make_request(ctx, env);
 		core::Result<std::shared_ptr<http::IHttpResponse>> result;
 		try
 		{
@@ -267,7 +267,7 @@ net::HandlerFunc MainApplication::make_handler()
 						if (!result.value->err())
 						{
 							auto middleware_result = this->process_response_middleware(
-								request, result.value.get()
+								request, result.value
 							);
 							if (middleware_result.catch_(core::HttpError) || middleware_result.value)
 							{
@@ -322,7 +322,7 @@ net::HandlerFunc MainApplication::make_handler()
 			);
 		}
 
-		start_response(ctx, result);
+		return start_response(ctx, result);
 	};
 
 	return handler;
@@ -363,12 +363,12 @@ void MainApplication::build_app_patterns(std::vector<std::shared_ptr<urls::UrlPa
 }
 
 core::Result<std::shared_ptr<http::IHttpResponse>> MainApplication::process_request_middleware(
-	http::HttpRequest* request
+	std::shared_ptr<http::HttpRequest>& request
 )
 {
 	for (auto& middleware : this->settings->MIDDLEWARE)
 	{
-		auto result = middleware->process_request(request);
+		auto result = middleware->process_request(request.get());
 		if (result.err)
 		{
 			// TODO: print middleware name.
@@ -383,34 +383,38 @@ core::Result<std::shared_ptr<http::IHttpResponse>> MainApplication::process_requ
 }
 
 core::Result<std::shared_ptr<http::IHttpResponse>> MainApplication::process_urlpatterns(
-	http::HttpRequest* request,
+	std::shared_ptr<http::HttpRequest>& request,
 	std::vector<std::shared_ptr<urls::UrlPattern>>& urlpatterns
 )
 {
 	auto apply = urls::resolve(request->path(), this->settings->ROOT_URLCONF);
 	if (apply)
 	{
-		return apply(request, this->settings);
+		return apply(request.get(), this->settings);
 	}
 
 	this->settings->LOGGER->trace("The requested resource was not found", _ERROR_DETAILS_);
-	return core::raise<core::NotFound, std::shared_ptr<http::IHttpResponse>>("<h2>404 - Not Found</h2>");
+	return core::raise<
+		core::NotFound, std::shared_ptr<http::IHttpResponse>
+	>("<h2>404 - Not Found</h2>");
 }
 
 core::Result<std::shared_ptr<http::IHttpResponse>> MainApplication::process_response_middleware(
-	http::HttpRequest* request,
-	http::IHttpResponse* response
+	std::shared_ptr<http::HttpRequest>& request,
+	std::shared_ptr<http::IHttpResponse>& response
 )
 {
 	long long size = this->settings->MIDDLEWARE.size();
 	for (long long i = size - 1; i >= 0; i--)
 	{
-		auto result = this->settings->MIDDLEWARE[i]->process_response(request, response);
+		auto result = this->settings->MIDDLEWARE[i]->process_response(
+			request.get(), response.get()
+		);
 		if (result.err)
 		{
 			// TODO: print middleware name.
 			this->settings->LOGGER->trace(
-				"Method 'process_response' of 'unknown' middleware returned an error", _ERROR_DETAILS_
+					"Method 'process_response' of 'unknown' middleware returned an error", _ERROR_DETAILS_
 			);
 			return result;
 		}
@@ -531,7 +535,7 @@ std::shared_ptr<http::IHttpResponse> MainApplication::error_to_response(const co
 	return std::make_shared<http::HttpResponse>(code, err->msg);
 }
 
-void MainApplication::start_response(
+uint MainApplication::start_response(
 	net::RequestContext* ctx,
 	const core::Result<std::shared_ptr<http::IHttpResponse>>& result
 )
@@ -547,8 +551,8 @@ void MainApplication::start_response(
 		// Response was not instantiated, so return 204 - No Content.
 		response = std::make_shared<http::HttpResponse>(204);
 		this->settings->LOGGER->warning(
-			"Response was not instantiated, returned 204",
-			_ERROR_DETAILS_
+				"Response was not instantiated, returned 204",
+				_ERROR_DETAILS_
 		);
 	}
 	else
@@ -566,6 +570,7 @@ void MainApplication::start_response(
 	}
 
 	this->finish_response(ctx, response.get());
+	return response->status();
 }
 
 void MainApplication::finish_response(

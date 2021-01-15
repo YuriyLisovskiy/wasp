@@ -544,7 +544,7 @@ void Settings::_init_env(YAML::Node& env)
 		}
 
 		auto auto_escape = env["auto_escape"];
-		this->TEMPLATES_ENGINE = std::make_unique<render::DefaultEngine>(
+		this->TEMPLATE_ENGINE = std::make_unique<render::DefaultEngine>(
 			dirs,
 			this->DEBUG,
 			auto_escape && auto_escape.as<bool>(),
@@ -566,6 +566,7 @@ void Settings::_init_logger(YAML::Node& logger)
 		logger_config.enable_warning = levels["warning"].as<bool>(true);
 		logger_config.enable_error = levels["error"].as<bool>(true);
 		logger_config.enable_fatal = levels["fatal"].as<bool>(true);
+		logger_config.enable_trace = levels["trace"].as<bool>(true);
 		logger_config.enable_print = levels["print"].as<bool>(true);
 	}
 

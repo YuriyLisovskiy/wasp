@@ -73,11 +73,13 @@ void StartServerCommand::add_flags()
 	this->_use_ipv6_flag = this->flag_set->make_bool(
 		"use-ipv6", false, "Use IPv6 address or not (used in case when host is set to 'localhost')"
 	);
+	this->_log_color_flag = this->flag_set->make_bool("log-color", true, "Use colors for output");
 }
 
 void StartServerCommand::handle()
 {
 	core::InterruptException::initialize();
+	this->settings->LOGGER->use_colors(this->_log_color_flag->get());
 	if (!this->settings->DEBUG && this->settings->ALLOWED_HOSTS.empty())
 	{
 		throw core::CommandError("You must set 'allowed_hosts' if 'debug' is false.");
