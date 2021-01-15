@@ -11,7 +11,7 @@
 // Core libraries.
 #include <xalwart.core/collections/multi_dict.h>
 #include <xalwart.core/result.h>
-#include <xalwart.core/string.h>
+#include <xalwart.core/str.h>
 
 // Module definitions.
 #include "./_def_.h"
@@ -86,16 +86,15 @@ public:
 		}
 	};
 
-//	HttpRequest() : _major_version(0), _minor_version(0), _keep_alive(false) {};
 	explicit HttpRequest(
 		const conf::Settings* settings,
-		const std::string& method, std::string path, size_t major_v, size_t minor_v,
+		std::string method, std::string path, size_t major_v, size_t minor_v,
 		std::string query, bool keep_alive, xw::string content,
-		const std::map<std::string, std::string>& headers,
-		const HttpRequest::Parameters<std::string, xw::string>& get_params,
-		const HttpRequest::Parameters<std::string, xw::string>& post_params,
-		const HttpRequest::Parameters<std::string, files::UploadedFile>& files_params,
-		const collections::Dict<std::string, std::string>& meta_params
+		collections::Dict<std::string, std::string> headers,
+		HttpRequest::Parameters<std::string, xw::string> get_params,
+		HttpRequest::Parameters<std::string, xw::string> post_params,
+		HttpRequest::Parameters<std::string, files::UploadedFile> files_params,
+		collections::Dict<std::string, std::string> meta_params
 	);
 
 	collections::Dict<std::string, std::string> headers;
@@ -107,9 +106,17 @@ public:
 
 	[[nodiscard]]
 	std::string version() const;
+
+	[[nodiscard]]
 	std::string path() const;
+
+	[[nodiscard]]
 	std::string full_path(bool force_append_slash = false) const;
+
+	[[nodiscard]]
 	std::string query() const;
+
+	[[nodiscard]]
 	std::string method() const;
 
 	[[nodiscard]]

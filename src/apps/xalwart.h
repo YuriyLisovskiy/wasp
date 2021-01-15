@@ -8,6 +8,9 @@
 
 #pragma once
 
+// Core libraries.
+#include <xalwart.core/net/server.h>
+
 // Module definitions.
 #include "./_def_.h"
 
@@ -19,8 +22,47 @@ __APPS_BEGIN__
 
 class MainApplication final
 {
+protected:
+	conf::Settings* settings;
+
+	std::function<std::shared_ptr<net::IServer>(
+		core::ILogger*,
+		collections::Dict<std::string, std::string>
+	)> server_initializer;
+
+protected:
+	net::HandlerFunc make_handler();
+	bool static_is_allowed(const std::string& static_url);
+	void build_static_patterns(std::vector<std::shared_ptr<urls::UrlPattern>>& patterns);
+	void build_app_patterns(std::vector<std::shared_ptr<urls::UrlPattern>>& patterns);
+
+	core::Result<std::shared_ptr<http::IHttpResponse>> process_request_middleware(
+		std::shared_ptr<http::HttpRequest>& request
+	);
+	core::Result<std::shared_ptr<http::IHttpResponse>> process_response_middleware(
+		std::shared_ptr<http::HttpRequest>& request,
+		std::shared_ptr<http::IHttpResponse>& response
+	);
+	core::Result<std::shared_ptr<http::IHttpResponse>> process_urlpatterns(
+		std::shared_ptr<http::HttpRequest>& request,
+		std::vector<std::shared_ptr<urls::UrlPattern>>& urlpatterns
+	);
+
+	std::shared_ptr<http::HttpRequest> make_request(
+		net::RequestContext* ctx,
+		collections::Dict<std::string, std::string> env
+	);
+
+	static std::shared_ptr<http::IHttpResponse> error_to_response(const core::Error* err);
+
+	uint start_response(
+		net::RequestContext* ctx,
+		const core::Result<std::shared_ptr<http::IHttpResponse>>& result
+	);
+
+	void finish_response(net::RequestContext* ctx, http::IHttpResponse* response);
+
 private:
-	conf::Settings* _settings;
 	std::string _help_message;
 
 	// List of commands to run from command line.
@@ -34,7 +76,13 @@ private:
 	void _perform_checks();
 
 public:
-	explicit MainApplication(conf::Settings* settings);
+	explicit MainApplication(
+		conf::Settings* settings,
+		std::function<std::shared_ptr<net::IServer>(
+			core::ILogger*,
+			collections::Dict<std::string, std::string>
+		)> server_initializer
+	);
 	void execute(int argc, char** argv);
 };
 

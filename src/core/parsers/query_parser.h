@@ -12,7 +12,7 @@
 #include <string>
 
 // Core libraries.
-#include <xalwart.core/string.h>
+#include <xalwart.core/string_utils.h>
 #include <xalwart.core/collections/multi_dict.h>
 
 // Module definitions.

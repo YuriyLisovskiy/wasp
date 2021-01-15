@@ -107,6 +107,17 @@ protected:
 		this->_commands.push_back(cmd);
 	}
 
+	template <
+		typename CommandT,
+		typename = std::enable_if<std::is_base_of<cmd::AppCommand, CommandT>::value>,
+		typename ...Args
+	>
+	void command(Args&& ...args)
+	{
+		auto cmd = std::make_shared<CommandT>(std::forward<Args>(args)...);
+		this->_commands.push_back(cmd);
+	}
+
 	explicit AppConfig(
 		const std::string& app_path, conf::Settings* settings
 	);

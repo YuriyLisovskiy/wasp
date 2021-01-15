@@ -8,13 +8,14 @@
 
 #pragma once
 
+// Core libraries.
+#include <xalwart.core/net/server.h>
+
 // Module definitions.
 #include "./_def_.h"
 
 // Framework libraries.
 #include "../../commands/app_command.h"
-#include "../../core/server/interfaces.h"
-#include "../../core/server/func.h"
 
 
 __MANAGEMENT_COMMANDS_BEGIN__
@@ -32,6 +33,7 @@ private:
 	std::shared_ptr<core::flags::Uint16Flag> _port_flag;
 	std::shared_ptr<core::flags::UnsignedLongFlag> _threads_flag;
 	std::shared_ptr<core::flags::BoolFlag> _use_ipv6_flag;
+	std::shared_ptr<core::flags::BoolFlag> _log_color_flag;
 
 	rgx::Regex _ipv4_ipv6_port_regex;
 	rgx::Regex _ipv4_regex;
@@ -42,33 +44,27 @@ private:
 	const uint16_t DEFAULT_PORT = 8000;
 	const size_t DEFAULT_THREADS = 16;
 
+	std::function<std::shared_ptr<net::IServer>(
+		core::ILogger*,
+		collections::Dict<std::string, std::string>
+	)> make_server;
+
 protected:
 	void add_flags() final;
 	void handle() final;
-	server::HttpHandlerFunc make_handler();
-	bool static_is_allowed(const std::string& static_url);
-	void build_static_patterns(std::vector<std::shared_ptr<urls::UrlPattern>>& patterns);
-	void build_app_patterns(std::vector<std::shared_ptr<urls::UrlPattern>>& patterns);
 	void retrieve_args(
 		std::string& host, uint16_t& port, bool& use_ipv6, size_t& threads_count
 	);
 
-	core::Result<std::shared_ptr<http::IHttpResponse>> process_request_middleware(
-		http::HttpRequest* request, conf::Settings* settings
-	);
-	core::Result<std::shared_ptr<http::IHttpResponse>> process_response_middleware(
-		http::HttpRequest* request,
-		http::IHttpResponse* response,
-		conf::Settings* settings
-	);
-	core::Result<std::shared_ptr<http::IHttpResponse>> process_urlpatterns(
-		http::HttpRequest* request,
-		std::vector<std::shared_ptr<urls::UrlPattern>>& urlpatterns,
-		conf::Settings* settings
-	);
-
 public:
-	explicit StartServerCommand(apps::IAppConfig* config, conf::Settings* settings);
+	explicit StartServerCommand(
+		apps::IAppConfig* config,
+		conf::Settings* settings,
+		std::function<std::shared_ptr<net::IServer>(
+			core::ILogger*,
+			collections::Dict<std::string, std::string>
+		)> make_server
+	);
 	collections::Dict<std::string, std::string> get_kwargs() override;
 };
 

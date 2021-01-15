@@ -25,7 +25,7 @@ http::HttpRequest make_request(const conf::Settings* settings, const std::string
 		collections::MultiValueDict<std::string, xw::string>()
 	);
 
-	auto empty_map = std::map<std::string, std::string>();
+	auto empty_map = collections::Dict<std::string, std::string>();
 	return http::HttpRequest(
 		settings,
 		method,
@@ -292,7 +292,7 @@ TEST_F(RedirectViewPermanentAndQueryStringTestCase, GetRedirectUrlTest)
 		collections::Dict<std::string, xw::string>(),
 		collections::MultiValueDict<std::string, xw::string>()
 	);
-	auto empty_map = std::map<std::string, std::string>();
+	auto empty_map = collections::Dict<std::string, std::string>();
 	auto* request = new http::HttpRequest(
 		this->settings,
 		"get",
