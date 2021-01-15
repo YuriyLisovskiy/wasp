@@ -165,7 +165,7 @@ void MainApplication::_perform_checks()
 	if (!this->settings->TEMPLATE_ENGINE)
 	{
 		this->settings->LOGGER->error(
-			"TEMPLATES_ENGINE instance must be configured in order to use the application."
+			"TEMPLATE_ENGINE must be configured in order to use the application."
 		);
 		err_count++;
 	}

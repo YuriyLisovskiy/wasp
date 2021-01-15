@@ -12,8 +12,6 @@
 #include <xalwart.core/datetime.h>
 #include <xalwart.core/logger.h>
 #include <xalwart.core/result.h>
-#include <xalwart.core/yaml/yaml-cpp/yaml.h>
-#include <xalwart.core/net/server.h>
 
 // Render libraries.
 #include <xalwart.render/library/base.h>
@@ -228,15 +226,24 @@ public:
 	void init();
 	void prepare();
 
-protected:
-	virtual void register_logger();
 	virtual void register_apps();
 	virtual void register_middleware();
 	virtual void register_libraries();
-	virtual void register_templates_engine();
-	virtual void register_templates_engine(const YAML::Node& config);
 	virtual void register_loaders();
 
+	[[nodiscard]]
+	std::shared_ptr<apps::IAppConfig> get_app(const std::string& full_name) const;
+
+	[[nodiscard]]
+	std::shared_ptr<middleware::IMiddleware> get_middleware(const std::string& full_name) const;
+
+	[[nodiscard]]
+	std::shared_ptr<render::lib::ILibrary> get_library(const std::string& full_name) const;
+
+	[[nodiscard]]
+	std::shared_ptr<render::ILoader> get_loader(const std::string& full_name) const;
+
+protected:
 	template <typename T, typename = std::enable_if<std::is_base_of<apps::IAppConfig, T>::value>>
 	void app(const std::string& full_name)
 	{
@@ -324,29 +331,6 @@ private:
 	const std::string CONFIG_NAME = "config.yml";
 	const std::string LOCAL_CONFIG_NAME = "config.local.yml";
 
-	[[nodiscard]]
-	YAML::Node _load_config(const std::string& file_name) const;
-
-	// Loads local configuration file and overrides existing one.
-	static void _override_scalar(
-		YAML::Node& config, YAML::Node& local, const std::string& key
-	);
-	static void _override_sequence(
-		YAML::Node& config, YAML::Node& local, const std::string& key
-	);
-	void _override_config(YAML::Node& config);
-
-	void _init_env(YAML::Node& config);
-	void _init_logger(YAML::Node& logger);
-	void _init_allowed_hosts(YAML::Node& allowed_hosts);
-	void _init_disallowed_user_agents(YAML::Node& agents);
-	void _init_ignorable_404_urls(YAML::Node& urls);
-	void _init_formats(YAML::Node& config);
-	void _init_csrf(YAML::Node& config);
-	void _init_secure(YAML::Node& config);
-	void _init_apps(YAML::Node& apps);
-	void _init_middleware(YAML::Node& middleware);
-
 private:
 	std::map<
 		std::string,
@@ -367,18 +351,6 @@ private:
 		std::string,
 		std::function<std::shared_ptr<render::ILoader>()>
 	> _loaders;
-
-	[[nodiscard]]
-	std::shared_ptr<apps::IAppConfig> _get_app(const std::string& full_name) const;
-
-	[[nodiscard]]
-	std::shared_ptr<middleware::IMiddleware> _get_middleware(const std::string& full_name) const;
-
-	[[nodiscard]]
-	std::shared_ptr<render::lib::ILibrary> _get_library(const std::string& full_name) const;
-
-	[[nodiscard]]
-	std::shared_ptr<render::ILoader> _get_loader(const std::string& full_name) const;
 };
 
 __CONF_END__
