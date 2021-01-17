@@ -22,10 +22,6 @@ struct ViewTestSettings : public conf::Settings
 {
 	ViewTestSettings() : conf::Settings("./")
 	{
-	}
-
-	void register_logger() final
-	{
 		auto lc = core::LoggerConfig();
 		lc.enable_info = false;
 		lc.enable_debug = false;

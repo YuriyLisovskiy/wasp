@@ -7,7 +7,7 @@
 #include "./yaml_settings_loader.h"
 
 // C++ libraries.
-// TODO
+#include <iostream>
 
 // Core libraries.
 #include <xalwart.core/string_utils.h>
@@ -31,6 +31,31 @@ std::string YamlSettingsLoader::local_config_name() const
 	return "config.local.yaml";
 }
 
+YAML::Node YamlSettingsLoader::null() const
+{
+	return YAML::Node(YAML::NodeType::Null);
+}
+
+YAML::Node YamlSettingsLoader::undefined() const
+{
+	return YAML::Node(YAML::NodeType::Undefined);
+}
+
+YAML::Node YamlSettingsLoader::map_node() const
+{
+	return YAML::Node(YAML::NodeType::Map);
+}
+
+YAML::Node YamlSettingsLoader::get_or_null(const YAML::Node& node) const
+{
+	return !node ? this->null() : node;
+}
+
+YAML::Node YamlSettingsLoader::get_or_undefined(const YAML::Node& node) const
+{
+	return !node ? YAML::Node(YAML::NodeType::Undefined) : node;
+}
+
 YAML::Node YamlSettingsLoader::load_yaml(const std::string& file_path)
 {
 	if (path::exists(file_path))
@@ -51,185 +76,150 @@ void YamlSettingsLoader::check_config(const YAML::Node& config, const std::strin
 	}
 }
 
-void YamlSettingsLoader::overwrite_scalar(
+void YamlSettingsLoader::overwrite_scalar_or_remove_if_null(
 	YAML::Node& config, const YAML::Node& local_config, const std::string& key
 )
 {
 	auto value = local_config[key];
-	if (value)
+	if (!value || value.IsNull())
 	{
-		if (value.IsScalar())
-		{
-			config[key] = local_config[key];
-		}
-		else if (value.IsNull())
-		{
-			if (config[key])
-			{
-				config.remove(key);
-			}
-		}
+		config[key] = this->null();
+	}
+	else if (value.IsScalar())
+	{
+		config[key] = value;
 	}
 }
 
-void YamlSettingsLoader::overwrite_sequence(
+void YamlSettingsLoader::overwrite_sequence_or_remove_if_null(
 	YAML::Node& config, const YAML::Node& local_config, const std::string& key
 )
 {
 	auto value = local_config[key];
-	if (value)
+	if (!value || value.IsNull())
 	{
-		if (value.IsSequence())
-		{
-			config[key] = local_config[key];
-		}
-		else if (value.IsNull())
-		{
-			if (config[key])
-			{
-				config.remove(key);
-			}
-		}
+		config[key] = this->null();
+	}
+	else if (value.IsSequence())
+	{
+		config[key] = value;
 	}
 }
 
 void YamlSettingsLoader::overwrite_config(YAML::Node& config, const YAML::Node& local_config)
 {
-	this->overwrite_scalar(config, local_config, "debug");
+	auto local_debug = local_config["debug"];
+	if (local_debug && (local_debug.IsNull() || local_debug.IsScalar()))
+	{
+		config["debug"] = local_debug;
+	}
 
 	auto local_logger = local_config["logger"];
 	if (local_logger)
 	{
-		if (local_logger.IsNull() && config["logger"])
-		{
-			config.remove("logger");
-		}
-		else if (local_logger.IsMap())
-		{
-			auto logger = config["logger"];
-			if (!logger)
-			{
-				config["logger"] = local_logger;
-			}
-			else
-			{
-				auto local_levels = local_logger["levels"];
-				if (local_levels)
-				{
-					if (local_levels.IsNull() && logger["levels"])
-					{
-						logger.remove("levels");
-					}
-					else if (local_levels.IsMap())
-					{
-						auto levels = logger["levels"];
-						if (!levels)
-						{
-							logger["levels"] = local_levels;
-						}
-						else
-						{
-							this->overwrite_scalar(levels, local_levels, "info");
-							this->overwrite_scalar(levels, local_levels, "debug");
-							this->overwrite_scalar(levels, local_levels, "warning");
-							this->overwrite_scalar(levels, local_levels, "error");
-							this->overwrite_scalar(levels, local_levels, "fatal");
-							this->overwrite_scalar(levels, local_levels, "print");
-							logger["levels"] = levels;
-						}
-					}
-				}
-
-				auto local_out = local_logger["out"];
-				if (local_out)
-				{
-					if (local_out.IsNull() && logger["out"])
-					{
-						logger.remove("out");
-					}
-					else if (local_out.IsMap())
-					{
-						auto out = logger["out"];
-						if (!out)
-						{
-							logger["out"] = local_out;
-						}
-						else
-						{
-							this->overwrite_scalar(out, local_out, "console");
-							this->overwrite_scalar(out, local_out, "file");
-							this->overwrite_sequence(out, local_out, "files");
-						}
-					}
-				}
-
-				config["logger"] = logger;
-			}
-		}
+		auto logger = config["logger"];
+		this->overwrite_logger(logger, local_logger);
+		config["logger"] = logger;
 	}
 
-	this->overwrite_sequence(config, local_config, "allowed_hosts");
+	auto local_allowed_hosts = local_config["allowed_hosts"];
+	if (local_allowed_hosts && (local_allowed_hosts.IsNull() || local_allowed_hosts.IsSequence()))
+	{
+		config["allowed_hosts"] = local_allowed_hosts;
+	}
 
-	auto local_timezone = config["timezone"];
+	auto local_timezone = local_config["timezone"];
 	if (local_timezone)
 	{
-		if (local_timezone.IsNull() && config["timezone"])
+		auto timezone = config["timezone"];
+		if (!timezone || local_timezone.IsNull())
 		{
-			config.remove("timezone");
+			config["timezone"] = local_timezone;
 		}
-		else if (local_timezone.IsMap())
+		else
 		{
-			auto timezone = config["timezone"];
-			if (!timezone)
+			this->overwrite_scalar_or_remove_if_null(timezone, local_timezone, "name");
+			auto local_offset = local_timezone["offset"];
+			if (!local_offset || local_offset.IsNull())
 			{
-				config["timezone"] = local_timezone;
-			}
-			else
-			{
-				this->overwrite_scalar(timezone, local_timezone, "name");
-				auto local_offset = local_timezone["offset"];
-				if (local_offset.IsNull() && timezone["offset"])
+				if (timezone["offset"])
 				{
 					timezone.remove("offset");
 				}
-				else if (local_offset.IsMap())
-				{
-					auto offset = timezone["offset"];
-					if (!offset)
-					{
-						timezone["offset"] = local_offset;
-					}
-					else
-					{
-						this->overwrite_scalar(offset, local_offset, "days");
-						this->overwrite_scalar(offset, local_offset, "seconds");
-						this->overwrite_scalar(offset, local_offset, "microseconds");
-						this->overwrite_scalar(offset, local_offset, "milliseconds");
-						this->overwrite_scalar(offset, local_offset, "minutes");
-						this->overwrite_scalar(offset, local_offset, "hours");
-						this->overwrite_scalar(offset, local_offset, "weeks");
-						timezone["offset"] = offset;
-					}
-				}
-
-				config["timezone"] = timezone;
 			}
+			else if (local_offset.IsMap())
+			{
+				auto offset = timezone["offset"];
+				if (!offset)
+				{
+					timezone["offset"] = local_offset;
+				}
+				else
+				{
+					this->overwrite_scalar_or_remove_if_null(offset, local_offset, "days");
+					this->overwrite_scalar_or_remove_if_null(offset, local_offset, "seconds");
+					this->overwrite_scalar_or_remove_if_null(offset, local_offset, "microseconds");
+					this->overwrite_scalar_or_remove_if_null(offset, local_offset, "milliseconds");
+					this->overwrite_scalar_or_remove_if_null(offset, local_offset, "minutes");
+					this->overwrite_scalar_or_remove_if_null(offset, local_offset, "hours");
+					this->overwrite_scalar_or_remove_if_null(offset, local_offset, "weeks");
+					timezone["offset"] = offset;
+				}
+			}
+
+			config["timezone"] = timezone;
 		}
 	}
 
-	this->overwrite_scalar(config, local_config, "use_tz");
-	this->overwrite_scalar(config, local_config, "charset");
-	this->overwrite_scalar(config, local_config, "append_slash");
-	this->overwrite_sequence(config, local_config, "disallowed_user_agents");
-	this->overwrite_sequence(config, local_config, "ignorable_404_urls");
-	this->overwrite_scalar(config, local_config, "secret_key");
+	auto local_use_tz = local_config["use_tz"];
+	if (local_use_tz && (local_use_tz.IsNull() || local_use_tz.IsScalar()))
+	{
+		config["use_tz"] = local_use_tz;
+	}
+
+	auto local_charset = local_config["charset"];
+	if (local_charset && (local_charset.IsNull() || local_charset.IsScalar()))
+	{
+		config["charset"] = local_charset;
+	}
+
+	auto local_append_slash = local_config["append_slash"];
+	if (local_append_slash && (local_append_slash.IsNull() || local_append_slash.IsScalar()))
+	{
+		config["append_slash"] = local_append_slash;
+	}
+
+	auto local_disallowed_user_agents = local_config["disallowed_user_agents"];
+	if (local_disallowed_user_agents && (
+		local_disallowed_user_agents.IsNull() || local_disallowed_user_agents.IsSequence()
+	))
+	{
+		config["disallowed_user_agents"] = local_disallowed_user_agents;
+	}
+
+	auto local_ignorable_404_urls = local_config["ignorable_404_urls"];
+	if (local_ignorable_404_urls && (
+		local_ignorable_404_urls.IsNull() || local_ignorable_404_urls.IsSequence()
+	))
+	{
+		config["ignorable_404_urls"] = local_ignorable_404_urls;
+	}
+
+	auto local_secret_key = local_config["secret_key"];
+	if (local_secret_key && (local_secret_key.IsNull() || local_secret_key.IsScalar()))
+	{
+		config["secret_key"] = local_secret_key;
+	}
 
 	auto local_media = local_config["media"];
 	if (local_media)
 	{
-		if (local_media.IsNull() && config["media"])
+		if (local_media.IsNull())
 		{
-			config.remove("media");
+			if (config["media"])
+			{
+				config.remove("media");
+			}
 		}
 		else if (local_media.IsMap())
 		{
@@ -240,8 +230,8 @@ void YamlSettingsLoader::overwrite_config(YAML::Node& config, const YAML::Node& 
 			}
 			else
 			{
-				this->overwrite_scalar(media, local_media, "root");
-				this->overwrite_scalar(media, local_media, "url");
+				this->overwrite_scalar_or_remove_if_null(media, local_media, "root");
+				this->overwrite_scalar_or_remove_if_null(media, local_media, "url");
 				config["media"] = media;
 			}
 		}
@@ -250,9 +240,12 @@ void YamlSettingsLoader::overwrite_config(YAML::Node& config, const YAML::Node& 
 	auto local_static = local_config["static"];
 	if (local_static)
 	{
-		if (local_static.IsNull() && config["static"])
+		if (local_static.IsNull())
 		{
-			config.remove("static");
+			if (config["static"])
+			{
+				config.remove("static");
+			}
 		}
 		else if (local_static.IsMap())
 		{
@@ -263,24 +256,52 @@ void YamlSettingsLoader::overwrite_config(YAML::Node& config, const YAML::Node& 
 			}
 			else
 			{
-				this->overwrite_scalar(static_, local_static, "root");
-				this->overwrite_scalar(static_, local_static, "url");
+				this->overwrite_scalar_or_remove_if_null(static_, local_static, "root");
+				this->overwrite_scalar_or_remove_if_null(static_, local_static, "url");
 				config["static"] = static_;
 			}
 		}
 	}
 
-	this->overwrite_scalar(config, local_config, "file_upload_max_memory_size");
-	this->overwrite_scalar(config, local_config, "data_upload_max_memory_size");
-	this->overwrite_scalar(config, local_config, "prepend_www");
-	this->overwrite_scalar(config, local_config, "data_upload_max_number_fields");
+	auto local_file_upload_max_memory_size = local_config["file_upload_max_memory_size"];
+	if (local_file_upload_max_memory_size && (
+		local_file_upload_max_memory_size.IsNull() || local_file_upload_max_memory_size.IsScalar()
+	))
+	{
+		config["file_upload_max_memory_size"] = local_file_upload_max_memory_size;
+	}
+
+	auto local_data_upload_max_memory_size = local_config["data_upload_max_memory_size"];
+	if (local_data_upload_max_memory_size && (
+		local_data_upload_max_memory_size.IsNull() || local_data_upload_max_memory_size.IsScalar()
+	))
+	{
+		config["data_upload_max_memory_size"] = local_data_upload_max_memory_size;
+	}
+
+	auto local_prepend_www = local_config["prepend_www"];
+	if (local_prepend_www && (local_prepend_www.IsNull() || local_prepend_www.IsScalar()))
+	{
+		config["prepend_www"] = local_prepend_www;
+	}
+
+	auto local_data_upload_max_number_fields = local_config["data_upload_max_number_fields"];
+	if (local_data_upload_max_number_fields && (
+		local_data_upload_max_number_fields.IsNull() || local_data_upload_max_number_fields.IsScalar()
+	))
+	{
+		config["data_upload_max_number_fields"] = local_data_upload_max_number_fields;
+	}
 
 	auto local_formats = local_config["formats"];
 	if (local_formats)
 	{
-		if (local_formats.IsNull() && config["formats"])
+		if (local_formats.IsNull())
 		{
-			config.remove("formats");
+			if (config["formats"])
+			{
+				config.remove("formats");
+			}
 		}
 		else if (local_formats.IsMap())
 		{
@@ -291,32 +312,83 @@ void YamlSettingsLoader::overwrite_config(YAML::Node& config, const YAML::Node& 
 			}
 			else
 			{
-				this->overwrite_scalar(formats, local_formats, "date");
-				this->overwrite_scalar(formats, local_formats, "datetime");
-				this->overwrite_scalar(formats, local_formats, "time");
-				this->overwrite_scalar(formats, local_formats, "year_month");
-				this->overwrite_scalar(formats, local_formats, "month_day");
-				this->overwrite_scalar(formats, local_formats, "short_date");
-				this->overwrite_scalar(formats, local_formats, "short_datetime");
+				this->overwrite_scalar_or_remove_if_null(formats, local_formats, "date");
+				this->overwrite_scalar_or_remove_if_null(formats, local_formats, "datetime");
+				this->overwrite_scalar_or_remove_if_null(formats, local_formats, "time");
+				this->overwrite_scalar_or_remove_if_null(formats, local_formats, "year_month");
+				this->overwrite_scalar_or_remove_if_null(formats, local_formats, "month_day");
+				this->overwrite_scalar_or_remove_if_null(formats, local_formats, "short_date");
+				this->overwrite_scalar_or_remove_if_null(formats, local_formats, "short_datetime");
 				config["formats"] = formats;
 			}
 		}
 	}
 
-	this->overwrite_scalar(config, local_config, "first_day_of_week");
-	this->overwrite_scalar(config, local_config, "decimal_separator");
-	this->overwrite_scalar(config, local_config, "use_thousand_separator");
-	this->overwrite_scalar(config, local_config, "thousand_separator");
-	this->overwrite_scalar(config, local_config, "x_frame_options");
-	this->overwrite_scalar(config, local_config, "use_x_forwarded_host");
-	this->overwrite_scalar(config, local_config, "use_x_forwarded_port");
+	auto local_first_day_of_week = local_config["first_day_of_week"];
+	if (local_first_day_of_week && (
+		local_first_day_of_week.IsNull() || local_first_day_of_week.IsScalar()
+	))
+	{
+		config["first_day_of_week"] = local_first_day_of_week;
+	}
+
+	auto local_decimal_separator = local_config["decimal_separator"];
+	if (local_decimal_separator && (
+		local_decimal_separator.IsNull() || local_decimal_separator.IsScalar()
+	))
+	{
+		config["decimal_separator"] = local_decimal_separator;
+	}
+
+	auto local_use_thousand_separator = local_config["use_thousand_separator"];
+	if (local_use_thousand_separator && (
+		local_use_thousand_separator.IsNull() || local_use_thousand_separator.IsScalar()
+	))
+	{
+		config["use_thousand_separator"] = local_use_thousand_separator;
+	}
+
+	auto local_thousand_separator = local_config["thousand_separator"];
+	if (local_thousand_separator && (
+		local_thousand_separator.IsNull() || local_thousand_separator.IsScalar()
+	))
+	{
+		config["thousand_separator"] = local_thousand_separator;
+	}
+
+	auto local_x_frame_options = local_config["x_frame_options"];
+	if (local_x_frame_options && (
+		local_x_frame_options.IsNull() || local_x_frame_options.IsScalar()
+	))
+	{
+		config["x_frame_options"] = local_x_frame_options;
+	}
+
+	auto local_use_x_forwarded_host = local_config["use_x_forwarded_host"];
+	if (local_use_x_forwarded_host && (
+		local_use_x_forwarded_host.IsNull() || local_use_x_forwarded_host.IsScalar()
+	))
+	{
+		config["use_x_forwarded_host"] = local_use_x_forwarded_host;
+	}
+
+	auto local_use_x_forwarded_port = local_config["use_x_forwarded_port"];
+	if (local_use_x_forwarded_port && (
+		local_use_x_forwarded_port.IsNull() || local_use_x_forwarded_port.IsScalar()
+	))
+	{
+		config["use_x_forwarded_port"] = local_use_x_forwarded_port;
+	}
 
 	auto local_csrf = local_config["csrf"];
 	if (local_csrf)
 	{
-		if (local_csrf.IsNull() && config["csrf"])
+		if (local_csrf.IsNull())
 		{
-			config.remove("csrf");
+			if (config["csrf"])
+			{
+				config.remove("csrf");
+			}
 		}
 		else if (local_csrf.IsMap())
 		{
@@ -328,48 +400,56 @@ void YamlSettingsLoader::overwrite_config(YAML::Node& config, const YAML::Node& 
 			else
 			{
 				auto local_cookie = local_csrf["cookie"];
-				if (local_cookie)
+				if (!local_cookie || local_cookie.IsNull())
 				{
-					if (local_cookie.IsNull() && csrf["cookie"])
+					if (csrf["cookie"])
 					{
 						csrf.remove("cookie");
 					}
-					else if (local_cookie.IsMap())
+				}
+				else if (local_cookie.IsMap())
+				{
+					auto cookie = csrf["cookie"];
+					if (!cookie)
 					{
-						auto cookie = csrf["cookie"];
-						if (!cookie)
-						{
-							csrf["cookie"] = local_cookie;
-						}
-						else
-						{
-							this->overwrite_scalar(cookie, local_cookie, "name");
-							this->overwrite_scalar(cookie, local_cookie, "age");
-							this->overwrite_scalar(cookie, local_cookie, "domain");
-							this->overwrite_scalar(cookie, local_cookie, "path");
-							this->overwrite_scalar(cookie, local_cookie, "secure");
-							this->overwrite_scalar(cookie, local_cookie, "http_only");
-							this->overwrite_scalar(cookie, local_cookie, "same_site");
-							csrf["cookie"] = cookie;
-						}
+						csrf["cookie"] = local_cookie;
+					}
+					else
+					{
+						this->overwrite_scalar_or_remove_if_null(cookie, local_cookie, "name");
+						this->overwrite_scalar_or_remove_if_null(cookie, local_cookie, "age");
+						this->overwrite_scalar_or_remove_if_null(cookie, local_cookie, "domain");
+						this->overwrite_scalar_or_remove_if_null(cookie, local_cookie, "path");
+						this->overwrite_scalar_or_remove_if_null(cookie, local_cookie, "secure");
+						this->overwrite_scalar_or_remove_if_null(cookie, local_cookie, "http_only");
+						this->overwrite_scalar_or_remove_if_null(cookie, local_cookie, "same_site");
+						csrf["cookie"] = cookie;
 					}
 				}
 
-				this->overwrite_scalar(csrf, local_csrf, "header_name");
-				this->overwrite_scalar(csrf, local_csrf, "use_sessions");
-				this->overwrite_sequence(csrf, local_csrf, "trusted_origins");
+				this->overwrite_scalar_or_remove_if_null(csrf, local_csrf, "header_name");
+				this->overwrite_scalar_or_remove_if_null(csrf, local_csrf, "use_sessions");
+				this->overwrite_sequence_or_remove_if_null(csrf, local_csrf, "trusted_origins");
 				config["csrf"] = csrf;
 			}
 		}
 	}
 
-	this->overwrite_scalar(config, local_config, "use_ssl");
+	auto local_use_ssl = local_config["use_ssl"];
+	if (local_use_ssl && (local_use_ssl.IsNull() || local_use_ssl.IsScalar()))
+	{
+		config["use_ssl"] = local_use_ssl;
+	}
+
 	auto local_secure = local_config["secure"];
 	if (local_secure)
 	{
-		if (local_secure.IsNull() && config["secure"])
+		if (local_secure.IsNull())
 		{
-			config.remove("secure");
+			if (config["secure"])
+			{
+				config.remove("secure");
+			}
 		}
 		else if (local_secure.IsMap())
 		{
@@ -380,35 +460,35 @@ void YamlSettingsLoader::overwrite_config(YAML::Node& config, const YAML::Node& 
 			}
 			else
 			{
-				this->overwrite_scalar(secure, local_secure, "browser_xss_filter");
-				this->overwrite_scalar(secure, local_secure, "content_type_no_sniff");
-				this->overwrite_scalar(secure, local_secure, "hsts_include_subdomains");
-				this->overwrite_scalar(secure, local_secure, "hsts_preload");
-				this->overwrite_scalar(secure, local_secure, "hsts_seconds");
-				this->overwrite_sequence(secure, local_secure, "redirect_exempt");
-				this->overwrite_scalar(secure, local_secure, "referrer_policy");
-				this->overwrite_scalar(secure, local_secure, "ssl_host");
-				this->overwrite_scalar(secure, local_secure, "ssl_redirect");
+				this->overwrite_scalar_or_remove_if_null(secure, local_secure, "browser_xss_filter");
+				this->overwrite_scalar_or_remove_if_null(secure, local_secure, "content_type_no_sniff");
+				this->overwrite_scalar_or_remove_if_null(secure, local_secure, "hsts_include_subdomains");
+				this->overwrite_scalar_or_remove_if_null(secure, local_secure, "hsts_preload");
+				this->overwrite_scalar_or_remove_if_null(secure, local_secure, "hsts_seconds");
+				this->overwrite_sequence_or_remove_if_null(secure, local_secure, "redirect_exempt");
+				this->overwrite_scalar_or_remove_if_null(secure, local_secure, "referrer_policy");
+				this->overwrite_scalar_or_remove_if_null(secure, local_secure, "ssl_host");
+				this->overwrite_scalar_or_remove_if_null(secure, local_secure, "ssl_redirect");
 				auto local_psslh = local_secure["proxy_ssl_header"];
-				if (local_psslh)
+				if (!local_psslh || local_psslh.IsNull())
 				{
-					if (local_psslh.IsNull() && secure["proxy_ssl_header"])
+					if (secure["proxy_ssl_header"])
 					{
 						secure.remove("proxy_ssl_header");
 					}
-					else if (local_psslh.IsMap())
+				}
+				else if (local_psslh.IsMap())
+				{
+					auto psslh = secure["proxy_ssl_header"];
+					if (!psslh)
 					{
-						auto psslh = secure["proxy_ssl_header"];
-						if (!psslh)
-						{
-							secure["proxy_ssl_header"] = local_psslh;
-						}
-						else
-						{
-							this->overwrite_scalar(psslh, local_psslh, "name");
-							this->overwrite_scalar(psslh, local_psslh, "value");
-							secure["proxy_ssl_header"] = psslh;
-						}
+						secure["proxy_ssl_header"] = local_psslh;
+					}
+					else
+					{
+						this->overwrite_scalar_or_remove_if_null(psslh, local_psslh, "name");
+						this->overwrite_scalar_or_remove_if_null(psslh, local_psslh, "value");
+						secure["proxy_ssl_header"] = psslh;
 					}
 				}
 
@@ -417,32 +497,121 @@ void YamlSettingsLoader::overwrite_config(YAML::Node& config, const YAML::Node& 
 		}
 	}
 
-	this->overwrite_sequence(config, local_config, "installed_apps");
-	this->overwrite_sequence(config, local_config, "middleware");
+	auto local_installed_apps = local_config["installed_apps"];
+	if (local_installed_apps && (
+		local_installed_apps.IsNull() || local_installed_apps.IsSequence()
+	))
+	{
+		config["installed_apps"] = local_installed_apps;
+	}
+
+	auto local_middleware = local_config["middleware"];
+	if (local_middleware && (
+		local_middleware.IsNull() || local_middleware.IsSequence()
+	))
+	{
+		config["middleware"] = local_middleware;
+	}
 
 	auto local_template_engine = local_config["template_engine"];
 	if (local_template_engine)
 	{
-		if (local_template_engine.IsNull() && config["template_engine"])
+		auto template_engine = config["template_engine"];
+		this->overwrite_template_engine(template_engine, local_template_engine);
+		config["template_engine"] = template_engine;
+	}
+}
+
+void YamlSettingsLoader::overwrite_logger(YAML::Node& logger, const YAML::Node& local_logger)
+{
+	if (!logger || local_logger.IsNull())
+	{
+		logger = this->null();
+	}
+	else if (local_logger.IsMap())
+	{
+		auto local_levels = this->get_or_undefined(local_logger["levels"]);
+		if (local_levels.IsNull())
 		{
-			config.remove("template_engine");
+			logger["levels"] = this->null();
 		}
-		else if (local_template_engine.IsMap())
+		else if (local_levels.IsMap())
 		{
-			auto env = config["template_engine"];
-			if (!env)
+			auto levels = this->get_or_null(logger["levels"]);
+			if (levels.IsNull())
 			{
-				config["template_engine"] = local_template_engine;
+				logger["levels"] = local_levels;
 			}
 			else
 			{
-				this->overwrite_sequence(env, local_template_engine, "directories");
-				this->overwrite_sequence(env, local_template_engine, "libraries");
-				this->overwrite_scalar(env, local_template_engine, "use_app_directories");
-				this->overwrite_scalar(env, local_template_engine, "auto_escape");
-				this->overwrite_scalar(env, local_template_engine, "use_default_engine");
+				if (!levels)
+				{
+					levels = this->map_node();
+				}
+
+				this->overwrite_scalar_or_remove_if_null(levels, local_levels, "info");
+				this->overwrite_scalar_or_remove_if_null(levels, local_levels, "debug");
+				this->overwrite_scalar_or_remove_if_null(levels, local_levels, "warning");
+				this->overwrite_scalar_or_remove_if_null(levels, local_levels, "error");
+				this->overwrite_scalar_or_remove_if_null(levels, local_levels, "fatal");
+				this->overwrite_scalar_or_remove_if_null(levels, local_levels, "print");
+				logger["levels"] = levels;
 			}
 		}
+
+		auto local_out = this->get_or_null(local_logger["out"]);
+		if (local_out.IsNull())
+		{
+			logger["out"] = this->null();
+		}
+		else if (local_out.IsMap())
+		{
+			auto out = this->get_or_null(logger["out"]);
+			if (out.IsNull())
+			{
+				logger["out"] = local_out;
+			}
+			else
+			{
+				if (!out)
+				{
+					out = this->map_node();
+				}
+
+				this->overwrite_scalar_or_remove_if_null(out, local_out, "console");
+				this->overwrite_scalar_or_remove_if_null(out, local_out, "file");
+				this->overwrite_sequence_or_remove_if_null(out, local_out, "files");
+				logger["out"] = out;
+			}
+		}
+	}
+}
+
+void YamlSettingsLoader::overwrite_template_engine(
+	YAML::Node& template_engine, const YAML::Node& local_template_engine
+)
+{
+	if (!template_engine || local_template_engine.IsNull())
+	{
+		template_engine = local_template_engine;
+	}
+	else if (local_template_engine.IsMap())
+	{
+		this->overwrite_sequence_or_remove_if_null(
+			template_engine, local_template_engine, "directories"
+		);
+		this->overwrite_sequence_or_remove_if_null(
+			template_engine, local_template_engine, "libraries"
+		);
+		this->overwrite_scalar_or_remove_if_null(
+			template_engine, local_template_engine, "use_app_directories"
+		);
+		this->overwrite_scalar_or_remove_if_null(
+			template_engine, local_template_engine, "auto_escape"
+		);
+		this->overwrite_scalar_or_remove_if_null(
+			template_engine, local_template_engine, "use_default_engine"
+		);
 	}
 }
 
@@ -451,6 +620,7 @@ void YamlSettingsLoader::init(Settings* settings, const YAML::Node& config)
 	settings->DEBUG = config["debug"].as<bool>(false);
 
 	auto logger = config["logger"];
+
 	if (logger && logger.IsMap())
 	{
 		this->init_logger(settings, logger);
@@ -591,27 +761,69 @@ void YamlSettingsLoader::init_logger(Settings* settings, const YAML::Node& confi
 {
 	core::LoggerConfig logger_config{};
 	auto levels = config["levels"];
-	if (levels && levels.IsMap())
+	if (!levels.IsNull())
 	{
-		logger_config.enable_info = levels["info"].as<bool>(true);
-		logger_config.enable_debug = levels["debug"].as<bool>(true);
-		logger_config.enable_warning = levels["warning"].as<bool>(true);
-		logger_config.enable_error = levels["error"].as<bool>(true);
-		logger_config.enable_fatal = levels["fatal"].as<bool>(true);
-		logger_config.enable_trace = levels["trace"].as<bool>(true);
-		logger_config.enable_print = levels["print"].as<bool>(true);
+		auto info = levels["info"];
+		if (!info.IsNull())
+		{
+			logger_config.enable_info = info.as<bool>(true);
+		}
+
+		auto debug = levels["debug"];
+		if (!debug.IsNull())
+		{
+			logger_config.enable_debug = debug.as<bool>(true);
+		}
+
+		auto warning = levels["warning"];
+		if (!warning.IsNull())
+		{
+			logger_config.enable_warning = warning.as<bool>(true);
+		}
+
+		auto error = levels["error"];
+		if (!error.IsNull())
+		{
+			logger_config.enable_error = error.as<bool>(true);
+		}
+
+		auto fatal = levels["fatal"];
+		if (!fatal.IsNull())
+		{
+			logger_config.enable_fatal = fatal.as<bool>(true);
+		}
+
+		auto trace = levels["trace"];
+		if (!trace.IsNull())
+		{
+			logger_config.enable_trace = trace.as<bool>(true);
+		}
+
+		auto print = levels["print"];
+		if (!print.IsNull())
+		{
+			logger_config.enable_print = print.as<bool>(true);
+		}
+
+//		logger_config.enable_warning = levels["warning"].as<bool>(true);
+//		logger_config.enable_error = levels["error"].as<bool>(true);
+//		logger_config.enable_fatal = levels["fatal"].as<bool>(true);
+//		logger_config.enable_trace = levels["trace"].as<bool>(true);
+//		logger_config.enable_print = levels["print"].as<bool>(true);
 	}
 
 	auto out = config["out"];
-	if (out && out.IsMap())
+	if (!out.IsNull())
 	{
-		if (out["console"].as<bool>(true))
+		auto console = out["console"];
+		if (!console.IsNull() && console.as<bool>(true))
 		{
+			std::cerr << "Console is true!\n";
 			logger_config.add_console_stream();
 		}
 
 		auto file_out = out["file"];
-		if (file_out && file_out.IsScalar())
+		if (!file_out.IsNull())
 		{
 			auto f_path = file_out.as<std::string>();
 			auto full_path = path::is_absolute(f_path) ? f_path : path::join(settings->BASE_DIR, f_path);
@@ -620,7 +832,7 @@ void YamlSettingsLoader::init_logger(Settings* settings, const YAML::Node& confi
 		else
 		{
 			auto files_out = out["files"];
-			if (files_out && files_out.IsSequence())
+			if (files_out.IsSequence())
 			{
 				for (auto it = files_out.begin(); it != files_out.end(); it++)
 				{

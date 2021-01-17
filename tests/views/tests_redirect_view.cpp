@@ -45,14 +45,9 @@ http::HttpRequest make_request(const conf::Settings* settings, const std::string
 	);
 }
 
-
 struct RedirectViewTestSettings : public conf::Settings
 {
 	RedirectViewTestSettings() : conf::Settings("./")
-	{
-	}
-
-	void register_logger() final
 	{
 		auto lc = core::LoggerConfig();
 		lc.enable_info = false;

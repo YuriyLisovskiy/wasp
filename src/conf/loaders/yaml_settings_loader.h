@@ -9,7 +9,7 @@
 #pragma once
 
 // C++ libraries.
-// TODO
+#include <iostream>
 
 // Core libraries.
 #include <xalwart.core/path.h>
@@ -36,19 +36,35 @@ protected:
 	[[nodiscard]]
 	virtual std::string local_config_name() const;
 
+	YAML::Node null() const;
+
+	YAML::Node undefined() const;
+
+	YAML::Node map_node() const;
+
+	YAML::Node get_or_null(const YAML::Node& node) const;
+
+	YAML::Node get_or_undefined(const YAML::Node& node) const;
+
 	virtual YAML::Node load_yaml(const std::string& file_path);
 
 	virtual void check_config(const YAML::Node& config, const std::string& file_path);
 
 	// Loads local configuration file and overrides existing one.
-	void overwrite_scalar(
+	void overwrite_scalar_or_remove_if_null(
 		YAML::Node& config, const YAML::Node& local_config, const std::string& key
 	);
-	void overwrite_sequence(
+	void overwrite_sequence_or_remove_if_null(
 		YAML::Node& config, const YAML::Node& local_config, const std::string& key
 	);
 
 	virtual void overwrite_config(YAML::Node& config, const YAML::Node& local_config);
+
+	virtual void overwrite_logger(YAML::Node& logger_cfg, const YAML::Node& local_logger_cfg);
+
+	virtual void overwrite_template_engine(
+		YAML::Node& engine_cfg, const YAML::Node& local_engine_cfg
+	);
 
 	virtual void init(Settings* settings, const YAML::Node& config);
 
