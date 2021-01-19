@@ -70,7 +70,6 @@ protected:
 	void SetUp() override
 	{
 		this->settings = new RedirectViewTestSettings();
-		this->settings->init();
 		this->view = new views::RedirectView(this->settings, "/hello");
 	}
 
@@ -205,7 +204,6 @@ protected:
 	void SetUp() override
 	{
 		this->settings = new RedirectViewTestSettings();
-		this->settings->init();
 		this->view = new views::RedirectView(
 			this->settings, "/hello/world", true, true
 		);
@@ -322,7 +320,6 @@ protected:
 	void SetUp() override
 	{
 		this->settings = new RedirectViewTestSettings();
-		this->settings->init();
 		this->view = new views::RedirectView(this->settings, "");
 	}
 

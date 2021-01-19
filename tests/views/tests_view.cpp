@@ -69,7 +69,6 @@ protected:
 	void SetUp() override
 	{
 		this->settings = new ViewTestSettings();
-		this->settings->init();
 		this->view = new views::View(this->settings);
 	}
 
