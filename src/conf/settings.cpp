@@ -61,11 +61,6 @@ Settings::Settings(const std::string& base_dir)
 	};
 }
 
-void Settings::init()
-{
-	// TODO: search for config
-}
-
 void Settings::prepare()
 {
 	if (!this->ROOT_APP && !this->INSTALLED_APPS.empty())

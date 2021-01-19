@@ -39,7 +39,6 @@ MainApplication::MainApplication(
 	}
 
 	this->settings = settings;
-	this->settings->init();
 	this->settings->prepare();
 	this->_perform_checks();
 
@@ -423,6 +422,7 @@ core::Result<std::shared_ptr<http::IHttpResponse>> MainApplication::process_resp
 	return core::Result<std::shared_ptr<http::IHttpResponse>>::null();
 }
 
+// TODO: fill the table below.
 // | METHOD     | Contains request body? | Contains response body? |
 // +------------+------------------------+-------------------------+
 // | OPTIONS    |                        |                         |

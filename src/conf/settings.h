@@ -223,7 +223,6 @@ public:
 
 	explicit Settings(const std::string& base_dir);
 	virtual ~Settings() = default;
-	void init();
 	void prepare();
 
 	virtual void register_apps();
