@@ -155,7 +155,7 @@ void MainApplication::_extend_settings_commands_or_error(
 
 void MainApplication::_perform_checks()
 {
-	std::cout << "Performing checks...";
+	std::cout << "Performing checks..." << std::endl;
 	if (!this->settings->LOGGER)
 	{
 		throw core::ImproperlyConfigured("LOGGER instance must be configured");
@@ -222,7 +222,7 @@ void MainApplication::_perform_checks()
 		);
 	}
 
-	this->settings->LOGGER->print(" Done.");
+	std::cout << "Done." << std::endl;
 }
 
 net::HandlerFunc MainApplication::make_handler()
