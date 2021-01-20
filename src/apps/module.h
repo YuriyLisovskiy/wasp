@@ -10,8 +10,6 @@
 
 #pragma once
 
-#include <iostream>
-
 // Core libraries.
 #include <xalwart.core/string_utils.h>
 
@@ -24,23 +22,28 @@
 #include "../urls/url.h"
 #include "../commands/app_command.h"
 
-template<unsigned N>
-struct FixedString
+template<size_t N>
+struct fixed_string
 {
-	char buf[N + 1]{};
-	int length = N;
+	char value[N + 1]{};
+	size_t length = N;
 
-	constexpr FixedString(char const* string)
+	constexpr fixed_string(char const* s)
 	{
-		for (unsigned index = 0; index < N; ++index) {
-			buf[index] = string[index];
+		for (size_t i = 0; i < N; i++)
+		{
+			this->value[i] = s[i];
 		}
 	}
-	constexpr operator char const*() const { return buf; }
+
+	constexpr explicit operator char const* () const
+	{
+		return this->value;
+	}
 };
 
-template<unsigned N>
-FixedString(char const (&)[N]) -> FixedString<N - 1>;
+template<size_t N>
+fixed_string(char const (&)[N]) -> fixed_string<N - 1>;
 
 __APPS_BEGIN__
 
@@ -57,7 +60,6 @@ private:
 	std::vector<std::shared_ptr<cmd::BaseCommand>> _commands;
 	std::vector<std::function<void()>> _sub_modules_to_init;
 
-//	template <typename ModuleConfigT>
 	std::shared_ptr<IModuleConfig> _find_module(const std::string& name)
 	{
 		auto module = std::find_if(
@@ -65,7 +67,6 @@ private:
 			this->settings->INSTALLED_MODULES.end(),
 			[name](const std::shared_ptr<IModuleConfig>& entry) -> bool {
 				return entry->get_name() == name;
-//				return dynamic_cast<ModuleConfigT*>(entry.get()) != nullptr;
 			}
 		);
 		if (module == this->settings->INSTALLED_MODULES.end())
@@ -109,36 +110,11 @@ protected:
 		));
 	}
 
-//	template<unsigned N>
-//	struct FixedString {
-//		char buf[N + 1]{};
-//		constexpr FixedString(char const* s)
-//		{
-//			for (unsigned i = 0; i != N; ++i) buf[i] = s[i];
-//		}
-//
-//		constexpr operator char const*() const { return buf; }
-//	};
-//
-//	template<unsigned N> FixedString(char const (&)[N]) -> FixedString<N - 1>;
-
-//	struct constexpr_str {
-//		char const* str;
-//		std::size_t size;
-//
-//		// can only construct from a char[] literal
-//		template <std::size_t N>
-//		constexpr explicit constexpr_str(const char (&s)[N]) : str(s), size(N - 1) // not count the trailing nul
-//		{
-////			this->str[N - 1] = '\0';
-//		}
-//	};
-
-	template <FixedString module_config_name>
+	template <fixed_string module_name>
 	void include(const std::string& prefix, const std::string& namespace_="")
 	{
 		this->_sub_modules_to_init.emplace_back([this, prefix, namespace_]() -> void {
-			auto app = this->_find_module(module_config_name.buf);
+			auto app = this->_find_module(module_name.value);
 			auto included_urlpatterns = app->get_urlpatterns();
 			auto ns = namespace_.empty() ? app->get_name() : namespace_;
 			for (const auto& pattern : included_urlpatterns)
