@@ -15,12 +15,12 @@
 #include "./_def_.h"
 
 // Framework libraries.
-#include "../apps/config.h"
+#include "../apps/module.h"
 
 
 __MANAGEMENT_BEGIN__
 
-class CoreManagementAppConfig final : public apps::AppConfig
+class CoreManagementModuleConfig final : public apps::ModuleConfig
 {
 private:
 	std::function<std::shared_ptr<net::IServer>(
@@ -29,7 +29,7 @@ private:
 	)> _make_server;
 
 public:
-	explicit CoreManagementAppConfig(
+	explicit CoreManagementModuleConfig(
 		conf::Settings* settings,
 		std::function<std::shared_ptr<net::IServer>(
 			core::ILogger*,

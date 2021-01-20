@@ -6,10 +6,6 @@
 
 #include "./settings.h"
 
-// Core libraries.
-#include <xalwart.core/path.h>
-#include <xalwart.core/string_utils.h>
-
 // Render libraries.
 #include <xalwart.render/engine.h>
 #include <xalwart.render/loaders.h>
@@ -63,13 +59,13 @@ Settings::Settings(const std::string& base_dir)
 
 void Settings::prepare()
 {
-	if (!this->ROOT_APP && !this->INSTALLED_APPS.empty())
+	if (!this->ROOT_MODULE && !this->INSTALLED_MODULES.empty())
 	{
-		this->ROOT_APP = this->INSTALLED_APPS.front();
+		this->ROOT_MODULE = this->INSTALLED_MODULES.front();
 	}
 }
 
-void Settings::register_apps()
+void Settings::register_modules()
 {
 }
 
@@ -85,13 +81,13 @@ void Settings::register_loaders()
 {
 }
 
-std::shared_ptr<apps::IAppConfig> Settings::get_app(
+std::shared_ptr<apps::IModuleConfig> Settings::get_module(
 	const std::string& full_name
 ) const
 {
-	if (this->_apps.find(full_name) != this->_apps.end())
+	if (this->_modules.find(full_name) != this->_modules.end())
 	{
-		return this->_apps.at(full_name)();
+		return this->_modules.at(full_name)();
 	}
 
 	return nullptr;

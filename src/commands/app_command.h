@@ -24,11 +24,11 @@ __COMMANDS_BEGIN__
 class AppCommand : public BaseCommand
 {
 protected:
-	apps::IAppConfig* app_config;
+	apps::IModuleConfig* app_config;
 	conf::Settings* settings;
 
 	AppCommand(
-		apps::IAppConfig* app_cfg,
+		apps::IModuleConfig* app_cfg,
 		conf::Settings* settings,
 		const std::string& cmd_name,
 		const std::string& help

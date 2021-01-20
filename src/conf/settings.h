@@ -12,6 +12,8 @@
 #include <xalwart.core/datetime.h>
 #include <xalwart.core/logger.h>
 #include <xalwart.core/result.h>
+#include <xalwart.core/string_utils.h>
+#include <xalwart.core/utility.h>
 
 // Render libraries.
 #include <xalwart.render/library/base.h>
@@ -20,7 +22,7 @@
 #include "./_def_.h"
 
 // Framework libraries.
-#include "../apps/interfaces.h"
+#include "../apps/abc.h"
 #include "../middleware/interfaces.h"
 #include "../urls/url.h"
 
@@ -57,21 +59,21 @@ public:
 
 	/// Root application where framework will load urlpatterns.
 	///
-	/// ROOT_APP is the first installed app by default, it can
+	/// ROOT_MODULE is the first installed module by default, it can
 	/// be overridden in project settings.
-	std::shared_ptr<apps::IAppConfig> ROOT_APP;
+	std::shared_ptr<apps::IModuleConfig> ROOT_MODULE;
 
-	/// Vector of patterns which will be loaded from ROOT_APP.
-	/// To change this setting, setup ROOT_APP in your project
+	/// Vector of patterns which will be loaded from ROOT_MODULE.
+	/// To change this setting, setup ROOT_MODULE in your project
 	/// settings.
 	std::vector<std::shared_ptr<urls::UrlPattern>> ROOT_URLCONF;
 
-	/// List of AppConfig-derived objects representing apps.
-	/// Order is required. The first app is interpreted as
-	/// main application configuration.
-	std::vector<std::shared_ptr<apps::IAppConfig>> INSTALLED_APPS;
+	/// List of ModuleConfig-derived objects representing modules.
+	/// Order is required. The first item is interpreted as main
+	/// module configuration.
+	std::vector<std::shared_ptr<apps::IModuleConfig>> INSTALLED_MODULES;
 
-	/// Backend for rendering templates.
+	/// Engine for rendering templates.
 	std::unique_ptr<render::IEngine> TEMPLATE_ENGINE;
 
 	/// Whether to append trailing slashes to URLs.
@@ -181,7 +183,7 @@ public:
 	bool USE_X_FORWARDED_HOST;
 	bool USE_X_FORWARDED_PORT;
 
-	/// If your app is behind a proxy that sets a header to specify secure
+	/// If your module is behind a proxy that sets a header to specify secure
 	/// connections, AND that proxy ensures that user-submitted headers with the
 	/// same name are ignored (so that people can't spoof it), set this value to
 	/// a std::pair of (header_name, header_value). For any requests that come in with
@@ -225,13 +227,13 @@ public:
 	virtual ~Settings() = default;
 	void prepare();
 
-	virtual void register_apps();
+	virtual void register_modules();
 	virtual void register_middleware();
 	virtual void register_libraries();
 	virtual void register_loaders();
 
 	[[nodiscard]]
-	std::shared_ptr<apps::IAppConfig> get_app(const std::string& full_name) const;
+	std::shared_ptr<apps::IModuleConfig> get_module(const std::string& full_name) const;
 
 	[[nodiscard]]
 	std::shared_ptr<middleware::IMiddleware> get_middleware(const std::string& full_name) const;
@@ -243,24 +245,39 @@ public:
 	std::shared_ptr<render::ILoader> get_loader(const std::string& full_name) const;
 
 protected:
-	template <typename T, typename = std::enable_if<std::is_base_of<apps::IAppConfig, T>::value>>
-	void app(const std::string& full_name)
+	template <apps::ModuleConfigType ModuleConfigT>
+	void module(const std::string& full_name="")
 	{
-		if (this->_apps.find(full_name) != this->_apps.end())
+		auto name = full_name;
+		if (name.empty())
+		{
+			name = utility::demangle(typeid(ModuleConfigT).name());
+			auto r = apps::_R_CONFIG_NAME;
+			if (r.search(name))
+			{
+				auto suffix = r.group(0);
+				if (name != suffix)
+				{
+					str::rtrim(name, suffix);
+				}
+			}
+		}
+
+		if (this->_modules.find(name) != this->_modules.end())
 		{
 			if (this->LOGGER)
 			{
 				this->LOGGER->warning(
-						"unable to register '" + full_name + "' app which already exists"
+					"unable to register module which already exists: '" + name + "'"
 				);
 			}
 		}
 		else
 		{
-			this->_apps[full_name] = [this]() -> std::shared_ptr<apps::IAppConfig> {
-				auto app = std::make_shared<T>(this);
-				app->init(app->__type__());
-				return app;
+			this->_modules[name] = [this, name]() -> std::shared_ptr<apps::IModuleConfig> {
+				auto module = std::make_shared<ModuleConfigT>(this);
+				module->init(name);
+				return module;
 			};
 		}
 	}
@@ -273,7 +290,7 @@ protected:
 			if (this->LOGGER)
 			{
 				this->LOGGER->warning(
-						"unable to register '" + full_name + "' middleware which already exists"
+					"unable to register '" + full_name + "' middleware which already exists"
 				);
 			}
 		}
@@ -293,7 +310,7 @@ protected:
 			if (this->LOGGER)
 			{
 				this->LOGGER->warning(
-						"unable to register '" + full_name + "' library which already exists"
+					"unable to register '" + full_name + "' library which already exists"
 				);
 			}
 		}
@@ -313,7 +330,7 @@ protected:
 			if (this->LOGGER)
 			{
 				this->LOGGER->warning(
-						"unable to register '" + full_name + "' loader which already exists"
+					"unable to register '" + full_name + "' loader which already exists"
 				);
 			}
 		}
@@ -324,11 +341,6 @@ protected:
 			};
 		}
 	}
-
-private:
-	const std::string CONFIG_ROOT = "application";
-	const std::string CONFIG_NAME = "config.yml";
-	const std::string LOCAL_CONFIG_NAME = "config.local.yml";
 
 private:
 	std::map<
@@ -343,8 +355,8 @@ private:
 
 	std::map<
 		std::string,
-		std::function<std::shared_ptr<apps::IAppConfig>()>
-	> _apps;
+		std::function<std::shared_ptr<apps::IModuleConfig>()>
+	> _modules;
 
 	std::map<
 		std::string,

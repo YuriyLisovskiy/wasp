@@ -10,7 +10,10 @@
 __COMMANDS_BEGIN__
 
 AppCommand::AppCommand(
-	apps::IAppConfig* app_cfg, conf::Settings* settings, const std::string& cmd_name, const std::string& help
+	apps::IModuleConfig* app_cfg,
+	conf::Settings* settings,
+	const std::string& cmd_name,
+	const std::string& help
 ) : BaseCommand(cmd_name, help), app_config(app_cfg), settings(settings)
 {
 	if (!this->app_config)

@@ -1,13 +1,10 @@
 /**
  * apps/xalwart.cpp
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  */
 
 #include "./xalwart.h"
-
-// C++ libraries.
-#include <iostream>
 
 // Core libraries.
 #include <xalwart.core/path.h>
@@ -91,22 +88,21 @@ void MainApplication::execute(int argc, char** argv)
 
 void MainApplication::_setup_commands()
 {
-	// Retrieve commands from INSTALLED_APPS and
-	// check if apps' commands do not override
-	// settings commands, if not, then append them
-	// to settings.COMMANDS
-	for (auto& installed_app : this->settings->INSTALLED_APPS)
+	// Retrieve commands from INSTALLED_MODULES and
+	// check if modules' commands do not override
+	// settings commands.
+	for (auto& installed_module : this->settings->INSTALLED_MODULES)
 	{
 		this->_extend_settings_commands_or_error(
-			installed_app->get_commands(),
-			[installed_app](const std::string& cmd_name) -> std::string {
-				return "App with name '" + installed_app->get_name() +
+			installed_module->get_commands(),
+			[installed_module](const std::string& cmd_name) -> std::string {
+				return "Module with name '" + installed_module->get_name() +
 				       "' overrides commands with '" + cmd_name + "' command";
 			}
 		);
 	}
 
-	auto default_commands = management::CoreManagementAppConfig(
+	auto default_commands = management::CoreManagementModuleConfig(
 		this->settings, [this](
 			core::ILogger* logger,
 			collections::Dict<std::string, std::string> kwargs
@@ -189,10 +185,10 @@ void MainApplication::_perform_checks()
 		err_count++;
 	}
 
-	if (this->settings->INSTALLED_APPS.empty())
+	if (this->settings->INSTALLED_MODULES.empty())
 	{
 		this->settings->LOGGER->warning(
-			"You have not added any app to INSTALLED_APPS setting."
+			"You have not added any module to INSTALLED_MODULES setting."
 		);
 	}
 
@@ -204,11 +200,11 @@ void MainApplication::_perform_checks()
 		err_count++;
 	}
 
-	for (auto& module : this->settings->INSTALLED_APPS)
+	for (auto& module : this->settings->INSTALLED_MODULES)
 	{
-		if (!module->is_initialized())
+		if (!module->ready())
 		{
-			this->settings->LOGGER->error("Module '" + module->get_name() + "' is not initialized.");
+			this->settings->LOGGER->error("Module '" + module->get_name() + "' is not ready.");
 			err_count++;
 			break;
 		}
@@ -230,9 +226,9 @@ net::HandlerFunc MainApplication::make_handler()
 	// and create necessary urls.
 	this->build_static_patterns(this->settings->ROOT_URLCONF);
 
-	// Retrieve main app patterns and append them
+	// Retrieve main module patterns and append them
 	// to result.
-	this->build_app_patterns(this->settings->ROOT_URLCONF);
+	this->build_module_patterns(this->settings->ROOT_URLCONF);
 
 	// Initialize template engine's libraries.
 	this->settings->TEMPLATE_ENGINE->load_libraries();
@@ -352,12 +348,12 @@ void MainApplication::build_static_patterns(std::vector<std::shared_ptr<urls::Ur
 	}
 }
 
-void MainApplication::build_app_patterns(std::vector<std::shared_ptr<urls::UrlPattern>>& patterns)
+void MainApplication::build_module_patterns(std::vector<std::shared_ptr<urls::UrlPattern>>& patterns)
 {
-	if (this->settings->ROOT_APP)
+	if (this->settings->ROOT_MODULE)
 	{
-		auto apps_patterns = this->settings->ROOT_APP->get_urlpatterns();
-		patterns.insert(patterns.end(), apps_patterns.begin(), apps_patterns.end());
+		auto modules_patterns = this->settings->ROOT_MODULE->get_urlpatterns();
+		patterns.insert(patterns.end(), modules_patterns.begin(), modules_patterns.end());
 	}
 }
 

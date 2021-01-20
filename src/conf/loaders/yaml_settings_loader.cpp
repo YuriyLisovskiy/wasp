@@ -148,16 +148,16 @@ void YamlSettingsLoader::_init_secure(Settings* settings, const YAML::Node& secu
 	}
 }
 
-void YamlSettingsLoader::_init_apps(Settings* settings, const YAML::Node& apps)
+void YamlSettingsLoader::_init_modules(Settings* settings, const YAML::Node& installed_modules)
 {
-	for (auto it = apps.begin(); it != apps.end(); it++)
+	for (auto it = installed_modules.begin(); it != installed_modules.end(); it++)
 	{
 		if (it->IsDefined() && it->IsScalar())
 		{
-			auto item = settings->get_app(it->as<std::string>());
+			auto item = settings->get_module(it->as<std::string>());
 			if (item)
 			{
-				settings->INSTALLED_APPS.push_back(item);
+				settings->INSTALLED_MODULES.push_back(item);
 			}
 		}
 	}
@@ -335,7 +335,7 @@ void YamlSettingsLoader::overwrite_template_engine(
 			template_engine, local_template_engine, "loaders"
 		);
 		this->overwrite_scalar_or_remove_if_null(
-			template_engine, local_template_engine, "use_app_directories"
+			template_engine, local_template_engine, "use_module_directories"
 		);
 		this->overwrite_scalar_or_remove_if_null(
 			template_engine, local_template_engine, "auto_escape"
@@ -480,12 +480,12 @@ void YamlSettingsLoader::init_template_engine_setting(Settings* settings, const 
 		}
 	}
 
-	auto use_app_dirs = config["use_app_directories"];
-	if (use_app_dirs && use_app_dirs.IsScalar() && use_app_dirs.as<bool>(false))
+	auto use_module_dirs = config["use_module_directories"];
+	if (use_module_dirs && use_module_dirs.IsScalar() && use_module_dirs.as<bool>(false))
 	{
-		for (const auto& app : settings->INSTALLED_APPS)
+		for (const auto& module : settings->INSTALLED_MODULES)
 		{
-			dirs.push_back(path::dirname(app->get_app_path()));
+			dirs.push_back(path::dirname(module->get_module_path()));
 		}
 	}
 
@@ -965,12 +965,12 @@ void YamlSettingsLoader::overwrite_config(YAML::Node& config, const YAML::Node& 
 		}
 	}
 
-	auto local_installed_apps = local_config["installed_apps"];
-	if (local_installed_apps && (
-		local_installed_apps.IsNull() || local_installed_apps.IsSequence()
+	auto local_installed_modules = local_config["installed_modules"];
+	if (local_installed_modules && (
+		local_installed_modules.IsNull() || local_installed_modules.IsSequence()
 	))
 	{
-		config["installed_apps"] = local_installed_apps;
+		config["installed_modules"] = local_installed_modules;
 	}
 
 	auto local_middleware = local_config["middleware"];
@@ -1124,11 +1124,11 @@ void YamlSettingsLoader::init_settings(Settings* settings, const YAML::Node& con
 		_init_secure(settings, secure);
 	}
 
-	auto apps = config["installed_apps"];
-	if (apps && apps.IsSequence() && apps.size() > 0)
+	auto installed_modules = config["installed_modules"];
+	if (installed_modules && installed_modules.IsSequence() && installed_modules.size() > 0)
 	{
-		settings->register_apps();
-		_init_apps(settings, apps);
+		settings->register_modules();
+		_init_modules(settings, installed_modules);
 	}
 
 	auto middleware = config["middleware"];

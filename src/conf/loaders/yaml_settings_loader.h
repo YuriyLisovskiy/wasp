@@ -35,7 +35,7 @@ private:
 
 	static void _init_secure(Settings* settings, const YAML::Node& config);
 
-	static void _init_apps(Settings* settings, const YAML::Node& apps);
+	static void _init_modules(Settings* settings, const YAML::Node& installed_modules);
 
 	static void _init_middleware(Settings* settings, const YAML::Node& middleware);
 

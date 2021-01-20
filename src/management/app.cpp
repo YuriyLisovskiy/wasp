@@ -12,18 +12,17 @@
 
 __MANAGEMENT_BEGIN__
 
-CoreManagementAppConfig::CoreManagementAppConfig(
+CoreManagementModuleConfig::CoreManagementModuleConfig(
 	conf::Settings* settings,
 	std::function<std::shared_ptr<net::IServer>(
 		core::ILogger*,
 		collections::Dict<std::string, std::string>
 	)> make_server
-) : AppConfig(__FILE__, settings), _make_server(std::move(make_server))
+) : ModuleConfig(__FILE__, settings), _make_server(std::move(make_server))
 {
-	this->init(this->__type__());
 }
 
-void CoreManagementAppConfig::commands()
+void CoreManagementModuleConfig::commands()
 {
 	this->command<cmd::StartServerCommand>(this, this->settings, this->_make_server);
 }

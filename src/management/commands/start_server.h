@@ -58,7 +58,7 @@ protected:
 
 public:
 	explicit StartServerCommand(
-		apps::IAppConfig* config,
+		apps::IModuleConfig* config,
 		conf::Settings* settings,
 		std::function<std::shared_ptr<net::IServer>(
 			core::ILogger*,

@@ -1,7 +1,7 @@
 /**
  * apps/xalwart.h
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
  * Purpose: an implementation of main application.
  */
@@ -20,7 +20,7 @@
 
 __APPS_BEGIN__
 
-class MainApplication final
+class MainApplication
 {
 protected:
 	conf::Settings* settings;
@@ -34,7 +34,7 @@ protected:
 	net::HandlerFunc make_handler();
 	bool static_is_allowed(const std::string& static_url);
 	void build_static_patterns(std::vector<std::shared_ptr<urls::UrlPattern>>& patterns);
-	void build_app_patterns(std::vector<std::shared_ptr<urls::UrlPattern>>& patterns);
+	void build_module_patterns(std::vector<std::shared_ptr<urls::UrlPattern>>& patterns);
 
 	core::Result<std::shared_ptr<http::IHttpResponse>> process_request_middleware(
 		std::shared_ptr<http::HttpRequest>& request

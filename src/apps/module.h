@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include <iostream>
+
 // Core libraries.
 #include <xalwart.core/string_utils.h>
 
@@ -17,6 +19,7 @@
 #include "./_def_.h"
 
 // Framework libraries.
+#include "./abc.h"
 #include "../views/view.h"
 #include "../urls/url.h"
 #include "../commands/app_command.h"
@@ -26,42 +29,50 @@ __APPS_BEGIN__
 
 /// Derived class must contain constructor with
 /// pointer to conf::Settings parameter.
-class AppConfig : public IAppConfig, public object::Object
+class ModuleConfig : public IModuleConfig
 {
 private:
 	bool _is_initialized;
 
+	friend class conf::Settings;
+
 	std::vector<std::shared_ptr<urls::UrlPattern>> _urlpatterns;
 	std::vector<std::shared_ptr<cmd::BaseCommand>> _commands;
+	std::vector<std::function<void()>> _sub_modules_to_init;
 
-	template <typename AppConfigT>
-	std::shared_ptr<apps::IAppConfig> find_or_create_app()
+//	template <typename ModuleConfigT>
+	std::shared_ptr<IModuleConfig> _find_module(const std::string& name)
 	{
-		auto app = std::find_if(
-			this->settings->INSTALLED_APPS.begin(),
-			this->settings->INSTALLED_APPS.end(),
-			[](const std::shared_ptr<apps::IAppConfig>& entry) -> bool {
-				return dynamic_cast<AppConfigT*>(entry.get()) != nullptr;
+		auto module = std::find_if(
+			this->settings->INSTALLED_MODULES.begin(),
+			this->settings->INSTALLED_MODULES.end(),
+			[name](const std::shared_ptr<IModuleConfig>& entry) -> bool {
+				return entry->get_name() == name;
+//				return dynamic_cast<ModuleConfigT*>(entry.get()) != nullptr;
 			}
 		);
-		if (app == this->settings->INSTALLED_APPS.end())
+		if (module == this->settings->INSTALLED_MODULES.end())
 		{
-			auto created_app = std::make_shared<AppConfigT>(this->settings);
-			created_app->init(created_app->__type__());
-			this->settings->INSTALLED_APPS.push_back(created_app);
-			return created_app;
+			throw core::ImproperlyConfigured(
+				"module is used but was not enabled and(or) registered: " + module_name
+			);
 		}
 
-		return *app;
+		return *module;
 	}
 
 protected:
-	std::string app_name;
-	std::string app_path;
+	std::string module_name;
+	std::string module_path;
 	conf::Settings* settings;
 
+protected:
+	explicit ModuleConfig(
+		std::string app_path, conf::Settings* settings
+	);
+
 	template <typename ViewT, typename = std::enable_if<std::is_base_of<views::View, ViewT>::value>>
-	void url(const std::string& pattern, const std::string& name = "")
+	void url(const std::string& pattern, const std::string& name="")
 	{
 		views::ViewHandler view_handler = [this](
 			http::HttpRequest* request,
@@ -81,23 +92,25 @@ protected:
 		));
 	}
 
-	template <typename AppConfigT, typename = std::enable_if<std::is_base_of<IAppConfig, AppConfigT>::value>>
-	void include(const std::string& prefix, const std::string& namespace_ = "")
+	template <const char* module_config_name>
+	void include(const std::string& prefix, const std::string& namespace_="")
 	{
-		auto app = this->find_or_create_app<AppConfigT>();
-		auto included_urlpatterns = app->get_urlpatterns();
-		std::string ns = namespace_.empty() ? app->get_name() : namespace_;
-		for (const auto& pattern : included_urlpatterns)
-		{
-			this->_urlpatterns.push_back(std::make_shared<urls::UrlPattern>(
-				str::rtrim(
-					str::starts_with(prefix, "/") ? prefix : "/" + prefix,
-					"/"
-				),
-				pattern,
-				ns
-			));
-		}
+		this->_sub_modules_to_init.push_back([this, prefix, namespace_]() -> void {
+			auto app = this->_find_module(module_config_name);
+			auto included_urlpatterns = app->get_urlpatterns();
+			auto ns = namespace_.empty() ? app->get_name() : namespace_;
+			for (const auto& pattern : included_urlpatterns)
+			{
+				this->_urlpatterns.push_back(std::make_shared<urls::UrlPattern>(
+					str::rtrim(
+						str::starts_with(prefix, "/") ? prefix : "/" + prefix,
+						"/"
+					),
+					pattern,
+					ns
+				));
+			}
+		});
 	}
 
 	template <typename CommandT, typename = std::enable_if<std::is_base_of<cmd::AppCommand, CommandT>::value>>
@@ -118,19 +131,27 @@ protected:
 		this->_commands.push_back(cmd);
 	}
 
-	explicit AppConfig(
-		const std::string& app_path, conf::Settings* settings
-	);
+	virtual void urlpatterns();
+
+	virtual void commands();
 
 public:
-	void init(const object::Type& type);
-	[[nodiscard]] bool is_initialized() const override;
-	std::string get_name() final;
-	std::string get_app_path() final;
+	[[nodiscard]]
+	bool ready() const override;
+
+	[[nodiscard]]
+	std::string get_name() const final;
+
+	[[nodiscard]]
+	std::string get_module_path() const final;
+
+	[[nodiscard]]
 	std::vector<std::shared_ptr<urls::UrlPattern>> get_urlpatterns() final;
+
+	[[nodiscard]]
 	std::vector<std::shared_ptr<cmd::BaseCommand>> get_commands() final;
-	virtual void urlpatterns();
-	virtual void commands();
+
+	virtual void init(const std::string& custom_name);
 };
 
 __APPS_END__
