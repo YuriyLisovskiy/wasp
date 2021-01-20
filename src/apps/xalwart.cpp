@@ -6,6 +6,9 @@
 
 #include "./xalwart.h"
 
+// C++ libraries.
+#include <iostream>
+
 // Core libraries.
 #include <xalwart.core/path.h>
 
@@ -352,6 +355,13 @@ void MainApplication::build_module_patterns(std::vector<std::shared_ptr<urls::Ur
 {
 	if (this->settings->ROOT_MODULE)
 	{
+//		std::cerr << "\n=========================================\n";
+//		for (auto& cx : this->settings->INSTALLED_MODULES)
+//		{
+//			std::cerr << cx->get_name() << '\n';
+//		}
+//		std::cerr << "=========================================\n";
+
 		auto modules_patterns = this->settings->ROOT_MODULE->get_urlpatterns();
 		patterns.insert(patterns.end(), modules_patterns.begin(), modules_patterns.end());
 	}

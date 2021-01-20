@@ -24,6 +24,23 @@
 #include "../urls/url.h"
 #include "../commands/app_command.h"
 
+template<unsigned N>
+struct FixedString
+{
+	char buf[N + 1]{};
+	int length = N;
+
+	constexpr FixedString(char const* string)
+	{
+		for (unsigned index = 0; index < N; ++index) {
+			buf[index] = string[index];
+		}
+	}
+	constexpr operator char const*() const { return buf; }
+};
+
+template<unsigned N>
+FixedString(char const (&)[N]) -> FixedString<N - 1>;
 
 __APPS_BEGIN__
 
@@ -54,7 +71,7 @@ private:
 		if (module == this->settings->INSTALLED_MODULES.end())
 		{
 			throw core::ImproperlyConfigured(
-				"module is used but was not enabled and(or) registered: " + module_name
+				"module is used but was not enabled and(or) registered: " + name
 			);
 		}
 
@@ -92,11 +109,36 @@ protected:
 		));
 	}
 
-	template <const char* module_config_name>
+//	template<unsigned N>
+//	struct FixedString {
+//		char buf[N + 1]{};
+//		constexpr FixedString(char const* s)
+//		{
+//			for (unsigned i = 0; i != N; ++i) buf[i] = s[i];
+//		}
+//
+//		constexpr operator char const*() const { return buf; }
+//	};
+//
+//	template<unsigned N> FixedString(char const (&)[N]) -> FixedString<N - 1>;
+
+//	struct constexpr_str {
+//		char const* str;
+//		std::size_t size;
+//
+//		// can only construct from a char[] literal
+//		template <std::size_t N>
+//		constexpr explicit constexpr_str(const char (&s)[N]) : str(s), size(N - 1) // not count the trailing nul
+//		{
+////			this->str[N - 1] = '\0';
+//		}
+//	};
+
+	template <FixedString module_config_name>
 	void include(const std::string& prefix, const std::string& namespace_="")
 	{
-		this->_sub_modules_to_init.push_back([this, prefix, namespace_]() -> void {
-			auto app = this->_find_module(module_config_name);
+		this->_sub_modules_to_init.emplace_back([this, prefix, namespace_]() -> void {
+			auto app = this->_find_module(module_config_name.buf);
 			auto included_urlpatterns = app->get_urlpatterns();
 			auto ns = namespace_.empty() ? app->get_name() : namespace_;
 			for (const auto& pattern : included_urlpatterns)
