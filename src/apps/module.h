@@ -1,16 +1,16 @@
 /**
- * apps/config.h
+ * apps/module.h
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
  * Purpose:
- * 	Represents application configuration
- * 	with urls and models (will be developed in future)
+ * 	Represents module configuration with urls and commands.
  */
 
 #pragma once
 
 // Core libraries.
+#include <xalwart.core/str.h>
 #include <xalwart.core/string_utils.h>
 
 // Module definitions.
@@ -22,28 +22,6 @@
 #include "../urls/url.h"
 #include "../commands/app_command.h"
 
-template<size_t N>
-struct fixed_string
-{
-	char value[N + 1]{};
-	size_t length = N;
-
-	constexpr fixed_string(char const* s)
-	{
-		for (size_t i = 0; i < N; i++)
-		{
-			this->value[i] = s[i];
-		}
-	}
-
-	constexpr explicit operator char const* () const
-	{
-		return this->value;
-	}
-};
-
-template<size_t N>
-fixed_string(char const (&)[N]) -> fixed_string<N - 1>;
 
 __APPS_BEGIN__
 

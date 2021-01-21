@@ -1,7 +1,7 @@
 /**
  * render/tags/_def_.h
  *
- * Copyright (c) 2020 Yuriy Lisovskiy
+ * Copyright (c) 2020-2021 Yuriy Lisovskiy
  *
  * Purpose: render/tags module's definitions.
  */
@@ -11,6 +11,6 @@
 #include <xalwart.render/_def_.h>
 
 
-/// render::internal::tags
+// xw::render::internal::tags
 #define __TAGS_BEGIN__ __RENDER_INTERNAL_BEGIN__ namespace tags {
 #define __TAGS_END__ } __RENDER_INTERNAL_END__

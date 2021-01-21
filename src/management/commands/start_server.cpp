@@ -20,7 +20,9 @@ StartServerCommand::StartServerCommand(
 		core::ILogger*,
 		collections::Dict<std::string, std::string>
 	)> make_server
-) : AppCommand(config, settings, "start-server", "Starts a web application"), make_server(std::move(make_server))
+) : AppCommand(
+	config, settings, "start-server", "Starts a web application"
+), make_server(std::move(make_server))
 {
 	if (!this->make_server)
 	{

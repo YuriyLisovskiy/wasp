@@ -13,8 +13,8 @@
 #include <xalwart.core/types/value.h>
 
 // Render libraries.
-#include <xalwart.render/internal/syntax/parse_var_name.h>
-#include <xalwart.render/internal/utility.h>
+#include <xalwart.render/syntax/parse_var_name.h>
+#include <xalwart.render/syntax/utility.h>
 
 // Framework libraries.
 #include "../../utils/functional.h"

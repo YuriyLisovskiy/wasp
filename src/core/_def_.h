@@ -1,7 +1,7 @@
 /**
  * core/_def_.h
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
  * Purpose: core module's definitions.
  */
@@ -11,7 +11,7 @@
 #include "../_def_.h"
 
 
-// core::mime
+// xw::core::mime
 #define __MIME_BEGIN__ __CORE_BEGIN__ namespace mime {
 #define __MIME_END__ } __CORE_END__
 

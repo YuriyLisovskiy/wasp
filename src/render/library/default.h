@@ -1,7 +1,7 @@
 /**
  * render/library/default.h
  *
- * Copyright (c) 2020 Yuriy Lisovskiy
+ * Copyright (c) 2020-2021 Yuriy Lisovskiy
  *
  * Purpose: TODO
  */
@@ -13,7 +13,7 @@
 #include "../../conf/settings.h"
 
 
-__LIB_BEGIN__
+__RENDER_BEGIN__
 
 class DefaultLibrary final : public Library
 {
@@ -28,4 +28,4 @@ public:
 	std::string name() override;
 };
 
-__LIB_END__
+__RENDER_END__

@@ -1,7 +1,7 @@
 /**
  * render/library/library.h
  *
- * Copyright (c) 2020 Yuriy Lisovskiy
+ * Copyright (c) 2020-2021 Yuriy Lisovskiy
  *
  * Purpose: TODO
  */
@@ -9,13 +9,13 @@
 #pragma once
 
 // Render libraries.
-#include <xalwart.render/library/base.h>
+#include <xalwart.render/library/abc.h>
 
 // Framework libraries.
 #include "../../conf/settings.h"
 
 
-__LIB_BEGIN__
+__RENDER_BEGIN__
 
 class Library : public ILibrary
 {
@@ -28,4 +28,4 @@ public:
 	std::shared_ptr<Tags> get_tags() override;
 };
 
-__LIB_END__
+__RENDER_END__

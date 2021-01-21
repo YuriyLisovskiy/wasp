@@ -13,7 +13,7 @@
 #include <xalwart.core/path.h>
 
 // Framework libraries.
-#include "../management/app.h"
+#include "../management/module.h"
 #include "../core/parsers/url_parser.h"
 #include "../core/parsers/query_parser.h"
 #include "../core/parsers/multipart_parser.h"
@@ -306,9 +306,9 @@ net::HandlerFunc MainApplication::make_handler()
 			this->settings->LOGGER->trace(
 				"An error was caught as core::BaseException", _ERROR_DETAILS_
 			);
-			result = core::raise<core::InternalServerError, std::shared_ptr<http::IHttpResponse>>(
-				"<p style=\"font-size: 24px;\" >Internal Server Error</p><p>" + std::string(exc.what()) + "</p>"
-			);
+			result = core::raise<
+				core::InternalServerError, std::shared_ptr<http::IHttpResponse>
+			>(exc.what());
 		}
 		catch (const std::exception& exc)
 		{
@@ -412,7 +412,7 @@ core::Result<std::shared_ptr<http::IHttpResponse>> MainApplication::process_resp
 		{
 			// TODO: print middleware name.
 			this->settings->LOGGER->trace(
-					"Method 'process_response' of 'unknown' middleware returned an error", _ERROR_DETAILS_
+				"Method 'process_response' of 'unknown' middleware returned an error", _ERROR_DETAILS_
 			);
 			return result;
 		}
@@ -531,6 +531,7 @@ std::shared_ptr<http::IHttpResponse> MainApplication::error_to_response(const co
 			break;
 	}
 
+	// TODO: "<p style=\"font-size: 24px;\" >Internal Server Error</p><p>" +  + "</p>"
 	return std::make_shared<http::HttpResponse>(code, err->msg);
 }
 

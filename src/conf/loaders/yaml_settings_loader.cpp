@@ -450,8 +450,8 @@ void YamlSettingsLoader::init_template_engine_setting(Settings* settings, const 
 		}
 	}
 
-	std::vector<std::shared_ptr<render::lib::ILibrary>> libs{
-		settings->get_library(render::lib::DefaultLibrary::FULL_NAME)
+	std::vector<std::shared_ptr<render::ILibrary>> libs{
+		settings->get_library(render::DefaultLibrary::FULL_NAME)
 	};
 	auto libraries = config["libraries"];
 	if (libraries && libraries.IsSequence() && libraries.size() > 0)

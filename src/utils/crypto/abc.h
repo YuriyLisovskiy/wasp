@@ -1,9 +1,9 @@
 /**
- * utils/crypto/interface.h
+ * utils/crypto/abc.h
  *
- * Copyright (c) 2020 Yuriy Lisovskiy
+ * Copyright (c) 2020-2021 Yuriy Lisovskiy
  *
- * Purpose: a collection of interfaces for cryptography module.
+ * Purpose: abstract base classes for cryptography module.
  */
 
 #pragma once

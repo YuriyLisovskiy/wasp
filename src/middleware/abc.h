@@ -1,9 +1,9 @@
 /**
- * middleware/interface.h
+ * middleware/abc.h
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
- * Purpose:	provides interfaces for middleware module.
+ * Purpose:	abstract base classes for middleware module.
  */
 
 #pragma once
@@ -39,5 +39,8 @@ public:
 		http::HttpRequest* request, http::IHttpResponse* response
 	) = 0;
 };
+
+template <typename T>
+concept MiddlewareType = std::is_base_of_v<IMiddleware, T>;
 
 __MIDDLEWARE_END__

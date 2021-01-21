@@ -43,10 +43,9 @@ Settings::Settings(const std::string& base_dir)
 		}}
 	};
 
-	using namespace render::lib;
 	this->_libraries = {
-		{DefaultLibrary::FULL_NAME, [this]() -> std::shared_ptr<ILibrary> {
-			return std::make_shared<DefaultLibrary>(this);
+		{render::DefaultLibrary::FULL_NAME, [this]() -> std::shared_ptr<render::ILibrary> {
+			return std::make_shared<render::DefaultLibrary>(this);
 		}}
 	};
 
@@ -105,7 +104,7 @@ std::shared_ptr<middleware::IMiddleware> Settings::get_middleware(
 	return nullptr;
 }
 
-std::shared_ptr<render::lib::ILibrary> Settings::get_library(
+std::shared_ptr<render::ILibrary> Settings::get_library(
 	const std::string& full_name
 ) const
 {

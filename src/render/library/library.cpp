@@ -1,13 +1,13 @@
 /**
  * render/library/library.cpp
  *
- * Copyright (c) 2020 Yuriy Lisovskiy
+ * Copyright (c) 2020-2021 Yuriy Lisovskiy
  */
 
 #include "./library.h"
 
 
-__LIB_BEGIN__
+__RENDER_BEGIN__
 
 Library::Library(const std::string& lib_name, conf::Settings* settings)
 {
@@ -31,4 +31,4 @@ std::shared_ptr<Tags> Library::get_tags()
 	return nullptr;
 }
 
-__LIB_END__
+__RENDER_END__

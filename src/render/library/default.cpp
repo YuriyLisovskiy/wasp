@@ -1,7 +1,7 @@
 /**
  * render/library/default.cpp
  *
- * Copyright (c) 2020 Yuriy Lisovskiy
+ * Copyright (c) 2020-2021 Yuriy Lisovskiy
  */
 
 #include "./default.h"
@@ -11,9 +11,9 @@
 #include "../tags/url_tag.h"
 
 
-__LIB_BEGIN__
+__RENDER_BEGIN__
 
-const std::string DefaultLibrary::FULL_NAME = "xw::render::lib::DefaultLibrary";
+const std::string DefaultLibrary::FULL_NAME = "xw::render::DefaultLibrary";
 
 DefaultLibrary::DefaultLibrary(conf::Settings* settings)
 	: Library(DefaultLibrary::FULL_NAME, settings)
@@ -46,4 +46,4 @@ std::string DefaultLibrary::name()
 	return DefaultLibrary::FULL_NAME;
 }
 
-__LIB_END__
+__RENDER_END__

@@ -1,7 +1,7 @@
 /**
  * views/template_view.h
  *
- * Copyright (c) 2020 Yuriy Lisovskiy
+ * Copyright (c) 2020-2021 Yuriy Lisovskiy
  *
  * Purpose: classes for working with template responses.
  */
@@ -9,7 +9,7 @@
 #pragma once
 
 // Render libraries.
-#include <xalwart.render/base.h>
+#include <xalwart.render/abc.h>
 
 // Module definitions.
 #include "./_def_.h"

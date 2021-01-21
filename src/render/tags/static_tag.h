@@ -9,7 +9,7 @@
 #pragma once
 
 // Render libraries.
-#include <xalwart.render/internal/parser.h>
+#include <xalwart.render/syntax/parser.h>
 
 // Module definitions.
 #include "./_def_.h"

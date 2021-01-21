@@ -44,7 +44,7 @@
 #include "./_def_.h"
 
 // Framework libraries.
-#include "./interfaces.h"
+#include "./abc.h"
 
 
 __CRYPTO_BEGIN__

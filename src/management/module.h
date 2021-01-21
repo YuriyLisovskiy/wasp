@@ -1,9 +1,9 @@
 /**
- * core/management/app.h
+ * management/module.h
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
- * Purpose: core/management app config.
+ * Purpose: management module's config.
  */
 
 #pragma once

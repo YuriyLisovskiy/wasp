@@ -1,10 +1,10 @@
 /**
- * management/app.cpp
+ * management/module.cpp
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  */
 
-#include "./app.h"
+#include "./module.h"
 
 // Framework libraries.
 #include "./commands/start_server.h"

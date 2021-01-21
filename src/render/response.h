@@ -1,7 +1,7 @@
 /**
  * render/response.h
  *
- * Copyright (c) 2020 Yuriy Lisovskiy
+ * Copyright (c) 2020-2021 Yuriy Lisovskiy
  *
  * Purpose:
  * 	Http response which can render it's content using
@@ -14,7 +14,7 @@
 #include <xalwart.render/_def_.h>
 
 // Render libraries.
-#include <xalwart.render/base.h>
+#include <xalwart.render/abc.h>
 
 // Framework libraries.
 #include "../http/response.h"

@@ -1,7 +1,7 @@
 /**
  * utils/crypto/hmac.h
  *
- * Copyright (c) 2020 Yuriy Lisovskiy
+ * Copyright (c) 2020-2021 Yuriy Lisovskiy
  *
  * Purpose: a collection of hmac functions.
  */
@@ -15,7 +15,7 @@
 #include "./_def_.h"
 
 // Framework modules.
-#include "./interfaces.h"
+#include "./abc.h"
 
 
 __CRYPTO_BEGIN__

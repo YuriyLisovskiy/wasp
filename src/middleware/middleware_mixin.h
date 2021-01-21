@@ -1,7 +1,7 @@
 /**
  * middleware/middleware_mixin.h
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
  * Purpose: base middleware class.
  */
@@ -12,7 +12,7 @@
 #include "./_def_.h"
 
 // Framework libraries.
-#include "./interfaces.h"
+#include "./abc.h"
 #include "../conf/settings.h"
 
 
