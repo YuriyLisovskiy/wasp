@@ -6,8 +6,6 @@
 
 #include "./request.h"
 
-#include <iostream>
-
 // Core libraries.
 #include <xalwart.core/exceptions.h>
 #include <xalwart.core/string_utils.h>
@@ -24,10 +22,10 @@ __HTTP_BEGIN__
 HttpRequest::HttpRequest(
 	const conf::Settings* settings,
 	std::string method, std::string path, size_t major_v, size_t minor_v,
-	std::string query, bool keep_alive, xw::string content,
+	std::string query, bool keep_alive, std::string content,
 	collections::Dict<std::string, std::string> headers,
-	HttpRequest::Parameters<std::string, xw::string> get_params,
-	HttpRequest::Parameters<std::string, xw::string> post_params,
+	HttpRequest::Parameters<std::string, std::string> get_params,
+	HttpRequest::Parameters<std::string, std::string> post_params,
 	HttpRequest::Parameters<std::string, files::UploadedFile> files_params,
 	collections::Dict<std::string, std::string> env
 ) : settings(settings),
@@ -78,7 +76,7 @@ bool HttpRequest::keep_alive() const
 	return this->_keep_alive;
 }
 
-xw::string HttpRequest::body()
+std::string HttpRequest::body()
 {
 	return this->_body;
 }

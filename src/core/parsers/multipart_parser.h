@@ -9,7 +9,6 @@
 #pragma once
 
 // Core libraries.
-#include <xalwart.core/str.h>
 #include <xalwart.core/collections/multi_dict.h>
 
 // Module definitions.
@@ -25,8 +24,8 @@ struct multipart_parser final
 {
 	std::string media_root;
 
-	collections::Dict<std::string, xw::string> post_values;
-	collections::MultiValueDict<std::string, xw::string> multi_post_value;
+	collections::Dict<std::string, std::string> post_values;
+	collections::MultiValueDict<std::string, std::string> multi_post_value;
 
 	collections::Dict<std::string, files::UploadedFile> file_values;
 	collections::MultiValueDict<std::string, files::UploadedFile> multi_file_value;
@@ -51,7 +50,7 @@ struct multipart_parser final
 
 	};
 
-	void append_parameter(const std::string& key, const xw::string& value);
+	void append_parameter(const std::string& key, const std::string& value);
 	void append_file(
 		const std::string& key,
 		const std::string& file_name,
@@ -65,7 +64,7 @@ struct multipart_parser final
 	static void assert_boundary(const std::string& actual, const std::string& expected);
 
 	explicit multipart_parser(const std::string& mediaRoot = "");
-	void parse(const std::string& content_type, const xw::string& body);
+	void parse(const std::string& content_type, const std::string& body);
 };
 
 __PARSERS_END__

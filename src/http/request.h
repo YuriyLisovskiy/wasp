@@ -11,7 +11,6 @@
 // Core libraries.
 #include <xalwart.core/collections/multi_dict.h>
 #include <xalwart.core/result.h>
-#include <xalwart.core/str.h>
 
 // Module definitions.
 #include "./_def_.h"
@@ -89,17 +88,17 @@ public:
 	explicit HttpRequest(
 		const conf::Settings* settings,
 		std::string method, std::string path, size_t major_v, size_t minor_v,
-		std::string query, bool keep_alive, xw::string content,
+		std::string query, bool keep_alive, std::string content,
 		collections::Dict<std::string, std::string> headers,
-		HttpRequest::Parameters<std::string, xw::string> get_params,
-		HttpRequest::Parameters<std::string, xw::string> post_params,
+		HttpRequest::Parameters<std::string, std::string> get_params,
+		HttpRequest::Parameters<std::string, std::string> post_params,
 		HttpRequest::Parameters<std::string, files::UploadedFile> files_params,
 		collections::Dict<std::string, std::string> meta_params
 	);
 
 	collections::Dict<std::string, std::string> headers;
-	HttpRequest::Parameters<std::string, xw::string> GET;
-	HttpRequest::Parameters<std::string, xw::string> POST;
+	HttpRequest::Parameters<std::string, std::string> GET;
+	HttpRequest::Parameters<std::string, std::string> POST;
 	collections::Dict<std::string, std::string> COOKIES;
 	HttpRequest::Parameters<std::string, files::UploadedFile> FILES;
 	collections::Dict<std::string, std::string> META;
@@ -121,8 +120,11 @@ public:
 
 	[[nodiscard]]
 	bool keep_alive() const;
-	xw::string body();
+
+	std::string body();
+
 	bool is_secure(std::pair<std::string, std::string>* secure_proxy_ssl_header) const;
+
 	std::string scheme(std::pair<std::string, std::string>* secure_proxy_ssl_header) const;
 
 	/// Return the HTTP host using the environment or request headers.
@@ -152,7 +154,7 @@ private:
 	std::string _query;
 	std::string _method;
 	bool _keep_alive;
-	xw::string _body;
+	std::string _body;
 };
 
 __HTTP_END__

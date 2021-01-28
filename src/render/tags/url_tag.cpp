@@ -10,7 +10,7 @@
 #include <iostream>
 
 // Core libraries.
-#include <xalwart.core/types/value.h>
+#include <xalwart.core/types/string.h>
 
 // Render libraries.
 #include <xalwart.render/syntax/parse_var_name.h>
@@ -36,7 +36,7 @@ std::string url_node::render(IContext* ctx)
 	{
 		ctx->push_var(
 			this->var_name,
-			std::make_shared<types::Value<std::string>>(built_url)
+			std::make_shared<types::String>(built_url)
 		);
 		return "";
 	}

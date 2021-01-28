@@ -15,7 +15,6 @@
 
 // Core libraries.
 #include <xalwart.core/sys.h>
-#include <xalwart.core/str.h>
 #include <xalwart.core/string_utils.h>
 #include <xalwart.core/exceptions.h>
 
@@ -33,7 +32,7 @@ class BaseSettingsLoader
 {
 protected:
 	std::filesystem::directory_entry find_file(
-		const xw::string& base_dir, const std::string& file_name
+		const std::string& base_dir, const std::string& file_name
 	)
 	{
 		std::regex file_name_regex(file_name);
@@ -63,7 +62,7 @@ public:
 	virtual std::string local_config_name() const = 0;
 
 	// Reads and loads config from file.
-	virtual ConfigT load_file(const xw::string& base_dir, const std::string& file_name) = 0;
+	virtual ConfigT load_file(const std::string& base_dir, const std::string& file_name) = 0;
 
 	virtual void overwrite_config(ConfigT& config, const ConfigT& local_config) = 0;
 

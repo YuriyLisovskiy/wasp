@@ -10,7 +10,6 @@
 #pragma once
 
 // Core libraries.
-#include <xalwart.core/str.h>
 #include <xalwart.core/string_utils.h>
 
 // Module definitions.
@@ -88,7 +87,7 @@ protected:
 		));
 	}
 
-	template <fixed_string module_name>
+	template <str::fixed_string module_name>
 	void include(const std::string& prefix, const std::string& namespace_="")
 	{
 		this->_sub_modules_to_init.emplace_back([this, prefix, namespace_]() -> void {

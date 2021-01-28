@@ -9,7 +9,7 @@
 
 __PARSERS_BEGIN__
 
-void query_parser::parse(const xw::string& content)
+void query_parser::parse(const std::string& content)
 {
 	if (content.empty())
 	{
@@ -54,7 +54,7 @@ void query_parser::parse(const xw::string& content)
 	this->append_parameter(item_key, item_value);
 }
 
-void query_parser::append_parameter(const std::string& key, const xw::string& value)
+void query_parser::append_parameter(const std::string& key, const std::string& value)
 {
 	if (!this->dict.contains(key))
 	{

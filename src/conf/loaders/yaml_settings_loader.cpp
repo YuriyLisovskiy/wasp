@@ -510,7 +510,7 @@ std::string YamlSettingsLoader::local_config_name() const
 	return R"(config\.local\.y(a)?ml)";
 }
 
-YAML::Node YamlSettingsLoader::load_file(const xw::string& base_dir, const std::string& file_name)
+YAML::Node YamlSettingsLoader::load_file(const std::string& base_dir, const std::string& file_name)
 {
 	auto file_entry = this->find_file(base_dir, file_name);
 	if (file_entry.exists())

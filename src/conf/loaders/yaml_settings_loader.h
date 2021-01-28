@@ -81,7 +81,7 @@ public:
 	std::string local_config_name() const override;
 
 	// Reads and loads yaml from file.
-	YAML::Node load_file(const xw::string& base_dir, const std::string& file_name) override;
+	YAML::Node load_file(const std::string& base_dir, const std::string& file_name) override;
 
 	void overwrite_config(YAML::Node& config, const YAML::Node& local_config) override;
 

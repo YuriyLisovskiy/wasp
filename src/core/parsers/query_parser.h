@@ -29,12 +29,12 @@ struct query_parser final
 		s_val
 	};
 
-	collections::Dict<std::string, xw::string> dict;
-	collections::MultiValueDict<std::string, xw::string> multi_dict;
+	collections::Dict<std::string, std::string> dict;
+	collections::MultiValueDict<std::string, std::string> multi_dict;
 
 	query_parser() = default;
-	void append_parameter(const std::string& key, const xw::string& value);
-	void parse(const xw::string& data);
+	void append_parameter(const std::string& key, const std::string& value);
+	void parse(const std::string& data);
 };
 
 __PARSERS_END__

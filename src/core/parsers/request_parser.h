@@ -12,9 +12,6 @@
 #include <string>
 #include <map>
 
-// Core libraries.
-#include <xalwart.core/str.h>
-
 // Module definitions.
 #include "../_def_.h"
 
@@ -44,7 +41,7 @@ struct request_parser final
 	bool keep_alive{};
 
 	/// Contains body of http request.
-	xw::string content;
+	std::string content;
 
 	/// Accumulates request's headers.
 	std::map<std::string, std::string> headers;
@@ -132,7 +129,7 @@ struct request_parser final
 	/// Parses chunks from http request body if request is chunked.
 	///
 	/// @param data: chunked http request body.
-	void parse_chunks(const xw::string& data);
+	void parse_chunks(const std::string& data);
 
 	/// Checks if a byte is an HTTP character.
 	///
@@ -166,12 +163,12 @@ struct request_parser final
 	/// @param data: http request body as std::string.
 	/// @param media_root: path to media folder, where files will be saved;
 	///	if this parameter is empty-string, files will not be saved.
-	void parse_body(const xw::string& data, const xw::string& media_root);
+	void parse_body(const std::string& data, const std::string& media_root);
 
 	/// Parses http request headers from given stream.
 	///
 	/// @param data: http request headers as std::string.
-	void parse_headers(const xw::string& data);
+	void parse_headers(const std::string& data);
 };
 
 __PARSERS_END__

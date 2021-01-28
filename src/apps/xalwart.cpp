@@ -438,7 +438,7 @@ std::shared_ptr<http::HttpRequest> MainApplication::make_request(
 )
 {
 	parsers::query_parser qp;
-	http::HttpRequest::Parameters<std::string, xw::string> get_params, post_params;
+	http::HttpRequest::Parameters<std::string, std::string> get_params, post_params;
 	http::HttpRequest::Parameters<std::string, files::UploadedFile> files_params;
 	if (ctx->content_size)
 	{

@@ -21,7 +21,7 @@
 __PARSERS_BEGIN__
 
 // Parses http request headers from given stream.
-void request_parser::parse_headers(const xw::string& data)
+void request_parser::parse_headers(const std::string& data)
 {
 	std::string new_header_name;
 	std::string new_header_value;
@@ -372,7 +372,7 @@ void request_parser::parse_headers(const xw::string& data)
 }
 
 // Parses http request body from given stream.
-void request_parser::parse_body(const xw::string& data, const xw::string& media_root)
+void request_parser::parse_body(const std::string& data, const std::string& media_root)
 {
 	if (strlen(data.c_str()))
 	{
@@ -402,7 +402,7 @@ void request_parser::parse_http_word(char input, char expected, request_parser::
 
 // Parses chunks from http request body if request is chunked.
 // TODO: check if parse_chunks parses chunked request properly.
-void request_parser::parse_chunks(const xw::string& data)
+void request_parser::parse_chunks(const std::string& data)
 {
 	for (const auto& input : data)
 	{
