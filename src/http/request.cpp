@@ -57,7 +57,7 @@ std::string HttpRequest::path() const
 std::string HttpRequest::full_path(bool force_append_slash) const
 {
 	return this->_path +
-	       (force_append_slash && !str::ends_with(this->_path, "/") ? "/" : "") +
+	       (force_append_slash && !this->_path.ends_with("/") ? "/" : "") +
 	       (this->_query.empty() ? "" : "?" + this->_query);
 }
 

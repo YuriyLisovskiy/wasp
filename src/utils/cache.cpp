@@ -34,7 +34,7 @@ bool _if_match_passes(
 		// so there is a match to '*'.
 		return true;
 	}
-	else if (str::starts_with(target_etag, "W/"))
+	else if (target_etag.starts_with("W/"))
 	{
 		// A weak ETag can never strongly match another ETag.
 		return false;

@@ -443,7 +443,7 @@ void FileResponse::_set_headers()
 		{"xz", "application/x-xz"}
 	});
 	this->set_header("Content-Length", std::to_string(path::get_size(this->_file_path)));
-	if (str::starts_with(this->_headers.get("Content-Type", ""), "text/html"))
+	if (this->_headers.get("Content-Type", "").starts_with("text/html"))
 	{
 		std::string content_type, encoding;
 		core::mime::guess_content_type(this->_file_path, content_type, encoding);

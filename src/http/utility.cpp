@@ -58,7 +58,7 @@ void split_domain_port(
 		}
 
 		// Remove a trailing dot (if present) from the domain.
-		if (str::ends_with(domain, "."))
+		if (domain.ends_with("."))
 		{
 			domain.pop_back();
 		}
@@ -94,13 +94,13 @@ bool is_same_domain(const std::string& host, const std::string& pattern)
 
 	auto lc_pattern  = str::lower(pattern);
 	return (lc_pattern[0] == '.' && (
-		str::ends_with(host, lc_pattern) || host == lc_pattern.substr(1, lc_pattern.size() - 1)
+		host.ends_with(lc_pattern) || host == lc_pattern.substr(1, lc_pattern.size() - 1)
 	)) || lc_pattern == host;
 }
 
 void escape_leading_slashes(std::string& url)
 {
-	if (str::starts_with(url, "//"))
+	if (url.starts_with("//"))
 	{
 		url = "/%2F" + url.substr(2);
 	}

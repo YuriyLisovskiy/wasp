@@ -29,7 +29,7 @@ void multipart_parser::append_file(
 	const std::string& content_type,
 	const std::string& boundary,
 	const std::string& content_disposition,
-	const std::vector<core::byte>& data
+	const std::vector<unsigned char>& data
 )
 {
 	bool root_is_empty = this->media_root.empty();
@@ -59,7 +59,7 @@ void multipart_parser::append_file(
 
 std::string multipart_parser::get_boundary(const std::string& content_type)
 {
-	if (!str::starts_with(content_type, "multipart/"))
+	if (!content_type.starts_with("multipart/"))
 	{
 		throw core::MultiPartParserError("Invalid Content-Type: " + content_type, _ERROR_DETAILS_);
 	}
@@ -101,7 +101,7 @@ void multipart_parser::parse(const std::string& content_type, const std::string&
 {
 	std::string boundary = multipart_parser::get_boundary(content_type);
 	std::string current_boundary, content_disposition, key, value, file_content_type, file_name;
-	std::vector<core::byte> file;
+	std::vector<unsigned char> file;
 	size_t end_pos = 0, content_idx = 0;
 	auto begin = body.begin();
 	auto end = body.end();

@@ -81,7 +81,7 @@ protected:
 		};
 
 		this->_urlpatterns.push_back(urls::make_url(
-			str::starts_with(pattern, "/") ? pattern : "/" + pattern,
+			pattern.starts_with("/") ? pattern : "/" + pattern,
 			view_handler,
 			name
 		));
@@ -97,10 +97,7 @@ protected:
 			for (const auto& pattern : included_urlpatterns)
 			{
 				this->_urlpatterns.push_back(std::make_shared<urls::UrlPattern>(
-					str::rtrim(
-						str::starts_with(prefix, "/") ? prefix : "/" + prefix,
-						"/"
-					),
+					str::rtrim(prefix.starts_with("/") ? prefix : "/" + prefix, "/"),
 					pattern,
 					ns
 				));

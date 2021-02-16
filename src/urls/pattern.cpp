@@ -23,7 +23,7 @@ UrlPattern::UrlPattern(
 	this->_pattern_parts = this->_regex.parts();
 	if (!this->_pattern_parts.empty())
 	{
-		if (str::ends_with(this->_pattern_parts.back(), "?"))
+		if (this->_pattern_parts.back().ends_with("?"))
 		{
 			this->_pattern_parts.back().pop_back();
 		}

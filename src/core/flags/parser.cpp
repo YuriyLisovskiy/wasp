@@ -27,7 +27,7 @@ args_parser::args_parser(int argc, char** argv, size_t parse_from, bool is_verbo
 	for (size_t i = parse_from; i < argc; i++)
 	{
 		std::string token = argv[i];
-		if (str::starts_with(token, "--"))
+		if (token.starts_with("--"))
 		{
 			if (!is_received)
 			{

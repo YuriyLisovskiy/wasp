@@ -8,7 +8,6 @@
 
 // Core libraries.
 #include <xalwart.core/utility.h>
-#include <xalwart.core/string_utils.h>
 
 // Framework libraries.
 #include "../urls/resolver.h"
@@ -36,7 +35,7 @@ core::Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::get_respons
 
 bool CommonMiddleware::should_redirect_with_slash(http::HttpRequest* request)
 {
-	if (this->settings->APPEND_SLASH && !str::ends_with(request->path(), "/"))
+	if (this->settings->APPEND_SLASH && !request->path().ends_with("/"))
 	{
 		auto path = request->path();
 		return !urls::is_valid_path(path, this->settings->ROOT_URLCONF) &&
@@ -118,8 +117,7 @@ core::Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::process_req
 
 	auto host = result.value;
 	bool must_prepend = this->settings->PREPEND_WWW &&
-		!host.empty() &&
-		!str::starts_with(host, "www.");
+		!host.empty() && !host.starts_with("www.");
 	auto redirect_url = must_prepend ? (
 		request->scheme(this->settings->SECURE_PROXY_SSL_HEADER.get()) + "://www." + host
 	) : "";
