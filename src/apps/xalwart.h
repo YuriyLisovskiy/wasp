@@ -26,7 +26,7 @@ protected:
 	conf::Settings* settings;
 
 	std::function<std::shared_ptr<net::IServer>(
-		core::ILogger*,
+		log::ILogger*,
 		collections::Dict<std::string, std::string>
 	)> server_initializer;
 
@@ -79,7 +79,7 @@ public:
 	explicit MainApplication(
 		conf::Settings* settings,
 		std::function<std::shared_ptr<net::IServer>(
-			core::ILogger*,
+			log::ILogger*,
 			collections::Dict<std::string, std::string>
 		)> server_initializer
 	);

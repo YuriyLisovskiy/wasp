@@ -17,7 +17,7 @@ StartServerCommand::StartServerCommand(
 	apps::IModuleConfig* config,
 	conf::Settings* settings,
 	std::function<std::shared_ptr<net::IServer>(
-		core::ILogger*,
+		log::ILogger*,
 		collections::Dict<std::string, std::string>
 	)> make_server
 ) : AppCommand(
@@ -121,7 +121,6 @@ void StartServerCommand::handle()
 		this->settings->LOGGER->error(exc.what(), _ERROR_DETAILS_);
 	}
 
-	core::Logger::finalize();
 	server->close();
 }
 

@@ -47,7 +47,7 @@ private:
 	core::Result<std::shared_ptr<http::IHttpResponse>> null();
 
 protected:
-	core::ILogger* logger;
+	log::ILogger* logger;
 
 	conf::Settings* settings;
 

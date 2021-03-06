@@ -25,7 +25,7 @@ __APPS_BEGIN__
 MainApplication::MainApplication(
 	conf::Settings* settings,
 	std::function<std::shared_ptr<net::IServer>(
-		core::ILogger*,
+		log::ILogger*,
 		collections::Dict<std::string, std::string>
 	)> server_initializer
 ) : server_initializer(std::move(server_initializer))
@@ -107,7 +107,7 @@ void MainApplication::_setup_commands()
 
 	auto default_commands = management::CoreManagementModuleConfig(
 		this->settings, [this](
-			core::ILogger* logger,
+			log::ILogger* logger,
 			collections::Dict<std::string, std::string> kwargs
 		) -> std::shared_ptr<net::IServer>
 		{

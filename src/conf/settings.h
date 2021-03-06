@@ -34,7 +34,7 @@ struct Settings
 public:
 	bool DEBUG;
 
-	std::shared_ptr<core::ILogger> LOGGER;
+	std::shared_ptr<log::ILogger> LOGGER;
 
 	// Build paths inside the project like this: path::join(BASE_DIR, ...)
 	std::string BASE_DIR;

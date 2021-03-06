@@ -345,7 +345,7 @@ void YamlSettingsLoader::overwrite_template_engine(
 
 void YamlSettingsLoader::init_logger_setting(Settings* settings, const YAML::Node& config)
 {
-	core::LoggerConfig logger_config{};
+	log::Config logger_config{};
 	auto levels = config["levels"];
 	if (!levels)
 	{
@@ -429,7 +429,7 @@ void YamlSettingsLoader::init_logger_setting(Settings* settings, const YAML::Nod
 		}
 	}
 
-	settings->LOGGER = core::Logger::get_instance(logger_config);
+	settings->LOGGER = std::make_shared<log::Logger>(logger_config);
 }
 
 void YamlSettingsLoader::init_template_engine_setting(Settings* settings, const YAML::Node& config)

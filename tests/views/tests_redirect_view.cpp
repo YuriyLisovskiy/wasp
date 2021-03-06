@@ -49,14 +49,14 @@ struct RedirectViewTestSettings : public conf::Settings
 {
 	RedirectViewTestSettings() : conf::Settings("./")
 	{
-		auto lc = core::LoggerConfig();
+		auto lc = log::Config();
 		lc.enable_info = false;
 		lc.enable_debug = false;
 		lc.enable_warning = false;
 		lc.enable_error = false;
 		lc.enable_fatal = false;
 		lc.enable_print = false;
-		this->LOGGER = core::Logger::get_instance(lc);
+		this->LOGGER = std::make_shared<log::Logger>(lc);
 	}
 };
 

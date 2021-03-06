@@ -45,7 +45,7 @@ private:
 	const size_t DEFAULT_THREADS = 16;
 
 	std::function<std::shared_ptr<net::IServer>(
-		core::ILogger*,
+		log::ILogger*,
 		collections::Dict<std::string, std::string>
 	)> make_server;
 
@@ -61,7 +61,7 @@ public:
 		apps::IModuleConfig* config,
 		conf::Settings* settings,
 		std::function<std::shared_ptr<net::IServer>(
-			core::ILogger*,
+			log::ILogger*,
 			collections::Dict<std::string, std::string>
 		)> make_server
 	);
