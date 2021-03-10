@@ -39,7 +39,11 @@ CMakeSettings.json
 # CLion
 .idea/
 cmake-build-*
+build/
 
 # Dependencies
 include/
 lib/
+
+# Other stuff
+Dockerfile*

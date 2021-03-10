@@ -37,23 +37,23 @@ private:
 	std::vector<std::shared_ptr<cmd::BaseCommand>> _commands;
 	std::vector<std::function<void()>> _sub_modules_to_init;
 
-	std::shared_ptr<IModuleConfig> _find_module(const std::string& name)
+	inline std::shared_ptr<IModuleConfig> _find_module(const std::string& module)
 	{
-		auto module = std::find_if(
+		auto result = std::find_if(
 			this->settings->INSTALLED_MODULES.begin(),
 			this->settings->INSTALLED_MODULES.end(),
-			[name](const std::shared_ptr<IModuleConfig>& entry) -> bool {
-				return entry->get_name() == name;
+			[module](const std::shared_ptr<IModuleConfig>& entry) -> bool {
+				return entry->get_name() == module;
 			}
 		);
-		if (module == this->settings->INSTALLED_MODULES.end())
+		if (result == this->settings->INSTALLED_MODULES.end())
 		{
 			throw core::ImproperlyConfigured(
-				"module is used but was not enabled and(or) registered: " + name
+				"module is used but was not registered: " + module, _ERROR_DETAILS_
 			);
 		}
 
-		return *module;
+		return *result;
 	}
 
 protected:
@@ -67,7 +67,7 @@ protected:
 	);
 
 	template <typename ViewT, typename = std::enable_if<std::is_base_of<views::View, ViewT>::value>>
-	void url(const std::string& pattern, const std::string& name="")
+	inline void url(const std::string& pattern, const std::string& name="")
 	{
 		views::ViewHandler view_handler = [this](
 			http::HttpRequest* request,
@@ -87,11 +87,12 @@ protected:
 		));
 	}
 
-	template <str::fixed_string module_name>
-	void include(const std::string& prefix, const std::string& namespace_="")
+	inline void include(
+		const std::string& module, const std::string& prefix, const std::string& namespace_=""
+	)
 	{
-		this->_sub_modules_to_init.emplace_back([this, prefix, namespace_]() -> void {
-			auto app = this->_find_module(module_name.value);
+		this->_sub_modules_to_init.emplace_back([this, prefix, namespace_, module]() -> void {
+			auto app = this->_find_module(module);
 			auto included_urlpatterns = app->get_urlpatterns();
 			auto ns = namespace_.empty() ? app->get_name() : namespace_;
 			for (const auto& pattern : included_urlpatterns)
@@ -106,7 +107,7 @@ protected:
 	}
 
 	template <typename CommandT, typename = std::enable_if<std::is_base_of<cmd::AppCommand, CommandT>::value>>
-	void command()
+	inline void command()
 	{
 		auto cmd = std::make_shared<CommandT>(this, this->settings);
 		this->_commands.push_back(cmd);
@@ -117,7 +118,7 @@ protected:
 		typename = std::enable_if<std::is_base_of<cmd::AppCommand, CommandT>::value>,
 		typename ...Args
 	>
-	void command(Args&& ...args)
+	inline void command(Args&& ...args)
 	{
 		auto cmd = std::make_shared<CommandT>(std::forward<Args>(args)...);
 		this->_commands.push_back(cmd);
@@ -143,7 +144,7 @@ public:
 	[[nodiscard]]
 	std::vector<std::shared_ptr<cmd::BaseCommand>> get_commands() final;
 
-	virtual void init(const std::string& custom_name);
+	virtual void init(const std::string& name);
 };
 
 __APPS_END__

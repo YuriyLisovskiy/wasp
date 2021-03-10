@@ -259,9 +259,9 @@ public:
 
 protected:
 	template <apps::ModuleConfigType ModuleConfigT>
-	void module(const std::string& full_name="")
+	void module(const std::string& custom_name="")
 	{
-		auto name = this->get_name_or<ModuleConfigT>(full_name);
+		auto name = this->get_name_or<ModuleConfigT>(custom_name);
 		if (this->_modules.find(name) != this->_modules.end() && this->LOGGER)
 		{
 			this->LOGGER->warning("module '" + name + "' was overwritten");
@@ -275,9 +275,9 @@ protected:
 	}
 
 	template <middleware::MiddlewareType MiddlewareT>
-	void middleware(const std::string& full_name="")
+	void middleware(const std::string& custom_name="")
 	{
-		auto name = this->get_name_or<MiddlewareT>(full_name);
+		auto name = this->get_name_or<MiddlewareT>(custom_name);
 		if (this->_middleware.find(name) != this->_middleware.end() && this->LOGGER)
 		{
 			this->LOGGER->warning("middleware '" + name + "' was overwritten");
@@ -289,9 +289,9 @@ protected:
 	}
 
 	template <render::LibraryType LibraryT>
-	void library(const std::string& full_name="")
+	void library(const std::string& custom_name="")
 	{
-		auto name = this->get_name_or<LibraryT>(full_name);
+		auto name = this->get_name_or<LibraryT>(custom_name);
 		if (this->_libraries.find(name) != this->_libraries.end() && this->LOGGER)
 		{
 			this->LOGGER->warning("library '" + name + "' was overwritten");
@@ -303,9 +303,9 @@ protected:
 	}
 
 	template <render::LoaderType LoaderT>
-	void loader(const std::string& full_name="")
+	void loader(const std::string& custom_name="")
 	{
-		auto name = this->get_name_or<LoaderT>(full_name);
+		auto name = this->get_name_or<LoaderT>(custom_name);
 		if (this->_loaders.find(name) != this->_loaders.end() && this->LOGGER)
 		{
 			this->LOGGER->warning("loader '" + name + "' was overwritten");

@@ -1,21 +1,38 @@
-## Xalwart
+## xalwart
 
-![Continuous Integration](https://github.com/YuriyLisovskiy/xalwart/workflows/tests/badge.svg)
+| build | info |
+|---|---|
+| [![gcc](https://github.com/YuriyLisovskiy/xalwart/actions/workflows/tests-gcc.yml/badge.svg)](https://github.com/YuriyLisovskiy/xalwart/actions/workflows/tests-gcc.yml) [![clang](https://github.com/YuriyLisovskiy/xalwart.server/actions/workflows/tests-clang.yml/badge.svg)](https://github.com/YuriyLisovskiy/xalwart.server/actions/workflows/tests-clang.yml) | [![c++](https://img.shields.io/badge/c%2B%2B-20-blue)](https://isocpp.org/) [![system](https://img.shields.io/badge/Ubuntu-OS-blue.svg?style=flat&logo=ubuntu)](https://ubuntu.com/) |
 
 Inspired by [Django](https://github.com/django/django).
 
 ### Requirements
-
-C++ compiler minimum version:
-* Ubuntu: [see actions](https://github.com/YuriyLisovskiy/xalwart/actions)
-* Microsoft C/C++: Visual Studio 2019 v16.6
+- C++ compiler:
+    - `gcc`: v10 or later.
+    - `clang`: v10 or later.
+- CMake: `3.12` or later.
+- Additional libraries:
+    - [xalwart.core](https://github.com/YuriyLisovskiy/xalwart.core) (required)
+    - [xalwart.render](https://github.com/YuriyLisovskiy/xalwart.render) (required)
+    - [xalwart.server](https://github.com/YuriyLisovskiy/xalwart.server) (optional)
+    - [xalwart.orm](https://github.com/YuriyLisovskiy/xalwart.orm) (optional)
 
 ### Third party
-Yaml library: [jbeder/yaml-cpp](https://github.com/jbeder/yaml-cpp) (v0.6.3)
+- [yaml parser](https://github.com/jbeder/yaml-cpp) (already included v0.6.3)
+
+### Build and Install
+```bash
+mkdir build && cd build
+cmake -DCMAKE_BUILD_TYPE=Release ..
+make && sudo make install
+```
 
 ### Testing
-
-Use valgrind to check for memory leaks:
+```bash
+mkdir build && cd build
+cmake -DCMAKE_BUILD_TYPE=Debug .. && make
 ```
-$ valgrind --leak-check=full ./your-executable
+Use valgrind to check for memory leaks:
+```bash
+valgrind --leak-check=full ./tests/unittests-all
 ```
