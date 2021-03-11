@@ -39,7 +39,6 @@ protected:
 
 public:
 	explicit SecurityMiddleware(conf::Settings* settings);
-	SecurityMiddleware(nullptr_t) = delete;
 
 	core::Result<std::shared_ptr<http::IHttpResponse>> process_request(
 		http::HttpRequest* request

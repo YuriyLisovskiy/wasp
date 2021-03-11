@@ -11,6 +11,13 @@ __MIDDLEWARE_BEGIN__
 
 MiddlewareMixin::MiddlewareMixin(conf::Settings* settings)
 {
+	if (!settings)
+	{
+		throw core::NullPointerException(
+			"middleware: settings is not instantiated", _ERROR_DETAILS_
+		);
+	}
+
 	this->settings = settings;
 }
 

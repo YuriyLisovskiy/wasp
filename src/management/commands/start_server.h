@@ -23,6 +23,11 @@ __MANAGEMENT_COMMANDS_BEGIN__
 class StartServerCommand final : public xw::cmd::AppCommand
 {
 private:
+	const std::string DEFAULT_IPV4_HOST = "127.0.0.1";
+	const std::string DEFAULT_IPV6_HOST = "[::1]";
+	const uint16_t DEFAULT_PORT = 8000;
+	const size_t DEFAULT_THREADS = 16;
+
 	std::string _host;
 	uint16_t _port = DEFAULT_PORT;
 	bool _use_ipv6 = false;
@@ -38,11 +43,6 @@ private:
 	rgx::Regex _ipv4_ipv6_port_regex;
 	rgx::Regex _ipv4_regex;
 	rgx::Regex _ipv6_regex;
-
-	const std::string DEFAULT_IPV4_HOST = "127.0.0.1";
-	const std::string DEFAULT_IPV6_HOST = "[::1]";
-	const uint16_t DEFAULT_PORT = 8000;
-	const size_t DEFAULT_THREADS = 16;
 
 	std::function<std::shared_ptr<net::IServer>(
 		log::ILogger*,

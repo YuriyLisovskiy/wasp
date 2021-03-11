@@ -50,7 +50,6 @@ protected:
 
 public:
 	explicit CommonMiddleware(conf::Settings* settings);
-	CommonMiddleware(nullptr_t) = delete;
 
 	/// Check for denied User-Agents and rewrite the URL based on
 	/// settings.APPEND_SLASH and settings.PREPEND_WWW

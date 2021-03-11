@@ -23,7 +23,6 @@ public:
 	static const std::string FULL_NAME;
 
 	explicit CookieMiddleware(conf::Settings* settings);
-	CookieMiddleware(nullptr_t) = delete;
 
 	core::Result<std::shared_ptr<http::IHttpResponse>> process_request(
 		http::HttpRequest* request

@@ -48,7 +48,7 @@ protected:
 
 public:
 	explicit MiddlewareMixin(conf::Settings* settings);
-	MiddlewareMixin(nullptr_t) = delete;
+	MiddlewareMixin(std::nullptr_t) = delete;
 	~MiddlewareMixin() override = default;
 
 	core::Result<std::shared_ptr<http::IHttpResponse>> process_request(http::HttpRequest* request) override;
