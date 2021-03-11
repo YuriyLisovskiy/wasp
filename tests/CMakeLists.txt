@@ -22,7 +22,8 @@ function(add_tests SUB_DIR SUB_NAME)
     set(FULL_BIN ${BINARY}-${SUB_NAME})
     add_executable(${FULL_BIN} ${LIB_SOURCES} ${SOURCES} ${TESTS_DIR}/main.cpp)
     target_include_directories(${FULL_BIN} PUBLIC ${GNU_INCLUDE_DIR})
-    target_link_libraries(${FULL_BIN} PUBLIC gtest stdc++fs
+    target_link_libraries(${FULL_BIN} PUBLIC
+        gtest
         ${FRAMEWORK_NAME}.core-0.0.1
         ${FRAMEWORK_NAME}.render-0.0.1
     )
