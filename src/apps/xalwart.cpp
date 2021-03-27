@@ -6,9 +6,6 @@
 
 #include "./xalwart.h"
 
-// C++ libraries.
-#include <iostream>
-
 // Core libraries.
 #include <xalwart.core/path.h>
 
@@ -408,6 +405,7 @@ core::Result<std::shared_ptr<http::IHttpResponse>> MainApplication::process_resp
 		auto result = this->settings->MIDDLEWARE[i]->process_response(
 			request.get(), response.get()
 		);
+
 		if (result.err)
 		{
 			// TODO: print middleware name.
