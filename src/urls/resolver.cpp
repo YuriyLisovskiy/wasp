@@ -1,7 +1,7 @@
 /**
  * urls/resolver.cpp
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  */
 
 #include "./resolver.h"
@@ -17,8 +17,7 @@ std::function<core::Result<std::shared_ptr<http::IHttpResponse>>(
 )
 {
 	std::function<core::Result<std::shared_ptr<http::IHttpResponse>>(
-		http::HttpRequest* request,
-		conf::Settings* settings
+		http::HttpRequest*, conf::Settings*
 	)> fn = nullptr;
 	for (auto& url_pattern : urlpatterns)
 	{

@@ -63,7 +63,7 @@ core::Result<std::shared_ptr<http::IHttpResponse>> UrlPattern::apply(
 
 bool UrlPattern::match(const std::string& url, std::map<std::string, std::string>& args)
 {
-	if (this->_regex.match(url))
+	if (this->_regex.match(url) && this->_regex.search(url))
 	{
 		args = this->_regex.args();
 		return true;
