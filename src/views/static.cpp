@@ -61,7 +61,7 @@ core::Result<std::shared_ptr<http::IHttpResponse>> StaticView::get(http::HttpReq
 		return this->response<http::HttpResponseNotFound>(this->_kwargs->get("http_404", "404 Not Found"));
 	}
 
-	auto stat_info = core::File::file_stat(full_path);
+	auto stat_info = core::file_stat(full_path);
 	if (!internal::was_modified_since(
 		request->headers.get(http::IF_MODIFIED_SINCE, ""),
 		stat_info.st_mtime, stat_info.st_size)
@@ -106,7 +106,7 @@ bool was_modified_since(const std::string& header, size_t time, size_t size)
 	}
 	else
 	{
-		auto rgx = rgx::Regex("([^;]+)(; length=([0-9]+))?", std::regex_constants::icase);
+		auto rgx = re::Regex("([^;]+)(; length=([0-9]+))?", std::regex_constants::icase);
 		if (rgx.search(header))
 		{
 			auto header_time = http::parse_http_datetime(rgx.group(1));

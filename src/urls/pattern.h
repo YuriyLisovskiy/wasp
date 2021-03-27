@@ -11,7 +11,7 @@
 #pragma once
 
 // Core libraries.
-#include <xalwart.core/regex.h>
+#include <xalwart.core/re/arg_regex.h>
 
 // Module definitions.
 #include "./_def_.h"
@@ -41,7 +41,7 @@ private:
 	std::vector<std::string> _pattern_parts;
 	ViewHandler _handler;
 	std::string _name;
-	rgx::ArgRegex _regex;
+	re::ArgRegex _regex;
 	std::string _namespace;
 
 public:

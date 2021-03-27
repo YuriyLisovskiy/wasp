@@ -16,7 +16,7 @@
 
 __SIGNING_INTERNAL_BEGIN__
 
-rgx::Regex _SEP_UNSAFE_REGEX = rgx::Regex(R"([A-z0-9-_=]*)");
+re::Regex _SEP_UNSAFE_REGEX = re::Regex(R"([A-z0-9-_=]*)");
 
 __SIGNING_INTERNAL_END__
 

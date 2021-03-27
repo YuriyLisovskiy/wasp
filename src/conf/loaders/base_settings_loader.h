@@ -43,7 +43,7 @@ protected:
 			{
 				auto str_path = entry.path().string();
 				std::string curr_file_name(str_path.begin() + base_dir.size(), str_path.end());
-				str::ltrim(curr_file_name, dir_sep);
+				curr_file_name = str::ltrim(curr_file_name, dir_sep);
 				if (std::regex_match(curr_file_name, file_name_regex))
 				{
 					return entry;

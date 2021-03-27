@@ -29,20 +29,13 @@ void multipart_parser::append_file(
 	const std::string& content_type,
 	const std::string& boundary,
 	const std::string& content_disposition,
-	const std::vector<unsigned char>& data
+	std::vector<unsigned char>& data
 )
 {
-	bool root_is_empty = this->media_root.empty();
-	core::File file;
-	if (!root_is_empty)
-	{
-		file = core::File(data, this->media_root + "/" + file_name);
-	}
-
 	files::UploadedFile uploaded_file(
 		this->media_root + "/" + file_name,
-		root_is_empty ? 0 : data.size(),
-		file,
+		this->media_root.empty() ? 0 : data.size(),
+		data,
 		content_type,
 		"",
 		boundary,
@@ -78,8 +71,7 @@ std::string multipart_parser::get_boundary(const std::string& content_type)
 		);
 	}
 
-	str::ltrim(boundary, "-");
-	return boundary;
+	return str::ltrim(boundary, "-");
 }
 
 void multipart_parser::assert_boundary(const std::string& actual, const std::string& expected)

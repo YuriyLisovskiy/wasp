@@ -13,7 +13,7 @@
 
 __HTTP_INTERNAL_BEGIN__
 
-rgx::Regex host_validation_regex = rgx::Regex(
+re::Regex host_validation_regex = re::Regex(
 	R"(([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(:\d+)?)"
 );
 
@@ -64,8 +64,7 @@ void split_domain_port(
 		}
 	}
 
-	str::rtrim(domain, "]");
-	str::ltrim(domain, "[");
+	domain = str::trim(domain, "[]");
 }
 
 bool validate_host(

@@ -35,7 +35,7 @@ protected:
 	bool redirect;
 	std::string redirect_host;
 	std::string referrer_policy;
-	std::vector<rgx::Regex> redirect_exempt;
+	std::vector<re::Regex> redirect_exempt;
 
 public:
 	explicit SecurityMiddleware(conf::Settings* settings);

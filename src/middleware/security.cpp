@@ -129,11 +129,11 @@ core::Result<std::shared_ptr<http::IHttpResponse>> SecurityMiddleware::process_r
 		auto split = str::split(this->referrer_policy, ',');
 		for (auto& item : split)
 		{
-			str::trim(item);
+			item = str::trim(item);
 		}
 
 		response->set_header(
-			http::REFERRER_POLICY, str::join(split.begin(), split.end(), ",")
+			http::REFERRER_POLICY, str::join(",", split.begin(), split.end())
 		);
 	}
 

@@ -12,7 +12,7 @@ __FILES_BEGIN__
 UploadedFile::UploadedFile(
 	const std::string& name,
 	size_t size,
-	core::File& file,
+	std::vector<unsigned char>& data,
 	const std::string& content_type,
 	const std::string& charset,
 	const std::string& boundary,
@@ -25,34 +25,43 @@ UploadedFile::UploadedFile(
 	this->_content_type = content_type;
 	this->_charset = charset;
 	this->_size = size;
-	this->_file = core::File(file);
-}
-
-UploadedFile::UploadedFile(const UploadedFile& copy)
-{
-	if (this != &copy)
+	if (this->_size > 0)
 	{
-		this->_name = copy._name;
-		this->_boundary = copy._boundary;
-		this->_content_disposition = copy._content_disposition;
-		this->_charset = copy._charset;
-		this->_content_type = copy._content_type;
-		this->_size = copy._size;
-		this->_file = copy._file;
+		this->_data = std::move(data);
 	}
 }
 
-UploadedFile& UploadedFile::operator=(const UploadedFile& copy)
+UploadedFile::UploadedFile(const UploadedFile& other)
 {
-	if (this != &copy)
+	if (this != &other)
 	{
-		this->_name = copy._name;
-		this->_boundary = copy._boundary;
-		this->_content_disposition = copy._content_disposition;
-		this->_charset = copy._charset;
-		this->_content_type = copy._content_type;
-		this->_size = copy._size;
-		this->_file = copy._file;
+		this->_name = other._name;
+		this->_boundary = other._boundary;
+		this->_content_disposition = other._content_disposition;
+		this->_charset = other._charset;
+		this->_content_type = other._content_type;
+		this->_size = other._size;
+		if (this->_size > 0)
+		{
+			this->_data = other._data;
+		}
+	}
+}
+
+UploadedFile& UploadedFile::operator= (const UploadedFile& other)
+{
+	if (this != &other)
+	{
+		this->_name = other._name;
+		this->_boundary = other._boundary;
+		this->_content_disposition = other._content_disposition;
+		this->_charset = other._charset;
+		this->_content_type = other._content_type;
+		this->_size = other._size;
+		if (this->_size > 0)
+		{
+			this->_data = other._data;
+		}
 	}
 
 	return *this;
@@ -95,9 +104,15 @@ bool UploadedFile::exists() const
 
 void UploadedFile::save()
 {
-	if (!this->_file.path().empty())
+	if (this->_name != "/")
 	{
-		this->_file.save_file();
+		core::File file(this->_name, core::File::wb);
+		file.open();
+		if (file.is_open())
+		{
+			file.write(this->_data);
+			file.save();
+		}
 	}
 }
 

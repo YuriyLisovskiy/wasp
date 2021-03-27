@@ -13,7 +13,7 @@
 
 __UTILS_HTTP_INTERNAL_BEGIN__
 
-rgx::Regex ETAG_REGEX = rgx::Regex(R"(((?:W\/)?"[^"]*"))");
+re::Regex ETAG_REGEX = re::Regex(R"(((?:W\/)?"[^"]*"))");
 
 const std::string _D = R"(<day>(\d{2}))";
 const std::string _D2 = R"(<day>([ \d]\d))";
@@ -22,13 +22,13 @@ const std::string _Y = R"(<year>(\d{4}))";
 const std::string _Y2 = R"(<year>(\d{2}))";
 const std::string _T = R"(<hour>(\d{2}):<min>(\d{2}):<sec>(\d{2}))";
 
-rgx::ArgRegex RFC1123_DATE = rgx::ArgRegex(
+re::ArgRegex RFC1123_DATE(
 	R"(\w{3}, )" + _D + R"( )" + _M + R"( )" + _Y + R"( )" + _T + R"( GMT)"
 );
-rgx::ArgRegex RFC850_DATE = rgx::ArgRegex(
+re::ArgRegex RFC850_DATE(
 	R"(w{6,9}, )" + _D + R"(-)" + _M + R"(-)" + _Y2 + R"( )" + _T + R"( GMT)"
 );
-rgx::ArgRegex ASCTIME_DATE = rgx::ArgRegex(
+re::ArgRegex ASCTIME_DATE(
 	R"(w{3} )" + _M + R"( )" + _D2 + R"( )" + _T + R"( )" + _Y + R"()"
 );
 
@@ -54,15 +54,15 @@ long parse_http_date(const std::string& date)
 	std::map<std::string, std::string> match;
 	if (rfc_1123_date.search(date))
 	{
-		match = rfc_1123_date.groups();
+		match = rfc_1123_date.args();
 	}
 	else if (rfc_850_date.search(date))
 	{
-		match = rfc_850_date.groups();
+		match = rfc_850_date.args();
 	}
 	else if (asc_time_date.search(date))
 	{
-		match = asc_time_date.groups();
+		match = asc_time_date.args();
 	}
 	else
 	{

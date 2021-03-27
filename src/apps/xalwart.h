@@ -9,7 +9,7 @@
 #pragma once
 
 // Core libraries.
-#include <xalwart.core/net/server.h>
+#include <xalwart.core/net/abc.h>
 
 // Module definitions.
 #include "./_def_.h"

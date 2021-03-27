@@ -9,7 +9,7 @@
 #pragma once
 
 // Core libraries.
-#include <xalwart.core/net/server.h>
+#include <xalwart.core/net/abc.h>
 
 // Module definitions.
 #include "./_def_.h"
@@ -40,9 +40,9 @@ private:
 	std::shared_ptr<core::flags::BoolFlag> _use_ipv6_flag;
 	std::shared_ptr<core::flags::BoolFlag> _log_color_flag;
 
-	rgx::Regex _ipv4_ipv6_port_regex;
-	rgx::Regex _ipv4_regex;
-	rgx::Regex _ipv6_regex;
+	re::Regex _ipv4_ipv6_port_regex;
+	re::Regex _ipv4_regex;
+	re::Regex _ipv6_regex;
 
 	std::function<std::shared_ptr<net::IServer>(
 		log::ILogger*,

@@ -57,7 +57,7 @@ struct multipart_parser final
 		const std::string& content_type,
 		const std::string& boundary,
 		const std::string& content_disposition,
-		const std::vector<unsigned char>& data
+		std::vector<unsigned char>& data
 	);
 
 	static std::string get_boundary(const std::string& content_type);

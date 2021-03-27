@@ -37,14 +37,14 @@ args_parser::args_parser(int argc, char** argv, size_t parse_from, bool is_verbo
 			auto param = str::split(token, '=');
 			if (param.size() > 1)
 			{
-				str::ltrim(param[0], "-");
-				auto val = str::join(param.begin() + 1, param.end(), "");
+				param[0] = str::ltrim(param[0], "-");
+				auto val = str::join("", param.begin() + 1, param.end());
 				this->flags[param[0]] = val;
 			}
 			else
 			{
 				last_arg = token;
-				str::ltrim(last_arg, "-");
+				last_arg = str::ltrim(last_arg, "-");
 				is_received = false;
 			}
 		}

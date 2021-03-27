@@ -27,14 +27,14 @@ private:
 	std::string _charset;
 	std::string _content_type;
 	size_t _size{};
-	core::File _file;
+	std::vector<unsigned char> _data;
 
 public:
 	UploadedFile() = default;
 	UploadedFile(
 		const std::string& name,
 		size_t size,
-		core::File& file,
+		std::vector<unsigned char>& data,
 		const std::string& content_type = "",
 		const std::string& charset = "",
 		const std::string& boundary = "",
@@ -43,13 +43,13 @@ public:
 	UploadedFile(const UploadedFile& other);
 	UploadedFile& operator=(const UploadedFile& other);
 
-	std::string name() const;
-	std::string boundary() const;
-	std::string content_disposition() const;
-	std::string charset() const;
-	std::string content_type() const;
-	size_t size() const;
-	bool exists() const;
+	[[nodiscard]] std::string name() const;
+	[[nodiscard]] std::string boundary() const;
+	[[nodiscard]] std::string content_disposition() const;
+	[[nodiscard]] std::string charset() const;
+	[[nodiscard]] std::string content_type() const;
+	[[nodiscard]] size_t size() const;
+	[[nodiscard]] bool exists() const;
 	void save();
 };
 

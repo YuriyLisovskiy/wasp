@@ -167,7 +167,7 @@ core::Result<std::shared_ptr<http::IHttpResponse>> View::options(http::HttpReque
 	auto allowed_methods = this->allowed_methods();
 	response->set_header(
 		"Allow",
-		str::join(allowed_methods.begin(), allowed_methods.end(), ", ")
+		str::join(", ", allowed_methods.begin(), allowed_methods.end())
 	);
 	response->set_header("Content-Length", "0");
 	return this->response(response);

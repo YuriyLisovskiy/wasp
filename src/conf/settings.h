@@ -90,7 +90,7 @@ public:
 	//         core::rgx::Regex(R"(SiteSucker.*)"),
 	//         core::rgx::Regex(R"(sohu-search.*)")
 	//     };
-	std::vector<rgx::Regex> DISALLOWED_USER_AGENTS;
+	std::vector<re::Regex> DISALLOWED_USER_AGENTS;
 
 	// List of compiled regular expression objects representing URLs that need not
 	// be reported by BrokenLinkEmailsMiddleware.
@@ -103,7 +103,7 @@ public:
 	//        core::rgx::Regex(R"(/phpmyadmin/)"),
 	//        core::rgx::Regex(R"(/apple-touch-icon.*\.png)")
 	//    };
-	std::vector<rgx::Regex> IGNORABLE_404_URLS;
+	std::vector<re::Regex> IGNORABLE_404_URLS;
 
 	// A secret key for this particular installation. Used in secret-key
 	// hashing algorithms. Set this in your settings.

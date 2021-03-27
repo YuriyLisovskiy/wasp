@@ -8,6 +8,9 @@
 
 #pragma once
 
+// Core libraries.
+#include <xalwart.core/re/regex.h>
+
 // Module definitions.
 #include "./_def_.h"
 
@@ -33,7 +36,7 @@ public:
 template <typename T>
 concept ModuleConfigType = std::is_base_of_v<IModuleConfig, T>;
 
-const rgx::Regex _R_CONFIG_NAME = rgx::Regex(
+const re::Regex _R_CONFIG_NAME = re::Regex(
 	R"((((M|m)odule)|((C|c)onfig)|((M|m)odule_*(C|c)onfig))$)"
 );
 

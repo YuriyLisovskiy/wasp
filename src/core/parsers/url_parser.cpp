@@ -1,13 +1,10 @@
 /**
  * core/parsers/url_parser.cpp
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  */
 
 #include "./url_parser.h"
-
-// Core libraries.
-#include <xalwart.core/string_utils.h>
 
 
 __PARSERS_BEGIN__
@@ -25,7 +22,6 @@ void url_parser::parse(const std::string& str)
 	std::string username_or_hostname, port_or_password;
 	this->path = "/";
 	url_parser::state st = url_parser::state::s_scheme;
-	str::ltrim(str, "/");
 	for (char ch : str)
 	{
 		switch (st)

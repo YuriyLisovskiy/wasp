@@ -11,19 +11,22 @@
 // C++ libraries.
 #include <string>
 
-// Core libraries.
-#include <xalwart.core/object/interfaces.h>
-
 // Module definitions.
 #include "./_def_.h"
 
 
 __CRYPTO_BEGIN__
 
-class IHash : public object::ICloneable
+class IHash
 {
+private:
+	IHash(const IHash&) = default;
+	IHash& operator=(const IHash&) = default;
+
 public:
-	IHash* clone() override = 0;
+	IHash() = default;
+
+	virtual IHash* clone() = 0;
 
 	// Continues message-digest operation,
 	// processing another message block.

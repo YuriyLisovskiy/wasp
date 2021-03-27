@@ -33,15 +33,15 @@ StartServerCommand::StartServerCommand(
 	}
 
 	std::string ipv4 = R"((\d{1,3}(?:\.\d{1,3}){3})|localhost)";
-	this->_ipv4_regex = rgx::Regex(ipv4);
+	this->_ipv4_regex = re::Regex(ipv4);
 
 	std::string ipv6 = R"(\[([a-fA-F0-9:]+)\]|\[localhost\])";
-	this->_ipv6_regex = rgx::Regex(ipv6);
+	this->_ipv6_regex = re::Regex(ipv6);
 
 	std::string fqdn = R"([a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*)";
 
 	std::string port = R"(\d+)";
-	this->_ipv4_ipv6_port_regex = rgx::Regex(
+	this->_ipv4_ipv6_port_regex = re::Regex(
 		R"((?:(()" + ipv4 + R"()|()" + ipv6 + R"()|()" + fqdn + R"()):)?()" + port + R"())"
 	);
 }
@@ -140,9 +140,7 @@ void StartServerCommand::retrieve_args(
 		auto groups = this->_ipv4_ipv6_port_regex.groups();
 		auto address = (groups[1].empty() ? this->DEFAULT_IPV4_HOST : groups[1]);
 		use_ipv6 = this->_ipv6_regex.match(address);
-		auto trimmed_addr = address;
-		str::rtrim(trimmed_addr, "]");
-		str::ltrim(trimmed_addr, "[");
+		auto trimmed_addr = str::trim(address, "[]");
 		if (trimmed_addr == "localhost")
 		{
 			address = use_ipv6 ? this->DEFAULT_IPV6_HOST : this->DEFAULT_IPV4_HOST;
@@ -171,9 +169,7 @@ void StartServerCommand::retrieve_args(
 			}
 		}
 
-		auto trimmed_addr = address;
-		str::rtrim(trimmed_addr, "]");
-		str::ltrim(trimmed_addr, "[");
+		auto trimmed_addr = str::trim(address, "[]");
 		if (trimmed_addr == "localhost")
 		{
 			address = use_ipv6 ? this->DEFAULT_IPV6_HOST : this->DEFAULT_IPV4_HOST;

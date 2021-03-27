@@ -19,7 +19,7 @@ UrlPattern::UrlPattern(
 	const std::string& name
 ) : _regex(rgx)
 {
-	this->_orig = this->_regex.original();
+	this->_orig = this->_regex.str();
 	this->_pattern_parts = this->_regex.parts();
 	if (!this->_pattern_parts.empty())
 	{
@@ -28,7 +28,7 @@ UrlPattern::UrlPattern(
 			this->_pattern_parts.back().pop_back();
 		}
 
-		str::rtrim(this->_pattern_parts.back(), "/");
+		this->_pattern_parts.back() = str::rtrim(this->_pattern_parts.back(), "/");
 	}
 
 	this->_handler = handler;
@@ -65,7 +65,7 @@ bool UrlPattern::match(const std::string& url, std::map<std::string, std::string
 {
 	if (this->_regex.match(url))
 	{
-		args = this->_regex.groups();
+		args = this->_regex.args();
 		return true;
 	}
 

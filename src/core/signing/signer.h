@@ -9,7 +9,7 @@
 #pragma once
 
 // Core libraries.
-#include <xalwart.core/regex.h>
+#include <xalwart.core/re/regex.h>
 
 // Module definitions.
 #include "./_def_.h"
@@ -17,7 +17,7 @@
 
 __SIGNING_INTERNAL_BEGIN__
 
-extern rgx::Regex _SEP_UNSAFE_REGEX;
+extern re::Regex _SEP_UNSAFE_REGEX;
 
 __SIGNING_INTERNAL_END__
 

@@ -9,7 +9,8 @@
 #pragma once
 
 // Core libraries.
-#include <xalwart.core/regex.h>
+#include <xalwart.core/re/regex.h>
+#include <xalwart.core/re/arg_regex.h>
 
 // Module definitions.
 #include "./_def_.h"
@@ -39,7 +40,7 @@ __UTILS_HTTP_END__
 
 __UTILS_HTTP_INTERNAL_BEGIN__
 
-extern rgx::Regex ETAG_REGEX;
+extern re::Regex ETAG_REGEX;
 
 extern const std::string _D;
 extern const std::string _D2;
@@ -48,9 +49,9 @@ extern const std::string _Y;
 extern const std::string _Y2;
 extern const std::string _T;
 
-extern rgx::ArgRegex RFC1123_DATE;
-extern rgx::ArgRegex RFC850_DATE;
-extern rgx::ArgRegex ASCTIME_DATE;
+extern re::ArgRegex RFC1123_DATE;
+extern re::ArgRegex RFC850_DATE;
+extern re::ArgRegex ASCTIME_DATE;
 
 extern const std::vector<std::string> MONTHS;
 
