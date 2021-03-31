@@ -87,9 +87,9 @@ long parse_http_date(const std::string& date)
 	}
 
 	int month = (int) utility::index_of(
+		str::lower(match["mon"]),
 		internal::MONTHS.begin(),
-		internal::MONTHS.end(),
-		str::lower(match["mon"])
+		internal::MONTHS.end()
 	) + 1;
 	int day = std::stoi(match["day"]);
 	int hour = std::stoi(match["hour"]);

@@ -51,7 +51,7 @@ core::Result<std::string> CommonMiddleware::get_full_path_with_slash(http::HttpR
 
 	// Prevent construction of scheme relative urls.
 	http::escape_leading_slashes(new_path);
-	if (this->settings->DEBUG && utility::contains(
+	if (this->settings->DEBUG && utility::contains<std::string>(
 		request->method(), {"POST", "PUT", "PATCH"}
 	))
 	{
@@ -112,7 +112,7 @@ core::Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::process_req
 	if (result.err)
 	{
 		this->settings->LOGGER->trace("Method 'get_host' returned an error", _ERROR_DETAILS_);
-		return result.forward<std::shared_ptr<http::IHttpResponse>>();
+		return result.forward_err<std::shared_ptr<http::IHttpResponse>>();
 	}
 
 	auto host = result.value;
@@ -132,7 +132,7 @@ core::Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::process_req
 			this->settings->LOGGER->trace(
 				"Method 'get_full_path_with_slash' returned an error", _ERROR_DETAILS_
 			);
-			return result.forward<std::shared_ptr<http::IHttpResponse>>();
+			return result.forward_err<std::shared_ptr<http::IHttpResponse>>();
 		}
 
 		path = result.value;
@@ -168,7 +168,7 @@ core::Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::process_res
 				this->settings->LOGGER->trace(
 					"Method 'get_full_path_with_slash' returned an error", _ERROR_DETAILS_
 				);
-				return result.forward<std::shared_ptr<http::IHttpResponse>>();
+				return result.forward_err<std::shared_ptr<http::IHttpResponse>>();
 			}
 
 			return this->get_response_redirect(result.value);

@@ -43,7 +43,7 @@ bool _if_match_passes(
 	{
 		// Since the ETag is strong, this will only return True
 		// if there's a strong match.
-		return utility::contains(target_etag, etags);
+		return utility::contains(target_etag, etags.begin(), etags.end());
 	}
 }
 

@@ -140,7 +140,10 @@ std::string Cookie::to_string() const
 	if (!this->_same_site.empty())
 	{
 		std::vector<std::string> allowed_same_site_values = {"lax", "none", "strict"};
-		if (!utility::contains(str::lower(this->_same_site), allowed_same_site_values))
+		if (!utility::contains(
+			str::lower(this->_same_site),
+			allowed_same_site_values.begin(), allowed_same_site_values.end()
+		))
 		{
 			throw core::ValueError(R"(samesite must be "lax", "none", or "strict".)");
 		}

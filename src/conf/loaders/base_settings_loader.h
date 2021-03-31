@@ -14,7 +14,7 @@
 #include <regex>
 
 // Core libraries.
-#include <xalwart.core/sys.h>
+#include <xalwart.core/path.h>
 #include <xalwart.core/string_utils.h>
 #include <xalwart.core/exceptions.h>
 
@@ -36,7 +36,7 @@ protected:
 	)
 	{
 		std::regex file_name_regex(file_name);
-		auto dir_sep = std::string(1, sys::dir_separator);
+		auto dir_sep = std::string(1, path::sep);
 		for (const auto& entry : std::filesystem::directory_iterator(base_dir))
 		{
 			if (!entry.is_directory())
