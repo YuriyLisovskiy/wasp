@@ -178,6 +178,76 @@ void YamlSettingsLoader::_init_middleware(Settings* settings, const YAML::Node& 
 	}
 }
 
+void YamlSettingsLoader::_init_databases(Settings* settings, const YAML::Node& databases)
+{
+	// TODO: check if contains default database because it is required!
+	for (auto it = databases.begin(); it != databases.end(); it++)
+	{
+		if (it->IsDefined() && it->IsMap())
+		{
+			auto db_info = *it;
+			if (!db_info || !db_info.IsMap())
+			{
+				throw core::ImproperlyConfigured(
+					"databases: parameter must be non-empty map", _ERROR_DETAILS_
+				);
+			}
+
+			auto driver_node = db_info["driver"];
+			if (!driver_node || !driver_node.IsScalar())
+			{
+				throw core::ImproperlyConfigured(
+					"databases: the 'driver' parameter is required and must have a string type",
+					_ERROR_DETAILS_
+				);
+			}
+
+			auto name_node = db_info["name"];
+			if (!name_node || !name_node.IsScalar())
+			{
+				throw core::ImproperlyConfigured(
+					"databases: the 'name' parameter is required and must have a string type",
+					_ERROR_DETAILS_
+				);
+			}
+
+			auto db_name = name_node.as<std::string>();
+			auto driver_name = driver_node.as<std::string>();
+			std::shared_ptr<orm::abc::ISQLDriver> driver;
+			if (driver_name == "sqlite3")
+			{
+				auto filepath = db_info["file"];
+				if (!filepath || !filepath.IsScalar())
+				{
+					throw core::ImproperlyConfigured(
+						"databases: the 'file' parameter of SQLite3 database info is required and must have a string type",
+						_ERROR_DETAILS_
+					);
+				}
+
+				driver = settings->build_sqlite3_database(db_name, filepath.as<std::string>());
+			}
+			else
+			{
+				// TODO: add more driver initializations.
+				driver = settings->build_custom_database(db_name, db_info);
+			}
+
+			if (driver)
+			{
+				if (db_name == "default")
+				{
+					settings->DB = std::make_shared<orm::Client>(driver);
+				}
+				else
+				{
+					settings->DATABASES.push_back(std::make_shared<orm::Client>(driver));
+				}
+			}
+		}
+	}
+}
+
 YAML::Node YamlSettingsLoader::null() const
 {
 	return YAML::Node(YAML::NodeType::Null);
@@ -981,6 +1051,12 @@ void YamlSettingsLoader::overwrite_config(YAML::Node& config, const YAML::Node& 
 		config["middleware"] = local_middleware;
 	}
 
+	auto local_databases = local_config["databases"];
+	if (local_databases && local_databases.IsSequence())
+	{
+		config["databases"] = local_databases;
+	}
+
 	auto local_template_engine = local_config["template_engine"];
 	if (local_template_engine)
 	{
@@ -1136,6 +1212,16 @@ void YamlSettingsLoader::init_settings(Settings* settings, const YAML::Node& con
 	{
 		settings->register_middleware();
 		_init_middleware(settings, middleware);
+	}
+
+	auto databases = config["databases"];
+	if (databases && databases.IsSequence() && databases.size() > 0)
+	{
+		_init_databases(settings, databases);
+	}
+	else
+	{
+		settings->LOGGER->warning("databases: databases were not detected", _ERROR_DETAILS_);
 	}
 
 	auto template_engine = config["template_engine"];

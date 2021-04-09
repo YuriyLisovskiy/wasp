@@ -80,6 +80,20 @@ void Settings::register_loaders()
 {
 }
 
+std::shared_ptr<orm::abc::ISQLDriver> Settings::build_sqlite3_database(
+	const std::string& name, const std::string& filepath
+)
+{
+	return nullptr;
+}
+
+std::shared_ptr<orm::abc::ISQLDriver> Settings::build_custom_database(
+	const std::string& name, const YAML::Node& database
+)
+{
+	return nullptr;
+}
+
 std::shared_ptr<apps::IModuleConfig> Settings::get_module(
 	const std::string& full_name
 ) const

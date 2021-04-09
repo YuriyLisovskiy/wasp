@@ -39,6 +39,8 @@ private:
 
 	static void _init_middleware(Settings* settings, const YAML::Node& middleware);
 
+	static void _init_databases(Settings* settings, const YAML::Node& databases);
+
 protected:
 
 	// Returns YAML::Node of type Null

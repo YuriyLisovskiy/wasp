@@ -14,9 +14,13 @@
 #include <xalwart.core/result.h>
 #include <xalwart.core/string_utils.h>
 #include <xalwart.core/utility.h>
+#include <xalwart.core/yaml/yaml-cpp/yaml.h>
 
 // Render libraries.
 #include <xalwart.render/library/abc.h>
+
+// ORM libraries.
+#include <xalwart.orm/client.h>
 
 // Module definitions.
 #include "./_def_.h"
@@ -75,6 +79,12 @@ public:
 
 	// Engine for rendering templates.
 	std::unique_ptr<render::IEngine> TEMPLATE_ENGINE;
+
+	// Default database instance.
+	std::shared_ptr<orm::Client> DB;
+
+	// List of databases.
+	std::vector<std::shared_ptr<orm::Client>> DATABASES;
 
 	// Whether to append trailing slashes to URLs.
 	bool APPEND_SLASH;
@@ -232,6 +242,13 @@ public:
 	virtual void register_libraries();
 	virtual void register_loaders();
 
+	virtual std::shared_ptr<orm::abc::ISQLDriver> build_sqlite3_database(
+		const std::string& name, const std::string& filepath
+	);
+	virtual std::shared_ptr<orm::abc::ISQLDriver> build_custom_database(
+		const std::string& name, const YAML::Node& database
+	);
+
 	[[nodiscard]]
 	std::shared_ptr<apps::IModuleConfig> get_module(const std::string& full_name) const;
 
@@ -243,6 +260,9 @@ public:
 
 	[[nodiscard]]
 	std::shared_ptr<render::ILoader> get_loader(const std::string& full_name) const;
+
+	[[nodiscard]]
+	std::shared_ptr<orm::abc::ISQLDriver> get_database(const std::string& full_name) const;
 
 	template <class T>
 	[[nodiscard]]

@@ -70,6 +70,20 @@ jobs:
                      .. && \
           sudo make && \
           sudo make install
+      - name: Install ORM Library
+        run: |
+          cd /tmp && \
+          git clone https://${{secrets.GH_ACCESS_TOKEN}}@github.com/YuriyLisovskiy/xalwart.orm.git && \
+          cd xalwart.orm && \
+          git checkout dev && \
+          sudo mkdir build && \
+          cd build && \
+          sudo cmake -DCMAKE_BUILD_TYPE=Release \
+                     -DCMAKE_CXX_COMPILER=g++-${{ matrix.compiler_version }} \
+                     -DCMAKE_C_COMPILER=gcc-${{ matrix.compiler_version }} \
+                     .. && \
+          sudo make && \
+          sudo make install
       - name: Update Links and Cache of Linker
         run: |
           sudo ldconfig

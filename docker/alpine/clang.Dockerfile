@@ -49,6 +49,15 @@ RUN git clone -q https://$GH_ACCESS_TOKEN@github.com/YuriyLisovskiy/xalwart.rend
     make && make install && \
     cd / && rm -rf /xalwart.render
 
+RUN git clone -q https://$GH_ACCESS_TOKEN@github.com/YuriyLisovskiy/xalwart.orm.git /xalwart.orm && \
+    mkdir -p /xalwart.orm/build && \
+    cd /xalwart.orm && \
+    git checkout dev && \
+    cd /xalwart.orm/build && \
+    cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_BUILD_TYPE=Release .. && \
+    make && make install && \
+    cd / && rm -rf /xalwart.orm
+
 RUN ldconfig /etc/ld.so.conf.d
 
 COPY . .
