@@ -1,5 +1,5 @@
 /**
- * apps/xalwart.cpp
+ * conf/xalwart.cpp
  *
  * Copyright (c) 2019-2021 Yuriy Lisovskiy
  */
@@ -17,7 +17,7 @@
 #include "../urls/resolver.h"
 
 
-__APPS_BEGIN__
+__CONF_BEGIN__
 
 MainApplication::MainApplication(
 	conf::Settings* settings,
@@ -436,7 +436,7 @@ std::shared_ptr<http::HttpRequest> MainApplication::make_request(
 	net::RequestContext* ctx, collections::Dict<std::string, std::string> env
 )
 {
-	parsers::query_parser qp;
+	parsers::url_query_parser qp;
 	http::HttpRequest::Parameters<std::string, std::string> get_params, post_params;
 	http::HttpRequest::Parameters<std::string, files::UploadedFile> files_params;
 	if (ctx->content_size)
@@ -600,4 +600,4 @@ void MainApplication::finish_response(
 	}
 }
 
-__APPS_END__
+__CONF_END__

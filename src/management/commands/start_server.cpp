@@ -14,13 +14,13 @@
 __MANAGEMENT_COMMANDS_BEGIN__
 
 StartServerCommand::StartServerCommand(
-	apps::IModuleConfig* config,
+	conf::IModuleConfig* config,
 	conf::Settings* settings,
 	std::function<std::shared_ptr<net::IServer>(
 		log::ILogger*,
 		collections::Dict<std::string, std::string>
 	)> make_server
-) : AppCommand(
+) : Command(
 	config, settings, "start-server", "Starts a web application"
 ), make_server(std::move(make_server))
 {
@@ -48,7 +48,7 @@ StartServerCommand::StartServerCommand(
 
 collections::Dict<std::string, std::string> StartServerCommand::get_kwargs()
 {
-	auto kwargs = AppCommand::get_kwargs();
+	auto kwargs = Command::get_kwargs();
 	kwargs["xw.workers"] = std::to_string(this->_threads_count);
 	kwargs["xw.max_body_size"] = std::to_string(this->settings->DATA_UPLOAD_MAX_MEMORY_SIZE);
 
@@ -84,7 +84,10 @@ void StartServerCommand::handle()
 	this->settings->LOGGER->use_colors(this->_log_color_flag->get());
 	if (!this->settings->DEBUG && this->settings->ALLOWED_HOSTS.empty())
 	{
-		throw core::CommandError("You must set 'allowed_hosts' if 'debug' is false.");
+		throw core::CommandError(
+			"You must set 'allowed_hosts' if 'debug' is false.",
+			_ERROR_DETAILS_
+		);
 	}
 
 	this->retrieve_args(
@@ -94,19 +97,12 @@ void StartServerCommand::handle()
 	try
 	{
 		server->bind(this->_host, this->_port);
-//		try
-//		{
-			std::string message = dt::Datetime::now().strftime("%B %d, %Y - %T") + "\n" +
-			                      LIB_NAME + " version " + LIB_VERSION + "\n" +
-			                      "Starting development server at " +
-			                      "http://" + this->_host + ":" + std::to_string(this->_port) + "/\n" +
-			                      "Quit the server with CONTROL-C.";
-			server->listen(message);
-//		}
-//		catch (const xw::core::InterruptException& exc)
-//		{
-			// skip
-//		}
+		std::string message = dt::Datetime::now().strftime("%B %d, %Y - %T") + "\n" +
+		                      LIB_NAME + " version " + LIB_VERSION + "\n" +
+		                      "Starting development server at " +
+		                      "http://" + this->_host + ":" + std::to_string(this->_port) + "/\n" +
+		                      "Quit the server with CONTROL-C.";
+		server->listen(message);
 	}
 	catch (const core::InterruptException& exc)
 	{
@@ -165,7 +161,10 @@ void StartServerCommand::retrieve_args(
 			}
 			else if (!this->_ipv4_regex.match(address))
 			{
-				throw core::CommandError(this->_addr_flag->get_raw() + " is invalid address");
+				throw core::CommandError(
+					this->_addr_flag->get_raw() + " is invalid address",
+					_ERROR_DETAILS_
+				);
 			}
 		}
 
@@ -182,14 +181,18 @@ void StartServerCommand::retrieve_args(
 		}
 		else
 		{
-			throw core::CommandError(this->_port_flag->get_raw() + " is invalid port");
+			throw core::CommandError(
+				this->_port_flag->get_raw() + " is invalid port",
+				_ERROR_DETAILS_
+			);
 		}
 	}
 
 	if (!this->_threads_flag->valid())
 	{
 		throw core::CommandError(
-			"threads count is not a valid positive integer: " + this->_threads_flag->get_raw()
+			"threads count is not a valid positive integer: " + this->_threads_flag->get_raw(),
+			_ERROR_DETAILS_
 		);
 	}
 

@@ -1,7 +1,7 @@
 /**
  * core/mime_types.h
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
  * Purpose:
  * 	Guess the MIME type of a file.
@@ -36,6 +36,8 @@
 
 __MIME_BEGIN__
 
+// TESTME: ext_from_file_name
+//
 /// Returns extension from file name,
 ///		i.e. 'foo.bar' - 'bar' will be returned.
 ///
@@ -43,6 +45,8 @@ __MIME_BEGIN__
 /// @return extension of given file's name.
 extern std::string ext_from_file_name(const std::string& file_name);
 
+// TESTME: ext_from_path
+//
 /// Returns extension from file path,
 ///		i.e. 'path/to/foo.bar' - 'bar' will be returned.
 ///
@@ -50,6 +54,8 @@ extern std::string ext_from_file_name(const std::string& file_name);
 /// @return extension of given file's path.
 extern std::string ext_from_path(const std::string& path);
 
+// TESTME: guess_content_type
+//
 /// Returns content type from file path.
 ///
 /// @param _path: path to analyze.

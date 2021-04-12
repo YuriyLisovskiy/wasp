@@ -1,9 +1,9 @@
 /**
- * apps/xalwart.h
+ * conf/xalwart.h
  *
  * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
- * Purpose: an implementation of main application.
+ * An implementation of main application.
  */
 
 #pragma once
@@ -18,7 +18,7 @@
 #include "../conf/settings.h"
 
 
-__APPS_BEGIN__
+__CONF_BEGIN__
 
 class MainApplication
 {
@@ -86,4 +86,4 @@ public:
 	void execute(int argc, char** argv);
 };
 
-__APPS_END__
+__CONF_END__

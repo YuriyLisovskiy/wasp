@@ -26,7 +26,7 @@
 #include "./_def_.h"
 
 // Framework libraries.
-#include "../apps/abc.h"
+#include "./abc.h"
 #include "../middleware/abc.h"
 #include "../urls/url.h"
 
@@ -65,7 +65,7 @@ public:
 	//
 	// ROOT_MODULE is the first installed module by default, it can
 	// be overridden in project settings.
-	std::shared_ptr<apps::IModuleConfig> ROOT_MODULE;
+	std::shared_ptr<IModuleConfig> ROOT_MODULE;
 
 	// Vector of patterns which will be loaded from ROOT_MODULE.
 	// To change this setting, setup ROOT_MODULE in your project
@@ -75,7 +75,7 @@ public:
 	// List of ModuleConfig-derived objects representing modules.
 	// Order is required. The first item is interpreted as main
 	// module configuration.
-	std::vector<std::shared_ptr<apps::IModuleConfig>> INSTALLED_MODULES;
+	std::vector<std::shared_ptr<IModuleConfig>> INSTALLED_MODULES;
 
 	// Engine for rendering templates.
 	std::unique_ptr<render::IEngine> TEMPLATE_ENGINE;
@@ -250,7 +250,7 @@ public:
 	);
 
 	[[nodiscard]]
-	std::shared_ptr<apps::IModuleConfig> get_module(const std::string& full_name) const;
+	std::shared_ptr<IModuleConfig> get_module(const std::string& full_name) const;
 
 	[[nodiscard]]
 	std::shared_ptr<middleware::IMiddleware> get_middleware(const std::string& full_name) const;
@@ -278,7 +278,7 @@ public:
 	}
 
 protected:
-	template <apps::ModuleConfigType ModuleConfigT>
+	template <module_config_type ModuleConfigT>
 	void module(const std::string& custom_name="")
 	{
 		auto name = this->get_name_or<ModuleConfigT>(custom_name);
@@ -287,7 +287,7 @@ protected:
 			this->LOGGER->warning("module '" + name + "' was overwritten");
 		}
 
-		this->_modules[name] = [this, name]() -> std::shared_ptr<apps::IModuleConfig> {
+		this->_modules[name] = [this, name]() -> std::shared_ptr<IModuleConfig> {
 			auto module = std::make_shared<ModuleConfigT>(this);
 			module->init(name);
 			return module;
@@ -349,7 +349,7 @@ private:
 
 	std::map<
 		std::string,
-		std::function<std::shared_ptr<apps::IModuleConfig>()>
+		std::function<std::shared_ptr<IModuleConfig>()>
 	> _modules;
 
 	std::map<

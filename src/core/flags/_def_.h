@@ -10,6 +10,7 @@
 
 #include "../_def_.h"
 
+// TESTME: flags module.
 
 // xw::core::flags
 #define __FLAGS_BEGIN__ __CORE_BEGIN__ namespace flags {

@@ -1,9 +1,9 @@
 /**
- * apps/abs.h
+ * conf/abs.h
  *
  * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
- * Purpose: abstract base classes for apps module.
+ * Abstract base classes for `conf` module.
  */
 
 #pragma once
@@ -19,7 +19,7 @@
 #include "../commands/base.h"
 
 
-__APPS_BEGIN__
+__CONF_BEGIN__
 
 class IModuleConfig
 {
@@ -34,10 +34,10 @@ public:
 };
 
 template <typename T>
-concept ModuleConfigType = std::is_base_of_v<IModuleConfig, T>;
+concept module_config_type = std::is_base_of_v<IModuleConfig, T>;
 
 const re::Regex _R_CONFIG_NAME = re::Regex(
 	R"((((M|m)odule)|((C|c)onfig)|((M|m)odule_*(C|c)onfig))$)"
 );
 
-__APPS_END__
+__CONF_END__

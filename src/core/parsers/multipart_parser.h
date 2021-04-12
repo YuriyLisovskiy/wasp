@@ -1,9 +1,9 @@
 /**
  * core/parsers/multipart_parser.h
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
- * Purpose: parses multipart/form-data http request.
+ * multipart/form-data parser.
  */
 
 #pragma once
@@ -20,6 +20,7 @@
 
 __PARSERS_BEGIN__
 
+// TESTME: multipart_parser
 struct multipart_parser final
 {
 	std::string media_root;
@@ -50,7 +51,29 @@ struct multipart_parser final
 
 	};
 
+	// Constructs parser from media root.
+	//
+	// `media_root`: path where file should be saved.
+	//
+	// !IMPORTANT! The parser does not save file, but
+	// only builds path to future file location.
+	explicit multipart_parser(const std::string& media_root="");
+
+	// Appends non-file parameter to the result.
+	//
+	// `key`: name of the parameter.
+	// `value`: actual value of the parameter.
 	void append_parameter(const std::string& key, const std::string& value);
+
+	// Creates `UploadedFile` object from given bytes and
+	// meta information and appends it to the result.
+	//
+	// `key`: name of the parameter.
+	// `file_name`: name of parsed file.
+	// `content_type`: content type of the file.
+	// `boundary`: boundary name.
+	// `content_disposition`: content disposition string.
+	// `data`: actual content of the file in bytes.
 	void append_file(
 		const std::string& key,
 		const std::string& file_name,
@@ -60,10 +83,24 @@ struct multipart_parser final
 		std::vector<unsigned char>& data
 	);
 
+	// Retrieves boundary name from Content-Type header.
+	//
+	// Throws `core::MultiPartParserError` if Content-Type
+	// is not `multipart` or if retrieved boundary is empty.
+	//
+	// `content_type`: value of Content-Type header.
 	static std::string get_boundary(const std::string& content_type);
+
+	// Checks if boundaries are equal.
+	//
+	// Throws `core::MultiPartParserError` if boundaries are
+	// different.
 	static void assert_boundary(const std::string& actual, const std::string& expected);
 
-	explicit multipart_parser(const std::string& mediaRoot = "");
+	// Parses input data. Extracts request's parameters.
+	//
+	// `content_type`: data content type.
+	// `body`: input data to parse.
 	void parse(const std::string& content_type, const std::string& body);
 };
 

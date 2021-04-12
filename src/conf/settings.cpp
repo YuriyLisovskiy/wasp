@@ -94,7 +94,7 @@ std::shared_ptr<orm::abc::ISQLDriver> Settings::build_custom_database(
 	return nullptr;
 }
 
-std::shared_ptr<apps::IModuleConfig> Settings::get_module(
+std::shared_ptr<IModuleConfig> Settings::get_module(
 	const std::string& full_name
 ) const
 {

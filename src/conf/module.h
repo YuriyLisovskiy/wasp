@@ -1,10 +1,10 @@
 /**
- * apps/module.h
+ * conf/module.h
  *
  * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
- * Purpose:
- * 	Represents module configuration with urls and commands.
+ * Configuration of separate module with urls, commands and other
+ * stuff.
  */
 
 #pragma once
@@ -19,13 +19,13 @@
 #include "./abc.h"
 #include "../views/view.h"
 #include "../urls/url.h"
-#include "../commands/app_command.h"
+#include "../commands/command.h"
 
 
-__APPS_BEGIN__
+__CONF_BEGIN__
 
-/// Derived class must contain constructor with
-/// pointer to conf::Settings parameter.
+// Derived class must contain constructor with
+// pointer to conf::Settings parameter.
 class ModuleConfig : public IModuleConfig
 {
 private:
@@ -106,18 +106,14 @@ protected:
 		});
 	}
 
-	template <typename CommandT, typename = std::enable_if<std::is_base_of<cmd::AppCommand, CommandT>::value>>
+	template <cmd::command_type CommandT>
 	inline void command()
 	{
 		auto cmd = std::make_shared<CommandT>(this, this->settings);
 		this->_commands.push_back(cmd);
 	}
 
-	template <
-		typename CommandT,
-		typename = std::enable_if<std::is_base_of<cmd::AppCommand, CommandT>::value>,
-		typename ...Args
-	>
+	template <cmd::command_type CommandT, typename ...Args>
 	inline void command(Args&& ...args)
 	{
 		auto cmd = std::make_shared<CommandT>(std::forward<Args>(args)...);
@@ -147,4 +143,4 @@ public:
 	virtual void init(const std::string& name);
 };
 
-__APPS_END__
+__CONF_END__

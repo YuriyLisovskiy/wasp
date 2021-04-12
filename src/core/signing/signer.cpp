@@ -1,7 +1,7 @@
 /**
  * core/signing/signer.cpp
  *
- * Copyright (c) 2020 Yuriy Lisovskiy
+ * Copyright (c) 2020-2021 Yuriy Lisovskiy
  */
 
 #include "./signer.h"
@@ -14,17 +14,10 @@
 #include "../../utils/crypto/hmac.h"
 
 
-__SIGNING_INTERNAL_BEGIN__
-
-re::Regex _SEP_UNSAFE_REGEX = re::Regex(R"([A-z0-9-_=]*)");
-
-__SIGNING_INTERNAL_END__
-
-
 __SIGNING_BEGIN__
 
 Signer::Signer(
-	const std::string& key, char sep, const std::string& salt
+	const std::string& key, char sep, const std::string& salt, utils::crypto::IHash* hash_func
 )
 {
 	if (key.empty())
@@ -32,10 +25,11 @@ Signer::Signer(
 		throw ValueError("Signer: key must not be empty", _ERROR_DETAILS_);
 	}
 
+	this->_hash_func = hash_func;
 	this->_key = key;
 	this->_sep = sep;
 	this->_str_sep = std::string(1, this->_sep);
-	auto sep_unsafe_regex = internal::_SEP_UNSAFE_REGEX;
+	auto sep_unsafe_regex = _SEP_UNSAFE_REGEX;
 	if (sep_unsafe_regex.match(this->_str_sep))
 	{
 		throw ValueError(
@@ -46,7 +40,7 @@ Signer::Signer(
 
 	if (salt.empty())
 	{
-		this->_salt = "core.signing.Signer";
+		this->_salt = "core::signing::Signer";
 	}
 	else
 	{
@@ -56,24 +50,18 @@ Signer::Signer(
 
 std::string Signer::signature(const std::string& value)
 {
-	auto hmac = utils::crypto::salted_hmac(
-		this->_salt + "signer", value, this->_key
-	);
-	auto result = hmac->hex_digest();
-	delete hmac;
-	return result;
-}
-
-std::string Signer::sign(const std::string& value)
-{
-	return value + this->_sep + this->signature(value);
+	return utils::crypto::salted_hmac(
+		this->_salt + "signer", value, this->_key, this->_hash_func
+	)->hex_digest();
 }
 
 std::string Signer::unsign(const std::string& signed_value)
 {
 	if (signed_value.find(this->_sep) == std::string::npos)
 	{
-		throw BadSignature("No \"" + this->_str_sep + "\" found in value");
+		throw BadSignature(
+			"no \"" + this->_str_sep + "\" found in value", _ERROR_DETAILS_
+		);
 	}
 
 	auto value_sig = str::rsplit(signed_value, this->_sep, 1);
@@ -82,7 +70,9 @@ std::string Signer::unsign(const std::string& signed_value)
 		return value_sig[0];
 	}
 
-	throw BadSignature("Signature \"" + this->_str_sep + "\" does not match");
+	throw BadSignature(
+		"signature \"" + this->_str_sep + "\" does not match", _ERROR_DETAILS_
+	);
 }
 
 __SIGNING_END__

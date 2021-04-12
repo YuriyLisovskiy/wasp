@@ -1,7 +1,7 @@
 /**
  * core/uploaded_file.h
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
  * Purpose:
  * 	Represents some file data that the user submitted with a form.
@@ -18,6 +18,7 @@
 
 __FILES_BEGIN__
 
+// TESTME: UploadedFile
 class UploadedFile
 {
 private:

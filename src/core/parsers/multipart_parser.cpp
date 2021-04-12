@@ -1,7 +1,7 @@
 /**
  * core/parsers/multipart_parser.cpp
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  */
 
 #include "./multipart_parser.h"
@@ -54,7 +54,7 @@ std::string multipart_parser::get_boundary(const std::string& content_type)
 {
 	if (!content_type.starts_with("multipart/"))
 	{
-		throw core::MultiPartParserError("Invalid Content-Type: " + content_type, _ERROR_DETAILS_);
+		throw core::MultiPartParserError("invalid Content-Type: " + content_type, _ERROR_DETAILS_);
 	}
 
 	std::string boundary;
@@ -67,26 +67,26 @@ std::string multipart_parser::get_boundary(const std::string& content_type)
 	if (boundary.empty())
 	{
 		throw core::MultiPartParserError(
-			"Unable to parse request body: boundary is empty", _ERROR_DETAILS_
+			"unable to parse request body: boundary is empty", _ERROR_DETAILS_
 		);
 	}
 
-	return str::ltrim(boundary, "-");
+	return str::ltrim(boundary, '-');
 }
 
 void multipart_parser::assert_boundary(const std::string& actual, const std::string& expected)
 {
-	if (str::trim(actual, "-") != str::trim(expected, "-"))
+	if (str::trim(actual, '-') != str::trim(expected, '-'))
 	{
 		throw core::MultiPartParserError(
-			"Unable to parse request body: invalid boundary", _ERROR_DETAILS_
+			"unable to parse request body: invalid boundary", _ERROR_DETAILS_
 		);
 	}
 }
 
 multipart_parser::multipart_parser(const std::string& media_root)
 {
-	this->media_root = str::rtrim(media_root, "/");
+	this->media_root = str::rtrim(media_root, '/');
 }
 
 void multipart_parser::parse(const std::string& content_type, const std::string& body)
@@ -107,7 +107,8 @@ void multipart_parser::parse(const std::string& content_type, const std::string&
 				if (input == '\r' || input == '\n')
 				{
 					throw core::MultiPartParserError(
-						"Unable to parse request body: invalid boundary structure", _ERROR_DETAILS_
+						"unable to parse request body: invalid boundary structure",
+						_ERROR_DETAILS_
 					);
 				}
 				if (input == '-')
@@ -143,7 +144,8 @@ void multipart_parser::parse(const std::string& content_type, const std::string&
 				else
 				{
 					throw core::MultiPartParserError(
-						"Unable to parse request body: invalid boundary ending", _ERROR_DETAILS_
+						"unable to parse request body: invalid boundary ending",
+						_ERROR_DETAILS_
 					);
 				}
 				break;
@@ -165,7 +167,8 @@ void multipart_parser::parse(const std::string& content_type, const std::string&
 					else
 					{
 						throw core::MultiPartParserError(
-							"Unable to parse request body: invalid content disposition", _ERROR_DETAILS_
+							"unable to parse request body: invalid content disposition",
+							_ERROR_DETAILS_
 						);
 					}
 				}
@@ -181,7 +184,8 @@ void multipart_parser::parse(const std::string& content_type, const std::string&
 					else
 					{
 						throw core::MultiPartParserError(
-							"Unable to parse request body: invalid content disposition", _ERROR_DETAILS_
+							"unable to parse request body: invalid content disposition",
+							_ERROR_DETAILS_
 						);
 					}
 				}
@@ -201,7 +205,8 @@ void multipart_parser::parse(const std::string& content_type, const std::string&
 					else
 					{
 						throw core::MultiPartParserError(
-							"Unable to parse request body: invalid content disposition", _ERROR_DETAILS_
+							"unable to parse request body: invalid content disposition",
+							_ERROR_DETAILS_
 						);
 					}
 				}
@@ -228,7 +233,8 @@ void multipart_parser::parse(const std::string& content_type, const std::string&
 					else
 					{
 						throw core::MultiPartParserError(
-							"Unable to parse request body: invalid content disposition", _ERROR_DETAILS_
+							"unable to parse request body: invalid content disposition",
+							_ERROR_DETAILS_
 						);
 					}
 				}
@@ -242,14 +248,16 @@ void multipart_parser::parse(const std::string& content_type, const std::string&
 					else
 					{
 						throw core::MultiPartParserError(
-							"Unable to parse request body: invalid content disposition", _ERROR_DETAILS_
+							"unable to parse request body: invalid content disposition",
+							_ERROR_DETAILS_
 						);
 					}
 				}
 				else
 				{
 					throw core::MultiPartParserError(
-						"Unable to parse request body: invalid content disposition", _ERROR_DETAILS_
+						"unable to parse request body: invalid content disposition",
+						_ERROR_DETAILS_
 					);
 				}
 				break;
@@ -264,14 +272,16 @@ void multipart_parser::parse(const std::string& content_type, const std::string&
 					else
 					{
 						throw core::MultiPartParserError(
-							"Unable to parse filename: missing \" before filename", _ERROR_DETAILS_
+							"unable to parse filename: missing \" before filename",
+							_ERROR_DETAILS_
 						);
 					}
 				}
 				else if (input == '\r')
 				{
 					throw core::MultiPartParserError(
-						"Unable to parse filename: invalid filename structure", _ERROR_DETAILS_
+						"unable to parse filename: invalid filename structure",
+						_ERROR_DETAILS_
 					);
 				}
 				break;
@@ -289,14 +299,16 @@ void multipart_parser::parse(const std::string& content_type, const std::string&
 						else
 						{
 							throw core::MultiPartParserError(
-								"Unable to parse filename: missing end of line", _ERROR_DETAILS_
+								"unable to parse filename: missing end of line",
+								_ERROR_DETAILS_
 							);
 						}
 					}
 					else
 					{
 						throw core::MultiPartParserError(
-							"Unable to parse filename: control symbol \\r", _ERROR_DETAILS_
+							"unable to parse filename: control symbol \\r",
+							_ERROR_DETAILS_
 						);
 					}
 				}
@@ -316,14 +328,16 @@ void multipart_parser::parse(const std::string& content_type, const std::string&
 					else
 					{
 						throw core::MultiPartParserError(
-							"Unable to parse content type: invalid content type structure", _ERROR_DETAILS_
+							"unable to parse content type: invalid content type structure",
+							_ERROR_DETAILS_
 						);
 					}
 				}
 				else if (input == '\r')
 				{
 					throw core::MultiPartParserError(
-						"Unable to parse content type: invalid content type structure", _ERROR_DETAILS_
+						"unable to parse content type: invalid content type structure",
+						_ERROR_DETAILS_
 					);
 				}
 				break;
@@ -338,7 +352,8 @@ void multipart_parser::parse(const std::string& content_type, const std::string&
 					else
 					{
 						throw core::MultiPartParserError(
-							"Unable to parse content type: missing end of line", _ERROR_DETAILS_
+							"unable to parse content type: missing end of line",
+							_ERROR_DETAILS_
 						);
 					}
 				}
@@ -358,7 +373,8 @@ void multipart_parser::parse(const std::string& content_type, const std::string&
 						if (end_pos == std::string::npos)
 						{
 							throw core::MultiPartParserError(
-								"Unable to parse request body: invalid content structure", _ERROR_DETAILS_
+								"unable to parse request body: invalid content structure",
+								_ERROR_DETAILS_
 							);
 						}
 
@@ -367,7 +383,8 @@ void multipart_parser::parse(const std::string& content_type, const std::string&
 					else
 					{
 						throw core::MultiPartParserError(
-							"Unable to parse request body: invalid content structure", _ERROR_DETAILS_
+							"unable to parse request body: invalid content structure",
+							_ERROR_DETAILS_
 						);
 					}
 				}
@@ -378,7 +395,8 @@ void multipart_parser::parse(const std::string& content_type, const std::string&
 					if (input != '\r')
 					{
 						throw core::MultiPartParserError(
-							"Unable to parse request body: invalid content structure", _ERROR_DETAILS_
+							"unable to parse request body: invalid content structure",
+							_ERROR_DETAILS_
 						);
 					}
 
@@ -386,7 +404,8 @@ void multipart_parser::parse(const std::string& content_type, const std::string&
 					if (input != '\n')
 					{
 						throw core::MultiPartParserError(
-							"Unable to parse request body: invalid content structure", _ERROR_DETAILS_
+							"unable to parse request body: invalid content structure",
+							_ERROR_DETAILS_
 						);
 					}
 
@@ -428,11 +447,11 @@ void multipart_parser::parse(const std::string& content_type, const std::string&
 				}
 				break;
 			default:
-				throw core::MultiPartParserError("Unable to parse request body", _ERROR_DETAILS_);
+				throw core::MultiPartParserError("unable to parse request body", _ERROR_DETAILS_);
 		}
 	}
 
-	throw core::MultiPartParserError("Unable to parse request body", _ERROR_DETAILS_);
+	throw core::MultiPartParserError("unable to parse request body", _ERROR_DETAILS_);
 }
 
 __PARSERS_END__

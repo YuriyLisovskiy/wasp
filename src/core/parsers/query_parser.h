@@ -1,9 +1,9 @@
 /**
  * core/parsers/query_parser.h
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
- * Purpose: parses URL's query.
+ * URL's query parser.
  */
 
 #pragma once
@@ -21,7 +21,8 @@
 
 __PARSERS_BEGIN__
 
-struct query_parser final
+// TESTME: url_query_parser
+struct url_query_parser final
 {
 	enum state
 	{
@@ -32,8 +33,18 @@ struct query_parser final
 	collections::Dict<std::string, std::string> dict;
 	collections::MultiValueDict<std::string, std::string> multi_dict;
 
-	query_parser() = default;
+	// Default constructor.
+	url_query_parser() = default;
+
+	// Appends parsed parameter to the result.
+	//
+	// `key`: name of the parameter.
+	// `value`: actual value of the parameter.
 	void append_parameter(const std::string& key, const std::string& value);
+
+	// Parses URL's query. Splits query string into key-value pairs.
+	//
+	// `data`: an actual query.
 	void parse(const std::string& data);
 };
 

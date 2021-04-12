@@ -1,9 +1,9 @@
 /**
  * core/parsers/cookie_parser.h
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
- * Purpose: parses cookies from http request.
+ * HTTP cookies' parser.
  */
 
 #pragma once
@@ -18,6 +18,7 @@
 
 __PARSERS_BEGIN__
 
+// TESTME: cookie_parser
 struct cookie_parser final
 {
 	enum state
@@ -28,6 +29,9 @@ struct cookie_parser final
 
 	std::map<std::string, std::string> result;
 
+	// Splits cookie header to map.
+	//
+	// `content`: input string content.
 	void parse(const std::string& content);
 };
 

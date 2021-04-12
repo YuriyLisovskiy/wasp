@@ -15,12 +15,12 @@
 #include "./_def_.h"
 
 // Framework libraries.
-#include "../apps/module.h"
+#include "../conf/module.h"
 
 
 __MANAGEMENT_BEGIN__
 
-class CoreManagementModuleConfig final : public apps::ModuleConfig
+class CoreManagementModuleConfig final : public conf::ModuleConfig
 {
 private:
 	std::function<std::shared_ptr<net::IServer>(

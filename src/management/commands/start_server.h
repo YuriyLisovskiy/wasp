@@ -15,12 +15,12 @@
 #include "./_def_.h"
 
 // Framework libraries.
-#include "../../commands/app_command.h"
+#include "../../commands/command.h"
 
 
 __MANAGEMENT_COMMANDS_BEGIN__
 
-class StartServerCommand final : public xw::cmd::AppCommand
+class StartServerCommand final : public xw::cmd::Command
 {
 private:
 	const std::string DEFAULT_IPV4_HOST = "127.0.0.1";
@@ -58,7 +58,7 @@ protected:
 
 public:
 	explicit StartServerCommand(
-		apps::IModuleConfig* config,
+		conf::IModuleConfig* config,
 		conf::Settings* settings,
 		std::function<std::shared_ptr<net::IServer>(
 			log::ILogger*,

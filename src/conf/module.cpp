@@ -1,5 +1,5 @@
 /**
- * apps/module.cpp
+ * conf/module.cpp
  *
  * Copyright (c) 2019-2021 Yuriy Lisovskiy
  */
@@ -7,7 +7,7 @@
 #include "./module.h"
 
 
-__APPS_BEGIN__
+__CONF_BEGIN__
 
 ModuleConfig::ModuleConfig(
 	std::string module_path, conf::Settings* settings
@@ -76,4 +76,4 @@ void ModuleConfig::init(const std::string& name)
 	}
 }
 
-__APPS_END__
+__CONF_END__

@@ -29,7 +29,7 @@ TEST(QueryParserTestCase, get)
 		std::pair<std::string, std::string>("hello_key", "hello_value"),
 		std::pair<std::string, std::string>("world_key", "world_value"),
 	};
-	parsers::query_parser parser;
+	parsers::url_query_parser parser;
 	parser.parse("hello=world&world=hello&hello_key=hello_value&world_key=world_value");
 
 	http::HttpRequest::Parameters<std::string, std::string> actual(parser.dict, parser.multi_dict);
@@ -47,7 +47,7 @@ TEST(QueryParserTestCase, getList)
 	auto expected = std::vector<std::string> {
 		"world", "hello", "hello_value"
 	};
-	parsers::query_parser parser;
+	parsers::url_query_parser parser;
 	parser.parse("hello=world&hello=hello&hello=hello_value");
 	http::HttpRequest::Parameters<std::string, std::string> parameters(parser.dict, parser.multi_dict);
 
@@ -71,7 +71,7 @@ TEST(QueryParserTestCase, keys)
 		"world",
 		"world_key",
 	};
-	parsers::query_parser parser;
+	parsers::url_query_parser parser;
 	parser.parse("hello=world&world=hello&hello_key=hello_value&world_key=world_value");
 	http::HttpRequest::Parameters<std::string, std::string> parsed(parser.dict, parser.multi_dict);
 	auto actual = parsed.keys();
@@ -82,7 +82,7 @@ TEST(QueryParserTestCase, keys)
 TEST(QueryParserTestCase, size)
 {
 	auto expected = 4;
-	parsers::query_parser parser;
+	parsers::url_query_parser parser;
 	parser.parse("hello=world&world=hello&hello_key=hello_value&world_key=world_value");
 	http::HttpRequest::Parameters<std::string, std::string> parsed(parser.dict, parser.multi_dict);
 	auto actual = parsed.size();
@@ -92,7 +92,7 @@ TEST(QueryParserTestCase, size)
 
 TEST(QueryParserTestCase, empty)
 {
-	parsers::query_parser parser;
+	parsers::url_query_parser parser;
 	parser.parse("");
 	http::HttpRequest::Parameters<std::string, std::string> parsed(parser.dict, parser.multi_dict);
 
