@@ -40,13 +40,12 @@ private:
 	inline std::shared_ptr<IModuleConfig> _find_module(const std::string& module)
 	{
 		auto result = std::find_if(
-			this->settings->INSTALLED_MODULES.begin(),
-			this->settings->INSTALLED_MODULES.end(),
+			this->settings->MODULES.begin(), this->settings->MODULES.end(),
 			[module](const std::shared_ptr<IModuleConfig>& entry) -> bool {
 				return entry->get_name() == module;
 			}
 		);
-		if (result == this->settings->INSTALLED_MODULES.end())
+		if (result == this->settings->MODULES.end())
 		{
 			throw core::ImproperlyConfigured(
 				"module is used but was not registered: " + module, _ERROR_DETAILS_

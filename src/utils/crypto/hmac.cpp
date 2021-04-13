@@ -1,7 +1,7 @@
 /**
  * utils/crypto/hmac.cpp
  *
- * Copyright (c) 2020 Yuriy Lisovskiy
+ * Copyright (c) 2020-2021 Yuriy Lisovskiy
  */
 
 #include "./hmac.h"
@@ -17,13 +17,18 @@ __CRYPTO_BEGIN__
 
 HMAC::HMAC(std::string key, IHash* hash_func)
 {
-	if (!hash_func)
+	if (hash_func)
 	{
-		hash_func = new MD5();
+		this->_outer = hash_func->clone();
+		this->_inner = hash_func->clone();
+	}
+	else
+	{
+		MD5 md5;
+		this->_outer = md5.clone();
+		this->_inner = md5.clone();
 	}
 
-	this->_outer = hash_func->clone();
-	this->_inner = hash_func->clone();
 	this->_size = this->_inner->size();
 	this->_block_size = this->_inner->block_size();
 	this->_i_pad = new unsigned char[this->_block_size]();

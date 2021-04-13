@@ -14,6 +14,7 @@
 #include <xalwart.core/result.h>
 #include <xalwart.core/string_utils.h>
 #include <xalwart.core/utility.h>
+#include <xalwart.core/path.h>
 #include <xalwart.core/yaml/yaml-cpp/yaml.h>
 
 // Render libraries.
@@ -21,6 +22,7 @@
 
 // ORM libraries.
 #include <xalwart.orm/client.h>
+#include <xalwart.orm/sqlite3/driver.h>
 
 // Module definitions.
 #include "./_def_.h"
@@ -75,7 +77,7 @@ public:
 	// List of ModuleConfig-derived objects representing modules.
 	// Order is required. The first item is interpreted as main
 	// module configuration.
-	std::vector<std::shared_ptr<IModuleConfig>> INSTALLED_MODULES;
+	std::vector<std::shared_ptr<IModuleConfig>> MODULES;
 
 	// Engine for rendering templates.
 	std::unique_ptr<render::IEngine> TEMPLATE_ENGINE;
@@ -237,17 +239,42 @@ public:
 	virtual ~Settings() = default;
 	void prepare();
 
-	virtual void register_modules();
-	virtual void register_middleware();
-	virtual void register_libraries();
-	virtual void register_loaders();
+	inline virtual void register_modules()
+	{
+	}
 
-	virtual std::shared_ptr<orm::abc::ISQLDriver> build_sqlite3_database(
+	inline virtual void register_middleware()
+	{
+	}
+
+	inline virtual void register_libraries()
+	{
+	}
+
+	inline virtual void register_loaders()
+	{
+	}
+
+	inline virtual std::shared_ptr<orm::abc::ISQLDriver> build_sqlite3_database(
 		const std::string& name, const std::string& filepath
-	);
-	virtual std::shared_ptr<orm::abc::ISQLDriver> build_custom_database(
+	)
+	{
+		std::shared_ptr<orm::abc::ISQLDriver> db;
+		#ifdef USE_SQLITE3
+			auto file_path = path::join(this->BASE_DIR, filepath);
+			db = std::make_shared<orm::sqlite3::Driver>(file_path.c_str());
+		#else
+			db = nullptr;
+		#endif
+		return db;
+	}
+
+	inline virtual std::shared_ptr<orm::abc::ISQLDriver> build_custom_database(
 		const std::string& name, const YAML::Node& database
-	);
+	)
+	{
+		return nullptr;
+	}
 
 	[[nodiscard]]
 	std::shared_ptr<IModuleConfig> get_module(const std::string& full_name) const;
@@ -260,9 +287,6 @@ public:
 
 	[[nodiscard]]
 	std::shared_ptr<render::ILoader> get_loader(const std::string& full_name) const;
-
-	[[nodiscard]]
-	std::shared_ptr<orm::abc::ISQLDriver> get_database(const std::string& full_name) const;
 
 	template <class T>
 	[[nodiscard]]

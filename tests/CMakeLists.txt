@@ -26,6 +26,7 @@ function(add_tests SUB_DIR SUB_NAME)
         gtest
         ${FRAMEWORK_NAME}.core-0.0.1
         ${FRAMEWORK_NAME}.render-0.0.1
+        ${FRAMEWORK_NAME}.orm-0.0.1
     )
 endfunction()
 

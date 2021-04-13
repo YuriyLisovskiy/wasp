@@ -32,6 +32,12 @@ set(FULL_LIBRARY_NAME ${LIBRARY_NAME}-${LIBRARY_VERSION})
 add_library(${FULL_LIBRARY_NAME} SHARED ${SOURCES})
 target_include_directories(${FULL_LIBRARY_NAME} PUBLIC ${GNU_INCLUDE_DIR})
 
+if (USE_SQLITE3)
+    # Use sqlite3 driver.
+    add_compile_definitions(USE_SQLITE3)
+    target_link_libraries(${FULL_LIBRARY_NAME} PUBLIC sqlite3)
+endif()
+
 # Install library.
 install(
     TARGETS ${FULL_LIBRARY_NAME}

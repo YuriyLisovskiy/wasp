@@ -91,7 +91,7 @@ void MainApplication::_setup_commands()
 	// Retrieve commands from INSTALLED_MODULES and
 	// check if modules' commands do not override
 	// settings commands.
-	for (auto& installed_module : this->settings->INSTALLED_MODULES)
+	for (auto& installed_module : this->settings->MODULES)
 	{
 		this->_extend_settings_commands_or_error(
 			installed_module->get_commands(),
@@ -153,14 +153,45 @@ void MainApplication::_perform_checks()
 	std::cout << "Performing checks..." << std::endl;
 	if (!this->settings->LOGGER)
 	{
-		throw core::ImproperlyConfigured("LOGGER instance must be configured");
+		throw core::ImproperlyConfigured("'logger' must be configured");
 	}
 
 	size_t err_count = 0;
+	if (this->settings->BASE_DIR.empty())
+	{
+		this->settings->LOGGER->error(
+			"'base_dir' must not be empty in order to use the application."
+		);
+		err_count++;
+	}
+	else if (!path::exists(this->settings->BASE_DIR))
+	{
+		this->settings->LOGGER->error(
+			"'base_dir' must exist in order to use the application."
+		);
+		err_count++;
+	}
+
+	if (this->settings->SECRET_KEY.empty())
+	{
+		this->settings->LOGGER->error(
+			"'secret_key' must be set in order to use the application."
+		);
+		err_count++;
+	}
+
+	if (!this->settings->DB)
+	{
+		this->settings->LOGGER->error(
+			"No database was set, at least one database must be configured in order to use the application"
+		);
+		err_count++;
+	}
+
 	if (!this->settings->TEMPLATE_ENGINE)
 	{
 		this->settings->LOGGER->error(
-			"TEMPLATE_ENGINE must be configured in order to use the application."
+			"'template_engine' must be configured in order to use the application."
 		);
 		err_count++;
 	}
@@ -170,37 +201,14 @@ void MainApplication::_perform_checks()
 		this->settings->LOGGER->warning("You have not added any middleware.");
 	}
 
-	if (this->settings->BASE_DIR.empty())
-	{
-		this->settings->LOGGER->error(
-			"BASE_DIR must not be empty in order to use the application."
-		);
-		err_count++;
-	}
-	else if (!path::exists(this->settings->BASE_DIR))
-	{
-		this->settings->LOGGER->error(
-			"BASE_DIR must exist in order to use the application."
-		);
-		err_count++;
-	}
-
-	if (this->settings->INSTALLED_MODULES.empty())
+	if (this->settings->MODULES.empty())
 	{
 		this->settings->LOGGER->warning(
-			"You have not added any module to INSTALLED_MODULES setting."
+			"You have not added any module to 'modules' setting."
 		);
 	}
 
-	if (this->settings->SECRET_KEY.empty())
-	{
-		this->settings->LOGGER->error(
-			"SECRET_KEY must be set in order to use the application."
-		);
-		err_count++;
-	}
-
-	for (auto& module : this->settings->INSTALLED_MODULES)
+	for (auto& module : this->settings->MODULES)
 	{
 		if (!module->ready())
 		{
