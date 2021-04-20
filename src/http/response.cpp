@@ -37,7 +37,7 @@ HttpResponseBase::HttpResponseBase(
 	{
 		if (status < 100 || status > 599)
 		{
-			throw core::ValueError("HTTP status code must be an integer from 100 to 599.", _ERROR_DETAILS_);
+			throw ValueError("HTTP status code must be an integer from 100 to 599.", _ERROR_DETAILS_);
 		}
 
 		this->_status = status;
@@ -107,7 +107,7 @@ void HttpResponseBase::set_cookie(
 		auto ss_lower = str::lower(same_site_);
 		if (ss_lower != "lax" && ss_lower != "strict")
 		{
-			throw core::ValueError(R"(samesite must be "lax" or "strict".)");
+			throw ValueError(R"(samesite must be "lax" or "strict".)", _ERROR_DETAILS_);
 		}
 
 		same_site_ = same_site;
@@ -213,7 +213,7 @@ void HttpResponseBase::close()
 
 void HttpResponseBase::write(const std::string& content)
 {
-	throw core::RuntimeError("This HttpResponseBase instance is not writable", _ERROR_DETAILS_);
+	throw RuntimeError("This HttpResponseBase instance is not writable", _ERROR_DETAILS_);
 }
 
 void HttpResponseBase::flush()
@@ -222,7 +222,7 @@ void HttpResponseBase::flush()
 
 unsigned long int HttpResponseBase::tell()
 {
-	throw core::RuntimeError("This HttpResponseBase instance cannot tell its position", _ERROR_DETAILS_);
+	throw RuntimeError("This HttpResponseBase instance cannot tell its position", _ERROR_DETAILS_);
 }
 
 bool HttpResponseBase::readable()
@@ -242,7 +242,7 @@ bool HttpResponseBase::writable()
 
 void HttpResponseBase::write_lines(const std::vector<std::string>& lines)
 {
-	throw core::RuntimeError("This HttpResponseBase instance is not writable", _ERROR_DETAILS_);
+	throw RuntimeError("This HttpResponseBase instance is not writable", _ERROR_DETAILS_);
 }
 
 std::string HttpResponseBase::serialize_headers()
@@ -277,7 +277,7 @@ std::string& HttpResponseBase::operator[] (const std::string& key)
 	return this->_headers[key];
 }
 
-core::Error HttpResponseBase::err()
+Error HttpResponseBase::err()
 {
 	return this->_err;
 }
@@ -366,8 +366,9 @@ StreamingHttpResponse::StreamingHttpResponse(
 
 std::string StreamingHttpResponse::serialize()
 {
-	throw core::RuntimeError(
-		"This StreamingHttpResponse or its child instance cannot be serialized", _ERROR_DETAILS_
+	throw RuntimeError(
+		"This StreamingHttpResponse or its child instance cannot be serialized",
+		_ERROR_DETAILS_
 	);
 }
 
@@ -389,8 +390,8 @@ FileResponse::FileResponse(
 {
 	if (!path::exists(this->_file_path))
 	{
-		this->_err = core::Error(
-			core::FileDoesNotExistError, "file '" + this->_file_path + "' does not exist", _ERROR_DETAILS_
+		this->_err = Error(
+			FileDoesNotExistError, "file '" + this->_file_path + "' does not exist", _ERROR_DETAILS_
 		);
 	}
 	else
@@ -458,7 +459,7 @@ void FileResponse::_set_headers()
 	{
 		file_expr = "filename=\"" + encoding::encode(file_name, encoding::ascii) + "\"";
 	}
-	catch (const core::EncodingError& e)
+	catch (const EncodingError& e)
 	{
 		file_expr = "filename*=utf-8''" + encoding::quote(file_name);
 	}
@@ -503,15 +504,16 @@ HttpResponseRedirectBase::HttpResponseRedirectBase(
 {
 	if (status < 300 || status > 399)
 	{
-		throw core::ValueError("invalid status", _ERROR_DETAILS_);
+		throw ValueError("invalid status", _ERROR_DETAILS_);
 	}
 
 	this->set_header("Location", encoding::encode_url(redirect_to));
 	Url url(redirect_to);
 	if (!url.scheme().empty() && this->_allowed_schemes.find(url.scheme()) == this->_allowed_schemes.end())
 	{
-		this->_err = core::Error(
-			core::DisallowedRedirect, "Unsafe redirect to URL with protocol " + url.scheme(), _ERROR_DETAILS_
+		this->_err = Error(
+			DisallowedRedirect, "Unsafe redirect to URL with protocol " + url.scheme(),
+			_ERROR_DETAILS_
 		);
 	}
 }
@@ -556,7 +558,10 @@ void HttpResponseNotModified::set_content(const std::string& content)
 {
 	if (!content.empty())
 	{
-		throw core::AttributeError("You cannot set content to a 304 (Not Modified) response", _ERROR_DETAILS_);
+		throw AttributeError(
+			"You cannot set content to a 304 (Not Modified) response",
+			_ERROR_DETAILS_
+		);
 	}
 
 	this->_content = "";

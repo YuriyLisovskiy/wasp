@@ -10,15 +10,14 @@
 
 #include "../_def_.h"
 
+// xw::core
+#define __CORE_BEGIN__ __MAIN_NAMESPACE_BEGIN__ namespace core {
+#define __CORE_END__ } __MAIN_NAMESPACE_END__
 
 // xw::core::mime
-#define __MIME_BEGIN__ __CORE_BEGIN__ namespace mime {
-#define __MIME_END__ } __CORE_END__
+#define __CORE_MIME_BEGIN__ __CORE_BEGIN__ namespace mime {
+#define __CORE_MIME_END__ } __CORE_END__
 
-// xw::parsers
-#define __PARSERS_BEGIN__ __MAIN_NAMESPACE_BEGIN__ namespace parsers {
-#define __PARSERS_END__ } __MAIN_NAMESPACE_END__
-
-// xw::files
-#define __FILES_BEGIN__ __MAIN_NAMESPACE_BEGIN__ namespace files {
-#define __FILES_END__ } __MAIN_NAMESPACE_END__
+// xw::core::files
+#define __CORE_FILES_BEGIN__ __MAIN_NAMESPACE_BEGIN__ namespace files {
+#define __CORE_FILES_END__ } __MAIN_NAMESPACE_END__

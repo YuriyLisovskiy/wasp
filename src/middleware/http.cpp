@@ -25,7 +25,7 @@ ConditionalGetMiddleware::ConditionalGetMiddleware(
 {
 }
 
-core::Result<std::shared_ptr<http::IHttpResponse>> ConditionalGetMiddleware::process_response(
+Result<std::shared_ptr<http::IHttpResponse>> ConditionalGetMiddleware::process_response(
 	http::HttpRequest* request, http::IHttpResponse* response
 )
 {

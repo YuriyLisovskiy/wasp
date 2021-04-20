@@ -16,10 +16,10 @@
 #include <xalwart.core/collections/multi_dict.h>
 
 // Module definitions.
-#include "../_def_.h"
+#include "./_def_.h"
 
 
-__PARSERS_BEGIN__
+__CORE_PARSERS_BEGIN__
 
 // TESTME: url_query_parser
 struct url_query_parser final
@@ -48,4 +48,4 @@ struct url_query_parser final
 	void parse(const std::string& data);
 };
 
-__PARSERS_END__
+__CORE_PARSERS_END__

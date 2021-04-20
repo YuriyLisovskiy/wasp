@@ -14,10 +14,10 @@
 #include "../../utils/crypto/hmac.h"
 
 
-__SIGNING_BEGIN__
+__CORE_SIGNING_BEGIN__
 
 Signer::Signer(
-	const std::string& key, char sep, const std::string& salt, utils::crypto::IHash* hash_func
+	const std::string& key, char sep, const std::string& salt, crypto::IHash* hash_func
 )
 {
 	if (key.empty())
@@ -50,7 +50,7 @@ Signer::Signer(
 
 std::string Signer::signature(const std::string& value)
 {
-	return utils::crypto::salted_hmac(
+	return crypto::salted_hmac(
 		this->_salt + "signer", value, this->_key, this->_hash_func
 	)->hex_digest();
 }
@@ -75,4 +75,4 @@ std::string Signer::unsign(const std::string& signed_value)
 	);
 }
 
-__SIGNING_END__
+__CORE_SIGNING_END__

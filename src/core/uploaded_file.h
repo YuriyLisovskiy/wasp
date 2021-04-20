@@ -16,7 +16,7 @@
 #include "./_def_.h"
 
 
-__FILES_BEGIN__
+__CORE_FILES_BEGIN__
 
 // TESTME: UploadedFile
 class UploadedFile
@@ -54,4 +54,4 @@ public:
 	void save();
 };
 
-__FILES_END__
+__CORE_FILES_END__

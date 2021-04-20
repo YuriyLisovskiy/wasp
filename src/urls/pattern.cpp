@@ -52,7 +52,7 @@ std::string UrlPattern::get_name() const
 	return this->_name;
 }
 
-core::Result<std::shared_ptr<http::IHttpResponse>> UrlPattern::apply(
+Result<std::shared_ptr<http::IHttpResponse>> UrlPattern::apply(
 	http::HttpRequest* request,
 	conf::Settings* settings,
 	views::Args* args
@@ -98,7 +98,7 @@ std::string UrlPattern::build(const std::vector<std::string>& args) const
 		return built_url;
 	}
 
-	throw core::AttributeError(
+	throw AttributeError(
 		"Unable to build url: arguments do not match pattern '" + this->_orig + "'",
 		_ERROR_DETAILS_
 	);

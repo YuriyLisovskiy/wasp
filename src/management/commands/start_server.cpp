@@ -16,7 +16,7 @@ __MANAGEMENT_COMMANDS_BEGIN__
 StartServerCommand::StartServerCommand(
 	conf::IModuleConfig* config,
 	conf::Settings* settings,
-	std::function<std::shared_ptr<net::IServer>(
+	std::function<std::shared_ptr<net::abc::IServer>(
 		log::ILogger*,
 		collections::Dict<std::string, std::string>
 	)> make_server
@@ -26,7 +26,7 @@ StartServerCommand::StartServerCommand(
 {
 	if (!this->make_server)
 	{
-		throw core::ImproperlyConfigured(
+		throw ImproperlyConfigured(
 			"StartServerCommand: server initializer must be instantiated in order to use the application",
 			_ERROR_DETAILS_
 		);
@@ -80,11 +80,11 @@ void StartServerCommand::add_flags()
 
 void StartServerCommand::handle()
 {
-	core::InterruptException::initialize();
+	InterruptException::initialize();
 	this->settings->LOGGER->use_colors(this->_log_color_flag->get());
 	if (!this->settings->DEBUG && this->settings->ALLOWED_HOSTS.empty())
 	{
-		throw core::CommandError(
+		throw CommandError(
 			"You must set 'allowed_hosts' if 'debug' is false.",
 			_ERROR_DETAILS_
 		);
@@ -104,11 +104,11 @@ void StartServerCommand::handle()
 		                      "Quit the server with CONTROL-C.";
 		server->listen(message);
 	}
-	catch (const core::InterruptException& exc)
+	catch (const InterruptException& exc)
 	{
 		this->settings->LOGGER->debug("Interrupted");
 	}
-	catch (const core::BaseException& exc)
+	catch (const BaseException& exc)
 	{
 		this->settings->LOGGER->error(exc);
 	}
@@ -130,7 +130,9 @@ void StartServerCommand::retrieve_args(
 	{
 		if (!this->_ipv4_ipv6_port_regex.match(host_port_str))
 		{
-			throw core::CommandError(host_port_str + " is not valid host:port pair");
+			throw CommandError(
+				host_port_str + " is not valid host:port pair", _ERROR_DETAILS_
+			);
 		}
 
 		auto groups = this->_ipv4_ipv6_port_regex.groups();
@@ -161,7 +163,7 @@ void StartServerCommand::retrieve_args(
 			}
 			else if (!this->_ipv4_regex.match(address))
 			{
-				throw core::CommandError(
+				throw CommandError(
 					this->_addr_flag->get_raw() + " is invalid address",
 					_ERROR_DETAILS_
 				);
@@ -181,7 +183,7 @@ void StartServerCommand::retrieve_args(
 		}
 		else
 		{
-			throw core::CommandError(
+			throw CommandError(
 				this->_port_flag->get_raw() + " is invalid port",
 				_ERROR_DETAILS_
 			);
@@ -190,7 +192,7 @@ void StartServerCommand::retrieve_args(
 
 	if (!this->_threads_flag->valid())
 	{
-		throw core::CommandError(
+		throw CommandError(
 			"threads count is not a valid positive integer: " + this->_threads_flag->get_raw(),
 			_ERROR_DETAILS_
 		);

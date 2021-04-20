@@ -27,18 +27,18 @@ void StaticView::set_kwargs(collections::Dict<std::string, std::string>* kwargs)
 	this->_kwargs = kwargs;
 }
 
-core::Result<std::shared_ptr<http::IHttpResponse>> StaticView::get(http::HttpRequest* request, Args* args)
+Result<std::shared_ptr<http::IHttpResponse>> StaticView::get(http::HttpRequest* request, Args* args)
 {
 	if (!this->_kwargs)
 	{
-		throw core::ImproperlyConfigured(
+		throw ImproperlyConfigured(
 			"views::StaticView requires kwargs", _ERROR_DETAILS_
 		);
 	}
 
 	if (!this->_kwargs->contains("document_root"))
 	{
-		throw core::ImproperlyConfigured(
+		throw ImproperlyConfigured(
 			"views::StaticView requires \"document_root\" argument", _ERROR_DETAILS_
 		);
 	}
@@ -61,7 +61,7 @@ core::Result<std::shared_ptr<http::IHttpResponse>> StaticView::get(http::HttpReq
 		return this->response<http::HttpResponseNotFound>(this->_kwargs->get("http_404", "404 Not Found"));
 	}
 
-	auto stat_info = core::file_stat(full_path);
+	auto stat_info = file_stat(full_path);
 	if (!internal::was_modified_since(
 		request->headers.get(http::IF_MODIFIED_SINCE, ""),
 		stat_info.st_mtime, stat_info.st_size)

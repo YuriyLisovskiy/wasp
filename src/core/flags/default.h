@@ -19,7 +19,7 @@
 #include "./flag.h"
 
 
-__FLAGS_INTERNAL_BEGIN__
+__CORE_FLAGS_INTERNAL_BEGIN__
 
 const std::regex BOOL_TYPE("true|TRUE|false|FALSE|yes|YES|no|NO|1|0");
 const std::regex LONG_INT_TYPE("[+-]?[0-9]{1,10}");
@@ -27,10 +27,10 @@ const std::regex UNSIGNED_LONG_INT_TYPE("[+]?[0-9]{1,10}");
 const std::regex UINT16_TYPE("[+-]?[0-9]{1,5}");
 const std::regex DOUBLE_TYPE("[+-]?[0-9]+[.]?[0-9]+");
 
-__FLAGS_INTERNAL_END__
+__CORE_FLAGS_INTERNAL_END__
 
 
-__FLAGS_BEGIN__
+__CORE_FLAGS_BEGIN__
 
 class UnsignedLongFlag final : public TemplateFlag<unsigned long>
 {
@@ -102,4 +102,4 @@ public:
 	bool valid() final;
 };
 
-__FLAGS_END__
+__CORE_FLAGS_END__

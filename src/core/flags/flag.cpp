@@ -7,7 +7,7 @@
 #include "./flag.h"
 
 
-__FLAGS_BEGIN__
+__CORE_FLAGS_BEGIN__
 
 Flag::Flag(const std::string& label, const std::string& help)
 {
@@ -35,4 +35,4 @@ std::string Flag::get_raw()
 	return this->_data;
 }
 
-__FLAGS_END__
+__CORE_FLAGS_END__

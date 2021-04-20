@@ -29,14 +29,14 @@ std::shared_ptr<urls::UrlPattern> make_static(
 {
 	if (static_url.empty())
 	{
-		throw core::ImproperlyConfigured("Empty static url not permitted", _ERROR_DETAILS_);
+		throw ImproperlyConfigured("Empty static url not permitted", _ERROR_DETAILS_);
 	}
 
 	auto view_func = [static_root](
 		http::HttpRequest* request,
 		views::Args* args,
 		conf::Settings* settings
-	) -> core::Result<std::shared_ptr<http::IHttpResponse>>
+	) -> Result<std::shared_ptr<http::IHttpResponse>>
 	{
 		views::StaticView view(settings);
 		auto kwargs = std::make_unique<collections::Dict<std::string, std::string>>(

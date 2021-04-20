@@ -16,7 +16,7 @@
 #include "./_def_.h"
 
 
-__FLAGS_INTERNAL_BEGIN__
+__CORE_FLAGS_INTERNAL_BEGIN__
 
 struct args_parser
 {
@@ -28,4 +28,4 @@ struct args_parser
 	void remove_arg(const std::string& label);
 };
 
-__FLAGS_INTERNAL_END__
+__CORE_FLAGS_INTERNAL_END__

@@ -66,7 +66,7 @@ void ModuleConfig::init(const std::string& name)
 {
 	if (name.empty())
 	{
-		throw core::ValueError("module name can not be empty", _ERROR_DETAILS_);
+		throw ValueError("module name can not be empty", _ERROR_DETAILS_);
 	}
 
 	if (!this->_is_initialized)

@@ -23,7 +23,7 @@ __MANAGEMENT_BEGIN__
 class CoreManagementModuleConfig final : public conf::ModuleConfig
 {
 private:
-	std::function<std::shared_ptr<net::IServer>(
+	std::function<std::shared_ptr<net::abc::IServer>(
 		log::ILogger*,
 		collections::Dict<std::string, std::string>
 	)> _make_server;
@@ -31,7 +31,7 @@ private:
 public:
 	explicit CoreManagementModuleConfig(
 		conf::Settings* settings,
-		std::function<std::shared_ptr<net::IServer>(
+		std::function<std::shared_ptr<net::abc::IServer>(
 			log::ILogger*,
 			collections::Dict<std::string, std::string>
 		)> make_server

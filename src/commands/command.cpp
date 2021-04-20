@@ -18,7 +18,7 @@ Command::Command(
 {
 	if (!this->app_config)
 	{
-		throw core::ImproperlyConfigured(
+		throw ImproperlyConfigured(
 			"ModuleCommand: module config must be instantiated in order to use the application",
 			_ERROR_DETAILS_
 		);
@@ -26,7 +26,7 @@ Command::Command(
 
 	if (!this->settings)
 	{
-		throw core::ImproperlyConfigured(
+		throw ImproperlyConfigured(
 			"ModuleCommand: settings must be instantiated in order to use the application",
 			_ERROR_DETAILS_
 		);

@@ -18,7 +18,7 @@
 #include "../../utils/crypto/abc.h"
 
 
-__SIGNING_BEGIN__
+__CORE_SIGNING_BEGIN__
 
 inline re::Regex _SEP_UNSAFE_REGEX = re::Regex(R"([A-z0-9-_=]*)");
 
@@ -31,12 +31,12 @@ private:
 	char _sep;
 	std::string _str_sep;
 	std::string _salt;
-	utils::crypto::IHash* _hash_func;
+	crypto::IHash* _hash_func;
 
 public:
 	explicit Signer(
 		const std::string& key, char sep=':', const std::string& salt="",
-		utils::crypto::IHash* hash_func=nullptr
+		crypto::IHash* hash_func=nullptr
 	);
 
 	std::string signature(const std::string& value);
@@ -49,4 +49,4 @@ public:
 	std::string unsign(const std::string& signed_value);
 };
 
-__SIGNING_END__
+__CORE_SIGNING_END__

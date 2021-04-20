@@ -12,13 +12,13 @@
 #include <xalwart.core/collections/multi_dict.h>
 
 // Module definitions.
-#include "../_def_.h"
+#include "./_def_.h"
 
 // Framework libraries.
 #include "../../core/uploaded_file.h"
 
 
-__PARSERS_BEGIN__
+__CORE_PARSERS_BEGIN__
 
 // TESTME: multipart_parser
 struct multipart_parser final
@@ -104,4 +104,4 @@ struct multipart_parser final
 	void parse(const std::string& content_type, const std::string& body);
 };
 
-__PARSERS_END__
+__CORE_PARSERS_END__

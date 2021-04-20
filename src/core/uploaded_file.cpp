@@ -7,7 +7,7 @@
 #include "./uploaded_file.h"
 
 
-__FILES_BEGIN__
+__CORE_FILES_BEGIN__
 
 UploadedFile::UploadedFile(
 	const std::string& name,
@@ -106,7 +106,7 @@ void UploadedFile::save()
 {
 	if (this->_name != "/")
 	{
-		core::File file(this->_name, core::File::wb);
+		File file(this->_name, File::wb);
 		file.open();
 		if (file.is_open())
 		{
@@ -116,4 +116,4 @@ void UploadedFile::save()
 	}
 }
 
-__FILES_END__
+__CORE_FILES_END__

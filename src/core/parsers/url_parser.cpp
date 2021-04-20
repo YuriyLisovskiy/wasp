@@ -7,7 +7,7 @@
 #include "./url_parser.h"
 
 
-__PARSERS_BEGIN__
+__CORE_PARSERS_BEGIN__
 
 void url_parser::parse(const std::string& str)
 {
@@ -251,4 +251,4 @@ void url_parser::parse(const std::string& str)
 	this->is_parsed = true;
 }
 
-__PARSERS_END__
+__CORE_PARSERS_END__

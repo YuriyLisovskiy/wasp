@@ -41,7 +41,7 @@ std::string RedirectView::get_redirect_url()
 	return url;
 }
 
-core::Result<std::shared_ptr<http::IHttpResponse>> RedirectView::get(http::HttpRequest* request, Args* args)
+Result<std::shared_ptr<http::IHttpResponse>> RedirectView::get(http::HttpRequest* request, Args* args)
 {
 	std::string url = this->get_redirect_url();
 	if (url.empty())
@@ -62,32 +62,32 @@ core::Result<std::shared_ptr<http::IHttpResponse>> RedirectView::get(http::HttpR
 	return this->response<http::HttpResponseRedirect>(url);
 }
 
-core::Result<std::shared_ptr<http::IHttpResponse>> RedirectView::post(http::HttpRequest* request, Args* args)
+Result<std::shared_ptr<http::IHttpResponse>> RedirectView::post(http::HttpRequest* request, Args* args)
 {
 	return this->get(request, args);
 }
 
-core::Result<std::shared_ptr<http::IHttpResponse>> RedirectView::put(http::HttpRequest* request, Args* args)
+Result<std::shared_ptr<http::IHttpResponse>> RedirectView::put(http::HttpRequest* request, Args* args)
 {
 	return this->get(request, args);
 }
 
-core::Result<std::shared_ptr<http::IHttpResponse>> RedirectView::patch(http::HttpRequest* request, Args* args)
+Result<std::shared_ptr<http::IHttpResponse>> RedirectView::patch(http::HttpRequest* request, Args* args)
 {
 	return this->get(request, args);
 }
 
-core::Result<std::shared_ptr<http::IHttpResponse>> RedirectView::delete_(http::HttpRequest* request, Args* args)
+Result<std::shared_ptr<http::IHttpResponse>> RedirectView::delete_(http::HttpRequest* request, Args* args)
 {
 	return this->get(request, args);
 }
 
-core::Result<std::shared_ptr<http::IHttpResponse>> RedirectView::head(http::HttpRequest* request, Args* args)
+Result<std::shared_ptr<http::IHttpResponse>> RedirectView::head(http::HttpRequest* request, Args* args)
 {
 	return this->get(request, args);
 }
 
-core::Result<std::shared_ptr<http::IHttpResponse>> RedirectView::options(http::HttpRequest* request, Args* args)
+Result<std::shared_ptr<http::IHttpResponse>> RedirectView::options(http::HttpRequest* request, Args* args)
 {
 	return this->get(request, args);
 }

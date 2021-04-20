@@ -21,7 +21,7 @@ Url::Url(const std::string& url)
 	parser.parse(url);
 	if (!parser.is_parsed)
 	{
-		throw core::ParseError(parser.last_err, parser.err_line, parser.err_func, parser.err_file);
+		throw ParseError(parser.last_err, parser.err_line, parser.err_func, parser.err_file);
 	}
 
 	this->_str_url = url;

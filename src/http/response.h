@@ -41,7 +41,7 @@ protected:
 	std::string _charset;
 	std::string _reason_phrase;
 	bool _streaming;
-	core::Error _err;
+	Error _err;
 
 	std::string serialize_headers();
 
@@ -117,7 +117,7 @@ public:
 
 	std::string& operator[] (const std::string& key) override;
 
-	core::Error err() final;
+	Error err() final;
 };
 
 

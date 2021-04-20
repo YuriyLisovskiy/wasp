@@ -22,7 +22,7 @@ __URLS_BEGIN__
 
 /// Searches path in urlpatterns and returns an expression
 /// to process request if path is found, otherwise returns nullptr.
-extern std::function<core::Result<std::shared_ptr<http::IHttpResponse>>(
+extern std::function<Result<std::shared_ptr<http::IHttpResponse>>(
 	http::HttpRequest* request,
 	conf::Settings* settings
 )> resolve(

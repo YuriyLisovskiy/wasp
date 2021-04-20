@@ -47,7 +47,7 @@ private:
 		);
 		if (result == this->settings->MODULES.end())
 		{
-			throw core::ImproperlyConfigured(
+			throw ImproperlyConfigured(
 				"module is used but was not registered: " + module, _ERROR_DETAILS_
 			);
 		}
@@ -72,7 +72,7 @@ protected:
 			http::HttpRequest* request,
 			views::Args* args,
 			conf::Settings* settings_ptr
-		) -> core::Result<std::shared_ptr<http::IHttpResponse>>
+		) -> Result<std::shared_ptr<http::IHttpResponse>>
 		{
 			ViewT view(settings_ptr);
 			view.setup(request);

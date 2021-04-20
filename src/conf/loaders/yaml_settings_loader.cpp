@@ -187,7 +187,7 @@ void YamlSettingsLoader::_init_databases(Settings* settings, const YAML::Node& d
 			auto db_info = *it;
 			if (!db_info || !db_info.IsMap())
 			{
-				throw core::ImproperlyConfigured(
+				throw ImproperlyConfigured(
 					"databases: parameter must be non-empty map", _ERROR_DETAILS_
 				);
 			}
@@ -195,7 +195,7 @@ void YamlSettingsLoader::_init_databases(Settings* settings, const YAML::Node& d
 			auto driver_node = db_info["driver"];
 			if (!driver_node || !driver_node.IsScalar())
 			{
-				throw core::ImproperlyConfigured(
+				throw ImproperlyConfigured(
 					"databases: the 'driver' parameter is required and must have a string type",
 					_ERROR_DETAILS_
 				);
@@ -204,7 +204,7 @@ void YamlSettingsLoader::_init_databases(Settings* settings, const YAML::Node& d
 			auto name_node = db_info["name"];
 			if (!name_node || !name_node.IsScalar())
 			{
-				throw core::ImproperlyConfigured(
+				throw ImproperlyConfigured(
 					"databases: the 'name' parameter is required and must have a string type",
 					_ERROR_DETAILS_
 				);
@@ -246,7 +246,7 @@ void YamlSettingsLoader::_init_sqlite3_database(
 	auto filepath = database["file"];
 	if (!filepath || !filepath.IsScalar())
 	{
-		throw core::ImproperlyConfigured(
+		throw ImproperlyConfigured(
 			"databases: the 'file' parameter of SQLite3 database info is required and must have a string type",
 			_ERROR_DETAILS_
 		);
@@ -262,7 +262,7 @@ void YamlSettingsLoader::check_config(const YAML::Node& config, const std::strin
 		return;
 	}
 
-	throw core::ValueError("'" + file_path + "' file must have map type");
+	throw ValueError("'" + file_path + "' file must have map type", _ERROR_DETAILS_);
 }
 
 void YamlSettingsLoader::overwrite_scalar_or_remove_if_null(

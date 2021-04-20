@@ -86,7 +86,7 @@ long parse_http_date(const std::string& date)
 		}
 	}
 
-	int month = (int) utility::index_of(
+	int month = (int) util::index_of(
 		str::lower(match["mon"]),
 		internal::MONTHS.begin(),
 		internal::MONTHS.end()

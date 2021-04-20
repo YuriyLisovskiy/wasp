@@ -7,7 +7,7 @@
 #include "./query_parser.h"
 
 
-__PARSERS_BEGIN__
+__CORE_PARSERS_BEGIN__
 
 void url_query_parser::parse(const std::string& content)
 {
@@ -64,4 +64,4 @@ void url_query_parser::append_parameter(const std::string& key, const std::strin
 	this->multi_dict.append(key, value);
 }
 
-__PARSERS_END__
+__CORE_PARSERS_END__

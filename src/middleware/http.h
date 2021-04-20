@@ -27,13 +27,13 @@ public:
 
 protected:
 
-	/// Return true if an ETag header should be added to response.
+	// Return true if an ETag header should be added to response.
 	static bool needs_etag(http::IHttpResponse* response);
 
 public:
 	explicit ConditionalGetMiddleware(conf::Settings* settings);
 
-	core::Result<std::shared_ptr<http::IHttpResponse>> process_response(
+	Result<std::shared_ptr<http::IHttpResponse>> process_response(
 		http::HttpRequest* request, http::IHttpResponse* response
 	) override;
 };

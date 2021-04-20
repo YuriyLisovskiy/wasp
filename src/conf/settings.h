@@ -295,7 +295,7 @@ public:
 		auto name = full_name;
 		if (name.empty())
 		{
-			name = utility::demangle(typeid(T).name());
+			name = util::demangle(typeid(T).name());
 		}
 
 		return name;
@@ -318,7 +318,7 @@ protected:
 		};
 	}
 
-	template <middleware::MiddlewareType MiddlewareT>
+	template <middleware::middleware_type_c MiddlewareT>
 	void middleware(const std::string& custom_name="")
 	{
 		auto name = this->get_name_or<MiddlewareT>(custom_name);

@@ -24,7 +24,7 @@ public:
 
 	explicit CookieMiddleware(conf::Settings* settings);
 
-	core::Result<std::shared_ptr<http::IHttpResponse>> process_request(
+	Result<std::shared_ptr<http::IHttpResponse>> process_request(
 		http::HttpRequest* request
 	) final;
 };

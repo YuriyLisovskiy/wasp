@@ -16,7 +16,7 @@
 #include "./_def_.h"
 
 
-__FLAGS_BEGIN__
+__CORE_FLAGS_BEGIN__
 
 class Flag
 {
@@ -92,4 +92,4 @@ public:
 	}
 };
 
-__FLAGS_END__
+__CORE_FLAGS_END__

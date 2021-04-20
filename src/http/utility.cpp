@@ -31,7 +31,7 @@ size_t parse_http_datetime(const std::string& http_datetime)
 
 std::string http_date(size_t epoch_seconds)
 {
-	return utility::format_date(epoch_seconds, false, true);
+	return util::format_date(epoch_seconds, false, true);
 }
 
 void split_domain_port(

@@ -116,7 +116,7 @@ std::shared_ptr<HMAC> salted_hmac(
 {
 	if (secret_key.empty())
 	{
-		throw core::ValueError("Secret: key can not be empty", _ERROR_DETAILS_);
+		throw ValueError("Secret: key can not be empty", _ERROR_DETAILS_);
 	}
 
 	bool is_default_hf = !hash_func;

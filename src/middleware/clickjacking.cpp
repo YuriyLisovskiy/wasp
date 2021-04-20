@@ -19,7 +19,7 @@ XFrameOptionsMiddleware::XFrameOptionsMiddleware(conf::Settings* settings)
 {
 }
 
-core::Result<std::shared_ptr<http::IHttpResponse>> XFrameOptionsMiddleware::process_response(
+Result<std::shared_ptr<http::IHttpResponse>> XFrameOptionsMiddleware::process_response(
 	http::HttpRequest* request, http::IHttpResponse* response
 )
 {

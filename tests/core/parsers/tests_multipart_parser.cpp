@@ -39,7 +39,7 @@ TEST_F(MultipartParserStaticTestCase, AssertBoundaryTestThrows)
 	ASSERT_THROW(parsers::multipart_parser::assert_boundary(
 		this->ORIG_BOUNDARY,
 		this->DIFFERENT_BOUNDARY
-	), core::MultiPartParserError);
+	), MultiPartParserError);
 }
 
 TEST_F(MultipartParserStaticTestCase, AssertGetBoundaryTestSuccess)
@@ -54,7 +54,7 @@ TEST_F(MultipartParserStaticTestCase, AssertGetBoundaryTestThrowsInvalidContentT
 {
 	ASSERT_THROW(
 		parsers::multipart_parser::get_boundary("application/x-www-urlencoded"),
-		core::MultiPartParserError
+		MultiPartParserError
 	);
 }
 
@@ -62,7 +62,7 @@ TEST_F(MultipartParserStaticTestCase, AssertGetBoundaryTestThrowsEmptyBoundary)
 {
 	ASSERT_THROW(
 		parsers::multipart_parser::get_boundary("multipart/form-data"),
-		core::MultiPartParserError
+		MultiPartParserError
 	);
 }
 

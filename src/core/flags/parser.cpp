@@ -13,7 +13,7 @@
 #include <xalwart.core/string_utils.h>
 
 
-__FLAGS_INTERNAL_BEGIN__
+__CORE_FLAGS_INTERNAL_BEGIN__
 
 args_parser::args_parser(int argc, char** argv, size_t parse_from, bool is_verbose)
 {
@@ -91,4 +91,4 @@ void args_parser::remove_arg(const std::string& label)
 	}
 }
 
-__FLAGS_INTERNAL_END__
+__CORE_FLAGS_INTERNAL_END__

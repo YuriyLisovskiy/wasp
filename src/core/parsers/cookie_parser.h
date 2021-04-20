@@ -13,10 +13,10 @@
 #include <string>
 
 // Module definitions.
-#include "../_def_.h"
+#include "./_def_.h"
 
 
-__PARSERS_BEGIN__
+__CORE_PARSERS_BEGIN__
 
 // TESTME: cookie_parser
 struct cookie_parser final
@@ -35,4 +35,4 @@ struct cookie_parser final
 	void parse(const std::string& content);
 };
 
-__PARSERS_END__
+__CORE_PARSERS_END__

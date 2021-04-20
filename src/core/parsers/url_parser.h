@@ -12,10 +12,10 @@
 #include <string>
 
 // Module definitions.
-#include "../_def_.h"
+#include "./_def_.h"
 
 
-__PARSERS_BEGIN__
+__CORE_PARSERS_BEGIN__
 
 // TESTME: url_parser
 struct url_parser final
@@ -92,4 +92,4 @@ struct url_parser final
 	}
 };
 
-__PARSERS_END__
+__CORE_PARSERS_END__

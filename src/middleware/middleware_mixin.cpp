@@ -13,7 +13,7 @@ MiddlewareMixin::MiddlewareMixin(conf::Settings* settings)
 {
 	if (!settings)
 	{
-		throw core::NullPointerException(
+		throw NullPointerException(
 			"middleware: settings is not instantiated", _ERROR_DETAILS_
 		);
 	}
@@ -21,24 +21,24 @@ MiddlewareMixin::MiddlewareMixin(conf::Settings* settings)
 	this->settings = settings;
 }
 
-core::Result<std::shared_ptr<http::IHttpResponse>> MiddlewareMixin::none()
+Result<std::shared_ptr<http::IHttpResponse>> MiddlewareMixin::none()
 {
-	return core::Result<std::shared_ptr<http::IHttpResponse>>();
+	return Result<std::shared_ptr<http::IHttpResponse>>();
 }
 
-core::Result<std::shared_ptr<http::IHttpResponse>> MiddlewareMixin::result(
+Result<std::shared_ptr<http::IHttpResponse>> MiddlewareMixin::result(
 	const std::shared_ptr<http::IHttpResponse>& response
 )
 {
-	return core::Result<std::shared_ptr<http::IHttpResponse>>(response);
+	return Result<std::shared_ptr<http::IHttpResponse>>(response);
 }
 
-core::Result<std::shared_ptr<http::IHttpResponse>> MiddlewareMixin::process_request(http::HttpRequest* request)
+Result<std::shared_ptr<http::IHttpResponse>> MiddlewareMixin::process_request(http::HttpRequest* request)
 {
 	return this->none();
 }
 
-core::Result<std::shared_ptr<http::IHttpResponse>> MiddlewareMixin::process_response(
+Result<std::shared_ptr<http::IHttpResponse>> MiddlewareMixin::process_response(
 	http::HttpRequest* request, http::IHttpResponse* response
 )
 {

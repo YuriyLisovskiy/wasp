@@ -91,7 +91,7 @@ public:
 
 	virtual std::string& operator[] (const std::string& key) = 0;
 
-	virtual core::Error err() = 0;
+	virtual Error err() = 0;
 };
 
 __HTTP_END__

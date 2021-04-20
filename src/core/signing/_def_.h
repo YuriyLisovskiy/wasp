@@ -10,7 +10,6 @@
 
 #include "../_def_.h"
 
-
 // xw::core::signing
-#define __SIGNING_BEGIN__ __CORE_BEGIN__ namespace signing {
-#define __SIGNING_END__ } __CORE_END__
+#define __CORE_SIGNING_BEGIN__ __CORE_BEGIN__ namespace signing {
+#define __CORE_SIGNING_END__ } __CORE_END__

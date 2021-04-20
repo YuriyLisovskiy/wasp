@@ -7,7 +7,7 @@
 #include "./cookie_parser.h"
 
 
-__PARSERS_BEGIN__
+__CORE_PARSERS_BEGIN__
 
 void cookie_parser::parse(const std::string& content)
 {
@@ -54,4 +54,4 @@ void cookie_parser::parse(const std::string& content)
 	this->result[cookie_key] = cookie_value;
 }
 
-__PARSERS_END__
+__CORE_PARSERS_END__

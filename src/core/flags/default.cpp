@@ -10,7 +10,7 @@
 #include <xalwart.core/string_utils.h>
 
 
-__FLAGS_BEGIN__
+__CORE_FLAGS_BEGIN__
 
 Uint16Flag::Uint16Flag(const std::string& label, const std::string& help, uint16_t default_val)
 	: TemplateFlag<uint16_t>(label, help, default_val)
@@ -112,4 +112,4 @@ bool BoolFlag::valid()
 	return this->_data.empty() || std::regex_match(this->_data, internal::BOOL_TYPE);
 }
 
-__FLAGS_END__
+__CORE_FLAGS_END__

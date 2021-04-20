@@ -25,7 +25,7 @@ class MainApplication
 protected:
 	conf::Settings* settings;
 
-	std::function<std::shared_ptr<net::IServer>(
+	std::function<std::shared_ptr<net::abc::IServer>(
 		log::ILogger*,
 		collections::Dict<std::string, std::string>
 	)> server_initializer;
@@ -36,14 +36,14 @@ protected:
 	void build_static_patterns(std::vector<std::shared_ptr<urls::UrlPattern>>& patterns);
 	void build_module_patterns(std::vector<std::shared_ptr<urls::UrlPattern>>& patterns);
 
-	core::Result<std::shared_ptr<http::IHttpResponse>> process_request_middleware(
+	Result<std::shared_ptr<http::IHttpResponse>> process_request_middleware(
 		std::shared_ptr<http::HttpRequest>& request
 	);
-	core::Result<std::shared_ptr<http::IHttpResponse>> process_response_middleware(
+	Result<std::shared_ptr<http::IHttpResponse>> process_response_middleware(
 		std::shared_ptr<http::HttpRequest>& request,
 		std::shared_ptr<http::IHttpResponse>& response
 	);
-	core::Result<std::shared_ptr<http::IHttpResponse>> process_urlpatterns(
+	Result<std::shared_ptr<http::IHttpResponse>> process_urlpatterns(
 		std::shared_ptr<http::HttpRequest>& request,
 		std::vector<std::shared_ptr<urls::UrlPattern>>& urlpatterns
 	);
@@ -53,11 +53,11 @@ protected:
 		collections::Dict<std::string, std::string> env
 	);
 
-	static std::shared_ptr<http::IHttpResponse> error_to_response(const core::Error* err);
+	static std::shared_ptr<http::IHttpResponse> error_to_response(const Error* err);
 
 	uint start_response(
 		net::RequestContext* ctx,
-		const core::Result<std::shared_ptr<http::IHttpResponse>>& result
+		const Result<std::shared_ptr<http::IHttpResponse>>& result
 	);
 
 	void finish_response(net::RequestContext* ctx, http::IHttpResponse* response);
@@ -78,7 +78,7 @@ private:
 public:
 	explicit MainApplication(
 		conf::Settings* settings,
-		std::function<std::shared_ptr<net::IServer>(
+		std::function<std::shared_ptr<net::abc::IServer>(
 			log::ILogger*,
 			collections::Dict<std::string, std::string>
 		)> server_initializer
