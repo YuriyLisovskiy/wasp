@@ -18,7 +18,7 @@
 #include "../../urls/pattern.h"
 
 
-__TAGS_BEGIN__
+__RENDER_TAGS_BEGIN__
 
 const std::string TAG_NAME_URL = "url";
 
@@ -35,4 +35,4 @@ extern std::function<std::shared_ptr<internal::node>(
 	internal::parser*, internal::token_t& token
 )> make_url_tag(const std::vector<std::shared_ptr<urls::UrlPattern>>& patterns);
 
-__TAGS_END__
+__RENDER_TAGS_END__

@@ -39,7 +39,7 @@ Result<std::shared_ptr<http::IHttpResponse>> ConditionalGetMiddleware::process_r
 
 	if (needs_etag(response) && !response->has_header(http::E_TAG))
 	{
-		utils::cache::set_response_etag(response);
+		cache::set_response_etag(response);
 	}
 
 	auto etag = response->get_header(http::E_TAG, "");
@@ -48,7 +48,7 @@ Result<std::shared_ptr<http::IHttpResponse>> ConditionalGetMiddleware::process_r
 	);
 	if (!etag.empty() || last_modified != -1)
 	{
-		auto conditional_response = utils::cache::get_conditional_response(
+		auto conditional_response = cache::get_conditional_response(
 			request, etag, last_modified, response
 		);
 		if (conditional_response)

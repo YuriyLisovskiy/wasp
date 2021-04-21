@@ -15,7 +15,7 @@
 #include "./_def_.h"
 
 
-__TAGS_BEGIN__
+__RENDER_TAGS_BEGIN__
 
 const std::string TAG_NAME_STATIC = "static";
 const std::string TAG_NAME_MEDIA = "media";
@@ -33,4 +33,4 @@ extern std::function<std::shared_ptr<internal::node>(
 	internal::parser*, internal::token_t& token
 )> make_static_tag(const std::string& name, const std::string& prefix);
 
-__TAGS_END__
+__RENDER_TAGS_END__

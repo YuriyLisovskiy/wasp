@@ -20,13 +20,13 @@
 #include "../../utils/functional.h"
 
 
-__TAGS_BEGIN__
+__RENDER_TAGS_BEGIN__
 
 std::string url_node::render(IContext* ctx)
 {
 	using Fe = std::shared_ptr<FilterExpression>;
 	auto built_url = this->pattern->build(
-		utils::fn::map<Fe, std::string>(this->params, [ctx](const Fe& p) -> std::string {
+		fn::map<Fe, std::string>(this->params, [ctx](const Fe& p) -> std::string {
 			auto p_var = p->resolve(ctx);
 			return p_var ? p_var->__str__() : "";
 		})
@@ -103,4 +103,4 @@ std::function<std::shared_ptr<internal::node>(
 	};
 }
 
-__TAGS_END__
+__RENDER_TAGS_END__

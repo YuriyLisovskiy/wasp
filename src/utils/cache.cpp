@@ -16,7 +16,7 @@
 #include "./http.h"
 
 
-__UTIL_CACHE_INTERNAL_BEGIN__
+__CACHE_INTERNAL_BEGIN__
 
 bool _if_match_passes(
 	const std::string& target_etag, std::vector<std::string>& etags
@@ -136,10 +136,10 @@ std::shared_ptr<http::IHttpResponse> _not_modified(
 	return new_response;
 }
 
-__UTIL_CACHE_INTERNAL_END__
+__CACHE_INTERNAL_END__
 
 
-__UTIL_CACHE_BEGIN__
+__CACHE_BEGIN__
 
 void set_response_etag(http::IHttpResponse* response)
 {
@@ -226,4 +226,4 @@ std::shared_ptr<http::IHttpResponse> get_conditional_response(
 	return nullptr;
 }
 
-__UTIL_CACHE_END__
+__CACHE_END__

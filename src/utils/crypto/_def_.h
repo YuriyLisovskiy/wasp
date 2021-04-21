@@ -11,5 +11,5 @@
 #include "../_def_.h"
 
 // xw::crypto
-#define __CRYPTO_BEGIN__ namespace crypto {
-#define __CRYPTO_END__ }
+#define __CRYPTO_BEGIN__ __MAIN_NAMESPACE_BEGIN__ namespace crypto {
+#define __CRYPTO_END__ } __MAIN_NAMESPACE_END__

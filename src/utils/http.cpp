@@ -11,7 +11,7 @@
 #include <xalwart.core/string_utils.h>
 
 
-__UTILS_HTTP_INTERNAL_BEGIN__
+__UTIL_HTTP_INTERNAL_BEGIN__
 
 re::Regex ETAG_REGEX = re::Regex(R"(((?:W\/)?"[^"]*"))");
 
@@ -36,10 +36,10 @@ const std::vector<std::string> MONTHS = {
 	"jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"
 };
 
-__UTILS_HTTP_INTERNAL_END__
+__UTIL_HTTP_INTERNAL_END__
 
 
-__UTILS_HTTP_BEGIN__
+__UTIL_HTTP_BEGIN__
 
 long parse_http_date(const std::string& date)
 {
@@ -133,4 +133,4 @@ std::vector<std::string> parse_etags(const std::string& etag_str)
 	return result;
 }
 
-__UTILS_HTTP_END__
+__UTIL_HTTP_END__

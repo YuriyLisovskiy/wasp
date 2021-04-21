@@ -15,7 +15,7 @@
 #include <xalwart.render/syntax/utility.h>
 
 
-__TAGS_BEGIN__
+__RENDER_TAGS_BEGIN__
 
 std::string static_node::render(IContext* ctx)
 {
@@ -76,4 +76,4 @@ std::function<std::shared_ptr<internal::node>(
 	};
 }
 
-__TAGS_END__
+__RENDER_TAGS_END__

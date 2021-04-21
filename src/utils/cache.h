@@ -42,7 +42,7 @@ extern bool _if_unmodified_since_passes(
 	long last_modified, long if_unmodified_since
 );
 
-extern std::shared_ptr<xw::http::IHttpResponse> _precondition_failed(
+extern std::shared_ptr<http::IHttpResponse> _precondition_failed(
 	http::HttpRequest* request
 );
 
