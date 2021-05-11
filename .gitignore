@@ -47,3 +47,4 @@ lib/
 
 # Other stuff
 Dockerfile*
+Makefile

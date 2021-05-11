@@ -8,6 +8,7 @@
 
 // Framework libraries.
 #include "./commands/start_server.h"
+#include "./commands/migrate.h"
 
 
 __MANAGEMENT_BEGIN__
@@ -25,6 +26,7 @@ CoreManagementModuleConfig::CoreManagementModuleConfig(
 void CoreManagementModuleConfig::commands()
 {
 	this->command<cmd::StartServerCommand>(this, this->settings, this->_make_server);
+	this->command<cmd::MigrateCommand>(this, this->settings);
 }
 
 __MANAGEMENT_END__

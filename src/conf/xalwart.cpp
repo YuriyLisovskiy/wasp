@@ -450,7 +450,7 @@ std::shared_ptr<http::HttpRequest> MainApplication::make_request(
 	if (ctx->content_size)
 	{
 		auto cont_type = str::lower(ctx->headers.get("Content-Type"));
-		if (cont_type == "application/x-www-form-urlencoded")
+		if (cont_type.starts_with("application/x-www-form-urlencoded"))
 		{
 			qp.parse(ctx->content);
 			if (ctx->method == "GET")
@@ -462,7 +462,7 @@ std::shared_ptr<http::HttpRequest> MainApplication::make_request(
 				post_params = http::HttpRequest::Parameters(qp.dict, qp.multi_dict);
 			}
 		}
-		else if (cont_type == "multipart/form-data")
+		else if (cont_type.starts_with("multipart/form-data"))
 		{
 			parsers::multipart_parser mp(this->settings->MEDIA_ROOT);
 			mp.parse(ctx->headers["Content-Type"], ctx->content);

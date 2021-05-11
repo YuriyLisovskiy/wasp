@@ -22,6 +22,7 @@
 
 // ORM libraries.
 #include <xalwart.orm/client.h>
+#include <xalwart.orm/db/migration.h>
 #include <xalwart.orm/sqlite3/driver.h>
 
 // Module definitions.
@@ -86,7 +87,7 @@ public:
 	std::shared_ptr<orm::Client> DB;
 
 	// List of databases.
-	std::vector<std::shared_ptr<orm::Client>> DATABASES;
+	std::map<std::string, std::shared_ptr<orm::Client>> DATABASES;
 
 	// Whether to append trailing slashes to URLs.
 	bool APPEND_SLASH;
@@ -97,10 +98,10 @@ public:
 	//
 	// Here are a few examples:
 	//     DISALLOWED_USER_AGENTS = {
-	//         core::rgx::Regex(R"(NaverBot.*)"),
-	//         core::rgx::Regex(R"(EmailSiphon.*)"),
-	//         core::rgx::Regex(R"(SiteSucker.*)"),
-	//         core::rgx::Regex(R"(sohu-search.*)")
+	//         rgx::Regex(R"(NaverBot.*)"),
+	//         rgx::Regex(R"(EmailSiphon.*)"),
+	//         rgx::Regex(R"(SiteSucker.*)"),
+	//         rgx::Regex(R"(sohu-search.*)")
 	//     };
 	std::vector<re::Regex> DISALLOWED_USER_AGENTS;
 
@@ -109,11 +110,11 @@ public:
 	//
 	// Here are a few examples:
 	//    IGNORABLE_404_URLS = {
-	//        core::rgx::Regex(R"(/apple-touch-icon.*\.png)"),
-	//        core::rgx::Regex(R"(/favicon.ico)"),
-	//        core::rgx::Regex(R"(/robots.txt)"),
-	//        core::rgx::Regex(R"(/phpmyadmin/)"),
-	//        core::rgx::Regex(R"(/apple-touch-icon.*\.png)")
+	//        rgx::Regex(R"(/apple-touch-icon.*\.png)"),
+	//        rgx::Regex(R"(/favicon.ico)"),
+	//        rgx::Regex(R"(/robots.txt)"),
+	//        rgx::Regex(R"(/phpmyadmin/)"),
+	//        rgx::Regex(R"(/apple-touch-icon.*\.png)")
 	//    };
 	std::vector<re::Regex> IGNORABLE_404_URLS;
 
@@ -255,6 +256,10 @@ public:
 	{
 	}
 
+	inline virtual void register_migrations()
+	{
+	}
+
 	inline virtual std::shared_ptr<orm::abc::ISQLDriver> build_sqlite3_database(
 		const std::string& name, const std::string& filepath
 	)
@@ -288,9 +293,25 @@ public:
 	[[nodiscard]]
 	std::shared_ptr<render::ILoader> get_loader(const std::string& full_name) const;
 
+	inline std::list<std::shared_ptr<orm::db::Migration>> get_migrations(orm::abc::ISQLDriver* driver)
+	{
+		if (this->_migrations.empty())
+		{
+			this->register_migrations();
+		}
+
+		std::list<std::shared_ptr<orm::db::Migration>> migrations;
+		for (const auto& migration : this->_migrations)
+		{
+			migrations.push_back(migration(driver));
+		}
+
+		return migrations;
+	}
+
 	template <class T>
 	[[nodiscard]]
-	std::string get_name_or(const std::string& full_name) const
+	inline std::string get_name_or(const std::string& full_name) const
 	{
 		auto name = full_name;
 		if (name.empty())
@@ -303,7 +324,7 @@ public:
 
 protected:
 	template <module_config_type ModuleConfigT>
-	void module(const std::string& custom_name="")
+	inline void module(const std::string& custom_name="")
 	{
 		auto name = this->get_name_or<ModuleConfigT>(custom_name);
 		if (this->_modules.find(name) != this->_modules.end() && this->LOGGER)
@@ -319,7 +340,7 @@ protected:
 	}
 
 	template <middleware::middleware_type_c MiddlewareT>
-	void middleware(const std::string& custom_name="")
+	inline void middleware(const std::string& custom_name="")
 	{
 		auto name = this->get_name_or<MiddlewareT>(custom_name);
 		if (this->_middleware.find(name) != this->_middleware.end() && this->LOGGER)
@@ -333,7 +354,7 @@ protected:
 	}
 
 	template <render::LibraryType LibraryT>
-	void library(const std::string& custom_name="")
+	inline void library(const std::string& custom_name="")
 	{
 		auto name = this->get_name_or<LibraryT>(custom_name);
 		if (this->_libraries.find(name) != this->_libraries.end() && this->LOGGER)
@@ -347,7 +368,7 @@ protected:
 	}
 
 	template <render::LoaderType LoaderT>
-	void loader(const std::string& custom_name="")
+	inline void loader(const std::string& custom_name="")
 	{
 		auto name = this->get_name_or<LoaderT>(custom_name);
 		if (this->_loaders.find(name) != this->_loaders.end() && this->LOGGER)
@@ -358,6 +379,15 @@ protected:
 		this->_loaders[name] = [this]() -> std::shared_ptr<render::ILoader> {
 			return std::make_shared<LoaderT>(this);
 		};
+	}
+
+	template <class MigrationT, class ...Args>
+	inline void migration(Args&& ...args)
+	{
+		this->_migrations.push_back([args...](auto* driver) -> std::shared_ptr<orm::db::Migration>
+		{
+			return std::make_shared<MigrationT>(driver, std::forward<Args>(args)...);
+		});
 	}
 
 private:
@@ -380,6 +410,10 @@ private:
 		std::string,
 		std::function<std::shared_ptr<render::ILoader>()>
 	> _loaders;
+
+	std::list<
+		std::function<std::shared_ptr<orm::db::Migration>(orm::abc::ISQLDriver* driver)>
+	> _migrations;
 };
 
 __CONF_END__

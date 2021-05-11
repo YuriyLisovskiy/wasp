@@ -63,15 +63,15 @@ void Settings::prepare()
 		this->ROOT_MODULE = this->MODULES.front();
 	}
 
-	if (!this->DB)
-	{
-		this->LOGGER->warning("Missing 'default' database");
-		if (!this->DATABASES.empty())
-		{
-			this->DB = this->DATABASES.front();
-			this->LOGGER->warning("Using the first database from 'databases' list");
-		}
-	}
+//	if (!this->DB)
+//	{
+//		this->LOGGER->warning("Missing 'default' database");
+//		if (!this->DATABASES.empty())
+//		{
+//			this->DB = this->DATABASES.front();
+//			this->LOGGER->warning("Using the first database from 'databases' list");
+//		}
+//	}
 }
 
 std::shared_ptr<IModuleConfig> Settings::get_module(

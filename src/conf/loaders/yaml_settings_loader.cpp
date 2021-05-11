@@ -225,16 +225,29 @@ void YamlSettingsLoader::_init_databases(Settings* settings, const YAML::Node& d
 
 			if (driver)
 			{
-				if (db_name == "default")
-				{
-					settings->DB = std::make_shared<orm::Client>(driver);
-				}
-				else
-				{
-					settings->DATABASES.push_back(std::make_shared<orm::Client>(driver));
-				}
+				settings->DATABASES[db_name] = std::make_shared<orm::Client>(driver);
+//				if (db_name == "default")
+//				{
+//					settings->DB = std::make_shared<orm::Client>(driver);
+//				}
+//				else
+//				{
+//					settings->DATABASES.push_back();
+//				}
 			}
 		}
+	}
+
+	if (settings->DATABASES.find("default") != settings->DATABASES.end())
+	{
+		settings->DB = settings->DATABASES["default"];
+	}
+	else
+	{
+		throw ImproperlyConfigured(
+			"databases: default database is required to be configured",
+			_ERROR_DETAILS_
+		);
 	}
 }
 
