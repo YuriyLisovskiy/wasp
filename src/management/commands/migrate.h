@@ -23,6 +23,7 @@ private:
 	std::shared_ptr<core::flags::StringFlag> _db_flag;
 	std::shared_ptr<core::flags::StringFlag> _migration_flag;
 	std::shared_ptr<core::flags::BoolFlag> _rollback_flag;
+	std::shared_ptr<core::flags::BoolFlag> _no_colors_flag;
 
 protected:
 	inline void log_progress(const std::string& msg, const std::string& end) const

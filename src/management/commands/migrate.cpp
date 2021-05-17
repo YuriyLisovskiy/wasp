@@ -32,10 +32,14 @@ void MigrateCommand::add_flags()
 	this->_rollback_flag = this->flag_set->make_bool(
 		"rollback", false, "Identifies whether to rollback database migrations"
 	);
+	this->_no_colors_flag = this->flag_set->make_bool(
+		"no-colors", false, "Disable colors in logs"
+	);
 }
 
 void MigrateCommand::handle()
 {
+	this->settings->LOGGER->use_colors(!this->_no_colors_flag->get());
 	auto db_name = this->_db_flag->get();
 	if (this->settings->DATABASES.find(db_name) == this->settings->DATABASES.end())
 	{

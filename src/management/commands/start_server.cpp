@@ -75,13 +75,14 @@ void StartServerCommand::add_flags()
 	this->_use_ipv6_flag = this->flag_set->make_bool(
 		"use-ipv6", false, "Use IPv6 address or not (used in case when host is set to 'localhost')"
 	);
-	this->_log_color_flag = this->flag_set->make_bool("log-color", true, "Use colors for output");
+	this->_no_colors_flag = this->flag_set->make_bool(
+		"no-colors", false, "Disable colors in logs"
+	);
 }
 
 void StartServerCommand::handle()
 {
-	InterruptException::initialize();
-	this->settings->LOGGER->use_colors(this->_log_color_flag->get());
+	this->settings->LOGGER->use_colors(!this->_no_colors_flag->get());
 	if (!this->settings->DEBUG && this->settings->ALLOWED_HOSTS.empty())
 	{
 		throw CommandError(

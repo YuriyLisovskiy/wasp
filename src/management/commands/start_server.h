@@ -38,7 +38,7 @@ private:
 	std::shared_ptr<core::flags::Uint16Flag> _port_flag;
 	std::shared_ptr<core::flags::UnsignedLongFlag> _threads_flag;
 	std::shared_ptr<core::flags::BoolFlag> _use_ipv6_flag;
-	std::shared_ptr<core::flags::BoolFlag> _log_color_flag;
+	std::shared_ptr<core::flags::BoolFlag> _no_colors_flag;
 
 	re::Regex _ipv4_ipv6_port_regex;
 	re::Regex _ipv4_regex;
