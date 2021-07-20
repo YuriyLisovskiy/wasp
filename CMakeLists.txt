@@ -10,6 +10,7 @@ project(${LIBRARY_NAME})
 
 include(GNUInstallDirs)
 set(GNU_INCLUDE_DIR /usr/local/include)
+set(GNU_LIB_DIR /usr/local/lib)
 
 option(XW_BUILD_LIB "Build the library." ON)
 if (${XW_BUILD_LIB})
