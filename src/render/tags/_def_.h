@@ -10,7 +10,6 @@
 
 #include <xalwart.render/_def_.h>
 
-
 // xw::render::internal::tags
-#define __TAGS_BEGIN__ __RENDER_INTERNAL_BEGIN__ namespace tags {
-#define __TAGS_END__ } __RENDER_INTERNAL_END__
+#define __RENDER_TAGS_BEGIN__ __RENDER_INTERNAL_BEGIN__ namespace tags {
+#define __RENDER_TAGS_END__ } __RENDER_INTERNAL_END__

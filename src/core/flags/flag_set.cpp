@@ -1,19 +1,19 @@
 /**
  * core/flags/flag_set.cpp
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  */
 
 #include "./flag_set.h"
 
-// Core libraries.
-#include <xalwart.core/exceptions.h>
+// Base libraries.
+#include <xalwart.base/exceptions.h>
 
 // Framework libraries.
 #include "./parser.h"
 
 
-__FLAGS_BEGIN__
+__CORE_FLAGS_BEGIN__
 
 FlagSet::FlagSet(const std::string& name, const std::string& usage)
 {
@@ -35,7 +35,10 @@ void FlagSet::parse(int argc, char** argv, size_t parse_from, bool is_verbose)
 
 	if (!ap.flags.empty())
 	{
-		throw core::ArgumentError("flag provided but not defined: " + ap.flags.begin()->first);
+		throw ArgumentError(
+			"flag provided but not defined: " + ap.flags.begin()->first,
+			_ERROR_DETAILS_
+		);
 	}
 }
 
@@ -109,4 +112,4 @@ std::shared_ptr<BoolFlag> FlagSet::make_bool(
 	return flag;
 }
 
-__FLAGS_END__
+__CORE_FLAGS_END__

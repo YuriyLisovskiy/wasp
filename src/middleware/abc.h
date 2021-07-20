@@ -11,8 +11,8 @@
 // C++ libraries.
 #include <memory>
 
-// Core libraries.
-#include <xalwart.core/result.h>
+// Base libraries.
+#include <xalwart.base/result.h>
 
 // Module definitions.
 #include "./_def_.h"
@@ -29,18 +29,18 @@ class IMiddleware
 public:
 	virtual ~IMiddleware() = default;
 
-	/// An input http request before processing in views::View.
-	virtual core::Result<std::shared_ptr<http::IHttpResponse>> process_request(
+	// An input http request before processing in views::View.
+	virtual Result<std::shared_ptr<http::IHttpResponse>> process_request(
 		http::HttpRequest* request
 	) = 0;
 
-	/// An output http request and response after processing in views::View.
-	virtual core::Result<std::shared_ptr<http::IHttpResponse>> process_response(
+	// An output http request and response after processing in views::View.
+	virtual Result<std::shared_ptr<http::IHttpResponse>> process_response(
 		http::HttpRequest* request, http::IHttpResponse* response
 	) = 0;
 };
 
 template <typename T>
-concept MiddlewareType = std::is_base_of_v<IMiddleware, T>;
+concept middleware_type_c = std::is_base_of_v<IMiddleware, T>;
 
 __MIDDLEWARE_END__

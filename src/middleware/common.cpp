@@ -1,13 +1,13 @@
 /**
  * middleware/common.cpp
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  */
 
 #include "./common.h"
 
-// Core libraries.
-#include <xalwart.core/utility.h>
+// Base libraries.
+#include <xalwart.base/utility.h>
 
 // Framework libraries.
 #include "../urls/resolver.h"
@@ -24,11 +24,11 @@ CommonMiddleware::CommonMiddleware(conf::Settings* settings)
 {
 }
 
-core::Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::get_response_redirect(
+Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::get_response_redirect(
 	const std::string& redirect_to
 )
 {
-	return core::Result<std::shared_ptr<http::IHttpResponse>>(
+	return Result<std::shared_ptr<http::IHttpResponse>>(
 		std::make_shared<http::HttpResponsePermanentRedirect>(redirect_to)
 	);
 }
@@ -45,13 +45,13 @@ bool CommonMiddleware::should_redirect_with_slash(http::HttpRequest* request)
 	return false;
 }
 
-core::Result<std::string> CommonMiddleware::get_full_path_with_slash(http::HttpRequest* request)
+Result<std::string> CommonMiddleware::get_full_path_with_slash(http::HttpRequest* request)
 {
 	auto new_path = request->full_path(true);
 
 	// Prevent construction of scheme relative urls.
 	http::escape_leading_slashes(new_path);
-	if (this->settings->DEBUG && utility::contains<std::string>(
+	if (this->settings->DEBUG && util::contains<std::string>(
 		request->method(), {"POST", "PUT", "PATCH"}
 	))
 	{
@@ -69,7 +69,7 @@ core::Result<std::string> CommonMiddleware::get_full_path_with_slash(http::HttpR
 		}
 
 		auto host = result.value;
-		throw core::RuntimeError(
+		throw RuntimeError(
 			"You called this URL via " + method + "s, but the URL doesn't end "
 			"in a slash and you have APPEND_SLASH set. Xalwart can't "
 			"redirect to the slash URL while maintaining " + method + "s data. "
@@ -78,10 +78,10 @@ core::Result<std::string> CommonMiddleware::get_full_path_with_slash(http::HttpR
 		);
 	}
 
-	return core::Result(new_path);
+	return Result(new_path);
 }
 
-core::Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::process_request(
+Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::process_request(
 	http::HttpRequest* request
 )
 {
@@ -95,7 +95,7 @@ core::Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::process_req
 				this->settings->LOGGER->trace(
 					"Found user agent which is not allowed: '" + user_agent + "'", _ERROR_DETAILS_
 				);
-				return this->raise<core::PermissionDenied>(
+				return this->raise<PermissionDenied>(
 					"Forbidden user agent", _ERROR_DETAILS_
 				);
 			}
@@ -152,7 +152,7 @@ core::Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::process_req
 	return this->none();
 }
 
-core::Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::process_response(
+Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::process_response(
 	http::HttpRequest* request, http::IHttpResponse* response
 )
 {

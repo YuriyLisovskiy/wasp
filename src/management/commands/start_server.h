@@ -8,19 +8,19 @@
 
 #pragma once
 
-// Core libraries.
-#include <xalwart.core/net/abc.h>
+// Base libraries.
+#include <xalwart.base/net/abc.h>
 
 // Module definitions.
 #include "./_def_.h"
 
 // Framework libraries.
-#include "../../commands/app_command.h"
+#include "../../commands/command.h"
 
 
 __MANAGEMENT_COMMANDS_BEGIN__
 
-class StartServerCommand final : public xw::cmd::AppCommand
+class StartServerCommand final : public xw::cmd::Command
 {
 private:
 	const std::string DEFAULT_IPV4_HOST = "127.0.0.1";
@@ -38,13 +38,13 @@ private:
 	std::shared_ptr<core::flags::Uint16Flag> _port_flag;
 	std::shared_ptr<core::flags::UnsignedLongFlag> _threads_flag;
 	std::shared_ptr<core::flags::BoolFlag> _use_ipv6_flag;
-	std::shared_ptr<core::flags::BoolFlag> _log_color_flag;
+	std::shared_ptr<core::flags::BoolFlag> _no_colors_flag;
 
 	re::Regex _ipv4_ipv6_port_regex;
 	re::Regex _ipv4_regex;
 	re::Regex _ipv6_regex;
 
-	std::function<std::shared_ptr<net::IServer>(
+	std::function<std::shared_ptr<net::abc::IServer>(
 		log::ILogger*,
 		collections::Dict<std::string, std::string>
 	)> make_server;
@@ -58,9 +58,9 @@ protected:
 
 public:
 	explicit StartServerCommand(
-		apps::IModuleConfig* config,
+		conf::IModuleConfig* config,
 		conf::Settings* settings,
-		std::function<std::shared_ptr<net::IServer>(
+		std::function<std::shared_ptr<net::abc::IServer>(
 			log::ILogger*,
 			collections::Dict<std::string, std::string>
 		)> make_server

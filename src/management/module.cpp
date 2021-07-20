@@ -8,13 +8,14 @@
 
 // Framework libraries.
 #include "./commands/start_server.h"
+#include "./commands/migrate.h"
 
 
 __MANAGEMENT_BEGIN__
 
 CoreManagementModuleConfig::CoreManagementModuleConfig(
 	conf::Settings* settings,
-	std::function<std::shared_ptr<net::IServer>(
+	std::function<std::shared_ptr<net::abc::IServer>(
 		log::ILogger*,
 		collections::Dict<std::string, std::string>
 	)> make_server
@@ -25,6 +26,7 @@ CoreManagementModuleConfig::CoreManagementModuleConfig(
 void CoreManagementModuleConfig::commands()
 {
 	this->command<cmd::StartServerCommand>(this, this->settings, this->_make_server);
+	this->command<cmd::MigrateCommand>(this, this->settings);
 }
 
 __MANAGEMENT_END__

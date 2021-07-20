@@ -16,7 +16,7 @@ using namespace xw;
 TEST(HmacTestCase, Md5HasherTest)
 {
 	std::string key = "+s6cv712&nw4gsk)1dmgpje+f#%^4lhp@!up+=p3ts+hxz(fr2";
-	auto hmac = utils::crypto::Hmac(key);
+	auto hmac = crypto::HMAC(key);
 
 	ASSERT_EQ(hmac.size(), 16);
 	ASSERT_EQ(hmac.block_size(), 64);

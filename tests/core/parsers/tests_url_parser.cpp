@@ -6,7 +6,7 @@
 
 #include <gtest/gtest.h>
 
-#include <xalwart.core/exceptions.h>
+#include <xalwart.base/exceptions.h>
 
 #include "../../../src/core/parsers/url_parser.h"
 

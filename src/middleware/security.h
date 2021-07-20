@@ -40,10 +40,10 @@ protected:
 public:
 	explicit SecurityMiddleware(conf::Settings* settings);
 
-	core::Result<std::shared_ptr<http::IHttpResponse>> process_request(
+	Result<std::shared_ptr<http::IHttpResponse>> process_request(
 		http::HttpRequest* request
 	) override;
-	core::Result<std::shared_ptr<http::IHttpResponse>> process_response(
+	Result<std::shared_ptr<http::IHttpResponse>> process_response(
 		http::HttpRequest* request, http::IHttpResponse* response
 	) override;
 };

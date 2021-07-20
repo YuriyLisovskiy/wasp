@@ -19,7 +19,7 @@ CookieMiddleware::CookieMiddleware(conf::Settings* settings)
 {
 }
 
-core::Result<std::shared_ptr<http::IHttpResponse>> CookieMiddleware::process_request(
+Result<std::shared_ptr<http::IHttpResponse>> CookieMiddleware::process_request(
 	http::HttpRequest* request
 )
 {

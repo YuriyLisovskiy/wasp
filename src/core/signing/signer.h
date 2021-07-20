@@ -1,46 +1,52 @@
 /**
  * core/signing/signer.h
  *
- * Copyright (c) 2020 Yuriy Lisovskiy
+ * Copyright (c) 2020-2021 Yuriy Lisovskiy
  *
- * Purpose: used for signing string.
+ * String signer.
  */
 
 #pragma once
 
-// Core libraries.
-#include <xalwart.core/re/regex.h>
+// Base libraries.
+#include <xalwart.base/re/regex.h>
 
 // Module definitions.
 #include "./_def_.h"
 
-
-__SIGNING_INTERNAL_BEGIN__
-
-extern re::Regex _SEP_UNSAFE_REGEX;
-
-__SIGNING_INTERNAL_END__
+// Framework libraries.
+#include "../../utils/crypto/abc.h"
 
 
-__SIGNING_BEGIN__
+__CORE_SIGNING_BEGIN__
 
-class Signer
+inline re::Regex _SEP_UNSAFE_REGEX = re::Regex(R"([A-z0-9-_=]*)");
+
+// TODO: docs
+// TESTME: Signer
+class Signer final
 {
 private:
 	std::string _key;
 	char _sep;
 	std::string _str_sep;
 	std::string _salt;
+	crypto::IHash* _hash_func;
 
 public:
 	explicit Signer(
-		const std::string& key,
-		char sep = ':',
-		const std::string& salt = ""
+		const std::string& key, char sep=':', const std::string& salt="",
+		crypto::IHash* hash_func=nullptr
 	);
+
 	std::string signature(const std::string& value);
-	std::string sign(const std::string& value);
+
+	inline std::string sign(const std::string& value)
+	{
+		return value + this->_sep + this->signature(value);
+	}
+
 	std::string unsign(const std::string& signed_value);
 };
 
-__SIGNING_END__
+__CORE_SIGNING_END__

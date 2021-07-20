@@ -1,13 +1,13 @@
 /**
  * middleware/http.cpp
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  */
 
 #include "./http.h"
 
-// Core libraries.
-#include <xalwart.core/string_utils.h>
+// Base libraries.
+#include <xalwart.base/string_utils.h>
 
 // Framework libraries.
 #include "../utils/cache.h"
@@ -25,7 +25,7 @@ ConditionalGetMiddleware::ConditionalGetMiddleware(
 {
 }
 
-core::Result<std::shared_ptr<http::IHttpResponse>> ConditionalGetMiddleware::process_response(
+Result<std::shared_ptr<http::IHttpResponse>> ConditionalGetMiddleware::process_response(
 	http::HttpRequest* request, http::IHttpResponse* response
 )
 {
@@ -39,7 +39,7 @@ core::Result<std::shared_ptr<http::IHttpResponse>> ConditionalGetMiddleware::pro
 
 	if (needs_etag(response) && !response->has_header(http::E_TAG))
 	{
-		utils::cache::set_response_etag(response);
+		cache::set_response_etag(response);
 	}
 
 	auto etag = response->get_header(http::E_TAG, "");
@@ -48,7 +48,7 @@ core::Result<std::shared_ptr<http::IHttpResponse>> ConditionalGetMiddleware::pro
 	);
 	if (!etag.empty() || last_modified != -1)
 	{
-		auto conditional_response = utils::cache::get_conditional_response(
+		auto conditional_response = cache::get_conditional_response(
 			request, etag, last_modified, response
 		);
 		if (conditional_response)

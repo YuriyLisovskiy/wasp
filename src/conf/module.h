@@ -1,16 +1,16 @@
 /**
- * apps/module.h
+ * conf/module.h
  *
  * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
- * Purpose:
- * 	Represents module configuration with urls and commands.
+ * Configuration of separate module with urls, commands and other
+ * stuff.
  */
 
 #pragma once
 
-// Core libraries.
-#include <xalwart.core/string_utils.h>
+// Base libraries.
+#include <xalwart.base/string_utils.h>
 
 // Module definitions.
 #include "./_def_.h"
@@ -19,13 +19,13 @@
 #include "./abc.h"
 #include "../views/view.h"
 #include "../urls/url.h"
-#include "../commands/app_command.h"
+#include "../commands/command.h"
 
 
-__APPS_BEGIN__
+__CONF_BEGIN__
 
-/// Derived class must contain constructor with
-/// pointer to conf::Settings parameter.
+// Derived class must contain constructor with
+// pointer to conf::Settings parameter.
 class ModuleConfig : public IModuleConfig
 {
 private:
@@ -40,15 +40,14 @@ private:
 	inline std::shared_ptr<IModuleConfig> _find_module(const std::string& module)
 	{
 		auto result = std::find_if(
-			this->settings->INSTALLED_MODULES.begin(),
-			this->settings->INSTALLED_MODULES.end(),
+			this->settings->MODULES.begin(), this->settings->MODULES.end(),
 			[module](const std::shared_ptr<IModuleConfig>& entry) -> bool {
 				return entry->get_name() == module;
 			}
 		);
-		if (result == this->settings->INSTALLED_MODULES.end())
+		if (result == this->settings->MODULES.end())
 		{
-			throw core::ImproperlyConfigured(
+			throw ImproperlyConfigured(
 				"module is used but was not registered: " + module, _ERROR_DETAILS_
 			);
 		}
@@ -73,7 +72,7 @@ protected:
 			http::HttpRequest* request,
 			views::Args* args,
 			conf::Settings* settings_ptr
-		) -> core::Result<std::shared_ptr<http::IHttpResponse>>
+		) -> Result<std::shared_ptr<http::IHttpResponse>>
 		{
 			ViewT view(settings_ptr);
 			view.setup(request);
@@ -106,18 +105,14 @@ protected:
 		});
 	}
 
-	template <typename CommandT, typename = std::enable_if<std::is_base_of<cmd::AppCommand, CommandT>::value>>
+	template <cmd::command_type CommandT>
 	inline void command()
 	{
 		auto cmd = std::make_shared<CommandT>(this, this->settings);
 		this->_commands.push_back(cmd);
 	}
 
-	template <
-		typename CommandT,
-		typename = std::enable_if<std::is_base_of<cmd::AppCommand, CommandT>::value>,
-		typename ...Args
-	>
+	template <cmd::command_type CommandT, typename ...Args>
 	inline void command(Args&& ...args)
 	{
 		auto cmd = std::make_shared<CommandT>(std::forward<Args>(args)...);
@@ -147,4 +142,4 @@ public:
 	virtual void init(const std::string& name);
 };
 
-__APPS_END__
+__CONF_END__

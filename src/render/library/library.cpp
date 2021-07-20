@@ -13,8 +13,9 @@ Library::Library(const std::string& lib_name, conf::Settings* settings)
 {
 	if (!settings)
 	{
-		throw core::ImproperlyConfigured(
-			lib_name + ": 'settings' parameter must be initialized"
+		throw ImproperlyConfigured(
+			lib_name + ": 'settings' parameter must be initialized",
+			_ERROR_DETAILS_
 		);
 	}
 

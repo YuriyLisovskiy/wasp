@@ -1,15 +1,15 @@
 /**
  * http/cookie.cpp
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  */
 
 #include "./cookie.h"
 
-// Core libraries.
-#include <xalwart.core/utility.h>
-#include <xalwart.core/exceptions.h>
-#include <xalwart.core/string_utils.h>
+// Base libraries.
+#include <xalwart.base/utility.h>
+#include <xalwart.base/exceptions.h>
+#include <xalwart.base/string_utils.h>
 
 
 __HTTP_BEGIN__
@@ -72,12 +72,12 @@ Cookie::Cookie(
 {
 	if (this->_name.empty())
 	{
-		throw core::ValueError("cookie's name can not be empty", _ERROR_DETAILS_);
+		throw ValueError("cookie's name can not be empty", _ERROR_DETAILS_);
 	}
 
 	if (this->_max_age < 0)
 	{
-		throw core::ValueError("cookie's Max-age can not be less than zero", _ERROR_DETAILS_);
+		throw ValueError("cookie's Max-age can not be less than zero", _ERROR_DETAILS_);
 	}
 
 	if (!this->_expires.empty())
@@ -140,12 +140,12 @@ std::string Cookie::to_string() const
 	if (!this->_same_site.empty())
 	{
 		std::vector<std::string> allowed_same_site_values = {"lax", "none", "strict"};
-		if (!utility::contains(
+		if (!util::contains(
 			str::lower(this->_same_site),
 			allowed_same_site_values.begin(), allowed_same_site_values.end()
 		))
 		{
-			throw core::ValueError(R"(samesite must be "lax", "none", or "strict".)");
+			throw ValueError(R"(samesite must be "lax", "none", or "strict".)");
 		}
 
 		result += "; SameSite=" + this->_same_site;

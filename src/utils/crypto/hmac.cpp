@@ -1,13 +1,13 @@
 /**
  * utils/crypto/hmac.cpp
  *
- * Copyright (c) 2020 Yuriy Lisovskiy
+ * Copyright (c) 2020-2021 Yuriy Lisovskiy
  */
 
 #include "./hmac.h"
 
-// Core libraries.
-#include <xalwart.core/exceptions.h>
+// Base libraries.
+#include <xalwart.base/exceptions.h>
 
 // Framework libraries.
 #include "./md5.h"
@@ -15,24 +15,20 @@
 
 __CRYPTO_BEGIN__
 
-Hmac::Hmac(
-	std::string key,
-	std::function<IHash*()> make_hash_func
-)
+HMAC::HMAC(std::string key, IHash* hash_func)
 {
-	if (!make_hash_func)
+	if (hash_func)
 	{
-		make_hash_func = []() -> IHash* { return new MD5(); };
+		this->_outer = hash_func->clone();
+		this->_inner = hash_func->clone();
+	}
+	else
+	{
+		MD5 md5;
+		this->_outer = md5.clone();
+		this->_inner = md5.clone();
 	}
 
-	this->_outer = make_hash_func();
-	if (!this->_outer)
-	{
-		make_hash_func = []() -> IHash* { return new MD5(); };
-		this->_outer = make_hash_func();
-	}
-
-	this->_inner = make_hash_func();
 	this->_size = this->_inner->size();
 	this->_block_size = this->_inner->block_size();
 	this->_i_pad = new unsigned char[this->_block_size]();
@@ -58,7 +54,7 @@ Hmac::Hmac(
 	this->_inner->update(this->_i_pad, this->_block_size);
 }
 
-Hmac::~Hmac()
+HMAC::~HMAC()
 {
 	delete[] this->_o_pad;
 	delete[] this->_i_pad;
@@ -66,44 +62,44 @@ Hmac::~Hmac()
 	delete this->_inner;
 }
 
-void Hmac::update(const unsigned char input[], unsigned int n)
+void HMAC::update(const unsigned char input[], unsigned int n)
 {
 	this->_inner->update(input, n);
 }
 
-void Hmac::update(const char input[], unsigned int n)
+void HMAC::update(const char input[], unsigned int n)
 {
 	this->_inner->update(input, n);
 }
 
-void Hmac::update(const std::string& input)
+void HMAC::update(const std::string& input)
 {
 	this->_inner->update(input);
 }
 
-size_t Hmac::size() const
+size_t HMAC::size() const
 {
 	return this->_size;
 }
 
-size_t Hmac::block_size() const
+size_t HMAC::block_size() const
 {
 	return this->_block_size;
 }
 
-unsigned char* Hmac::digest()
+unsigned char* HMAC::digest()
 {
 	this->_prepare_outer();
 	return this->_outer->digest();
 }
 
-std::string Hmac::hex_digest()
+std::string HMAC::hex_digest()
 {
 	this->_prepare_outer();
 	return this->_outer->hex_digest();
 }
 
-void Hmac::_prepare_outer()
+void HMAC::_prepare_outer()
 {
 	auto inner_sum = this->_inner->digest();
 	this->_outer->reset();
@@ -111,8 +107,7 @@ void Hmac::_prepare_outer()
 	this->_outer->update(inner_sum, this->_inner->size());
 }
 
-
-Hmac* salted_hmac(
+std::shared_ptr<HMAC> salted_hmac(
 	const std::string& salt,
 	const std::string& value,
 	const std::string& secret_key,
@@ -121,7 +116,7 @@ Hmac* salted_hmac(
 {
 	if (secret_key.empty())
 	{
-		throw core::ValueError("Secret: key can not be empty", _ERROR_DETAILS_);
+		throw ValueError("Secret: key can not be empty", _ERROR_DETAILS_);
 	}
 
 	bool is_default_hf = !hash_func;
@@ -140,9 +135,7 @@ Hmac* salted_hmac(
 	// the hmac module does the same thing for keys longer than the block size.
 	// However, we need to ensure that we *always* do this.
 	hash_func->reset();
-	Hmac* hmac = new Hmac(
-		salted_key, [hash_func]() -> IHash* { return hash_func->clone(); }
-	);
+	auto hmac = std::make_shared<HMAC>(salted_key, hash_func);
 	if (is_default_hf)
 	{
 		delete hash_func;

@@ -8,9 +8,9 @@
 
 #include <gtest/gtest.h>
 
-#include <xalwart.core/string_utils.h>
-#include <xalwart.core/collections/dict.h>
-#include <xalwart.core/collections/multi_dict.h>
+#include <xalwart.base/string_utils.h>
+#include <xalwart.base/collections/dict.h>
+#include <xalwart.base/collections/multi_dict.h>
 
 #include "../../src/views/view.h"
 #include "../../src/conf/settings.h"
@@ -158,7 +158,7 @@ TEST_F(ViewTestCase, SetupAndDispatchAllowedTest)
 {
 	auto request = ViewTestCase::make_request(this->settings, "options");
 
-	ASSERT_THROW(this->view->dispatch(nullptr), core::NullPointerException);
+	ASSERT_THROW(this->view->dispatch(nullptr), NullPointerException);
 
 	this->view->setup(&request);
 	auto response = this->view->dispatch(nullptr);

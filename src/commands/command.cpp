@@ -1,16 +1,16 @@
 /**
- * commands/app_command.cpp
+ * commands/command.cpp
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  */
 
-#include "./app_command.h"
+#include "./command.h"
 
 
 __COMMANDS_BEGIN__
 
-AppCommand::AppCommand(
-	apps::IModuleConfig* app_cfg,
+Command::Command(
+	conf::IModuleConfig* app_cfg,
 	conf::Settings* settings,
 	const std::string& cmd_name,
 	const std::string& help
@@ -18,7 +18,7 @@ AppCommand::AppCommand(
 {
 	if (!this->app_config)
 	{
-		throw core::ImproperlyConfigured(
+		throw ImproperlyConfigured(
 			"ModuleCommand: module config must be instantiated in order to use the application",
 			_ERROR_DETAILS_
 		);
@@ -26,7 +26,7 @@ AppCommand::AppCommand(
 
 	if (!this->settings)
 	{
-		throw core::ImproperlyConfigured(
+		throw ImproperlyConfigured(
 			"ModuleCommand: settings must be instantiated in order to use the application",
 			_ERROR_DETAILS_
 		);

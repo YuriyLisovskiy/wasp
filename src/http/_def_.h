@@ -10,7 +10,6 @@
 
 #include "../_def_.h"
 
-
 // xw::http
 #define __HTTP_BEGIN__ __MAIN_NAMESPACE_BEGIN__ namespace http {
 #define __HTTP_END__ } __MAIN_NAMESPACE_END__

@@ -58,29 +58,23 @@ Settings::Settings(const std::string& base_dir)
 
 void Settings::prepare()
 {
-	if (!this->ROOT_MODULE && !this->INSTALLED_MODULES.empty())
+	if (!this->ROOT_MODULE && !this->MODULES.empty())
 	{
-		this->ROOT_MODULE = this->INSTALLED_MODULES.front();
+		this->ROOT_MODULE = this->MODULES.front();
 	}
+
+//	if (!this->DB)
+//	{
+//		this->LOGGER->warning("Missing 'default' database");
+//		if (!this->DATABASES.empty())
+//		{
+//			this->DB = this->DATABASES.front();
+//			this->LOGGER->warning("Using the first database from 'databases' list");
+//		}
+//	}
 }
 
-void Settings::register_modules()
-{
-}
-
-void Settings::register_middleware()
-{
-}
-
-void Settings::register_libraries()
-{
-}
-
-void Settings::register_loaders()
-{
-}
-
-std::shared_ptr<apps::IModuleConfig> Settings::get_module(
+std::shared_ptr<IModuleConfig> Settings::get_module(
 	const std::string& full_name
 ) const
 {

@@ -10,7 +10,6 @@
 
 #include "../_def_.h"
 
-
 // xw::views
 #define __VIEWS_BEGIN__ __MAIN_NAMESPACE_BEGIN__ namespace views {
 #define __VIEWS_END__ } __MAIN_NAMESPACE_END__

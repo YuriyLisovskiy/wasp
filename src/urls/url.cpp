@@ -1,13 +1,13 @@
 /**
  * urls/url.cpp
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  */
 
 #include "./url.h"
 
-// Core libraries.
-#include <xalwart.core/string_utils.h>
+// Base libraries.
+#include <xalwart.base/string_utils.h>
 
 
 __URLS_BEGIN__
@@ -29,14 +29,14 @@ std::shared_ptr<urls::UrlPattern> make_static(
 {
 	if (static_url.empty())
 	{
-		throw core::ImproperlyConfigured("Empty static url not permitted", _ERROR_DETAILS_);
+		throw ImproperlyConfigured("Empty static url not permitted", _ERROR_DETAILS_);
 	}
 
 	auto view_func = [static_root](
 		http::HttpRequest* request,
 		views::Args* args,
 		conf::Settings* settings
-	) -> core::Result<std::shared_ptr<http::IHttpResponse>>
+	) -> Result<std::shared_ptr<http::IHttpResponse>>
 	{
 		views::StaticView view(settings);
 		auto kwargs = std::make_unique<collections::Dict<std::string, std::string>>(

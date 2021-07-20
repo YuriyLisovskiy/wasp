@@ -1,7 +1,7 @@
 /**
  * core/uploaded_file.h
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
  * Purpose:
  * 	Represents some file data that the user submitted with a form.
@@ -9,15 +9,16 @@
 
 #pragma once
 
-// Core modules.
-#include <xalwart.core/file.h>
+// Base modules.
+#include <xalwart.base/file.h>
 
 // Module definitions.
 #include "./_def_.h"
 
 
-__FILES_BEGIN__
+__CORE_FILES_BEGIN__
 
+// TESTME: UploadedFile
 class UploadedFile
 {
 private:
@@ -53,4 +54,4 @@ public:
 	void save();
 };
 
-__FILES_END__
+__CORE_FILES_END__

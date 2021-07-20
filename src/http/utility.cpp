@@ -1,14 +1,14 @@
 /**
  * http/utility.cpp
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  */
 
 #include "./utility.h"
 
-// Core libraries.
-#include <xalwart.core/utility.h>
-#include <xalwart.core/string_utils.h>
+// Base libraries.
+#include <xalwart.base/utility.h>
+#include <xalwart.base/string_utils.h>
 
 
 __HTTP_INTERNAL_BEGIN__
@@ -31,7 +31,7 @@ size_t parse_http_datetime(const std::string& http_datetime)
 
 std::string http_date(size_t epoch_seconds)
 {
-	return utility::format_date(epoch_seconds, false, true);
+	return util::format_date(epoch_seconds, false, true);
 }
 
 void split_domain_port(

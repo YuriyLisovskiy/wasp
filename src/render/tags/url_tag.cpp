@@ -1,7 +1,7 @@
 /**
  * render/tags/url_tag.cpp
  *
- * Copyright (c) 2020 Yuriy Lisovskiy
+ * Copyright (c) 2020-2021 Yuriy Lisovskiy
  */
 
 #include "./url_tag.h"
@@ -9,8 +9,8 @@
 // C++ libraries.
 #include <iostream>
 
-// Core libraries.
-#include <xalwart.core/types/string.h>
+// Base libraries.
+#include <xalwart.base/types/string.h>
 
 // Render libraries.
 #include <xalwart.render/syntax/parse_var_name.h>
@@ -20,13 +20,13 @@
 #include "../../utils/functional.h"
 
 
-__TAGS_BEGIN__
+__RENDER_TAGS_BEGIN__
 
 std::string url_node::render(IContext* ctx)
 {
 	using Fe = std::shared_ptr<FilterExpression>;
 	auto built_url = this->pattern->build(
-		utils::fn::map<Fe, std::string>(this->params, [ctx](const Fe& p) -> std::string {
+		fn::map<Fe, std::string>(this->params, [ctx](const Fe& p) -> std::string {
 			auto p_var = p->resolve(ctx);
 			return p_var ? p_var->__str__() : "";
 		})
@@ -103,4 +103,4 @@ std::function<std::shared_ptr<internal::node>(
 	};
 }
 
-__TAGS_END__
+__RENDER_TAGS_END__

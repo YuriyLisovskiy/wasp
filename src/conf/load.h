@@ -11,8 +11,8 @@
 // C++ libraries.
 #include <memory>
 
-// Core libraries.
-#include <xalwart.core/exceptions.h>
+// Base libraries.
+#include <xalwart.base/exceptions.h>
 
 // Module definitions.
 #include "./_def_.h"
@@ -37,7 +37,7 @@ public:
 	{
 		if (!this->_loader)
 		{
-			throw core::NullPointerException(
+			throw NullPointerException(
 				"settings loader is not instantiated", _ERROR_DETAILS_
 			);
 		}
@@ -51,7 +51,7 @@ public:
 		auto config = this->_loader->load_file(settings->BASE_DIR, this->_loader->config_name());
 		if (!config)
 		{
-			throw core::RuntimeError("'" + this->_loader->config_name() + "' is not found");
+			throw RuntimeError("'" + this->_loader->config_name() + "' is not found");
 		}
 
 		auto local_config = this->_loader->load_file(

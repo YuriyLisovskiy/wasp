@@ -1,16 +1,16 @@
 /**
  * http/interfaces.h
  *
- * Copyright (c) 2020 Yuriy Lisovskiy
+ * Copyright (c) 2020-2021 Yuriy Lisovskiy
  *
  * Purpose: TODO
  */
 
 #pragma once
 
-// Core libraries.
-#include <xalwart.core/collections/dict.h>
-#include <xalwart.core/result.h>
+// Base libraries.
+#include <xalwart.base/collections/dict.h>
+#include <xalwart.base/result.h>
 
 // Module definitions.
 #include "./_def_.h"
@@ -91,7 +91,7 @@ public:
 
 	virtual std::string& operator[] (const std::string& key) = 0;
 
-	virtual core::Error err() = 0;
+	virtual Error err() = 0;
 };
 
 __HTTP_END__

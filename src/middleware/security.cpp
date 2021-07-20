@@ -1,13 +1,13 @@
 /**
  * middleware/security.cpp
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  */
 
 #include "./security.h"
 
-// Core libraries.
-#include <xalwart.core/string_utils.h>
+// Base libraries.
+#include <xalwart.base/string_utils.h>
 
 // Framework libraries.
 #include "../http/headers.h"
@@ -35,7 +35,7 @@ SecurityMiddleware::SecurityMiddleware(
 	}
 }
 
-core::Result<std::shared_ptr<http::IHttpResponse>> SecurityMiddleware::process_request(
+Result<std::shared_ptr<http::IHttpResponse>> SecurityMiddleware::process_request(
 	http::HttpRequest* request
 )
 {
@@ -88,7 +88,7 @@ core::Result<std::shared_ptr<http::IHttpResponse>> SecurityMiddleware::process_r
 	return this->none();
 }
 
-core::Result<std::shared_ptr<http::IHttpResponse>> SecurityMiddleware::process_response(
+Result<std::shared_ptr<http::IHttpResponse>> SecurityMiddleware::process_response(
 	http::HttpRequest* request, http::IHttpResponse* response
 )
 {

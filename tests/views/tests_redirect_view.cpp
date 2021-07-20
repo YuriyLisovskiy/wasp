@@ -8,9 +8,9 @@
 
 #include <gtest/gtest.h>
 
-#include <xalwart.core/logger.h>
-#include <xalwart.core/collections/dict.h>
-#include <xalwart.core/collections/multi_dict.h>
+#include <xalwart.base/logger.h>
+#include <xalwart.base/collections/dict.h>
+#include <xalwart.base/collections/multi_dict.h>
 
 #include "../../src/views/redirect_view.h"
 #include "../../src/conf/settings.h"
@@ -168,7 +168,7 @@ TEST_F(RedirectViewWithDefaultParamsTestCase, SetupAndDispatchAllowedTest)
 {
 	auto request = make_request(this->settings, "get");
 
-	ASSERT_THROW(this->view->dispatch(nullptr), core::NullPointerException);
+	ASSERT_THROW(this->view->dispatch(nullptr), NullPointerException);
 
 	this->view->setup(&request);
 	auto response = this->view->dispatch(nullptr);

@@ -6,9 +6,9 @@
 
 #include "./view.h"
 
-// Core libraries.
-#include <xalwart.core/utility.h>
-#include <xalwart.core/string_utils.h>
+// Base libraries.
+#include <xalwart.base/utility.h>
+#include <xalwart.base/string_utils.h>
 
 // Framework libraries.
 #include "../conf/settings.h"
@@ -20,15 +20,15 @@ View::View(conf::Settings* settings)
 {
 	if (!this->settings->LOGGER)
 	{
-		throw core::ImproperlyConfigured("View: LOGGER instance must be configured");
+		throw ImproperlyConfigured("View: LOGGER instance must be configured");
 	}
 
 	this->logger = this->settings->LOGGER.get();
 }
 
-core::Result<std::shared_ptr<http::IHttpResponse>> View::null()
+Result<std::shared_ptr<http::IHttpResponse>> View::null()
 {
-	return core::Result<std::shared_ptr<http::IHttpResponse>>::null();
+	return Result<std::shared_ptr<http::IHttpResponse>>::null();
 }
 
 View::View(
@@ -48,12 +48,12 @@ void View::setup(http::HttpRequest* request)
 	this->request = request;
 }
 
-core::Result<std::shared_ptr<http::IHttpResponse>> View::dispatch(Args* args)
+Result<std::shared_ptr<http::IHttpResponse>> View::dispatch(Args* args)
 {
 	if (this->request == nullptr)
 	{
-		throw core::NullPointerException(
-			utility::demangle(typeid(*this).name()) +
+		throw NullPointerException(
+			util::demangle(typeid(*this).name()) +
 			" instance has not initialized request."
 			" Did you override setup() and forget to call base method?",
 			_ERROR_DETAILS_
@@ -61,7 +61,7 @@ core::Result<std::shared_ptr<http::IHttpResponse>> View::dispatch(Args* args)
 	}
 
 	std::string method = str::lower(this->request->method());
-	auto result = core::Result<std::shared_ptr<http::IHttpResponse>>::null();
+	auto result = Result<std::shared_ptr<http::IHttpResponse>>::null();
 	if (method == "get")
 	{
 		result = this->get(this->request, args);
@@ -103,7 +103,7 @@ core::Result<std::shared_ptr<http::IHttpResponse>> View::dispatch(Args* args)
 	return result;
 }
 
-core::Result<std::shared_ptr<http::IHttpResponse>> View::http_method_not_allowed(http::HttpRequest* request)
+Result<std::shared_ptr<http::IHttpResponse>> View::http_method_not_allowed(http::HttpRequest* request)
 {
 	this->logger->warning(
 		"Method Not Allowed (" + request->method() + "): " + request->path(),
@@ -131,37 +131,37 @@ std::vector<std::string> View::allowed_methods()
 	return result;
 }
 
-core::Result<std::shared_ptr<http::IHttpResponse>> View::get(http::HttpRequest* request, Args* args)
+Result<std::shared_ptr<http::IHttpResponse>> View::get(http::HttpRequest* request, Args* args)
 {
 	return this->null();
 }
 
-core::Result<std::shared_ptr<http::IHttpResponse>> View::post(http::HttpRequest* request, Args* args)
+Result<std::shared_ptr<http::IHttpResponse>> View::post(http::HttpRequest* request, Args* args)
 {
 	return this->null();
 }
 
-core::Result<std::shared_ptr<http::IHttpResponse>> View::put(http::HttpRequest* request, Args* args)
+Result<std::shared_ptr<http::IHttpResponse>> View::put(http::HttpRequest* request, Args* args)
 {
 	return this->null();
 }
 
-core::Result<std::shared_ptr<http::IHttpResponse>> View::patch(http::HttpRequest* request, Args* args)
+Result<std::shared_ptr<http::IHttpResponse>> View::patch(http::HttpRequest* request, Args* args)
 {
 	return this->null();
 }
 
-core::Result<std::shared_ptr<http::IHttpResponse>> View::delete_(http::HttpRequest* request, Args* args)
+Result<std::shared_ptr<http::IHttpResponse>> View::delete_(http::HttpRequest* request, Args* args)
 {
 	return this->null();
 }
 
-core::Result<std::shared_ptr<http::IHttpResponse>> View::head(http::HttpRequest* request, Args* args)
+Result<std::shared_ptr<http::IHttpResponse>> View::head(http::HttpRequest* request, Args* args)
 {
 	return this->get(request, args);
 }
 
-core::Result<std::shared_ptr<http::IHttpResponse>> View::options(http::HttpRequest* request, Args* args)
+Result<std::shared_ptr<http::IHttpResponse>> View::options(http::HttpRequest* request, Args* args)
 {
 	auto response = std::make_shared<http::HttpResponse>(200);
 	auto allowed_methods = this->allowed_methods();
@@ -173,7 +173,7 @@ core::Result<std::shared_ptr<http::IHttpResponse>> View::options(http::HttpReque
 	return this->response(response);
 }
 
-core::Result<std::shared_ptr<http::IHttpResponse>> View::trace(http::HttpRequest* request, Args* args)
+Result<std::shared_ptr<http::IHttpResponse>> View::trace(http::HttpRequest* request, Args* args)
 {
 	return this->null();
 }

@@ -1,0 +1,119 @@
+name: "ci"
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - dev
+      - release
+jobs:
+  compile-lib:
+    name: Build the library and upload it to artifacts
+    runs-on: ubuntu-18.04
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - name: alpine
+            version: 3.13
+          - name: ubuntu
+            version: 18.04
+        compiler: [ gcc, clang ]
+        compiler_version: [ 10 ]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Download Base Library
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          github_token: ${{ secrets.GH_ACCESS_TOKEN }}
+          workflow: ci.yml
+          branch: dev
+          name: xalwart.base-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
+          path: xalwart.base-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
+          repo: YuriyLisovskiy/xalwart.base
+      - name: Download ORM Library
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          github_token: ${{ secrets.GH_ACCESS_TOKEN }}
+          workflow: ci.yml
+          branch: dev
+          name: xalwart.orm-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
+          path: xalwart.orm-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
+          repo: YuriyLisovskiy/xalwart.orm
+      - name: Download Render Library
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          github_token: ${{ secrets.GH_ACCESS_TOKEN }}
+          workflow: ci.yml
+          branch: dev
+          name: xalwart.render-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
+          path: xalwart.render-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
+          repo: YuriyLisovskiy/xalwart.render
+      - name: Build the Library
+        run: |
+          sudo docker run -i \
+                          -v ${{ github.workspace }}:/app \
+                          xalwart/${{ matrix.compiler }}:${{ matrix.compiler_version }}-${{ matrix.os.name }}-${{ matrix.os.version }} \
+                          bash /app/scripts/linux/build.sh ${{ matrix.os.name }} ${{ matrix.compiler }} ${{ matrix.compiler_version }}
+      - name: Upload the Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: xalwart-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
+          path: xalwart-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
+          retention-days: 90
+  test:
+    name: "${{ matrix.os.name }}-${{ matrix.os.version }} [${{ matrix.compiler }}-${{ matrix.compiler_version }}]"
+    needs: [ compile-lib ]
+    runs-on: ubuntu-18.04
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - name: alpine
+            version: 3.13
+          - name: ubuntu
+            version: 18.04
+          - name: ubuntu
+            version: 20.04
+        compiler: [ clang, gcc ]
+        compiler_version: [ 10 ]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Download Base Library
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          github_token: ${{ secrets.GH_ACCESS_TOKEN }}
+          workflow: ci.yml
+          branch: dev
+          name: xalwart.base-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
+          path: xalwart.base-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
+          repo: YuriyLisovskiy/xalwart.base
+      - name: Download ORM Library
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          github_token: ${{ secrets.GH_ACCESS_TOKEN }}
+          workflow: ci.yml
+          branch: dev
+          name: xalwart.orm-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
+          path: xalwart.orm-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
+          repo: YuriyLisovskiy/xalwart.orm
+      - name: Download Render Library
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          github_token: ${{ secrets.GH_ACCESS_TOKEN }}
+          workflow: ci.yml
+          branch: dev
+          name: xalwart.render-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
+          path: xalwart.render-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
+          repo: YuriyLisovskiy/xalwart.render
+      - name: Download the Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: xalwart-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
+          path: xalwart-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
+      - name: Build and Run Tests
+        run: |
+          sudo docker run -i \
+                          -v ${{ github.workspace }}:/app \
+                          xalwart/gtest:1.11.0-${{ matrix.compiler }}-${{ matrix.compiler_version }}-${{ matrix.os.name }}-${{ matrix.os.version }} \
+                          bash /app/scripts/linux/test.sh ${{ matrix.os.name }} ${{ matrix.compiler }} ${{ matrix.compiler_version }}

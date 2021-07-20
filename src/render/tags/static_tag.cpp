@@ -1,21 +1,21 @@
 /**
  * render/tags/static_tag.cpp
  *
- * Copyright (c) 2020 Yuriy Lisovskiy
+ * Copyright (c) 2020-2021 Yuriy Lisovskiy
  */
 
 #include "./static_tag.h"
 
-// Core libraries.
-#include <xalwart.core/path.h>
-#include <xalwart.core/types/string.h>
+// Base libraries.
+#include <xalwart.base/path.h>
+#include <xalwart.base/types/string.h>
 
 // Render libraries.
 #include <xalwart.render/syntax/parse_var_name.h>
 #include <xalwart.render/syntax/utility.h>
 
 
-__TAGS_BEGIN__
+__RENDER_TAGS_BEGIN__
 
 std::string static_node::render(IContext* ctx)
 {
@@ -76,4 +76,4 @@ std::function<std::shared_ptr<internal::node>(
 	};
 }
 
-__TAGS_END__
+__RENDER_TAGS_END__

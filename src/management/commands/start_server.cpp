@@ -6,27 +6,27 @@
 
 #include "./start_server.h"
 
-// Core libraries.
-#include <xalwart.core/string_utils.h>
-#include <xalwart.core/datetime.h>
+// Base libraries.
+#include <xalwart.base/string_utils.h>
+#include <xalwart.base/datetime.h>
 
 
 __MANAGEMENT_COMMANDS_BEGIN__
 
 StartServerCommand::StartServerCommand(
-	apps::IModuleConfig* config,
+	conf::IModuleConfig* config,
 	conf::Settings* settings,
-	std::function<std::shared_ptr<net::IServer>(
+	std::function<std::shared_ptr<net::abc::IServer>(
 		log::ILogger*,
 		collections::Dict<std::string, std::string>
 	)> make_server
-) : AppCommand(
+) : Command(
 	config, settings, "start-server", "Starts a web application"
 ), make_server(std::move(make_server))
 {
 	if (!this->make_server)
 	{
-		throw core::ImproperlyConfigured(
+		throw ImproperlyConfigured(
 			"StartServerCommand: server initializer must be instantiated in order to use the application",
 			_ERROR_DETAILS_
 		);
@@ -48,7 +48,7 @@ StartServerCommand::StartServerCommand(
 
 collections::Dict<std::string, std::string> StartServerCommand::get_kwargs()
 {
-	auto kwargs = AppCommand::get_kwargs();
+	auto kwargs = Command::get_kwargs();
 	kwargs["xw.workers"] = std::to_string(this->_threads_count);
 	kwargs["xw.max_body_size"] = std::to_string(this->settings->DATA_UPLOAD_MAX_MEMORY_SIZE);
 
@@ -75,16 +75,20 @@ void StartServerCommand::add_flags()
 	this->_use_ipv6_flag = this->flag_set->make_bool(
 		"use-ipv6", false, "Use IPv6 address or not (used in case when host is set to 'localhost')"
 	);
-	this->_log_color_flag = this->flag_set->make_bool("log-color", true, "Use colors for output");
+	this->_no_colors_flag = this->flag_set->make_bool(
+		"no-colors", false, "Disable colors in logs"
+	);
 }
 
 void StartServerCommand::handle()
 {
-	core::InterruptException::initialize();
-	this->settings->LOGGER->use_colors(this->_log_color_flag->get());
+	this->settings->LOGGER->use_colors(!this->_no_colors_flag->get());
 	if (!this->settings->DEBUG && this->settings->ALLOWED_HOSTS.empty())
 	{
-		throw core::CommandError("You must set 'allowed_hosts' if 'debug' is false.");
+		throw CommandError(
+			"You must set 'allowed_hosts' if 'debug' is false.",
+			_ERROR_DETAILS_
+		);
 	}
 
 	this->retrieve_args(
@@ -94,25 +98,18 @@ void StartServerCommand::handle()
 	try
 	{
 		server->bind(this->_host, this->_port);
-//		try
-//		{
-			std::string message = dt::Datetime::now().strftime("%B %d, %Y - %T") + "\n" +
-			                      LIB_NAME + " version " + LIB_VERSION + "\n" +
-			                      "Starting development server at " +
-			                      "http://" + this->_host + ":" + std::to_string(this->_port) + "/\n" +
-			                      "Quit the server with CONTROL-C.";
-			server->listen(message);
-//		}
-//		catch (const xw::core::InterruptException& exc)
-//		{
-			// skip
-//		}
+		std::string message = dt::Datetime::now().strftime("%B %d, %Y - %T") + "\n" +
+		                      v::framework_name + " version " + v::version.to_string() + "\n" +
+		                      "Starting development server at " +
+		                      "http://" + this->_host + ":" + std::to_string(this->_port) + "/\n" +
+		                      "Quit the server with CONTROL-C.";
+		server->listen(message);
 	}
-	catch (const core::InterruptException& exc)
+	catch (const InterruptException& exc)
 	{
 		this->settings->LOGGER->debug("Interrupted");
 	}
-	catch (const core::BaseException& exc)
+	catch (const BaseException& exc)
 	{
 		this->settings->LOGGER->error(exc);
 	}
@@ -134,7 +131,9 @@ void StartServerCommand::retrieve_args(
 	{
 		if (!this->_ipv4_ipv6_port_regex.match(host_port_str))
 		{
-			throw core::CommandError(host_port_str + " is not valid host:port pair");
+			throw CommandError(
+				host_port_str + " is not valid host:port pair", _ERROR_DETAILS_
+			);
 		}
 
 		auto groups = this->_ipv4_ipv6_port_regex.groups();
@@ -165,7 +164,10 @@ void StartServerCommand::retrieve_args(
 			}
 			else if (!this->_ipv4_regex.match(address))
 			{
-				throw core::CommandError(this->_addr_flag->get_raw() + " is invalid address");
+				throw CommandError(
+					this->_addr_flag->get_raw() + " is invalid address",
+					_ERROR_DETAILS_
+				);
 			}
 		}
 
@@ -182,14 +184,18 @@ void StartServerCommand::retrieve_args(
 		}
 		else
 		{
-			throw core::CommandError(this->_port_flag->get_raw() + " is invalid port");
+			throw CommandError(
+				this->_port_flag->get_raw() + " is invalid port",
+				_ERROR_DETAILS_
+			);
 		}
 	}
 
 	if (!this->_threads_flag->valid())
 	{
-		throw core::CommandError(
-			"threads count is not a valid positive integer: " + this->_threads_flag->get_raw()
+		throw CommandError(
+			"threads count is not a valid positive integer: " + this->_threads_flag->get_raw(),
+			_ERROR_DETAILS_
 		);
 	}
 

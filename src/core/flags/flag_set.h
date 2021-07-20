@@ -18,7 +18,7 @@
 #include "./default.h"
 
 
-__FLAGS_BEGIN__
+__CORE_FLAGS_BEGIN__
 
 class FlagSet final
 {
@@ -51,4 +51,4 @@ public:
 	);
 };
 
-__FLAGS_END__
+__CORE_FLAGS_END__

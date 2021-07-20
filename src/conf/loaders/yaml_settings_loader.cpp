@@ -6,8 +6,8 @@
 
 #include "./yaml_settings_loader.h"
 
-// Core libraries.
-#include <xalwart.core/path.h>
+// Base libraries.
+#include <xalwart.base/path.h>
 
 // Render libraries.
 #include <xalwart.render/engine.h>
@@ -148,16 +148,16 @@ void YamlSettingsLoader::_init_secure(Settings* settings, const YAML::Node& secu
 	}
 }
 
-void YamlSettingsLoader::_init_modules(Settings* settings, const YAML::Node& installed_modules)
+void YamlSettingsLoader::_init_modules(Settings* settings, const YAML::Node& modules)
 {
-	for (auto it = installed_modules.begin(); it != installed_modules.end(); it++)
+	for (auto it = modules.begin(); it != modules.end(); it++)
 	{
 		if (it->IsDefined() && it->IsScalar())
 		{
 			auto item = settings->get_module(it->as<std::string>());
 			if (item)
 			{
-				settings->INSTALLED_MODULES.push_back(item);
+				settings->MODULES.push_back(item);
 			}
 		}
 	}
@@ -178,14 +178,94 @@ void YamlSettingsLoader::_init_middleware(Settings* settings, const YAML::Node& 
 	}
 }
 
-YAML::Node YamlSettingsLoader::null() const
+void YamlSettingsLoader::_init_databases(Settings* settings, const YAML::Node& databases)
 {
-	return YAML::Node(YAML::NodeType::Null);
+	for (auto it = databases.begin(); it != databases.end(); it++)
+	{
+		if (it->IsDefined() && it->IsMap())
+		{
+			auto db_info = *it;
+			if (!db_info || !db_info.IsMap())
+			{
+				throw ImproperlyConfigured(
+					"databases: parameter must be non-empty map", _ERROR_DETAILS_
+				);
+			}
+
+			auto driver_node = db_info["driver"];
+			if (!driver_node || !driver_node.IsScalar())
+			{
+				throw ImproperlyConfigured(
+					"databases: the 'driver' parameter is required and must have a string type",
+					_ERROR_DETAILS_
+				);
+			}
+
+			auto name_node = db_info["name"];
+			if (!name_node || !name_node.IsScalar())
+			{
+				throw ImproperlyConfigured(
+					"databases: the 'name' parameter is required and must have a string type",
+					_ERROR_DETAILS_
+				);
+			}
+
+			auto db_name = name_node.as<std::string>();
+			auto driver_name = driver_node.as<std::string>();
+			std::shared_ptr<orm::abc::ISQLDriver> driver;
+			if (driver_name == "sqlite3")
+			{
+				_init_sqlite3_database(db_name, settings, driver, db_info);
+			}
+			else
+			{
+				// TODO: add more driver initializations.
+				driver = settings->build_custom_database(db_name, db_info);
+			}
+
+			if (driver)
+			{
+				settings->DATABASES[db_name] = std::make_shared<orm::Client>(driver);
+//				if (db_name == "default")
+//				{
+//					settings->DB = std::make_shared<orm::Client>(driver);
+//				}
+//				else
+//				{
+//					settings->DATABASES.push_back();
+//				}
+			}
+		}
+	}
+
+	if (settings->DATABASES.find("default") != settings->DATABASES.end())
+	{
+		settings->DB = settings->DATABASES["default"];
+	}
+	else
+	{
+		throw ImproperlyConfigured(
+			"databases: default database is required to be configured",
+			_ERROR_DETAILS_
+		);
+	}
 }
 
-YAML::Node YamlSettingsLoader::map_node() const
+void YamlSettingsLoader::_init_sqlite3_database(
+	const std::string& name, Settings* settings,
+	std::shared_ptr<orm::abc::ISQLDriver>& driver, const YAML::Node& database
+)
 {
-	return YAML::Node(YAML::NodeType::Map);
+	auto filepath = database["file"];
+	if (!filepath || !filepath.IsScalar())
+	{
+		throw ImproperlyConfigured(
+			"databases: the 'file' parameter of SQLite3 database info is required and must have a string type",
+			_ERROR_DETAILS_
+		);
+	}
+
+	driver = settings->build_sqlite3_database(name, filepath.as<std::string>());
 }
 
 void YamlSettingsLoader::check_config(const YAML::Node& config, const std::string& file_path)
@@ -195,7 +275,7 @@ void YamlSettingsLoader::check_config(const YAML::Node& config, const std::strin
 		return;
 	}
 
-	throw core::ValueError("'" + file_path + "' file must have map type");
+	throw ValueError("'" + file_path + "' file must have map type", _ERROR_DETAILS_);
 }
 
 void YamlSettingsLoader::overwrite_scalar_or_remove_if_null(
@@ -483,7 +563,7 @@ void YamlSettingsLoader::init_template_engine_setting(Settings* settings, const 
 	auto use_module_dirs = config["use_module_directories"];
 	if (use_module_dirs && use_module_dirs.IsScalar() && use_module_dirs.as<bool>(false))
 	{
-		for (const auto& module : settings->INSTALLED_MODULES)
+		for (const auto& module : settings->MODULES)
 		{
 			dirs.push_back(path::dirname(module->get_module_path()));
 		}
@@ -965,12 +1045,12 @@ void YamlSettingsLoader::overwrite_config(YAML::Node& config, const YAML::Node& 
 		}
 	}
 
-	auto local_installed_modules = local_config["installed_modules"];
-	if (local_installed_modules && (
-		local_installed_modules.IsNull() || local_installed_modules.IsSequence()
+	auto local_modules = local_config["modules"];
+	if (local_modules && (
+		local_modules.IsNull() || local_modules.IsSequence()
 	))
 	{
-		config["installed_modules"] = local_installed_modules;
+		config["modules"] = local_modules;
 	}
 
 	auto local_middleware = local_config["middleware"];
@@ -979,6 +1059,12 @@ void YamlSettingsLoader::overwrite_config(YAML::Node& config, const YAML::Node& 
 	))
 	{
 		config["middleware"] = local_middleware;
+	}
+
+	auto local_databases = local_config["databases"];
+	if (local_databases && local_databases.IsSequence())
+	{
+		config["databases"] = local_databases;
 	}
 
 	auto local_template_engine = local_config["template_engine"];
@@ -1124,11 +1210,11 @@ void YamlSettingsLoader::init_settings(Settings* settings, const YAML::Node& con
 		_init_secure(settings, secure);
 	}
 
-	auto installed_modules = config["installed_modules"];
-	if (installed_modules && installed_modules.IsSequence() && installed_modules.size() > 0)
+	auto modules = config["modules"];
+	if (modules && modules.IsSequence() && modules.size() > 0)
 	{
 		settings->register_modules();
-		_init_modules(settings, installed_modules);
+		_init_modules(settings, modules);
 	}
 
 	auto middleware = config["middleware"];
@@ -1136,6 +1222,16 @@ void YamlSettingsLoader::init_settings(Settings* settings, const YAML::Node& con
 	{
 		settings->register_middleware();
 		_init_middleware(settings, middleware);
+	}
+
+	auto databases = config["databases"];
+	if (databases && databases.IsSequence() && databases.size() > 0)
+	{
+		_init_databases(settings, databases);
+	}
+	else
+	{
+		settings->LOGGER->warning("databases: databases were not detected", _ERROR_DETAILS_);
 	}
 
 	auto template_engine = config["template_engine"];

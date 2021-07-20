@@ -8,22 +8,22 @@
 
 #pragma once
 
-// Core libraries.
-#include <xalwart.core/net/abc.h>
+// Base libraries.
+#include <xalwart.base/net/abc.h>
 
 // Module definitions.
 #include "./_def_.h"
 
 // Framework libraries.
-#include "../apps/module.h"
+#include "../conf/module.h"
 
 
 __MANAGEMENT_BEGIN__
 
-class CoreManagementModuleConfig final : public apps::ModuleConfig
+class CoreManagementModuleConfig final : public conf::ModuleConfig
 {
 private:
-	std::function<std::shared_ptr<net::IServer>(
+	std::function<std::shared_ptr<net::abc::IServer>(
 		log::ILogger*,
 		collections::Dict<std::string, std::string>
 	)> _make_server;
@@ -31,7 +31,7 @@ private:
 public:
 	explicit CoreManagementModuleConfig(
 		conf::Settings* settings,
-		std::function<std::shared_ptr<net::IServer>(
+		std::function<std::shared_ptr<net::abc::IServer>(
 			log::ILogger*,
 			collections::Dict<std::string, std::string>
 		)> make_server

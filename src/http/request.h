@@ -8,9 +8,9 @@
 
 #pragma once
 
-// Core libraries.
-#include <xalwart.core/collections/multi_dict.h>
-#include <xalwart.core/result.h>
+// Base libraries.
+#include <xalwart.base/collections/multi_dict.h>
+#include <xalwart.base/result.h>
 
 // Module definitions.
 #include "./_def_.h"
@@ -128,7 +128,7 @@ public:
 	std::string scheme(std::pair<std::string, std::string>* secure_proxy_ssl_header) const;
 
 	/// Return the HTTP host using the environment or request headers.
-	core::Result<std::string> get_host(
+	Result<std::string> get_host(
 		bool use_x_forwarded_host, bool use_x_forwarded_port,
 		bool debug, std::vector<std::string> allowed_hosts
 	);

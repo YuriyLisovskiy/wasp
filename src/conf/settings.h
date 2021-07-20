@@ -8,21 +8,28 @@
 
 #pragma once
 
-// Core libraries.
-#include <xalwart.core/datetime.h>
-#include <xalwart.core/logger.h>
-#include <xalwart.core/result.h>
-#include <xalwart.core/string_utils.h>
-#include <xalwart.core/utility.h>
+// Base libraries.
+#include <xalwart.base/datetime.h>
+#include <xalwart.base/logger.h>
+#include <xalwart.base/result.h>
+#include <xalwart.base/string_utils.h>
+#include <xalwart.base/utility.h>
+#include <xalwart.base/path.h>
+#include <xalwart.base/yaml/yaml-cpp/yaml.h>
 
 // Render libraries.
 #include <xalwart.render/library/abc.h>
+
+// ORM libraries.
+#include <xalwart.orm/client.h>
+#include <xalwart.orm/db/migration.h>
+#include <xalwart.orm/sqlite3/driver.h>
 
 // Module definitions.
 #include "./_def_.h"
 
 // Framework libraries.
-#include "../apps/abc.h"
+#include "./abc.h"
 #include "../middleware/abc.h"
 #include "../urls/url.h"
 
@@ -61,7 +68,7 @@ public:
 	//
 	// ROOT_MODULE is the first installed module by default, it can
 	// be overridden in project settings.
-	std::shared_ptr<apps::IModuleConfig> ROOT_MODULE;
+	std::shared_ptr<IModuleConfig> ROOT_MODULE;
 
 	// Vector of patterns which will be loaded from ROOT_MODULE.
 	// To change this setting, setup ROOT_MODULE in your project
@@ -71,10 +78,16 @@ public:
 	// List of ModuleConfig-derived objects representing modules.
 	// Order is required. The first item is interpreted as main
 	// module configuration.
-	std::vector<std::shared_ptr<apps::IModuleConfig>> INSTALLED_MODULES;
+	std::vector<std::shared_ptr<IModuleConfig>> MODULES;
 
 	// Engine for rendering templates.
 	std::unique_ptr<render::IEngine> TEMPLATE_ENGINE;
+
+	// Default database instance.
+	std::shared_ptr<orm::Client> DB;
+
+	// List of databases.
+	std::map<std::string, std::shared_ptr<orm::Client>> DATABASES;
 
 	// Whether to append trailing slashes to URLs.
 	bool APPEND_SLASH;
@@ -85,10 +98,10 @@ public:
 	//
 	// Here are a few examples:
 	//     DISALLOWED_USER_AGENTS = {
-	//         core::rgx::Regex(R"(NaverBot.*)"),
-	//         core::rgx::Regex(R"(EmailSiphon.*)"),
-	//         core::rgx::Regex(R"(SiteSucker.*)"),
-	//         core::rgx::Regex(R"(sohu-search.*)")
+	//         rgx::Regex(R"(NaverBot.*)"),
+	//         rgx::Regex(R"(EmailSiphon.*)"),
+	//         rgx::Regex(R"(SiteSucker.*)"),
+	//         rgx::Regex(R"(sohu-search.*)")
 	//     };
 	std::vector<re::Regex> DISALLOWED_USER_AGENTS;
 
@@ -97,11 +110,11 @@ public:
 	//
 	// Here are a few examples:
 	//    IGNORABLE_404_URLS = {
-	//        core::rgx::Regex(R"(/apple-touch-icon.*\.png)"),
-	//        core::rgx::Regex(R"(/favicon.ico)"),
-	//        core::rgx::Regex(R"(/robots.txt)"),
-	//        core::rgx::Regex(R"(/phpmyadmin/)"),
-	//        core::rgx::Regex(R"(/apple-touch-icon.*\.png)")
+	//        rgx::Regex(R"(/apple-touch-icon.*\.png)"),
+	//        rgx::Regex(R"(/favicon.ico)"),
+	//        rgx::Regex(R"(/robots.txt)"),
+	//        rgx::Regex(R"(/phpmyadmin/)"),
+	//        rgx::Regex(R"(/apple-touch-icon.*\.png)")
 	//    };
 	std::vector<re::Regex> IGNORABLE_404_URLS;
 
@@ -227,13 +240,49 @@ public:
 	virtual ~Settings() = default;
 	void prepare();
 
-	virtual void register_modules();
-	virtual void register_middleware();
-	virtual void register_libraries();
-	virtual void register_loaders();
+	inline virtual void register_modules()
+	{
+	}
+
+	inline virtual void register_middleware()
+	{
+	}
+
+	inline virtual void register_libraries()
+	{
+	}
+
+	inline virtual void register_loaders()
+	{
+	}
+
+	inline virtual void register_migrations()
+	{
+	}
+
+	inline virtual std::shared_ptr<orm::abc::ISQLDriver> build_sqlite3_database(
+		const std::string& name, const std::string& filepath
+	)
+	{
+		std::shared_ptr<orm::abc::ISQLDriver> db;
+		#ifdef USE_SQLITE3
+			auto file_path = path::join(this->BASE_DIR, filepath);
+			db = std::make_shared<orm::sqlite3::Driver>(file_path.c_str());
+		#else
+			db = nullptr;
+		#endif
+		return db;
+	}
+
+	inline virtual std::shared_ptr<orm::abc::ISQLDriver> build_custom_database(
+		const std::string& name, const YAML::Node& database
+	)
+	{
+		return nullptr;
+	}
 
 	[[nodiscard]]
-	std::shared_ptr<apps::IModuleConfig> get_module(const std::string& full_name) const;
+	std::shared_ptr<IModuleConfig> get_module(const std::string& full_name) const;
 
 	[[nodiscard]]
 	std::shared_ptr<middleware::IMiddleware> get_middleware(const std::string& full_name) const;
@@ -244,22 +293,38 @@ public:
 	[[nodiscard]]
 	std::shared_ptr<render::ILoader> get_loader(const std::string& full_name) const;
 
+	inline std::list<std::shared_ptr<orm::db::Migration>> get_migrations(orm::abc::ISQLDriver* driver)
+	{
+		if (this->_migrations.empty())
+		{
+			this->register_migrations();
+		}
+
+		std::list<std::shared_ptr<orm::db::Migration>> migrations;
+		for (const auto& migration : this->_migrations)
+		{
+			migrations.push_back(migration(driver));
+		}
+
+		return migrations;
+	}
+
 	template <class T>
 	[[nodiscard]]
-	std::string get_name_or(const std::string& full_name) const
+	inline std::string get_name_or(const std::string& full_name) const
 	{
 		auto name = full_name;
 		if (name.empty())
 		{
-			name = utility::demangle(typeid(T).name());
+			name = util::demangle(typeid(T).name());
 		}
 
 		return name;
 	}
 
 protected:
-	template <apps::ModuleConfigType ModuleConfigT>
-	void module(const std::string& custom_name="")
+	template <module_config_type ModuleConfigT>
+	inline void module(const std::string& custom_name="")
 	{
 		auto name = this->get_name_or<ModuleConfigT>(custom_name);
 		if (this->_modules.find(name) != this->_modules.end() && this->LOGGER)
@@ -267,15 +332,15 @@ protected:
 			this->LOGGER->warning("module '" + name + "' was overwritten");
 		}
 
-		this->_modules[name] = [this, name]() -> std::shared_ptr<apps::IModuleConfig> {
+		this->_modules[name] = [this, name]() -> std::shared_ptr<IModuleConfig> {
 			auto module = std::make_shared<ModuleConfigT>(this);
 			module->init(name);
 			return module;
 		};
 	}
 
-	template <middleware::MiddlewareType MiddlewareT>
-	void middleware(const std::string& custom_name="")
+	template <middleware::middleware_type_c MiddlewareT>
+	inline void middleware(const std::string& custom_name="")
 	{
 		auto name = this->get_name_or<MiddlewareT>(custom_name);
 		if (this->_middleware.find(name) != this->_middleware.end() && this->LOGGER)
@@ -289,7 +354,7 @@ protected:
 	}
 
 	template <render::LibraryType LibraryT>
-	void library(const std::string& custom_name="")
+	inline void library(const std::string& custom_name="")
 	{
 		auto name = this->get_name_or<LibraryT>(custom_name);
 		if (this->_libraries.find(name) != this->_libraries.end() && this->LOGGER)
@@ -303,7 +368,7 @@ protected:
 	}
 
 	template <render::LoaderType LoaderT>
-	void loader(const std::string& custom_name="")
+	inline void loader(const std::string& custom_name="")
 	{
 		auto name = this->get_name_or<LoaderT>(custom_name);
 		if (this->_loaders.find(name) != this->_loaders.end() && this->LOGGER)
@@ -314,6 +379,15 @@ protected:
 		this->_loaders[name] = [this]() -> std::shared_ptr<render::ILoader> {
 			return std::make_shared<LoaderT>(this);
 		};
+	}
+
+	template <class MigrationT, class ...Args>
+	inline void migration(Args&& ...args)
+	{
+		this->_migrations.push_back([args...](auto* driver) -> std::shared_ptr<orm::db::Migration>
+		{
+			return std::make_shared<MigrationT>(driver, std::forward<Args>(args)...);
+		});
 	}
 
 private:
@@ -329,13 +403,17 @@ private:
 
 	std::map<
 		std::string,
-		std::function<std::shared_ptr<apps::IModuleConfig>()>
+		std::function<std::shared_ptr<IModuleConfig>()>
 	> _modules;
 
 	std::map<
 		std::string,
 		std::function<std::shared_ptr<render::ILoader>()>
 	> _loaders;
+
+	std::list<
+		std::function<std::shared_ptr<orm::db::Migration>(orm::abc::ISQLDriver* driver)>
+	> _migrations;
 };
 
 __CONF_END__

@@ -1,15 +1,15 @@
 /**
  * urls/resolver.h
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
  * Purpose: resolves given url as string.
  */
 
 #pragma once
 
-// Core libraries.
-#include <xalwart.core/result.h>
+// Base libraries.
+#include <xalwart.base/result.h>
 
 // Module definitions.
 #include "./_def_.h"
@@ -22,7 +22,7 @@ __URLS_BEGIN__
 
 /// Searches path in urlpatterns and returns an expression
 /// to process request if path is found, otherwise returns nullptr.
-extern std::function<core::Result<std::shared_ptr<http::IHttpResponse>>(
+extern std::function<Result<std::shared_ptr<http::IHttpResponse>>(
 	http::HttpRequest* request,
 	conf::Settings* settings
 )> resolve(

@@ -8,8 +8,8 @@
 
 #pragma once
 
-// Core libraries.
-#include <xalwart.core/yaml/yaml-cpp/yaml.h>
+// Base libraries.
+#include <xalwart.base/yaml/yaml-cpp/yaml.h>
 
 // Module definitions.
 #include "../_def_.h"
@@ -35,19 +35,32 @@ private:
 
 	static void _init_secure(Settings* settings, const YAML::Node& config);
 
-	static void _init_modules(Settings* settings, const YAML::Node& installed_modules);
+	static void _init_modules(Settings* settings, const YAML::Node& modules);
 
 	static void _init_middleware(Settings* settings, const YAML::Node& middleware);
+
+	static void _init_databases(Settings* settings, const YAML::Node& databases);
+
+	static void _init_sqlite3_database(
+		const std::string& name, Settings* settings,
+		std::shared_ptr<orm::abc::ISQLDriver>& driver, const YAML::Node& database
+	);
 
 protected:
 
 	// Returns YAML::Node of type Null
 	[[nodiscard]]
-	YAML::Node null() const;
+	inline YAML::Node null() const
+	{
+		return YAML::Node(YAML::NodeType::Null);
+	}
 
 	// Returns YAML::Node of type Map
 	[[nodiscard]]
-	YAML::Node map_node() const;
+	inline YAML::Node map_node() const
+	{
+		return YAML::Node(YAML::NodeType::Map);
+	}
 
 	virtual void check_config(const YAML::Node& config, const std::string& file_path);
 

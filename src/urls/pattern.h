@@ -1,7 +1,7 @@
 /**
  * urls/pattern.h
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
  * Purpose: used for mapping url pattern to it's handler.
  *
@@ -10,8 +10,8 @@
 
 #pragma once
 
-// Core libraries.
-#include <xalwart.core/re/arg_regex.h>
+// Base libraries.
+#include <xalwart.base/re/arg_regex.h>
 
 // Module definitions.
 #include "./_def_.h"
@@ -30,7 +30,7 @@ __CONF_END__
 
 __URLS_BEGIN__
 
-typedef std::function<core::Result<std::shared_ptr<http::IHttpResponse>>(
+typedef std::function<Result<std::shared_ptr<http::IHttpResponse>>(
 	http::HttpRequest*, views::Args*, conf::Settings*
 )> ViewHandler;
 
@@ -57,7 +57,7 @@ public:
 	);
 
 	[[nodiscard]] std::string get_name() const;
-	core::Result<std::shared_ptr<http::IHttpResponse>> apply(
+	Result<std::shared_ptr<http::IHttpResponse>> apply(
 		http::HttpRequest* request,
 		conf::Settings* settings,
 		views::Args* args = nullptr

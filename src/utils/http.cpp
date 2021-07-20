@@ -1,17 +1,17 @@
 /**
  * utils/http.cpp
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  */
 
 #include "./http.h"
 
-// Core libraries.
-#include <xalwart.core/utility.h>
-#include <xalwart.core/string_utils.h>
+// Base libraries.
+#include <xalwart.base/utility.h>
+#include <xalwart.base/string_utils.h>
 
 
-__UTILS_HTTP_INTERNAL_BEGIN__
+__UTIL_HTTP_INTERNAL_BEGIN__
 
 re::Regex ETAG_REGEX = re::Regex(R"(((?:W\/)?"[^"]*"))");
 
@@ -36,10 +36,10 @@ const std::vector<std::string> MONTHS = {
 	"jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"
 };
 
-__UTILS_HTTP_INTERNAL_END__
+__UTIL_HTTP_INTERNAL_END__
 
 
-__UTILS_HTTP_BEGIN__
+__UTIL_HTTP_BEGIN__
 
 long parse_http_date(const std::string& date)
 {
@@ -86,7 +86,7 @@ long parse_http_date(const std::string& date)
 		}
 	}
 
-	int month = (int) utility::index_of(
+	int month = (int) util::index_of(
 		str::lower(match["mon"]),
 		internal::MONTHS.begin(),
 		internal::MONTHS.end()
@@ -133,4 +133,4 @@ std::vector<std::string> parse_etags(const std::string& etag_str)
 	return result;
 }
 
-__UTILS_HTTP_END__
+__UTIL_HTTP_END__

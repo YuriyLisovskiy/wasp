@@ -1,13 +1,13 @@
 /**
- * apps/xalwart.cpp
+ * conf/xalwart.cpp
  *
  * Copyright (c) 2019-2021 Yuriy Lisovskiy
  */
 
 #include "./xalwart.h"
 
-// Core libraries.
-#include <xalwart.core/path.h>
+// Base libraries.
+#include <xalwart.base/path.h>
 
 // Framework libraries.
 #include "../management/module.h"
@@ -17,21 +17,22 @@
 #include "../urls/resolver.h"
 
 
-__APPS_BEGIN__
+__CONF_BEGIN__
 
 MainApplication::MainApplication(
 	conf::Settings* settings,
-	std::function<std::shared_ptr<net::IServer>(
+	std::function<std::shared_ptr<net::abc::IServer>(
 		log::ILogger*,
 		collections::Dict<std::string, std::string>
 	)> server_initializer
 ) : server_initializer(std::move(server_initializer))
 {
-	core::InterruptException::initialize();
+	InterruptException::initialize();
 	if (!settings)
 	{
-		throw core::ImproperlyConfigured(
-			"Setting must be configured in order to use the application."
+		throw ImproperlyConfigured(
+			"Setting must be configured in order to use the application.",
+			_ERROR_DETAILS_
 		);
 	}
 
@@ -71,11 +72,11 @@ void MainApplication::execute(int argc, char** argv)
 				std::cout << "Command \"" << argv[1] << "\" is not found.\n\n";
 			}
 		}
-		catch (const core::CommandError& exc)
+		catch (const CommandError& exc)
 		{
 			this->settings->LOGGER->error(exc.what(), exc.line(), exc.function(), exc.file());
 		}
-		catch (const core::InterruptException& exc)
+		catch (const InterruptException& exc)
 		{
 			this->settings->LOGGER->error(exc.what(), exc.line(), exc.function(), exc.file());
 		}
@@ -91,7 +92,7 @@ void MainApplication::_setup_commands()
 	// Retrieve commands from INSTALLED_MODULES and
 	// check if modules' commands do not override
 	// settings commands.
-	for (auto& installed_module : this->settings->INSTALLED_MODULES)
+	for (auto& installed_module : this->settings->MODULES)
 	{
 		this->_extend_settings_commands_or_error(
 			installed_module->get_commands(),
@@ -106,7 +107,7 @@ void MainApplication::_setup_commands()
 		this->settings, [this](
 			log::ILogger* logger,
 			collections::Dict<std::string, std::string> kwargs
-		) -> std::shared_ptr<net::IServer>
+		) -> std::shared_ptr<net::abc::IServer>
 		{
 			auto server = this->server_initializer(logger, std::move(kwargs));
 			server->setup_handler(this->make_handler());
@@ -153,14 +154,45 @@ void MainApplication::_perform_checks()
 	std::cout << "Performing checks..." << std::endl;
 	if (!this->settings->LOGGER)
 	{
-		throw core::ImproperlyConfigured("LOGGER instance must be configured");
+		throw ImproperlyConfigured("'logger' must be configured", _ERROR_DETAILS_);
 	}
 
 	size_t err_count = 0;
+	if (this->settings->BASE_DIR.empty())
+	{
+		this->settings->LOGGER->error(
+			"'base_dir' must not be empty in order to use the application."
+		);
+		err_count++;
+	}
+	else if (!path::exists(this->settings->BASE_DIR))
+	{
+		this->settings->LOGGER->error(
+			"'base_dir' must exist in order to use the application."
+		);
+		err_count++;
+	}
+
+	if (this->settings->SECRET_KEY.empty())
+	{
+		this->settings->LOGGER->error(
+			"'secret_key' must be set in order to use the application."
+		);
+		err_count++;
+	}
+
+	if (!this->settings->DB)
+	{
+		this->settings->LOGGER->error(
+			"No database was set, at least one database must be configured in order to use the application"
+		);
+		err_count++;
+	}
+
 	if (!this->settings->TEMPLATE_ENGINE)
 	{
 		this->settings->LOGGER->error(
-			"TEMPLATE_ENGINE must be configured in order to use the application."
+			"'template_engine' must be configured in order to use the application."
 		);
 		err_count++;
 	}
@@ -170,37 +202,14 @@ void MainApplication::_perform_checks()
 		this->settings->LOGGER->warning("You have not added any middleware.");
 	}
 
-	if (this->settings->BASE_DIR.empty())
-	{
-		this->settings->LOGGER->error(
-			"BASE_DIR must not be empty in order to use the application."
-		);
-		err_count++;
-	}
-	else if (!path::exists(this->settings->BASE_DIR))
-	{
-		this->settings->LOGGER->error(
-			"BASE_DIR must exist in order to use the application."
-		);
-		err_count++;
-	}
-
-	if (this->settings->INSTALLED_MODULES.empty())
+	if (this->settings->MODULES.empty())
 	{
 		this->settings->LOGGER->warning(
-			"You have not added any module to INSTALLED_MODULES setting."
+			"You have not added any module to 'modules' setting."
 		);
 	}
 
-	if (this->settings->SECRET_KEY.empty())
-	{
-		this->settings->LOGGER->error(
-			"SECRET_KEY must be set in order to use the application."
-		);
-		err_count++;
-	}
-
-	for (auto& module : this->settings->INSTALLED_MODULES)
+	for (auto& module : this->settings->MODULES)
 	{
 		if (!module->ready())
 		{
@@ -212,8 +221,9 @@ void MainApplication::_perform_checks()
 
 	if (err_count > 0)
 	{
-		throw core::ImproperlyConfigured(
-			"System check identified " + std::to_string(err_count) + " issues."
+		throw ImproperlyConfigured(
+			"System check identified " + std::to_string(err_count) + " issues.",
+			_ERROR_DETAILS_
 		);
 	}
 
@@ -238,15 +248,16 @@ net::HandlerFunc MainApplication::make_handler()
 	) -> uint
 	{
 		auto request = this->make_request(ctx, env);
-		core::Result<std::shared_ptr<http::IHttpResponse>> result;
+		Result<std::shared_ptr<http::IHttpResponse>> result;
 		try
 		{
 			result = this->process_request_middleware(request);
-			if (!result.catch_(core::HttpError) && !result.value)
+			if (!result.catch_(HttpError) && !result.value)
 			{
 				result = this->process_urlpatterns(request, this->settings->ROOT_URLCONF);
+
 				// TODO: check if it is required to process response middleware in case of view error.
-				if (!result.catch_(core::HttpError))
+				if (!result.catch_(HttpError))
 				{
 					if (!result.value)
 					{
@@ -264,7 +275,7 @@ net::HandlerFunc MainApplication::make_handler()
 							auto middleware_result = this->process_response_middleware(
 								request, result.value
 							);
-							if (middleware_result.catch_(core::HttpError) || middleware_result.value)
+							if (middleware_result.catch_(HttpError) || middleware_result.value)
 							{
 								if (middleware_result.err)
 								{
@@ -298,21 +309,19 @@ net::HandlerFunc MainApplication::make_handler()
 				);
 			}
 		}
-		catch (const core::BaseException& exc)
+		catch (const BaseException& exc)
 		{
 			this->settings->LOGGER->trace(
 				"An error was caught as core::BaseException", _ERROR_DETAILS_
 			);
-			result = core::raise<
-				core::InternalServerError, std::shared_ptr<http::IHttpResponse>
-			>(exc.what());
+			result = raise<InternalServerError, std::shared_ptr<http::IHttpResponse>>(exc.what());
 		}
 		catch (const std::exception& exc)
 		{
 			this->settings->LOGGER->trace(
 				"An error was caught as std::exception", _ERROR_DETAILS_
 			);
-			result = core::raise<core::InternalServerError, std::shared_ptr<http::IHttpResponse>>(
+			result = raise<InternalServerError, std::shared_ptr<http::IHttpResponse>>(
 				"<p style=\"font-size: 24px;\" >Internal Server Error</p><p>" + std::string(exc.what()) + "</p>"
 			);
 		}
@@ -357,7 +366,7 @@ void MainApplication::build_module_patterns(std::vector<std::shared_ptr<urls::Ur
 	}
 }
 
-core::Result<std::shared_ptr<http::IHttpResponse>> MainApplication::process_request_middleware(
+Result<std::shared_ptr<http::IHttpResponse>> MainApplication::process_request_middleware(
 	std::shared_ptr<http::HttpRequest>& request
 )
 {
@@ -374,10 +383,10 @@ core::Result<std::shared_ptr<http::IHttpResponse>> MainApplication::process_requ
 		}
 	}
 
-	return core::Result<std::shared_ptr<http::IHttpResponse>>::null();
+	return Result<std::shared_ptr<http::IHttpResponse>>::null();
 }
 
-core::Result<std::shared_ptr<http::IHttpResponse>> MainApplication::process_urlpatterns(
+Result<std::shared_ptr<http::IHttpResponse>> MainApplication::process_urlpatterns(
 	std::shared_ptr<http::HttpRequest>& request,
 	std::vector<std::shared_ptr<urls::UrlPattern>>& urlpatterns
 )
@@ -389,12 +398,12 @@ core::Result<std::shared_ptr<http::IHttpResponse>> MainApplication::process_urlp
 	}
 
 	this->settings->LOGGER->trace("The requested resource was not found", _ERROR_DETAILS_);
-	return core::raise<
-		core::NotFound, std::shared_ptr<http::IHttpResponse>
-	>("<h2>404 - Not Found</h2>");
+	return raise<NotFound, std::shared_ptr<http::IHttpResponse>>(
+		"<h2>404 - Not Found</h2>"
+	);
 }
 
-core::Result<std::shared_ptr<http::IHttpResponse>> MainApplication::process_response_middleware(
+Result<std::shared_ptr<http::IHttpResponse>> MainApplication::process_response_middleware(
 	std::shared_ptr<http::HttpRequest>& request,
 	std::shared_ptr<http::IHttpResponse>& response
 )
@@ -416,7 +425,7 @@ core::Result<std::shared_ptr<http::IHttpResponse>> MainApplication::process_resp
 		}
 	}
 
-	return core::Result<std::shared_ptr<http::IHttpResponse>>::null();
+	return Result<std::shared_ptr<http::IHttpResponse>>::null();
 }
 
 // TODO: fill the table below.
@@ -435,13 +444,13 @@ std::shared_ptr<http::HttpRequest> MainApplication::make_request(
 	net::RequestContext* ctx, collections::Dict<std::string, std::string> env
 )
 {
-	parsers::query_parser qp;
+	parsers::url_query_parser qp;
 	http::HttpRequest::Parameters<std::string, std::string> get_params, post_params;
 	http::HttpRequest::Parameters<std::string, files::UploadedFile> files_params;
 	if (ctx->content_size)
 	{
 		auto cont_type = str::lower(ctx->headers.get("Content-Type"));
-		if (cont_type == "application/x-www-form-urlencoded")
+		if (cont_type.starts_with("application/x-www-form-urlencoded"))
 		{
 			qp.parse(ctx->content);
 			if (ctx->method == "GET")
@@ -453,7 +462,7 @@ std::shared_ptr<http::HttpRequest> MainApplication::make_request(
 				post_params = http::HttpRequest::Parameters(qp.dict, qp.multi_dict);
 			}
 		}
-		else if (cont_type == "multipart/form-data")
+		else if (cont_type.starts_with("multipart/form-data"))
 		{
 			parsers::multipart_parser mp(this->settings->MEDIA_ROOT);
 			mp.parse(ctx->headers["Content-Type"], ctx->content);
@@ -497,33 +506,33 @@ std::shared_ptr<http::HttpRequest> MainApplication::make_request(
 	);
 }
 
-std::shared_ptr<http::IHttpResponse> MainApplication::error_to_response(const core::Error* err)
+std::shared_ptr<http::IHttpResponse> MainApplication::error_to_response(const Error* err)
 {
 	unsigned short code;
 	switch (err->type)
 	{
-		case core::EntityTooLargeError:
+		case EntityTooLargeError:
 			code = 413;
 			break;
-		case core::PermissionDenied:
+		case PermissionDenied:
 			code = 403;
 			break;
-		case core::NotFound:
-		case core::FileDoesNotExistError:
+		case NotFound:
+		case FileDoesNotExistError:
 			code = 404;
 			break;
-		case core::RequestTimeout:
+		case RequestTimeout:
 			code = 408;
 			break;
-		case core::InternalServerError:
+		case InternalServerError:
 			code = 500;
 			break;
-		case core::SuspiciousOperation:
-		case core::DisallowedHost:
-		case core::DisallowedRedirect:
+		case SuspiciousOperation:
+		case DisallowedHost:
+		case DisallowedRedirect:
 			code = 400;
 			break;
-		case core::HttpError:
+		case HttpError:
 		default:
 			code = 500;
 			break;
@@ -535,11 +544,11 @@ std::shared_ptr<http::IHttpResponse> MainApplication::error_to_response(const co
 
 uint MainApplication::start_response(
 	net::RequestContext* ctx,
-	const core::Result<std::shared_ptr<http::IHttpResponse>>& result
+	const Result<std::shared_ptr<http::IHttpResponse>>& result
 )
 {
 	std::shared_ptr<http::IHttpResponse> response;
-	if (result.catch_(core::HttpError))
+	if (result.catch_(HttpError))
 	{
 		this->settings->LOGGER->trace(result.err.msg, _ERROR_DETAILS_);
 		response = error_to_response(&result.err);
@@ -549,8 +558,8 @@ uint MainApplication::start_response(
 		// Response was not instantiated, so return 204 - No Content.
 		response = std::make_shared<http::HttpResponse>(204);
 		this->settings->LOGGER->warning(
-				"Response was not instantiated, returned 204",
-				_ERROR_DETAILS_
+			"Response was not instantiated, returned 204",
+			_ERROR_DETAILS_
 		);
 	}
 	else
@@ -599,4 +608,4 @@ void MainApplication::finish_response(
 	}
 }
 
-__APPS_END__
+__CONF_END__

@@ -1,22 +1,22 @@
 /**
  * utils/http.h
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
  * Purpose: provides http utils.
  */
 
 #pragma once
 
-// Core libraries.
-#include <xalwart.core/re/regex.h>
-#include <xalwart.core/re/arg_regex.h>
+// Base libraries.
+#include <xalwart.base/re/regex.h>
+#include <xalwart.base/re/arg_regex.h>
 
 // Module definitions.
 #include "./_def_.h"
 
 
-__UTILS_HTTP_BEGIN__
+__UTIL_HTTP_BEGIN__
 
 /// Parse a date format as specified by HTTP RFC7231 section 7.1.1.1.
 ///
@@ -35,10 +35,10 @@ extern std::string quote_etag(const std::string& e_tag);
 /// or {"*"} if all ETags should be matched.
 extern std::vector<std::string> parse_etags(const std::string& etag_str);
 
-__UTILS_HTTP_END__
+__UTIL_HTTP_END__
 
 
-__UTILS_HTTP_INTERNAL_BEGIN__
+__UTIL_HTTP_INTERNAL_BEGIN__
 
 extern re::Regex ETAG_REGEX;
 
@@ -55,4 +55,4 @@ extern re::ArgRegex ASCTIME_DATE;
 
 extern const std::vector<std::string> MONTHS;
 
-__UTILS_HTTP_INTERNAL_END__
+__UTIL_HTTP_INTERNAL_END__

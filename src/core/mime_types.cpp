@@ -1,17 +1,17 @@
 /**
  * core/mime_types.cpp
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  */
 
 #include "./mime_types.h"
 
-// Core libraries.
-#include <xalwart.core/path.h>
-#include <xalwart.core/string_utils.h>
+// Base libraries.
+#include <xalwart.base/path.h>
+#include <xalwart.base/string_utils.h>
 
 
-__MIME_BEGIN__
+__CORE_MIME_BEGIN__
 
 std::string ext_from_file_name(const std::string& file_name)
 {
@@ -336,4 +336,4 @@ collections::Dict<std::string, std::string> TYPES_MAP({
 	{".zip", "application/zip"},
 });
 
-__MIME_END__
+__CORE_MIME_END__
