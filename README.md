@@ -24,7 +24,7 @@ The following libraries are required:
 - [xalwart.orm](https://github.com/YuriyLisovskiy/xalwart.orm) 0.x.x or later
 - [xalwart.render](https://github.com/YuriyLisovskiy/xalwart.render) 0.x.x or later
 
-The following library is optional:
+The following library is optional (you can use alternatives):
 - [xalwart.server](https://github.com/YuriyLisovskiy/xalwart.server) 0.x.x or later
 
 ### Third party
