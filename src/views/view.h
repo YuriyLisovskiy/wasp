@@ -14,9 +14,9 @@
 #include <memory>
 #include <functional>
 
-// Core libraries.
-#include <xalwart.core/logger.h>
-#include <xalwart.core/result.h>
+// Base libraries.
+#include <xalwart.base/logger.h>
+#include <xalwart.base/result.h>
 
 // Module definitions.
 #include "./_def_.h"

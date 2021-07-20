@@ -1,14 +1,14 @@
 /**
  * utils/cache.cpp
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  */
 
 #include "./cache.h"
 
-// Core libraries.
-#include <xalwart.core/utility.h>
-#include <xalwart.core/string_utils.h>
+// Base libraries.
+#include <xalwart.base/utility.h>
+#include <xalwart.base/string_utils.h>
 
 // Framework libraries.
 #include "./crypto/md5.h"

@@ -8,9 +8,9 @@
 
 #include <gtest/gtest.h>
 
-#include <xalwart.core/logger.h>
-#include <xalwart.core/collections/dict.h>
-#include <xalwart.core/collections/multi_dict.h>
+#include <xalwart.base/logger.h>
+#include <xalwart.base/collections/dict.h>
+#include <xalwart.base/collections/multi_dict.h>
 
 #include "../../src/views/redirect_view.h"
 #include "../../src/conf/settings.h"

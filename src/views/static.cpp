@@ -6,8 +6,8 @@
 
 #include "./static.h"
 
-// Core libraries.
-#include <xalwart.core/path.h>
+// Base libraries.
+#include <xalwart.base/path.h>
 
 // Framework libraries.
 #include "../http/headers.h"

@@ -1,17 +1,17 @@
 /**
  * http/response.cpp
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  */
 
 #include "./response.h"
 
-// Core libraries.
-#include <xalwart.core/datetime.h>
-#include <xalwart.core/exceptions.h>
-#include <xalwart.core/path.h>
-#include <xalwart.core/string_utils.h>
-#include <xalwart.core/encoding.h>
+// Base libraries.
+#include <xalwart.base/datetime.h>
+#include <xalwart.base/exceptions.h>
+#include <xalwart.base/path.h>
+#include <xalwart.base/string_utils.h>
+#include <xalwart.base/encoding.h>
 
 // Framework libraries.
 #include "./status.h"

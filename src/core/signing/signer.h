@@ -8,8 +8,8 @@
 
 #pragma once
 
-// Core libraries.
-#include <xalwart.core/re/regex.h>
+// Base libraries.
+#include <xalwart.base/re/regex.h>
 
 // Module definitions.
 #include "./_def_.h"

@@ -9,8 +9,8 @@
 
 #pragma once
 
-// Core modules.
-#include <xalwart.core/file.h>
+// Base modules.
+#include <xalwart.base/file.h>
 
 // Module definitions.
 #include "./_def_.h"

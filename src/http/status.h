@@ -1,7 +1,7 @@
 /**
  * http/status.h
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
  * Purpose:
  * 	Hold all available http statuses, which contains status code,
@@ -13,8 +13,8 @@
 // C++ libraries.
 #include <string>
 
-// Core modules.
-#include <xalwart.core/collections/dict.h>
+// Base modules.
+#include <xalwart.base/collections/dict.h>
 
 // Module definitions.
 #include "./_def_.h"

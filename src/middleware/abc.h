@@ -11,8 +11,8 @@
 // C++ libraries.
 #include <memory>
 
-// Core libraries.
-#include <xalwart.core/result.h>
+// Base libraries.
+#include <xalwart.base/result.h>
 
 // Module definitions.
 #include "./_def_.h"

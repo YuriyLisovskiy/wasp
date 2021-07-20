@@ -8,9 +8,9 @@
 
 #include <gtest/gtest.h>
 
-#include <xalwart.core/exceptions.h>
-#include <xalwart.core/string_utils.h>
-#include <xalwart.core/path.h>
+#include <xalwart.base/exceptions.h>
+#include <xalwart.base/string_utils.h>
+#include <xalwart.base/path.h>
 
 #include "../../../src/core/parsers/multipart_parser.h"
 #include "../../../src/http/request.h"

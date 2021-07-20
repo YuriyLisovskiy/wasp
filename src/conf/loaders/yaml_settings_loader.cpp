@@ -6,8 +6,8 @@
 
 #include "./yaml_settings_loader.h"
 
-// Core libraries.
-#include <xalwart.core/path.h>
+// Base libraries.
+#include <xalwart.base/path.h>
 
 // Render libraries.
 #include <xalwart.render/engine.h>

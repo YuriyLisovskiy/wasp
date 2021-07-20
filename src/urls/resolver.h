@@ -1,15 +1,15 @@
 /**
  * urls/resolver.h
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
  * Purpose: resolves given url as string.
  */
 
 #pragma once
 
-// Core libraries.
-#include <xalwart.core/result.h>
+// Base libraries.
+#include <xalwart.base/result.h>
 
 // Module definitions.
 #include "./_def_.h"

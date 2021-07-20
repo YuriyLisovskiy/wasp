@@ -6,10 +6,10 @@
 
 #include "./request.h"
 
-// Core libraries.
-#include <xalwart.core/exceptions.h>
-#include <xalwart.core/string_utils.h>
-#include <xalwart.core/net/meta.h>
+// Base libraries.
+#include <xalwart.base/exceptions.h>
+#include <xalwart.base/string_utils.h>
+#include <xalwart.base/net/meta.h>
 
 // Framework libraries.
 #include "./headers.h"

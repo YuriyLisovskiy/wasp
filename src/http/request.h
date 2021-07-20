@@ -8,9 +8,9 @@
 
 #pragma once
 
-// Core libraries.
-#include <xalwart.core/collections/multi_dict.h>
-#include <xalwart.core/result.h>
+// Base libraries.
+#include <xalwart.base/collections/multi_dict.h>
+#include <xalwart.base/result.h>
 
 // Module definitions.
 #include "./_def_.h"

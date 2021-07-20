@@ -6,9 +6,9 @@
 
 #include "./multipart_parser.h"
 
-// Core libraries.
-#include <xalwart.core/exceptions.h>
-#include <xalwart.core/string_utils.h>
+// Base libraries.
+#include <xalwart.base/exceptions.h>
+#include <xalwart.base/string_utils.h>
 
 
 __CORE_PARSERS_BEGIN__

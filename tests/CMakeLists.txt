@@ -1,11 +1,3 @@
-set(LIB_DIRECTORY ${PROJECT_SOURCE_DIR}/src)
-file(GLOB_RECURSE LIB_SOURCES LIST_DIRECTORIES true ${LIB_DIRECTORY}/*.h ${LIB_DIRECTORY}/*.cpp)
-foreach(entry ${SOURCES})
-    if (IS_DIRECTORY ${entry})
-        list(REMOVE_ITEM SOURCES ${entry})
-    endif()
-endforeach()
-
 set(CMAKE_CXX_FLAGS "-pthread")
 
 set(BINARY unittests)
@@ -20,13 +12,14 @@ function(add_tests SUB_DIR SUB_NAME)
     endforeach()
     list(FILTER SOURCES EXCLUDE REGEX ".*main.cpp$")
     set(FULL_BIN ${BINARY}-${SUB_NAME})
-    add_executable(${FULL_BIN} ${LIB_SOURCES} ${SOURCES} ${TESTS_DIR}/main.cpp)
+    add_executable(${FULL_BIN} ${SOURCES} ${TESTS_DIR}/main.cpp)
     target_include_directories(${FULL_BIN} PUBLIC ${GNU_INCLUDE_DIR})
     target_link_libraries(${FULL_BIN} PUBLIC
         gtest
-        ${FRAMEWORK_NAME}.core-0.0.1
-        ${FRAMEWORK_NAME}.render-0.0.1
-        ${FRAMEWORK_NAME}.orm-0.0.1
+        ${FRAMEWORK_NAME}.base
+        ${FRAMEWORK_NAME}.orm
+        ${FRAMEWORK_NAME}.render
+        ${LIBRARY_NAME}
     )
 endfunction()
 

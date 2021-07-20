@@ -6,9 +6,9 @@
 
 #include "./view.h"
 
-// Core libraries.
-#include <xalwart.core/utility.h>
-#include <xalwart.core/string_utils.h>
+// Base libraries.
+#include <xalwart.base/utility.h>
+#include <xalwart.base/string_utils.h>
 
 // Framework libraries.
 #include "../conf/settings.h"

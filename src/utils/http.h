@@ -1,16 +1,16 @@
 /**
  * utils/http.h
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
  * Purpose: provides http utils.
  */
 
 #pragma once
 
-// Core libraries.
-#include <xalwart.core/re/regex.h>
-#include <xalwart.core/re/arg_regex.h>
+// Base libraries.
+#include <xalwart.base/re/regex.h>
+#include <xalwart.base/re/arg_regex.h>
 
 // Module definitions.
 #include "./_def_.h"

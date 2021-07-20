@@ -1,14 +1,14 @@
 /**
  * core/mime_types.cpp
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  */
 
 #include "./mime_types.h"
 
-// Core libraries.
-#include <xalwart.core/path.h>
-#include <xalwart.core/string_utils.h>
+// Base libraries.
+#include <xalwart.base/path.h>
+#include <xalwart.base/string_utils.h>
 
 
 __CORE_MIME_BEGIN__

@@ -8,14 +8,14 @@
 
 #pragma once
 
-// Core libraries.
-#include <xalwart.core/datetime.h>
-#include <xalwart.core/logger.h>
-#include <xalwart.core/result.h>
-#include <xalwart.core/string_utils.h>
-#include <xalwart.core/utility.h>
-#include <xalwart.core/path.h>
-#include <xalwart.core/yaml/yaml-cpp/yaml.h>
+// Base libraries.
+#include <xalwart.base/datetime.h>
+#include <xalwart.base/logger.h>
+#include <xalwart.base/result.h>
+#include <xalwart.base/string_utils.h>
+#include <xalwart.base/utility.h>
+#include <xalwart.base/path.h>
+#include <xalwart.base/yaml/yaml-cpp/yaml.h>
 
 // Render libraries.
 #include <xalwart.render/library/abc.h>

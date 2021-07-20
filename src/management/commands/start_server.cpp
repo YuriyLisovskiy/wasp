@@ -6,9 +6,9 @@
 
 #include "./start_server.h"
 
-// Core libraries.
-#include <xalwart.core/string_utils.h>
-#include <xalwart.core/datetime.h>
+// Base libraries.
+#include <xalwart.base/string_utils.h>
+#include <xalwart.base/datetime.h>
 
 
 __MANAGEMENT_COMMANDS_BEGIN__
@@ -99,7 +99,7 @@ void StartServerCommand::handle()
 	{
 		server->bind(this->_host, this->_port);
 		std::string message = dt::Datetime::now().strftime("%B %d, %Y - %T") + "\n" +
-		                      LIB_NAME + " version " + LIB_VERSION + "\n" +
+		                      v::framework_name + " version " + v::version.to_string() + "\n" +
 		                      "Starting development server at " +
 		                      "http://" + this->_host + ":" + std::to_string(this->_port) + "/\n" +
 		                      "Quit the server with CONTROL-C.";

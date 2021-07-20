@@ -1,7 +1,7 @@
 /**
  * render/tags/url_tag.cpp
  *
- * Copyright (c) 2020 Yuriy Lisovskiy
+ * Copyright (c) 2020-2021 Yuriy Lisovskiy
  */
 
 #include "./url_tag.h"
@@ -9,8 +9,8 @@
 // C++ libraries.
 #include <iostream>
 
-// Core libraries.
-#include <xalwart.core/types/string.h>
+// Base libraries.
+#include <xalwart.base/types/string.h>
 
 // Render libraries.
 #include <xalwart.render/syntax/parse_var_name.h>

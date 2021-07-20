@@ -8,8 +8,8 @@
 
 #pragma once
 
-// Core libraries.
-#include <xalwart.core/yaml/yaml-cpp/yaml.h>
+// Base libraries.
+#include <xalwart.base/yaml/yaml-cpp/yaml.h>
 
 // Module definitions.
 #include "../_def_.h"

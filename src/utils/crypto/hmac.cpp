@@ -6,8 +6,8 @@
 
 #include "./hmac.h"
 
-// Core libraries.
-#include <xalwart.core/exceptions.h>
+// Base libraries.
+#include <xalwart.base/exceptions.h>
 
 // Framework libraries.
 #include "./md5.h"

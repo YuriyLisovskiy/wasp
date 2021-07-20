@@ -13,10 +13,10 @@
 #include <filesystem>
 #include <regex>
 
-// Core libraries.
-#include <xalwart.core/path.h>
-#include <xalwart.core/string_utils.h>
-#include <xalwart.core/exceptions.h>
+// Base libraries.
+#include <xalwart.base/path.h>
+#include <xalwart.base/string_utils.h>
+#include <xalwart.base/exceptions.h>
 
 // Module definitions.
 #include "../_def_.h"

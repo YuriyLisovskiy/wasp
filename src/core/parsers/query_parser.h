@@ -11,9 +11,9 @@
 // C++ libraries.
 #include <string>
 
-// Core libraries.
-#include <xalwart.core/string_utils.h>
-#include <xalwart.core/collections/multi_dict.h>
+// Base libraries.
+#include <xalwart.base/string_utils.h>
+#include <xalwart.base/collections/multi_dict.h>
 
 // Module definitions.
 #include "./_def_.h"

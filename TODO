@@ -5,42 +5,6 @@ TODO:
         - gzip
         - locale
 
-TODO:
-    Add utf8 strings' support.
-
-
-TEST_ME:
-    - src/apps/*
-
-TEST_ME:
-    - src/core/datetime/*
-    - src/core/management/*
-    - src/core/net/*
-    - src/core/object/*
-    - src/core/signing/*
-    - src/core/thread_pool
-    - src/core/flags/parser
-    - src/core/string/format
-    - src/core/regex
-
-TEST_ME:
-    - src/http/request
-    - src/http/response
-    - src/http/utility
-
-TEST_ME:
-    - src/middleware/*
-
-TEST_ME:
-    - src/urls/*
-
-TEST_ME:
-    - src/utils/*
-
-TEST_ME:
-    - src/views/static
-
-
 Implement next settings (not urgent):
 
 ####################

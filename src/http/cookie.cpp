@@ -1,15 +1,15 @@
 /**
  * http/cookie.cpp
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  */
 
 #include "./cookie.h"
 
-// Core libraries.
-#include <xalwart.core/utility.h>
-#include <xalwart.core/exceptions.h>
-#include <xalwart.core/string_utils.h>
+// Base libraries.
+#include <xalwart.base/utility.h>
+#include <xalwart.base/exceptions.h>
+#include <xalwart.base/string_utils.h>
 
 
 __HTTP_BEGIN__

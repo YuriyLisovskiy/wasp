@@ -1,13 +1,13 @@
 /**
  * middleware/common.cpp
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  */
 
 #include "./common.h"
 
-// Core libraries.
-#include <xalwart.core/utility.h>
+// Base libraries.
+#include <xalwart.base/utility.h>
 
 // Framework libraries.
 #include "../urls/resolver.h"

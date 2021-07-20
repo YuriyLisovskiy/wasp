@@ -1,7 +1,7 @@
 /**
  * http/response.h
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
  * Purpose:
  * 	Contains base http response and most frequently
@@ -14,8 +14,8 @@
 #include <set>
 #include <fstream>
 
-// Core libraries.
-#include <xalwart.core/collections/dict.h>
+// Base libraries.
+#include <xalwart.base/collections/dict.h>
 
 // Module definitions.
 #include "./_def_.h"

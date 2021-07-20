@@ -8,8 +8,8 @@
 
 #pragma once
 
-// Core libraries.
-#include <xalwart.core/net/abc.h>
+// Base libraries.
+#include <xalwart.base/net/abc.h>
 
 // Module definitions.
 #include "./_def_.h"
