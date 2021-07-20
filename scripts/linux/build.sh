@@ -52,4 +52,4 @@ mkdir -p "${BUILD_PATH}"/lib
 cd include/ || exit 1
 cp -r xalwart "${BUILD_PATH}"/include
 cd ../lib/ || exit 1
-cp libxalwart* "${BUILD_PATH}"/lib
+cp libxalwart.so "${BUILD_PATH}"/lib
