@@ -220,7 +220,7 @@ void YamlSettingsLoader::_init_databases(Settings* settings, const YAML::Node& d
 			else
 			{
 				// TODO: add more driver initializations.
-				driver = settings->build_custom_database(db_name, db_info);
+				driver = settings->build_database(db_name, db_info);
 			}
 
 			if (driver)
@@ -530,7 +530,7 @@ void YamlSettingsLoader::init_template_engine_setting(Settings* settings, const 
 		}
 	}
 
-	std::vector<std::shared_ptr<render::ILibrary>> libs{
+	std::vector<std::shared_ptr<render::abc::ILibrary>> libs{
 		settings->get_library(render::DefaultLibrary::FULL_NAME)
 	};
 	auto libraries = config["libraries"];
@@ -546,7 +546,7 @@ void YamlSettingsLoader::init_template_engine_setting(Settings* settings, const 
 		}
 	}
 
-	std::vector<std::shared_ptr<render::ILoader>> loaders_vec;
+	std::vector<std::shared_ptr<render::abc::ILoader>> loaders_vec;
 	auto loaders = config["loaders"];
 	if (loaders && loaders.IsSequence() && loaders.size() > 0)
 	{

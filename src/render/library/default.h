@@ -23,8 +23,8 @@ public:
 public:
 	explicit DefaultLibrary(conf::Settings* settings);
 
-	std::shared_ptr<Filters> get_filters() override;
-	std::shared_ptr<Tags> get_tags() override;
+	std::shared_ptr<collections::Dict<std::string, filter_t>> get_filters() override;
+	std::shared_ptr<collections::Dict<std::string, tag_t>> get_tags() override;
 	std::string name() override;
 };
 

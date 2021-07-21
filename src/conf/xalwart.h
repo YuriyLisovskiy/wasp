@@ -73,7 +73,6 @@ private:
 		const std::vector<std::shared_ptr<cmd::BaseCommand>>& from,
 		const std::function<std::string(const std::string& cmd_name)>& err_fn
 	);
-	void _perform_checks();
 
 public:
 	explicit MainApplication(

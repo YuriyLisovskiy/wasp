@@ -38,7 +38,7 @@ MainApplication::MainApplication(
 
 	this->settings = settings;
 	this->settings->prepare();
-	this->_perform_checks();
+	this->settings->perform_checks();
 
 	this->_setup_commands();
 
@@ -133,8 +133,7 @@ void MainApplication::_extend_settings_commands_or_error(
 	for (auto& command : from)
 	{
 		if (std::find_if(
-			this->_commands.begin(),
-			this->_commands.end(),
+			this->_commands.begin(), this->_commands.end(),
 			[command](const std::pair<
 				std::string, std::shared_ptr<cmd::BaseCommand>
 			>& pair) -> bool {
@@ -147,87 +146,6 @@ void MainApplication::_extend_settings_commands_or_error(
 
 		this->_commands[command->name()] = command;
 	}
-}
-
-void MainApplication::_perform_checks()
-{
-	std::cout << "Performing checks..." << std::endl;
-	if (!this->settings->LOGGER)
-	{
-		throw ImproperlyConfigured("'logger' must be configured", _ERROR_DETAILS_);
-	}
-
-	size_t err_count = 0;
-	if (this->settings->BASE_DIR.empty())
-	{
-		this->settings->LOGGER->error(
-			"'base_dir' must not be empty in order to use the application."
-		);
-		err_count++;
-	}
-	else if (!path::exists(this->settings->BASE_DIR))
-	{
-		this->settings->LOGGER->error(
-			"'base_dir' must exist in order to use the application."
-		);
-		err_count++;
-	}
-
-	if (this->settings->SECRET_KEY.empty())
-	{
-		this->settings->LOGGER->error(
-			"'secret_key' must be set in order to use the application."
-		);
-		err_count++;
-	}
-
-	if (!this->settings->DB)
-	{
-		this->settings->LOGGER->error(
-			"No database was set, at least one database must be configured in order to use the application"
-		);
-		err_count++;
-	}
-
-	if (!this->settings->TEMPLATE_ENGINE)
-	{
-		this->settings->LOGGER->error(
-			"'template_engine' must be configured in order to use the application."
-		);
-		err_count++;
-	}
-
-	if (this->settings->MIDDLEWARE.empty())
-	{
-		this->settings->LOGGER->warning("You have not added any middleware.");
-	}
-
-	if (this->settings->MODULES.empty())
-	{
-		this->settings->LOGGER->warning(
-			"You have not added any module to 'modules' setting."
-		);
-	}
-
-	for (auto& module : this->settings->MODULES)
-	{
-		if (!module->ready())
-		{
-			this->settings->LOGGER->error("Module '" + module->get_name() + "' is not ready.");
-			err_count++;
-			break;
-		}
-	}
-
-	if (err_count > 0)
-	{
-		throw ImproperlyConfigured(
-			"System check identified " + std::to_string(err_count) + " issues.",
-			_ERROR_DETAILS_
-		);
-	}
-
-	std::cout << "Done." << std::endl;
 }
 
 net::HandlerFunc MainApplication::make_handler()

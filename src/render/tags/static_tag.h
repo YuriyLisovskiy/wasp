@@ -26,7 +26,7 @@ struct static_node : public node
 	std::string var_name;
 	std::shared_ptr<FilterExpression> path;
 
-	std::string render(IContext* ctx) override;
+	std::string render(abc::IContext* ctx) override;
 };
 
 extern std::function<std::shared_ptr<internal::node>(

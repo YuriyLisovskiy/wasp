@@ -18,6 +18,7 @@
 #include <xalwart.base/yaml/yaml-cpp/yaml.h>
 
 // Render libraries.
+#include <xalwart.render/abc.h>
 #include <xalwart.render/library/abc.h>
 
 // ORM libraries.
@@ -39,9 +40,9 @@ __CONF_BEGIN__
 struct Settings
 {
 public:
-	bool DEBUG;
+	bool DEBUG = false;
 
-	std::shared_ptr<log::ILogger> LOGGER;
+	std::shared_ptr<log::ILogger> LOGGER = nullptr;
 
 	// Build paths inside the project like this: path::join(BASE_DIR, ...)
 	std::string BASE_DIR;
@@ -55,20 +56,20 @@ public:
 	// https://en.wikipedia.org/wiki/List_of_tz_zones_by_name (although not all
 	// systems may support all possibilities). When USE_TZ is true, this is
 	// interpreted as the default user time zone.
-	std::shared_ptr<dt::Timezone> TIME_ZONE;
+	std::shared_ptr<dt::Timezone> TIME_ZONE = std::make_shared<dt::Timezone>(dt::Timezone::UTC);
 
 	// If you set this to True, Django will use timezone-aware datetimes.
-	bool USE_TZ;
+	bool USE_TZ = false;
 
 	// Default charset to use for all HttpResponse objects, if a MIME type isn't
 	// manually specified. It's used to construct the Content-Type header.
-	std::string CHARSET;
+	std::string CHARSET = "utf-8";
 
 	// Root application where framework will load urlpatterns.
 	//
 	// ROOT_MODULE is the first installed module by default, it can
 	// be overridden in project settings.
-	std::shared_ptr<IModuleConfig> ROOT_MODULE;
+	std::shared_ptr<IModuleConfig> ROOT_MODULE = nullptr;
 
 	// Vector of patterns which will be loaded from ROOT_MODULE.
 	// To change this setting, setup ROOT_MODULE in your project
@@ -81,16 +82,16 @@ public:
 	std::vector<std::shared_ptr<IModuleConfig>> MODULES;
 
 	// Engine for rendering templates.
-	std::unique_ptr<render::IEngine> TEMPLATE_ENGINE;
+	std::shared_ptr<render::abc::IEngine> TEMPLATE_ENGINE = nullptr;
 
 	// Default database instance.
-	std::shared_ptr<orm::Client> DB;
+	std::shared_ptr<orm::Client> DB = nullptr;
 
 	// List of databases.
 	std::map<std::string, std::shared_ptr<orm::Client>> DATABASES;
 
 	// Whether to append trailing slashes to URLs.
-	bool APPEND_SLASH;
+	bool APPEND_SLASH = true;
 
 	// List of regular expression objects representing User-Agent strings
 	// that are not allowed to visit any page, systemwide. Use this for bad
@@ -143,58 +144,89 @@ public:
 
 	// Maximum size, in bytes, of a request before it will be streamed to the
 	// file system instead of into memory.
-	size_t FILE_UPLOAD_MAX_MEMORY_SIZE;
+	size_t FILE_UPLOAD_MAX_MEMORY_SIZE = 2621440;
 
 	// Maximum size in bytes of request data (excluding file uploads) that will be
 	// read before a SuspiciousOperation (RequestDataTooBig) is raised.
-	size_t DATA_UPLOAD_MAX_MEMORY_SIZE;
+	size_t DATA_UPLOAD_MAX_MEMORY_SIZE = 2621440;
 
 	// Whether to prepend the "www." subdomain to URLs that don't have it.
-	bool PREPEND_WWW;
+	bool PREPEND_WWW = false;
 
 	// Maximum number of GET/POST parameters that will be read before a
 	// SuspiciousOperation (TooManyFieldsSent) is thrown.
-	size_t DATA_UPLOAD_MAX_NUMBER_FIELDS;
+	size_t DATA_UPLOAD_MAX_NUMBER_FIELDS = 1000;
 
 	// Default formatting for date objects.
-	std::string DATE_FORMAT;
+	std::string DATE_FORMAT = "%b %d, %Y";
 
 	// Default formatting for datetime objects.
-	std::string DATETIME_FORMAT;
+	std::string DATETIME_FORMAT = "%b %d, %Y, %T";
 
 	// Default formatting for time objects.
-	std::string TIME_FORMAT;
+	std::string TIME_FORMAT = "%T";
 
 	// Default formatting for date objects when only the year and month are relevant.
-	std::string YEAR_MONTH_FORMAT;
+	std::string YEAR_MONTH_FORMAT = "%B %Y";
 
 	// Default formatting for date objects when only the month and day are relevant.
-	std::string MONTH_DAY_FORMAT;
+	std::string MONTH_DAY_FORMAT = "%B %d";
 
 	// Default short formatting for date objects.
-	std::string SHORT_DATE_FORMAT;
+	std::string SHORT_DATE_FORMAT = "%m/%d/%Y";
 
 	// Default short formatting for datetime objects.
-	std::string SHORT_DATETIME_FORMAT;
+	std::string SHORT_DATETIME_FORMAT = "%m/%d/%Y %T";
 
 	// First day of week, to be used on calendars
 	// 0 means Sunday, 1 means Monday...
-	uint FIRST_DAY_OF_WEEK;
+	uint FIRST_DAY_OF_WEEK = 0;
 
 	// Decimal separator symbol
-	char DECIMAL_SEPARATOR;
+	char DECIMAL_SEPARATOR = '.';
 
 	// Boolean that sets whether to add thousand separator when formatting numbers
-	bool USE_THOUSAND_SEPARATOR;
+	bool USE_THOUSAND_SEPARATOR = false;
 
 	// Thousand separator symbol
-	char THOUSAND_SEPARATOR;
+	char THOUSAND_SEPARATOR = ',';
 
 	// Default X-Frame-Options header value
-	std::string X_FRAME_OPTIONS;
+	std::string X_FRAME_OPTIONS = "SAMEORIGIN";
 
-	bool USE_X_FORWARDED_HOST;
-	bool USE_X_FORWARDED_PORT;
+	bool USE_X_FORWARDED_HOST = false;
+	bool USE_X_FORWARDED_PORT = false;
+
+	// List of middleware to use. Order is important; in the request phase, these
+	// middleware will be applied in the order given, and in the response
+	// phase the middleware will be applied in reverse order.
+	std::vector<std::shared_ptr<middleware::IMiddleware>> MIDDLEWARE;
+
+	// Settings for CSRF cookie.
+	std::string CSRF_COOKIE_NAME = "csrftoken";
+	size_t CSRF_COOKIE_AGE = 60 * 60 * 24 * 7 * 52;
+	std::string CSRF_COOKIE_DOMAIN;
+	std::string CSRF_COOKIE_PATH = "/";
+	bool CSRF_COOKIE_SECURE = false;
+	bool CSRF_COOKIE_HTTP_ONLY = false;
+	std::string CSRF_COOKIE_SAME_SITE = "Lax";
+	std::string CSRF_HEADER_NAME = "X-XSRF-TOKEN";
+	std::vector<std::string> CSRF_TRUSTED_ORIGINS;
+	bool CSRF_USE_SESSIONS = false;
+
+	// SSL settings (will be added in future).
+	bool USE_SSL = false;
+
+	// Security middleware.
+	bool SECURE_BROWSER_XSS_FILTER = false;
+	bool SECURE_CONTENT_TYPE_NO_SNIFF = true;
+	bool SECURE_HSTS_INCLUDE_SUBDOMAINS = false;
+	bool SECURE_HSTS_PRELOAD = false;
+	size_t SECURE_HSTS_SECONDS = 0;
+	std::vector<std::string> SECURE_REDIRECT_EXEMPT;
+	std::string SECURE_REFERRER_POLICY;
+	std::string SECURE_SSL_HOST;
+	bool SECURE_SSL_REDIRECT = false;
 
 	// If your module is behind a proxy that sets a header to specify secure
 	// connections, AND that proxy ensures that user-submitted headers with the
@@ -203,42 +235,13 @@ public:
 	// that header/value, request.is_secure() will return true.
 	// WARNING! Only set this if you fully understand what you're doing. Otherwise,
 	// you may be opening yourself up to a security risk.
-	std::shared_ptr<std::pair<std::string, std::string>> SECURE_PROXY_SSL_HEADER;
-
-	// List of middleware to use. Order is important; in the request phase, these
-	// middleware will be applied in the order given, and in the response
-	// phase the middleware will be applied in reverse order.
-	std::vector<std::shared_ptr<middleware::IMiddleware>> MIDDLEWARE;
-
-	// Settings for CSRF cookie.
-	std::string CSRF_COOKIE_NAME;
-	size_t CSRF_COOKIE_AGE;
-	std::string CSRF_COOKIE_DOMAIN;
-	std::string CSRF_COOKIE_PATH;
-	bool CSRF_COOKIE_SECURE;
-	bool CSRF_COOKIE_HTTP_ONLY;
-	std::string CSRF_COOKIE_SAME_SITE;
-	std::string CSRF_HEADER_NAME;
-	std::vector<std::string> CSRF_TRUSTED_ORIGINS;
-	bool CSRF_USE_SESSIONS;
-
-	// SSL settings (will be added in future).
-	bool USE_SSL;
-
-	// Security middleware.
-	bool SECURE_BROWSER_XSS_FILTER;
-	bool SECURE_CONTENT_TYPE_NO_SNIFF;
-	bool SECURE_HSTS_INCLUDE_SUBDOMAINS;
-	bool SECURE_HSTS_PRELOAD;
-	size_t SECURE_HSTS_SECONDS;
-	std::vector<std::string> SECURE_REDIRECT_EXEMPT;
-	std::string SECURE_REFERRER_POLICY;
-	std::string SECURE_SSL_HOST;
-	bool SECURE_SSL_REDIRECT;
+	std::shared_ptr<std::pair<std::string, std::string>> SECURE_PROXY_SSL_HEADER =
+		std::make_shared<std::pair<std::string, std::string>>("X-Forwarded-Proto", "https");
 
 	explicit Settings(const std::string& base_dir);
 	virtual ~Settings() = default;
 	void prepare();
+	void perform_checks();
 
 	inline virtual void register_modules()
 	{
@@ -274,7 +277,7 @@ public:
 		return db;
 	}
 
-	inline virtual std::shared_ptr<orm::abc::ISQLDriver> build_custom_database(
+	inline virtual std::shared_ptr<orm::abc::ISQLDriver> build_database(
 		const std::string& name, const YAML::Node& database
 	)
 	{
@@ -288,10 +291,10 @@ public:
 	std::shared_ptr<middleware::IMiddleware> get_middleware(const std::string& full_name) const;
 
 	[[nodiscard]]
-	std::shared_ptr<render::ILibrary> get_library(const std::string& full_name) const;
+	std::shared_ptr<render::abc::ILibrary> get_library(const std::string& full_name) const;
 
 	[[nodiscard]]
-	std::shared_ptr<render::ILoader> get_loader(const std::string& full_name) const;
+	std::shared_ptr<render::abc::ILoader> get_loader(const std::string& full_name) const;
 
 	inline std::list<std::shared_ptr<orm::db::Migration>> get_migrations(orm::abc::ISQLDriver* driver)
 	{
@@ -353,7 +356,7 @@ protected:
 		};
 	}
 
-	template <render::LibraryType LibraryT>
+	template <render::abc::library_type_c LibraryT>
 	inline void library(const std::string& custom_name="")
 	{
 		auto name = this->get_name_or<LibraryT>(custom_name);
@@ -362,12 +365,12 @@ protected:
 			this->LOGGER->warning("library '" + name + "' was overwritten");
 		}
 
-		this->_libraries[name] = [this]() -> std::shared_ptr<render::ILibrary> {
+		this->_libraries[name] = [this]() -> std::shared_ptr<render::abc::ILibrary> {
 			return std::make_shared<LibraryT>(this);
 		};
 	}
 
-	template <render::LoaderType LoaderT>
+	template <render::abc::loader_type_c LoaderT>
 	inline void loader(const std::string& custom_name="")
 	{
 		auto name = this->get_name_or<LoaderT>(custom_name);
@@ -376,7 +379,7 @@ protected:
 			this->LOGGER->warning("loader '" + name + "' was overwritten");
 		}
 
-		this->_loaders[name] = [this]() -> std::shared_ptr<render::ILoader> {
+		this->_loaders[name] = [this]() -> std::shared_ptr<render::abc::ILoader> {
 			return std::make_shared<LoaderT>(this);
 		};
 	}
@@ -398,7 +401,7 @@ private:
 
 	std::map<
 		std::string,
-		std::function<std::shared_ptr<render::ILibrary>()>
+		std::function<std::shared_ptr<render::abc::ILibrary>()>
 	> _libraries;
 
 	std::map<
@@ -408,7 +411,7 @@ private:
 
 	std::map<
 		std::string,
-		std::function<std::shared_ptr<render::ILoader>()>
+		std::function<std::shared_ptr<render::abc::ILoader>()>
 	> _loaders;
 
 	std::list<

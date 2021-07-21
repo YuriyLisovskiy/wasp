@@ -13,7 +13,7 @@
 
 __VIEWS_BEGIN__
 
-TemplateResponseMixin::TemplateResponseMixin(render::IEngine* engine)
+TemplateResponseMixin::TemplateResponseMixin(render::abc::IEngine* engine)
 {
 	if (!engine)
 	{
@@ -30,7 +30,7 @@ TemplateResponseMixin::TemplateResponseMixin(render::IEngine* engine)
 
 Result<std::shared_ptr<http::IHttpResponse>> TemplateResponseMixin::render(
 	http::HttpRequest* request,
-	const std::shared_ptr<render::IContext>& context,
+	const std::shared_ptr<render::abc::IContext>& context,
 	const std::string& template_name,
 	unsigned short int status,
 	const std::string& content_type,
@@ -83,7 +83,7 @@ TemplateView::TemplateView(
 	this->content_type = content_type;
 }
 
-std::shared_ptr<render::IContext> TemplateView::get_context(
+std::shared_ptr<render::abc::IContext> TemplateView::get_context(
 	http::HttpRequest* request, Args* args
 )
 {

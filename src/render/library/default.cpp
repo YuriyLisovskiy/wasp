@@ -20,24 +20,24 @@ DefaultLibrary::DefaultLibrary(conf::Settings* settings)
 {
 }
 
-std::shared_ptr<Filters> DefaultLibrary::get_filters()
+std::shared_ptr<collections::Dict<std::string, filter_t>> DefaultLibrary::get_filters()
 {
 	return nullptr;
 }
 
-std::shared_ptr<Tags> DefaultLibrary::get_tags()
+std::shared_ptr<collections::Dict<std::string, tag_t>> DefaultLibrary::get_tags()
 {
 	using namespace internal;
-	return std::make_shared<Tags>(std::map<std::string, Tag>{
+	return std::make_shared<collections::Dict<std::string, tag_t>>(std::map<std::string, tag_t>{
 
 		// Example: {% static('path/to/file.css') -> css_variable %}
-		{tags::TAG_NAME_STATIC, tags::make_static_tag("static", this->settings->STATIC_URL)},
+		{tags::TAG_NAME_STATIC, {tags::make_static_tag("static", this->settings->STATIC_URL)}},
 
 		// Example: {% media('path/to/file.jpg') -> jpg_variable %}
-		{tags::TAG_NAME_MEDIA, tags::make_static_tag("media", this->settings->MEDIA_URL)},
+		{tags::TAG_NAME_MEDIA, {tags::make_static_tag("media", this->settings->MEDIA_URL)}},
 
 		// Example: {% url('app_namespace::profile', 256) -> profile_256 %}
-		{tags::TAG_NAME_URL, tags::make_url_tag(this->settings->ROOT_URLCONF)}
+		{tags::TAG_NAME_URL, {tags::make_url_tag(this->settings->ROOT_URLCONF)}}
 	});
 }
 

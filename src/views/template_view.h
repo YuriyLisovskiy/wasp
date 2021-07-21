@@ -26,16 +26,16 @@ class TemplateResponseMixin
 protected:
 	std::string template_name;
 	std::string content_type;
-	render::IEngine* engine;
+	render::abc::IEngine* engine;
 
 public:
-	explicit TemplateResponseMixin(render::IEngine* engine);
+	explicit TemplateResponseMixin(render::abc::IEngine* engine);
 
 	/// Returns a response with a template rendered with
 	/// the given context.
 	virtual Result<std::shared_ptr<http::IHttpResponse>> render(
 		http::HttpRequest* request,
-		const std::shared_ptr<render::IContext>& context = nullptr,
+		const std::shared_ptr<render::abc::IContext>& context = nullptr,
 		const std::string& template_name = "",
 		unsigned short int status = 200,
 		const std::string& content_type = "",
@@ -56,7 +56,7 @@ public:
 
 	/// Used in default get() method, can be overridden
 	/// in derived classes.
-	virtual std::shared_ptr<render::IContext> get_context(
+	virtual std::shared_ptr<render::abc::IContext> get_context(
 		http::HttpRequest* request, Args* args
 	);
 

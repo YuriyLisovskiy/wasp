@@ -44,7 +44,7 @@ Settings::Settings(const std::string& base_dir)
 	};
 
 	this->_libraries = {
-		{render::DefaultLibrary::FULL_NAME, [this]() -> std::shared_ptr<render::ILibrary> {
+		{render::DefaultLibrary::FULL_NAME, [this]() -> std::shared_ptr<render::abc::ILibrary> {
 			return std::make_shared<render::DefaultLibrary>(this);
 		}}
 	};
@@ -63,15 +63,96 @@ void Settings::prepare()
 		this->ROOT_MODULE = this->MODULES.front();
 	}
 
-//	if (!this->DB)
-//	{
-//		this->LOGGER->warning("Missing 'default' database");
-//		if (!this->DATABASES.empty())
-//		{
-//			this->DB = this->DATABASES.front();
-//			this->LOGGER->warning("Using the first database from 'databases' list");
-//		}
-//	}
+	if (!this->DB)
+	{
+		this->LOGGER->warning("Missing 'default' database");
+		if (!this->DATABASES.empty())
+		{
+			this->DB = this->DATABASES.begin()->second;
+			this->LOGGER->warning("Using the first database from 'databases' map");
+		}
+	}
+}
+
+void Settings::perform_checks()
+{
+	std::cout << "Performing checks..." << std::endl;
+	if (!this->LOGGER)
+	{
+		throw ImproperlyConfigured("'logger' must be configured", _ERROR_DETAILS_);
+	}
+
+	size_t err_count = 0;
+	if (this->BASE_DIR.empty())
+	{
+		this->LOGGER->error(
+			"'base_dir' must not be empty in order to use the application."
+		);
+		err_count++;
+	}
+	else if (!path::exists(this->BASE_DIR))
+	{
+		this->LOGGER->error(
+			"'base_dir' must exist in order to use the application."
+		);
+		err_count++;
+	}
+
+	if (this->SECRET_KEY.empty())
+	{
+		this->LOGGER->error(
+			"'secret_key' must be set in order to use the application."
+		);
+		err_count++;
+	}
+
+	if (!this->DB)
+	{
+		this->LOGGER->error(
+			"No database was set, at least one database must be configured in order to use the application"
+		);
+		err_count++;
+	}
+
+	if (!this->TEMPLATE_ENGINE)
+	{
+		this->LOGGER->error(
+			"'template_engine' must be configured in order to use the application."
+		);
+		err_count++;
+	}
+
+	if (this->MIDDLEWARE.empty())
+	{
+		this->LOGGER->warning("You have not added any middleware.");
+	}
+
+	if (this->MODULES.empty())
+	{
+		this->LOGGER->warning(
+			"You have not added any module to 'modules' setting."
+		);
+	}
+
+	for (auto& module : this->MODULES)
+	{
+		if (!module->ready())
+		{
+			this->LOGGER->error("Module '" + module->get_name() + "' is not ready.");
+			err_count++;
+			break;
+		}
+	}
+
+	if (err_count > 0)
+	{
+		throw ImproperlyConfigured(
+			"System check identified " + std::to_string(err_count) + " issues.",
+			_ERROR_DETAILS_
+		);
+	}
+
+	std::cout << "Done." << std::endl;
 }
 
 std::shared_ptr<IModuleConfig> Settings::get_module(
@@ -98,7 +179,7 @@ std::shared_ptr<middleware::IMiddleware> Settings::get_middleware(
 	return nullptr;
 }
 
-std::shared_ptr<render::ILibrary> Settings::get_library(
+std::shared_ptr<render::abc::ILibrary> Settings::get_library(
 	const std::string& full_name
 ) const
 {
@@ -110,7 +191,7 @@ std::shared_ptr<render::ILibrary> Settings::get_library(
 	return nullptr;
 }
 
-std::shared_ptr<render::ILoader> Settings::get_loader(
+std::shared_ptr<render::abc::ILoader> Settings::get_loader(
 	const std::string& full_name
 ) const
 {

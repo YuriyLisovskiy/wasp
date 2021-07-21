@@ -22,7 +22,7 @@
 
 __RENDER_TAGS_BEGIN__
 
-std::string url_node::render(IContext* ctx)
+std::string url_node::render(abc::IContext* ctx)
 {
 	using Fe = std::shared_ptr<FilterExpression>;
 	auto built_url = this->pattern->build(

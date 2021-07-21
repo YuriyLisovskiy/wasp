@@ -17,7 +17,7 @@
 
 __RENDER_TAGS_BEGIN__
 
-std::string static_node::render(IContext* ctx)
+std::string static_node::render(abc::IContext* ctx)
 {
 	std::string result;
 	if (this->path)

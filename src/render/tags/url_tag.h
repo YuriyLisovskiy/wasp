@@ -28,7 +28,7 @@ struct url_node : public node
 	std::vector<std::shared_ptr<FilterExpression>> params;
 	std::string var_name;
 
-	std::string render(IContext* ctx) override;
+	std::string render(abc::IContext* ctx) override;
 };
 
 extern std::function<std::shared_ptr<internal::node>(

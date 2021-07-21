@@ -17,15 +17,15 @@
 
 __RENDER_BEGIN__
 
-class Library : public ILibrary
+class Library : public abc::ILibrary
 {
 protected:
 	conf::Settings* settings;
 
 public:
 	explicit Library(const std::string& lib_name, conf::Settings* settings);
-	std::shared_ptr<Filters> get_filters() override;
-	std::shared_ptr<Tags> get_tags() override;
+	std::shared_ptr<collections::Dict<std::string, filter_t>> get_filters() override;
+	std::shared_ptr<collections::Dict<std::string, tag_t>> get_tags() override;
 };
 
 __RENDER_END__
