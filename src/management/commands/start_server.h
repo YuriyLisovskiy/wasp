@@ -28,11 +28,13 @@ private:
 	const std::string DEFAULT_IPV6_HOST = "[::1]";
 	const uint16_t DEFAULT_PORT = 8000;
 	const size_t DEFAULT_THREADS = 16;
+	const size_t DEFAULT_RETRIES_COUNT = 5;
 
 	std::string _host;
 	uint16_t _port = DEFAULT_PORT;
 	bool _use_ipv6 = false;
 	size_t _threads_count = DEFAULT_THREADS;
+	size_t _retries_count = DEFAULT_RETRIES_COUNT;
 
 	std::shared_ptr<core::flags::StringFlag> _addr_port_flag;
 	std::shared_ptr<core::flags::StringFlag> _addr_flag;
@@ -40,6 +42,7 @@ private:
 	std::shared_ptr<core::flags::UnsignedLongFlag> _threads_flag;
 	std::shared_ptr<core::flags::BoolFlag> _use_ipv6_flag;
 	std::shared_ptr<core::flags::BoolFlag> _no_colors_flag;
+	std::shared_ptr<core::flags::UnsignedLongFlag> _retries_count_flag;
 
 	re::Regex _ipv4_ipv6_port_regex;
 	re::Regex _ipv4_regex;
@@ -50,9 +53,7 @@ private:
 protected:
 	void add_flags() final;
 	void handle() final;
-	void retrieve_args(
-		std::string& host, uint16_t& port, bool& use_ipv6, size_t& threads_count
-	);
+	void retrieve_args();
 
 public:
 	explicit StartServerCommand(

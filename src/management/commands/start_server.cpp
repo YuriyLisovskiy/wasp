@@ -46,12 +46,13 @@ StartServerCommand::StartServerCommand(
 Kwargs StartServerCommand::get_kwargs()
 {
 	auto kwargs = Command::get_kwargs();
-	kwargs.set("xw.workers", std::to_string(this->_threads_count));
-	kwargs.set("xw.max_body_size", std::to_string(this->settings->DATA_UPLOAD_MAX_MEMORY_SIZE));
+	kwargs.set("workers", std::to_string(this->_threads_count));
+	kwargs.set("max_body_size", std::to_string(this->settings->DATA_UPLOAD_MAX_MEMORY_SIZE));
+	kwargs.set("retries_count", std::to_string(this->_retries_count));
 
-	// TODO: add timeout to command args!
-	kwargs.set("xw.timeout_sec", std::to_string(5));
-	kwargs.set("xw.timeout_usec", std::to_string(0));
+	// TODO: add the next parameters to command flags!
+	kwargs.set("timeout_sec", std::to_string(5));
+	kwargs.set("timeout_usec", std::to_string(0));
 	return kwargs;
 }
 
@@ -75,6 +76,9 @@ void StartServerCommand::add_flags()
 	this->_no_colors_flag = this->flag_set->make_bool(
 		"no-colors", false, "Disable colors in logs"
 	);
+	this->_retries_count_flag = this->flag_set->make_unsigned_long(
+		"retries", this->DEFAULT_RETRIES_COUNT, "Max retries count to bind socket"
+	);
 }
 
 void StartServerCommand::handle()
@@ -88,9 +92,7 @@ void StartServerCommand::handle()
 		);
 	}
 
-	this->retrieve_args(
-		this->_host, this->_port, this->_use_ipv6, this->_threads_count
-	);
+	this->retrieve_args();
 	auto server = this->make_server(this->settings->LOGGER.get(), this->get_kwargs());
 	try
 	{
@@ -118,9 +120,7 @@ void StartServerCommand::handle()
 	server->close();
 }
 
-void StartServerCommand::retrieve_args(
-	std::string& host, uint16_t& port, bool& use_ipv6, size_t& threads_count
-)
+void StartServerCommand::retrieve_args()
 {
 	// Setup address and port.
 	auto host_port_str = this->_addr_port_flag->get();
@@ -135,29 +135,29 @@ void StartServerCommand::retrieve_args(
 
 		auto groups = this->_ipv4_ipv6_port_regex.groups();
 		auto address = (groups[1].empty() ? this->DEFAULT_IPV4_HOST : groups[1]);
-		use_ipv6 = this->_ipv6_regex.match(address);
+		this->_use_ipv6 = this->_ipv6_regex.match(address);
 		auto trimmed_addr = str::trim(address, "[]");
 		if (trimmed_addr == "localhost")
 		{
-			address = use_ipv6 ? this->DEFAULT_IPV6_HOST : this->DEFAULT_IPV4_HOST;
+			address = this->_use_ipv6 ? this->DEFAULT_IPV6_HOST : this->DEFAULT_IPV4_HOST;
 		}
 
-		host = address;
-		port = groups[4].empty() ? this->DEFAULT_PORT : (uint16_t) std::stoi(groups[4]);
+		this->_host = address;
+		this->_port = groups[4].empty() ? this->DEFAULT_PORT : (uint16_t) std::stoi(groups[4]);
 	}
 	else
 	{
 		auto address = this->_addr_flag->get();
 		if (address.empty())
 		{
-			use_ipv6 = this->_use_ipv6_flag->get();
-			address = use_ipv6 ? this->DEFAULT_IPV6_HOST : this->DEFAULT_IPV4_HOST;
+			this->_use_ipv6 = this->_use_ipv6_flag->get();
+			address = this->_use_ipv6 ? this->DEFAULT_IPV6_HOST : this->DEFAULT_IPV4_HOST;
 		}
 		else
 		{
 			if (this->_ipv6_regex.match(address))
 			{
-				use_ipv6 = true;
+				this->_use_ipv6 = true;
 			}
 			else if (!this->_ipv4_regex.match(address))
 			{
@@ -171,13 +171,13 @@ void StartServerCommand::retrieve_args(
 		auto trimmed_addr = str::trim(address, "[]");
 		if (trimmed_addr == "localhost")
 		{
-			address = use_ipv6 ? this->DEFAULT_IPV6_HOST : this->DEFAULT_IPV4_HOST;
+			address = this->_use_ipv6 ? this->DEFAULT_IPV6_HOST : this->DEFAULT_IPV4_HOST;
 		}
 
-		host = address;
+		this->_host = address;
 		if (this->_port_flag->valid())
 		{
-			port = this->_port_flag->get();
+			this->_port = this->_port_flag->get();
 		}
 		else
 		{
@@ -196,7 +196,8 @@ void StartServerCommand::retrieve_args(
 		);
 	}
 
-	threads_count = this->_threads_flag->get();
+	this->_threads_count = this->_threads_flag->get();
+	this->_retries_count = this->_retries_count_flag->get();
 }
 
 __MANAGEMENT_COMMANDS_END__
