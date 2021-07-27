@@ -16,7 +16,9 @@ __MANAGEMENT_COMMANDS_BEGIN__
 StartServerCommand::StartServerCommand(
 	conf::IModuleConfig* config,
 	conf::Settings* settings,
-	std::function<std::shared_ptr<net::abc::IServer>(log::ILogger*, const Kwargs&)> make_server
+	std::function<std::shared_ptr<net::abc::IServer>(
+		log::ILogger*, const Kwargs&, std::shared_ptr<dt::Timezone>
+	)> make_server
 ) : Command(
 	config, settings, "start-server", "Starts a web application"
 ), make_server(std::move(make_server))
@@ -93,11 +95,11 @@ void StartServerCommand::handle()
 	}
 
 	this->retrieve_args();
-	auto server = this->make_server(this->settings->LOGGER.get(), this->get_kwargs());
+	auto server = this->make_server(this->settings->LOGGER.get(), this->get_kwargs(), this->settings->TIME_ZONE);
 	try
 	{
 		server->bind(this->_host, this->_port);
-		std::string message = dt::Datetime::now().strftime("%B %d, %Y - %T") + "\n" +
+		std::string message = dt::Datetime::now(this->settings->TIME_ZONE).strftime("%B %d, %Y - %T") + "\n" +
 		                      v::framework_name + " version " + v::version.to_string() + "\n" +
 		                      "Starting development server at " +
 		                      "http://" + this->_host + ":" + std::to_string(this->_port) + "/\n" +

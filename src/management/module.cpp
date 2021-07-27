@@ -15,7 +15,9 @@ __MANAGEMENT_BEGIN__
 
 CoreManagementModuleConfig::CoreManagementModuleConfig(
 	conf::Settings* settings,
-	std::function<std::shared_ptr<net::abc::IServer>(log::ILogger*, const Kwargs&)> make_server
+	std::function<std::shared_ptr<net::abc::IServer>(
+		log::ILogger*, const Kwargs&, std::shared_ptr<dt::Timezone>
+	)> make_server
 ) : ModuleConfig(__FILE__, settings), _make_server(std::move(make_server))
 {
 }

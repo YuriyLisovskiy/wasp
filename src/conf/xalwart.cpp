@@ -21,7 +21,9 @@ __CONF_BEGIN__
 
 MainApplication::MainApplication(
 	conf::Settings* settings,
-	std::function<std::shared_ptr<net::abc::IServer>(log::ILogger*, const Kwargs&)> server_initializer
+	std::function<std::shared_ptr<net::abc::IServer>(
+		log::ILogger*, const Kwargs&, std::shared_ptr<dt::Timezone>
+	)> server_initializer
 ) : server_initializer(std::move(server_initializer))
 {
 	InterruptException::initialize();
@@ -102,10 +104,10 @@ void MainApplication::_setup_commands()
 
 	auto default_commands = management::CoreManagementModuleConfig(
 		this->settings, [this](
-			log::ILogger* logger, const Kwargs& kwargs
+			log::ILogger* logger, const Kwargs& kwargs, std::shared_ptr<dt::Timezone> tz
 		) -> std::shared_ptr<net::abc::IServer>
 		{
-			auto server = this->server_initializer(logger, kwargs);
+			auto server = this->server_initializer(logger, kwargs, tz);
 			server->setup_handler(this->make_handler());
 			return server;
 		}

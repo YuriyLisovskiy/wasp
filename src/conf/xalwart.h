@@ -24,7 +24,9 @@ class MainApplication
 {
 protected:
 	conf::Settings* settings;
-	std::function<std::shared_ptr<net::abc::IServer>(log::ILogger*, const Kwargs&)> server_initializer;
+	std::function<std::shared_ptr<net::abc::IServer>(
+		log::ILogger*, const Kwargs&, std::shared_ptr<dt::Timezone>
+	)> server_initializer;
 
 protected:
 	net::HandlerFunc make_handler();
@@ -73,7 +75,9 @@ private:
 public:
 	explicit MainApplication(
 		conf::Settings* settings,
-		std::function<std::shared_ptr<net::abc::IServer>(log::ILogger*, const Kwargs&)> server_initializer
+		std::function<std::shared_ptr<net::abc::IServer>(
+			log::ILogger*, const Kwargs&, std::shared_ptr<dt::Timezone>
+		)> server_initializer
 	);
 	void execute(int argc, char** argv);
 };
