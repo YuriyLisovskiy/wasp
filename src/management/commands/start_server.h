@@ -9,6 +9,7 @@
 #pragma once
 
 // Base libraries.
+#include <xalwart.base/kwargs.h>
 #include <xalwart.base/net/abc.h>
 
 // Module definitions.
@@ -44,10 +45,7 @@ private:
 	re::Regex _ipv4_regex;
 	re::Regex _ipv6_regex;
 
-	std::function<std::shared_ptr<net::abc::IServer>(
-		log::ILogger*,
-		collections::Dict<std::string, std::string>
-	)> make_server;
+	std::function<std::shared_ptr<net::abc::IServer>(log::ILogger*, const Kwargs&)> make_server;
 
 protected:
 	void add_flags() final;
@@ -60,12 +58,11 @@ public:
 	explicit StartServerCommand(
 		conf::IModuleConfig* config,
 		conf::Settings* settings,
-		std::function<std::shared_ptr<net::abc::IServer>(
-			log::ILogger*,
-			collections::Dict<std::string, std::string>
-		)> make_server
+		std::function<std::shared_ptr<net::abc::IServer>(log::ILogger*, const Kwargs&)> make_server
 	);
-	collections::Dict<std::string, std::string> get_kwargs() override;
+
+	// Returns command flags.
+	Kwargs get_kwargs() override;
 };
 
 __MANAGEMENT_COMMANDS_END__

@@ -24,16 +24,14 @@ class CoreManagementModuleConfig final : public conf::ModuleConfig
 {
 private:
 	std::function<std::shared_ptr<net::abc::IServer>(
-		log::ILogger*,
-		collections::Dict<std::string, std::string>
+		log::ILogger*, const Kwargs&
 	)> _make_server;
 
 public:
 	explicit CoreManagementModuleConfig(
 		conf::Settings* settings,
 		std::function<std::shared_ptr<net::abc::IServer>(
-			log::ILogger*,
-			collections::Dict<std::string, std::string>
+			log::ILogger*, const Kwargs&
 		)> make_server
 	);
 	void commands() override;

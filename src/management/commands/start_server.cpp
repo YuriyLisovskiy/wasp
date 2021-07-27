@@ -16,10 +16,7 @@ __MANAGEMENT_COMMANDS_BEGIN__
 StartServerCommand::StartServerCommand(
 	conf::IModuleConfig* config,
 	conf::Settings* settings,
-	std::function<std::shared_ptr<net::abc::IServer>(
-		log::ILogger*,
-		collections::Dict<std::string, std::string>
-	)> make_server
+	std::function<std::shared_ptr<net::abc::IServer>(log::ILogger*, const Kwargs&)> make_server
 ) : Command(
 	config, settings, "start-server", "Starts a web application"
 ), make_server(std::move(make_server))
@@ -46,15 +43,15 @@ StartServerCommand::StartServerCommand(
 	);
 }
 
-collections::Dict<std::string, std::string> StartServerCommand::get_kwargs()
+Kwargs StartServerCommand::get_kwargs()
 {
 	auto kwargs = Command::get_kwargs();
-	kwargs["xw.workers"] = std::to_string(this->_threads_count);
-	kwargs["xw.max_body_size"] = std::to_string(this->settings->DATA_UPLOAD_MAX_MEMORY_SIZE);
+	kwargs.set("xw.workers", std::to_string(this->_threads_count));
+	kwargs.set("xw.max_body_size", std::to_string(this->settings->DATA_UPLOAD_MAX_MEMORY_SIZE));
 
 	// TODO: add timeout to command args!
-	kwargs["xw.timeout_sec"] = std::to_string(5);
-	kwargs["xw.timeout_usec"] = std::to_string(0);
+	kwargs.set("xw.timeout_sec", std::to_string(5));
+	kwargs.set("xw.timeout_usec", std::to_string(0));
 	return kwargs;
 }
 

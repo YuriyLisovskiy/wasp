@@ -70,8 +70,7 @@ protected:
 	{
 		ctrl::Handler controller_handler = [this](
 			http::HttpRequest* request,
-			core::Kwargs* kwargs,
-			conf::Settings* settings_ptr
+			Kwargs* kwargs, conf::Settings* settings_ptr
 		) -> Result<std::shared_ptr<http::IHttpResponse>>
 		{
 			ControllerT controller(settings_ptr);
@@ -105,14 +104,14 @@ protected:
 		});
 	}
 
-	template <cmd::command_type CommandT>
+	template <cmd::command_type_c CommandT>
 	inline void command()
 	{
 		auto cmd = std::make_shared<CommandT>(this, this->settings);
 		this->_commands.push_back(cmd);
 	}
 
-	template <cmd::command_type CommandT, typename ...Args>
+	template <cmd::command_type_c CommandT, typename ...Args>
 	inline void command(Args&& ...args)
 	{
 		auto cmd = std::make_shared<CommandT>(std::forward<Args>(args)...);

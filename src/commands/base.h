@@ -3,8 +3,7 @@
  *
  * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
- * Purpose:
- * 	The base class from which all commands ultimately derive.
+ * The base class from which all commands ultimately derive.
  */
 
 #pragma once
@@ -13,7 +12,7 @@
 #include <string>
 
 // Base libraries.
-#include <xalwart.base/collections/dict.h>
+#include <xalwart.base/kwargs.h>
 
 // Module definitions.
 #include "./_def_.h"
@@ -46,22 +45,35 @@ protected:
 	void create_flags();
 
 	/// Override in child class to add more commands.
-	virtual void add_flags();
+	virtual inline void add_flags()
+	{
+	}
 
-	virtual void validate();
+	/// Validates arguments before processing the command.
+	virtual inline void validate()
+	{
+	}
 
 	/// The actual logic of the command. Subclasses must implement
 	/// this method.
 	virtual void handle() = 0;
 
 public:
-	virtual collections::Dict<std::string, std::string> get_kwargs();
+
+	// Returns command flags.
+	virtual inline Kwargs get_kwargs()
+	{
+		return Kwargs();
+	}
 
 	/// Returns usage based on flag_set.
 	std::string usage();
 
 	/// Returns full command's name.
-	std::string name();
+	inline std::string name()
+	{
+		return this->label;
+	}
 
 	/// Creates flags if they are not created yet,
 	/// parses argv and runs handle() method.

@@ -21,8 +21,8 @@ __COMMANDS_BEGIN__
 class Command : public BaseCommand
 {
 protected:
-	conf::IModuleConfig* app_config;
 	conf::Settings* settings;
+	conf::IModuleConfig* module_config;
 
 protected:
 	Command(
@@ -34,6 +34,6 @@ protected:
 };
 
 template <typename T>
-concept command_type = std::is_base_of_v<Command, T>;
+concept command_type_c = std::is_base_of_v<Command, T>;
 
 __COMMANDS_END__

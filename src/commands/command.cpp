@@ -10,25 +10,23 @@
 __COMMANDS_BEGIN__
 
 Command::Command(
-	conf::IModuleConfig* app_cfg,
+	conf::IModuleConfig* module_cfg,
 	conf::Settings* settings,
 	const std::string& cmd_name,
 	const std::string& help
-) : BaseCommand(cmd_name, help), app_config(app_cfg), settings(settings)
+) : BaseCommand(cmd_name, help), module_config(module_cfg), settings(settings)
 {
-	if (!this->app_config)
+	if (!this->module_config)
 	{
-		throw ImproperlyConfigured(
-			"ModuleCommand: module config must be instantiated in order to use the application",
-			_ERROR_DETAILS_
+		throw NullPointerException(
+			"cmd::ModuleCommand: module_cfg is nullptr", _ERROR_DETAILS_
 		);
 	}
 
 	if (!this->settings)
 	{
-		throw ImproperlyConfigured(
-			"ModuleCommand: settings must be instantiated in order to use the application",
-			_ERROR_DETAILS_
+		throw NullPointerException(
+			"cmd::ModuleCommand: settings is nullptr", _ERROR_DETAILS_
 		);
 	}
 }

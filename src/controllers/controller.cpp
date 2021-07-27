@@ -28,7 +28,7 @@ Controller::Controller(
 	}
 }
 
-Result<std::shared_ptr<http::IHttpResponse>> Controller::dispatch(core::Kwargs* kwargs)
+Result<std::shared_ptr<http::IHttpResponse>> Controller::dispatch(Kwargs* kwargs)
 {
 	if (this->request == nullptr)
 	{
@@ -116,7 +116,7 @@ std::vector<std::string> Controller::allowed_methods()
 	return result;
 }
 
-Result<std::shared_ptr<http::IHttpResponse>> Controller::options(core::Kwargs* kwargs)
+Result<std::shared_ptr<http::IHttpResponse>> Controller::options(Kwargs* kwargs)
 {
 	auto response = std::make_shared<http::HttpResponse>(200);
 	auto allowed_methods = this->allowed_methods();

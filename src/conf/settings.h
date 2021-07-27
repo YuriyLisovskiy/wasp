@@ -9,6 +9,7 @@
 #pragma once
 
 // Base libraries.
+#include <xalwart.base/kwargs.h>
 #include <xalwart.base/datetime.h>
 #include <xalwart.base/logger.h>
 #include <xalwart.base/result.h>
@@ -34,7 +35,6 @@
 #include "./abc.h"
 #include "../middleware/abc.h"
 #include "../urls/url.h"
-#include "../core/kwargs.h"
 
 
 __CONF_BEGIN__
@@ -286,7 +286,7 @@ public:
 		return nullptr;
 	}
 
-	inline virtual std::shared_ptr<net::abc::IServer> build_server(const core::Kwargs& kwargs)
+	inline virtual std::shared_ptr<net::abc::IServer> build_server(const Kwargs& kwargs)
 	{
 		return nullptr;
 	}

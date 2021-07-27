@@ -21,10 +21,7 @@ __CONF_BEGIN__
 
 MainApplication::MainApplication(
 	conf::Settings* settings,
-	std::function<std::shared_ptr<net::abc::IServer>(
-		log::ILogger*,
-		collections::Dict<std::string, std::string>
-	)> server_initializer
+	std::function<std::shared_ptr<net::abc::IServer>(log::ILogger*, const Kwargs&)> server_initializer
 ) : server_initializer(std::move(server_initializer))
 {
 	InterruptException::initialize();
@@ -105,11 +102,10 @@ void MainApplication::_setup_commands()
 
 	auto default_commands = management::CoreManagementModuleConfig(
 		this->settings, [this](
-			log::ILogger* logger,
-			collections::Dict<std::string, std::string> kwargs
+			log::ILogger* logger, const Kwargs& kwargs
 		) -> std::shared_ptr<net::abc::IServer>
 		{
-			auto server = this->server_initializer(logger, std::move(kwargs));
+			auto server = this->server_initializer(logger, kwargs);
 			server->setup_handler(this->make_handler());
 			return server;
 		}

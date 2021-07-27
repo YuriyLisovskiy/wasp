@@ -14,6 +14,7 @@
 #include <functional>
 
 // Base libraries.
+#include <xalwart.base/kwargs.h>
 #include <xalwart.base/result.h>
 
 // Module definitions.
@@ -23,7 +24,6 @@
 #include "../http/request.h"
 #include "../http/response.h"
 #include "../conf/_def_.h"
-#include "../core/kwargs.h"
 
 
 __CONF_BEGIN__
@@ -36,7 +36,7 @@ __CONF_END__
 __CONTROLLERS_BEGIN__
 
 typedef std::function<Result<std::shared_ptr<http::IHttpResponse>>(
-	http::HttpRequest*, core::Kwargs*, conf::Settings*
+	http::HttpRequest*, Kwargs*, conf::Settings*
 )> Handler;
 
 class Controller
@@ -110,7 +110,7 @@ public:
 	/// @param request: pointer to http request.
 	/// @param args: pointer to requests' url arguments.
 	/// @return pointer to http response instance.
-	virtual inline Result<std::shared_ptr<http::IHttpResponse>> get(core::Kwargs* args)
+	virtual inline Result<std::shared_ptr<http::IHttpResponse>> get(Kwargs* args)
 	{
 		return this->null();
 	}
@@ -121,7 +121,7 @@ public:
 	/// @param request: pointer to http request.
 	/// @param args: pointer to requests' url arguments.
 	/// @return pointer to http response instance.
-	virtual inline Result<std::shared_ptr<http::IHttpResponse>> post(core::Kwargs* args)
+	virtual inline Result<std::shared_ptr<http::IHttpResponse>> post(Kwargs* args)
 	{
 		return this->null();
 	}
@@ -132,7 +132,7 @@ public:
 	/// @param request: pointer to http request.
 	/// @param args: pointer to requests' url arguments.
 	/// @return pointer to http response instance.
-	virtual inline Result<std::shared_ptr<http::IHttpResponse>> put(core::Kwargs* args)
+	virtual inline Result<std::shared_ptr<http::IHttpResponse>> put(Kwargs* args)
 	{
 		return this->null();
 	}
@@ -143,7 +143,7 @@ public:
 	/// @param request: pointer to http request.
 	/// @param args: pointer to requests's url arguments.
 	/// @return pointer to http response instance.
-	virtual inline Result<std::shared_ptr<http::IHttpResponse>> patch(core::Kwargs* args)
+	virtual inline Result<std::shared_ptr<http::IHttpResponse>> patch(Kwargs* args)
 	{
 		return this->null();
 	}
@@ -154,7 +154,7 @@ public:
 	/// @param request: pointer to http request.
 	/// @param args: pointer to requests's url arguments.
 	/// @return pointer to http response instance.
-	virtual inline Result<std::shared_ptr<http::IHttpResponse>> delete_(core::Kwargs* args)
+	virtual inline Result<std::shared_ptr<http::IHttpResponse>> delete_(Kwargs* args)
 	{
 		return this->null();
 	}
@@ -165,7 +165,7 @@ public:
 	/// @param request: pointer to http request.
 	/// @param args: pointer to requests's url arguments.
 	/// @return pointer to http response instance.
-	virtual inline Result<std::shared_ptr<http::IHttpResponse>> head(core::Kwargs* kwargs)
+	virtual inline Result<std::shared_ptr<http::IHttpResponse>> head(Kwargs* kwargs)
 	{
 		return this->get(kwargs);
 	}
@@ -176,7 +176,7 @@ public:
 	/// @param request: pointer to http request.
 	/// @param args: pointer to requests's url arguments.
 	/// @return pointer to http response instance.
-	virtual Result<std::shared_ptr<http::IHttpResponse>> options(core::Kwargs* args);
+	virtual Result<std::shared_ptr<http::IHttpResponse>> options(Kwargs* args);
 
 	/// Processes http TRACE request.
 	/// Can be overridden in derived class, otherwise returns nullptr.
@@ -184,7 +184,7 @@ public:
 	/// @param request: pointer to http request.
 	/// @param args: pointer to requests's url arguments.
 	/// @return pointer to http response instance.
-	virtual inline Result<std::shared_ptr<http::IHttpResponse>> trace(core::Kwargs* args)
+	virtual inline Result<std::shared_ptr<http::IHttpResponse>> trace(Kwargs* args)
 	{
 		return this->null();
 	}
@@ -203,7 +203,7 @@ public:
 	///
 	/// @param request: an actual http request from client.
 	/// @return pointer to http response returned from handler.
-	virtual Result<std::shared_ptr<http::IHttpResponse>> dispatch(core::Kwargs* args);
+	virtual Result<std::shared_ptr<http::IHttpResponse>> dispatch(Kwargs* args);
 
 	/// Returns Http 405 (Method Not Allowed) response.
 	///

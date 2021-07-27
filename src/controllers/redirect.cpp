@@ -28,7 +28,7 @@ std::string RedirectController::get_redirect_url()
 	return url;
 }
 
-Result<std::shared_ptr<http::IHttpResponse>> RedirectController::get(core::Kwargs* kwargs)
+Result<std::shared_ptr<http::IHttpResponse>> RedirectController::get(Kwargs* kwargs)
 {
 	std::string url = this->get_redirect_url();
 	if (url.empty())
@@ -47,36 +47,6 @@ Result<std::shared_ptr<http::IHttpResponse>> RedirectController::get(core::Kwarg
 	}
 
 	return this->response<http::HttpResponseRedirect>(url);
-}
-
-Result<std::shared_ptr<http::IHttpResponse>> RedirectController::post(core::Kwargs* kwargs)
-{
-	return this->get(kwargs);
-}
-
-Result<std::shared_ptr<http::IHttpResponse>> RedirectController::put(core::Kwargs* kwargs)
-{
-	return this->get(kwargs);
-}
-
-Result<std::shared_ptr<http::IHttpResponse>> RedirectController::patch(core::Kwargs* kwargs)
-{
-	return this->get(kwargs);
-}
-
-Result<std::shared_ptr<http::IHttpResponse>> RedirectController::delete_(core::Kwargs* kwargs)
-{
-	return this->get(kwargs);
-}
-
-Result<std::shared_ptr<http::IHttpResponse>> RedirectController::head(core::Kwargs* kwargs)
-{
-	return this->get(kwargs);
-}
-
-Result<std::shared_ptr<http::IHttpResponse>> RedirectController::options(core::Kwargs* kwargs)
-{
-	return this->get(kwargs);
 }
 
 __CONTROLLERS_END__

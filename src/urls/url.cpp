@@ -33,13 +33,11 @@ std::shared_ptr<urls::UrlPattern> make_static(
 	}
 
 	auto controller_func = [static_root](
-		http::HttpRequest* request,
-		core::Kwargs* args,
-		conf::Settings* settings
+		http::HttpRequest* request, Kwargs* args, conf::Settings* settings
 	) -> Result<std::shared_ptr<http::IHttpResponse>>
 	{
 		ctrl::StaticController controller(settings);
-		controller.set_kwargs(core::Kwargs({
+		controller.set_kwargs(Kwargs({
 			{"document_root", static_root}
 		}));
 		controller.setup(request);

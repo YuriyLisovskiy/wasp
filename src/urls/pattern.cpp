@@ -53,9 +53,7 @@ std::string UrlPattern::get_name() const
 }
 
 Result<std::shared_ptr<http::IHttpResponse>> UrlPattern::apply(
-	http::HttpRequest* request,
-	conf::Settings* settings,
-	core::Kwargs* kwargs
+	http::HttpRequest* request, conf::Settings* settings, Kwargs* kwargs
 )
 {
 	return this->_handler(request, kwargs, settings);

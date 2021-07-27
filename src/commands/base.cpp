@@ -1,7 +1,7 @@
 /**
  * commands/base.cpp
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  */
 
 #include "./base.h"
@@ -18,20 +18,10 @@ BaseCommand::BaseCommand(const std::string& cmd_name, const std::string& help)
 	this->label = cmd_name;
 }
 
-collections::Dict<std::string, std::string> BaseCommand::get_kwargs()
-{
-	return collections::Dict<std::string, std::string>();
-}
-
 std::string BaseCommand::usage()
 {
 	this->create_flags();
 	return this->label + ":\n" + this->help + "\n" + this->flag_set->usage("  ");
-}
-
-std::string BaseCommand::name()
-{
-	return this->label;
 }
 
 void BaseCommand::create_flags()
@@ -41,14 +31,6 @@ void BaseCommand::create_flags()
 		this->add_flags();
 		this->is_created = true;
 	}
-}
-
-void BaseCommand::add_flags()
-{
-}
-
-void BaseCommand::validate()
-{
 }
 
 void BaseCommand::run_from_argv(int argc, char** argv, bool is_verbose)

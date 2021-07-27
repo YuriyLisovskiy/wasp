@@ -1,9 +1,9 @@
 /**
  * commands/_def_.h
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
- * Purpose: commands module's definitions.
+ * Definitions of `commands` module.
  */
 
 #pragma once

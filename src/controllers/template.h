@@ -56,12 +56,12 @@ public:
 
 	/// Used in default get() method, can be overridden
 	/// in derived classes.
-	virtual inline std::shared_ptr<render::abc::IContext> get_context(core::Kwargs* kwargs)
+	virtual inline std::shared_ptr<render::abc::IContext> get_context(Kwargs* kwargs)
 	{
 		return nullptr;
 	}
 
-	inline Result<std::shared_ptr<http::IHttpResponse>> get(core::Kwargs* kwargs) override
+	inline Result<std::shared_ptr<http::IHttpResponse>> get(Kwargs* kwargs) override
 	{
 		return this->render(this->request, this->get_context(kwargs), "", 200, "", "utf-8");
 	}

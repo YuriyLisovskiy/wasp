@@ -29,7 +29,7 @@ std::function<Result<std::shared_ptr<http::IHttpResponse>>(
 				conf::Settings* settings
 			) mutable -> Result<std::shared_ptr<http::IHttpResponse>>
 			{
-				auto kwargs = core::Kwargs(args_map);
+				auto kwargs = Kwargs(args_map);
 				return url_pattern->apply(request, settings, &kwargs);
 			};
 			break;

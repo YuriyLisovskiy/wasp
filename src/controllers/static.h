@@ -25,19 +25,19 @@ extern bool was_modified_since(const std::string& header, size_t time, size_t si
 class StaticController final : public Controller
 {
 private:
-	core::Kwargs _kwargs;
+	Kwargs _kwargs;
 
 public:
 	inline explicit StaticController(conf::Settings* settings) : Controller({"get"}, settings)
 	{
 	}
 
-	inline void set_kwargs(const core::Kwargs& kwargs)
+	inline void set_kwargs(const Kwargs& kwargs)
 	{
 		this->_kwargs = kwargs;
 	}
 
-	Result<std::shared_ptr<http::IHttpResponse>> get(core::Kwargs* kwargs) final;
+	Result<std::shared_ptr<http::IHttpResponse>> get(Kwargs* kwargs) final;
 };
 
 __CONTROLLERS_END__

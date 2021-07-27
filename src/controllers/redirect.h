@@ -40,13 +40,37 @@ public:
 	/// Return the URL redirect to.
 	std::string get_redirect_url();
 
-	Result<std::shared_ptr<http::IHttpResponse>> get(core::Kwargs* args) override;
-	Result<std::shared_ptr<http::IHttpResponse>> post(core::Kwargs* args) override;
-	Result<std::shared_ptr<http::IHttpResponse>> head(core::Kwargs* args) override;
-	Result<std::shared_ptr<http::IHttpResponse>> options(core::Kwargs* args) override;
-	Result<std::shared_ptr<http::IHttpResponse>> put(core::Kwargs* args) override;
-	Result<std::shared_ptr<http::IHttpResponse>> delete_(core::Kwargs* args) override;
-	Result<std::shared_ptr<http::IHttpResponse>> patch(core::Kwargs* args) override;
+	Result<std::shared_ptr<http::IHttpResponse>> get(Kwargs* args) override;
+
+	inline Result<std::shared_ptr<http::IHttpResponse>> post(Kwargs* kwargs) override
+	{
+		return this->get(kwargs);
+	}
+
+	inline Result<std::shared_ptr<http::IHttpResponse>> head(Kwargs* kwargs) override
+	{
+		return this->get(kwargs);
+	}
+
+	inline Result<std::shared_ptr<http::IHttpResponse>> options(Kwargs* kwargs) override
+	{
+		return this->get(kwargs);
+	}
+
+	inline Result<std::shared_ptr<http::IHttpResponse>> put(Kwargs* kwargs) override
+	{
+		return this->get(kwargs);
+	}
+
+	inline Result<std::shared_ptr<http::IHttpResponse>> delete_(Kwargs* kwargs) override
+	{
+		return this->get(kwargs);
+	}
+
+	inline Result<std::shared_ptr<http::IHttpResponse>> patch(Kwargs* kwargs) override
+	{
+		return this->get(kwargs);
+	}
 };
 
 __CONTROLLERS_END__

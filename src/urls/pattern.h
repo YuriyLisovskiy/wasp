@@ -11,13 +11,13 @@
 #pragma once
 
 // Base libraries.
+#include <xalwart.base/kwargs.h>
 #include <xalwart.base/re/arg_regex.h>
 
 // Module definitions.
 #include "./_def_.h"
 
 // Framework libraries.
-#include "../core/kwargs.h"
 #include "../http/request.h"
 #include "../http/response.h"
 #include "../conf/_def_.h"
@@ -33,7 +33,7 @@ __CONF_END__
 __URLS_BEGIN__
 
 typedef std::function<Result<std::shared_ptr<http::IHttpResponse>>(
-	http::HttpRequest*, core::Kwargs*, conf::Settings*
+	http::HttpRequest*, Kwargs*, conf::Settings*
 )> ControllerHandler;
 
 class UrlPattern final
@@ -62,7 +62,7 @@ public:
 	Result<std::shared_ptr<http::IHttpResponse>> apply(
 		http::HttpRequest* request,
 		conf::Settings* settings,
-		core::Kwargs* kwargs=nullptr
+		Kwargs* kwargs=nullptr
 	);
 	bool match(const std::string& url, std::map<std::string, std::string>& args);
 	[[nodiscard]] std::string build(const std::vector<std::string>& args) const;
