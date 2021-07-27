@@ -65,23 +65,23 @@ protected:
 		std::string app_path, conf::Settings* settings
 	);
 
-	template <typename ViewT, typename = std::enable_if<std::is_base_of<ctrl::Controller, ViewT>::value>>
+	template <typename ControllerT, typename = std::enable_if<std::is_base_of<ctrl::Controller, ControllerT>::value>>
 	inline void url(const std::string& pattern, const std::string& name="")
 	{
-		ctrl::ViewHandler view_handler = [this](
+		ctrl::Handler controller_handler = [this](
 			http::HttpRequest* request,
 			core::Kwargs* kwargs,
 			conf::Settings* settings_ptr
 		) -> Result<std::shared_ptr<http::IHttpResponse>>
 		{
-			ViewT view(settings_ptr);
-			view.setup(request);
-			return view.dispatch(kwargs);
+			ControllerT controller(settings_ptr);
+			controller.setup(request);
+			return controller.dispatch(kwargs);
 		};
 
 		this->_urlpatterns.push_back(urls::make_url(
 			pattern.starts_with("/") ? pattern : "/" + pattern,
-			view_handler,
+			controller_handler,
 			name
 		));
 	}

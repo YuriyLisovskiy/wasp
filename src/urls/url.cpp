@@ -14,7 +14,7 @@ __URLS_BEGIN__
 
 std::shared_ptr<UrlPattern> make_url(
 	const std::string& rgx,
-	const ctrl::ViewHandler& handler,
+	const ctrl::Handler& handler,
 	const std::string& name
 )
 {
@@ -32,7 +32,7 @@ std::shared_ptr<urls::UrlPattern> make_static(
 		throw ImproperlyConfigured("Empty static url not permitted", _ERROR_DETAILS_);
 	}
 
-	auto view_func = [static_root](
+	auto controller_func = [static_root](
 		http::HttpRequest* request,
 		core::Kwargs* args,
 		conf::Settings* settings
@@ -48,7 +48,7 @@ std::shared_ptr<urls::UrlPattern> make_static(
 
 	return make_url(
 		str::rtrim(static_url, "/") + "/" + "<path>(.*)",
-		view_func,
+		controller_func,
 		name.empty() ? "static" : name
 	);
 }

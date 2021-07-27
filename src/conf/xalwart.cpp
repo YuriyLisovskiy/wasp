@@ -174,12 +174,12 @@ net::HandlerFunc MainApplication::make_handler()
 			{
 				result = this->process_urlpatterns(request, this->settings->ROOT_URLCONF);
 
-				// TODO: check if it is required to process response middleware in case of view error.
+				// TODO: check if it is required to process response middleware in case of controller error.
 				if (!result.catch_(HttpError))
 				{
 					if (!result.value)
 					{
-						// If view returns empty result, return 204 - No Content.
+						// If controller returns empty result, return 204 - No Content.
 						result.value = std::make_shared<http::HttpResponse>(204);
 						this->settings->LOGGER->warning(
 							"Response was not instantiated, returned 204",

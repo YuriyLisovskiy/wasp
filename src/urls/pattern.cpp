@@ -15,7 +15,7 @@ __URLS_BEGIN__
 
 UrlPattern::UrlPattern(
 	const std::string& rgx,
-	const ViewHandler& handler,
+	const ControllerHandler& handler,
 	const std::string& name
 ) : _regex(rgx)
 {

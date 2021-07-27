@@ -20,7 +20,7 @@ __URLS_BEGIN__
 
 extern std::shared_ptr<urls::UrlPattern> make_url(
 	const std::string& rgx,
-	const ctrl::ViewHandler& handler,
+	const ctrl::Handler& handler,
 	const std::string& name
 );
 

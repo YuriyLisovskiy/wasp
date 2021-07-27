@@ -1,5 +1,5 @@
 /**
- * views/tests_view.cpp
+ * controllers/tests_controller.cpp
  *
  * Copyright (c) 2019 Yuriy Lisovskiy
  */

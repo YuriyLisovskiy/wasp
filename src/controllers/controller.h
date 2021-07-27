@@ -3,8 +3,8 @@
  *
  * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
- * Intentionally simple parent class for all views. Only
- * implements dispatch-by-method and simple sanity checking.
+ * Intentionally simple parent class for all controllers.
+ * Only implements dispatch-by-method and simple sanity checking.
  */
 
 #pragma once
@@ -37,7 +37,7 @@ __CONTROLLERS_BEGIN__
 
 typedef std::function<Result<std::shared_ptr<http::IHttpResponse>>(
 	http::HttpRequest*, core::Kwargs*, conf::Settings*
-)> ViewHandler;
+)> Handler;
 
 class Controller
 {
@@ -51,7 +51,7 @@ protected:
 	http::HttpRequest* request = nullptr;
 	conf::Settings* settings = nullptr;
 
-	/// Contains all possible http methods which view can handle.
+	/// Contains all possible http methods which controller can handle.
 	const std::vector<std::string> http_method_names = {
 		"get", "post", "put", "patch", "delete", "head", "options", "trace"
 	};

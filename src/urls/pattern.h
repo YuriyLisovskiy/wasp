@@ -24,7 +24,9 @@
 
 
 __CONF_BEGIN__
+
 struct Settings;
+
 __CONF_END__
 
 
@@ -32,14 +34,14 @@ __URLS_BEGIN__
 
 typedef std::function<Result<std::shared_ptr<http::IHttpResponse>>(
 	http::HttpRequest*, core::Kwargs*, conf::Settings*
-)> ViewHandler;
+)> ControllerHandler;
 
 class UrlPattern final
 {
 private:
 	std::string _orig;
 	std::vector<std::string> _pattern_parts;
-	ViewHandler _handler;
+	ControllerHandler _handler;
 	std::string _name;
 	re::ArgRegex _regex;
 	std::string _namespace;
@@ -47,7 +49,7 @@ private:
 public:
 	UrlPattern(
 		const std::string& rgx,
-		const ViewHandler& handler,
+		const ControllerHandler& handler,
 		const std::string& name
 	);
 	UrlPattern(

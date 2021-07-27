@@ -48,7 +48,7 @@ public:
 };
 
 
-/// A view that can render a template.
+/// A controller that can render a template.
 class TemplateController : public TemplateResponseMixin, public Controller
 {
 public:
