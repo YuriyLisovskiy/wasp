@@ -29,7 +29,7 @@ endfunction(add_sub_tests)
 
 add_tests("" all)
 add_sub_tests(conf)
+add_sub_tests(controllers)
 add_sub_tests(core)
 add_sub_tests(http)
 add_sub_tests(utils)
-add_sub_tests(views)

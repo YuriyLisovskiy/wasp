@@ -1,11 +1,10 @@
 /**
- * views/view.h
+ * controllers/controller.h
  *
  * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
- * Purpose:
- * 	Intentionally simple parent class for all views. Only
- * 	implements dispatch-by-method and simple sanity checking.
+ * Intentionally simple parent class for all views. Only
+ * implements dispatch-by-method and simple sanity checking.
  */
 
 #pragma once
@@ -15,17 +14,16 @@
 #include <functional>
 
 // Base libraries.
-#include <xalwart.base/logger.h>
 #include <xalwart.base/result.h>
 
 // Module definitions.
 #include "./_def_.h"
 
 // Framework libraries.
-#include "./args.h"
 #include "../http/request.h"
 #include "../http/response.h"
 #include "../conf/_def_.h"
+#include "../core/kwargs.h"
 
 
 __CONF_BEGIN__
@@ -35,25 +33,23 @@ struct Settings;
 __CONF_END__
 
 
-__VIEWS_BEGIN__
+__CONTROLLERS_BEGIN__
 
 typedef std::function<Result<std::shared_ptr<http::IHttpResponse>>(
-	http::HttpRequest*, views::Args*, conf::Settings*
+	http::HttpRequest*, core::Kwargs*, conf::Settings*
 )> ViewHandler;
 
-class View
+class Controller
 {
 private:
-	Result<std::shared_ptr<http::IHttpResponse>> null();
+	inline Result<std::shared_ptr<http::IHttpResponse>> null()
+	{
+		return Result<std::shared_ptr<http::IHttpResponse>>::null();
+	}
 
 protected:
-	log::ILogger* logger;
-
-	conf::Settings* settings;
-
-	/// Holds pointer to client's request.
-	/// Caution: must be deleted outside!
-	http::HttpRequest* request;
+	http::HttpRequest* request = nullptr;
+	conf::Settings* settings = nullptr;
 
 	/// Contains all possible http methods which view can handle.
 	const std::vector<std::string> http_method_names = {
@@ -64,13 +60,13 @@ protected:
 	std::vector<std::string> allowed_methods_list;
 
 protected:
-	explicit View(
+	explicit Controller(
 		const std::vector<std::string>& allowed_methods,
 		conf::Settings* settings
 	);
 
 	template <typename ResponseT, typename ...Args>
-	Result<std::shared_ptr<http::IHttpResponse>> response(Args&& ...args)
+	inline Result<std::shared_ptr<http::IHttpResponse>> response(Args&& ...args)
 	{
 		return Result<std::shared_ptr<http::IHttpResponse>>(
 			std::make_shared<ResponseT>(std::forward<Args>(args)...)
@@ -78,7 +74,7 @@ protected:
 	}
 
 	template <unsigned short StatusCode, typename ...Args>
-	Result<std::shared_ptr<http::IHttpResponse>> response(Args&& ...args)
+	inline Result<std::shared_ptr<http::IHttpResponse>> response(Args&& ...args)
 	{
 		return Result<std::shared_ptr<http::IHttpResponse>>(
 			std::make_shared<http::HttpResponse>(StatusCode, std::forward<Args>(args)...)
@@ -86,13 +82,13 @@ protected:
 	}
 
 	template <typename ...Args>
-	Result<std::shared_ptr<http::IHttpResponse>> response(Args&& ...args)
+	inline Result<std::shared_ptr<http::IHttpResponse>> response(Args&& ...args)
 	{
 		return Result<std::shared_ptr<http::IHttpResponse>>(std::forward<Args>(args)...);
 	}
 
 	template<error_type ErrorType, typename ...Args>
-	Result<std::shared_ptr<http::IHttpResponse>> raise(Args&& ...args)
+	inline Result<std::shared_ptr<http::IHttpResponse>> raise(Args&& ...args)
 	{
 		return raise<ErrorType, std::shared_ptr<http::IHttpResponse>>(
 			std::forward<Args>(args)...
@@ -100,31 +96,46 @@ protected:
 	}
 
 public:
-	explicit View(conf::Settings* settings);
+	inline explicit Controller(conf::Settings* settings) : allowed_methods_list({"options"}), settings(settings)
+	{
+		if (!this->settings)
+		{
+			throw NullPointerException("ctrl::Controller: settings is nullptr", _ERROR_DETAILS_);
+		}
+	}
 
 	/// Processes http GET request.
 	/// Can be overridden in derived class, otherwise returns nullptr.
 	///
 	/// @param request: pointer to http request.
-	/// @param args: pointer to requests's url arguments.
+	/// @param args: pointer to requests' url arguments.
 	/// @return pointer to http response instance.
-	virtual Result<std::shared_ptr<http::IHttpResponse>> get(http::HttpRequest* request, Args* args);
+	virtual inline Result<std::shared_ptr<http::IHttpResponse>> get(core::Kwargs* args)
+	{
+		return this->null();
+	}
 
 	/// Processes http POST request.
 	/// Can be overridden in derived class, otherwise returns nullptr.
 	///
 	/// @param request: pointer to http request.
-	/// @param args: pointer to requests's url arguments.
+	/// @param args: pointer to requests' url arguments.
 	/// @return pointer to http response instance.
-	virtual Result<std::shared_ptr<http::IHttpResponse>> post(http::HttpRequest* request, Args* args);
+	virtual inline Result<std::shared_ptr<http::IHttpResponse>> post(core::Kwargs* args)
+	{
+		return this->null();
+	}
 
 	/// Processes http PUT request.
 	/// Can be overridden in derived class, otherwise returns nullptr.
 	///
 	/// @param request: pointer to http request.
-	/// @param args: pointer to requests's url arguments.
+	/// @param args: pointer to requests' url arguments.
 	/// @return pointer to http response instance.
-	virtual Result<std::shared_ptr<http::IHttpResponse>> put(http::HttpRequest* request, Args* args);
+	virtual inline Result<std::shared_ptr<http::IHttpResponse>> put(core::Kwargs* args)
+	{
+		return this->null();
+	}
 
 	/// Processes http PATCH request.
 	/// Can be overridden in derived class, otherwise returns nullptr.
@@ -132,7 +143,10 @@ public:
 	/// @param request: pointer to http request.
 	/// @param args: pointer to requests's url arguments.
 	/// @return pointer to http response instance.
-	virtual Result<std::shared_ptr<http::IHttpResponse>> patch(http::HttpRequest* request, Args* args);
+	virtual inline Result<std::shared_ptr<http::IHttpResponse>> patch(core::Kwargs* args)
+	{
+		return this->null();
+	}
 
 	/// Processes http DELETE request.
 	/// Can be overridden in derived class, otherwise returns nullptr.
@@ -140,7 +154,10 @@ public:
 	/// @param request: pointer to http request.
 	/// @param args: pointer to requests's url arguments.
 	/// @return pointer to http response instance.
-	virtual Result<std::shared_ptr<http::IHttpResponse>> delete_(http::HttpRequest* request, Args* args);
+	virtual inline Result<std::shared_ptr<http::IHttpResponse>> delete_(core::Kwargs* args)
+	{
+		return this->null();
+	}
 
 	/// Processes http HEAD request.
 	/// Can be overridden in derived class, otherwise returns nullptr.
@@ -148,7 +165,10 @@ public:
 	/// @param request: pointer to http request.
 	/// @param args: pointer to requests's url arguments.
 	/// @return pointer to http response instance.
-	virtual Result<std::shared_ptr<http::IHttpResponse>> head(http::HttpRequest* request, Args* args);
+	virtual inline Result<std::shared_ptr<http::IHttpResponse>> head(core::Kwargs* kwargs)
+	{
+		return this->get(kwargs);
+	}
 
 	/// Processes http OPTIONS request.
 	/// Can be overridden in derived class, otherwise returns nullptr.
@@ -156,7 +176,7 @@ public:
 	/// @param request: pointer to http request.
 	/// @param args: pointer to requests's url arguments.
 	/// @return pointer to http response instance.
-	virtual Result<std::shared_ptr<http::IHttpResponse>> options(http::HttpRequest* request, Args* args);
+	virtual Result<std::shared_ptr<http::IHttpResponse>> options(core::Kwargs* args);
 
 	/// Processes http TRACE request.
 	/// Can be overridden in derived class, otherwise returns nullptr.
@@ -164,14 +184,18 @@ public:
 	/// @param request: pointer to http request.
 	/// @param args: pointer to requests's url arguments.
 	/// @return pointer to http response instance.
-	virtual Result<std::shared_ptr<http::IHttpResponse>> trace(http::HttpRequest* request, Args* args);
+	virtual inline Result<std::shared_ptr<http::IHttpResponse>> trace(core::Kwargs* args)
+	{
+		return this->null();
+	}
 
 	/// Setups request before dispatch call.
-	/// Can be overridden in derived class, but requires
-	///		request initialization.
 	///
 	/// @param request: pointer to http request.
-	virtual void setup(http::HttpRequest* request);
+	virtual inline void setup(http::HttpRequest* request)
+	{
+		this->request = request;
+	}
 
 	/// Try to dispatch to the right method; if a method doesn't exist,
 	/// defer to the error handler. Also defer to the error handler if the
@@ -179,13 +203,13 @@ public:
 	///
 	/// @param request: an actual http request from client.
 	/// @return pointer to http response returned from handler.
-	virtual Result<std::shared_ptr<http::IHttpResponse>> dispatch(Args* args);
+	virtual Result<std::shared_ptr<http::IHttpResponse>> dispatch(core::Kwargs* args);
 
 	/// Returns Http 405 (Method Not Allowed) response.
 	///
 	/// @param request: pointer to http request.
 	/// @return pointer to http response returned from handler.
-	Result<std::shared_ptr<http::IHttpResponse>> http_method_not_allowed(http::HttpRequest* request);
+	Result<std::shared_ptr<http::IHttpResponse>> http_method_not_allowed();
 
 	/// Builds vector of allowed methods.
 	/// Used for http OPTIONS response.
@@ -197,4 +221,4 @@ public:
 	std::vector<std::string> allowed_methods();
 };
 
-__VIEWS_END__
+__CONTROLLERS_END__

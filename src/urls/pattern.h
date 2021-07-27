@@ -17,7 +17,7 @@
 #include "./_def_.h"
 
 // Framework libraries.
-#include "../views/args.h"
+#include "../core/kwargs.h"
 #include "../http/request.h"
 #include "../http/response.h"
 #include "../conf/_def_.h"
@@ -31,7 +31,7 @@ __CONF_END__
 __URLS_BEGIN__
 
 typedef std::function<Result<std::shared_ptr<http::IHttpResponse>>(
-	http::HttpRequest*, views::Args*, conf::Settings*
+	http::HttpRequest*, core::Kwargs*, conf::Settings*
 )> ViewHandler;
 
 class UrlPattern final
@@ -60,7 +60,7 @@ public:
 	Result<std::shared_ptr<http::IHttpResponse>> apply(
 		http::HttpRequest* request,
 		conf::Settings* settings,
-		views::Args* args = nullptr
+		core::Kwargs* kwargs=nullptr
 	);
 	bool match(const std::string& url, std::map<std::string, std::string>& args);
 	[[nodiscard]] std::string build(const std::vector<std::string>& args) const;

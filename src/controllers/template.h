@@ -1,9 +1,9 @@
 /**
- * views/template_view.h
+ * controllers/template.h
  *
  * Copyright (c) 2020-2021 Yuriy Lisovskiy
  *
- * Purpose: classes for working with template responses.
+ * Classes for working with template responses.
  */
 
 #pragma once
@@ -15,10 +15,10 @@
 #include "./_def_.h"
 
 // Framework libraries.
-#include "../views/view.h"
+#include "./controller.h"
 
 
-__VIEWS_BEGIN__
+__CONTROLLERS_BEGIN__
 
 /// A mixin that can be used to render a template.
 class TemplateResponseMixin
@@ -35,11 +35,11 @@ public:
 	/// the given context.
 	virtual Result<std::shared_ptr<http::IHttpResponse>> render(
 		http::HttpRequest* request,
-		const std::shared_ptr<render::abc::IContext>& context = nullptr,
-		const std::string& template_name = "",
-		unsigned short int status = 200,
-		const std::string& content_type = "",
-		const std::string& charset = "utf-8"
+		const std::shared_ptr<render::abc::IContext>& context,
+		const std::string& template_name="",
+		unsigned short int status=200,
+		const std::string& content_type="",
+		const std::string& charset="utf-8"
 	);
 
 	/// Returns a template name to be used for the request.
@@ -49,28 +49,30 @@ public:
 
 
 /// A view that can render a template.
-class TemplateView : public TemplateResponseMixin, public View
+class TemplateController : public TemplateResponseMixin, public Controller
 {
 public:
-	explicit TemplateView(conf::Settings* settings);
+	explicit TemplateController(conf::Settings* settings);
 
 	/// Used in default get() method, can be overridden
 	/// in derived classes.
-	virtual std::shared_ptr<render::abc::IContext> get_context(
-		http::HttpRequest* request, Args* args
-	);
+	virtual inline std::shared_ptr<render::abc::IContext> get_context(core::Kwargs* kwargs)
+	{
+		return nullptr;
+	}
 
-	Result<std::shared_ptr<http::IHttpResponse>> get(
-		http::HttpRequest* request, Args* args
-	) override;
+	inline Result<std::shared_ptr<http::IHttpResponse>> get(core::Kwargs* kwargs) override
+	{
+		return this->render(this->request, this->get_context(kwargs), "", 200, "", "utf-8");
+	}
 
 protected:
-	explicit TemplateView(
+	explicit TemplateController(
 		const std::vector<std::string>& allowed_methods,
 		conf::Settings* settings,
-		const std::string& template_name = "",
-		const std::string& content_type = ""
+		const std::string& template_name="",
+		const std::string& content_type=""
 	);
 };
 
-__VIEWS_END__
+__CONTROLLERS_END__

@@ -17,7 +17,7 @@
 
 // Framework libraries.
 #include "./abc.h"
-#include "../views/view.h"
+#include "../controllers/controller.h"
 #include "../urls/url.h"
 #include "../commands/command.h"
 
@@ -65,18 +65,18 @@ protected:
 		std::string app_path, conf::Settings* settings
 	);
 
-	template <typename ViewT, typename = std::enable_if<std::is_base_of<views::View, ViewT>::value>>
+	template <typename ViewT, typename = std::enable_if<std::is_base_of<ctrl::Controller, ViewT>::value>>
 	inline void url(const std::string& pattern, const std::string& name="")
 	{
-		views::ViewHandler view_handler = [this](
+		ctrl::ViewHandler view_handler = [this](
 			http::HttpRequest* request,
-			views::Args* args,
+			core::Kwargs* kwargs,
 			conf::Settings* settings_ptr
 		) -> Result<std::shared_ptr<http::IHttpResponse>>
 		{
 			ViewT view(settings_ptr);
 			view.setup(request);
-			return view.dispatch(args);
+			return view.dispatch(kwargs);
 		};
 
 		this->_urlpatterns.push_back(urls::make_url(

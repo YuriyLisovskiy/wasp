@@ -55,10 +55,10 @@ std::string UrlPattern::get_name() const
 Result<std::shared_ptr<http::IHttpResponse>> UrlPattern::apply(
 	http::HttpRequest* request,
 	conf::Settings* settings,
-	views::Args* args
+	core::Kwargs* kwargs
 )
 {
-	return this->_handler(request, args, settings);
+	return this->_handler(request, kwargs, settings);
 }
 
 bool UrlPattern::match(const std::string& url, std::map<std::string, std::string>& args)

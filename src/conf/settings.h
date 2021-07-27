@@ -16,6 +16,7 @@
 #include <xalwart.base/utility.h>
 #include <xalwart.base/path.h>
 #include <xalwart.base/yaml/yaml-cpp/yaml.h>
+#include <xalwart.base/net/abc.h>
 
 // Render libraries.
 #include <xalwart.render/abc.h>
@@ -33,6 +34,7 @@
 #include "./abc.h"
 #include "../middleware/abc.h"
 #include "../urls/url.h"
+#include "../core/kwargs.h"
 
 
 __CONF_BEGIN__
@@ -280,6 +282,11 @@ public:
 	inline virtual std::shared_ptr<orm::abc::ISQLDriver> build_database(
 		const std::string& name, const YAML::Node& database
 	)
+	{
+		return nullptr;
+	}
+
+	inline virtual std::shared_ptr<net::abc::IServer> build_server(const core::Kwargs& kwargs)
 	{
 		return nullptr;
 	}

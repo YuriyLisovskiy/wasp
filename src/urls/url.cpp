@@ -14,7 +14,7 @@ __URLS_BEGIN__
 
 std::shared_ptr<UrlPattern> make_url(
 	const std::string& rgx,
-	const views::ViewHandler& handler,
+	const ctrl::ViewHandler& handler,
 	const std::string& name
 )
 {
@@ -34,19 +34,16 @@ std::shared_ptr<urls::UrlPattern> make_static(
 
 	auto view_func = [static_root](
 		http::HttpRequest* request,
-		views::Args* args,
+		core::Kwargs* args,
 		conf::Settings* settings
 	) -> Result<std::shared_ptr<http::IHttpResponse>>
 	{
-		views::StaticView view(settings);
-		auto kwargs = std::make_unique<collections::Dict<std::string, std::string>>(
-			std::map<std::string, std::string>{
-				{"document_root", static_root}
-			}
-		);
-		view.set_kwargs(kwargs.get());
-		view.setup(request);
-		return view.dispatch(args);
+		ctrl::StaticController controller(settings);
+		controller.set_kwargs(core::Kwargs({
+			{"document_root", static_root}
+		}));
+		controller.setup(request);
+		return controller.dispatch(args);
 	};
 
 	return make_url(

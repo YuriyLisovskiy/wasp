@@ -1,19 +1,19 @@
 /**
- * views/template_view.cpp
+ * controllers/template.cpp
  *
- * Copyright (c) 2020 Yuriy Lisovskiy
+ * Copyright (c) 2020-2021 Yuriy Lisovskiy
  */
 
-#include "./template_view.h"
+#include "./template.h"
 
 // Framework libraries.
 #include "../render/response.h"
 #include "../conf/settings.h"
 
 
-__VIEWS_BEGIN__
+__CONTROLLERS_BEGIN__
 
-TemplateResponseMixin::TemplateResponseMixin(render::abc::IEngine* engine)
+TemplateResponseMixin::TemplateResponseMixin(render::abc::IEngine* engine) : template_name(""), content_type("")
 {
 	if (!engine)
 	{
@@ -24,8 +24,6 @@ TemplateResponseMixin::TemplateResponseMixin(render::abc::IEngine* engine)
 	}
 
 	this->engine = engine;
-	this->template_name = "";
-	this->content_type = "";
 }
 
 Result<std::shared_ptr<http::IHttpResponse>> TemplateResponseMixin::render(
@@ -64,37 +62,23 @@ std::string TemplateResponseMixin::get_template_name()
 }
 
 
-TemplateView::TemplateView(
+TemplateController::TemplateController(
 	conf::Settings* settings
-) : views::View({"get", "options"}, settings),
+) : Controller({"get", "options"}, settings),
 	TemplateResponseMixin(settings->TEMPLATE_ENGINE.get())
 {
 }
 
-TemplateView::TemplateView(
+TemplateController::TemplateController(
 	const std::vector<std::string>& allowed_methods,
 	conf::Settings* settings,
 	const std::string& template_name,
 	const std::string& content_type
-) : views::View(allowed_methods, settings),
+) : Controller(allowed_methods, settings),
     TemplateResponseMixin(settings->TEMPLATE_ENGINE.get())
 {
 	this->template_name = template_name;
 	this->content_type = content_type;
 }
 
-std::shared_ptr<render::abc::IContext> TemplateView::get_context(
-	http::HttpRequest* request, Args* args
-)
-{
-	return nullptr;
-}
-
-Result<std::shared_ptr<http::IHttpResponse>> TemplateView::get(
-	http::HttpRequest* request, Args* args
-)
-{
-	return this->render(request, this->get_context(request, args));
-}
-
-__VIEWS_END__
+__CONTROLLERS_END__

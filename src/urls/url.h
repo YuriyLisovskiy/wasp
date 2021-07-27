@@ -13,14 +13,14 @@
 
 // Framework libraries.
 #include "./pattern.h"
-#include "../views/static.h"
+#include "../controllers/static.h"
 
 
 __URLS_BEGIN__
 
 extern std::shared_ptr<urls::UrlPattern> make_url(
 	const std::string& rgx,
-	const views::ViewHandler& handler,
+	const ctrl::ViewHandler& handler,
 	const std::string& name
 );
 
