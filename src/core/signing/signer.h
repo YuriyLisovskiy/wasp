@@ -20,7 +20,7 @@
 
 __CORE_SIGNING_BEGIN__
 
-inline re::Regex _SEP_UNSAFE_REGEX = re::Regex(R"([A-z0-9-_=]*)");
+inline const re::Regex _SEP_UNSAFE_REGEX = re::Regex(R"([A-z0-9-_=]*)");
 
 // TODO: docs
 // TESTME: Signer
@@ -39,9 +39,11 @@ public:
 		crypto::IHash* hash_func=nullptr
 	);
 
-	std::string signature(const std::string& value);
+	[[nodiscard]]
+	std::string signature(const std::string& value) const;
 
-	inline std::string sign(const std::string& value)
+	[[nodiscard]]
+	inline std::string sign(const std::string& value) const
 	{
 		return value + this->_sep + this->signature(value);
 	}

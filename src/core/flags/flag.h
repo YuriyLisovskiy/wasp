@@ -1,9 +1,9 @@
 /**
  * core/flags/flag.h
  *
- * Copyright (c) 2020 Yuriy Lisovskiy
+ * Copyright (c) 2020-2021 Yuriy Lisovskiy
  *
- * Purpose: base flags types.
+ * Base flags types.
  */
 
 #pragma once
@@ -11,6 +11,9 @@
 // C++ libraries.
 #include <string>
 #include <type_traits>
+
+// Base libraries.
+#include <xalwart.base/utility.h>
 
 // Module definitions.
 #include "./_def_.h"
@@ -25,23 +28,57 @@ private:
 
 protected:
 	std::string _label;
-	std::string _help;
+	std::string _short_label;
+	std::string _usage;
 	std::string _data;
 
-	Flag(const std::string& label, const std::string& help);
+	Flag(std::string short_label, std::string label, std::string usage) :
+		_short_label(std::move(short_label)), _label(std::move(label)), _usage(std::move(usage))
+	{
+	}
 
 public:
 	virtual ~Flag() = default;
-	bool empty();
-	virtual std::string label();
-	virtual std::string usage();
-	virtual std::string get_raw();
-	virtual bool valid() = 0;
-	virtual std::pair<std::string, std::string> kwarg() = 0;
+
+	[[nodiscard]]
+	inline bool empty() const
+	{
+		return this->_data.empty();
+	}
+
+	[[nodiscard]]
+	virtual inline std::string short_label() const
+	{
+		return this->_short_label;
+	}
+
+	[[nodiscard]]
+	virtual inline std::string label() const
+	{
+		return this->_label;
+	}
+
+	[[nodiscard]]
+	virtual inline std::string usage() const
+	{
+		return this->_usage;
+	}
+
+	[[nodiscard]]
+	virtual std::string get_raw() const
+	{
+		return this->_data;
+	}
+
+	[[nodiscard]]
+	virtual bool valid() const = 0;
+
+	[[nodiscard]]
+	virtual std::pair<std::string, std::string> kwarg() const = 0;
 };
 
 template<class T>
-concept Stringifiable = requires(T x) {
+concept is_stringifiable_c = requires(T x) {
 	std::to_string(x);
 };
 
@@ -54,17 +91,16 @@ protected:
 	FlagT _default_val;
 
 protected:
-	virtual FlagT from_string() = 0;
+	virtual FlagT from_string() const = 0;
 
 public:
 	TemplateFlag(
-		const std::string& label, const std::string& help, FlagT default_val
-	) : Flag(label, help)
+		const std::string& short_label, const std::string& label, const std::string& help, FlagT default_val
+	) : Flag(short_label, label, help), _default_val(default_val)
 	{
-		this->_default_val = default_val;
 	}
 
-	FlagT get()
+	FlagT get() const
 	{
 		if (!this->_data.empty())
 		{
@@ -74,14 +110,15 @@ public:
 		return this->_default_val;
 	}
 
-	std::pair<std::string, std::string> kwarg() override
+	[[nodiscard]]
+	std::pair<std::string, std::string> kwarg() const override
 	{
 		if (this->valid() && !this->_data.empty())
 		{
 			return {this->_label, this->_data};
 		}
 
-		if constexpr (Stringifiable<FlagT>)
+		if constexpr (is_stringifiable_c<FlagT>)
 		{
 			return {this->_label, std::to_string(this->_default_val)};
 		}

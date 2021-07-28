@@ -1,9 +1,9 @@
 /**
  * core/flags/flags.h
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
- * Purpose: flags' types.
+ * Default flags.
  */
 
 #pragma once
@@ -11,6 +11,9 @@
 // C++ libraries.
 #include <string>
 #include <regex>
+
+// Base libraries.
+#include <xalwart.base/string_utils.h>
 
 // Module definitions.
 #include "./_def_.h"
@@ -21,11 +24,11 @@
 
 __CORE_FLAGS_INTERNAL_BEGIN__
 
-const std::regex BOOL_TYPE("true|TRUE|false|FALSE|yes|YES|no|NO|1|0");
-const std::regex LONG_INT_TYPE("[+-]?[0-9]{1,10}");
-const std::regex UNSIGNED_LONG_INT_TYPE("[+]?[0-9]{1,10}");
-const std::regex UINT16_TYPE("[+-]?[0-9]{1,5}");
-const std::regex DOUBLE_TYPE("[+-]?[0-9]+[.]?[0-9]+");
+inline const std::regex BOOL_TYPE("true|TRUE|false|FALSE|yes|YES|no|NO|1|0|on|ON|off|OFF");
+inline const std::regex LONG_INT_TYPE("[+-]?[0-9]{1,10}");
+inline const std::regex UNSIGNED_LONG_INT_TYPE("[+]?[0-9]{1,10}");
+inline const std::regex UINT16_TYPE("[+-]?[0-9]{1,5}");
+inline const std::regex DOUBLE_TYPE("[+-]?[0-9]+[.]?[0-9]+");
 
 __CORE_FLAGS_INTERNAL_END__
 
@@ -35,71 +38,141 @@ __CORE_FLAGS_BEGIN__
 class UnsignedLongFlag final : public TemplateFlag<unsigned long>
 {
 protected:
-	unsigned long from_string() override;
+	[[nodiscard]]
+	inline unsigned long from_string() const override
+	{
+		return std::stol(this->_data);
+	}
 
 public:
-	UnsignedLongFlag(
-		const std::string& label, const std::string& help, unsigned long default_val
-	);
-	bool valid() final;
+	inline UnsignedLongFlag(
+		const std::string& short_label, const std::string& label, const std::string& usage, unsigned long default_val
+	) : TemplateFlag<unsigned long>(short_label, label, usage, default_val)
+	{
+	}
+
+	[[nodiscard]]
+	inline bool valid() const override
+	{
+		return this->_data.empty() || std::regex_match(this->_data, internal::UNSIGNED_LONG_INT_TYPE);
+	}
 };
 
 class Uint16Flag final : public TemplateFlag<uint16_t>
 {
 protected:
-	uint16_t from_string() override;
+	[[nodiscard]]
+	uint16_t inline from_string() const override
+	{
+		return std::stol(this->_data);
+	}
 
 public:
-	Uint16Flag(
-		const std::string& label, const std::string& help, uint16_t default_val
-	);
-	bool valid() final;
+	inline Uint16Flag(
+		const std::string& short_label, const std::string& label, const std::string& usage, uint16_t default_val
+	) : TemplateFlag<uint16_t>(short_label, label, usage, default_val)
+	{
+	}
+
+	[[nodiscard]]
+	inline bool valid() const override
+	{
+		return this->_data.empty() || std::regex_match(this->_data, internal::UINT16_TYPE);
+	}
 };
 
 class LongIntFlag final : public TemplateFlag<long int>
 {
 protected:
-	long int from_string() override;
+	[[nodiscard]]
+	inline long int from_string() const override
+	{
+		return std::stol(this->_data);
+	}
 
 public:
-	LongIntFlag(
-			const std::string& label, const std::string& help, long default_val
-	);
-	bool valid() final;
+	inline LongIntFlag(
+		const std::string& short_label, const std::string& label, const std::string& usage, long default_val
+	) : TemplateFlag<long>(short_label, label, usage, default_val)
+	{
+	}
+
+	[[nodiscard]]
+	inline bool valid() const override
+	{
+		return this->_data.empty() || std::regex_match(this->_data, internal::LONG_INT_TYPE);
+	}
 };
 
 class DoubleFlag final : public TemplateFlag<double>
 {
 protected:
-	double from_string() override;
+	[[nodiscard]]
+	inline double from_string() const override
+	{
+		return std::stod(this->_data);
+	}
 
 public:
-	DoubleFlag(
-		const std::string& label, const std::string& help, double default_val
-	);
-	bool valid() final;
+	inline DoubleFlag(
+		const std::string& short_label, const std::string& label, const std::string& usage, double default_val
+	) : TemplateFlag<double>(short_label, label, usage, default_val)
+	{
+	}
+
+	[[nodiscard]]
+	inline bool valid() const override
+	{
+		return this->_data.empty() || std::regex_match(this->_data, internal::DOUBLE_TYPE);
+	}
 };
 
 class StringFlag final : public TemplateFlag<std::basic_string<char>>
 {
 protected:
-	std::string from_string() override;
+	[[nodiscard]]
+	inline std::string from_string() const override
+	{
+		return this->_data;
+	}
 
 public:
-	StringFlag(
-		const std::string& label, const std::string& help, const std::basic_string<char>& default_val
-	);
-	bool valid() final;
+	inline StringFlag(
+		const std::string& short_label, const std::string& label,
+		const std::string& usage, const std::basic_string<char>& default_val
+	) : TemplateFlag<std::basic_string<char>>(short_label, label, usage, default_val)
+	{
+	}
+
+	[[nodiscard]]
+	inline bool valid() const override
+	{
+		return true;
+	}
 };
 
 class BoolFlag final : public TemplateFlag<bool>
 {
 protected:
-	bool from_string() override;
+	[[nodiscard]]
+	inline bool from_string() const override
+	{
+		auto lower = str::lower(this->_data);
+		return lower == "true" || lower == "yes" || lower == "1" || lower == "on";
+	}
 
 public:
-	BoolFlag(const std::string& label, const std::string& help, bool default_val);
-	bool valid() final;
+	inline BoolFlag(
+		const std::string& short_label, const std::string& label, const std::string& usage, bool default_val
+	) : TemplateFlag<bool>(short_label, label, usage, default_val)
+	{
+	}
+
+	[[nodiscard]]
+	inline bool valid() const override
+	{
+		return this->_data.empty() || std::regex_match(this->_data, internal::BOOL_TYPE);
+	}
 };
 
 __CORE_FLAGS_END__

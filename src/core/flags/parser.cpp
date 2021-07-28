@@ -73,22 +73,4 @@ args_parser::args_parser(int argc, char** argv, size_t parse_from, bool is_verbo
 	}
 }
 
-bool args_parser::exists(const std::string& label)
-{
-	return this->flags.find(label) != this->flags.end();
-}
-
-std::string args_parser::get_arg(const std::string& label)
-{
-	return this->flags[label];
-}
-
-void args_parser::remove_arg(const std::string& label)
-{
-	if (this->exists(label))
-	{
-		this->flags.erase(label);
-	}
-}
-
 __CORE_FLAGS_INTERNAL_END__

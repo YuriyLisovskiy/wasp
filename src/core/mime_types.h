@@ -5,7 +5,7 @@
  *
  * Guess the MIME type of a file.
  *
- *	Variables:
+ * Variables:
  *
  * SUFFIX_MAP -- dictionary mapping suffixes to suffixes
  * ENCODINGS_MAP -- dictionary mapping suffixes to encodings

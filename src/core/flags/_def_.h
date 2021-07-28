@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
- * Purpose: core/flags module's definitions.
+ * Definitions of `core/flags` module.
  */
 
 #pragma once

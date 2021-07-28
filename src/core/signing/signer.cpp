@@ -48,7 +48,7 @@ Signer::Signer(
 	}
 }
 
-std::string Signer::signature(const std::string& value)
+std::string Signer::signature(const std::string& value) const
 {
 	return crypto::salted_hmac(
 		this->_salt + "signer", value, this->_key, this->_hash_func

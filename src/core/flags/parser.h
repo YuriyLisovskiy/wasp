@@ -1,9 +1,9 @@
 /**
  * core/flags/parser.h
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
- * Purpose: parses command line arguments.
+ * Command line arguments parser.
  */
 
 #pragma once
@@ -23,9 +23,26 @@ struct args_parser
 	std::map<std::string, std::string> flags;
 
 	explicit args_parser(int argc, char** argv, size_t parse_from = 1, bool is_verbose = false);
-	bool exists(const std::string& label);
-	std::string get_arg(const std::string& label);
-	void remove_arg(const std::string& label);
+
+	[[nodiscard]]
+	inline bool exists(const std::string& label) const
+	{
+		return this->flags.find(label) != this->flags.end();
+	}
+
+	[[nodiscard]]
+	inline std::string get_arg(const std::string& label) const
+	{
+		return this->flags.at(label);
+	}
+
+	inline void remove_arg(const std::string& label)
+	{
+		if (this->exists(label))
+		{
+			this->flags.erase(label);
+		}
+	}
 };
 
 __CORE_FLAGS_INTERNAL_END__
