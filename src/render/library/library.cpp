@@ -22,12 +22,12 @@ Library::Library(const std::string& lib_name, conf::Settings* settings)
 	this->settings = settings;
 }
 
-std::shared_ptr<collections::Dict<std::string, filter_t>> Library::get_filters()
+std::shared_ptr<collections::Dictionary<std::string, filter_t>> Library::get_filters()
 {
 	return nullptr;
 }
 
-std::shared_ptr<collections::Dict<std::string, tag_t>> Library::get_tags()
+std::shared_ptr<collections::Dictionary<std::string, tag_t>> Library::get_tags()
 {
 	return nullptr;
 }

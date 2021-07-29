@@ -30,7 +30,7 @@ HttpResponseBase::HttpResponseBase(
 )
 {
 	this->_streaming = false;
-	this->_headers = collections::Dict<std::string, std::string>();
+	this->_headers = collections::Dictionary<std::string, std::string>();
 	this->_closed = false;
 
 	if (status != 0)
@@ -140,13 +140,13 @@ void HttpResponseBase::set_signed_cookie(
 }
 
 void HttpResponseBase::set_cookies(
-	const collections::Dict<std::string, Cookie>& cookies
+	const collections::Dictionary<std::string, Cookie>& cookies
 )
 {
 	this->_cookies = cookies;
 }
 
-const collections::Dict<std::string, Cookie>& HttpResponseBase::get_cookies()
+const collections::Dictionary<std::string, Cookie>& HttpResponseBase::get_cookies()
 {
 	return this->_cookies;
 }
@@ -270,11 +270,6 @@ std::string HttpResponseBase::serialize_headers()
 	}
 
 	return result;
-}
-
-std::string& HttpResponseBase::operator[] (const std::string& key)
-{
-	return this->_headers[key];
 }
 
 Error HttpResponseBase::err()
@@ -438,7 +433,7 @@ std::string FileResponse::get_chunk()
 
 void FileResponse::_set_headers()
 {
-	auto encoding_map = collections::Dict<std::string, std::string>({
+	auto encoding_map = collections::Dictionary<std::string, std::string>({
 		{"bzip2", "application/x-bzip"},
 		{"gzip", "application/gzip"},
 		{"xz", "application/x-xz"}
@@ -508,11 +503,11 @@ HttpResponseRedirectBase::HttpResponseRedirectBase(
 	}
 
 	this->set_header("Location", encoding::encode_url(redirect_to));
-	Url url(redirect_to);
-	if (!url.scheme().empty() && this->_allowed_schemes.find(url.scheme()) == this->_allowed_schemes.end())
+	auto url = http::parse_url(redirect_to);
+	if (!url.scheme.empty() && this->_allowed_schemes.find(url.scheme) == this->_allowed_schemes.end())
 	{
 		this->_err = Error(
-			DisallowedRedirect, "Unsafe redirect to URL with protocol " + url.scheme(),
+			DisallowedRedirect, "Unsafe redirect to URL with protocol " + url.scheme,
 			_ERROR_DETAILS_
 		);
 	}

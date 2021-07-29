@@ -20,15 +20,15 @@ DefaultLibrary::DefaultLibrary(conf::Settings* settings)
 {
 }
 
-std::shared_ptr<collections::Dict<std::string, filter_t>> DefaultLibrary::get_filters()
+std::shared_ptr<collections::Dictionary<std::string, filter_t>> DefaultLibrary::get_filters()
 {
 	return nullptr;
 }
 
-std::shared_ptr<collections::Dict<std::string, tag_t>> DefaultLibrary::get_tags()
+std::shared_ptr<collections::Dictionary<std::string, tag_t>> DefaultLibrary::get_tags()
 {
 	using namespace internal;
-	return std::make_shared<collections::Dict<std::string, tag_t>>(std::map<std::string, tag_t>{
+	return std::make_shared<collections::Dictionary<std::string, tag_t>>(std::map<std::string, tag_t>{
 
 		// Example: {% static('path/to/file.css') -> css_variable %}
 		{tags::TAG_NAME_STATIC, {tags::make_static_tag("static", this->settings->STATIC_URL)}},

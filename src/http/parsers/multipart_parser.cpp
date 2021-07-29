@@ -1,5 +1,5 @@
 /**
- * core/parsers/multipart_parser.cpp
+ * http/parsers/multipart_parser.cpp
  *
  * Copyright (c) 2019-2021 Yuriy Lisovskiy
  */
@@ -11,7 +11,7 @@
 #include <xalwart.base/string_utils.h>
 
 
-__CORE_PARSERS_BEGIN__
+__HTTP_INTERNAL_BEGIN__
 
 void multipart_parser::append_parameter(const std::string& key, const std::string& value)
 {
@@ -20,7 +20,7 @@ void multipart_parser::append_parameter(const std::string& key, const std::strin
 		this->post_values.set(key, value);
 	}
 
-	this->multi_post_value.append(key, value);
+	this->multi_post_value.add(key, value);
 }
 
 void multipart_parser::append_file(
@@ -47,7 +47,7 @@ void multipart_parser::append_file(
 		this->file_values.set(key, uploaded_file);
 	}
 
-	this->multi_file_value.append(key, uploaded_file);
+	this->multi_file_value.add(key, uploaded_file);
 }
 
 std::string multipart_parser::get_boundary(const std::string& content_type)
@@ -454,4 +454,4 @@ void multipart_parser::parse(const std::string& content_type, const std::string&
 	throw MultiPartParserError("unable to parse request body", _ERROR_DETAILS_);
 }
 
-__CORE_PARSERS_END__
+__HTTP_INTERNAL_END__

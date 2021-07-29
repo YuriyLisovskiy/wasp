@@ -27,14 +27,23 @@ private:
 	friend class FlagSet;
 
 protected:
-	std::string _label;
 	std::string _short_label;
+	std::string _label;
 	std::string _usage;
 	std::string _data;
 
 	Flag(std::string short_label, std::string label, std::string usage) :
 		_short_label(std::move(short_label)), _label(std::move(label)), _usage(std::move(usage))
 	{
+		if (this->_short_label.empty())
+		{
+			throw ArgumentError("core::flags::Flag: short label can not be empty", _ERROR_DETAILS_);
+		}
+
+		if (this->_label.empty())
+		{
+			throw ArgumentError("core::flags::Flag: label can not be empty", _ERROR_DETAILS_);
+		}
 	}
 
 public:

@@ -23,11 +23,11 @@ HttpRequest::HttpRequest(
 	const conf::Settings* settings,
 	std::string method, std::string path, size_t major_v, size_t minor_v,
 	std::string query, bool keep_alive, std::string content,
-	collections::Dict<std::string, std::string> headers,
-	HttpRequest::Parameters<std::string, std::string> get_params,
-	HttpRequest::Parameters<std::string, std::string> post_params,
-	HttpRequest::Parameters<std::string, files::UploadedFile> files_params,
-	collections::Dict<std::string, std::string> env
+	collections::Dictionary<std::string, std::string> headers,
+	collections::MultiDictionary<std::string, std::string> get_params,
+	collections::MultiDictionary<std::string, std::string> post_params,
+	collections::MultiDictionary<std::string, files::UploadedFile> files_params,
+	collections::Dictionary<std::string, std::string> env
 ) : settings(settings),
 	_method(std::move(method)),
 	_path(std::move(path)),

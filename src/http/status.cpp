@@ -1,7 +1,7 @@
 /**
  * http/status.cpp
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  */
 
 #include "./status.h"
@@ -9,7 +9,7 @@
 
 __HTTP_INTERNAL_BEGIN__
 
-collections::Dict<unsigned short int, std::pair<std::string, std::string>> HTTP_STATUS(
+collections::Dictionary<unsigned short int, std::pair<std::string, std::string>> HTTP_STATUS(
 	std::map<unsigned short int, std::pair<std::string, std::string>>{
 
 		// Informational

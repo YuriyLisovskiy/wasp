@@ -1,7 +1,7 @@
 /**
  * controllers/tests_redirect_controller.cpp
  *
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019, 2021 Yuriy Lisovskiy
  */
 
 #include <map>
@@ -9,8 +9,8 @@
 #include <gtest/gtest.h>
 
 #include <xalwart.base/logger.h>
-#include <xalwart.base/collections/dict.h>
-#include <xalwart.base/collections/multi_dict.h>
+#include <xalwart.base/collections/dictionary.h>
+#include <xalwart.base/collections/multi_dictionary.h>
 
 #include "../../src/controllers/redirect.h"
 #include "../../src/conf/settings.h"
@@ -20,12 +20,8 @@ using namespace xw;
 
 http::HttpRequest make_request(const conf::Settings* settings, const std::string& method)
 {
-	auto empty_parameters = http::HttpRequest::Parameters<std::string, std::string>(
-		collections::Dict<std::string, std::string>(),
-		collections::MultiValueDict<std::string, std::string>()
-	);
-
-	auto empty_map = collections::Dict<std::string, std::string>();
+	auto empty_parameters = collections::MultiDictionary<std::string, std::string>();
+	auto empty_map = collections::Dictionary<std::string, std::string>();
 	return http::HttpRequest(
 		settings,
 		method,
@@ -37,10 +33,7 @@ http::HttpRequest make_request(const conf::Settings* settings, const std::string
 		empty_map,
 		empty_parameters,
 		empty_parameters,
-		http::HttpRequest::Parameters<std::string, files::UploadedFile>(
-			collections::Dict<std::string, files::UploadedFile>(),
-			collections::MultiValueDict<std::string, files::UploadedFile>()
-		),
+		collections::MultiDictionary<std::string, files::UploadedFile>(),
 		{}
 	);
 }
@@ -281,11 +274,8 @@ TEST_F(RedirectControllerPermanentAndQueryStringTestCase, OptionsTest)
 
 TEST_F(RedirectControllerPermanentAndQueryStringTestCase, GetRedirectUrlTest)
 {
-	auto empty_parameters = http::HttpRequest::Parameters<std::string, std::string>(
-		collections::Dict<std::string, std::string>(),
-		collections::MultiValueDict<std::string, std::string>()
-	);
-	auto empty_map = collections::Dict<std::string, std::string>();
+	auto empty_parameters = collections::MultiDictionary<std::string, std::string>();
+	auto empty_map = collections::Dictionary<std::string, std::string>();
 	auto* request = new http::HttpRequest(
 		this->settings,
 		"get",
@@ -297,10 +287,7 @@ TEST_F(RedirectControllerPermanentAndQueryStringTestCase, GetRedirectUrlTest)
 		empty_map,
 		empty_parameters,
 		empty_parameters,
-		http::HttpRequest::Parameters<std::string, files::UploadedFile>(
-			collections::Dict<std::string, files::UploadedFile>(),
-			collections::MultiValueDict<std::string, files::UploadedFile>()
-		),
+		collections::MultiDictionary<std::string, files::UploadedFile>(),
 		{}
 	);
 	this->controller->setup(request);

@@ -1,5 +1,5 @@
 /**
- * core/parsers/multipart_parser.h
+ * http/parsers/multipart_parser.h
  *
  * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
@@ -9,27 +9,28 @@
 #pragma once
 
 // Base libraries.
-#include <xalwart.base/collections/multi_dict.h>
+#include <xalwart.base/collections/dictionary.h>
+#include <xalwart.base/collections/multi_dictionary.h>
 
 // Module definitions.
-#include "./_def_.h"
+#include "../_def_.h"
 
 // Framework libraries.
 #include "../../core/uploaded_file.h"
 
 
-__CORE_PARSERS_BEGIN__
+__HTTP_INTERNAL_BEGIN__
 
 // TESTME: multipart_parser
 struct multipart_parser final
 {
 	std::string media_root;
 
-	collections::Dict<std::string, std::string> post_values;
-	collections::MultiValueDict<std::string, std::string> multi_post_value;
+	collections::Dictionary<std::string, std::string> post_values;
+	collections::MultiDictionary<std::string, std::string> multi_post_value;
 
-	collections::Dict<std::string, files::UploadedFile> file_values;
-	collections::MultiValueDict<std::string, files::UploadedFile> multi_file_value;
+	collections::Dictionary<std::string, files::UploadedFile> file_values;
+	collections::MultiDictionary<std::string, files::UploadedFile> multi_file_value;
 
 	enum state
 	{
@@ -104,4 +105,4 @@ struct multipart_parser final
 	void parse(const std::string& content_type, const std::string& body);
 };
 
-__CORE_PARSERS_END__
+__HTTP_INTERNAL_END__

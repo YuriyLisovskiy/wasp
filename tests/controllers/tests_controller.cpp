@@ -1,7 +1,7 @@
 /**
  * controllers/tests_controller.cpp
  *
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019, 2021 Yuriy Lisovskiy
  */
 
 #include <map>
@@ -9,8 +9,8 @@
 #include <gtest/gtest.h>
 
 #include <xalwart.base/string_utils.h>
-#include <xalwart.base/collections/dict.h>
-#include <xalwart.base/collections/multi_dict.h>
+#include <xalwart.base/collections/dictionary.h>
+#include <xalwart.base/collections/multi_dictionary.h>
 
 #include "../../src/controllers/controller.h"
 #include "../../src/conf/settings.h"
@@ -38,11 +38,8 @@ class ControllerTestCase : public ::testing::Test
 public:
 	static http::HttpRequest make_request(const conf::Settings* settings, const std::string& method)
 	{
-		auto empty_parameters = http::HttpRequest::Parameters<std::string, std::string>(
-			collections::Dict<std::string, std::string>(),
-			collections::MultiValueDict<std::string, std::string>()
-		);
-		auto empty_map = collections::Dict<std::string, std::string>();
+		auto empty_parameters = collections::MultiDictionary<std::string, std::string>();
+		auto empty_map = collections::Dictionary<std::string, std::string>();
 		return http::HttpRequest(
 			settings,
 			method,
@@ -54,10 +51,7 @@ public:
 			empty_map,
 			empty_parameters,
 			empty_parameters,
-			http::HttpRequest::Parameters<std::string, files::UploadedFile>(
-				collections::Dict<std::string, files::UploadedFile>(),
-				collections::MultiValueDict<std::string, files::UploadedFile>()
-			),
+			collections::MultiDictionary<std::string, files::UploadedFile>(),
 			{}
 		);
 	}

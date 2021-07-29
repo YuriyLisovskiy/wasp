@@ -11,9 +11,8 @@
 
 // Framework libraries.
 #include "../management/module.h"
-#include "../core/parsers/url_parser.h"
-#include "../core/parsers/query_parser.h"
-#include "../core/parsers/multipart_parser.h"
+#include "../http/url.h"
+#include "../http/parsers/multipart_parser.h"
 #include "../urls/resolver.h"
 
 
@@ -160,7 +159,7 @@ net::HandlerFunc MainApplication::make_handler()
 	this->settings->TEMPLATE_ENGINE->load_libraries();
 
 	auto handler = [this](
-		net::RequestContext* ctx, const collections::Dict<std::string, std::string>& env
+		net::RequestContext* ctx, const collections::Dictionary<std::string, std::string>& env
 	) -> uint
 	{
 		auto request = this->make_request(ctx, env);
@@ -250,12 +249,11 @@ net::HandlerFunc MainApplication::make_handler()
 
 bool MainApplication::static_is_allowed(const std::string& static_url)
 {
-	auto parser = parsers::url_parser();
-	parser.parse(static_url);
+	auto url = http::parse_url(static_url);
 
 	// Allow serving local static files if debug and
 	// static url is local.
-	return this->settings->DEBUG && parser.hostname.empty();
+	return this->settings->DEBUG && url.hostname().empty();
 }
 
 void MainApplication::build_static_patterns(std::vector<std::shared_ptr<urls::UrlPattern>>& patterns)
@@ -357,52 +355,51 @@ Result<std::shared_ptr<http::IHttpResponse>> MainApplication::process_response_m
 // | CONNECT    |                        |                         |
 // | PATCH      |                        |                         |
 std::shared_ptr<http::HttpRequest> MainApplication::make_request(
-	net::RequestContext* ctx, collections::Dict<std::string, std::string> env
+	net::RequestContext* ctx, collections::Dictionary<std::string, std::string> env
 )
 {
-	parsers::url_query_parser qp;
-	http::HttpRequest::Parameters<std::string, std::string> get_params, post_params;
-	http::HttpRequest::Parameters<std::string, files::UploadedFile> files_params;
+	collections::MultiDictionary<std::string, std::string> get_params, post_params;
+	collections::MultiDictionary<std::string, files::UploadedFile> files_params;
 	if (ctx->content_size)
 	{
 		auto cont_type = str::lower(ctx->headers.get("Content-Type"));
 		if (cont_type.starts_with("application/x-www-form-urlencoded"))
 		{
-			qp.parse(ctx->content);
+			auto query = http::parse_query(ctx->content);
 			if (ctx->method == "GET")
 			{
-				get_params = http::HttpRequest::Parameters(qp.dict, qp.multi_dict);
+				get_params = query;
 			}
 			else if (ctx->method == "POST")
 			{
-				post_params = http::HttpRequest::Parameters(qp.dict, qp.multi_dict);
+				post_params = query;
 			}
 		}
 		else if (cont_type.starts_with("multipart/form-data"))
 		{
-			parsers::multipart_parser mp(this->settings->MEDIA_ROOT);
-			mp.parse(ctx->headers["Content-Type"], ctx->content);
-			post_params = http::HttpRequest::Parameters(mp.post_values, mp.multi_post_value);
-			files_params = http::HttpRequest::Parameters(mp.file_values, mp.multi_file_value);
+			http::internal::multipart_parser mp(this->settings->MEDIA_ROOT);
+			mp.parse(ctx->headers.get("Content-Type"), ctx->content);
+			post_params = mp.multi_post_value;
+			files_params = mp.multi_file_value;
 		}
 	}
 	else
 	{
-		qp.parse(ctx->query);
+		auto query = http::parse_query(ctx->query);
 		if (ctx->method == "GET")
 		{
-			get_params = http::HttpRequest::Parameters(qp.dict, qp.multi_dict);
+			get_params = query;
 		}
 		else if (ctx->method == "POST")
 		{
-			post_params = http::HttpRequest::Parameters(qp.dict, qp.multi_dict);
+			post_params = query;
 		}
 	}
 
 	for (const auto& header : ctx->headers)
 	{
 		auto key = str::replace(header.first, "-", "_");
-		env["HTTP_" + str::upper(key)] = header.second;
+		env.set("HTTP_" + str::upper(key), header.second);
 	}
 
 	return std::make_shared<http::HttpRequest>(

@@ -15,7 +15,7 @@
 #include <fstream>
 
 // Base libraries.
-#include <xalwart.base/collections/dict.h>
+#include <xalwart.base/collections/dictionary.h>
 
 // Module definitions.
 #include "./_def_.h"
@@ -33,8 +33,8 @@ __HTTP_BEGIN__
 class HttpResponseBase : public IHttpResponse
 {
 protected:
-	collections::Dict<std::string, std::string> _headers;
-	collections::Dict<std::string, Cookie> _cookies;
+	collections::Dictionary<std::string, std::string> _headers;
+	collections::Dictionary<std::string, Cookie> _cookies;
 	std::string _body;
 	bool _closed;
 	unsigned short int _status;
@@ -86,9 +86,9 @@ public:
 	    bool is_http_only = false,
 		const std::string& same_site = ""
 	) final;
-	const collections::Dict<std::string, Cookie>& get_cookies() final;
+	const collections::Dictionary<std::string, Cookie>& get_cookies() final;
 	void set_cookies(
-		const collections::Dict<std::string, Cookie>& cookies
+		const collections::Dictionary<std::string, Cookie>& cookies
 	) final;
 	void delete_cookie(
 		const std::string& name, const std::string& path, const std::string& domain
@@ -114,8 +114,6 @@ public:
 	bool seekable() override;
 	bool writable() override;
 	void write_lines(const std::vector<std::string>& lines) override;
-
-	std::string& operator[] (const std::string& key) override;
 
 	Error err() final;
 };

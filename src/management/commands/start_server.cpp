@@ -61,25 +61,25 @@ Kwargs StartServerCommand::get_kwargs()
 void StartServerCommand::add_flags()
 {
 	this->_addr_port_flag = this->flag_set->make_string(
-		"bind", "", "Server address and port formatted as host:port"
+		"b", "bind", "", "Server address and port formatted as host:port"
 	);
 	this->_addr_flag = this->flag_set->make_string(
-		"host", "", "Server address"
+		"h", "host", "", "Server address"
 	);
 	this->_port_flag = this->flag_set->make_uint16(
-		"port", this->DEFAULT_PORT, "Server port"
+		"p", "port", this->DEFAULT_PORT, "Server port"
 	);
 	this->_threads_flag = this->flag_set->make_unsigned_long(
-		"threads", this->DEFAULT_THREADS, "Threads count"
+		"t", "threads", this->DEFAULT_THREADS, "Threads count"
 	);
 	this->_use_ipv6_flag = this->flag_set->make_bool(
-		"use-ipv6", false, "Use IPv6 address or not (used in case when host is set to 'localhost')"
+		"i", "use-ipv6", false, "Use IPv6 address or not (used in case when host is set to 'localhost')"
 	);
 	this->_no_colors_flag = this->flag_set->make_bool(
-		"no-colors", false, "Disable colors in logs"
+		"c", "colors", false, "Disable colors in logs"
 	);
 	this->_retries_count_flag = this->flag_set->make_unsigned_long(
-		"retries", this->DEFAULT_RETRIES_COUNT, "Max retries count to bind socket"
+		"r", "retries", this->DEFAULT_RETRIES_COUNT, "Max retries count to bind socket"
 	);
 }
 

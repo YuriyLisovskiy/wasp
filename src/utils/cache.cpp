@@ -121,7 +121,7 @@ std::shared_ptr<http::IHttpResponse> _not_modified(
 		{
 			if (response->has_header(header))
 			{
-				(*new_response)[header] = (*response)[header];
+				new_response->set_header(header, response->get_header(header, ""));
 			}
 		}
 

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
- * Purpose: urls module's definitions.
+ * Definitions of `urls` module.
  */
 
 #pragma once

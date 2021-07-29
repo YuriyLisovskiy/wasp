@@ -48,7 +48,7 @@ protected:
 
 	std::shared_ptr<http::HttpRequest> make_request(
 		net::RequestContext* ctx,
-		collections::Dict<std::string, std::string> env
+		collections::Dictionary<std::string, std::string> env
 	);
 
 	static std::shared_ptr<http::IHttpResponse> error_to_response(const Error* err);

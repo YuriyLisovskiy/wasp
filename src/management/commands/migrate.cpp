@@ -24,16 +24,16 @@ MigrateCommand::MigrateCommand(
 void MigrateCommand::add_flags()
 {
 	this->_db_flag = this->flag_set->make_string(
-		"db", "default", "The database to migrate"
+		"d", "database", "default", "The database to migrate"
 	);
 	this->_migration_flag = this->flag_set->make_string(
-		"migration", "", "Database will be brought to the state after this migration"
+		"m", "migration", "", "Database will be brought to the state after this migration"
 	);
 	this->_rollback_flag = this->flag_set->make_bool(
-		"rollback", false, "Identifies whether to rollback database migrations"
+		"r", "rollback", false, "Identifies whether to rollback database migrations"
 	);
 	this->_no_colors_flag = this->flag_set->make_bool(
-		"no-colors", false, "Disable colors in logs"
+		"c", "colors", true, "Enables colors in logs"
 	);
 }
 

@@ -1,10 +1,8 @@
 /**
  * core/parsers/tests_multipart_parser.cpp
  *
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019, 2021 Yuriy Lisovskiy
  */
-
-#include <fstream>
 
 #include <gtest/gtest.h>
 
@@ -12,8 +10,7 @@
 #include <xalwart.base/string_utils.h>
 #include <xalwart.base/path.h>
 
-#include "../../../src/core/parsers/multipart_parser.h"
-#include "../../../src/http/request.h"
+#include "../../../src/http/parsers/multipart_parser.h"
 
 using namespace xw;
 
@@ -28,7 +25,7 @@ protected:
 
 TEST_F(MultipartParserStaticTestCase, AssertBoundaryTestSuccess)
 {
-	ASSERT_NO_THROW(parsers::multipart_parser::assert_boundary(
+	ASSERT_NO_THROW(http::internal::multipart_parser::assert_boundary(
 		this->ORIG_BOUNDARY,
 		this->ORIG_BOUNDARY
 	));
@@ -36,7 +33,7 @@ TEST_F(MultipartParserStaticTestCase, AssertBoundaryTestSuccess)
 
 TEST_F(MultipartParserStaticTestCase, AssertBoundaryTestThrows)
 {
-	ASSERT_THROW(parsers::multipart_parser::assert_boundary(
+	ASSERT_THROW(http::internal::multipart_parser::assert_boundary(
 		this->ORIG_BOUNDARY,
 		this->DIFFERENT_BOUNDARY
 	), MultiPartParserError);
@@ -45,7 +42,7 @@ TEST_F(MultipartParserStaticTestCase, AssertBoundaryTestThrows)
 TEST_F(MultipartParserStaticTestCase, AssertGetBoundaryTestSuccess)
 {
 	ASSERT_EQ(
-		parsers::multipart_parser::get_boundary(this->CONTENT_TYPE),
+		http::internal::multipart_parser::get_boundary(this->CONTENT_TYPE),
 		str::ltrim(this->ORIG_BOUNDARY, "-")
 	);
 }
@@ -53,7 +50,7 @@ TEST_F(MultipartParserStaticTestCase, AssertGetBoundaryTestSuccess)
 TEST_F(MultipartParserStaticTestCase, AssertGetBoundaryTestThrowsInvalidContentType)
 {
 	ASSERT_THROW(
-		parsers::multipart_parser::get_boundary("application/x-www-urlencoded"),
+		http::internal::multipart_parser::get_boundary("application/x-www-urlencoded"),
 		MultiPartParserError
 	);
 }
@@ -61,7 +58,7 @@ TEST_F(MultipartParserStaticTestCase, AssertGetBoundaryTestThrowsInvalidContentT
 TEST_F(MultipartParserStaticTestCase, AssertGetBoundaryTestThrowsEmptyBoundary)
 {
 	ASSERT_THROW(
-		parsers::multipart_parser::get_boundary("multipart/form-data"),
+		http::internal::multipart_parser::get_boundary("multipart/form-data"),
 		MultiPartParserError
 	);
 }
@@ -174,11 +171,11 @@ protected:
 
 	const std::string ROOT = path::cwd() + "/";
 
-	parsers::multipart_parser* parser = nullptr;
+	http::internal::multipart_parser* parser = nullptr;
 
 	void SetUp() override
 	{
-		this->parser = new parsers::multipart_parser(this->ROOT);
+		this->parser = new http::internal::multipart_parser(this->ROOT);
 	}
 
 	void TearDown() override
@@ -190,26 +187,18 @@ protected:
 TEST_F(MultipartParserTestCase, ParseSingleParameterTest)
 {
 	this->parser->parse(this->CONTENT_TYPE, this->BODY_WITH_SINGLE_PARAM);
-	auto params = http::HttpRequest::Parameters(
-		this->parser->post_values, this->parser->multi_post_value
-	);
-
+	auto params = this->parser->multi_post_value;
 	ASSERT_EQ(params.size(), 1);
 	ASSERT_TRUE(params.contains("mail"));
 	ASSERT_EQ(params.get("mail"), "some_mail@gmail.com");
 
-	auto file_params = http::HttpRequest::Parameters(
-		this->parser->file_values, this->parser->multi_file_value
-	);
-	ASSERT_EQ(file_params.size(), 0);
+	ASSERT_EQ(this->parser->multi_file_value.size(), 0);
 }
 
 TEST_F(MultipartParserTestCase, ParseMultipleParametersWithoutFilesTest)
 {
 	this->parser->parse(this->CONTENT_TYPE, this->BODY_WITH_MULTIPLE_PARAM);
-	auto params = http::HttpRequest::Parameters(
-		this->parser->post_values, this->parser->multi_post_value
-	);
+	auto params = this->parser->multi_post_value;
 
 	ASSERT_EQ(params.size(), 3);
 	ASSERT_TRUE(params.contains("mail"));
@@ -219,18 +208,13 @@ TEST_F(MultipartParserTestCase, ParseMultipleParametersWithoutFilesTest)
 	ASSERT_TRUE(params.contains("birth_year"));
 	ASSERT_EQ(params.get("birth_year"), "2000");
 
-	auto file_params = http::HttpRequest::Parameters(
-		this->parser->file_values, this->parser->multi_file_value
-	);
-	ASSERT_EQ(file_params.size(), 0);
+	ASSERT_EQ(this->parser->multi_file_value.size(), 0);
 }
 
 TEST_F(MultipartParserTestCase, ParseMultipleParametersWithFilesTest)
 {
 	this->parser->parse(this->CONTENT_TYPE, this->BODY_WITH_FILE_AND_STR_PARAM);
-	auto post = http::HttpRequest::Parameters(
-		this->parser->post_values, this->parser->multi_post_value
-	);
+	auto post = this->parser->multi_post_value;
 
 	ASSERT_EQ(post.size(), 3);
 	ASSERT_TRUE(post.contains("mail"));
@@ -240,9 +224,7 @@ TEST_F(MultipartParserTestCase, ParseMultipleParametersWithFilesTest)
 	ASSERT_TRUE(post.contains("birth_year"));
 	ASSERT_EQ(post.get("birth_year"), "2000");
 
-	auto files = http::HttpRequest::Parameters(
-		this->parser->file_values, this->parser->multi_file_value
-	);
+	auto files = this->parser->multi_file_value;
 
 	ASSERT_EQ(files.size(), 1);
 	ASSERT_TRUE(files.contains("super_file"));

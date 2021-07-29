@@ -27,7 +27,7 @@
 #include <string>
 
 // Base libraries.
-#include <xalwart.base/collections/dict.h>
+#include <xalwart.base/collections/dictionary.h>
 
 // Module definitions.
 #include "./_def_.h"
@@ -62,15 +62,15 @@ extern void guess_content_type(const std::string& _path, std::string& type, std:
 
 // Dictionary which maps reduced archives' extensions to
 // their full variants.
-extern collections::Dict<std::string, std::string> SUFFIX_MAP;
+extern collections::Dictionary<std::string, std::string> SUFFIX_MAP;
 
 // Dictionary which maps archives' extensions to
 //	encoding names.
-extern collections::Dict<std::string, std::string> ENCODINGS_MAP;
+extern collections::Dictionary<std::string, std::string> ENCODINGS_MAP;
 
 // Before adding new types, make sure they are either registered with IANA,
 // at http://www.iana.org/assignments/media-types
 // or extensions, i.e. using the x- prefix
-extern collections::Dict<std::string, std::string> TYPES_MAP;
+extern collections::Dictionary<std::string, std::string> TYPES_MAP;
 
 __CORE_MIME_END__

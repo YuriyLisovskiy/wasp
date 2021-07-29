@@ -1,13 +1,13 @@
 /**
  * middleware/cookies.cpp
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  */
 
 #include "./cookies.h"
 
 // Framework libraries.
-#include "../core/parsers/cookie_parser.h"
+#include "../http/parsers/cookie_parser.h"
 
 
 __MIDDLEWARE_BEGIN__
@@ -23,9 +23,9 @@ Result<std::shared_ptr<http::IHttpResponse>> CookieMiddleware::process_request(
 	http::HttpRequest* request
 )
 {
-	parsers::cookie_parser cp;
+	http::internal::cookie_parser cp;
 	cp.parse(request->headers.get("Cookie", ""));
-	request->COOKIES = collections::Dict(cp.result);
+	request->COOKIES = collections::Dictionary(cp.result);
 	return this->none();
 }
 

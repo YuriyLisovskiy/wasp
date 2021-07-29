@@ -1,7 +1,7 @@
 /**
  * core/flags/tests_flags.cpp
  *
- * Copyright (c) 2019 Yuriy Lisovskiy
+ * Copyright (c) 2019, 2021 Yuriy Lisovskiy
  */
 
 #include <gtest/gtest.h>
@@ -14,9 +14,9 @@ using namespace xw;
 TEST(FlagsTestCase, ParseTest)
 {
 	auto fs = core::flags::FlagSet("TestFlagSet");
-	auto host = fs.make_string("host", "", "");
-	auto port = fs.make_long("port", 0, "");
-	auto verbose = fs.make_bool("verbose", false, "");
+	auto host = fs.make_string("h", "host", "", "");
+	auto port = fs.make_long("p", "port", 0, "");
+	auto verbose = fs.make_bool("v", "verbose", false, "");
 
 	std::vector<std::string> arguments = {"ignored", "--host", "127.0.0.1", "--port", "8000"};
 	std::vector<char*> argv;
@@ -36,9 +36,9 @@ TEST(FlagsTestCase, ParseTest)
 TEST(FlagsTestCase, ParseWithEqSignsTest)
 {
 	auto fs = core::flags::FlagSet("TestFlagSet");
-	auto host = fs.make_string("host", "", "");
-	auto port = fs.make_long("port", 0, "");
-	auto verbose = fs.make_bool("verbose", true, "");
+	auto host = fs.make_string("h", "host", "", "");
+	auto port = fs.make_long("p", "port", 0, "");
+	auto verbose = fs.make_bool("p", "verbose", true, "");
 
 	std::vector<std::string> arguments = {"ignored", "--host=127.0.0.1", "--port", "8000", "--verbose=false"};
 	std::vector<char*> argv;

@@ -9,7 +9,7 @@
 #pragma once
 
 // Base libraries.
-#include <xalwart.base/collections/dict.h>
+#include <xalwart.base/collections/dictionary.h>
 #include <xalwart.base/result.h>
 
 // Module definitions.
@@ -58,9 +58,9 @@ public:
 		bool is_http_only = false,
 		const std::string& same_site = ""
 	) = 0;
-	virtual const collections::Dict<std::string, Cookie>& get_cookies() = 0;
+	virtual const collections::Dictionary<std::string, Cookie>& get_cookies() = 0;
 	virtual void set_cookies(
-		const collections::Dict<std::string, Cookie>& cookies
+		const collections::Dictionary<std::string, Cookie>& cookies
 	) = 0;
 	virtual void delete_cookie(
 		const std::string& name, const std::string& path, const std::string& domain
@@ -88,8 +88,6 @@ public:
 	virtual void write_lines(const std::vector<std::string>& lines) = 0;
 
 	virtual std::string serialize() = 0;
-
-	virtual std::string& operator[] (const std::string& key) = 0;
 
 	virtual Error err() = 0;
 };

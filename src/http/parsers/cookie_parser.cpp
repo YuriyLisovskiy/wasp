@@ -1,13 +1,13 @@
 /**
- * core/parsers/cookie_parser.cpp
+ * http/parsers/cookie_parser.cpp
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  */
 
 #include "./cookie_parser.h"
 
 
-__CORE_PARSERS_BEGIN__
+__HTTP_INTERNAL_BEGIN__
 
 void cookie_parser::parse(const std::string& content)
 {
@@ -54,4 +54,4 @@ void cookie_parser::parse(const std::string& content)
 	this->result[cookie_key] = cookie_value;
 }
 
-__CORE_PARSERS_END__
+__HTTP_INTERNAL_END__

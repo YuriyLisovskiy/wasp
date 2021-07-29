@@ -9,7 +9,8 @@
 #pragma once
 
 // Base libraries.
-#include <xalwart.base/collections/multi_dict.h>
+#include <xalwart.base/collections/dictionary.h>
+#include <xalwart.base/collections/multi_dictionary.h>
 #include <xalwart.base/result.h>
 
 // Module definitions.
@@ -30,78 +31,23 @@ __HTTP_BEGIN__
 class HttpRequest
 {
 public:
-	template <typename Key, typename Val>
-	class Parameters
-	{
-	private:
-		collections::Dict<Key, Val> _dict;
-		collections::MultiValueDict<Key, Val> _multi_dict;
-
-	public:
-		explicit Parameters() = default;
-
-		explicit Parameters(
-			collections::Dict<Key, Val> dict,
-			collections::MultiValueDict<Key, Val> multi_dict
-		)
-		{
-			this->_dict = dict;
-			this->_multi_dict = multi_dict;
-		}
-
-		Val get(Key key, Val _default = Val{})
-		{
-			return this->_dict.get(key, _default);
-		}
-
-		std::vector<Val> get_list(Key key, std::vector<Val> _default = std::vector<Val>{})
-		{
-			return this->_multi_dict.get(key, _default);
-		}
-
-		bool contains(Key key)
-		{
-			return this->_dict.contains(key);
-		}
-
-		bool contains_list(Key key)
-		{
-			return this->_multi_dict.contains(key);
-		}
-
-		size_t size()
-		{
-			return this->_dict.size();
-		}
-
-		bool empty()
-		{
-			return this->_dict.is_empty();
-		}
-
-		std::vector<std::string> keys()
-		{
-			return this->_dict.keys();
-		}
-	};
-
 	explicit HttpRequest(
 		const conf::Settings* settings,
 		std::string method, std::string path, size_t major_v, size_t minor_v,
 		std::string query, bool keep_alive, std::string content,
-		collections::Dict<std::string, std::string> headers,
-		HttpRequest::Parameters<std::string, std::string> get_params,
-		HttpRequest::Parameters<std::string, std::string> post_params,
-		HttpRequest::Parameters<std::string, files::UploadedFile> files_params,
-		collections::Dict<std::string, std::string> meta_params
+		collections::Dictionary<std::string, std::string> headers,
+		collections::MultiDictionary<std::string, std::string> get_params,
+		collections::MultiDictionary<std::string, std::string> post_params,
+		collections::MultiDictionary<std::string, files::UploadedFile> files_params,
+		collections::Dictionary<std::string, std::string> meta_params
 	);
 
-	collections::Dict<std::string, std::string> headers;
-	HttpRequest::Parameters<std::string, std::string> GET;
-	HttpRequest::Parameters<std::string, std::string> POST;
-	collections::Dict<std::string, std::string> COOKIES;
-	HttpRequest::Parameters<std::string, files::UploadedFile> FILES;
-	collections::Dict<std::string, std::string> META;
+	collections::Dictionary<std::string, std::string> headers;
+	collections::MultiDictionary<std::string, std::string> GET;
+	collections::MultiDictionary<std::string, std::string> POST;
+	collections::Dictionary<std::string, std::string> COOKIES;
+	collections::MultiDictionary<std::string, files::UploadedFile> FILES;
+	collections::Dictionary<std::string, std::string> META;
 
 	[[nodiscard]]
 	std::string version() const;

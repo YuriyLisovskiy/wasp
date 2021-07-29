@@ -24,8 +24,8 @@ protected:
 
 public:
 	explicit Library(const std::string& lib_name, conf::Settings* settings);
-	std::shared_ptr<collections::Dict<std::string, filter_t>> get_filters() override;
-	std::shared_ptr<collections::Dict<std::string, tag_t>> get_tags() override;
+	std::shared_ptr<collections::Dictionary<std::string, filter_t>> get_filters() override;
+	std::shared_ptr<collections::Dictionary<std::string, tag_t>> get_tags() override;
 };
 
 __RENDER_END__

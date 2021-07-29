@@ -1,5 +1,5 @@
 /**
- * core/parsers/cookie_parser.h
+ * http/parsers/cookie_parser.h
  *
  * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
@@ -13,10 +13,10 @@
 #include <string>
 
 // Module definitions.
-#include "./_def_.h"
+#include "../_def_.h"
 
 
-__CORE_PARSERS_BEGIN__
+__HTTP_INTERNAL_BEGIN__
 
 // TESTME: cookie_parser
 struct cookie_parser final
@@ -35,4 +35,4 @@ struct cookie_parser final
 	void parse(const std::string& content);
 };
 
-__CORE_PARSERS_END__
+__HTTP_INTERNAL_END__
