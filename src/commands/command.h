@@ -18,6 +18,8 @@
 
 __COMMANDS_BEGIN__
 
+// TESTME: Command
+// TODO: docs for 'Command'
 class Command : public BaseCommand
 {
 protected:

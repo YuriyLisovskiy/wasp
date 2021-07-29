@@ -20,7 +20,9 @@
 
 __CONTROLLERS_BEGIN__
 
-/// A mixin that can be used to render a template.
+// TESTME: TemplateResponseMixin
+// TODO: docs for 'TemplateResponseMixin'
+// A mixin that can be used to render a template.
 class TemplateResponseMixin
 {
 protected:
@@ -31,8 +33,8 @@ protected:
 public:
 	explicit TemplateResponseMixin(render::abc::IEngine* engine);
 
-	/// Returns a response with a template rendered with
-	/// the given context.
+	// Returns a response with a template rendered with
+	// the given context.
 	virtual Result<std::shared_ptr<http::IHttpResponse>> render(
 		http::HttpRequest* request,
 		const std::shared_ptr<render::abc::IContext>& context,
@@ -42,20 +44,21 @@ public:
 		const std::string& charset="utf-8"
 	);
 
-	/// Returns a template name to be used for the request.
-	/// May not be called if render() is overridden.
+	// Returns a template name to be used for the request.
+	// May not be called if render() is overridden.
 	virtual std::string get_template_name();
 };
 
-
-/// A controller that can render a template.
+// TESTME: TemplateController
+// TODO: docs for 'TemplateController'
+// A controller that can render a template.
 class TemplateController : public TemplateResponseMixin, public Controller
 {
 public:
 	explicit TemplateController(conf::Settings* settings);
 
-	/// Used in default get() method, can be overridden
-	/// in derived classes.
+	// Used in default get() method, can be overridden
+	// in derived classes.
 	virtual inline std::shared_ptr<render::abc::IContext> get_context(Kwargs* kwargs)
 	{
 		return nullptr;

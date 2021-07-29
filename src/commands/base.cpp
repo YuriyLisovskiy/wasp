@@ -21,7 +21,9 @@ BaseCommand::BaseCommand(const std::string& cmd_name, const std::string& help)
 std::string BaseCommand::usage()
 {
 	this->create_flags();
-	return this->label + ":\n" + this->help + "\n" + this->flag_set->usage("  ");
+	return this->help_message() +
+		"\n\nUsage:\n  application " + this->name() + " [flags]\n\n" +
+		"Flags:\n" + this->flag_set->usage("  ");
 }
 
 void BaseCommand::create_flags()

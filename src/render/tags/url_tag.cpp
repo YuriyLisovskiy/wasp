@@ -17,7 +17,7 @@
 #include <xalwart.render/syntax/utility.h>
 
 // Framework libraries.
-#include "../../utils/functional.h"
+#include "../../utility/functional.h"
 
 
 __RENDER_TAGS_BEGIN__
@@ -26,7 +26,7 @@ std::string url_node::render(abc::IContext* ctx)
 {
 	using Fe = std::shared_ptr<FilterExpression>;
 	auto built_url = this->pattern->build(
-		fn::map<Fe, std::string>(this->params, [ctx](const Fe& p) -> std::string {
+		util::fn::map<Fe, std::string>(this->params, [ctx](const Fe& p) -> std::string {
 			auto p_var = p->resolve(ctx);
 			return p_var ? p_var->__str__() : "";
 		})

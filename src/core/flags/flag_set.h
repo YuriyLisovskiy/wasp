@@ -20,6 +20,8 @@
 
 __CORE_FLAGS_BEGIN__
 
+// TESTME: FlagSet
+// TODO: docs for 'FlagSet'
 class FlagSet final
 {
 private:
@@ -45,27 +47,27 @@ public:
 	std::string usage(const std::string& indent="") const;
 
 	std::shared_ptr<Uint16Flag> make_uint16(
-		const std::string& short_label, const std::string& label, uint16_t default_val, const std::string& usage
+		const std::string& shorthand, const std::string& name, uint16_t default_val, const std::string& usage
 	);
 
 	std::shared_ptr<UnsignedLongFlag> make_unsigned_long(
-		const std::string& short_label, const std::string& label, unsigned long default_val, const std::string& usage
+		const std::string& shorthand, const std::string& name, unsigned long default_val, const std::string& usage
 	);
 
 	std::shared_ptr<LongIntFlag> make_long(
-		const std::string& short_label, const std::string& label, long default_val, const std::string& usage
+		const std::string& shorthand, const std::string& name, long default_val, const std::string& usage
 	);
 
 	std::shared_ptr<DoubleFlag> make_double(
-		const std::string& short_label, const std::string& label, double default_val, const std::string& usage
+		const std::string& shorthand, const std::string& name, double default_val, const std::string& usage
 	);
 
 	std::shared_ptr<StringFlag> make_string(
-		const std::string& short_label, const std::string& label, const std::string& default_val, const std::string& usage
+		const std::string& shorthand, const std::string& name, const std::string& default_val, const std::string& usage
 	);
 
 	std::shared_ptr<BoolFlag> make_bool(
-		const std::string& short_label, const std::string& label, bool default_val, const std::string& usage
+		const std::string& shorthand, const std::string& name, bool default_val, const std::string& usage
 	);
 };
 

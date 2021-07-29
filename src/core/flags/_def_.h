@@ -3,14 +3,12 @@
  *
  * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
- * Definitions of `core/flags` module.
+ * Definitions of 'core/flags' module.
  */
 
 #pragma once
 
 #include "../_def_.h"
-
-// TESTME: flags module.
 
 // xw::core::flags
 #define __CORE_FLAGS_BEGIN__ __CORE_BEGIN__ namespace flags {

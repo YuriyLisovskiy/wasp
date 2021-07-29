@@ -10,8 +10,8 @@
 #include <xalwart.base/string_utils.h>
 
 // Framework libraries.
-#include "../utils/cache.h"
-#include "../utils/http.h"
+#include "../utility/cache.h"
+#include "../http/utility.h"
 #include "../http/headers.h"
 
 
@@ -39,16 +39,14 @@ Result<std::shared_ptr<http::IHttpResponse>> ConditionalGetMiddleware::process_r
 
 	if (needs_etag(response) && !response->has_header(http::E_TAG))
 	{
-		cache::set_response_etag(response);
+		util::cache::set_response_etag(response);
 	}
 
 	auto etag = response->get_header(http::E_TAG, "");
-	long last_modified = utils_http::parse_http_date(
-		response->get_header(http::LAST_MODIFIED, "")
-	);
+	long last_modified = http::parse_http_date(response->get_header(http::LAST_MODIFIED, ""));
 	if (!etag.empty() || last_modified != -1)
 	{
-		auto conditional_response = cache::get_conditional_response(
+		auto conditional_response = util::cache::get_conditional_response(
 			request, etag, last_modified, response
 		);
 		if (conditional_response)

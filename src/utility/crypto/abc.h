@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2020-2021 Yuriy Lisovskiy
  *
- * Purpose: abstract base classes for cryptography module.
+ * Abstract base classes for 'crypto' module.
  */
 
 #pragma once
@@ -15,7 +15,7 @@
 #include "./_def_.h"
 
 
-__CRYPTO_BEGIN__
+__CRYPTO_ABC_BEGIN__
 
 class IHash
 {
@@ -26,6 +26,9 @@ private:
 public:
 	IHash() = default;
 
+	// Creates a copy of itself.
+	// Created copy must be deleted manually because of
+	// allocating memory in heap.
 	virtual IHash* clone() = 0;
 
 	// Continues message-digest operation,
@@ -45,10 +48,14 @@ public:
 	virtual unsigned char* digest() = 0;
 
 	virtual void reset() = 0;
-	virtual size_t size() = 0;
-	virtual size_t block_size() = 0;
+
+	[[nodiscard]]
+	virtual size_t size() const = 0;
+
+	[[nodiscard]]
+	virtual size_t block_size() const = 0;
 
 	virtual ~IHash() = default;
 };
 
-__CRYPTO_END__
+__CRYPTO_ABC_END__

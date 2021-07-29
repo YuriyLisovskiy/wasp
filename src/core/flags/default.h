@@ -35,6 +35,8 @@ __CORE_FLAGS_INTERNAL_END__
 
 __CORE_FLAGS_BEGIN__
 
+// TESTME: UnsignedLongFlag
+// TODO: docs for 'UnsignedLongFlag'
 class UnsignedLongFlag final : public TemplateFlag<unsigned long>
 {
 protected:
@@ -46,8 +48,8 @@ protected:
 
 public:
 	inline UnsignedLongFlag(
-		const std::string& short_label, const std::string& label, const std::string& usage, unsigned long default_val
-	) : TemplateFlag<unsigned long>(short_label, label, usage, default_val)
+		const std::string& shorthand, const std::string& name, const std::string& usage, unsigned long default_val
+	) : TemplateFlag<unsigned long>(shorthand, name, usage, default_val)
 	{
 	}
 
@@ -58,6 +60,8 @@ public:
 	}
 };
 
+// TESTME: Uint16Flag
+// TODO: docs for 'Uint16Flag'
 class Uint16Flag final : public TemplateFlag<uint16_t>
 {
 protected:
@@ -69,8 +73,8 @@ protected:
 
 public:
 	inline Uint16Flag(
-		const std::string& short_label, const std::string& label, const std::string& usage, uint16_t default_val
-	) : TemplateFlag<uint16_t>(short_label, label, usage, default_val)
+		const std::string& shorthand, const std::string& name, const std::string& usage, uint16_t default_val
+	) : TemplateFlag<uint16_t>(shorthand, name, usage, default_val)
 	{
 	}
 
@@ -81,6 +85,8 @@ public:
 	}
 };
 
+// TESTME: LongIntFlag
+// TODO: docs for 'LongIntFlag'
 class LongIntFlag final : public TemplateFlag<long int>
 {
 protected:
@@ -92,8 +98,8 @@ protected:
 
 public:
 	inline LongIntFlag(
-		const std::string& short_label, const std::string& label, const std::string& usage, long default_val
-	) : TemplateFlag<long>(short_label, label, usage, default_val)
+		const std::string& shorthand, const std::string& name, const std::string& usage, long default_val
+	) : TemplateFlag<long>(shorthand, name, usage, default_val)
 	{
 	}
 
@@ -104,6 +110,8 @@ public:
 	}
 };
 
+// TESTME: DoubleFlag
+// TODO: docs for 'DoubleFlag'
 class DoubleFlag final : public TemplateFlag<double>
 {
 protected:
@@ -115,8 +123,8 @@ protected:
 
 public:
 	inline DoubleFlag(
-		const std::string& short_label, const std::string& label, const std::string& usage, double default_val
-	) : TemplateFlag<double>(short_label, label, usage, default_val)
+		const std::string& shorthand, const std::string& name, const std::string& usage, double default_val
+	) : TemplateFlag<double>(shorthand, name, usage, default_val)
 	{
 	}
 
@@ -127,6 +135,8 @@ public:
 	}
 };
 
+// TESTME: StringFlag
+// TODO: docs for 'StringFlag'
 class StringFlag final : public TemplateFlag<std::basic_string<char>>
 {
 protected:
@@ -138,9 +148,9 @@ protected:
 
 public:
 	inline StringFlag(
-		const std::string& short_label, const std::string& label,
+		const std::string& shorthand, const std::string& name,
 		const std::string& usage, const std::basic_string<char>& default_val
-	) : TemplateFlag<std::basic_string<char>>(short_label, label, usage, default_val)
+	) : TemplateFlag<std::basic_string<char>>(shorthand, name, usage, default_val)
 	{
 	}
 
@@ -151,6 +161,8 @@ public:
 	}
 };
 
+// TESTME: BoolFlag
+// TODO: docs for 'BoolFlag'
 class BoolFlag final : public TemplateFlag<bool>
 {
 protected:
@@ -163,8 +175,8 @@ protected:
 
 public:
 	inline BoolFlag(
-		const std::string& short_label, const std::string& label, const std::string& usage, bool default_val
-	) : TemplateFlag<bool>(short_label, label, usage, default_val)
+		const std::string& shorthand, const std::string& name, const std::string& usage, bool default_val
+	) : TemplateFlag<bool>(shorthand, name, usage, default_val)
 	{
 	}
 

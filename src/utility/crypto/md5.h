@@ -1,4 +1,7 @@
-/* MD5
+/**
+ * utils/crypto/md5.h
+ *
+ * MD5
  * converted to C++ class by Frank Thilo (thilo@unix-ag.org)
  * for bzflag (http://www.bzflag.org)
  *
@@ -8,7 +11,7 @@
  *    reference implementation of RFC 1321
  *
  *    Copyright (C) 1991-2, RSA Data Security, Inc. Created 1991. All rights reserved.
- *    Copyright (C) 2020 Yuriy Lisovskiy
+ *    Copyright (C) 2020-2021 Yuriy Lisovskiy
  *
  * License to copy and use this software is granted provided that it
  * is identified as the "RSA Data Security, Inc. MD5 Message-Digest
@@ -27,12 +30,6 @@
  *
  * These notices must be retained in any copies of any part of this
  * documentation and/or software.
- */
-
-/**
- * utils/crypto/md5.h
- *
- * Purpose: Provides md5 hash function algorithm.
  */
 
 #pragma once
@@ -67,7 +64,8 @@ __CRYPTO_BEGIN__
 #define S43 15
 #define S44 21
 
-class MD5 final : public IHash
+// TESTME: MD5
+class MD5 final : public abc::IHash
 {
 private:
 	typedef unsigned char uint8;
@@ -93,29 +91,58 @@ private:
 	uint8 _digest[SIZE];
 
 public:
-	MD5();
-	explicit MD5(const std::string& input);
-	MD5* clone() final;
+	inline MD5()
+	{
+		this->_init();
+	}
+
+	inline explicit MD5(const std::string& input)
+	{
+		this->_init();
+		this->update(input.c_str(), input.length());
+	}
+
+	MD5* clone() override;
 
 	// Continues an MD5 message-digest operation,
 	// processing another message block.
-	void update(const unsigned char input[], unsigned int n) final;
+	void update(const unsigned char input[], unsigned int n) override;
 
 	// For convenience provide a version with signed char.
-	void update(const char input[], unsigned int n) final;
+	inline void update(const char input[], unsigned int n) override
+	{
+		this->update((const unsigned char*) input, n);
+	}
 
 	// For convenience provide a version with std::string.
-	void update(const std::string& input) final;
+	inline void update(const std::string& input) override
+	{
+		this->update(input.c_str(), input.length());
+	}
 
 	// Hex representation of digest as string.
-	std::string hex_digest() final;
+	std::string hex_digest() override;
 
 	// Hex representation of digest as unsigned char array.
-	unsigned char* digest() final;
+	inline unsigned char* digest() override
+	{
+		this->_finalize();
+		return this->_digest;
+	}
 
-	void reset() final;
-	size_t size() final;
-	size_t block_size() final;
+	void reset() override;
+
+	[[nodiscard]]
+	inline size_t size() const override
+	{
+		return MD5::SIZE;
+	}
+
+	[[nodiscard]]
+	inline size_t block_size() const override
+	{
+		return MD5::BLOCK_SIZE;
+	}
 
 private:
 	void _init();
@@ -136,25 +163,55 @@ private:
 	static void _decode(uint32 output[], const uint8 input[], unsigned int n);
 
 	// Basic MD5 functions.
-	static inline uint32 F(uint32 x, uint32 y, uint32 z);
-	static inline uint32 G(uint32 x, uint32 y, uint32 z);
-	static inline uint32 H(uint32 x, uint32 y, uint32 z);
-	static inline uint32 I(uint32 x, uint32 y, uint32 z);
+	static inline uint32 F(uint32 x, uint32 y, uint32 z)
+	{
+		return x & y | ~x & z;
+	}
+
+	static inline uint32 G(uint32 x, uint32 y, uint32 z)
+	{
+		return x & z | y & ~z;
+	}
+
+	static inline uint32 H(uint32 x, uint32 y, uint32 z)
+	{
+		return x ^ y ^ z;
+	}
+
+	static inline uint32 I(uint32 x, uint32 y, uint32 z)
+	{
+		return y ^ (x | ~z);
+	}
 
 	// Rotates x left n bits.
-	static inline uint32 rotate_left(uint32 x, int n);
+	static inline uint32 rotate_left(uint32 x, int n)
+	{
+		return (x << n) | (x >> (32 - n));
+	}
 
 	// Transformations for 1-st round.
-	static inline void FF(uint32 &a, uint32 b, uint32 c, uint32 d, uint32 x, uint32 s, uint32 ac);
+	static inline void FF(uint32 &a, uint32 b, uint32 c, uint32 d, uint32 x, uint32 s, uint32 ac)
+	{
+		a = MD5::rotate_left(a + MD5::F(b, c, d) + x + ac, s) + b;
+	}
 
 	// Transformations for 2-nd round.
-	static inline void GG(uint32 &a, uint32 b, uint32 c, uint32 d, uint32 x, uint32 s, uint32 ac);
+	static inline void GG(uint32 &a, uint32 b, uint32 c, uint32 d, uint32 x, uint32 s, uint32 ac)
+	{
+		a = MD5::rotate_left(a + MD5::G(b, c, d) + x + ac, s) + b;
+	}
 
 	// Transformations for 4-rd round.
-	static inline void HH(uint32 &a, uint32 b, uint32 c, uint32 d, uint32 x, uint32 s, uint32 ac);
+	static inline void HH(uint32 &a, uint32 b, uint32 c, uint32 d, uint32 x, uint32 s, uint32 ac)
+	{
+		a = MD5::rotate_left(a + MD5::H(b, c, d) + x + ac, s) + b;
+	}
 
 	// Transformations for 4-th round.
-	static inline void II(uint32 &a, uint32 b, uint32 c, uint32 d, uint32 x, uint32 s, uint32 ac);
+	static inline void II(uint32 &a, uint32 b, uint32 c, uint32 d, uint32 x, uint32 s, uint32 ac)
+	{
+		a = MD5::rotate_left(a + MD5::I(b, c, d) + x + ac, s) + b;
+	}
 };
 
 __CRYPTO_END__

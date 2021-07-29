@@ -23,10 +23,11 @@
 
 __COMMANDS_BEGIN__
 
-/// Use this class if you want access to all of the mechanisms which
-/// parse the command-line arguments and work out what code to call in
-/// response; if you don't need to change any of that behavior,
-/// consider using one of the subclasses defined in this file.
+// TESTME: BaseCommand
+// Use this class if you want access to all of the mechanisms which
+// parse the command-line arguments and work out what code to call in
+// response; if you don't need to change any of that behavior,
+// consider using one of the subclasses defined in this file.
 class BaseCommand
 {
 protected:
@@ -41,42 +42,51 @@ protected:
 
 	explicit BaseCommand(const std::string& cmd_name, const std::string& help);
 
-	/// Creates flags if they are not created yet.
+	// Creates flags if they are not created yet.
 	void create_flags();
 
-	/// Override in child class to add more commands.
+	// Override in child class to add more commands.
 	virtual inline void add_flags()
 	{
 	}
 
-	/// Validates arguments before processing the command.
-	virtual inline void validate()
+	// Validates arguments before processing the command.
+	virtual inline void validate() const
 	{
 	}
 
-	/// The actual logic of the command. Subclasses must implement
-	/// this method.
+	// The actual logic of the command. Subclasses must implement
+	// this method.
 	virtual void handle() = 0;
 
 public:
 
 	// Returns command flags.
-	virtual inline Kwargs get_kwargs()
+	[[nodiscard]]
+	virtual inline Kwargs get_kwargs() const
 	{
 		return Kwargs();
 	}
 
-	/// Returns usage based on flag_set.
+	// Returns usage based on flag_set.
 	std::string usage();
 
-	/// Returns full command's name.
-	inline std::string name()
+	// Returns help message for command.
+	[[nodiscard]]
+	inline std::string help_message() const
+	{
+		return this->help;
+	}
+
+	// Returns full command's name.
+	[[nodiscard]]
+	inline std::string name() const
 	{
 		return this->label;
 	}
 
-	/// Creates flags if they are not created yet,
-	/// parses argv and runs handle() method.
+	// Creates flags if they are not created yet,
+	// parses argv and runs handle() method.
 	void run_from_argv(int argc, char** argv, bool is_verbose = false);
 };
 

@@ -27,7 +27,7 @@ args_parser::args_parser(int argc, char** argv, size_t parse_from, bool is_verbo
 	for (size_t i = parse_from; i < argc; i++)
 	{
 		std::string token = argv[i];
-		if (token.starts_with("--"))
+		if (token.starts_with("-"))
 		{
 			if (!is_received)
 			{
@@ -37,14 +37,12 @@ args_parser::args_parser(int argc, char** argv, size_t parse_from, bool is_verbo
 			auto param = str::split(token, '=');
 			if (param.size() > 1)
 			{
-				param[0] = str::ltrim(param[0], "-");
 				auto val = str::join("", param.begin() + 1, param.end());
 				this->flags[param[0]] = val;
 			}
 			else
 			{
 				last_arg = token;
-				last_arg = str::ltrim(last_arg, "-");
 				is_received = false;
 			}
 		}

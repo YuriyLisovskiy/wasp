@@ -18,16 +18,12 @@ Command::Command(
 {
 	if (!this->module_config)
 	{
-		throw NullPointerException(
-			"cmd::ModuleCommand: module_cfg is nullptr", _ERROR_DETAILS_
-		);
+		throw NullPointerException("xw::cmd::ModuleCommand: module_cfg is nullptr", _ERROR_DETAILS_);
 	}
 
 	if (!this->settings)
 	{
-		throw NullPointerException(
-			"cmd::ModuleCommand: settings is nullptr", _ERROR_DETAILS_
-		);
+		throw NullPointerException("xw::cmd::ModuleCommand: settings is nullptr", _ERROR_DETAILS_);
 	}
 }
 

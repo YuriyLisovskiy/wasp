@@ -21,30 +21,20 @@
 
 __CORE_FLAGS_BEGIN__
 
+// TESTME: Flag
+// TODO: docs for 'Flag'
 class Flag
 {
 private:
 	friend class FlagSet;
 
 protected:
-	std::string _short_label;
-	std::string _label;
+	std::string _shorthand;
+	std::string _name;
 	std::string _usage;
 	std::string _data;
 
-	Flag(std::string short_label, std::string label, std::string usage) :
-		_short_label(std::move(short_label)), _label(std::move(label)), _usage(std::move(usage))
-	{
-		if (this->_short_label.empty())
-		{
-			throw ArgumentError("core::flags::Flag: short label can not be empty", _ERROR_DETAILS_);
-		}
-
-		if (this->_label.empty())
-		{
-			throw ArgumentError("core::flags::Flag: label can not be empty", _ERROR_DETAILS_);
-		}
-	}
+	Flag(std::string shorthand, std::string name, std::string usage);
 
 public:
 	virtual ~Flag() = default;
@@ -56,15 +46,15 @@ public:
 	}
 
 	[[nodiscard]]
-	virtual inline std::string short_label() const
+	virtual inline std::string shorthand() const
 	{
-		return this->_short_label;
+		return this->_shorthand;
 	}
 
 	[[nodiscard]]
-	virtual inline std::string label() const
+	virtual inline std::string name() const
 	{
-		return this->_label;
+		return this->_name;
 	}
 
 	[[nodiscard]]
@@ -91,6 +81,8 @@ concept is_stringifiable_c = requires(T x) {
 	std::to_string(x);
 };
 
+// TESTME: TemplateFlag
+// TODO: docs for 'TemplateFlag'
 template <class FlagT, class = std::enable_if<
 	std::is_fundamental_v<FlagT> || std::is_same_v<FlagT, std::basic_string<char>>
 >>
@@ -104,8 +96,8 @@ protected:
 
 public:
 	TemplateFlag(
-		const std::string& short_label, const std::string& label, const std::string& help, FlagT default_val
-	) : Flag(short_label, label, help), _default_val(default_val)
+		const std::string& shorthand, const std::string& name, const std::string& help, FlagT default_val
+	) : Flag(shorthand, name, help), _default_val(default_val)
 	{
 	}
 
@@ -124,16 +116,16 @@ public:
 	{
 		if (this->valid() && !this->_data.empty())
 		{
-			return {this->_label, this->_data};
+			return {this->_name, this->_data};
 		}
 
 		if constexpr (is_stringifiable_c<FlagT>)
 		{
-			return {this->_label, std::to_string(this->_default_val)};
+			return {this->_name, std::to_string(this->_default_val)};
 		}
 		else
 		{
-			return {this->_label, this->_default_val};
+			return {this->_name, this->_default_val};
 		}
 	}
 };

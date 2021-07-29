@@ -17,6 +17,8 @@
 
 __CONTROLLERS_BEGIN__
 
+// TESTME: RedirectController
+// TODO: docs for 'RedirectController'
 class RedirectController : public Controller
 {
 private:
@@ -37,7 +39,7 @@ public:
 	{
 	}
 
-	/// Return the URL redirect to.
+	// Return the URL redirect to.
 	std::string get_redirect_url();
 
 	Result<std::shared_ptr<http::IHttpResponse>> get(Kwargs* args) override;

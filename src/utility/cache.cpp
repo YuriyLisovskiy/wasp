@@ -13,12 +13,12 @@
 // Framework libraries.
 #include "./crypto/md5.h"
 #include "../http/headers.h"
-#include "./http.h"
+#include "../http/utility.h"
 
 
-__CACHE_INTERNAL_BEGIN__
+__UTIL_CACHE_INTERNAL_BEGIN__
 
-bool _if_match_passes(
+bool if_match_passes(
 	const std::string& target_etag, std::vector<std::string>& etags
 )
 {
@@ -47,7 +47,7 @@ bool _if_match_passes(
 	}
 }
 
-bool _if_none_match_passes(
+bool if_none_match_passes(
 	const std::string& target_etag, std::vector<std::string>& etags
 )
 {
@@ -79,26 +79,7 @@ bool _if_none_match_passes(
 	}
 }
 
-bool _if_modified_since_passes(
-	long last_modified, long if_modified_since
-)
-{
-	return last_modified == -1 || last_modified > if_modified_since;
-}
-
-bool _if_unmodified_since_passes(
-	long last_modified, long if_unmodified_since
-)
-{
-	return last_modified != -1 && last_modified <= if_unmodified_since;
-}
-
-std::shared_ptr<http::IHttpResponse> _precondition_failed(http::HttpRequest* request)
-{
-	return std::make_shared<http::HttpResponse>(412);
-}
-
-std::shared_ptr<http::IHttpResponse> _not_modified(
+std::shared_ptr<http::IHttpResponse> not_modified(
 	http::HttpRequest* request, http::IHttpResponse* response
 )
 {
@@ -136,18 +117,17 @@ std::shared_ptr<http::IHttpResponse> _not_modified(
 	return new_response;
 }
 
-__CACHE_INTERNAL_END__
+__UTIL_CACHE_INTERNAL_END__
 
 
-__CACHE_BEGIN__
+__UTIL_CACHE_BEGIN__
 
 void set_response_etag(http::IHttpResponse* response)
 {
 	if (!response->is_streaming() && response->content_length() > 0)
 	{
 		response->set_header(
-			http::E_TAG,
-			utils_http::quote_etag(crypto::MD5(response->get_content()).hex_digest())
+			http::E_TAG, http::quote_etag(util::crypto::MD5(response->get_content()).hex_digest())
 		);
 	}
 }
@@ -166,45 +146,37 @@ std::shared_ptr<http::IHttpResponse> get_conditional_response(
 	}
 
 	// Get HTTP request headers.
-	auto if_match_etags = utils_http::parse_etags(
-		request->headers.get(http::IF_MATCH, "")
-	);
-	long if_unmodified_since = utils_http::parse_http_date(
-		request->headers.get(http::IF_UNMODIFIED_SINCE, "")
-	);
-	auto if_none_match_etags = utils_http::parse_etags(
-		request->headers.get(http::IF_NONE_MATCH, "")
-	);
-	long if_modified_since = utils_http::parse_http_date(
-		request->headers.get(http::IF_MODIFIED_SINCE)
-	);
+	auto if_match_etags = http::parse_etags(request->headers.get(http::IF_MATCH, ""));
+	long if_unmodified_since = http::parse_http_date(request->headers.get(http::IF_UNMODIFIED_SINCE, ""));
+	auto if_none_match_etags = http::parse_etags(request->headers.get(http::IF_NONE_MATCH, ""));
+	long if_modified_since = http::parse_http_date(request->headers.get(http::IF_MODIFIED_SINCE));
 
 	// Step 1 of section 6 of RFC 7232: Test the If-Match precondition.
-	if (!if_match_etags.empty() && !internal::_if_match_passes(etag, if_match_etags))
+	if (!if_match_etags.empty() && !internal::if_match_passes(etag, if_match_etags))
 	{
-		return internal::_precondition_failed(request);
+		return internal::precondition_failed(request);
 	}
 
 	// Step 2: Test the If-Unmodified-Since precondition.
 	if (
 		if_match_etags.empty() &&
 		if_unmodified_since != -1 &&
-		!internal::_if_unmodified_since_passes(last_modified, if_unmodified_since)
+		!internal::if_unmodified_since_passes(last_modified, if_unmodified_since)
 	)
 	{
-		return internal::_precondition_failed(request);
+		return internal::precondition_failed(request);
 	}
 
 	// Step 3: Test the If-None-Match precondition.
-	if (!if_none_match_etags.empty() && !internal::_if_none_match_passes(etag, if_none_match_etags))
+	if (!if_none_match_etags.empty() && !internal::if_none_match_passes(etag, if_none_match_etags))
 	{
 		if (request->method() == "GET" || request->method() == "HEAD")
 		{
-			return internal::_not_modified(request, response);
+			return internal::not_modified(request, response);
 		}
 		else
 		{
-			return internal::_precondition_failed(request);
+			return internal::precondition_failed(request);
 		}
 	}
 
@@ -212,12 +184,12 @@ std::shared_ptr<http::IHttpResponse> get_conditional_response(
 	if (
 		if_none_match_etags.empty() &&
 		if_modified_since != -1 &&
-		!internal::_if_modified_since_passes(last_modified, if_modified_since)
+		!internal::if_modified_since_passes(last_modified, if_modified_since)
 	)
 	{
 		if (request->method() == "GET" || request->method() == "HEAD")
 		{
-			return internal::_not_modified(request, response);
+			return internal::not_modified(request, response);
 		}
 	}
 
@@ -226,4 +198,4 @@ std::shared_ptr<http::IHttpResponse> get_conditional_response(
 	return nullptr;
 }
 
-__CACHE_END__
+__UTIL_CACHE_END__

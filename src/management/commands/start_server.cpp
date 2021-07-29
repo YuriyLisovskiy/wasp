@@ -26,7 +26,7 @@ StartServerCommand::StartServerCommand(
 	if (!this->make_server)
 	{
 		throw ImproperlyConfigured(
-			"StartServerCommand: server initializer must be instantiated in order to use the application",
+			"xw::management::cmd::StartServerCommand: server initializer must be instantiated in order to use the application",
 			_ERROR_DETAILS_
 		);
 	}
@@ -45,7 +45,7 @@ StartServerCommand::StartServerCommand(
 	);
 }
 
-Kwargs StartServerCommand::get_kwargs()
+Kwargs StartServerCommand::get_kwargs() const
 {
 	auto kwargs = Command::get_kwargs();
 	kwargs.set("workers", std::to_string(this->_threads_count));
@@ -64,7 +64,7 @@ void StartServerCommand::add_flags()
 		"b", "bind", "", "Server address and port formatted as host:port"
 	);
 	this->_addr_flag = this->flag_set->make_string(
-		"h", "host", "", "Server address"
+		"n", "hostname", "", "Server address"
 	);
 	this->_port_flag = this->flag_set->make_uint16(
 		"p", "port", this->DEFAULT_PORT, "Server port"
@@ -81,15 +81,24 @@ void StartServerCommand::add_flags()
 	this->_retries_count_flag = this->flag_set->make_unsigned_long(
 		"r", "retries", this->DEFAULT_RETRIES_COUNT, "Max retries count to bind socket"
 	);
+	this->_print_help_flag = this->flag_set->make_bool(
+		"h", "help", false, "Print usage"
+	);
 }
 
 void StartServerCommand::handle()
 {
+	if (this->_print_help_flag->get())
+	{
+		std::cout << this->usage() << '\n';
+		return;
+	}
+
 	this->settings->LOGGER->use_colors(!this->_no_colors_flag->get());
 	if (!this->settings->DEBUG && this->settings->ALLOWED_HOSTS.empty())
 	{
 		throw CommandError(
-			"You must set 'allowed_hosts' if 'debug' is false.",
+			"you must set 'allowed_hosts' if 'debug' is false.",
 			_ERROR_DETAILS_
 		);
 	}
@@ -128,11 +137,9 @@ void StartServerCommand::retrieve_args()
 	auto host_port_str = this->_addr_port_flag->get();
 	if (!host_port_str.empty())
 	{
-		if (!this->_ipv4_ipv6_port_regex.match(host_port_str))
+		if (!this->_ipv4_ipv6_port_regex.search(host_port_str))
 		{
-			throw CommandError(
-				host_port_str + " is not valid host:port pair", _ERROR_DETAILS_
-			);
+			throw CommandError(host_port_str + " is not valid host:port pair", _ERROR_DETAILS_);
 		}
 
 		auto groups = this->_ipv4_ipv6_port_regex.groups();

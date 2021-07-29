@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
- * Definitions of `core` module.
+ * Definitions of 'core' module.
  */
 
 #pragma once

@@ -24,14 +24,12 @@ __HTTP_BEGIN__
 
 size_t parse_http_datetime(const std::string& http_datetime)
 {
-	return dt::Datetime::strptime(
-		http_datetime, "%a, %d %b %Y %H:%M:%S GMT"
-	).timestamp();
+	return (size_t)dt::Datetime::strptime(http_datetime, "%a, %d %b %Y %H:%M:%S GMT").timestamp();
 }
 
 std::string http_date(size_t epoch_seconds)
 {
-	return util::format_date(epoch_seconds, false, true);
+	return util::format_date((time_t)epoch_seconds, false, true);
 }
 
 void split_domain_port(
@@ -108,6 +106,98 @@ void escape_leading_slashes(std::string& url)
 core::signing::Signer get_cookie_signer(const std::string& secret_key, const std::string& salt)
 {
 	return core::signing::Signer("" + secret_key, ':', salt);
+}
+
+long parse_http_date(const std::string& date)
+{
+	if (date.empty())
+	{
+		return -1;
+	}
+
+	auto rfc_1123_date = internal::RFC1123_DATE;
+	auto rfc_850_date = internal::RFC850_DATE;
+	auto asc_time_date = internal::ASCTIME_DATE;
+	std::map<std::string, std::string> match;
+	if (rfc_1123_date.search(date))
+	{
+		match = rfc_1123_date.args();
+	}
+	else if (rfc_850_date.search(date))
+	{
+		match = rfc_850_date.args();
+	}
+	else if (asc_time_date.search(date))
+	{
+		match = asc_time_date.args();
+	}
+	else
+	{
+		return -1;
+	}
+
+	int year = std::stoi(match["year"]);
+	if (year < 100)
+	{
+		int current_year = dt::Datetime::utc_now().date().year();
+		int current_century = current_year - (current_year % 100);
+		if (year - (current_year % 100) > 50)
+		{
+			// year that appears to be more than 50 years in the future are
+			// interpreted as representing the past.
+			year += current_century - 100;
+		}
+		else
+		{
+			year += current_century;
+		}
+	}
+
+	int month = (int) util::index_of(
+			str::lower(match["mon"]),
+			internal::MONTHS.begin(),
+			internal::MONTHS.end()
+	) + 1;
+	int day = std::stoi(match["day"]);
+	int hour = std::stoi(match["hour"]);
+	int min = std::stoi(match["min"]);
+	int sec = std::stoi(match["sec"]);
+
+	auto date_time = dt::Datetime(year, month, day, hour, min, sec);
+	return (long)date_time.timestamp();
+}
+
+std::string quote_etag(const std::string& e_tag)
+{
+	auto e_tag_regex = internal::ETAG_REGEX;
+	if (e_tag_regex.match(e_tag))
+	{
+		return e_tag;
+	}
+
+	return "\"" + e_tag + "\"";
+}
+
+std::vector<std::string> parse_etags(const std::string& etag_str)
+{
+	if (str::trim(etag_str) == "*")
+	{
+		return {"*"};
+	}
+
+	// Parse each ETag individually, and return any that are valid.
+	auto etags = str::split(etag_str, ',');
+	std::vector<std::string> result;
+	auto e_tag_regex = internal::ETAG_REGEX;
+	for (const auto& etag : etags)
+	{
+		if (e_tag_regex.search(str::trim(etag)))
+		{
+			result.push_back(e_tag_regex.group(1));
+		}
+	}
+
+	return result;
 }
 
 __HTTP_END__

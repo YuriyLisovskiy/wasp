@@ -1,7 +1,7 @@
 /**
  * utils/crypto/md5.cpp
  *
- * Copyright (c) 2020 Yuriy Lisovskiy
+ * Copyright (c) 2020-2021 Yuriy Lisovskiy
  */
 
 #include "./md5.h"
@@ -11,17 +11,6 @@
 
 
 __CRYPTO_BEGIN__
-
-MD5::MD5()
-{
-	this->_init();
-}
-
-MD5::MD5(const std::string& input)
-{
-	this->_init();
-	this->update(input.c_str(), input.length());
-}
 
 MD5* MD5::clone()
 {
@@ -88,16 +77,6 @@ void MD5::update(const unsigned char input[], unsigned int n)
 	std::memcpy(&this->_buffer[index], &input[i], n - i);
 }
 
-void MD5::update(const char input[], unsigned int n)
-{
-	this->update((const unsigned char*) input, n);
-}
-
-void MD5::update(const std::string& input)
-{
-	this->update(input.c_str(), input.length());
-}
-
 std::string MD5::hex_digest()
 {
 	this->_finalize();
@@ -112,12 +91,6 @@ std::string MD5::hex_digest()
 	return std::string(buf);
 }
 
-unsigned char* MD5::digest()
-{
-	this->_finalize();
-	return this->_digest;
-}
-
 void MD5::reset()
 {
 	if (!this->_finalized)
@@ -127,16 +100,6 @@ void MD5::reset()
 	}
 
 	this->_init();
-}
-
-size_t MD5::size()
-{
-	return MD5::SIZE;
-}
-
-size_t MD5::block_size()
-{
-	return MD5::BLOCK_SIZE;
 }
 
 void MD5::_init()
@@ -292,51 +255,6 @@ void MD5::_decode(uint32 output[], const uint8 input[], unsigned int n)
 		output[i] = ((uint32) input[j]) | (((uint32) input[j + 1]) << 8) |
 		            (((uint32) input[j + 2]) << 16) | (((uint32) input[j + 3]) << 24);
 	}
-}
-
-inline MD5::uint32 MD5::F(uint32 x, uint32 y, uint32 z)
-{
-	return x & y | ~x & z;
-}
-
-inline MD5::uint32 MD5::G(uint32 x, uint32 y, uint32 z)
-{
-	return x & z | y & ~z;
-}
-
-inline MD5::uint32 MD5::H(uint32 x, uint32 y, uint32 z)
-{
-	return x ^ y ^ z;
-}
-
-inline MD5::uint32 MD5::I(uint32 x, uint32 y, uint32 z)
-{
-	return y ^ (x | ~z);
-}
-
-inline MD5::uint32 MD5::rotate_left(uint32 x, int n)
-{
-	return (x << n) | (x >> (32 - n));
-}
-
-inline void MD5::FF(uint32& a, uint32 b, uint32 c, uint32 d, uint32 x, uint32 s, uint32 ac)
-{
-	a = MD5::rotate_left(a + MD5::F(b, c, d) + x + ac, s) + b;
-}
-
-inline void MD5::GG(uint32& a, uint32 b, uint32 c, uint32 d, uint32 x, uint32 s, uint32 ac)
-{
-	a = MD5::rotate_left(a + MD5::G(b, c, d) + x + ac, s) + b;
-}
-
-inline void MD5::HH(uint32& a, uint32 b, uint32 c, uint32 d, uint32 x, uint32 s, uint32 ac)
-{
-	a = MD5::rotate_left(a + MD5::H(b, c, d) + x + ac, s) + b;
-}
-
-inline void MD5::II(uint32& a, uint32 b, uint32 c, uint32 d, uint32 x, uint32 s, uint32 ac)
-{
-	a = MD5::rotate_left(a + MD5::I(b, c, d) + x + ac, s) + b;
 }
 
 __CRYPTO_END__

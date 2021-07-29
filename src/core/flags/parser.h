@@ -18,6 +18,8 @@
 
 __CORE_FLAGS_INTERNAL_BEGIN__
 
+// TESTME: args_parser
+// TODO: docs for 'args_parser'
 struct args_parser
 {
 	std::map<std::string, std::string> flags;

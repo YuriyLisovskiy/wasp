@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
- * Definitions of `commands` module.
+ * Definitions of 'commands' module.
  */
 
 #pragma once

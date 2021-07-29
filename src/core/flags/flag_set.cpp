@@ -40,8 +40,7 @@ void FlagSet::parse(int argc, char** argv, size_t parse_from, bool is_verbose)
 	if (!ap.flags.empty())
 	{
 		throw ArgumentError(
-			"flag provided but not defined: " + ap.flags.begin()->first,
-			_ERROR_DETAILS_
+			"flag provided but not defined: " + ap.flags.begin()->first, _ERROR_DETAILS_
 		);
 	}
 }
@@ -53,66 +52,122 @@ std::string FlagSet::usage(const std::string& indent) const
 		return this->_usage;
 	}
 
-	std::string usage = indent + "Usage options:";
+	size_t max_len = 0;
 	for (auto& flag : this->_flags)
 	{
-		usage.append("\n" + indent + "  -" + flag.first.first + ", --" + flag.first.second + "\t" + flag.second->usage());
+		auto new_len = flag.first.second.size();
+		if (new_len > max_len)
+		{
+			max_len = new_len;
+		}
 	}
 
-	return usage;
+	std::string usage;
+	for (auto& flag : this->_flags)
+	{
+		std::string ind(max_len - flag.first.second.size(), ' ');
+		usage.append(indent + flag.first.first);
+		usage.append(", ");
+		usage.append(flag.first.second);
+		usage.append(ind + "   " + flag.second->usage() + "\n");
+	}
+
+	return str::rtrim(usage, '\n');
 }
 
 std::shared_ptr<Uint16Flag> FlagSet::make_uint16(
-	const std::string& short_label, const std::string& label, uint16_t default_val, const std::string& usage
+	const std::string& shorthand, const std::string& name, uint16_t default_val, const std::string& usage
 )
 {
-	auto flag = std::make_shared<Uint16Flag>(short_label, label, usage, default_val);
-	this->_flags[{short_label, label}] = flag;
+	auto flag = std::make_shared<Uint16Flag>(shorthand, name, usage, default_val);
+	if (this->_flags.find({flag->shorthand(), flag->name()}) != this->_flags.end())
+	{
+		throw ValueError(
+			"flag <" + flag->shorthand() + ", " + flag->name() + "> already exists", _ERROR_DETAILS_
+		);
+	}
+
+	this->_flags[{flag->shorthand(), flag->name()}] = flag;
 	return flag;
 }
 
 std::shared_ptr<UnsignedLongFlag> FlagSet::make_unsigned_long(
-	const std::string& short_label, const std::string& label, unsigned long default_val, const std::string& usage
+	const std::string& shorthand, const std::string& name, unsigned long default_val, const std::string& usage
 )
 {
-	auto flag = std::make_shared<UnsignedLongFlag>(short_label, label, usage, default_val);
-	this->_flags[{short_label, label}] = flag;
+	auto flag = std::make_shared<UnsignedLongFlag>(shorthand, name, usage, default_val);
+	if (this->_flags.find({flag->shorthand(), flag->name()}) != this->_flags.end())
+	{
+		throw ValueError(
+			"flag <" + flag->shorthand() + ", " + flag->name() + "> already exists", _ERROR_DETAILS_
+		);
+	}
+
+	this->_flags[{flag->shorthand(), flag->name()}] = flag;
 	return flag;
 }
 
 std::shared_ptr<LongIntFlag> FlagSet::make_long(
-	const std::string& short_label, const std::string& label, long default_val, const std::string& usage
+	const std::string& shorthand, const std::string& name, long default_val, const std::string& usage
 )
 {
-	auto flag = std::make_shared<LongIntFlag>(short_label, label, usage, default_val);
-	this->_flags[{short_label, label}] = flag;
+	auto flag = std::make_shared<LongIntFlag>(shorthand, name, usage, default_val);
+	if (this->_flags.find({flag->shorthand(), flag->name()}) != this->_flags.end())
+	{
+		throw ValueError(
+			"flag <" + flag->shorthand() + ", " + flag->name() + "> already exists", _ERROR_DETAILS_
+		);
+	}
+
+	this->_flags[{flag->shorthand(), flag->name()}] = flag;
 	return flag;
 }
 
 std::shared_ptr<DoubleFlag> FlagSet::make_double(
-	const std::string& short_label, const std::string& label, double default_val, const std::string& usage
+	const std::string& shorthand, const std::string& name, double default_val, const std::string& usage
 )
 {
-	auto flag = std::make_shared<DoubleFlag>(short_label, label, usage, default_val);
-	this->_flags[{short_label, label}] = flag;
+	auto flag = std::make_shared<DoubleFlag>(shorthand, name, usage, default_val);
+	if (this->_flags.find({flag->shorthand(), flag->name()}) != this->_flags.end())
+	{
+		throw ValueError(
+			"flag <" + flag->shorthand() + ", " + flag->name() + "> already exists", _ERROR_DETAILS_
+		);
+	}
+
+	this->_flags[{flag->shorthand(), flag->name()}] = flag;
 	return flag;
 }
 
 std::shared_ptr<StringFlag> FlagSet::make_string(
-	const std::string& short_label, const std::string& label, const std::string& default_val, const std::string& usage
+	const std::string& shorthand, const std::string& name, const std::string& default_val, const std::string& usage
 )
 {
-	auto flag = std::make_shared<StringFlag>(short_label, label, usage, default_val);
-	this->_flags[{short_label, label}] = flag;
+	auto flag = std::make_shared<StringFlag>(shorthand, name, usage, default_val);
+	if (this->_flags.find({flag->shorthand(), flag->name()}) != this->_flags.end())
+	{
+		throw ValueError(
+			"flag <" + flag->shorthand() + ", " + flag->name() + "> already exists", _ERROR_DETAILS_
+		);
+	}
+
+	this->_flags[{flag->shorthand(), flag->name()}] = flag;
 	return flag;
 }
 
 std::shared_ptr<BoolFlag> FlagSet::make_bool(
-	const std::string& short_label, const std::string& label, bool default_val, const std::string& usage
+	const std::string& shorthand, const std::string& name, bool default_val, const std::string& usage
 )
 {
-	auto flag = std::make_shared<BoolFlag>(short_label, label, usage, default_val);
-	this->_flags[{short_label, label}] = flag;
+	auto flag = std::make_shared<BoolFlag>(shorthand, name, usage, default_val);
+	if (this->_flags.find({flag->shorthand(), flag->name()}) != this->_flags.end())
+	{
+		throw ValueError(
+			"flag <" + flag->shorthand() + ", " + flag->name() + "> already exists", _ERROR_DETAILS_
+		);
+	}
+
+	this->_flags[{flag->shorthand(), flag->name()}] = flag;
 	return flag;
 }
 

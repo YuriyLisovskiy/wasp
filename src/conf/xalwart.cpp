@@ -40,14 +40,27 @@ MainApplication::MainApplication(
 
 	this->_setup_commands();
 
+	size_t max_len = 0;
 	for (auto& command : this->_commands)
 	{
-		this->_help_message += command.second->usage() + '\n';
+		auto new_len = command.second->name().size();
+		if (new_len > max_len)
+		{
+			max_len = new_len;
+		}
+	}
+
+	for (auto& command : this->_commands)
+	{
+		std::string indent(max_len - command.second->name().size(), ' ');
+		this->_help_message += "  " + command.second->name() + indent + "  " + command.second->help_message() + '\n';
 	}
 
 	if (!this->_help_message.empty())
 	{
-		this->_help_message = "Available commands:\n\n" + this->_help_message;
+		this->_help_message = "Usage:\n  application [command]\n\n"
+			"Available Commands:\n" + this->_help_message +
+			"\nUse \"application [command] --help\" for more information about a command.";
 	}
 	else
 	{

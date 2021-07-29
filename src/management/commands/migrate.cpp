@@ -15,9 +15,7 @@ __MANAGEMENT_COMMANDS_BEGIN__
 MigrateCommand::MigrateCommand(
 	conf::IModuleConfig* config,
 	conf::Settings* settings
-) : Command(
-	config, settings, "migrate", "Migrates changes to the database"
-)
+) : Command(config, settings, "migrate", "Migrates changes to the database")
 {
 }
 
@@ -35,10 +33,19 @@ void MigrateCommand::add_flags()
 	this->_no_colors_flag = this->flag_set->make_bool(
 		"c", "colors", true, "Enables colors in logs"
 	);
+	this->_print_help_flag = this->flag_set->make_bool(
+		"h", "help", false, "Print usage"
+	);
 }
 
 void MigrateCommand::handle()
 {
+	if (this->_print_help_flag->get())
+	{
+		std::cout << this->usage() << '\n';
+		return;
+	}
+
 	this->settings->LOGGER->use_colors(!this->_no_colors_flag->get());
 	auto db_name = this->_db_flag->get();
 	if (this->settings->DATABASES.find(db_name) == this->settings->DATABASES.end())

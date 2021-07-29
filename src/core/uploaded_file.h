@@ -18,6 +18,7 @@
 __CORE_FILES_BEGIN__
 
 // TESTME: UploadedFile
+// TODO: docs for 'UploadedFile'
 class UploadedFile
 {
 private:

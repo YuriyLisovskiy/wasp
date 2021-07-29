@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
- * Purpose: main module's definitions.
+ * Definitions of main module.
  */
 
 #pragma once

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2020-2021 Yuriy Lisovskiy
  *
- * Definitions of `core/signing` module.
+ * Definitions of 'core/signing' module.
  */
 
 #pragma once

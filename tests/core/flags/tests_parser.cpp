@@ -36,7 +36,7 @@ TEST(TestCase_args_parser, parseValid)
 
 TEST(TestCase_args_parser, parseInvalidValid)
 {
-	std::vector<std::string> arguments = {"--host=localhost", "--retries", "5", "-ports", "1,2,3,4,5"};
+	std::vector<std::string> arguments = {"--host=localhost", "--retries", "5", "ports", "1,2,3,4,5"};
 	std::vector<char*> argv;
 	argv.reserve(arguments.size());
 	for (const auto& arg : arguments)

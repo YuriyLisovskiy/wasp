@@ -11,13 +11,13 @@
 #include <xalwart.base/string_utils.h>
 
 // Framework libraries.
-#include "../../utils/crypto/hmac.h"
+#include "../../utility/crypto/hmac.h"
 
 
 __CORE_SIGNING_BEGIN__
 
 Signer::Signer(
-	const std::string& key, char sep, const std::string& salt, crypto::IHash* hash_func
+	const std::string& key, char sep, const std::string& salt, util::crypto::abc::IHash* hash_func
 )
 {
 	if (key.empty())
@@ -50,7 +50,7 @@ Signer::Signer(
 
 std::string Signer::signature(const std::string& value) const
 {
-	return crypto::salted_hmac(
+	return util::crypto::salted_hmac(
 		this->_salt + "signer", value, this->_key, this->_hash_func
 	)->hex_digest();
 }

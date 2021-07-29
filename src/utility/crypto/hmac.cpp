@@ -15,7 +15,7 @@
 
 __CRYPTO_BEGIN__
 
-HMAC::HMAC(std::string key, IHash* hash_func)
+HMAC::HMAC(std::string key, abc::IHash* hash_func)
 {
 	if (hash_func)
 	{
@@ -62,43 +62,6 @@ HMAC::~HMAC()
 	delete this->_inner;
 }
 
-void HMAC::update(const unsigned char input[], unsigned int n)
-{
-	this->_inner->update(input, n);
-}
-
-void HMAC::update(const char input[], unsigned int n)
-{
-	this->_inner->update(input, n);
-}
-
-void HMAC::update(const std::string& input)
-{
-	this->_inner->update(input);
-}
-
-size_t HMAC::size() const
-{
-	return this->_size;
-}
-
-size_t HMAC::block_size() const
-{
-	return this->_block_size;
-}
-
-unsigned char* HMAC::digest()
-{
-	this->_prepare_outer();
-	return this->_outer->digest();
-}
-
-std::string HMAC::hex_digest()
-{
-	this->_prepare_outer();
-	return this->_outer->hex_digest();
-}
-
 void HMAC::_prepare_outer()
 {
 	auto inner_sum = this->_inner->digest();
@@ -111,12 +74,12 @@ std::shared_ptr<HMAC> salted_hmac(
 	const std::string& salt,
 	const std::string& value,
 	const std::string& secret_key,
-	IHash* hash_func
+	abc::IHash* hash_func
 )
 {
 	if (secret_key.empty())
 	{
-		throw ValueError("Secret: key can not be empty", _ERROR_DETAILS_);
+		throw ValueError("'secret_key' can not be empty", _ERROR_DETAILS_);
 	}
 
 	bool is_default_hf = !hash_func;
