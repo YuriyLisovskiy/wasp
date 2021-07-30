@@ -13,7 +13,7 @@ using namespace xw;
 
 TEST(TestCase_args_parser, parseValid)
 {
-	std::vector<std::string> arguments = {"./program", "--host=localhost", "--retries", "5", "--ports", "1,2,3,4,5"};
+	std::vector<std::string> arguments = {"./program", "--host=localhost", "--retries", "5", "-p", "1,2,3,4,5"};
 	std::vector<char*> argv;
 	argv.reserve(arguments.size());
 	for (const auto& arg : arguments)
@@ -25,7 +25,7 @@ TEST(TestCase_args_parser, parseValid)
 	core::flags::internal::args_parser parser((int)argv.size() - 1, argv.data(), 1, false);
 
 	std::map<std::string, std::string> expected = {
-		{"host", "localhost"}, {"retries", "5"}, {"ports", "1,2,3,4,5"}
+		{"--host", "localhost"}, {"--retries", "5"}, {"-p", "1,2,3,4,5"}
 	};
 	ASSERT_EQ(expected.size(), parser.flags.size());
 	for (const auto& item : expected)
@@ -48,7 +48,7 @@ TEST(TestCase_args_parser, parseInvalidValid)
 
 	core::flags::internal::args_parser parser((int)argv.size() - 1, argv.data(), 0, false);
 	std::map<std::string, std::string> expected = {
-		{"host", "localhost"}, {"retries", "1,2,3,4,5"}
+		{"--host", "localhost"}, {"--retries", "1,2,3,4,5"}
 	};
 	ASSERT_EQ(expected.size(), parser.flags.size());
 	for (const auto& item : expected)
