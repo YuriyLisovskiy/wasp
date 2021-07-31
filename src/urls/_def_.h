@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
- * Definitions of `urls` module.
+ * Definitions of 'urls' module.
  */
 
 #pragma once

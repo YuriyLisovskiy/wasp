@@ -3,9 +3,9 @@
  *
  * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
- * Purpose: used for mapping url pattern to it's handler.
+ * Url pattern mapping to it's handler.
  *
- * 	Pattern example: /profile/<user_id>(\d+)/?
+ * Example: /profile/<user_id>(\d+)/?
  */
 
 #pragma once
@@ -36,6 +36,8 @@ typedef std::function<Result<std::shared_ptr<http::IHttpResponse>>(
 	http::HttpRequest*, Kwargs*, conf::Settings*
 )> ControllerHandler;
 
+// TESTME: UrlPattern
+// TODO: docs for 'UrlPattern'
 class UrlPattern final
 {
 private:
@@ -47,25 +49,39 @@ private:
 	std::string _namespace;
 
 public:
-	UrlPattern(
-		const std::string& rgx,
-		const ControllerHandler& handler,
-		const std::string& name
-	);
+	UrlPattern(const std::string& rgx, ControllerHandler handler, std::string name);
+
 	UrlPattern(
 		const std::string& prefix,
 		const std::shared_ptr<UrlPattern>& url_pattern,
 		const std::string& namespace_
 	);
 
-	[[nodiscard]] std::string get_name() const;
-	Result<std::shared_ptr<http::IHttpResponse>> apply(
-		http::HttpRequest* request,
-		conf::Settings* settings,
-		Kwargs* kwargs=nullptr
-	);
+	[[nodiscard]]
+	inline std::string get_name() const
+	{
+		return this->_name;
+	}
+
+	inline Result<std::shared_ptr<http::IHttpResponse>> apply(
+		http::HttpRequest* request, conf::Settings* settings, Kwargs* kwargs=nullptr
+	)
+	{
+		return this->_handler(request, kwargs, settings);
+	}
+
 	bool match(const std::string& url, std::map<std::string, std::string>& args);
-	[[nodiscard]] std::string build(const std::vector<std::string>& args) const;
+
+	[[nodiscard]]
+	std::string build(const std::vector<std::string>& args) const;
 };
+
+// TESTME: make_static
+// TODO: docs for 'make_static'
+extern std::shared_ptr<urls::UrlPattern> make_static(
+	const std::string& static_url,
+	const std::string& static_root,
+	const std::string& name=""
+);
 
 __URLS_END__

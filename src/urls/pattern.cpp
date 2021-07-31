@@ -10,14 +10,14 @@
 #include <xalwart.base/exceptions.h>
 #include <xalwart.base/string_utils.h>
 
+// Framework libraries.
+#include "../controllers/static.h"
+
 
 __URLS_BEGIN__
 
-UrlPattern::UrlPattern(
-	const std::string& rgx,
-	const ControllerHandler& handler,
-	const std::string& name
-) : _regex(rgx)
+UrlPattern::UrlPattern(const std::string& rgx, ControllerHandler handler, std::string name) :
+	_regex(rgx), _handler(std::move(handler)), _name(std::move(name))
 {
 	this->_orig = this->_regex.str();
 	this->_pattern_parts = this->_regex.parts();
@@ -30,9 +30,6 @@ UrlPattern::UrlPattern(
 
 		this->_pattern_parts.back() = str::rtrim(this->_pattern_parts.back(), "/");
 	}
-
-	this->_handler = handler;
-	this->_name = name;
 }
 
 UrlPattern::UrlPattern(
@@ -40,23 +37,9 @@ UrlPattern::UrlPattern(
 	const std::shared_ptr<UrlPattern>& url_pattern,
 	const std::string& namespace_
 ) : UrlPattern(
-	prefix + url_pattern->_orig,
-	url_pattern->_handler,
-	namespace_ + "::" + url_pattern->_name
+	prefix + url_pattern->_orig, url_pattern->_handler, namespace_ + "::" + url_pattern->_name
 )
 {
-}
-
-std::string UrlPattern::get_name() const
-{
-	return this->_name;
-}
-
-Result<std::shared_ptr<http::IHttpResponse>> UrlPattern::apply(
-	http::HttpRequest* request, conf::Settings* settings, Kwargs* kwargs
-)
-{
-	return this->_handler(request, kwargs, settings);
 }
 
 bool UrlPattern::match(const std::string& url, std::map<std::string, std::string>& args)
@@ -97,8 +80,34 @@ std::string UrlPattern::build(const std::vector<std::string>& args) const
 	}
 
 	throw AttributeError(
-		"Unable to build url: arguments do not match pattern '" + this->_orig + "'",
+		"unable to build url: arguments do not match pattern '" + this->_orig + "'",
 		_ERROR_DETAILS_
+	);
+}
+
+std::shared_ptr<urls::UrlPattern> make_static(
+	const std::string& static_url, const std::string& static_root, const std::string& name
+)
+{
+	if (static_url.empty())
+	{
+		throw ImproperlyConfigured("empty static url not permitted", _ERROR_DETAILS_);
+	}
+
+	auto controller_func = [static_root](
+		http::HttpRequest* request, Kwargs* args, conf::Settings* settings
+	) -> Result<std::shared_ptr<http::IHttpResponse>>
+	{
+		ctrl::StaticController controller(settings);
+		controller.set_kwargs(Kwargs({
+			{"document_root", static_root}
+		}));
+		controller.setup(request);
+		return controller.dispatch(args);
+	};
+
+	return std::make_shared<UrlPattern>(
+		str::rtrim(static_url, "/") + "/" + "<path>(.*)", controller_func, name.empty() ? "static" : name
 	);
 }
 

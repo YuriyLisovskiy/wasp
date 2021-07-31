@@ -18,7 +18,6 @@
 // Framework libraries.
 #include "./abc.h"
 #include "../controllers/controller.h"
-#include "../urls/url.h"
 #include "../commands/command.h"
 
 
@@ -78,7 +77,7 @@ protected:
 			return controller.dispatch(kwargs);
 		};
 
-		this->_urlpatterns.push_back(urls::make_url(
+		this->_urlpatterns.push_back(std::make_shared<urls::UrlPattern>(
 			pattern.starts_with("/") ? pattern : "/" + pattern,
 			controller_handler,
 			name
