@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
- * Purpose:	abstract base classes for middleware module.
+ * Abstract base classes for middleware module.
  */
 
 #pragma once

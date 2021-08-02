@@ -1,9 +1,10 @@
 /**
  * middleware/cookies.h
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
- * Purpose: enables cookies in http request object.
+ * Sets cookies in http request object using cookie parser.
+ *
  */
 
 #pragma once
@@ -12,21 +13,30 @@
 #include "./_def_.h"
 
 // Framework libraries.
-#include "./middleware_mixin.h"
+#include "./base.h"
+#include "../http/internal/cookie_parser.h"
 
 
 __MIDDLEWARE_BEGIN__
 
-class CookieMiddleware final : public MiddlewareMixin
+// TESTME: CookieMiddleware
+// TODO: docs for 'CookieMiddleware'
+class CookieMiddleware final : public BaseMiddleware
 {
 public:
-	static const std::string FULL_NAME;
+	inline static const std::string FULL_NAME = "xw::middleware::CookieMiddleware";
 
-	explicit CookieMiddleware(conf::Settings* settings);
+	explicit CookieMiddleware(conf::Settings* settings) : BaseMiddleware(settings)
+	{
+	}
 
-	Result<std::shared_ptr<http::IHttpResponse>> process_request(
-		http::HttpRequest* request
-	) final;
+	inline Result<std::shared_ptr<http::IHttpResponse>> process_request(http::HttpRequest* request) override
+	{
+		request->COOKIES = collections::Dictionary(
+			http::internal::parse_cookie(request->headers.get("Cookie", ""), "")
+		);
+		return this->none();
+	}
 };
 
 __MIDDLEWARE_END__

@@ -1,12 +1,11 @@
 /**
  * middleware/http.h
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
- * Purpose:
- * 	Handle conditional GET operations. If the response has an ETag or
- * 	Last-Modified header and the request has If-None-Match or If-Modified-Since,
- * 	replace the response with HttpNotModified. Add an ETag header if needed.
+ * Handle conditional GET operations. If the response has an ETag or
+ * Last-Modified header and the request has If-None-Match or If-Modified-Since,
+ * replace the response with HttpNotModified. Add an ETag header if needed.
  */
 
 #pragma once
@@ -15,15 +14,16 @@
 #include "./_def_.h"
 
 // Framework libraries.
-#include "./middleware_mixin.h"
+#include "./base.h"
 
 
 __MIDDLEWARE_BEGIN__
 
-class ConditionalGetMiddleware : public MiddlewareMixin
+// TESTME: ConditionalGetMiddleware
+class ConditionalGetMiddleware : public BaseMiddleware
 {
 public:
-	static const std::string FULL_NAME;
+	inline static const std::string FULL_NAME = "xw::middleware::ConditionalGetMiddleware";
 
 protected:
 
@@ -31,7 +31,9 @@ protected:
 	static bool needs_etag(http::IHttpResponse* response);
 
 public:
-	explicit ConditionalGetMiddleware(conf::Settings* settings);
+	inline explicit ConditionalGetMiddleware(conf::Settings* settings) : BaseMiddleware(settings)
+	{
+	}
 
 	Result<std::shared_ptr<http::IHttpResponse>> process_response(
 		http::HttpRequest* request, http::IHttpResponse* response

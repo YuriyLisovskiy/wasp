@@ -15,11 +15,7 @@
 
 __MIDDLEWARE_BEGIN__
 
-const std::string SecurityMiddleware::FULL_NAME = "xw::middleware::SecurityMiddleware";
-
-SecurityMiddleware::SecurityMiddleware(
-	conf::Settings* settings
-) : MiddlewareMixin(settings)
+SecurityMiddleware::SecurityMiddleware(conf::Settings* settings) : BaseMiddleware(settings)
 {
 	this->sts_seconds = settings->SECURE_HSTS_SECONDS;
 	this->sts_include_subdomains = settings->SECURE_HSTS_INCLUDE_SUBDOMAINS;
@@ -35,9 +31,7 @@ SecurityMiddleware::SecurityMiddleware(
 	}
 }
 
-Result<std::shared_ptr<http::IHttpResponse>> SecurityMiddleware::process_request(
-	http::HttpRequest* request
-)
+Result<std::shared_ptr<http::IHttpResponse>> SecurityMiddleware::process_request(http::HttpRequest* request)
 {
 	auto path = str::ltrim(request->path(), "/");
 	bool matched = false;

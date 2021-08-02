@@ -9,7 +9,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../../../src/http/parsers/cookie_parser.h"
+#include "../../../src/http/internal/cookie_parser.h"
 
 using namespace xw;
 
@@ -27,9 +27,7 @@ protected:
 
 	void SetUp() override
 	{
-		auto parser = http::internal::cookie_parser();
-		parser.parse(COOKIES);
-		this->parsedMap = parser.result;
+		this->parsedMap = http::internal::parse_cookie(COOKIES, "");
 	}
 };
 

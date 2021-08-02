@@ -17,21 +17,13 @@
 
 __MIDDLEWARE_BEGIN__
 
-const std::string ConditionalGetMiddleware::FULL_NAME = "xw::middleware::ConditionalGetMiddleware";
-
-ConditionalGetMiddleware::ConditionalGetMiddleware(
-	conf::Settings* settings
-) : MiddlewareMixin(settings)
-{
-}
-
 Result<std::shared_ptr<http::IHttpResponse>> ConditionalGetMiddleware::process_response(
 	http::HttpRequest* request, http::IHttpResponse* response
 )
 {
-	/// It's too late to prevent an unsafe request with a 412 response, and
-	/// for a HEAD request, the response body is always empty so computing
-	/// an accurate ETag isn't possible.
+	// It's too late to prevent an unsafe request with a 412 response, and
+	// for a HEAD request, the response body is always empty so computing
+	// an accurate ETag isn't possible.
 	if (request->method() != "GET")
 	{
 		return this->none();
@@ -58,9 +50,7 @@ Result<std::shared_ptr<http::IHttpResponse>> ConditionalGetMiddleware::process_r
 	return this->none();
 }
 
-bool ConditionalGetMiddleware::needs_etag(
-	http::IHttpResponse* response
-)
+bool ConditionalGetMiddleware::needs_etag(http::IHttpResponse* response)
 {
 	auto cache_control = str::split(
 		response->get_header(http::CACHE_CONTROL, ""), ','

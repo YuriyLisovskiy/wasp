@@ -12,7 +12,7 @@
 // Framework libraries.
 #include "../management/module.h"
 #include "../http/url.h"
-#include "../http/parsers/multipart_parser.h"
+#include "../http/internal/multipart_parser.h"
 #include "../urls/resolver.h"
 
 

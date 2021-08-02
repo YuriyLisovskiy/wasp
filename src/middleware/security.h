@@ -1,9 +1,9 @@
 /**
  * middleware/security.h
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
- * Purpose: TODO
+ * TODO: docs
  */
 
 #pragma once
@@ -16,15 +16,17 @@
 #include "./_def_.h"
 
 // Framework libraries.
-#include "./middleware_mixin.h"
+#include "./base.h"
 
 
 __MIDDLEWARE_BEGIN__
 
-class SecurityMiddleware : public MiddlewareMixin
+// TESTME: SecurityMiddleware
+// TODO: docs for 'SecurityMiddleware'
+class SecurityMiddleware : public BaseMiddleware
 {
 public:
-	static const std::string FULL_NAME;
+	inline static const std::string FULL_NAME = "xw::middleware::SecurityMiddleware";
 
 protected:
 	size_t sts_seconds;
@@ -40,9 +42,7 @@ protected:
 public:
 	explicit SecurityMiddleware(conf::Settings* settings);
 
-	Result<std::shared_ptr<http::IHttpResponse>> process_request(
-		http::HttpRequest* request
-	) override;
+	Result<std::shared_ptr<http::IHttpResponse>> process_request(http::HttpRequest* request) override;
 	Result<std::shared_ptr<http::IHttpResponse>> process_response(
 		http::HttpRequest* request, http::IHttpResponse* response
 	) override;

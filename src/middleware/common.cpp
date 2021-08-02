@@ -17,22 +17,6 @@
 
 __MIDDLEWARE_BEGIN__
 
-const std::string CommonMiddleware::FULL_NAME = "xw::middleware::CommonMiddleware";
-
-CommonMiddleware::CommonMiddleware(conf::Settings* settings)
-	: MiddlewareMixin(settings)
-{
-}
-
-Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::get_response_redirect(
-	const std::string& redirect_to
-)
-{
-	return Result<std::shared_ptr<http::IHttpResponse>>(
-		std::make_shared<http::HttpResponsePermanentRedirect>(redirect_to)
-	);
-}
-
 bool CommonMiddleware::should_redirect_with_slash(http::HttpRequest* request)
 {
 	if (this->settings->APPEND_SLASH && !request->path().ends_with("/"))

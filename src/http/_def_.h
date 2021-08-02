@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
- * Purpose: http module's definitions.
+ * Definitions of 'http' module.
  */
 
 #pragma once
