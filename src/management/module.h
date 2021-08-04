@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
- * Purpose: management module's config.
+ * Management module's config.
  */
 
 #pragma once
@@ -20,7 +20,9 @@
 
 __MANAGEMENT_BEGIN__
 
-class CoreManagementModuleConfig final : public conf::ModuleConfig
+// TESTME: CoreModuleConfig
+// TODO: docs for 'CoreModuleConfig'
+class CoreModuleConfig final : public conf::ModuleConfig
 {
 private:
 	std::function<std::shared_ptr<net::abc::IServer>(
@@ -28,7 +30,7 @@ private:
 	)> _make_server;
 
 public:
-	explicit CoreManagementModuleConfig(
+	explicit CoreModuleConfig(
 		conf::Settings* settings,
 		std::function<std::shared_ptr<net::abc::IServer>(
 			log::ILogger*, const Kwargs&, std::shared_ptr<dt::Timezone>

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2021 Yuriy Lisovskiy
  *
- * Migrates changes to the database.
+ * Command to migrate changes to the database.
  */
 
 #pragma once
@@ -17,6 +17,8 @@
 
 __MANAGEMENT_COMMANDS_BEGIN__
 
+// TESTME: MigrateCommand
+// TODO: docs for 'MigrateCommand'
 class MigrateCommand final : public xw::cmd::Command
 {
 private:
@@ -38,7 +40,10 @@ protected:
 	void handle() final;
 
 public:
-	explicit MigrateCommand(conf::IModuleConfig* config, conf::Settings* settings);
+	inline explicit MigrateCommand(conf::IModuleConfig* config, conf::Settings* settings) :
+		Command(config, settings, "migrate", "Migrates changes to the database")
+	{
+	}
 };
 
 __MANAGEMENT_COMMANDS_END__

@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
- * Purpose: runs server from command line.
+ * Command to run the server from command line.
  */
 
 #pragma once
@@ -21,6 +21,8 @@
 
 __MANAGEMENT_COMMANDS_BEGIN__
 
+// TESTME: StartServerCommand
+// TODO: docs for 'StartServerCommand'
 class StartServerCommand final : public xw::cmd::Command
 {
 private:

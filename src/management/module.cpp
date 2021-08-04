@@ -13,7 +13,7 @@
 
 __MANAGEMENT_BEGIN__
 
-CoreManagementModuleConfig::CoreManagementModuleConfig(
+CoreModuleConfig::CoreModuleConfig(
 	conf::Settings* settings,
 	std::function<std::shared_ptr<net::abc::IServer>(
 		log::ILogger*, const Kwargs&, std::shared_ptr<dt::Timezone>
@@ -22,10 +22,10 @@ CoreManagementModuleConfig::CoreManagementModuleConfig(
 {
 }
 
-void CoreManagementModuleConfig::commands()
+void CoreModuleConfig::commands()
 {
-	this->command<cmd::StartServerCommand>(this, this->settings, this->_make_server);
 	this->command<cmd::MigrateCommand>(this, this->settings);
+	this->command<cmd::StartServerCommand>(this, this->settings, this->_make_server);
 }
 
 __MANAGEMENT_END__

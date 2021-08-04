@@ -12,13 +12,6 @@
 
 __MANAGEMENT_COMMANDS_BEGIN__
 
-MigrateCommand::MigrateCommand(
-	conf::IModuleConfig* config,
-	conf::Settings* settings
-) : Command(config, settings, "migrate", "Migrates changes to the database")
-{
-}
-
 void MigrateCommand::add_flags()
 {
 	this->_db_flag = this->flag_set->make_string(

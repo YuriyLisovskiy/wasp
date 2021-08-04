@@ -26,7 +26,7 @@ StartServerCommand::StartServerCommand(
 	if (!this->make_server)
 	{
 		throw ImproperlyConfigured(
-			"xw::management::cmd::StartServerCommand: server initializer must be instantiated in order to use the application",
+			"xw::mgmt::cmd::StartServerCommand: server initializer must be instantiated in order to use the application",
 			_ERROR_DETAILS_
 		);
 	}
