@@ -15,7 +15,7 @@
 #include "./_def_.h"
 
 // Framework libraries.
-#include "../../urls/pattern.h"
+#include "../../urls/abc.h"
 
 
 __RENDER_TAGS_BEGIN__
@@ -24,7 +24,7 @@ const std::string TAG_NAME_URL = "url";
 
 struct url_node : public node
 {
-	std::shared_ptr<urls::UrlPattern> pattern;
+	std::shared_ptr<urls::IPattern> pattern;
 	std::vector<std::shared_ptr<FilterExpression>> params;
 	std::string var_name;
 
@@ -33,6 +33,6 @@ struct url_node : public node
 
 extern std::function<std::shared_ptr<internal::node>(
 	internal::parser*, internal::token_t& token
-)> make_url_tag(const std::vector<std::shared_ptr<urls::UrlPattern>>& patterns);
+)> make_url_tag(const std::vector<std::shared_ptr<urls::IPattern>>& patterns);
 
 __RENDER_TAGS_END__

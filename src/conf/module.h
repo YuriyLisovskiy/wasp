@@ -17,6 +17,7 @@
 
 // Framework libraries.
 #include "./abc.h"
+#include "../urls/pattern.h"
 #include "../controllers/controller.h"
 #include "../commands/command.h"
 
@@ -32,7 +33,7 @@ private:
 
 	friend class conf::Settings;
 
-	std::vector<std::shared_ptr<urls::UrlPattern>> _urlpatterns;
+	std::vector<std::shared_ptr<urls::IPattern>> _urlpatterns;
 	std::vector<std::shared_ptr<cmd::BaseCommand>> _commands;
 	std::vector<std::function<void()>> _sub_modules_to_init;
 
@@ -64,20 +65,25 @@ protected:
 		std::string app_path, conf::Settings* settings
 	);
 
-	template <typename ControllerT, typename = std::enable_if<std::is_base_of<ctrl::Controller, ControllerT>::value>>
+	template <
+		typename ControllerT, typename ...ArgsT,
+		typename = std::enable_if<std::is_base_of<ctrl::Controller<ArgsT...>, ControllerT>::value>
+	>
 	inline void url(const std::string& pattern, const std::string& name="")
 	{
-		ctrl::Handler controller_handler = [this](
-			http::HttpRequest* request,
-			Kwargs* kwargs, conf::Settings* settings_ptr
+		ctrl::Handler<ArgsT...> controller_handler = [this](
+			http::HttpRequest* request, const std::tuple<ArgsT...>& args, conf::Settings* settings_ptr
 		) -> Result<std::shared_ptr<http::IHttpResponse>>
 		{
 			ControllerT controller(settings_ptr);
 			controller.setup(request);
-			return controller.dispatch(kwargs);
+			return std::apply(
+				[controller](ArgsT ...a) mutable -> auto { return controller.dispatch(a...); },
+				args
+			);
 		};
 
-		this->_urlpatterns.push_back(std::make_shared<urls::UrlPattern>(
+		this->_urlpatterns.push_back(std::make_shared<urls::Pattern<ArgsT...>>(
 			pattern.starts_with("/") ? pattern : "/" + pattern,
 			controller_handler,
 			name
@@ -94,11 +100,14 @@ protected:
 			auto ns = namespace_.empty() ? app->get_name() : namespace_;
 			for (const auto& pattern : included_urlpatterns)
 			{
-				this->_urlpatterns.push_back(std::make_shared<urls::UrlPattern>(
-					str::rtrim(prefix.starts_with("/") ? prefix : "/" + prefix, "/"),
-					pattern,
-					ns
-				));
+				pattern->add_namespace(ns);
+				pattern->add_prefix(str::rtrim(prefix.starts_with("/") ? prefix : "/" + prefix, "/"));
+				this->_urlpatterns.push_back(pattern);
+//				this->_urlpatterns.push_back(std::make_shared<urls::Pattern<>>(
+//					str::rtrim(prefix.starts_with("/") ? prefix : "/" + prefix, "/"),
+//					pattern,
+//					ns
+//				));
 			}
 		});
 	}
@@ -132,7 +141,7 @@ public:
 	std::string get_module_path() const final;
 
 	[[nodiscard]]
-	std::vector<std::shared_ptr<urls::UrlPattern>> get_urlpatterns() final;
+	std::vector<std::shared_ptr<urls::IPattern>> get_urlpatterns() final;
 
 	[[nodiscard]]
 	std::vector<std::shared_ptr<cmd::BaseCommand>> get_commands() final;

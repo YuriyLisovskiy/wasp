@@ -38,7 +38,7 @@ std::string ModuleConfig::get_module_path() const
 	return this->module_path;
 }
 
-std::vector<std::shared_ptr<urls::UrlPattern>> ModuleConfig::get_urlpatterns()
+std::vector<std::shared_ptr<urls::IPattern>> ModuleConfig::get_urlpatterns()
 {
 	if (this->_urlpatterns.empty())
 	{

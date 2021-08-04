@@ -75,7 +75,7 @@ public:
 	// Vector of patterns which will be loaded from ROOT_MODULE.
 	// To change this setting, setup ROOT_MODULE in your project
 	// settings.
-	std::vector<std::shared_ptr<urls::UrlPattern>> ROOT_URLCONF;
+	std::vector<std::shared_ptr<urls::IPattern>> ROOT_URLCONF;
 
 	// List of ModuleConfig-derived objects representing modules.
 	// Order is required. The first item is interpreted as main

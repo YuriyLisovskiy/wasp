@@ -19,7 +19,7 @@ __CONTROLLERS_BEGIN__
 
 // TESTME: RedirectController
 // TODO: docs for 'RedirectController'
-class RedirectController : public Controller
+class RedirectController : public Controller<>
 {
 private:
 	std::string _url;
@@ -42,36 +42,36 @@ public:
 	// Return the URL redirect to.
 	std::string get_redirect_url();
 
-	Result<std::shared_ptr<http::IHttpResponse>> get(Kwargs* args) override;
+	Result<std::shared_ptr<http::IHttpResponse>> get() override;
 
-	inline Result<std::shared_ptr<http::IHttpResponse>> post(Kwargs* kwargs) override
+	inline Result<std::shared_ptr<http::IHttpResponse>> post() override
 	{
-		return this->get(kwargs);
+		return this->get();
 	}
 
-	inline Result<std::shared_ptr<http::IHttpResponse>> head(Kwargs* kwargs) override
+	inline Result<std::shared_ptr<http::IHttpResponse>> head() override
 	{
-		return this->get(kwargs);
+		return this->get();
 	}
 
-	inline Result<std::shared_ptr<http::IHttpResponse>> options(Kwargs* kwargs) override
+	inline Result<std::shared_ptr<http::IHttpResponse>> options() override
 	{
-		return this->get(kwargs);
+		return this->get();
 	}
 
-	inline Result<std::shared_ptr<http::IHttpResponse>> put(Kwargs* kwargs) override
+	inline Result<std::shared_ptr<http::IHttpResponse>> put() override
 	{
-		return this->get(kwargs);
+		return this->get();
 	}
 
-	inline Result<std::shared_ptr<http::IHttpResponse>> delete_(Kwargs* kwargs) override
+	inline Result<std::shared_ptr<http::IHttpResponse>> delete_() override
 	{
-		return this->get(kwargs);
+		return this->get();
 	}
 
-	inline Result<std::shared_ptr<http::IHttpResponse>> patch(Kwargs* kwargs) override
+	inline Result<std::shared_ptr<http::IHttpResponse>> patch() override
 	{
-		return this->get(kwargs);
+		return this->get();
 	}
 };
 

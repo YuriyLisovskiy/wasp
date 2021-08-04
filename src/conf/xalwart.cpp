@@ -6,9 +6,6 @@
 
 #include "./xalwart.h"
 
-// Base libraries.
-#include <xalwart.base/path.h>
-
 // Framework libraries.
 #include "../management/module.h"
 #include "../http/url.h"
@@ -91,6 +88,14 @@ void MainApplication::execute(int argc, char** argv)
 		{
 			this->settings->LOGGER->error(exc.what(), exc.line(), exc.function(), exc.file());
 		}
+		catch (const std::exception& exc)
+		{
+			this->settings->LOGGER->error(exc.what());
+		}
+		catch (...)
+		{
+			this->settings->LOGGER->error("xw::conf::MainApplication: unknown error", _ERROR_DETAILS_);
+		}
 	}
 	else
 	{
@@ -114,7 +119,7 @@ void MainApplication::_setup_commands()
 		);
 	}
 
-	auto default_commands = management::CoreManagementModuleConfig(
+	auto default_commands = mgmt::CoreModuleConfig(
 		this->settings, [this](
 			log::ILogger* logger, const Kwargs& kwargs, std::shared_ptr<dt::Timezone> tz
 		) -> std::shared_ptr<net::abc::IServer>
@@ -269,7 +274,7 @@ bool MainApplication::static_is_allowed(const std::string& static_url)
 	return this->settings->DEBUG && url.hostname().empty();
 }
 
-void MainApplication::build_static_patterns(std::vector<std::shared_ptr<urls::UrlPattern>>& patterns)
+void MainApplication::build_static_patterns(std::vector<std::shared_ptr<urls::IPattern>>& patterns)
 {
 	if (!this->settings->STATIC_ROOT.empty() && this->static_is_allowed(this->settings->STATIC_URL))
 	{
@@ -284,7 +289,7 @@ void MainApplication::build_static_patterns(std::vector<std::shared_ptr<urls::Ur
 	}
 }
 
-void MainApplication::build_module_patterns(std::vector<std::shared_ptr<urls::UrlPattern>>& patterns)
+void MainApplication::build_module_patterns(std::vector<std::shared_ptr<urls::IPattern>>& patterns)
 {
 	if (this->settings->ROOT_MODULE)
 	{
@@ -315,7 +320,7 @@ Result<std::shared_ptr<http::IHttpResponse>> MainApplication::process_request_mi
 
 Result<std::shared_ptr<http::IHttpResponse>> MainApplication::process_urlpatterns(
 	std::shared_ptr<http::HttpRequest>& request,
-	std::vector<std::shared_ptr<urls::UrlPattern>>& urlpatterns
+	std::vector<std::shared_ptr<urls::IPattern>>& urlpatterns
 )
 {
 	auto apply = urls::resolve(request->path(), this->settings->ROOT_URLCONF);
@@ -355,18 +360,6 @@ Result<std::shared_ptr<http::IHttpResponse>> MainApplication::process_response_m
 	return Result<std::shared_ptr<http::IHttpResponse>>::null();
 }
 
-// TODO: fill the table below.
-// | METHOD     | Contains request body? | Contains response body? |
-// +------------+------------------------+-------------------------+
-// | OPTIONS    |                        |                         |
-// | GET        |                        |                         |
-// | HEAD       |                        |                         |
-// | POST       |                        |                         |
-// | PUT        |                        |                         |
-// | DELETE     |                        |                         |
-// | TRACE      |                        |                         |
-// | CONNECT    |                        |                         |
-// | PATCH      |                        |                         |
 std::shared_ptr<http::HttpRequest> MainApplication::make_request(
 	net::RequestContext* ctx, collections::Dictionary<std::string, std::string> env
 )

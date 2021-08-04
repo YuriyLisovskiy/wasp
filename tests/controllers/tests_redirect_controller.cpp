@@ -77,7 +77,7 @@ TEST_F(RedirectControllerWithDefaultParamsTestCase, GetTest)
 {
 	auto request = make_request(this->settings, "get");
 	this->controller->setup(&request);
-	auto response = this->controller->get(nullptr);
+	auto response = this->controller->get();
 
 	ASSERT_TRUE(dynamic_cast<http::HttpResponseRedirect*>(response.value.get()));
 }
@@ -86,7 +86,7 @@ TEST_F(RedirectControllerWithDefaultParamsTestCase, PostTest)
 {
 	auto request = make_request(this->settings, "post");
 	this->controller->setup(&request);
-	auto response = this->controller->post(nullptr);
+	auto response = this->controller->post();
 
 	ASSERT_TRUE(dynamic_cast<http::HttpResponseRedirect*>(response.value.get()));
 }
@@ -95,7 +95,7 @@ TEST_F(RedirectControllerWithDefaultParamsTestCase, PutTest)
 {
 	auto request = make_request(this->settings, "put");
 	this->controller->setup(&request);
-	auto response = this->controller->put(nullptr);
+	auto response = this->controller->put();
 
 	ASSERT_TRUE(dynamic_cast<http::HttpResponseRedirect*>(response.value.get()));
 }
@@ -104,7 +104,7 @@ TEST_F(RedirectControllerWithDefaultParamsTestCase, PatchTest)
 {
 	auto request = make_request(this->settings, "patch");
 	this->controller->setup(&request);
-	auto response = this->controller->patch(nullptr);
+	auto response = this->controller->patch();
 
 	ASSERT_TRUE(dynamic_cast<http::HttpResponseRedirect*>(response.value.get()));
 }
@@ -113,7 +113,7 @@ TEST_F(RedirectControllerWithDefaultParamsTestCase, DeleteTest)
 {
 	auto request = make_request(this->settings, "delete");
 	this->controller->setup(&request);
-	auto response = this->controller->delete_(nullptr);
+	auto response = this->controller->delete_();
 
 	ASSERT_TRUE(dynamic_cast<http::HttpResponseRedirect*>(response.value.get()));
 }
@@ -122,7 +122,7 @@ TEST_F(RedirectControllerWithDefaultParamsTestCase, HeadTest)
 {
 	auto request = make_request(this->settings, "head");
 	this->controller->setup(&request);
-	auto response = this->controller->head(nullptr);
+	auto response = this->controller->head();
 
 	ASSERT_TRUE(dynamic_cast<http::HttpResponseRedirect*>(response.value.get()));
 }
@@ -131,7 +131,7 @@ TEST_F(RedirectControllerWithDefaultParamsTestCase, OptionsTest)
 {
 	auto request = make_request(this->settings, "options");
 	this->controller->setup(&request);
-	auto response = this->controller->options(nullptr);
+	auto response = this->controller->options();
 
 	ASSERT_TRUE(dynamic_cast<http::HttpResponseRedirect*>(response.value.get()));
 }
@@ -139,7 +139,7 @@ TEST_F(RedirectControllerWithDefaultParamsTestCase, OptionsTest)
 TEST_F(RedirectControllerWithDefaultParamsTestCase, TraceTest)
 {
 	auto request = make_request(this->settings, "trace");
-	auto response = this->controller->trace(nullptr);
+	auto response = this->controller->trace();
 
 	ASSERT_EQ(response.value, nullptr);
 }
@@ -161,10 +161,10 @@ TEST_F(RedirectControllerWithDefaultParamsTestCase, SetupAndDispatchAllowedTest)
 {
 	auto request = make_request(this->settings, "get");
 
-	ASSERT_THROW(this->controller->dispatch(nullptr), NullPointerException);
+	ASSERT_THROW(this->controller->dispatch(), NullPointerException);
 
 	this->controller->setup(&request);
-	auto response = this->controller->dispatch(nullptr);
+	auto response = this->controller->dispatch();
 
 	ASSERT_EQ(response.value->status(), 302);
 }
@@ -175,7 +175,7 @@ TEST_F(RedirectControllerWithDefaultParamsTestCase, DispatchTraceNotAllowedTest)
 	auto request = make_request(this->settings, "trace");
 	this->controller->setup(&request);
 
-	auto response = this->controller->dispatch(nullptr);
+	auto response = this->controller->dispatch();
 
 	ASSERT_EQ(response.value->status(), 405);
 }
@@ -213,7 +213,7 @@ TEST_F(RedirectControllerPermanentAndQueryStringTestCase, GetTest)
 {
 	auto request = make_request(this->settings, "get");
 	this->controller->setup(&request);
-	auto response = this->controller->get(nullptr);
+	auto response = this->controller->get();
 
 	ASSERT_TRUE(dynamic_cast<http::HttpResponsePermanentRedirect*>(response.value.get()));
 }
@@ -222,7 +222,7 @@ TEST_F(RedirectControllerPermanentAndQueryStringTestCase, PostTest)
 {
 	auto request = make_request(this->settings, "post");
 	this->controller->setup(&request);
-	auto response = this->controller->post(nullptr);
+	auto response = this->controller->post();
 
 	ASSERT_TRUE(dynamic_cast<http::HttpResponsePermanentRedirect*>(response.value.get()));
 }
@@ -231,7 +231,7 @@ TEST_F(RedirectControllerPermanentAndQueryStringTestCase, PutTest)
 {
 	auto request = make_request(this->settings, "put");
 	this->controller->setup(&request);
-	auto response = this->controller->put(nullptr);
+	auto response = this->controller->put();
 
 	ASSERT_TRUE(dynamic_cast<http::HttpResponsePermanentRedirect*>(response.value.get()));
 }
@@ -240,7 +240,7 @@ TEST_F(RedirectControllerPermanentAndQueryStringTestCase, PatchTest)
 {
 	auto request = make_request(this->settings, "patch");
 	this->controller->setup(&request);
-	auto response = this->controller->patch(nullptr);
+	auto response = this->controller->patch();
 
 	ASSERT_TRUE(dynamic_cast<http::HttpResponsePermanentRedirect*>(response.value.get()));
 }
@@ -249,7 +249,7 @@ TEST_F(RedirectControllerPermanentAndQueryStringTestCase, DeleteTest)
 {
 	auto request = make_request(this->settings, "delete");
 	this->controller->setup(&request);
-	auto response = this->controller->delete_(nullptr);
+	auto response = this->controller->delete_();
 
 	ASSERT_TRUE(dynamic_cast<http::HttpResponsePermanentRedirect*>(response.value.get()));
 }
@@ -258,7 +258,7 @@ TEST_F(RedirectControllerPermanentAndQueryStringTestCase, HeadTest)
 {
 	auto request = make_request(this->settings, "head");
 	this->controller->setup(&request);
-	auto response = this->controller->head(nullptr);
+	auto response = this->controller->head();
 
 	ASSERT_TRUE(dynamic_cast<http::HttpResponsePermanentRedirect*>(response.value.get()));
 }
@@ -267,7 +267,7 @@ TEST_F(RedirectControllerPermanentAndQueryStringTestCase, OptionsTest)
 {
 	auto request = make_request(this->settings, "options");
 	this->controller->setup(&request);
-	auto response = this->controller->options(nullptr);
+	auto response = this->controller->options();
 
 	ASSERT_TRUE(dynamic_cast<http::HttpResponsePermanentRedirect*>(response.value.get()));
 }
@@ -321,7 +321,7 @@ TEST_F(RedirectControllerEmptyUrlTestCase, GetTest)
 {
 	auto request = make_request(this->settings, "get");
 	this->controller->setup(&request);
-	auto response = this->controller->get(nullptr);
+	auto response = this->controller->get();
 
 	ASSERT_TRUE(dynamic_cast<http::HttpResponseGone*>(response.value.get()));
 }
@@ -330,7 +330,7 @@ TEST_F(RedirectControllerEmptyUrlTestCase, PostTest)
 {
 	auto request = make_request(this->settings, "post");
 	this->controller->setup(&request);
-	auto response = this->controller->post(nullptr);
+	auto response = this->controller->post();
 
 	ASSERT_TRUE(dynamic_cast<http::HttpResponseGone*>(response.value.get()));
 }
@@ -339,7 +339,7 @@ TEST_F(RedirectControllerEmptyUrlTestCase, PutTest)
 {
 	auto request = make_request(this->settings, "put");
 	this->controller->setup(&request);
-	auto response = this->controller->put(nullptr);
+	auto response = this->controller->put();
 
 	ASSERT_TRUE(dynamic_cast<http::HttpResponseGone*>(response.value.get()));
 }
@@ -348,7 +348,7 @@ TEST_F(RedirectControllerEmptyUrlTestCase, PatchTest)
 {
 	auto request = make_request(this->settings, "patch");
 	this->controller->setup(&request);
-	auto response = this->controller->patch(nullptr);
+	auto response = this->controller->patch();
 
 	ASSERT_TRUE(dynamic_cast<http::HttpResponseGone*>(response.value.get()));
 }
@@ -357,7 +357,7 @@ TEST_F(RedirectControllerEmptyUrlTestCase, DeleteTest)
 {
 	auto request = make_request(this->settings, "delete");
 	this->controller->setup(&request);
-	auto response = this->controller->delete_(nullptr);
+	auto response = this->controller->delete_();
 
 	ASSERT_TRUE(dynamic_cast<http::HttpResponseGone*>(response.value.get()));
 }
@@ -366,7 +366,7 @@ TEST_F(RedirectControllerEmptyUrlTestCase, HeadTest)
 {
 	auto request = make_request(this->settings, "head");
 	this->controller->setup(&request);
-	auto response = this->controller->head(nullptr);
+	auto response = this->controller->head();
 
 	ASSERT_TRUE(dynamic_cast<http::HttpResponseGone*>(response.value.get()));
 }
@@ -375,7 +375,7 @@ TEST_F(RedirectControllerEmptyUrlTestCase, OptionsTest)
 {
 	auto request = make_request(this->settings, "options");
 	this->controller->setup(&request);
-	auto response = this->controller->options(nullptr);
+	auto response = this->controller->options();
 
 	ASSERT_TRUE(dynamic_cast<http::HttpResponseGone*>(response.value.get()));
 }

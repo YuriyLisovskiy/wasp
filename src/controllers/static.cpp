@@ -49,7 +49,7 @@ bool was_modified_since(const std::string& header, size_t time, size_t size)
 	return result;
 }
 
-Result<std::shared_ptr<http::IHttpResponse>> StaticController::get(Kwargs* req_kwargs)
+Result<std::shared_ptr<http::IHttpResponse>> StaticController::get(const std::string& p)
 {
 	if (!this->_kwargs.contains("document_root"))
 	{
@@ -58,25 +58,7 @@ Result<std::shared_ptr<http::IHttpResponse>> StaticController::get(Kwargs* req_k
 		);
 	}
 
-	if (!req_kwargs)
-	{
-		if (!this->settings->LOGGER)
-		{
-			throw NullPointerException("settings->logger is nullptr", _ERROR_DETAILS_);
-		}
-
-		this->settings->LOGGER->warning(
-			"unable to retrieve \"path\" argument from url while serving static file",
-			_ERROR_DETAILS_
-		);
-
-		// TODO: add default http 404 error content!
-		return this->response<http::HttpResponseNotFound>(this->_kwargs.get<std::string>("http_404", "404 Not Found"));
-	}
-
-	auto full_path = path::join(
-		this->_kwargs.get<std::string>("document_root", ""), req_kwargs->get<std::string>("path", "")
-	);
+	auto full_path = path::join(this->_kwargs.get<std::string>("document_root", ""), p);
 	if (!path::exists(full_path))
 	{
 		// TODO: add default http 404 error content!

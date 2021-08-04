@@ -8,6 +8,9 @@
 
 #pragma once
 
+#include <memory>
+#include <functional>
+
 // Base libraries.
 #include <xalwart.base/result.h>
 
@@ -15,7 +18,7 @@
 #include "./_def_.h"
 
 // Framework libraries.
-#include "./pattern.h"
+#include "./abc.h"
 
 
 __URLS_BEGIN__
@@ -26,14 +29,14 @@ __URLS_BEGIN__
 extern std::function<Result<std::shared_ptr<http::IHttpResponse>>(
 	http::HttpRequest* request, conf::Settings* settings
 )> resolve(
-	const std::string& path, std::vector<std::shared_ptr<UrlPattern>>& urlpatterns
+	const std::string& path, std::vector<std::shared_ptr<IPattern>>& urlpatterns
 );
 
 // TESTME: is_valid_path
 // Return true if the given path can be found in urlpatterns,
 // false otherwise.
 inline bool is_valid_path(
-	const std::string& path, std::vector<std::shared_ptr<UrlPattern>>& urlpatterns
+	const std::string& path, std::vector<std::shared_ptr<IPattern>>& urlpatterns
 )
 {
 	return resolve(path, urlpatterns) != nullptr;

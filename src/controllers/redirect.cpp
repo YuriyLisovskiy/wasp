@@ -28,7 +28,7 @@ std::string RedirectController::get_redirect_url()
 	return url;
 }
 
-Result<std::shared_ptr<http::IHttpResponse>> RedirectController::get(Kwargs* kwargs)
+Result<std::shared_ptr<http::IHttpResponse>> RedirectController::get()
 {
 	std::string url = this->get_redirect_url();
 	if (url.empty())

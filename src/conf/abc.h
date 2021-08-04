@@ -15,7 +15,7 @@
 #include "./_def_.h"
 
 // Framework libraries.
-#include "../urls/pattern.h"
+#include "../urls/abc.h"
 #include "../commands/base.h"
 
 
@@ -26,17 +26,24 @@ class IModuleConfig
 public:
 	virtual ~IModuleConfig() = default;
 
+	[[nodiscard]]
 	virtual bool ready() const = 0;
+
+	[[nodiscard]]
 	virtual std::string get_name() const = 0;
+
+	[[nodiscard]]
 	virtual std::string get_module_path() const = 0;
-	virtual std::vector<std::shared_ptr<urls::UrlPattern>> get_urlpatterns() = 0;
+
+	virtual std::vector<std::shared_ptr<urls::IPattern>> get_urlpatterns() = 0;
+
 	virtual std::vector<std::shared_ptr<cmd::BaseCommand>> get_commands() = 0;
 };
 
 template <typename T>
 concept module_config_type = std::is_base_of_v<IModuleConfig, T>;
 
-const re::Regex _R_CONFIG_NAME = re::Regex(
+inline const re::Regex _R_CONFIG_NAME = re::Regex(
 	R"((((M|m)odule)|((C|c)onfig)|((M|m)odule_*(C|c)onfig))$)"
 );
 

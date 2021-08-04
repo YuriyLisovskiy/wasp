@@ -12,24 +12,20 @@ __URLS_BEGIN__
 std::function<Result<std::shared_ptr<http::IHttpResponse>>(
 	http::HttpRequest* request,
 	conf::Settings* settings
-)> resolve(
-	const std::string& path, std::vector<std::shared_ptr<UrlPattern>>& urlpatterns
-)
+)> resolve(const std::string& path, std::vector<std::shared_ptr<IPattern>>& urlpatterns)
 {
 	std::function<Result<std::shared_ptr<http::IHttpResponse>>(
 		http::HttpRequest*, conf::Settings*
 	)> fn = nullptr;
 	for (auto& url_pattern : urlpatterns)
 	{
-		std::map<std::string, std::string> args_map;
-		if (url_pattern->match(path, args_map))
+		if (url_pattern->match(path))
 		{
-			fn = [url_pattern, args_map](
+			fn = [url_pattern](
 				http::HttpRequest* request, conf::Settings* settings
 			) mutable -> Result<std::shared_ptr<http::IHttpResponse>>
 			{
-				auto kwargs = Kwargs(args_map);
-				return url_pattern->apply(request, settings, &kwargs);
+				return url_pattern->apply(request, settings);
 			};
 			break;
 		}

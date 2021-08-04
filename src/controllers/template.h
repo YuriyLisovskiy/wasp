@@ -16,6 +16,7 @@
 
 // Framework libraries.
 #include "./controller.h"
+#include "../conf/settings.h"
 
 
 __CONTROLLERS_BEGIN__
@@ -52,21 +53,26 @@ public:
 // TESTME: TemplateController
 // TODO: docs for 'TemplateController'
 // A controller that can render a template.
-class TemplateController : public TemplateResponseMixin, public Controller
+template <typename ...UrlArgsT>
+class TemplateController : public TemplateResponseMixin, public Controller<UrlArgsT...>
 {
 public:
-	explicit TemplateController(conf::Settings* settings);
+	explicit TemplateController(conf::Settings* settings) :
+		Controller<UrlArgsT...>({"get", "options"}, settings),
+		TemplateResponseMixin(settings->TEMPLATE_ENGINE.get())
+	{
+	}
 
 	// Used in default get() method, can be overridden
 	// in derived classes.
-	virtual inline std::shared_ptr<render::abc::IContext> get_context(Kwargs* kwargs)
+	virtual inline std::shared_ptr<render::abc::IContext> get_context(UrlArgsT ...args)
 	{
 		return nullptr;
 	}
 
-	inline Result<std::shared_ptr<http::IHttpResponse>> get(Kwargs* kwargs) override
+	inline Result<std::shared_ptr<http::IHttpResponse>> get(UrlArgsT ...args) override
 	{
-		return this->render(this->request, this->get_context(kwargs), "", 200, "", "utf-8");
+		return this->render(this->request, this->get_context(args...), "", 200, "", "utf-8");
 	}
 
 protected:
@@ -75,7 +81,11 @@ protected:
 		conf::Settings* settings,
 		const std::string& template_name="",
 		const std::string& content_type=""
-	);
+	) : Controller<UrlArgsT...>(allowed_methods, settings), TemplateResponseMixin(settings->TEMPLATE_ENGINE.get())
+	{
+		this->template_name = template_name;
+		this->content_type = content_type;
+	}
 };
 
 __CONTROLLERS_END__

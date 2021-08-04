@@ -31,8 +31,8 @@ protected:
 protected:
 	net::HandlerFunc make_handler();
 	bool static_is_allowed(const std::string& static_url);
-	void build_static_patterns(std::vector<std::shared_ptr<urls::UrlPattern>>& patterns);
-	void build_module_patterns(std::vector<std::shared_ptr<urls::UrlPattern>>& patterns);
+	void build_static_patterns(std::vector<std::shared_ptr<urls::IPattern>>& patterns);
+	void build_module_patterns(std::vector<std::shared_ptr<urls::IPattern>>& patterns);
 
 	Result<std::shared_ptr<http::IHttpResponse>> process_request_middleware(
 		std::shared_ptr<http::HttpRequest>& request
@@ -43,7 +43,7 @@ protected:
 	);
 	Result<std::shared_ptr<http::IHttpResponse>> process_urlpatterns(
 		std::shared_ptr<http::HttpRequest>& request,
-		std::vector<std::shared_ptr<urls::UrlPattern>>& urlpatterns
+		std::vector<std::shared_ptr<urls::IPattern>>& urlpatterns
 	);
 
 	std::shared_ptr<http::HttpRequest> make_request(

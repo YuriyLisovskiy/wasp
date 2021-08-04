@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
- * Purpose: conf module's definitions.
+ * Definitions of 'conf' module.
  */
 
 #pragma once

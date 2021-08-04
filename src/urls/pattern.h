@@ -11,15 +11,14 @@
 #pragma once
 
 // Base libraries.
-#include <xalwart.base/kwargs.h>
 #include <xalwart.base/re/arg_regex.h>
+#include <xalwart.base/string_utils.h>
 
 // Module definitions.
 #include "./_def_.h"
 
 // Framework libraries.
-#include "../http/request.h"
-#include "../http/response.h"
+#include "./abc.h"
 #include "../conf/_def_.h"
 
 
@@ -32,56 +31,113 @@ __CONF_END__
 
 __URLS_BEGIN__
 
-typedef std::function<Result<std::shared_ptr<http::IHttpResponse>>(
-	http::HttpRequest*, Kwargs*, conf::Settings*
-)> ControllerHandler;
+template <typename ...ArgsT>
+using ControllerHandler = std::function<Result<std::shared_ptr<http::IHttpResponse>>(
+	http::HttpRequest*, const std::tuple<ArgsT...>&, conf::Settings*
+)>;
 
-// TESTME: UrlPattern
-// TODO: docs for 'UrlPattern'
-class UrlPattern final
+// TESTME: Pattern<...ArgsT>
+// TODO: docs for 'Pattern<...ArgsT>'
+template <typename ...ArgsT>
+class Pattern final : public IPattern
 {
 private:
 	std::string _orig;
 	std::vector<std::string> _pattern_parts;
-	ControllerHandler _handler;
+	ControllerHandler<ArgsT...> _handler;
 	std::string _name;
 	re::ArgRegex _regex;
-	std::string _namespace;
+
+private:
+	inline void _reload_pattern_parts()
+	{
+		this->_orig = this->_regex.str();
+		this->_pattern_parts = this->_regex.parts();
+		if (!this->_pattern_parts.empty())
+		{
+			if (this->_pattern_parts.back().ends_with("?"))
+			{
+				this->_pattern_parts.back().pop_back();
+			}
+
+			this->_pattern_parts.back() = str::rtrim(this->_pattern_parts.back(), "/");
+		}
+	}
 
 public:
-	UrlPattern(const std::string& rgx, ControllerHandler handler, std::string name);
-
-	UrlPattern(
-		const std::string& prefix,
-		const std::shared_ptr<UrlPattern>& url_pattern,
-		const std::string& namespace_
-	);
+	inline Pattern(const std::string& rgx, ControllerHandler<ArgsT...> handler, std::string name) :
+		_regex(rgx), _handler(std::move(handler)), _name(std::move(name))
+	{
+		this->_reload_pattern_parts();
+	}
 
 	[[nodiscard]]
-	inline std::string get_name() const
+	inline std::string get_name() const override
 	{
 		return this->_name;
 	}
 
-	inline Result<std::shared_ptr<http::IHttpResponse>> apply(
-		http::HttpRequest* request, conf::Settings* settings, Kwargs* kwargs=nullptr
-	)
+	[[nodiscard]]
+	inline std::string get_pattern_str() const override
 	{
-		return this->_handler(request, kwargs, settings);
+		return this->_orig;
 	}
 
-	bool match(const std::string& url, std::map<std::string, std::string>& args);
+	inline void add_prefix(const std::string& prefix) override
+	{
+		this->_regex = re::ArgRegex(prefix + this->_orig);
+		this->_reload_pattern_parts();
+	}
+
+	inline void add_namespace(const std::string& ns) override
+	{
+		this->_name = ns + "::" + this->_name;
+	}
+
+	inline Result<std::shared_ptr<http::IHttpResponse>> apply(
+		http::HttpRequest* request, conf::Settings* settings
+	) override
+	{
+		return this->_handler(request, this->_regex.template tuple<ArgsT...>(), settings);
+	}
+
+	inline bool match(const std::string& url) override
+	{
+		return this->_regex.match(url) && this->_regex.search(url);
+	}
 
 	[[nodiscard]]
-	std::string build(const std::vector<std::string>& args) const;
-};
+	inline std::string build(const std::vector<std::string>& args) const override
+	{
+		if (this->_pattern_parts.empty())
+		{
+			return "";
+		}
 
-// TESTME: make_static
-// TODO: docs for 'make_static'
-extern std::shared_ptr<urls::UrlPattern> make_static(
-	const std::string& static_url,
-	const std::string& static_root,
-	const std::string& name=""
-);
+		size_t a_len = args.size();
+		size_t p_len = this->_pattern_parts.size();
+		if (a_len == p_len || p_len - 1 == a_len)
+		{
+			size_t i = 0;
+			std::string built_url;
+			for (const auto& arg : args)
+			{
+				built_url += this->_pattern_parts[i++] + arg;
+			}
+
+			if (i < this->_pattern_parts.size())
+			{
+				built_url += this->_pattern_parts[i];
+			}
+
+			return built_url;
+		}
+
+		throw AttributeError(
+			"unable to build url: arguments do not match pattern '" + this->_orig + "'",
+			_ERROR_DETAILS_
+		);
+	}
+};
 
 __URLS_END__

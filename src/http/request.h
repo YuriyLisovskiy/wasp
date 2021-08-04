@@ -22,7 +22,9 @@
 
 
 __CONF_BEGIN__
+
 struct Settings;
+
 __CONF_END__
 
 

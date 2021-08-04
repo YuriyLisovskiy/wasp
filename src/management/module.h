@@ -20,22 +20,23 @@
 
 __MANAGEMENT_BEGIN__
 
+using make_server_func_t = std::function<std::shared_ptr<net::abc::IServer>(
+	log::ILogger*, const Kwargs&, std::shared_ptr<dt::Timezone>
+)>;
+
 // TESTME: CoreModuleConfig
 // TODO: docs for 'CoreModuleConfig'
 class CoreModuleConfig final : public conf::ModuleConfig
 {
 private:
-	std::function<std::shared_ptr<net::abc::IServer>(
-		log::ILogger*, const Kwargs&, std::shared_ptr<dt::Timezone>
-	)> _make_server;
+	make_server_func_t _make_server;
 
 public:
-	explicit CoreModuleConfig(
-		conf::Settings* settings,
-		std::function<std::shared_ptr<net::abc::IServer>(
-			log::ILogger*, const Kwargs&, std::shared_ptr<dt::Timezone>
-		)> make_server
-	);
+	explicit CoreModuleConfig(conf::Settings* settings, make_server_func_t make_server) :
+		ModuleConfig(__FILE__, settings), _make_server(std::move(make_server))
+	{
+	}
+
 	void commands() override;
 };
 

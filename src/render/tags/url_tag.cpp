@@ -46,7 +46,7 @@ std::string url_node::render(abc::IContext* ctx)
 
 std::function<std::shared_ptr<internal::node>(
 	internal::parser*, internal::token_t& token
-)> make_url_tag(const std::vector<std::shared_ptr<urls::UrlPattern>>& patterns)
+)> make_url_tag(const std::vector<std::shared_ptr<urls::IPattern>>& patterns)
 {
 	return [patterns](
 		internal::parser* parser,

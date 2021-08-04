@@ -61,24 +61,4 @@ std::string TemplateResponseMixin::get_template_name()
 	return this->template_name;
 }
 
-
-TemplateController::TemplateController(
-	conf::Settings* settings
-) : Controller({"get", "options"}, settings),
-	TemplateResponseMixin(settings->TEMPLATE_ENGINE.get())
-{
-}
-
-TemplateController::TemplateController(
-	const std::vector<std::string>& allowed_methods,
-	conf::Settings* settings,
-	const std::string& template_name,
-	const std::string& content_type
-) : Controller(allowed_methods, settings),
-    TemplateResponseMixin(settings->TEMPLATE_ENGINE.get())
-{
-	this->template_name = template_name;
-	this->content_type = content_type;
-}
-
 __CONTROLLERS_END__
