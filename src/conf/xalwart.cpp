@@ -11,6 +11,7 @@
 #include "../http/url.h"
 #include "../http/internal/multipart_parser.h"
 #include "../urls/resolver.h"
+#include "../urls/utilities.h"
 
 
 __CONF_BEGIN__

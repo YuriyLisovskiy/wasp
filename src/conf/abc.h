@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
- * Abstract base classes for `conf` module.
+ * Abstract base classes for 'conf' module.
  */
 
 #pragma once
@@ -42,9 +42,5 @@ public:
 
 template <typename T>
 concept module_config_type = std::is_base_of_v<IModuleConfig, T>;
-
-inline const re::Regex _R_CONFIG_NAME = re::Regex(
-	R"((((M|m)odule)|((C|c)onfig)|((M|m)odule_*(C|c)onfig))$)"
-);
 
 __CONF_END__
