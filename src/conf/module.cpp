@@ -9,43 +9,14 @@
 
 __CONF_BEGIN__
 
-ModuleConfig::ModuleConfig(
-	std::string module_path, conf::Settings* settings
-) : _is_initialized(false), settings(settings), module_path(std::move(module_path))
-{
-}
-
-void ModuleConfig::urlpatterns()
-{
-}
-
-void ModuleConfig::commands()
-{
-}
-
-bool ModuleConfig::ready() const
-{
-	return this->_is_initialized;
-}
-
-std::string ModuleConfig::get_name() const
-{
-	return this->module_name;
-}
-
-std::string ModuleConfig::get_module_path() const
-{
-	return this->module_path;
-}
-
 std::vector<std::shared_ptr<urls::IPattern>> ModuleConfig::get_urlpatterns()
 {
 	if (this->_urlpatterns.empty())
 	{
 		this->urlpatterns();
-		for (auto& module_to_init : this->_sub_modules_to_init)
+		for (auto& module : this->_sub_modules_to_init)
 		{
-			module_to_init();
+			module();
 		}
 	}
 
@@ -66,7 +37,7 @@ void ModuleConfig::init(const std::string& name)
 {
 	if (name.empty())
 	{
-		throw ValueError("module name can not be empty", _ERROR_DETAILS_);
+		throw ValueError("module name should not be empty", _ERROR_DETAILS_);
 	}
 
 	if (!this->_is_initialized)

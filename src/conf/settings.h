@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
- * Purpose: entire application's settings.
+ * Entire application's settings.
  */
 
 #pragma once
@@ -40,12 +40,88 @@ __CONF_BEGIN__
 
 struct Settings
 {
+private:
+	std::map<std::string, std::function<std::shared_ptr<middleware::IMiddleware>()>> _middleware;
+	std::map<std::string, std::function<std::shared_ptr<render::abc::ILibrary>()>> _libraries;
+	std::map<std::string, std::function<std::shared_ptr<IModuleConfig>()>> _modules;
+	std::map<std::string, std::function<std::shared_ptr<render::abc::ILoader>()>> _loaders;
+	std::list<std::function<std::shared_ptr<orm::db::Migration>(orm::abc::ISQLDriver* driver)>> _migrations;
+
+protected:
+	template <module_config_type ModuleConfigT>
+	inline void module(const std::string& custom_name="")
+	{
+		auto name = this->get_name_or<ModuleConfigT>(custom_name);
+		if (this->LOGGER && this->_modules.find(name) != this->_modules.end())
+		{
+			this->LOGGER->warning("module '" + name + "' will be overwritten");
+		}
+
+		this->_modules[name] = [this, name]() -> std::shared_ptr<IModuleConfig> {
+			auto module = std::make_shared<ModuleConfigT>(this);
+			module->init(name);
+			return module;
+		};
+	}
+
+	template <middleware::middleware_type_c MiddlewareT>
+	inline void middleware(const std::string& custom_name="")
+	{
+		auto name = this->get_name_or<MiddlewareT>(custom_name);
+		if (this->LOGGER && this->_middleware.find(name) != this->_middleware.end())
+		{
+			this->LOGGER->warning("middleware '" + name + "' will be overwritten");
+		}
+
+		this->_middleware[name] = [this]() -> std::shared_ptr<middleware::IMiddleware> {
+			return std::make_shared<MiddlewareT>(this);
+		};
+	}
+
+	template <render::abc::library_type_c LibraryT>
+	inline void library(const std::string& custom_name="")
+	{
+		auto name = this->get_name_or<LibraryT>(custom_name);
+		if (this->LOGGER && this->_libraries.find(name) != this->_libraries.end())
+		{
+			this->LOGGER->warning("library '" + name + "' will be overwritten");
+		}
+
+		this->_libraries[name] = [this]() -> std::shared_ptr<render::abc::ILibrary> {
+			return std::make_shared<LibraryT>(this);
+		};
+	}
+
+	template <render::abc::loader_type_c LoaderT>
+	inline void loader(const std::string& custom_name="")
+	{
+		auto name = this->get_name_or<LoaderT>(custom_name);
+		if (this->LOGGER && this->_loaders.find(name) != this->_loaders.end())
+		{
+			this->LOGGER->warning("loader '" + name + "' will be overwritten");
+		}
+
+		this->_loaders[name] = [this]() -> std::shared_ptr<render::abc::ILoader> {
+			return std::make_shared<LoaderT>(this);
+		};
+	}
+
+	template <class MigrationT, class ...Args>
+	inline void migration(Args&& ...args)
+	{
+		this->_migrations.push_back([args...](auto* driver) -> std::shared_ptr<orm::db::Migration>
+		{
+			return std::make_shared<MigrationT>(driver, std::forward<Args>(args)...);
+		});
+	}
+
 public:
+	// For development purposes only.
 	bool DEBUG = false;
 
 	std::shared_ptr<log::ILogger> LOGGER = nullptr;
 
-	// Build paths inside the project like this: path::join(BASE_DIR, ...)
+	// By default, it should be current working directory.
 	std::string BASE_DIR;
 
 	// Hosts/domain names that are valid for this site.
@@ -66,16 +142,9 @@ public:
 	// manually specified. It's used to construct the Content-Type header.
 	std::string CHARSET = "utf-8";
 
-	// Root application where framework will load urlpatterns.
-	//
-	// ROOT_MODULE is the first installed module by default, it can
-	// be overridden in project settings.
-	std::shared_ptr<IModuleConfig> ROOT_MODULE = nullptr;
-
-	// Vector of patterns which will be loaded from ROOT_MODULE.
-	// To change this setting, setup ROOT_MODULE in your project
-	// settings.
-	std::vector<std::shared_ptr<urls::IPattern>> ROOT_URLCONF;
+	// Vector of patterns which will be loaded from the first
+	// module from 'MODULES'.
+	std::vector<std::shared_ptr<urls::IPattern>> URLPATTERNS;
 
 	// List of ModuleConfig-derived objects representing modules.
 	// Order is required. The first item is interpreted as main
@@ -99,25 +168,25 @@ public:
 	// robots/crawlers.
 	//
 	// Here are a few examples:
-	//     DISALLOWED_USER_AGENTS = {
-	//         rgx::Regex(R"(NaverBot.*)"),
-	//         rgx::Regex(R"(EmailSiphon.*)"),
-	//         rgx::Regex(R"(SiteSucker.*)"),
-	//         rgx::Regex(R"(sohu-search.*)")
-	//     };
+	//   DISALLOWED_USER_AGENTS = {
+	//       re::Regex(R"(NaverBot.*)"),
+	//       re::Regex(R"(EmailSiphon.*)"),
+	//       re::Regex(R"(SiteSucker.*)"),
+	//       re::Regex(R"(sohu-search.*)")
+	//   };
 	std::vector<re::Regex> DISALLOWED_USER_AGENTS;
 
 	// List of compiled regular expression objects representing URLs that need not
 	// be reported by BrokenLinkEmailsMiddleware.
 	//
 	// Here are a few examples:
-	//    IGNORABLE_404_URLS = {
-	//        rgx::Regex(R"(/apple-touch-icon.*\.png)"),
-	//        rgx::Regex(R"(/favicon.ico)"),
-	//        rgx::Regex(R"(/robots.txt)"),
-	//        rgx::Regex(R"(/phpmyadmin/)"),
-	//        rgx::Regex(R"(/apple-touch-icon.*\.png)")
-	//    };
+	//   IGNORABLE_404_URLS = {
+	//       rgx::Regex(R"(/apple-touch-icon.*\.png)"),
+	//       rgx::Regex(R"(/favicon.ico)"),
+	//       rgx::Regex(R"(/robots.txt)"),
+	//       rgx::Regex(R"(/phpmyadmin/)"),
+	//       rgx::Regex(R"(/apple-touch-icon.*\.png)")
+	//   };
 	std::vector<re::Regex> IGNORABLE_404_URLS;
 
 	// A secret key for this particular installation. Used in secret-key
@@ -240,8 +309,11 @@ public:
 		std::make_shared<std::pair<std::string, std::string>>("X-Forwarded-Proto", "https");
 
 	explicit Settings(const std::string& base_dir);
+
 	virtual ~Settings() = default;
+
 	void prepare();
+
 	void perform_checks();
 
 	inline virtual void register_modules()
@@ -322,107 +394,13 @@ public:
 	[[nodiscard]]
 	inline std::string get_name_or(const std::string& full_name) const
 	{
-		auto name = full_name;
-		if (name.empty())
+		if (full_name.empty())
 		{
-			name = util::demangle(typeid(T).name());
+			return util::demangle(typeid(T).name());
 		}
 
-		return name;
+		return full_name;
 	}
-
-protected:
-	template <module_config_type ModuleConfigT>
-	inline void module(const std::string& custom_name="")
-	{
-		auto name = this->get_name_or<ModuleConfigT>(custom_name);
-		if (this->_modules.find(name) != this->_modules.end() && this->LOGGER)
-		{
-			this->LOGGER->warning("module '" + name + "' was overwritten");
-		}
-
-		this->_modules[name] = [this, name]() -> std::shared_ptr<IModuleConfig> {
-			auto module = std::make_shared<ModuleConfigT>(this);
-			module->init(name);
-			return module;
-		};
-	}
-
-	template <middleware::middleware_type_c MiddlewareT>
-	inline void middleware(const std::string& custom_name="")
-	{
-		auto name = this->get_name_or<MiddlewareT>(custom_name);
-		if (this->_middleware.find(name) != this->_middleware.end() && this->LOGGER)
-		{
-			this->LOGGER->warning("middleware '" + name + "' was overwritten");
-		}
-
-		this->_middleware[name] = [this]() -> std::shared_ptr<middleware::IMiddleware> {
-			return std::make_shared<MiddlewareT>(this);
-		};
-	}
-
-	template <render::abc::library_type_c LibraryT>
-	inline void library(const std::string& custom_name="")
-	{
-		auto name = this->get_name_or<LibraryT>(custom_name);
-		if (this->_libraries.find(name) != this->_libraries.end() && this->LOGGER)
-		{
-			this->LOGGER->warning("library '" + name + "' was overwritten");
-		}
-
-		this->_libraries[name] = [this]() -> std::shared_ptr<render::abc::ILibrary> {
-			return std::make_shared<LibraryT>(this);
-		};
-	}
-
-	template <render::abc::loader_type_c LoaderT>
-	inline void loader(const std::string& custom_name="")
-	{
-		auto name = this->get_name_or<LoaderT>(custom_name);
-		if (this->_loaders.find(name) != this->_loaders.end() && this->LOGGER)
-		{
-			this->LOGGER->warning("loader '" + name + "' was overwritten");
-		}
-
-		this->_loaders[name] = [this]() -> std::shared_ptr<render::abc::ILoader> {
-			return std::make_shared<LoaderT>(this);
-		};
-	}
-
-	template <class MigrationT, class ...Args>
-	inline void migration(Args&& ...args)
-	{
-		this->_migrations.push_back([args...](auto* driver) -> std::shared_ptr<orm::db::Migration>
-		{
-			return std::make_shared<MigrationT>(driver, std::forward<Args>(args)...);
-		});
-	}
-
-private:
-	std::map<
-		std::string,
-		std::function<std::shared_ptr<middleware::IMiddleware>()>
-	> _middleware;
-
-	std::map<
-		std::string,
-		std::function<std::shared_ptr<render::abc::ILibrary>()>
-	> _libraries;
-
-	std::map<
-		std::string,
-		std::function<std::shared_ptr<IModuleConfig>()>
-	> _modules;
-
-	std::map<
-		std::string,
-		std::function<std::shared_ptr<render::abc::ILoader>()>
-	> _loaders;
-
-	std::list<
-		std::function<std::shared_ptr<orm::db::Migration>(orm::abc::ISQLDriver* driver)>
-	> _migrations;
 };
 
 __CONF_END__

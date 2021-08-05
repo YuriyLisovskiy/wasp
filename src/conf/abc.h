@@ -32,9 +32,6 @@ public:
 	[[nodiscard]]
 	virtual std::string get_name() const = 0;
 
-	[[nodiscard]]
-	virtual std::string get_module_path() const = 0;
-
 	virtual std::vector<std::shared_ptr<urls::IPattern>> get_urlpatterns() = 0;
 
 	virtual std::vector<std::shared_ptr<cmd::BaseCommand>> get_commands() = 0;

@@ -33,7 +33,7 @@ private:
 
 public:
 	explicit CoreModuleConfig(conf::Settings* settings, make_server_func_t make_server) :
-		ModuleConfig(__FILE__, settings), _make_server(std::move(make_server))
+		ModuleConfig(settings), _make_server(std::move(make_server))
 	{
 	}
 

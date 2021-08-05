@@ -24,6 +24,8 @@
 
 __CONF_BEGIN__
 
+// TESTME: ModuleConfig
+// TODO: docs for 'ModuleConfig'
 // Derived class must contain constructor with
 // pointer to conf::Settings parameter.
 class ModuleConfig : public IModuleConfig
@@ -57,19 +59,18 @@ private:
 
 protected:
 	std::string module_name;
-	std::string module_path;
 	conf::Settings* settings;
 
 protected:
-	explicit ModuleConfig(
-		std::string app_path, conf::Settings* settings
-	);
+	inline explicit ModuleConfig(conf::Settings* settings) : _is_initialized(false), settings(settings)
+	{
+	}
 
 	template <
 		typename ControllerT, typename ...ArgsT,
 		typename = std::enable_if<std::is_base_of<ctrl::Controller<ArgsT...>, ControllerT>::value>
 	>
-	inline void url(const std::string& pattern, const std::string& name="")
+	inline void url(const std::string& pattern, const std::string& name)
 	{
 		ctrl::Handler<ArgsT...> controller_handler = [this](
 			http::HttpRequest* request, const std::tuple<ArgsT...>& args, conf::Settings* settings_ptr
@@ -78,21 +79,18 @@ protected:
 			ControllerT controller(settings_ptr);
 			controller.setup(request);
 			return std::apply(
-				[controller](ArgsT ...a) mutable -> auto { return controller.dispatch(a...); },
-				args
+				[controller](ArgsT ...a) mutable -> auto { return controller.dispatch(a...); }, args
 			);
 		};
 
 		this->_urlpatterns.push_back(std::make_shared<urls::Pattern<ArgsT...>>(
 			pattern.starts_with("/") ? pattern : "/" + pattern,
 			controller_handler,
-			name
+			name.empty() ? util::demangle(typeid(ControllerT).name()) : name
 		));
 	}
 
-	inline void include(
-		const std::string& module, const std::string& prefix, const std::string& namespace_=""
-	)
+	inline void include(const std::string& module, const std::string& prefix, const std::string& namespace_="")
 	{
 		this->_sub_modules_to_init.emplace_back([this, prefix, namespace_, module]() -> void {
 			auto app = this->_find_module(module);
@@ -103,11 +101,6 @@ protected:
 				pattern->add_namespace(ns);
 				pattern->add_prefix(str::rtrim(prefix.starts_with("/") ? prefix : "/" + prefix, "/"));
 				this->_urlpatterns.push_back(pattern);
-//				this->_urlpatterns.push_back(std::make_shared<urls::Pattern<>>(
-//					str::rtrim(prefix.starts_with("/") ? prefix : "/" + prefix, "/"),
-//					pattern,
-//					ns
-//				));
 			}
 		});
 	}
@@ -115,30 +108,35 @@ protected:
 	template <cmd::command_type_c CommandT>
 	inline void command()
 	{
-		auto cmd = std::make_shared<CommandT>(this, this->settings);
-		this->_commands.push_back(cmd);
+		this->_commands.push_back(std::make_shared<CommandT>(this, this->settings));
 	}
 
 	template <cmd::command_type_c CommandT, typename ...Args>
 	inline void command(Args&& ...args)
 	{
-		auto cmd = std::make_shared<CommandT>(std::forward<Args>(args)...);
-		this->_commands.push_back(cmd);
+		this->_commands.push_back(std::make_shared<CommandT>(std::forward<Args>(args)...));
 	}
 
-	virtual void urlpatterns();
+	virtual inline void urlpatterns()
+	{
+	}
 
-	virtual void commands();
+	virtual inline void commands()
+	{
+	}
 
 public:
 	[[nodiscard]]
-	bool ready() const override;
+	inline bool ready() const override
+	{
+		return this->_is_initialized;
+	}
 
 	[[nodiscard]]
-	std::string get_name() const final;
-
-	[[nodiscard]]
-	std::string get_module_path() const final;
+	inline std::string get_name() const final
+	{
+		return this->module_name;
+	}
 
 	[[nodiscard]]
 	std::vector<std::shared_ptr<urls::IPattern>> get_urlpatterns() final;

@@ -22,8 +22,8 @@ bool CommonMiddleware::should_redirect_with_slash(http::HttpRequest* request)
 	if (this->settings->APPEND_SLASH && !request->path().ends_with("/"))
 	{
 		auto path = request->path();
-		return !urls::is_valid_path(path, this->settings->ROOT_URLCONF) &&
-				urls::is_valid_path(path + "/", this->settings->ROOT_URLCONF);
+		return !urls::is_valid_path(path, this->settings->URLPATTERNS) &&
+				urls::is_valid_path(path + "/", this->settings->URLPATTERNS);
 	}
 
 	return false;

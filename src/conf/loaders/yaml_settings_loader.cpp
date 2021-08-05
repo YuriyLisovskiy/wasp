@@ -560,15 +560,6 @@ void YamlSettingsLoader::init_template_engine_setting(Settings* settings, const 
 		}
 	}
 
-	auto use_module_dirs = config["use_module_directories"];
-	if (use_module_dirs && use_module_dirs.IsScalar() && use_module_dirs.as<bool>(false))
-	{
-		for (const auto& module : settings->MODULES)
-		{
-			dirs.push_back(path::dirname(module->get_module_path()));
-		}
-	}
-
 	auto auto_escape = config["auto_escape"];
 	settings->TEMPLATE_ENGINE = std::make_unique<render::DefaultEngine>(
 		dirs,

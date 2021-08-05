@@ -58,11 +58,6 @@ Settings::Settings(const std::string& base_dir)
 
 void Settings::prepare()
 {
-	if (!this->ROOT_MODULE && !this->MODULES.empty())
-	{
-		this->ROOT_MODULE = this->MODULES.front();
-	}
-
 	if (!this->DB)
 	{
 		this->LOGGER->warning("Missing 'default' database");
@@ -79,46 +74,38 @@ void Settings::perform_checks()
 	std::cout << "Performing checks..." << std::endl;
 	if (!this->LOGGER)
 	{
-		throw ImproperlyConfigured("'logger' must be configured", _ERROR_DETAILS_);
+		throw ImproperlyConfigured("'LOGGER' must be configured", _ERROR_DETAILS_);
 	}
 
 	size_t err_count = 0;
 	if (this->BASE_DIR.empty())
 	{
-		this->LOGGER->error(
-			"'base_dir' must not be empty in order to use the application."
-		);
+		this->LOGGER->error("'BASE_DIR' must not be empty in order to use the application.");
 		err_count++;
 	}
 	else if (!path::exists(this->BASE_DIR))
 	{
-		this->LOGGER->error(
-			"'base_dir' must exist in order to use the application."
-		);
+		this->LOGGER->error("'BASE_DIR' must exist in order to use the application.");
 		err_count++;
 	}
 
 	if (this->SECRET_KEY.empty())
 	{
-		this->LOGGER->error(
-			"'secret_key' must be set in order to use the application."
-		);
+		this->LOGGER->error("'SECRET_KEY' must be set in order to use the application.");
 		err_count++;
 	}
 
 	if (!this->DB)
 	{
 		this->LOGGER->error(
-			"No database was set, at least one database must be configured in order to use the application"
+			"No database was set, at least one database must be configured in order to use the application."
 		);
 		err_count++;
 	}
 
 	if (!this->TEMPLATE_ENGINE)
 	{
-		this->LOGGER->error(
-			"'template_engine' must be configured in order to use the application."
-		);
+		this->LOGGER->error("'TEMPLATE_ENGINE' must be configured in order to use the application.");
 		err_count++;
 	}
 
@@ -129,9 +116,7 @@ void Settings::perform_checks()
 
 	if (this->MODULES.empty())
 	{
-		this->LOGGER->warning(
-			"You have not added any module to 'modules' setting."
-		);
+		this->LOGGER->warning("You have not added any module to 'modules' setting.");
 	}
 
 	for (auto& module : this->MODULES)
@@ -147,17 +132,14 @@ void Settings::perform_checks()
 	if (err_count > 0)
 	{
 		throw ImproperlyConfigured(
-			"System check identified " + std::to_string(err_count) + " issues.",
-			_ERROR_DETAILS_
+			"System check identified " + std::to_string(err_count) + " issues.", _ERROR_DETAILS_
 		);
 	}
 
 	std::cout << "Done." << std::endl;
 }
 
-std::shared_ptr<IModuleConfig> Settings::get_module(
-	const std::string& full_name
-) const
+std::shared_ptr<IModuleConfig> Settings::get_module(const std::string& full_name) const
 {
 	if (this->_modules.find(full_name) != this->_modules.end())
 	{
@@ -167,9 +149,7 @@ std::shared_ptr<IModuleConfig> Settings::get_module(
 	return nullptr;
 }
 
-std::shared_ptr<middleware::IMiddleware> Settings::get_middleware(
-	const std::string& full_name
-) const
+std::shared_ptr<middleware::IMiddleware> Settings::get_middleware(const std::string& full_name) const
 {
 	if (this->_middleware.find(full_name) != this->_middleware.end())
 	{
@@ -179,9 +159,7 @@ std::shared_ptr<middleware::IMiddleware> Settings::get_middleware(
 	return nullptr;
 }
 
-std::shared_ptr<render::abc::ILibrary> Settings::get_library(
-	const std::string& full_name
-) const
+std::shared_ptr<render::abc::ILibrary> Settings::get_library(const std::string& full_name) const
 {
 	if (this->_libraries.find(full_name) != this->_libraries.end())
 	{
@@ -191,9 +169,7 @@ std::shared_ptr<render::abc::ILibrary> Settings::get_library(
 	return nullptr;
 }
 
-std::shared_ptr<render::abc::ILoader> Settings::get_loader(
-	const std::string& full_name
-) const
+std::shared_ptr<render::abc::ILoader> Settings::get_loader(const std::string& full_name) const
 {
 	if (this->_loaders.find(full_name) != this->_loaders.end())
 	{

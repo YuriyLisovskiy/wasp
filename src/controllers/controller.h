@@ -60,8 +60,7 @@ protected:
 
 protected:
 	inline explicit Controller(
-		const std::vector<std::string>& allowed_methods,
-		conf::Settings* settings
+		const std::vector<std::string>& allowed_methods, conf::Settings* settings
 	) : Controller<URLArgsT...>(settings)
 	{
 		this->allowed_methods_list = allowed_methods;
@@ -104,7 +103,7 @@ public:
 	{
 		if (!this->settings)
 		{
-			throw NullPointerException("ctrl::Controller: settings is nullptr", _ERROR_DETAILS_);
+			throw NullPointerException("xw::ctrl::Controller: settings is nullptr", _ERROR_DETAILS_);
 		}
 	}
 

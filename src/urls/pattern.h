@@ -68,6 +68,11 @@ public:
 	inline Pattern(const std::string& rgx, ControllerHandler<ArgsT...> handler, std::string name) :
 		_regex(rgx), _handler(std::move(handler)), _name(std::move(name))
 	{
+		if (this->_name.empty())
+		{
+			throw ArgumentError("the name of pattern should not be empty", _ERROR_DETAILS_);
+		}
+
 		this->_reload_pattern_parts();
 	}
 

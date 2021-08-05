@@ -37,7 +37,7 @@ std::shared_ptr<collections::Dictionary<std::string, tag_t>> DefaultLibrary::get
 		{tags::TAG_NAME_MEDIA, {tags::make_static_tag("media", this->settings->MEDIA_URL)}},
 
 		// Example: {% url('app_namespace::profile', 256) -> profile_256 %}
-		{tags::TAG_NAME_URL, {tags::make_url_tag(this->settings->ROOT_URLCONF)}}
+		{tags::TAG_NAME_URL, {tags::make_url_tag(this->settings->URLPATTERNS)}}
 	});
 }
 

@@ -4,6 +4,8 @@
  * Copyright (c) 2019-2021 Yuriy Lisovskiy
  */
 
+#include <utility>
+
 #include "./xalwart.h"
 
 // Framework libraries.
@@ -17,18 +19,18 @@
 __CONF_BEGIN__
 
 MainApplication::MainApplication(
+	const std::string& version,
 	conf::Settings* settings,
 	std::function<std::shared_ptr<net::abc::IServer>(
 		log::ILogger*, const Kwargs&, std::shared_ptr<dt::Timezone>
 	)> server_initializer
-) : server_initializer(std::move(server_initializer))
+) : server_initializer(std::move(server_initializer)), version(version)
 {
 	InterruptException::initialize();
 	if (!settings)
 	{
 		throw ImproperlyConfigured(
-			"Setting must be configured in order to use the application.",
-			_ERROR_DETAILS_
+			"Settings must be configured in order to use the application.", _ERROR_DETAILS_
 		);
 	}
 
@@ -81,11 +83,7 @@ void MainApplication::execute(int argc, char** argv)
 				std::cout << "Command \"" << argv[1] << "\" is not found.\n\n";
 			}
 		}
-		catch (const CommandError& exc)
-		{
-			this->settings->LOGGER->error(exc.what(), exc.line(), exc.function(), exc.file());
-		}
-		catch (const InterruptException& exc)
+		catch (const BaseException& exc)
 		{
 			this->settings->LOGGER->error(exc.what(), exc.line(), exc.function(), exc.file());
 		}
@@ -106,16 +104,15 @@ void MainApplication::execute(int argc, char** argv)
 
 void MainApplication::_setup_commands()
 {
-	// Retrieve commands from INSTALLED_MODULES and
-	// check if modules' commands do not override
-	// settings commands.
+	// Retrieve commands from 'MODULES' and check if modules'
+	// commands do not override settings commands.
 	for (auto& installed_module : this->settings->MODULES)
 	{
 		this->_extend_settings_commands_or_error(
 			installed_module->get_commands(),
 			[installed_module](const std::string& cmd_name) -> std::string {
 				return "Module with name '" + installed_module->get_name() +
-				       "' overrides commands with '" + cmd_name + "' command";
+					"' overrides commands with '" + cmd_name + "' command";
 			}
 		);
 	}
@@ -125,14 +122,14 @@ void MainApplication::_setup_commands()
 			log::ILogger* logger, const Kwargs& kwargs, std::shared_ptr<dt::Timezone> tz
 		) -> std::shared_ptr<net::abc::IServer>
 		{
-			auto server = this->server_initializer(logger, kwargs, tz);
+			auto server = this->server_initializer(logger, kwargs, std::move(tz));
 			server->setup_handler(this->make_handler());
 			return server;
 		}
 	).get_commands();
 
 	// Check if user-defined commands do not override
-	// default commands, if not, append them to settings.COMMANDS
+	// default commands, if not, append them to '_commands'.
 	this->_extend_settings_commands_or_error(
 		default_commands,
 		[](const std::string& cmd_name) -> std::string {
@@ -150,9 +147,7 @@ void MainApplication::_extend_settings_commands_or_error(
 	{
 		if (std::find_if(
 			this->_commands.begin(), this->_commands.end(),
-			[command](const std::pair<
-				std::string, std::shared_ptr<cmd::BaseCommand>
-			>& pair) -> bool {
+			[command](const std::pair<std::string, std::shared_ptr<cmd::BaseCommand>>& pair) -> bool {
 				return command->name() == pair.first;
 			}
 		) != this->_commands.end())
@@ -166,13 +161,11 @@ void MainApplication::_extend_settings_commands_or_error(
 
 net::HandlerFunc MainApplication::make_handler()
 {
-	// Check if static files can be served
-	// and create necessary urls.
-	this->build_static_patterns(this->settings->ROOT_URLCONF);
+	// Check if static files can be served and create necessary urls.
+	this->build_static_patterns(this->settings->URLPATTERNS);
 
-	// Retrieve main module patterns and append them
-	// to result.
-	this->build_module_patterns(this->settings->ROOT_URLCONF);
+	// Retrieve main module patterns and append them to result.
+	this->build_module_patterns(this->settings->URLPATTERNS);
 
 	// Initialize template engine's libraries.
 	this->settings->TEMPLATE_ENGINE->load_libraries();
@@ -188,7 +181,7 @@ net::HandlerFunc MainApplication::make_handler()
 			result = this->process_request_middleware(request);
 			if (!result.catch_(HttpError) && !result.value)
 			{
-				result = this->process_urlpatterns(request, this->settings->ROOT_URLCONF);
+				result = this->process_urlpatterns(request, this->settings->URLPATTERNS);
 
 				// TODO: check if it is required to process response middleware in case of controller error.
 				if (!result.catch_(HttpError))
@@ -245,16 +238,12 @@ net::HandlerFunc MainApplication::make_handler()
 		}
 		catch (const BaseException& exc)
 		{
-			this->settings->LOGGER->trace(
-				"An error was caught as core::BaseException", _ERROR_DETAILS_
-			);
+			this->settings->LOGGER->trace("An error was caught as core::BaseException", _ERROR_DETAILS_);
 			result = raise<InternalServerError, std::shared_ptr<http::IHttpResponse>>(exc.what());
 		}
 		catch (const std::exception& exc)
 		{
-			this->settings->LOGGER->trace(
-				"An error was caught as std::exception", _ERROR_DETAILS_
-			);
+			this->settings->LOGGER->trace("An error was caught as std::exception", _ERROR_DETAILS_);
 			result = raise<InternalServerError, std::shared_ptr<http::IHttpResponse>>(
 				"<p style=\"font-size: 24px;\" >Internal Server Error</p><p>" + std::string(exc.what()) + "</p>"
 			);
@@ -284,17 +273,21 @@ void MainApplication::build_static_patterns(std::vector<std::shared_ptr<urls::IP
 
 	if (!this->settings->MEDIA_ROOT.empty() && this->static_is_allowed(this->settings->MEDIA_URL))
 	{
-		patterns.push_back(
-			urls::make_static(this->settings->MEDIA_URL, this->settings->MEDIA_ROOT, "media")
-		);
+		patterns.push_back(urls::make_static(this->settings->MEDIA_URL, this->settings->MEDIA_ROOT, "media"));
 	}
 }
 
 void MainApplication::build_module_patterns(std::vector<std::shared_ptr<urls::IPattern>>& patterns)
 {
-	if (this->settings->ROOT_MODULE)
+	if (!this->settings->MODULES.empty())
 	{
-		auto modules_patterns = this->settings->ROOT_MODULE->get_urlpatterns();
+		auto root_module = this->settings->MODULES.front();
+		if (!root_module)
+		{
+			throw NullPointerException("'root_module' is nullptr", _ERROR_DETAILS_);
+		}
+
+		auto modules_patterns = root_module->get_urlpatterns();
 		patterns.insert(patterns.end(), modules_patterns.begin(), modules_patterns.end());
 	}
 }
@@ -324,16 +317,14 @@ Result<std::shared_ptr<http::IHttpResponse>> MainApplication::process_urlpattern
 	std::vector<std::shared_ptr<urls::IPattern>>& urlpatterns
 )
 {
-	auto apply = urls::resolve(request->path(), this->settings->ROOT_URLCONF);
+	auto apply = urls::resolve(request->path(), this->settings->URLPATTERNS);
 	if (apply)
 	{
 		return apply(request.get(), this->settings);
 	}
 
 	this->settings->LOGGER->trace("The requested resource was not found", _ERROR_DETAILS_);
-	return raise<NotFound, std::shared_ptr<http::IHttpResponse>>(
-		"<h2>404 - Not Found</h2>"
-	);
+	return raise<NotFound, std::shared_ptr<http::IHttpResponse>>("<h2>404 - Not Found</h2>");
 }
 
 Result<std::shared_ptr<http::IHttpResponse>> MainApplication::process_response_middleware(
@@ -341,7 +332,7 @@ Result<std::shared_ptr<http::IHttpResponse>> MainApplication::process_response_m
 	std::shared_ptr<http::IHttpResponse>& response
 )
 {
-	long long size = this->settings->MIDDLEWARE.size();
+	long long size = (long long)this->settings->MIDDLEWARE.size();
 	for (long long i = size - 1; i >= 0; i--)
 	{
 		auto result = this->settings->MIDDLEWARE[i]->process_response(
@@ -478,8 +469,7 @@ uint MainApplication::start_response(
 		// Response was not instantiated, so return 204 - No Content.
 		response = std::make_shared<http::HttpResponse>(204);
 		this->settings->LOGGER->warning(
-			"Response was not instantiated, returned 204",
-			_ERROR_DETAILS_
+			"Response was not instantiated, returned 204", _ERROR_DETAILS_
 		);
 	}
 	else
