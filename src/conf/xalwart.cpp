@@ -4,8 +4,6 @@
  * Copyright (c) 2019-2021 Yuriy Lisovskiy
  */
 
-#include <utility>
-
 #include "./xalwart.h"
 
 // Framework libraries.
@@ -18,6 +16,48 @@
 
 
 __CONF_BEGIN__
+
+void MainApplication::_setup_commands(net::HandlerFunc handler)
+{
+	auto core_module = mgmt::CoreModuleConfig(
+		this->settings, [this, handler](
+			log::ILogger* logger, const Kwargs& kwargs, std::shared_ptr<dt::Timezone> tz
+		) mutable -> std::shared_ptr<net::abc::IServer>
+		{
+			auto server = this->server_initializer(logger, kwargs, std::move(tz));
+			server->setup_handler(std::move(handler));
+			return server;
+		}
+	);
+
+	this->_extend_settings_commands(core_module.get_commands(), core_module.get_name());
+	for (auto& installed_module : this->settings->MODULES)
+	{
+		this->_extend_settings_commands(installed_module->get_commands(), installed_module->get_name());
+	}
+}
+
+void MainApplication::_extend_settings_commands(
+	const std::vector<std::shared_ptr<cmd::BaseCommand>>& from, const std::string& module_name
+)
+{
+	for (auto& command : from)
+	{
+		if (std::find_if(
+			this->_commands.begin(), this->_commands.end(),
+			[command](const std::pair<std::string, std::shared_ptr<cmd::BaseCommand>>& pair) -> bool {
+				return command->name() == pair.first;
+			}
+		) != this->_commands.end())
+		{
+			this->settings->LOGGER->warning(
+				"Module with name '" + module_name + "' overrides commands with '" + command->name() + "' command"
+			);
+		}
+
+		this->_commands[command->name()] = command;
+	}
+}
 
 MainApplication::MainApplication(
 	const std::string& version,
@@ -39,7 +79,26 @@ MainApplication::MainApplication(
 	this->settings->prepare();
 	this->settings->perform_checks();
 
-	this->_setup_commands();
+	// Check if static files can be served and create necessary urls.
+	this->build_static_pattern(
+		this->settings->URLPATTERNS, this->settings->STATIC_ROOT, this->settings->STATIC_URL, "static"
+	);
+	this->build_static_pattern(
+		this->settings->URLPATTERNS, this->settings->MEDIA_ROOT, this->settings->MEDIA_URL, "media"
+	);
+
+	// Retrieve main module patterns and append them to result.
+	this->build_module_patterns(this->settings->URLPATTERNS);
+
+	// Initialize template engine's libraries.
+	if (this->settings->TEMPLATE_ENGINE == nullptr)
+	{
+		throw NullPointerException("'settings->TEMPLATE_ENGINE' is nullptr", _ERROR_DETAILS_);
+	}
+
+	this->settings->TEMPLATE_ENGINE->load_libraries();
+
+	this->_setup_commands(this->make_handler());
 
 	size_t max_len = 0;
 	for (auto& command : this->_commands)
@@ -103,78 +162,15 @@ void MainApplication::execute(int argc, char** argv)
 	}
 }
 
-void MainApplication::_setup_commands()
+net::HandlerFunc MainApplication::make_handler() const
 {
-	auto core_module = mgmt::CoreModuleConfig(
-		this->settings, [this](
-			log::ILogger* logger, const Kwargs& kwargs, std::shared_ptr<dt::Timezone> tz
-		) -> std::shared_ptr<net::abc::IServer>
-		{
-			auto server = this->server_initializer(logger, kwargs, std::move(tz));
-			server->setup_handler(this->make_handler());
-			return server;
-		}
-	);
-
-	this->_extend_settings_commands(core_module.get_commands(), core_module.get_name());
-	for (auto& installed_module : this->settings->MODULES)
+	return [this](net::RequestContext* ctx, const collections::Dictionary<std::string, std::string>& env) -> uint
 	{
-		this->_extend_settings_commands(installed_module->get_commands(), installed_module->get_name());
-	}
-}
-
-void MainApplication::_extend_settings_commands(
-	const std::vector<std::shared_ptr<cmd::BaseCommand>>& from, const std::string& module_name
-)
-{
-	for (auto& command : from)
-	{
-		if (std::find_if(
-			this->_commands.begin(), this->_commands.end(),
-			[command](const std::pair<std::string, std::shared_ptr<cmd::BaseCommand>>& pair) -> bool {
-				return command->name() == pair.first;
-			}
-		) != this->_commands.end())
-		{
-			this->settings->LOGGER->warning(
-				"Module with name '" + module_name + "' overrides commands with '" + command->name() + "' command"
-			);
-		}
-
-		this->_commands[command->name()] = command;
-	}
-}
-
-net::HandlerFunc MainApplication::make_handler()
-{
-	// Check if static files can be served and create necessary urls.
-	this->build_static_pattern(
-		this->settings->URLPATTERNS, this->settings->STATIC_ROOT, this->settings->STATIC_URL, "static"
-	);
-	this->build_static_pattern(
-		this->settings->URLPATTERNS, this->settings->MEDIA_ROOT, this->settings->MEDIA_URL, "media"
-	);
-
-	// Retrieve main module patterns and append them to result.
-	this->build_module_patterns(this->settings->URLPATTERNS);
-
-	// Initialize template engine's libraries.
-	if (this->settings->TEMPLATE_ENGINE == nullptr)
-	{
-		throw NullPointerException("'settings->TEMPLATE_ENGINE' is nullptr", _ERROR_DETAILS_);
-	}
-
-	this->settings->TEMPLATE_ENGINE->load_libraries();
-
-	auto handler = [this](
-		net::RequestContext* ctx, const collections::Dictionary<std::string, std::string>& env
-	) -> uint
-	{
-		auto request = this->make_request(ctx, env);
+		auto request = this->build_request(ctx, env);
 		http::result_t result;
 		try
 		{
-			result = this->process_request_middleware(request);
+			result = this->process_request(request);
 			if (!result.exception && !result.response)
 			{
 				result = this->process_urlpatterns(request, this->settings->URLPATTERNS);
@@ -192,7 +188,7 @@ net::HandlerFunc MainApplication::make_handler()
 					}
 					else
 					{
-						auto middleware_result = this->process_response_middleware(request, result.response);
+						auto middleware_result = this->process_response(request, result.response);
 						if (middleware_result.exception || middleware_result.response)
 						{
 							if (middleware_result.exception)
@@ -238,8 +234,6 @@ net::HandlerFunc MainApplication::make_handler()
 
 		return start_response(ctx, result);
 	};
-
-	return handler;
 }
 
 bool MainApplication::static_is_allowed(const std::string& static_url) const
@@ -262,7 +256,7 @@ void MainApplication::build_static_pattern(
 	}
 }
 
-void MainApplication::build_module_patterns(std::vector<std::shared_ptr<urls::IPattern>>& patterns)
+void MainApplication::build_module_patterns(std::vector<std::shared_ptr<urls::IPattern>>& patterns) const
 {
 	if (!this->settings->MODULES.empty())
 	{
@@ -277,7 +271,7 @@ void MainApplication::build_module_patterns(std::vector<std::shared_ptr<urls::IP
 	}
 }
 
-http::result_t MainApplication::process_request_middleware(std::shared_ptr<http::HttpRequest>& request)
+http::result_t MainApplication::process_request(std::shared_ptr<http::HttpRequest>& request) const
 {
 	for (auto& middleware : this->settings->MIDDLEWARE)
 	{
@@ -297,7 +291,7 @@ http::result_t MainApplication::process_request_middleware(std::shared_ptr<http:
 
 http::result_t MainApplication::process_urlpatterns(
 	std::shared_ptr<http::HttpRequest>& request, std::vector<std::shared_ptr<urls::IPattern>>& urlpatterns
-)
+) const
 {
 	auto apply = urls::resolve(request->path(), this->settings->URLPATTERNS);
 	if (apply)
@@ -309,9 +303,9 @@ http::result_t MainApplication::process_urlpatterns(
 	return http::raise(404, "<h2>404 - Not Found</h2>");
 }
 
-http::result_t MainApplication::process_response_middleware(
+http::result_t MainApplication::process_response(
 	std::shared_ptr<http::HttpRequest>& request, std::shared_ptr<http::IHttpResponse>& response
-)
+) const
 {
 	auto size = (long long)this->settings->MIDDLEWARE.size();
 	for (long long i = size - 1; i >= 0; i--)
@@ -332,9 +326,9 @@ http::result_t MainApplication::process_response_middleware(
 	return {};
 }
 
-std::shared_ptr<http::HttpRequest> MainApplication::make_request(
+std::shared_ptr<http::HttpRequest> MainApplication::build_request(
 	net::RequestContext* ctx, collections::Dictionary<std::string, std::string> env
-)
+) const
 {
 	collections::MultiDictionary<std::string, std::string> get_params, post_params;
 	collections::MultiDictionary<std::string, files::UploadedFile> files_params;
@@ -397,7 +391,7 @@ std::shared_ptr<http::HttpRequest> MainApplication::make_request(
 	);
 }
 
-uint MainApplication::start_response(net::RequestContext* ctx, const http::result_t& result)
+uint MainApplication::start_response(net::RequestContext* ctx, const http::result_t& result) const
 {
 	std::shared_ptr<http::IHttpResponse> response;
 	if (result.exception)
@@ -420,9 +414,7 @@ uint MainApplication::start_response(net::RequestContext* ctx, const http::resul
 	return response->status();
 }
 
-void MainApplication::finish_response(
-	net::RequestContext* ctx, http::IHttpResponse* response
-)
+void MainApplication::finish_response(net::RequestContext* ctx, http::IHttpResponse* response) const
 {
 	if (response->is_streaming())
 	{

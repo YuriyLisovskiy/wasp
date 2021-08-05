@@ -308,6 +308,7 @@ public:
 	std::shared_ptr<std::pair<std::string, std::string>> SECURE_PROXY_SSL_HEADER =
 		std::make_shared<std::pair<std::string, std::string>>("X-Forwarded-Proto", "https");
 
+public:
 	explicit Settings(const std::string& base_dir);
 
 	virtual ~Settings() = default;
