@@ -31,7 +31,7 @@ inline std::shared_ptr<urls::Pattern<std::string>> make_static(
 
 	auto controller_func = [static_root](
 		http::HttpRequest* request, const std::tuple<std::string>& args, conf::Settings* settings
-	) -> Result<std::shared_ptr<http::IHttpResponse>>
+	) -> http::result_t
 	{
 		ctrl::StaticController controller(settings);
 		controller.set_kwargs(Kwargs({

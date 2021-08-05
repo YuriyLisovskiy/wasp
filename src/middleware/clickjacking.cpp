@@ -12,18 +12,15 @@
 
 __MIDDLEWARE_BEGIN__
 
-Result<std::shared_ptr<http::IHttpResponse>> XFrameOptionsMiddleware::process_response(
-	http::HttpRequest* request, http::IHttpResponse* response
-)
+http::result_t XFrameOptionsMiddleware::process_response(http::HttpRequest* request, http::IHttpResponse* response)
 {
-	// Don't set it if it's already in the response.
-	if (response->has_header(http::X_FRAME_OPTIONS))
+	// Set it if it's not already in the response.
+	if (!response->has_header(http::X_FRAME_OPTIONS))
 	{
-		return this->none();
+		response->set_header(http::X_FRAME_OPTIONS, this->get_x_frame_options_value(request, response));
 	}
 
-	response->set_header(http::X_FRAME_OPTIONS, this->get_x_frame_options_value(request, response));
-	return this->none();
+	return {};
 }
 
 __MIDDLEWARE_END__

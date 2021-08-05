@@ -17,16 +17,14 @@
 
 __MIDDLEWARE_BEGIN__
 
-Result<std::shared_ptr<http::IHttpResponse>> ConditionalGetMiddleware::process_response(
-	http::HttpRequest* request, http::IHttpResponse* response
-)
+http::result_t ConditionalGetMiddleware::process_response(http::HttpRequest* request, http::IHttpResponse* response)
 {
 	// It's too late to prevent an unsafe request with a 412 response, and
 	// for a HEAD request, the response body is always empty so computing
 	// an accurate ETag isn't possible.
 	if (request->method() != "GET")
 	{
-		return this->none();
+		return {};
 	}
 
 	if (needs_etag(response) && !response->has_header(http::E_TAG))
@@ -43,11 +41,11 @@ Result<std::shared_ptr<http::IHttpResponse>> ConditionalGetMiddleware::process_r
 		);
 		if (conditional_response)
 		{
-			return this->result(conditional_response);
+			return {conditional_response, nullptr};
 		}
 	}
 
-	return this->none();
+	return {};
 }
 
 bool ConditionalGetMiddleware::needs_etag(http::IHttpResponse* response)

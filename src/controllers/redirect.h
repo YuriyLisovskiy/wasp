@@ -42,34 +42,34 @@ public:
 	// Return the URL redirect to.
 	std::string get_redirect_url();
 
-	Result<std::shared_ptr<http::IHttpResponse>> get() override;
+	http::result_t get() override;
 
-	inline Result<std::shared_ptr<http::IHttpResponse>> post() override
+	inline http::result_t post() override
 	{
 		return this->get();
 	}
 
-	inline Result<std::shared_ptr<http::IHttpResponse>> head() override
+	inline http::result_t head() override
 	{
 		return this->get();
 	}
 
-	inline Result<std::shared_ptr<http::IHttpResponse>> options() override
+	inline http::result_t options() override
 	{
 		return this->get();
 	}
 
-	inline Result<std::shared_ptr<http::IHttpResponse>> put() override
+	inline http::result_t put() override
 	{
 		return this->get();
 	}
 
-	inline Result<std::shared_ptr<http::IHttpResponse>> delete_() override
+	inline http::result_t delete_() override
 	{
 		return this->get();
 	}
 
-	inline Result<std::shared_ptr<http::IHttpResponse>> patch() override
+	inline http::result_t patch() override
 	{
 		return this->get();
 	}

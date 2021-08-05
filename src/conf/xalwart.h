@@ -34,21 +34,22 @@ protected:
 protected:
 	net::HandlerFunc make_handler();
 
-	bool static_is_allowed(const std::string& static_url);
+	bool static_is_allowed(const std::string& static_url) const;
 
-	void build_static_patterns(std::vector<std::shared_ptr<urls::IPattern>>& patterns);
+	void build_static_pattern(
+		std::vector<std::shared_ptr<urls::IPattern>>& patterns,
+		const std::string& root, const std::string& url, const std::string& name
+	) const;
 
 	void build_module_patterns(std::vector<std::shared_ptr<urls::IPattern>>& patterns);
 
-	Result<std::shared_ptr<http::IHttpResponse>> process_request_middleware(
-		std::shared_ptr<http::HttpRequest>& request
-	);
+	http::result_t process_request_middleware(std::shared_ptr<http::HttpRequest>& request);
 
-	Result<std::shared_ptr<http::IHttpResponse>> process_response_middleware(
+	http::result_t process_response_middleware(
 		std::shared_ptr<http::HttpRequest>& request, std::shared_ptr<http::IHttpResponse>& response
 	);
 
-	Result<std::shared_ptr<http::IHttpResponse>> process_urlpatterns(
+	http::result_t process_urlpatterns(
 		std::shared_ptr<http::HttpRequest>& request, std::vector<std::shared_ptr<urls::IPattern>>& urlpatterns
 	);
 
@@ -56,11 +57,9 @@ protected:
 		net::RequestContext* ctx, collections::Dictionary<std::string, std::string> env
 	);
 
-	static std::shared_ptr<http::IHttpResponse> error_to_response(const Error* err);
+//	static std::shared_ptr<http::IHttpResponse> error_to_response(const Error* err);
 
-	uint start_response(
-		net::RequestContext* ctx, const Result<std::shared_ptr<http::IHttpResponse>>& result
-	);
+	uint start_response(net::RequestContext* ctx, const http::result_t& result);
 
 	void finish_response(net::RequestContext* ctx, http::IHttpResponse* response);
 
@@ -72,9 +71,8 @@ private:
 
 	void _setup_commands();
 
-	void _extend_settings_commands_or_error(
-		const std::vector<std::shared_ptr<cmd::BaseCommand>>& from,
-		const std::function<std::string(const std::string& cmd_name)>& err_fn
+	void _extend_settings_commands(
+		const std::vector<std::shared_ptr<cmd::BaseCommand>>& from, const std::string& module_name
 	);
 
 public:

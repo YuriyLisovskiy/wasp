@@ -74,7 +74,7 @@ protected:
 	{
 		ctrl::Handler<ArgsT...> controller_handler = [this](
 			http::HttpRequest* request, const std::tuple<ArgsT...>& args, conf::Settings* settings_ptr
-		) -> Result<std::shared_ptr<http::IHttpResponse>>
+			) -> http::result_t
 		{
 			ControllerT controller(settings_ptr);
 			controller.setup(request);

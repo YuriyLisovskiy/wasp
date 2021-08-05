@@ -26,33 +26,6 @@ protected:
 	conf::Settings* settings;
 
 protected:
-	inline Result<std::shared_ptr<http::IHttpResponse>> none()
-	{
-		return {};
-	}
-
-	template<typename ResponseT, typename ...Args>
-	inline Result<std::shared_ptr<http::IHttpResponse>> result(Args&& ...args)
-	{
-		return Result<std::shared_ptr<http::IHttpResponse>>(
-			std::make_shared<ResponseT>(std::forward<Args>(args)...)
-		);
-	}
-
-	inline Result<std::shared_ptr<http::IHttpResponse>> result(
-		const std::shared_ptr<http::IHttpResponse>& response
-	)
-	{
-		return Result<std::shared_ptr<http::IHttpResponse>>(response);
-	}
-
-	template<error_type ErrorType, typename ...Args>
-	inline Result<std::shared_ptr<http::IHttpResponse>> raise(Args&& ...args)
-	{
-		return xw::raise<ErrorType, std::shared_ptr<http::IHttpResponse>>(
-			std::forward<Args>(args)...
-		);
-	}
 
 public:
 	inline explicit BaseMiddleware(conf::Settings* settings)
@@ -67,16 +40,16 @@ public:
 
 	~BaseMiddleware() override = default;
 
-	inline Result<std::shared_ptr<http::IHttpResponse>> process_request(http::HttpRequest* request) override
+	inline http::result_t process_request(http::HttpRequest* request) override
 	{
-		return this->none();
+		return {};
 	}
 
-	inline Result<std::shared_ptr<http::IHttpResponse>> process_response(
+	inline http::result_t process_response(
 		http::HttpRequest* request, http::IHttpResponse* response
 	) override
 	{
-		return this->none();
+		return {};
 	}
 };
 

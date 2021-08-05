@@ -38,7 +38,7 @@ public:
 	{
 	}
 
-	Result<std::shared_ptr<http::IHttpResponse>> process_response(
+	http::result_t process_response(
 		http::HttpRequest* request, http::IHttpResponse* response
 	) override;
 

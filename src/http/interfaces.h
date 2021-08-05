@@ -88,8 +88,6 @@ public:
 	virtual void write_lines(const std::vector<std::string>& lines) = 0;
 
 	virtual std::string serialize() = 0;
-
-	virtual Error err() = 0;
 };
 
 __HTTP_END__

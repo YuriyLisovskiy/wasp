@@ -78,37 +78,37 @@ TEST_F(ControllerTestCase, GetTestReturnsNullptr)
 	auto request = ControllerTestCase::make_request(this->settings, "get");
 	auto response = this->controller->get();
 
-	ASSERT_EQ(response.value, nullptr);
+	ASSERT_EQ(response.response, nullptr);
 }
 
 TEST_F(ControllerTestCase, PostTestReturnsNullptr)
 {
 	auto request = ControllerTestCase::make_request(this->settings, "post");
-	ASSERT_EQ(this->controller->post().value, nullptr);
+	ASSERT_EQ(this->controller->post().response, nullptr);
 }
 
 TEST_F(ControllerTestCase, PutTestReturnsNullptr)
 {
 	auto request = ControllerTestCase::make_request(this->settings, "put");
-	ASSERT_EQ(this->controller->put().value, nullptr);
+	ASSERT_EQ(this->controller->put().response, nullptr);
 }
 
 TEST_F(ControllerTestCase, PatchTestReturnsNullptr)
 {
 	auto request = ControllerTestCase::make_request(this->settings, "patch");
-	ASSERT_EQ(this->controller->patch().value, nullptr);
+	ASSERT_EQ(this->controller->patch().response, nullptr);
 }
 
 TEST_F(ControllerTestCase, DeleteTestReturnsNullptr)
 {
 	auto request = ControllerTestCase::make_request(this->settings, "delete");
-	ASSERT_EQ(this->controller->delete_().value, nullptr);
+	ASSERT_EQ(this->controller->delete_().response, nullptr);
 }
 
 TEST_F(ControllerTestCase, HeadTestReturnsNullptr)
 {
 	auto request = ControllerTestCase::make_request(this->settings, "head");
-	ASSERT_EQ(this->controller->head().value, nullptr);
+	ASSERT_EQ(this->controller->head().response, nullptr);
 }
 
 TEST_F(ControllerTestCase, OptionsTest)
@@ -124,15 +124,15 @@ TEST_F(ControllerTestCase, OptionsTest)
 	auto request = ControllerTestCase::make_request(this->settings, "options");
 	auto actual_response = this->controller->options();
 
-	ASSERT_EQ(actual_response.value->content_type(), expected_response.content_type());
-	ASSERT_EQ(actual_response.value->status(), expected_response.status());
-	ASSERT_EQ(actual_response.value->charset(), expected_response.charset());
+	ASSERT_EQ(actual_response.response->content_type(), expected_response.content_type());
+	ASSERT_EQ(actual_response.response->status(), expected_response.status());
+	ASSERT_EQ(actual_response.response->charset(), expected_response.charset());
 }
 
 TEST_F(ControllerTestCase, TraceTestReturnsNullptr)
 {
 	auto request = ControllerTestCase::make_request(this->settings, "trace");
-	ASSERT_EQ(this->controller->trace().value, nullptr);
+	ASSERT_EQ(this->controller->trace().response, nullptr);
 }
 
 TEST_F(ControllerTestCase, AllowedMethodsTest)
@@ -157,7 +157,7 @@ TEST_F(ControllerTestCase, SetupAndDispatchAllowedTest)
 	this->controller->setup(&request);
 	auto response = this->controller->dispatch();
 
-	ASSERT_EQ(response.value->status(), 200);
+	ASSERT_EQ(response.response->status(), 200);
 }
 
 TEST_F(ControllerTestCase, DispatchNotAllowedTest)
@@ -167,5 +167,5 @@ TEST_F(ControllerTestCase, DispatchNotAllowedTest)
 
 	auto response = this->controller->dispatch();
 
-	ASSERT_EQ(response.value->status(), 405);
+	ASSERT_EQ(response.response->status(), 405);
 }

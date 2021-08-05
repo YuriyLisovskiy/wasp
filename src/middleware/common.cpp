@@ -13,6 +13,7 @@
 #include "../urls/resolver.h"
 #include "../http/headers.h"
 #include "../http/utility.h"
+#include "../http/exceptions.h"
 
 
 __MIDDLEWARE_BEGIN__
@@ -65,9 +66,7 @@ Result<std::string> CommonMiddleware::get_full_path_with_slash(http::HttpRequest
 	return Result(new_path);
 }
 
-Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::process_request(
-	http::HttpRequest* request
-)
+http::result_t CommonMiddleware::process_request(http::HttpRequest* request)
 {
 	if (request->headers.contains(http::USER_AGENT))
 	{
@@ -79,9 +78,7 @@ Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::process_request(
 				this->settings->LOGGER->trace(
 					"Found user agent which is not allowed: '" + user_agent + "'", _ERROR_DETAILS_
 				);
-				return this->raise<PermissionDenied>(
-					"Forbidden user agent", _ERROR_DETAILS_
-				);
+				return http::raise(403, "Forbidden user agent");
 			}
 		}
 	}
@@ -96,7 +93,9 @@ Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::process_request(
 	if (result.err)
 	{
 		this->settings->LOGGER->trace("Method 'get_host' returned an error", _ERROR_DETAILS_);
-		return result.forward_err<std::shared_ptr<http::IHttpResponse>>();
+		return http::exception<http::DisallowedHostException>(
+			result.err.msg, result.err.line, result.err.func.c_str(), result.err.file.c_str()
+		);
 	}
 
 	auto host = result.value;
@@ -116,7 +115,9 @@ Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::process_request(
 			this->settings->LOGGER->trace(
 				"Method 'get_full_path_with_slash' returned an error", _ERROR_DETAILS_
 			);
-			return result.forward_err<std::shared_ptr<http::IHttpResponse>>();
+			return http::exception<http::DisallowedHostException>(
+				result.err.msg, result.err.line, result.err.func.c_str(), result.err.file.c_str()
+			);
 		}
 
 		path = result.value;
@@ -133,12 +134,10 @@ Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::process_request(
 		return this->get_response_redirect(redirect_url);
 	}
 
-	return this->none();
+	return {};
 }
 
-Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::process_response(
-	http::HttpRequest* request, http::IHttpResponse* response
-)
+http::result_t CommonMiddleware::process_response(http::HttpRequest* request, http::IHttpResponse* response)
 {
 	// If the given URL is "Not Found", then check if we
 	// should redirect to a path with a slash appended.
@@ -152,7 +151,9 @@ Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::process_response(
 				this->settings->LOGGER->trace(
 					"Method 'get_full_path_with_slash' returned an error", _ERROR_DETAILS_
 				);
-				return result.forward_err<std::shared_ptr<http::IHttpResponse>>();
+				return http::exception<http::DisallowedHostException>(
+					result.err.msg, result.err.line, result.err.func.c_str(), result.err.file.c_str()
+				);
 			}
 
 			return this->get_response_redirect(result.value);
@@ -168,7 +169,7 @@ Result<std::shared_ptr<http::IHttpResponse>> CommonMiddleware::process_response(
 		);
 	}
 
-	return this->none();
+	return {};
 }
 
 __MIDDLEWARE_END__

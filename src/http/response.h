@@ -13,9 +13,11 @@
 // C++ libraries.
 #include <set>
 #include <fstream>
+#include <memory>
 
 // Base libraries.
 #include <xalwart.base/collections/dictionary.h>
+#include <xalwart.base/exceptions.h>
 
 // Module definitions.
 #include "./_def_.h"
@@ -25,6 +27,30 @@
 
 
 __HTTP_BEGIN__
+
+//using result_t = std::pair<std::shared_ptr<IHttpResponse>, std::shared_ptr<BaseException>>;
+
+struct result_t
+{
+	std::shared_ptr<IHttpResponse> response = nullptr;
+	std::shared_ptr<BaseException> exception = nullptr;
+};
+
+// TESTME: result<HttpResponseT, ...ArgsT>
+// TODO: docs for 'result<HttpResponseT, ...ArgsT>'
+template <typename HttpResponseT, typename ...ArgsT>
+inline result_t result(ArgsT&& ...args)
+{
+	return result_t{std::make_shared<HttpResponseT>(std::forward<ArgsT>(args)...), nullptr};
+}
+
+// TESTME: error
+// TODO: docs for 'error'
+template <typename ExceptionT, typename ...ArgsT>
+inline result_t exception(ArgsT&& ...args)
+{
+	return result_t{nullptr, std::make_shared<ExceptionT>(std::forward<ArgsT>(args)...)};
+}
 
 /// An HTTP response base class with dictionary-accessed headers.
 ///
@@ -41,7 +67,6 @@ protected:
 	std::string _charset;
 	std::string _reason_phrase;
 	bool _streaming;
-	Error _err;
 
 	std::string serialize_headers();
 
@@ -114,8 +139,6 @@ public:
 	bool seekable() override;
 	bool writable() override;
 	void write_lines(const std::vector<std::string>& lines) override;
-
-	Error err() final;
 };
 
 
@@ -127,11 +150,11 @@ protected:
 
 public:
 	explicit HttpResponse(
-		unsigned short int status = 200,
-		const std::string& content = "",
-		const std::string& content_type = "",
-		const std::string& reason = "",
-		const std::string& charset = "utf-8"
+		unsigned short int status=200,
+		const std::string& content="",
+		const std::string& content_type="",
+		const std::string& reason="",
+		const std::string& charset="utf-8"
 	);
 	size_t content_length() override;
 	void set_content(const std::string& content) override;
@@ -143,6 +166,13 @@ public:
 	std::string serialize() override;
 };
 
+// TESTME: raise
+// TODO: docs for 'raise'
+template <typename ...ArgsT>
+inline result_t raise(unsigned short int status_code, ArgsT&& ...args)
+{
+	return result_t{std::make_shared<http::HttpResponse>(status_code, std::forward<ArgsT...>(args)...), nullptr};
+}
 
 class StreamingHttpResponse : public HttpResponseBase
 {

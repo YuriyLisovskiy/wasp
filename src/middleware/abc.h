@@ -30,12 +30,10 @@ public:
 	virtual ~IMiddleware() = default;
 
 	// An input http request before processing in controller.
-	virtual Result<std::shared_ptr<http::IHttpResponse>> process_request(
-		http::HttpRequest* request
-	) = 0;
+	virtual http::result_t process_request(http::HttpRequest* request) = 0;
 
 	// An output http request and response after processing in controller.
-	virtual Result<std::shared_ptr<http::IHttpResponse>> process_response(
+	virtual http::result_t process_response(
 		http::HttpRequest* request, http::IHttpResponse* response
 	) = 0;
 };

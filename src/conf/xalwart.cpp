@@ -11,6 +11,7 @@
 // Framework libraries.
 #include "../management/module.h"
 #include "../http/url.h"
+#include "../http/exceptions.h"
 #include "../http/internal/multipart_parser.h"
 #include "../urls/resolver.h"
 #include "../urls/utilities.h"
@@ -104,20 +105,7 @@ void MainApplication::execute(int argc, char** argv)
 
 void MainApplication::_setup_commands()
 {
-	// Retrieve commands from 'MODULES' and check if modules'
-	// commands do not override settings commands.
-	for (auto& installed_module : this->settings->MODULES)
-	{
-		this->_extend_settings_commands_or_error(
-			installed_module->get_commands(),
-			[installed_module](const std::string& cmd_name) -> std::string {
-				return "Module with name '" + installed_module->get_name() +
-					"' overrides commands with '" + cmd_name + "' command";
-			}
-		);
-	}
-
-	auto default_commands = mgmt::CoreModuleConfig(
+	auto core_module = mgmt::CoreModuleConfig(
 		this->settings, [this](
 			log::ILogger* logger, const Kwargs& kwargs, std::shared_ptr<dt::Timezone> tz
 		) -> std::shared_ptr<net::abc::IServer>
@@ -126,21 +114,17 @@ void MainApplication::_setup_commands()
 			server->setup_handler(this->make_handler());
 			return server;
 		}
-	).get_commands();
-
-	// Check if user-defined commands do not override
-	// default commands, if not, append them to '_commands'.
-	this->_extend_settings_commands_or_error(
-		default_commands,
-		[](const std::string& cmd_name) -> std::string {
-			return "Attempting to override '" + cmd_name + "' command which may produce an undefined behaviour.";
-		}
 	);
+
+	this->_extend_settings_commands(core_module.get_commands(), core_module.get_name());
+	for (auto& installed_module : this->settings->MODULES)
+	{
+		this->_extend_settings_commands(installed_module->get_commands(), installed_module->get_name());
+	}
 }
 
-void MainApplication::_extend_settings_commands_or_error(
-	const std::vector<std::shared_ptr<cmd::BaseCommand>>& from,
-	const std::function<std::string(const std::string& cmd_name)>& err_fn
+void MainApplication::_extend_settings_commands(
+	const std::vector<std::shared_ptr<cmd::BaseCommand>>& from, const std::string& module_name
 )
 {
 	for (auto& command : from)
@@ -152,7 +136,9 @@ void MainApplication::_extend_settings_commands_or_error(
 			}
 		) != this->_commands.end())
 		{
-			this->settings->LOGGER->warning(err_fn(command->name()));
+			this->settings->LOGGER->warning(
+				"Module with name '" + module_name + "' overrides commands with '" + command->name() + "' command"
+			);
 		}
 
 		this->_commands[command->name()] = command;
@@ -162,12 +148,22 @@ void MainApplication::_extend_settings_commands_or_error(
 net::HandlerFunc MainApplication::make_handler()
 {
 	// Check if static files can be served and create necessary urls.
-	this->build_static_patterns(this->settings->URLPATTERNS);
+	this->build_static_pattern(
+		this->settings->URLPATTERNS, this->settings->STATIC_ROOT, this->settings->STATIC_URL, "static"
+	);
+	this->build_static_pattern(
+		this->settings->URLPATTERNS, this->settings->MEDIA_ROOT, this->settings->MEDIA_URL, "media"
+	);
 
 	// Retrieve main module patterns and append them to result.
 	this->build_module_patterns(this->settings->URLPATTERNS);
 
 	// Initialize template engine's libraries.
+	if (this->settings->TEMPLATE_ENGINE == nullptr)
+	{
+		throw NullPointerException("'settings->TEMPLATE_ENGINE' is nullptr", _ERROR_DETAILS_);
+	}
+
 	this->settings->TEMPLATE_ENGINE->load_libraries();
 
 	auto handler = [this](
@@ -175,57 +171,45 @@ net::HandlerFunc MainApplication::make_handler()
 	) -> uint
 	{
 		auto request = this->make_request(ctx, env);
-		Result<std::shared_ptr<http::IHttpResponse>> result;
+		http::result_t result;
 		try
 		{
 			result = this->process_request_middleware(request);
-			if (!result.catch_(HttpError) && !result.value)
+			if (!result.exception && !result.response)
 			{
 				result = this->process_urlpatterns(request, this->settings->URLPATTERNS);
 
 				// TODO: check if it is required to process response middleware in case of controller error.
-				if (!result.catch_(HttpError))
+				if (!result.exception)
 				{
-					if (!result.value)
+					if (!result.response)
 					{
 						// If controller returns empty result, return 204 - No Content.
-						result.value = std::make_shared<http::HttpResponse>(204);
+						result.response = std::make_shared<http::HttpResponse>(204);
 						this->settings->LOGGER->warning(
-							"Response was not instantiated, returned 204",
-							_ERROR_DETAILS_
+							"Response was not instantiated, returned 204", _ERROR_DETAILS_
 						);
 					}
 					else
 					{
-						if (!result.value->err())
+						auto middleware_result = this->process_response_middleware(request, result.response);
+						if (middleware_result.exception || middleware_result.response)
 						{
-							auto middleware_result = this->process_response_middleware(
-								request, result.value
-							);
-							if (middleware_result.catch_(HttpError) || middleware_result.value)
+							if (middleware_result.exception)
 							{
-								if (middleware_result.err)
-								{
-									this->settings->LOGGER->trace(
-										"Method 'process_response_middleware' returned an error", _ERROR_DETAILS_
-									);
-								}
-
-								result = middleware_result;
+								this->settings->LOGGER->trace(
+									"Method 'process_response_middleware' returned an error", _ERROR_DETAILS_
+								);
 							}
-						}
-						else
-						{
-							this->settings->LOGGER->trace(
-								"IHttpResponse contains error", _ERROR_DETAILS_
-							);
+
+							result = middleware_result;
 						}
 					}
 				}
 				else
 				{
 					this->settings->LOGGER->trace(
-						"Function 'process_urlpatterns' returned an error", _ERROR_DETAILS_
+						"Method 'process_urlpatterns' returned an error", _ERROR_DETAILS_
 					);
 				}
 			}
@@ -236,17 +220,20 @@ net::HandlerFunc MainApplication::make_handler()
 				);
 			}
 		}
+		catch (const http::HttpException& exc)
+		{
+			this->settings->LOGGER->trace("An error was caught as http::HttpException", _ERROR_DETAILS_);
+			result = http::result_t{nullptr, std::make_shared<http::HttpException>(exc)};
+		}
 		catch (const BaseException& exc)
 		{
 			this->settings->LOGGER->trace("An error was caught as core::BaseException", _ERROR_DETAILS_);
-			result = raise<InternalServerError, std::shared_ptr<http::IHttpResponse>>(exc.what());
+			result = http::result_t{nullptr, std::make_shared<BaseException>(exc)};
 		}
 		catch (const std::exception& exc)
 		{
-			this->settings->LOGGER->trace("An error was caught as std::exception", _ERROR_DETAILS_);
-			result = raise<InternalServerError, std::shared_ptr<http::IHttpResponse>>(
-				"<p style=\"font-size: 24px;\" >Internal Server Error</p><p>" + std::string(exc.what()) + "</p>"
-			);
+			this->settings->LOGGER->error(exc.what(), _ERROR_DETAILS_);
+			result = http::raise(500, exc.what());
 		}
 
 		return start_response(ctx, result);
@@ -255,7 +242,7 @@ net::HandlerFunc MainApplication::make_handler()
 	return handler;
 }
 
-bool MainApplication::static_is_allowed(const std::string& static_url)
+bool MainApplication::static_is_allowed(const std::string& static_url) const
 {
 	auto url = http::parse_url(static_url);
 
@@ -264,16 +251,14 @@ bool MainApplication::static_is_allowed(const std::string& static_url)
 	return this->settings->DEBUG && url.hostname().empty();
 }
 
-void MainApplication::build_static_patterns(std::vector<std::shared_ptr<urls::IPattern>>& patterns)
+void MainApplication::build_static_pattern(
+	std::vector<std::shared_ptr<urls::IPattern>>& patterns,
+	const std::string& root, const std::string& url, const std::string& name
+) const
 {
-	if (!this->settings->STATIC_ROOT.empty() && this->static_is_allowed(this->settings->STATIC_URL))
+	if (!root.empty() && this->static_is_allowed(url))
 	{
-		patterns.push_back(urls::make_static(this->settings->STATIC_URL, this->settings->STATIC_ROOT));
-	}
-
-	if (!this->settings->MEDIA_ROOT.empty() && this->static_is_allowed(this->settings->MEDIA_URL))
-	{
-		patterns.push_back(urls::make_static(this->settings->MEDIA_URL, this->settings->MEDIA_ROOT, "media"));
+		patterns.push_back(urls::make_static(url, root, name));
 	}
 }
 
@@ -292,14 +277,12 @@ void MainApplication::build_module_patterns(std::vector<std::shared_ptr<urls::IP
 	}
 }
 
-Result<std::shared_ptr<http::IHttpResponse>> MainApplication::process_request_middleware(
-	std::shared_ptr<http::HttpRequest>& request
-)
+http::result_t MainApplication::process_request_middleware(std::shared_ptr<http::HttpRequest>& request)
 {
 	for (auto& middleware : this->settings->MIDDLEWARE)
 	{
 		auto result = middleware->process_request(request.get());
-		if (result.err)
+		if (result.exception)
 		{
 			// TODO: print middleware name.
 			this->settings->LOGGER->trace(
@@ -309,12 +292,11 @@ Result<std::shared_ptr<http::IHttpResponse>> MainApplication::process_request_mi
 		}
 	}
 
-	return Result<std::shared_ptr<http::IHttpResponse>>::null();
+	return {};
 }
 
-Result<std::shared_ptr<http::IHttpResponse>> MainApplication::process_urlpatterns(
-	std::shared_ptr<http::HttpRequest>& request,
-	std::vector<std::shared_ptr<urls::IPattern>>& urlpatterns
+http::result_t MainApplication::process_urlpatterns(
+	std::shared_ptr<http::HttpRequest>& request, std::vector<std::shared_ptr<urls::IPattern>>& urlpatterns
 )
 {
 	auto apply = urls::resolve(request->path(), this->settings->URLPATTERNS);
@@ -324,22 +306,20 @@ Result<std::shared_ptr<http::IHttpResponse>> MainApplication::process_urlpattern
 	}
 
 	this->settings->LOGGER->trace("The requested resource was not found", _ERROR_DETAILS_);
-	return raise<NotFound, std::shared_ptr<http::IHttpResponse>>("<h2>404 - Not Found</h2>");
+	return http::raise(404, "<h2>404 - Not Found</h2>");
 }
 
-Result<std::shared_ptr<http::IHttpResponse>> MainApplication::process_response_middleware(
-	std::shared_ptr<http::HttpRequest>& request,
-	std::shared_ptr<http::IHttpResponse>& response
+http::result_t MainApplication::process_response_middleware(
+	std::shared_ptr<http::HttpRequest>& request, std::shared_ptr<http::IHttpResponse>& response
 )
 {
-	long long size = (long long)this->settings->MIDDLEWARE.size();
+	auto size = (long long)this->settings->MIDDLEWARE.size();
 	for (long long i = size - 1; i >= 0; i--)
 	{
 		auto result = this->settings->MIDDLEWARE[i]->process_response(
 			request.get(), response.get()
 		);
-
-		if (result.err)
+		if (result.exception)
 		{
 			// TODO: print middleware name.
 			this->settings->LOGGER->trace(
@@ -349,7 +329,7 @@ Result<std::shared_ptr<http::IHttpResponse>> MainApplication::process_response_m
 		}
 	}
 
-	return Result<std::shared_ptr<http::IHttpResponse>>::null();
+	return {};
 }
 
 std::shared_ptr<http::HttpRequest> MainApplication::make_request(
@@ -417,73 +397,23 @@ std::shared_ptr<http::HttpRequest> MainApplication::make_request(
 	);
 }
 
-std::shared_ptr<http::IHttpResponse> MainApplication::error_to_response(const Error* err)
-{
-	unsigned short code;
-	switch (err->type)
-	{
-		case EntityTooLargeError:
-			code = 413;
-			break;
-		case PermissionDenied:
-			code = 403;
-			break;
-		case NotFound:
-		case FileDoesNotExistError:
-			code = 404;
-			break;
-		case RequestTimeout:
-			code = 408;
-			break;
-		case InternalServerError:
-			code = 500;
-			break;
-		case SuspiciousOperation:
-		case DisallowedHost:
-		case DisallowedRedirect:
-			code = 400;
-			break;
-		case HttpError:
-		default:
-			code = 500;
-			break;
-	}
-
-	// TODO: "<p style=\"font-size: 24px;\" >Internal Server Error</p><p>" +  + "</p>"
-	return std::make_shared<http::HttpResponse>(code, err->msg);
-}
-
-uint MainApplication::start_response(
-	net::RequestContext* ctx,
-	const Result<std::shared_ptr<http::IHttpResponse>>& result
-)
+uint MainApplication::start_response(net::RequestContext* ctx, const http::result_t& result)
 {
 	std::shared_ptr<http::IHttpResponse> response;
-	if (result.catch_(HttpError))
+	if (result.exception)
 	{
-		this->settings->LOGGER->trace(result.err.msg, _ERROR_DETAILS_);
-		response = error_to_response(&result.err);
+		this->settings->LOGGER->trace(result.exception->get_message(), _ERROR_DETAILS_);
+		response = std::make_shared<http::HttpResponseServerError>(result.exception->get_message());
 	}
-	else if (!result.value)
+	else if (!result.response)
 	{
 		// Response was not instantiated, so return 204 - No Content.
 		response = std::make_shared<http::HttpResponse>(204);
-		this->settings->LOGGER->warning(
-			"Response was not instantiated, returned 204", _ERROR_DETAILS_
-		);
+		this->settings->LOGGER->warning("Response was not instantiated, returned 204.", _ERROR_DETAILS_);
 	}
 	else
 	{
-		auto error = result.value->err();
-		if (error)
-		{
-			this->settings->LOGGER->trace(error.msg, _ERROR_DETAILS_);
-			response = error_to_response(&error);
-		}
-		else
-		{
-			response = result.value;
-		}
+		response = result.response;
 	}
 
 	this->finish_response(ctx, response.get());

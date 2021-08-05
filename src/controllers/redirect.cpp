@@ -6,9 +6,6 @@
 
 #include "./redirect.h"
 
-// Framework libraries.
-#include "../conf/settings.h"
-
 
 __CONTROLLERS_BEGIN__
 
@@ -28,7 +25,7 @@ std::string RedirectController::get_redirect_url()
 	return url;
 }
 
-Result<std::shared_ptr<http::IHttpResponse>> RedirectController::get()
+http::result_t RedirectController::get()
 {
 	std::string url = this->get_redirect_url();
 	if (url.empty())
@@ -38,15 +35,15 @@ Result<std::shared_ptr<http::IHttpResponse>> RedirectController::get()
 			this->settings->LOGGER->warning("Gone: " + request->path());
 		}
 
-		return this->response<http::HttpResponseGone>("");
+		return http::result<http::HttpResponseGone>("");
 	}
 
 	if (this->_permanent)
 	{
-		return this->response<http::HttpResponsePermanentRedirect>(url);
+		return http::result<http::HttpResponsePermanentRedirect>(url);
 	}
 
-	return this->response<http::HttpResponseRedirect>(url);
+	return http::result<http::HttpResponseRedirect>(url);
 }
 
 __CONTROLLERS_END__

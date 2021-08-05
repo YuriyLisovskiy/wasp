@@ -26,7 +26,7 @@ TemplateResponseMixin::TemplateResponseMixin(render::abc::IEngine* engine) : tem
 	this->engine = engine;
 }
 
-Result<std::shared_ptr<http::IHttpResponse>> TemplateResponseMixin::render(
+xw::http::result_t TemplateResponseMixin::render(
 	http::HttpRequest* request,
 	const std::shared_ptr<render::abc::IContext>& context,
 	const std::string& template_name,
@@ -44,7 +44,7 @@ Result<std::shared_ptr<http::IHttpResponse>> TemplateResponseMixin::render(
 		charset
 	);
 	response->render();
-	return Result<std::shared_ptr<http::IHttpResponse>>(response);
+	return {response, nullptr};
 }
 
 std::string TemplateResponseMixin::get_template_name()

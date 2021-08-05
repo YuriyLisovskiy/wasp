@@ -30,12 +30,12 @@ public:
 	{
 	}
 
-	inline Result<std::shared_ptr<http::IHttpResponse>> process_request(http::HttpRequest* request) override
+	inline http::result_t process_request(http::HttpRequest* request) override
 	{
 		request->COOKIES = collections::Dictionary(
 			http::internal::parse_cookie(request->headers.get("Cookie", ""), "")
 		);
-		return this->none();
+		return {};
 	}
 };
 

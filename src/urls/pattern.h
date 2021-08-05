@@ -32,7 +32,7 @@ __CONF_END__
 __URLS_BEGIN__
 
 template <typename ...ArgsT>
-using ControllerHandler = std::function<Result<std::shared_ptr<http::IHttpResponse>>(
+using ControllerHandler = std::function<http::result_t(
 	http::HttpRequest*, const std::tuple<ArgsT...>&, conf::Settings*
 )>;
 
@@ -99,7 +99,7 @@ public:
 		this->_name = ns + "::" + this->_name;
 	}
 
-	inline Result<std::shared_ptr<http::IHttpResponse>> apply(
+	inline http::result_t apply(
 		http::HttpRequest* request, conf::Settings* settings
 	) override
 	{

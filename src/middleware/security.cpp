@@ -11,6 +11,7 @@
 
 // Framework libraries.
 #include "../http/headers.h"
+#include "../http/exceptions.h"
 
 
 __MIDDLEWARE_BEGIN__
@@ -31,7 +32,7 @@ SecurityMiddleware::SecurityMiddleware(conf::Settings* settings) : BaseMiddlewar
 	}
 }
 
-Result<std::shared_ptr<http::IHttpResponse>> SecurityMiddleware::process_request(http::HttpRequest* request)
+http::result_t SecurityMiddleware::process_request(http::HttpRequest* request)
 {
 	auto path = str::ltrim(request->path(), "/");
 	bool matched = false;
@@ -64,7 +65,9 @@ Result<std::shared_ptr<http::IHttpResponse>> SecurityMiddleware::process_request
 				this->settings->LOGGER->trace(
 					"Method 'get_host' returned an error", _ERROR_DETAILS_
 				);
-				return result.forward_err<std::shared_ptr<http::IHttpResponse>>();
+				return http::exception<http::DisallowedHostException>(
+					result.err.msg, result.err.line, result.err.func.c_str(), result.err.file.c_str()
+				);
 			}
 
 			host = result.value;
@@ -74,17 +77,13 @@ Result<std::shared_ptr<http::IHttpResponse>> SecurityMiddleware::process_request
 			host = this->redirect_host;
 		}
 
-		return this->result<http::HttpResponsePermanentRedirect, std::string>(
-			"https://" + host + request->full_path()
-		);
+		return http::result<http::HttpResponsePermanentRedirect>("https://" + host + request->full_path());
 	}
 
-	return this->none();
+	return {};
 }
 
-Result<std::shared_ptr<http::IHttpResponse>> SecurityMiddleware::process_response(
-	http::HttpRequest* request, http::IHttpResponse* response
-)
+http::result_t SecurityMiddleware::process_response(http::HttpRequest* request, http::IHttpResponse* response)
 {
 	if (
 		this->sts_seconds &&
@@ -131,7 +130,7 @@ Result<std::shared_ptr<http::IHttpResponse>> SecurityMiddleware::process_respons
 		);
 	}
 
-	return this->none();
+	return {};
 }
 
 __MIDDLEWARE_END__

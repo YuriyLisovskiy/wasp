@@ -136,7 +136,7 @@ Result<std::string> HttpRequest::get_host(
 			msg += " The domain name provided is not valid according to RFC 1034/1035.";
 		}
 
-		return raise<DisallowedHost, std::string>(msg);
+		return xw::raise<DisallowedHost, std::string>(msg);
 	}
 }
 

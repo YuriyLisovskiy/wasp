@@ -17,6 +17,7 @@
 #include "./status.h"
 #include "./url.h"
 #include "./utility.h"
+#include "./exceptions.h"
 #include "../core/mime_types.h"
 
 
@@ -272,12 +273,6 @@ std::string HttpResponseBase::serialize_headers()
 	return result;
 }
 
-Error HttpResponseBase::err()
-{
-	return this->_err;
-}
-
-
 // HttpResponse implementation
 HttpResponse::HttpResponse(
 	unsigned short status,
@@ -385,9 +380,7 @@ FileResponse::FileResponse(
 {
 	if (!path::exists(this->_file_path))
 	{
-		this->_err = Error(
-			FileDoesNotExistError, "file '" + this->_file_path + "' does not exist", _ERROR_DETAILS_
-		);
+		throw FileDoesNotExistException("file '" + this->_file_path + "' does not exist", _ERROR_DETAILS_);
 	}
 	else
 	{
@@ -506,9 +499,8 @@ HttpResponseRedirectBase::HttpResponseRedirectBase(
 	auto url = http::parse_url(redirect_to);
 	if (!url.scheme.empty() && this->_allowed_schemes.find(url.scheme) == this->_allowed_schemes.end())
 	{
-		this->_err = Error(
-			DisallowedRedirect, "Unsafe redirect to URL with protocol " + url.scheme,
-			_ERROR_DETAILS_
+		throw DisallowedRedirectException(
+			"unsafe redirect to URL with protocol " + url.scheme, _ERROR_DETAILS_
 		);
 	}
 }
