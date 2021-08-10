@@ -79,11 +79,9 @@ bool if_none_match_passes(
 	}
 }
 
-std::shared_ptr<http::IHttpResponse> not_modified(
-	http::HttpRequest* request, http::IHttpResponse* response
-)
+std::shared_ptr<http::abc::IHttpResponse> not_modified(http::Request* request, http::abc::IHttpResponse* response)
 {
-	auto new_response = std::make_unique<http::HttpResponseNotModified>("");
+	auto new_response = std::make_unique<http::resp::NotModified>("");
 	if (response)
 	{
 		auto headers = {
@@ -122,21 +120,19 @@ __UTIL_CACHE_INTERNAL_END__
 
 __UTIL_CACHE_BEGIN__
 
-void set_response_etag(http::IHttpResponse* response)
+void set_response_etag(http::abc::IHttpResponse* response)
 {
 	if (!response->is_streaming() && response->content_length() > 0)
 	{
-		response->set_header(
-			http::E_TAG, http::quote_etag(util::crypto::MD5(response->get_content()).hex_digest())
-		);
+		response->set_header(http::E_TAG, http::quote_etag(util::crypto::MD5(response->get_content()).hex_digest()));
 	}
 }
 
-std::shared_ptr<http::IHttpResponse> get_conditional_response(
-	http::HttpRequest* request,
+std::shared_ptr<http::abc::IHttpResponse> get_conditional_response(
+	http::Request* request,
 	const std::string& etag,
 	long last_modified,
-	http::IHttpResponse* response
+	http::abc::IHttpResponse* response
 )
 {
 	// Only return conditional responses on successful requests.

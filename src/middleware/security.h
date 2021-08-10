@@ -21,12 +21,12 @@
 
 __MIDDLEWARE_BEGIN__
 
-// TESTME: SecurityMiddleware
-// TODO: docs for 'SecurityMiddleware'
-class SecurityMiddleware : public BaseMiddleware
+// TESTME: Security
+// TODO: docs for 'Security'
+class Security : public BaseMiddleware
 {
 public:
-	inline static const std::string FULL_NAME = "xw::middleware::SecurityMiddleware";
+	inline static const std::string FULL_NAME = "xw::middleware::Security";
 
 protected:
 	size_t sts_seconds;
@@ -40,11 +40,11 @@ protected:
 	std::vector<re::Regex> redirect_exempt;
 
 public:
-	explicit SecurityMiddleware(conf::Settings* settings);
+	explicit Security(conf::Settings* settings);
 
-	http::result_t process_request(http::HttpRequest* request) override;
+	http::result_t process_request(http::Request* request) override;
 
-	http::result_t process_response(http::HttpRequest* request, http::IHttpResponse* response) override;
+	http::result_t process_response(http::Request* request, http::abc::IHttpResponse* response) override;
 };
 
 __MIDDLEWARE_END__

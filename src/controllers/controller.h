@@ -13,7 +13,6 @@
 #include <functional>
 
 // Base libraries.
-#include <xalwart.base/result.h>
 #include <xalwart.base/utility.h>
 #include <xalwart.base/string_utils.h>
 
@@ -30,7 +29,7 @@ __CONTROLLERS_BEGIN__
 
 template <typename ...ArgsT>
 using Handler = std::function<http::result_t(
-	http::HttpRequest*, const std::tuple<ArgsT...>&, conf::Settings*
+	http::Request*, const std::tuple<ArgsT...>&, conf::Settings*
 )>;
 
 // TESTME: Controller<...URLArgsT>
@@ -39,7 +38,7 @@ template <typename ...URLArgsT>
 class Controller
 {
 protected:
-	http::HttpRequest* request = nullptr;
+	http::Request* request = nullptr;
 	conf::Settings* settings = nullptr;
 
 	// Contains all possible http methods which controller can handle.
@@ -73,9 +72,9 @@ protected:
 	}
 
 	template<unsigned short int HttpErrorCode, typename ...ArgsT>
-	inline std::shared_ptr<http::IHttpResponse> raise(ArgsT&& ...args)
+	inline std::shared_ptr<http::abc::IHttpResponse> raise(ArgsT&& ...args)
 	{
-		return std::make_shared<http::HttpResponse>(HttpErrorCode, std::forward<ArgsT>(args)...);
+		return std::make_shared<http::Response>(HttpErrorCode, std::forward<ArgsT>(args)...);
 	}
 
 public:
@@ -157,7 +156,7 @@ public:
 	// @return pointer to http response instance.
 	virtual inline http::result_t options(URLArgsT ...args)
 	{
-		auto response = std::make_shared<http::HttpResponse>(200);
+		auto response = std::make_shared<http::Response>(200);
 		auto allowed_methods = this->allowed_methods();
 		response->set_header(
 			"Allow", str::join(", ", allowed_methods.begin(), allowed_methods.end())
@@ -180,9 +179,9 @@ public:
 	// Setups request before dispatch call.
 	//
 	// @param request: pointer to http request.
-	virtual inline void setup(http::HttpRequest* r)
+	virtual inline void setup(http::Request* req)
 	{
-		this->request = r;
+		this->request = req;
 	}
 
 	// Try to dispatch to the right method; if a method doesn't exist,
@@ -269,7 +268,7 @@ public:
 			"Method Not Allowed (" + this->request->method() + "): " + this->request->path(),
 			_ERROR_DETAILS_
 		);
-		return http::result<http::HttpResponseNotAllowed>("", this->allowed_methods());
+		return http::result<http::resp::NotAllowed>("", this->allowed_methods());
 	}
 
 	// Builds vector of allowed methods and used for http OPTIONS response.

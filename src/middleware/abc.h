@@ -11,9 +11,6 @@
 // C++ libraries.
 #include <memory>
 
-// Base libraries.
-#include <xalwart.base/result.h>
-
 // Module definitions.
 #include "./_def_.h"
 
@@ -30,11 +27,11 @@ public:
 	virtual ~IMiddleware() = default;
 
 	// An input http request before processing in controller.
-	virtual http::result_t process_request(http::HttpRequest* request) = 0;
+	virtual http::result_t process_request(http::Request* request) = 0;
 
 	// An output http request and response after processing in controller.
 	virtual http::result_t process_response(
-		http::HttpRequest* request, http::IHttpResponse* response
+		http::Request* request, http::abc::IHttpResponse* response
 	) = 0;
 };
 

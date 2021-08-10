@@ -7,90 +7,18 @@
 #include "./request.h"
 
 // Base libraries.
-#include <xalwart.base/exceptions.h>
-#include <xalwart.base/string_utils.h>
 #include <xalwart.base/net/meta.h>
 
 // Framework libraries.
 #include "./headers.h"
 #include "./utility.h"
+#include "./exceptions.h"
 #include "../conf/settings.h"
 
 
 __HTTP_BEGIN__
 
-HttpRequest::HttpRequest(
-	const conf::Settings* settings,
-	std::string method, std::string path, size_t major_v, size_t minor_v,
-	std::string query, bool keep_alive, std::string content,
-	collections::Dictionary<std::string, std::string> headers,
-	collections::MultiDictionary<std::string, std::string> get_params,
-	collections::MultiDictionary<std::string, std::string> post_params,
-	collections::MultiDictionary<std::string, files::UploadedFile> files_params,
-	collections::Dictionary<std::string, std::string> env
-) : settings(settings),
-	_method(std::move(method)),
-	_path(std::move(path)),
-	_major_version(major_v),
-	_minor_version(minor_v),
-	_query(std::move(query)),
-	_keep_alive(keep_alive),
-	_body(std::move(content)),
-	headers(std::move(headers)),
-	GET(std::move(get_params)),
-	POST(std::move(post_params)),
-	FILES(std::move(files_params)),
-	META(std::move(env))
-{
-}
-
-std::string HttpRequest::version() const
-{
-	return std::to_string(this->_major_version) + "." + std::to_string(this->_minor_version);
-}
-
-std::string HttpRequest::path() const
-{
-	return this->_path;
-}
-
-std::string HttpRequest::full_path(bool force_append_slash) const
-{
-	return this->_path +
-	       (force_append_slash && !this->_path.ends_with("/") ? "/" : "") +
-	       (this->_query.empty() ? "" : "?" + this->_query);
-}
-
-std::string HttpRequest::query() const
-{
-	return this->_query;
-}
-
-std::string HttpRequest::method() const
-{
-	return this->_method;
-}
-
-bool HttpRequest::keep_alive() const
-{
-	return this->_keep_alive;
-}
-
-std::string HttpRequest::body()
-{
-	return this->_body;
-}
-
-bool HttpRequest::is_secure(
-	std::pair<std::string, std::string>* secure_proxy_ssl_header
-) const
-{
-	return this->scheme(secure_proxy_ssl_header) == "https";
-}
-
-std::string HttpRequest::scheme(
-	std::pair<std::string, std::string>* secure_proxy_ssl_header
-) const
+std::string Request::scheme(std::pair<std::string, std::string>* secure_proxy_ssl_header) const
 {
 	if (secure_proxy_ssl_header)
 	{
@@ -107,9 +35,8 @@ std::string HttpRequest::scheme(
 	return "http";
 }
 
-Result<std::string> HttpRequest::get_host(
-	bool use_x_forwarded_host, bool use_x_forwarded_port,
-	bool debug, std::vector<std::string> allowed_hosts
+std::pair<std::string, std::shared_ptr<BaseException>> Request::get_host(
+	bool use_x_forwarded_host, bool use_x_forwarded_port, bool debug, std::vector<std::string> allowed_hosts
 )
 {
 	auto host = this->get_raw_host(use_x_forwarded_host, use_x_forwarded_port);
@@ -122,27 +49,23 @@ Result<std::string> HttpRequest::get_host(
 	split_domain_port(host, domain, port);
 	if (!domain.empty() && validate_host(domain, allowed_hosts))
 	{
-		return Result(host);
+		return {host, nullptr};
+	}
+
+	auto msg = "Invalid HTTP_HOST header: ." + host + ".";
+	if (!domain.empty())
+	{
+		msg += " You may need to add " + domain + " to ALLOWED_HOSTS.";
 	}
 	else
 	{
-		auto msg = "Invalid HTTP_HOST header: ." + host + ".";
-		if (!domain.empty())
-		{
-			msg += " You may need to add " + domain + " to ALLOWED_HOSTS.";
-		}
-		else
-		{
-			msg += " The domain name provided is not valid according to RFC 1034/1035.";
-		}
-
-		return xw::raise<DisallowedHost, std::string>(msg);
+		msg += " The domain name provided is not valid according to RFC 1034/1035.";
 	}
+
+	return {"", std::make_shared<exc::DisallowedHost>(msg, _ERROR_DETAILS_)};
 }
 
-std::string HttpRequest::get_raw_host(
-	bool use_x_forwarded_host, bool use_x_forwarded_port
-) const
+std::string Request::get_raw_host(bool use_x_forwarded_host, bool use_x_forwarded_port) const
 {
 	std::string host;
 	if (use_x_forwarded_host && this->headers.contains(http::X_FORWARDED_HOST))
@@ -166,7 +89,7 @@ std::string HttpRequest::get_raw_host(
 	return host;
 }
 
-std::string HttpRequest::get_port(bool use_x_forwarded_port) const
+std::string Request::get_port(bool use_x_forwarded_port) const
 {
 	std::string port;
 	if (use_x_forwarded_port && this->headers.contains(http::X_FORWARDED_PORT))

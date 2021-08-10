@@ -37,7 +37,7 @@ public:
 	// Returns a response with a template rendered with
 	// the given context.
 	virtual xw::http::result_t render(
-		http::HttpRequest* request,
+		http::Request* request,
 		const std::shared_ptr<render::abc::IContext>& context,
 		const std::string& template_name="",
 		unsigned short int status=200,

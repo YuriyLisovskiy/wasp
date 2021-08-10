@@ -24,7 +24,7 @@ __RENDER_TAGS_BEGIN__
 
 std::string url_node::render(abc::IContext* ctx)
 {
-	using Fe = std::shared_ptr<FilterExpression>;
+	using Fe = std::shared_ptr<internal::FilterExpression>;
 	auto built_url = this->pattern->build(
 		util::fn::map<Fe, std::string>(this->params, [ctx](const Fe& p) -> std::string {
 			auto p_var = p->resolve(ctx);
@@ -34,10 +34,7 @@ std::string url_node::render(abc::IContext* ctx)
 
 	if (!this->var_name.empty())
 	{
-		ctx->push_var(
-			this->var_name,
-			std::make_shared<types::String>(built_url)
-		);
+		ctx->push_var(this->var_name, std::make_shared<types::String>(built_url));
 		return "";
 	}
 
@@ -53,30 +50,30 @@ std::function<std::shared_ptr<internal::node>(
 		internal::token_t& token
 	) -> std::shared_ptr<internal::node>
 	{
-		std::vector<token_t> params;
+		std::vector<internal::token_t> params;
 		size_t curr_pos;
 		if (!split_params(token.content, token.line_no, curr_pos, params))
 		{
-			parser::invalid_syntax(token, curr_pos);
+			internal::parser::invalid_syntax(token, curr_pos);
 		}
 
 		if (params.empty())
 		{
-			parser::throw_error("'url' tag takes, at least, one argument", token);
+			internal::parser::throw_error("'url' tag takes, at least, one argument", token);
 		}
 
 		std::string var_name;
 
 		// parse variable name after tag (function) call
-		if (!syntax::parse_var_name(token, var_name, curr_pos, false))
+		if (!internal::syntax::parse_var_name(token, var_name, curr_pos, false))
 		{
-			parser::invalid_syntax(token, curr_pos - 1);
+			internal::parser::invalid_syntax(token, curr_pos - 1);
 		}
 
 		auto url_name = params[0].content;
-		if (!trim_quotes(url_name))
+		if (!internal::trim_quotes(url_name))
 		{
-			parser::throw_error("first parameter of 'url' tag must be constant string", token);
+			internal::parser::throw_error("first parameter of 'url' tag must be constant string", token);
 		}
 
 		for (const auto& url_p : patterns)
@@ -98,7 +95,7 @@ std::function<std::shared_ptr<internal::node>(
 			}
 		}
 
-		parser::throw_error("url pattern '" + url_name + "' does not exist", token);
+		internal::parser::throw_error("url pattern '" + url_name + "' does not exist", token);
 		return nullptr;
 	};
 }

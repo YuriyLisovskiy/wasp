@@ -28,28 +28,25 @@
 
 __MIDDLEWARE_BEGIN__
 
-// TESTME: XFrameOptionsMiddleware
-class XFrameOptionsMiddleware : public BaseMiddleware
+// TESTME: XFrameOptions
+// TODO: docs for 'XFrameOptions'
+class XFrameOptions : public BaseMiddleware
 {
 public:
-	inline static const std::string FULL_NAME = "xw::middleware::XFrameOptionsMiddleware";
+	inline static const std::string FULL_NAME = "xw::middleware::XFrameOptions";
 
-	inline explicit XFrameOptionsMiddleware(conf::Settings* settings) : BaseMiddleware(settings)
+	inline explicit XFrameOptions(conf::Settings* settings) : BaseMiddleware(settings)
 	{
 	}
 
-	http::result_t process_response(
-		http::HttpRequest* request, http::IHttpResponse* response
-	) override;
+	http::result_t process_response(http::Request* request, http::abc::IHttpResponse* response) override;
 
 	// Get the value to set for the X_FRAME_OPTIONS header. Use the value from
 	// the X_FRAME_OPTIONS setting, or 'DENY' if not set.
 	//
 	// This method can be overridden if needed, allowing it to vary based on
 	// the request or response.
-	inline virtual std::string get_x_frame_options_value(
-		http::HttpRequest* request, http::IHttpResponse* response
-	)
+	inline virtual std::string get_x_frame_options_value(http::Request* request, http::abc::IHttpResponse* response)
 	{
 		return this->settings->X_FRAME_OPTIONS.empty() ? "DENY" : this->settings->X_FRAME_OPTIONS;
 	}

@@ -38,22 +38,14 @@ std::string Cookie::_get_expires(long max_age) const
 	}
 
 	auto now = dt::Datetime::utc_now();
-	return dt::Datetime::utc_from_timestamp(
-		now.timestamp() + (double)max_age
-	).strftime(this->DATE_TIME_FORMAT);
+	return dt::Datetime::utc_from_timestamp(now.timestamp() + (double)max_age).strftime(this->DATE_TIME_FORMAT);
 }
 
 long Cookie::_get_max_age(const std::string& expires) const
 {
-	auto expires_gmt = dt::Datetime::strptime(
-		expires, this->DATE_TIME_FORMAT
-	).timestamp();
+	auto expires_gmt = dt::Datetime::strptime(expires, this->DATE_TIME_FORMAT).timestamp();
 	long max_age = (long)expires_gmt - (long)dt::Datetime::utc_now().timestamp();
 	return max_age > 0 ? max_age : 0;
-}
-
-Cookie::Cookie() : Cookie("", "", 0)
-{
 }
 
 Cookie::Cookie(
@@ -97,28 +89,6 @@ Cookie::Cookie(
 
 		this->_expires = this->_get_expires(this->_max_age);
 	}
-}
-
-Cookie::Cookie(const Cookie& other)
-{
-	this->_copy(other);
-}
-
-Cookie::Cookie(Cookie&& other) noexcept
-{
-	this->_copy(other);
-}
-
-Cookie& Cookie::operator=(const Cookie& other)
-{
-	this->_copy(other);
-	return *this;
-}
-
-Cookie& Cookie::operator=(Cookie&& other) noexcept
-{
-	this->_copy(other);
-	return *this;
 }
 
 std::string Cookie::to_string() const

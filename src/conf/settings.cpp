@@ -11,7 +11,7 @@
 #include <xalwart.render/loaders.h>
 
 // Framework modules.
-#include "../render/library/default.h"
+#include "../render/default.h"
 #include "../middleware/clickjacking.h"
 #include "../middleware/common.h"
 #include "../middleware/cookies.h"
@@ -24,22 +24,21 @@ __CONF_BEGIN__
 Settings::Settings(const std::string& base_dir)
 {
 	this->BASE_DIR = base_dir;
-	using namespace middleware;
 	this->_middleware = {
-		{XFrameOptionsMiddleware::FULL_NAME, [this]() -> std::shared_ptr<middleware::IMiddleware> {
-			return std::make_shared<XFrameOptionsMiddleware>(this);
+		{middleware::XFrameOptions::FULL_NAME, [this]() -> std::shared_ptr<middleware::IMiddleware> {
+			return std::make_shared<middleware::XFrameOptions>(this);
 		}},
-		{CommonMiddleware::FULL_NAME, [this]() -> std::shared_ptr<middleware::IMiddleware> {
-			return std::make_shared<CommonMiddleware>(this);
+		{middleware::Common::FULL_NAME, [this]() -> std::shared_ptr<middleware::IMiddleware> {
+			return std::make_shared<middleware::Common>(this);
 		}},
-		{CookieMiddleware::FULL_NAME, [this]() -> std::shared_ptr<middleware::IMiddleware> {
-			return std::make_shared<CookieMiddleware>(this);
+		{middleware::Cookie::FULL_NAME, [this]() -> std::shared_ptr<middleware::IMiddleware> {
+			return std::make_shared<middleware::Cookie>(this);
 		}},
-		{ConditionalGetMiddleware::FULL_NAME, [this]() -> std::shared_ptr<middleware::IMiddleware> {
-			return std::make_shared<ConditionalGetMiddleware>(this);
+		{middleware::ConditionalGet::FULL_NAME, [this]() -> std::shared_ptr<middleware::IMiddleware> {
+			return std::make_shared<middleware::ConditionalGet>(this);
 		}},
-		{SecurityMiddleware::FULL_NAME, [this]() -> std::shared_ptr<middleware::IMiddleware> {
-			return std::make_shared<SecurityMiddleware>(this);
+		{middleware::Security::FULL_NAME, [this]() -> std::shared_ptr<middleware::IMiddleware> {
+			return std::make_shared<middleware::Security>(this);
 		}}
 	};
 

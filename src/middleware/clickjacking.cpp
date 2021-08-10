@@ -12,7 +12,7 @@
 
 __MIDDLEWARE_BEGIN__
 
-http::result_t XFrameOptionsMiddleware::process_response(http::HttpRequest* request, http::IHttpResponse* response)
+http::result_t XFrameOptions::process_response(http::Request* request, http::abc::IHttpResponse* response)
 {
 	// Set it if it's not already in the response.
 	if (!response->has_header(http::X_FRAME_OPTIONS))

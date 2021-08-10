@@ -644,7 +644,7 @@ std::string unescape(std::string s, escape_mode mode)
 		switch (s[i])
 		{
 			case '%':
-				t += unhex((s[i + 1]) << 4) | unhex(s[i + 2]);
+				t += unhex(s[i + 1]) << 4 | unhex(s[i + 2]);
 				i += 2;
 				break;
 			case '+':

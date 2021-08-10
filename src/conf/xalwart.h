@@ -59,27 +59,27 @@ protected:
 	void build_module_patterns(std::vector<std::shared_ptr<urls::IPattern>>& patterns) const;
 
 	[[nodiscard]]
-	http::result_t process_request(std::shared_ptr<http::HttpRequest>& request) const;
+	http::result_t process_request(std::shared_ptr<http::Request>& request) const;
 
 	[[nodiscard]]
 	http::result_t process_urlpatterns(
-		std::shared_ptr<http::HttpRequest>& request, std::vector<std::shared_ptr<urls::IPattern>>& urlpatterns
+		std::shared_ptr<http::Request>& request, std::vector<std::shared_ptr<urls::IPattern>>& urlpatterns
 	) const;
 
 	[[nodiscard]]
 	http::result_t process_response(
-		std::shared_ptr<http::HttpRequest>& request, std::shared_ptr<http::IHttpResponse>& response
+		std::shared_ptr<http::Request>& request, std::shared_ptr<http::abc::IHttpResponse>& response
 	) const;
 
 	[[nodiscard]]
-	std::shared_ptr<http::HttpRequest> build_request(
+	std::shared_ptr<http::Request> build_request(
 		net::RequestContext* ctx, collections::Dictionary<std::string, std::string> env
 	) const;
 
 	[[nodiscard]]
 	uint start_response(net::RequestContext* ctx, const http::result_t& result) const;
 
-	void finish_response(net::RequestContext* ctx, http::IHttpResponse* response) const;
+	void finish_response(net::RequestContext* ctx, http::abc::IHttpResponse* response) const;
 
 public:
 	explicit MainApplication(

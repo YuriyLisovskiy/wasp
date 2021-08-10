@@ -1,9 +1,9 @@
 /**
  * http/cookie.h
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
- * Purpose: represents an http cookies as object.
+ * An http cookies as object.
  */
 
 #pragma once
@@ -17,6 +17,8 @@
 
 __HTTP_BEGIN__
 
+// TESTME: Cookie
+// TODO: docs for 'Cookie'
 class Cookie final
 {
 private:
@@ -33,36 +35,58 @@ private:
 	std::string _same_site;
 
 	void _copy(const Cookie& other);
-	[[nodiscard]] std::string _get_expires(long max_age) const;
-	[[nodiscard]] long _get_max_age(const std::string& expires) const;
+
+	[[nodiscard]]
+	std::string _get_expires(long max_age) const;
+
+	[[nodiscard]]
+	long _get_max_age(const std::string& expires) const;
 
 public:
-	Cookie();
+	inline Cookie() : Cookie("", "", 0)
+	{
+	}
+
 	Cookie(
 		std::string name,
 		std::string value,
 		long max_age,
-		std::string expires = "",
-		std::string domain = "",
-		std::string path = "/",
-		bool is_secure = true,
-		bool is_http_only = false,
-		std::string same_site = ""
+		std::string expires="",
+		std::string domain="",
+		std::string path="/",
+		bool is_secure=true,
+		bool is_http_only=false,
+		std::string same_site=""
 	);
 
 	// Copy constructor.
-	Cookie(const Cookie& other);
+	inline Cookie(const Cookie& other)
+	{
+		this->_copy(other);
+	}
 
 	// Move constructor.
-	Cookie(Cookie&& other) noexcept;
+	inline Cookie(Cookie&& other) noexcept
+	{
+		this->_copy(other);
+	}
 
 	// Copy assignment operator.
-	Cookie& operator=(const Cookie& other);
+	inline Cookie& operator=(const Cookie& other)
+	{
+		this->_copy(other);
+		return *this;
+	}
 
 	// Move assignment operator.
-	Cookie& operator=(Cookie&& other) noexcept;
+	inline Cookie& operator=(Cookie&& other) noexcept
+	{
+		this->_copy(other);
+		return *this;
+	}
 
-	[[nodiscard]] std::string to_string() const;
+	[[nodiscard]]
+	std::string to_string() const;
 
 	bool operator==(const Cookie& right);
 };

@@ -19,23 +19,24 @@
 
 __MIDDLEWARE_BEGIN__
 
-// TESTME: ConditionalGetMiddleware
-class ConditionalGetMiddleware : public BaseMiddleware
+// TESTME: ConditionalGet
+// TODO: docs for 'ConditionalGet'
+class ConditionalGet : public BaseMiddleware
 {
 public:
-	inline static const std::string FULL_NAME = "xw::middleware::ConditionalGetMiddleware";
+	inline static const std::string FULL_NAME = "xw::middleware::ConditionalGet";
 
 protected:
 
 	// Return true if an ETag header should be added to response.
-	static bool needs_etag(http::IHttpResponse* response);
+	static bool needs_etag(http::abc::IHttpResponse* response);
 
 public:
-	inline explicit ConditionalGetMiddleware(conf::Settings* settings) : BaseMiddleware(settings)
+	inline explicit ConditionalGet(conf::Settings* settings) : BaseMiddleware(settings)
 	{
 	}
 
-	http::result_t process_response(http::HttpRequest* request, http::IHttpResponse* response) override;
+	http::result_t process_response(http::Request* request, http::abc::IHttpResponse* response) override;
 };
 
 __MIDDLEWARE_END__

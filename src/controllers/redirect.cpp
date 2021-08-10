@@ -19,7 +19,7 @@ std::string RedirectController::get_redirect_url()
 
 	if (this->_query_string)
 	{
-		url += "?" + this->request->query();
+		url += "?" + this->request->raw_query();
 	}
 
 	return url;
@@ -35,15 +35,15 @@ http::result_t RedirectController::get()
 			this->settings->LOGGER->warning("Gone: " + request->path());
 		}
 
-		return http::result<http::HttpResponseGone>("");
+		return http::result<http::resp::Gone>("");
 	}
 
 	if (this->_permanent)
 	{
-		return http::result<http::HttpResponsePermanentRedirect>(url);
+		return http::result<http::resp::PermanentRedirect>(url);
 	}
 
-	return http::result<http::HttpResponseRedirect>(url);
+	return http::result<http::resp::Redirect>(url);
 }
 
 __CONTROLLERS_END__

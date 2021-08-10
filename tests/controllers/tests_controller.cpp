@@ -13,7 +13,6 @@
 #include <xalwart.base/collections/multi_dictionary.h>
 
 #include "../../src/controllers/controller.h"
-#include "../../src/conf/settings.h"
 
 using namespace xw;
 
@@ -36,21 +35,13 @@ struct ControllerTestSettings : public conf::Settings
 class ControllerTestCase : public ::testing::Test
 {
 public:
-	static http::HttpRequest make_request(const conf::Settings* settings, const std::string& method)
+	static http::Request make_request(const conf::Settings* settings, const std::string& method)
 	{
 		auto empty_parameters = collections::MultiDictionary<std::string, std::string>();
 		auto empty_map = collections::Dictionary<std::string, std::string>();
-		return http::HttpRequest(
-			settings,
-			method,
-			"/hello",
-			1, 1,
-			"",
-			true,
-			"",
-			empty_map,
-			empty_parameters,
-			empty_parameters,
+		return http::Request(
+			settings, method, "/hello", 1, 1, "", true, "",
+			empty_map, empty_parameters, empty_parameters,
 			collections::MultiDictionary<std::string, files::UploadedFile>(),
 			{}
 		);
@@ -113,11 +104,10 @@ TEST_F(ControllerTestCase, HeadTestReturnsNullptr)
 
 TEST_F(ControllerTestCase, OptionsTest)
 {
-	auto expected_response = http::HttpResponse();
+	auto expected_response = http::Response();
 	auto vec = std::vector<std::string>{"get", "post", "head", "options"};
 	expected_response.set_header(
-		"Allow",
-		str::join(", ", vec.cbegin(), vec.cend())
+		"Allow", str::join(", ", vec.cbegin(), vec.cend())
 	);
 	expected_response.set_header("Content-Length", "0");
 

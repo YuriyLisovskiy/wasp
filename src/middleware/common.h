@@ -28,41 +28,42 @@
 
 __MIDDLEWARE_BEGIN__
 
-// TESTME: CommonMiddleware
-class CommonMiddleware : public BaseMiddleware
+// TESTME: Common
+// TODO: docs for 'Common'
+class Common : public BaseMiddleware
 {
 public:
-	inline static const std::string FULL_NAME = "xw::middleware::CommonMiddleware";
+	inline static const std::string FULL_NAME = "xw::middleware::Common";
 
 protected:
 	virtual inline http::result_t get_response_redirect(
 		const std::string& redirect_to
 	)
 	{
-		return http::result<http::HttpResponsePermanentRedirect>(redirect_to);
+		return http::result<http::resp::PermanentRedirect>(redirect_to);
 	}
 
 	// Return true if settings.APPEND_SLASH is true and appending a slash to
 	// the request path turns an invalid path into a valid one.
-	bool should_redirect_with_slash(http::HttpRequest* request);
+	bool should_redirect_with_slash(http::Request* request);
 
 	// Return the full path of the request with a trailing slash appended.
 	// Raise a RuntimeError if settings.DEBUG is true and request method is
 	// POST, PUT, or PATCH.
-	Result<std::string> get_full_path_with_slash(http::HttpRequest* request);
+	std::pair<std::string, std::shared_ptr<BaseException>> get_full_path_with_slash(http::Request* request);
 
 public:
-	inline explicit CommonMiddleware(conf::Settings* settings) : BaseMiddleware(settings)
+	inline explicit Common(conf::Settings* settings) : BaseMiddleware(settings)
 	{
 	}
 
 	// Check for denied User-Agents and rewrite the URL based on
 	// settings.APPEND_SLASH and settings.PREPEND_WWW
-	http::result_t process_request(http::HttpRequest* request) override;
+	http::result_t process_request(http::Request* request) override;
 
 	// When the status code of the response is 404, it may redirect to a path
 	// with an appended slash if should_redirect_with_slash() returns true.
-	http::result_t process_response(http::HttpRequest* request, http::IHttpResponse* response) override;
+	http::result_t process_response(http::Request* request, http::abc::IHttpResponse* response) override;
 };
 
 __MIDDLEWARE_END__

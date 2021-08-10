@@ -3,9 +3,8 @@
  *
  * Copyright (c) 2020-2021 Yuriy Lisovskiy
  *
- * Purpose:
- * 	Http response which can render it's content using
- * 	configured backend.
+ * Http response which can render it's content using
+ * configured backend.
  */
 
 #pragma once
@@ -19,7 +18,9 @@
 
 __RENDER_BEGIN__
 
-class TemplateResponse : public http::HttpResponse
+// TESTME: TemplateResponse
+// TODO: docs for 'TemplateResponse'
+class TemplateResponse : public http::Response
 {
 protected:
 	std::string template_name;
@@ -29,15 +30,16 @@ protected:
 
 public:
 	explicit TemplateResponse(
-			abc::IEngine* engine,
+		abc::IEngine* engine,
 		const std::string& template_name,
-		abc::IContext* context = nullptr,
-		unsigned short int status = 200,
-		const std::string& content_type = "",
-		const std::string& charset = "utf-8"
+		abc::IContext* context=nullptr,
+		unsigned short int status=200,
+		const std::string& content_type="",
+		const std::string& charset="utf-8"
 	);
 
 	void render();
+
 	std::string get_content() override;
 };
 

@@ -7,34 +7,19 @@
 #include "./utility.h"
 
 // Base libraries.
-#include <xalwart.base/utility.h>
 #include <xalwart.base/string_utils.h>
 
 
 __HTTP_INTERNAL_BEGIN__
 
-re::Regex host_validation_regex = re::Regex(
-	R"(([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(:\d+)?)"
-);
+re::Regex host_validation_regex = re::Regex(R"(([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(:\d+)?)");
 
 __HTTP_INTERNAL_END__
 
 
 __HTTP_BEGIN__
 
-size_t parse_http_datetime(const std::string& http_datetime)
-{
-	return (size_t)dt::Datetime::strptime(http_datetime, "%a, %d %b %Y %H:%M:%S GMT").timestamp();
-}
-
-std::string http_date(size_t epoch_seconds)
-{
-	return util::format_date((time_t)epoch_seconds, false, true);
-}
-
-void split_domain_port(
-	const std::string& host, std::string& domain, std::string& port
-)
+void split_domain_port(const std::string& host, std::string& domain, std::string& port)
 {
 	auto host_lower = str::lower(host);
 	if (!internal::host_validation_regex.match(host_lower))
@@ -65,9 +50,7 @@ void split_domain_port(
 	domain = str::trim(domain, "[]");
 }
 
-bool validate_host(
-	const std::string& host, const std::vector<std::string>& allowed_hosts
-)
+bool validate_host(const std::string& host, const std::vector<std::string>& allowed_hosts)
 {
 	bool result = false;
 	for (const auto& pattern : allowed_hosts)
@@ -101,11 +84,6 @@ void escape_leading_slashes(std::string& url)
 	{
 		url = "/%2F" + url.substr(2);
 	}
-}
-
-core::signing::Signer get_cookie_signer(const std::string& secret_key, const std::string& salt)
-{
-	return core::signing::Signer("" + secret_key, ':', salt);
 }
 
 long parse_http_date(const std::string& date)

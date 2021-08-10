@@ -67,7 +67,7 @@ http::result_t StaticController::get(const std::string& p)
 		request->headers.get(http::IF_MODIFIED_SINCE, ""), stat_info.st_mtime, stat_info.st_size
 	))
 	{
-		return http::result<http::HttpResponseNotModified>("");
+		return http::result<http::resp::NotModified>("");
 	}
 
 	std::string content_type, encoding;

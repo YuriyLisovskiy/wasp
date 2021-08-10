@@ -19,18 +19,18 @@
 
 __MIDDLEWARE_BEGIN__
 
-// TESTME: CookieMiddleware
-// TODO: docs for 'CookieMiddleware'
-class CookieMiddleware final : public BaseMiddleware
+// TESTME: Cookie
+// TODO: docs for 'Cookie'
+class Cookie final : public BaseMiddleware
 {
 public:
-	inline static const std::string FULL_NAME = "xw::middleware::CookieMiddleware";
+	inline static const std::string FULL_NAME = "xw::middleware::Cookie";
 
-	explicit CookieMiddleware(conf::Settings* settings) : BaseMiddleware(settings)
+	explicit Cookie(conf::Settings* settings) : BaseMiddleware(settings)
 	{
 	}
 
-	inline http::result_t process_request(http::HttpRequest* request) override
+	inline http::result_t process_request(http::Request* request) override
 	{
 		request->COOKIES = collections::Dictionary(
 			http::internal::parse_cookie(request->headers.get("Cookie", ""), "")

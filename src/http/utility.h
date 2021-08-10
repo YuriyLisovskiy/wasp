@@ -1,9 +1,9 @@
 /**
  * http/utility.h
  *
- * Copyright (c) 2019-2020 Yuriy Lisovskiy
+ * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
- * Purpose: useful http helpers.
+ * Http helpers.
  */
 
 #pragma once
@@ -11,6 +11,7 @@
 // Base libraries.
 #include <xalwart.base/re/regex.h>
 #include <xalwart.base/re/arg_regex.h>
+#include <xalwart.base/utility.h>
 
 // Module definitions.
 #include "./_def_.h"
@@ -21,9 +22,14 @@
 
 __HTTP_BEGIN__
 
+// TESTME: parse_http_datetime
 // Converts std::string datetime to utc epoch in seconds.
-extern size_t parse_http_datetime(const std::string& http_datetime);
+inline size_t parse_http_datetime(const std::string& http_datetime)
+{
+	return (size_t)dt::Datetime::strptime(http_datetime, "%a, %d %b %Y %H:%M:%S GMT").timestamp();
+}
 
+// TESTME: http_date
 // Format the time to match the RFC1123 date format as specified by HTTP
 // RFC7231 section 7.1.1.1.
 //
@@ -32,14 +38,19 @@ extern size_t parse_http_datetime(const std::string& http_datetime);
 // If set to None, it defaults to the current time.
 //
 // Output a string in the format 'Wdy, DD Mon YYYY HH:MM:SS GMT'.
-extern std::string http_date(size_t epoch_seconds);
+inline std::string http_date(size_t epoch_seconds)
+{
+	return util::format_date((time_t)epoch_seconds, false, true);
+}
 
+// TESTME: split_domain_port
 // Writes domain and port from a given host.
 //
 // Returned domain is lower-cased. If the host is invalid,
 // the domain will be empty.
 void split_domain_port(const std::string& host, std::string& domain, std::string& port);
 
+// TESTME: validate_host
 // Validate the given host for this site.
 //
 // Check that the host looks valid and matches a host or host pattern in the
@@ -54,6 +65,7 @@ void split_domain_port(const std::string& host, std::string& domain, std::string
 // Return `true` for a valid host, `false` otherwise.
 bool validate_host(const std::string& domain, const std::vector<std::string>& allowed_hosts);
 
+// TESTME: is_same_domain
 // Return `true` if the host is either an exact match or a match
 // to the wildcard pattern.
 //
@@ -62,14 +74,20 @@ bool validate_host(const std::string& domain, const std::vector<std::string>& al
 // `foo.example.com`). Anything else is an exact string match.
 extern bool is_same_domain(const std::string& host, const std::string& pattern);
 
+// TESTME: escape_leading_slashes
 // If redirecting to an absolute path (two leading slashes), a slash must be
 // escaped to prevent browsers from handling the path as schemaless and
 // redirecting to another host.
 extern void escape_leading_slashes(std::string& url);
 
-extern core::signing::Signer get_cookie_signer(
+// TESTME: get_cookie_signer
+// TODO: docs for 'get_cookie_signer'
+inline core::signing::Signer get_cookie_signer(
 	const std::string& secret_key, const std::string& salt="xw::http::get_cookie_signer"
-);
+)
+{
+	return core::signing::Signer("" + secret_key, ':', salt);
+}
 
 // TESTME: parse_http_date
 // Parse a date format as specified by HTTP RFC7231 section 7.1.1.1.

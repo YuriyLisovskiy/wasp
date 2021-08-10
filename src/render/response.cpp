@@ -1,7 +1,7 @@
 /**
  * render/response.cpp
  *
- * Copyright (c) 2020 Yuriy Lisovskiy
+ * Copyright (c) 2020-2021 Yuriy Lisovskiy
  */
 
 #include "./response.h"
@@ -19,7 +19,7 @@ TemplateResponse::TemplateResponse(
 	unsigned short int status,
 	const std::string& content_type,
 	const std::string& charset
-) : HttpResponse(status, "", content_type, "", charset)
+) : Response(status, "", content_type, "", charset)
 {
 	this->engine = engine;
 	this->template_name = template_name;
@@ -47,8 +47,7 @@ std::string TemplateResponse::get_content()
 	}
 
 	throw ContentNotRenderedError(
-		"The response content must be rendered before it can be accessed.",
-		_ERROR_DETAILS_
+		"The response content must be rendered before it can be accessed.", _ERROR_DETAILS_
 	);
 }
 

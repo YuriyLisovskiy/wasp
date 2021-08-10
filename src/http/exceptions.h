@@ -4,7 +4,16 @@
  * Copyright (c) 2021 Yuriy Lisovskiy
  *
  * List of http exceptions:
- *  -
+ *  - HttpError
+ *  - EntityTooLarge
+ *  - DisallowedHost
+ *  - DisallowedRedirect
+ *  - FileDoesNotExist
+ *  - InternalServerError
+ *  - NotFound
+ *  - PermissionDenied
+ *  - RequestTimeout
+ *  - SuspiciousOperation
  */
 
 #pragma once
@@ -12,28 +21,22 @@
 // Base libraries.
 #include <xalwart.base/exceptions.h>
 
-// C++ libraries.
-// TODO
-
 // Module definitions.
 #include "./_def_.h"
 
-// Other libraries.
-// TODO
 
+__HTTP_EXC_BEGIN__
 
-__HTTP_BEGIN__
-
-// TESTME: HttpException
-// TODO: docs for 'HttpException'
-class HttpException : public BaseException
+// TESTME: HttpError
+// TODO: docs for 'HttpError'
+class HttpError : public BaseException
 {
 private:
 	unsigned short int _status_code;
 
 protected:
 	// Use only when initializing of a derived exception!
-	inline HttpException(
+	inline HttpError(
 		unsigned short int status_code, const std::string& message,
 		int line, const char* function, const char* file, const char* type
 	) : BaseException(message.c_str(), line, function, file, type), _status_code(status_code)
@@ -41,9 +44,10 @@ protected:
 	}
 
 public:
-	inline HttpException(
-		unsigned short int status_code, const std::string& message, int line, const char* function, const char* file
-	) : HttpException(status_code, message, line, function, file, "HttpException")
+	inline HttpError(
+		unsigned short int status_code, const std::string& message,
+		int line=0, const char* function="", const char* file=""
+	) : HttpError(status_code, message, line, function, file, "xw::http::exc::HttpError")
 	{
 	}
 
@@ -61,112 +65,112 @@ public:
 	}
 };
 
-// TESTME: EntityTooLargeErrorException
-// TODO: docs for 'EntityTooLargeErrorException'
-class EntityTooLargeErrorException : public HttpException
+// TESTME: EntityTooLarge
+// TODO: docs for 'EntityTooLarge
+class EntityTooLarge : public HttpError
 {
 public:
-	inline EntityTooLargeErrorException(
-		const std::string& message, int line, const char* function, const char* file
-	) : HttpException(413, message, line, function, file, "EntityTooLargeErrorException")
+	inline explicit EntityTooLarge(
+		const std::string& message, int line=0, const char* function="", const char* file=""
+	) : HttpError(413, message, line, function, file, "xw::http::exc::EntityTooLarge")
 	{
 	}
 };
 
 // TESTME: DisallowedHostException
 // TODO: docs for 'DisallowedHostException'
-class DisallowedHostException : public HttpException
+class DisallowedHost : public HttpError
 {
 public:
-	inline DisallowedHostException(
-		const std::string& message, int line, const char* function, const char* file
-	) : HttpException(400, message, line, function, file, "DisallowedHostException")
+	inline explicit DisallowedHost(
+		const std::string& message, int line=0, const char* function="", const char* file=""
+	) : HttpError(400, message, line, function, file, "xw::http::exc::DisallowedHost")
 	{
 	}
 };
 
-// TESTME: DisallowedRedirectException
-// TODO: docs for 'DisallowedRedirectException'
-class DisallowedRedirectException : public HttpException
+// TESTME: DisallowedRedirect
+// TODO: docs for 'DisallowedRedirect'
+class DisallowedRedirect : public HttpError
 {
 public:
-	inline DisallowedRedirectException(
-		const std::string& message, int line, const char* function, const char* file
-	) : HttpException(400, message, line, function, file, "DisallowedRedirectException")
+	inline explicit DisallowedRedirect(
+		const std::string& message, int line=0, const char* function="", const char* file=""
+	) : HttpError(400, message, line, function, file, "xw::http::exc::DisallowedRedirect")
 	{
 	}
 };
 
-// TESTME: FileDoesNotExistException
-// TODO: docs for 'FileDoesNotExistException'
-class FileDoesNotExistException : public HttpException
+// TESTME: FileDoesNotExist
+// TODO: docs for 'FileDoesNotExist'
+class FileDoesNotExist : public HttpError
 {
 public:
-	inline FileDoesNotExistException(
-		const std::string& message, int line, const char* function, const char* file
-	) : HttpException(404, message, line, function, file, "FileDoesNotExistException")
+	inline explicit FileDoesNotExist(
+		const std::string& message, int line=0, const char* function="", const char* file=""
+	) : HttpError(404, message, line, function, file, "xw::http::exc::FileDoesNotExist")
 	{
 	}
 };
 
-// TESTME: InternalServerErrorException
-// TODO: docs for 'InternalServerErrorException'
-class InternalServerErrorException : public HttpException
+// TESTME: InternalServerError
+// TODO: docs for 'InternalServerError'
+class InternalServerError : public HttpError
 {
 public:
-	inline InternalServerErrorException(
-		const std::string& message, int line, const char* function, const char* file
-	) : HttpException(500, message, line, function, file, "InternalServerErrorException")
+	inline explicit InternalServerError(
+		const std::string& message, int line=0, const char* function="", const char* file=""
+	) : HttpError(500, message, line, function, file, "xw::http::exc::InternalServerError")
 	{
 	}
 };
 
-// TESTME: NotFoundException
-// TODO: docs for 'NotFoundException'
-class NotFoundException : public HttpException
+// TESTME: NotFound
+// TODO: docs for 'NotFound'
+class NotFound : public HttpError
 {
 public:
-	inline NotFoundException(
-		const std::string& message, int line, const char* function, const char* file
-	) : HttpException(404, message, line, function, file, "NotFoundException")
+	inline explicit NotFound(
+		const std::string& message, int line=0, const char* function="", const char* file=""
+	) : HttpError(404, message, line, function, file, "xw::http::exc::NotFound")
 	{
 	}
 };
 
-// TESTME: PermissionDeniedException
-// TODO: docs for 'PermissionDeniedException'
-class PermissionDeniedException : public HttpException
+// TESTME: PermissionDenied
+// TODO: docs for 'PermissionDenied'
+class PermissionDenied : public HttpError
 {
 public:
-	inline PermissionDeniedException(
-		const std::string& message, int line, const char* function, const char* file
-	) : HttpException(403, message, line, function, file, "PermissionDeniedException")
+	inline explicit PermissionDenied(
+		const std::string& message, int line=0, const char* function="", const char* file=""
+	) : HttpError(403, message, line, function, file, "xw::http::exc::PermissionDenied")
 	{
 	}
 };
 
-// TESTME: RequestTimeoutException
-// TODO: docs for 'RequestTimeoutException'
-class RequestTimeoutException : public HttpException
+// TESTME: RequestTimeout
+// TODO: docs for 'RequestTimeout'
+class RequestTimeout : public HttpError
 {
 public:
-	inline RequestTimeoutException(
-		const std::string& message, int line, const char* function, const char* file
-	) : HttpException(408, message, line, function, file, "RequestTimeoutException")
+	inline explicit RequestTimeout(
+		const std::string& message, int line=0, const char* function="", const char* file=""
+	) : HttpError(408, message, line, function, file, "xw::http::exc::RequestTimeout")
 	{
 	}
 };
 
-// TESTME: SuspiciousOperationException
-// TODO: docs for 'SuspiciousOperationException'
-class SuspiciousOperationException : public HttpException
+// TESTME: SuspiciousOperation
+// TODO: docs for 'SuspiciousOperation'
+class SuspiciousOperation : public HttpError
 {
 public:
-	inline SuspiciousOperationException(
-		const std::string& message, int line, const char* function, const char* file
-	) : HttpException(400, message, line, function, file, "SuspiciousOperationException")
+	inline explicit SuspiciousOperation(
+		const std::string& message, int line=0, const char* function="", const char* file=""
+	) : HttpError(400, message, line, function, file, "xw::http::exc::SuspiciousOperation")
 	{
 	}
 };
 
-__HTTP_END__
+__HTTP_EXC_END__

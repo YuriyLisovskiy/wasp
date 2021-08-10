@@ -47,24 +47,24 @@ std::function<std::shared_ptr<internal::node>(
 		internal::token_t& token
 	) -> std::shared_ptr<internal::node>
 	{
-		std::vector<token_t> params;
+		std::vector<internal::token_t> params;
 		size_t curr_pos;
 		if (!split_params(token.content, token.line_no, curr_pos, params))
 		{
-			parser::invalid_syntax(token, curr_pos);
+			internal::parser::invalid_syntax(token, curr_pos);
 		}
 
 		if (params.size() != 1)
 		{
-			parser::throw_error("'" + name + "' tag takes exactly one argument", token);
+			internal::parser::throw_error("'" + name + "' tag takes exactly one argument", token);
 		}
 
 		std::string var_name;
 
 		// parse variable name after tag (function) call
-		if (!syntax::parse_var_name(token, var_name, curr_pos, false))
+		if (!internal::syntax::parse_var_name(token, var_name, curr_pos, false))
 		{
-			parser::invalid_syntax(token, curr_pos - 1);
+			internal::parser::invalid_syntax(token, curr_pos - 1);
 		}
 
 		auto node = std::make_shared<static_node>();

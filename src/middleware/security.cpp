@@ -11,12 +11,11 @@
 
 // Framework libraries.
 #include "../http/headers.h"
-#include "../http/exceptions.h"
 
 
 __MIDDLEWARE_BEGIN__
 
-SecurityMiddleware::SecurityMiddleware(conf::Settings* settings) : BaseMiddleware(settings)
+Security::Security(conf::Settings* settings) : BaseMiddleware(settings)
 {
 	this->sts_seconds = settings->SECURE_HSTS_SECONDS;
 	this->sts_include_subdomains = settings->SECURE_HSTS_INCLUDE_SUBDOMAINS;
@@ -32,7 +31,7 @@ SecurityMiddleware::SecurityMiddleware(conf::Settings* settings) : BaseMiddlewar
 	}
 }
 
-http::result_t SecurityMiddleware::process_request(http::HttpRequest* request)
+http::result_t Security::process_request(http::Request* request)
 {
 	auto path = str::ltrim(request->path(), "/");
 	bool matched = false;
@@ -60,30 +59,26 @@ http::result_t SecurityMiddleware::process_request(http::HttpRequest* request)
 				this->settings->DEBUG,
 				this->settings->ALLOWED_HOSTS
 			);
-			if (result.err)
+			if (result.second)
 			{
-				this->settings->LOGGER->trace(
-					"Method 'get_host' returned an error", _ERROR_DETAILS_
-				);
-				return http::exception<http::DisallowedHostException>(
-					result.err.msg, result.err.line, result.err.func.c_str(), result.err.file.c_str()
-				);
+				this->settings->LOGGER->trace("Method 'get_host' returned an error", _ERROR_DETAILS_);
+				return {nullptr, result.second};
 			}
 
-			host = result.value;
+			host = result.first;
 		}
 		else
 		{
 			host = this->redirect_host;
 		}
 
-		return http::result<http::HttpResponsePermanentRedirect>("https://" + host + request->full_path());
+		return http::result<http::resp::PermanentRedirect>("https://" + host + request->full_path());
 	}
 
 	return {};
 }
 
-http::result_t SecurityMiddleware::process_response(http::HttpRequest* request, http::IHttpResponse* response)
+http::result_t Security::process_response(http::Request* request, http::abc::IHttpResponse* response)
 {
 	if (
 		this->sts_seconds &&

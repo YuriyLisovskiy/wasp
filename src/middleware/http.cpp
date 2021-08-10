@@ -17,7 +17,7 @@
 
 __MIDDLEWARE_BEGIN__
 
-http::result_t ConditionalGetMiddleware::process_response(http::HttpRequest* request, http::IHttpResponse* response)
+http::result_t ConditionalGet::process_response(http::Request* request, http::abc::IHttpResponse* response)
 {
 	// It's too late to prevent an unsafe request with a 412 response, and
 	// for a HEAD request, the response body is always empty so computing
@@ -48,11 +48,9 @@ http::result_t ConditionalGetMiddleware::process_response(http::HttpRequest* req
 	return {};
 }
 
-bool ConditionalGetMiddleware::needs_etag(http::IHttpResponse* response)
+bool ConditionalGet::needs_etag(http::abc::IHttpResponse* response)
 {
-	auto cache_control = str::split(
-		response->get_header(http::CACHE_CONTROL, ""), ','
-	);
+	auto cache_control = str::split(response->get_header(http::CACHE_CONTROL, ""), ',');
 	bool result = true;
 	for (const auto& directive : cache_control)
 	{

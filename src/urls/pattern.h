@@ -33,7 +33,7 @@ __URLS_BEGIN__
 
 template <typename ...ArgsT>
 using ControllerHandler = std::function<http::result_t(
-	http::HttpRequest*, const std::tuple<ArgsT...>&, conf::Settings*
+	http::Request*, const std::tuple<ArgsT...>&, conf::Settings*
 )>;
 
 // TESTME: Pattern<...ArgsT>
@@ -100,7 +100,7 @@ public:
 	}
 
 	inline http::result_t apply(
-		http::HttpRequest* request, conf::Settings* settings
+		http::Request* request, conf::Settings* settings
 	) override
 	{
 		return this->_handler(request, this->_regex.template tuple<ArgsT...>(), settings);

@@ -181,10 +181,8 @@ net::HandlerFunc MainApplication::make_handler() const
 					if (!result.response)
 					{
 						// If controller returns empty result, return 204 - No Content.
-						result.response = std::make_shared<http::HttpResponse>(204);
-						this->settings->LOGGER->warning(
-							"Response was not instantiated, returned 204", _ERROR_DETAILS_
-						);
+						result.response = std::make_shared<http::Response>(204);
+						this->settings->LOGGER->warning("Response was not instantiated, returned 204", _ERROR_DETAILS_);
 					}
 					else
 					{
@@ -216,20 +214,20 @@ net::HandlerFunc MainApplication::make_handler() const
 				);
 			}
 		}
-		catch (const http::HttpException& exc)
+		catch (const http::exc::HttpError& e)
 		{
 			this->settings->LOGGER->trace("An error was caught as http::HttpException", _ERROR_DETAILS_);
-			result = http::result_t{nullptr, std::make_shared<http::HttpException>(exc)};
+			result = http::result_t{nullptr, std::make_shared<http::exc::HttpError>(e)};
 		}
-		catch (const BaseException& exc)
+		catch (const BaseException& e)
 		{
 			this->settings->LOGGER->trace("An error was caught as core::BaseException", _ERROR_DETAILS_);
-			result = http::result_t{nullptr, std::make_shared<BaseException>(exc)};
+			result = http::result_t{nullptr, std::make_shared<BaseException>(e)};
 		}
-		catch (const std::exception& exc)
+		catch (const std::exception& e)
 		{
-			this->settings->LOGGER->error(exc.what(), _ERROR_DETAILS_);
-			result = http::raise(500, exc.what());
+			this->settings->LOGGER->error(e.what(), _ERROR_DETAILS_);
+			result = http::raise(500, e.what());
 		}
 
 		return start_response(ctx, result);
@@ -271,7 +269,7 @@ void MainApplication::build_module_patterns(std::vector<std::shared_ptr<urls::IP
 	}
 }
 
-http::result_t MainApplication::process_request(std::shared_ptr<http::HttpRequest>& request) const
+http::result_t MainApplication::process_request(std::shared_ptr<http::Request>& request) const
 {
 	for (auto& middleware : this->settings->MIDDLEWARE)
 	{
@@ -290,7 +288,7 @@ http::result_t MainApplication::process_request(std::shared_ptr<http::HttpReques
 }
 
 http::result_t MainApplication::process_urlpatterns(
-	std::shared_ptr<http::HttpRequest>& request, std::vector<std::shared_ptr<urls::IPattern>>& urlpatterns
+	std::shared_ptr<http::Request>& request, std::vector<std::shared_ptr<urls::IPattern>>& urlpatterns
 ) const
 {
 	auto apply = urls::resolve(request->path(), this->settings->URLPATTERNS);
@@ -304,7 +302,7 @@ http::result_t MainApplication::process_urlpatterns(
 }
 
 http::result_t MainApplication::process_response(
-	std::shared_ptr<http::HttpRequest>& request, std::shared_ptr<http::IHttpResponse>& response
+	std::shared_ptr<http::Request>& request, std::shared_ptr<http::abc::IHttpResponse>& response
 ) const
 {
 	auto size = (long long)this->settings->MIDDLEWARE.size();
@@ -326,7 +324,7 @@ http::result_t MainApplication::process_response(
 	return {};
 }
 
-std::shared_ptr<http::HttpRequest> MainApplication::build_request(
+std::shared_ptr<http::Request> MainApplication::build_request(
 	net::RequestContext* ctx, collections::Dictionary<std::string, std::string> env
 ) const
 {
@@ -374,7 +372,7 @@ std::shared_ptr<http::HttpRequest> MainApplication::build_request(
 		env.set("HTTP_" + str::upper(key), header.second);
 	}
 
-	return std::make_shared<http::HttpRequest>(
+	return std::make_shared<http::Request>(
 		this->settings,
 		ctx->method,
 		ctx->path,
@@ -393,16 +391,16 @@ std::shared_ptr<http::HttpRequest> MainApplication::build_request(
 
 uint MainApplication::start_response(net::RequestContext* ctx, const http::result_t& result) const
 {
-	std::shared_ptr<http::IHttpResponse> response;
+	std::shared_ptr<http::abc::IHttpResponse> response;
 	if (result.exception)
 	{
 		this->settings->LOGGER->trace(result.exception->get_message(), _ERROR_DETAILS_);
-		response = std::make_shared<http::HttpResponseServerError>(result.exception->get_message());
+		response = std::make_shared<http::resp::ServerError>(result.exception->get_message());
 	}
 	else if (!result.response)
 	{
 		// Response was not instantiated, so return 204 - No Content.
-		response = std::make_shared<http::HttpResponse>(204);
+		response = std::make_shared<http::Response>(204);
 		this->settings->LOGGER->warning("Response was not instantiated, returned 204.", _ERROR_DETAILS_);
 	}
 	else
@@ -414,11 +412,11 @@ uint MainApplication::start_response(net::RequestContext* ctx, const http::resul
 	return response->status();
 }
 
-void MainApplication::finish_response(net::RequestContext* ctx, http::IHttpResponse* response) const
+void MainApplication::finish_response(net::RequestContext* ctx, http::abc::IHttpResponse* response) const
 {
 	if (response->is_streaming())
 	{
-		auto* streaming_response = dynamic_cast<http::StreamingHttpResponse*>(response);
+		auto* streaming_response = dynamic_cast<http::StreamingResponse*>(response);
 		std::string chunk;
 		while (!(chunk = streaming_response->get_chunk()).empty())
 		{

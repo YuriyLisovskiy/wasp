@@ -12,7 +12,6 @@
 #include <xalwart.base/kwargs.h>
 #include <xalwart.base/datetime.h>
 #include <xalwart.base/logger.h>
-#include <xalwart.base/result.h>
 #include <xalwart.base/string_utils.h>
 #include <xalwart.base/utility.h>
 #include <xalwart.base/path.h>

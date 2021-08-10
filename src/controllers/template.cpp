@@ -8,18 +8,16 @@
 
 // Framework libraries.
 #include "../render/response.h"
-#include "../conf/settings.h"
 
 
 __CONTROLLERS_BEGIN__
 
-TemplateResponseMixin::TemplateResponseMixin(render::abc::IEngine* engine) : template_name(""), content_type("")
+TemplateResponseMixin::TemplateResponseMixin(render::abc::IEngine* engine)
 {
 	if (!engine)
 	{
 		throw ImproperlyConfigured(
-			"Template engine must be initialized in order to use the application",
-			_ERROR_DETAILS_
+			"Template engine must be initialized in order to use the application", _ERROR_DETAILS_
 		);
 	}
 
@@ -27,7 +25,7 @@ TemplateResponseMixin::TemplateResponseMixin(render::abc::IEngine* engine) : tem
 }
 
 xw::http::result_t TemplateResponseMixin::render(
-	http::HttpRequest* request,
+	http::Request* request,
 	const std::shared_ptr<render::abc::IContext>& context,
 	const std::string& template_name,
 	unsigned short int status,

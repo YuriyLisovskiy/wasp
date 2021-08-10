@@ -26,8 +26,8 @@ __CONF_BEGIN__
 
 // TESTME: ModuleConfig
 // TODO: docs for 'ModuleConfig'
-// Derived class must contain constructor with
-// pointer to conf::Settings parameter.
+// Derived class must contain constructor with pointer
+// to 'conf::Settings' parameter.
 class ModuleConfig : public IModuleConfig
 {
 private:
@@ -73,8 +73,8 @@ protected:
 	inline void url(const std::string& pattern, const std::string& name)
 	{
 		ctrl::Handler<ArgsT...> controller_handler = [this](
-			http::HttpRequest* request, const std::tuple<ArgsT...>& args, conf::Settings* settings_ptr
-			) -> http::result_t
+			http::Request* request, const std::tuple<ArgsT...>& args, conf::Settings* settings_ptr
+		) -> http::result_t
 		{
 			ControllerT controller(settings_ptr);
 			controller.setup(request);

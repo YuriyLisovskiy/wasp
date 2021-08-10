@@ -18,19 +18,19 @@
 
 __MIDDLEWARE_BEGIN__
 
-bool CommonMiddleware::should_redirect_with_slash(http::HttpRequest* request)
+bool Common::should_redirect_with_slash(http::Request* request)
 {
 	if (this->settings->APPEND_SLASH && !request->path().ends_with("/"))
 	{
 		auto path = request->path();
 		return !urls::is_valid_path(path, this->settings->URLPATTERNS) &&
-				urls::is_valid_path(path + "/", this->settings->URLPATTERNS);
+			urls::is_valid_path(path + "/", this->settings->URLPATTERNS);
 	}
 
 	return false;
 }
 
-Result<std::string> CommonMiddleware::get_full_path_with_slash(http::HttpRequest* request)
+std::pair<std::string, std::shared_ptr<BaseException>> Common::get_full_path_with_slash(http::Request* request)
 {
 	auto new_path = request->full_path(true);
 
@@ -47,26 +47,26 @@ Result<std::string> CommonMiddleware::get_full_path_with_slash(http::HttpRequest
 			this->settings->DEBUG,
 			this->settings->ALLOWED_HOSTS
 		);
-		if (result.err)
+		if (result.second)
 		{
 			this->settings->LOGGER->trace("Method 'get_host' returned an error", _ERROR_DETAILS_);
 			return result;
 		}
 
-		auto host = result.value;
+		auto host = result.first;
 		throw RuntimeError(
 			"You called this URL via " + method + "s, but the URL doesn't end "
 			"in a slash and you have APPEND_SLASH set. Xalwart can't "
 			"redirect to the slash URL while maintaining " + method + "s data. "
 			"Change your form to point to " + host + new_path + "s (note the trailing "
-			"slash), or set APPEND_SLASH=False in your Xalwart settings."
+			"slash), or set APPEND_SLASH to false in your Xalwart settings."
 		);
 	}
 
-	return Result(new_path);
+	return {new_path, nullptr};
 }
 
-http::result_t CommonMiddleware::process_request(http::HttpRequest* request)
+http::result_t Common::process_request(http::Request* request)
 {
 	if (request->headers.contains(http::USER_AGENT))
 	{
@@ -90,17 +90,14 @@ http::result_t CommonMiddleware::process_request(http::HttpRequest* request)
 		this->settings->DEBUG,
 		this->settings->ALLOWED_HOSTS
 	);
-	if (result.err)
+	if (result.second)
 	{
 		this->settings->LOGGER->trace("Method 'get_host' returned an error", _ERROR_DETAILS_);
-		return http::exception<http::DisallowedHostException>(
-			result.err.msg, result.err.line, result.err.func.c_str(), result.err.file.c_str()
-		);
+		return {nullptr, result.second};
 	}
 
-	auto host = result.value;
-	bool must_prepend = this->settings->PREPEND_WWW &&
-		!host.empty() && !host.starts_with("www.");
+	auto host = result.first;
+	bool must_prepend = this->settings->PREPEND_WWW && !host.empty() && !host.starts_with("www.");
 	auto redirect_url = must_prepend ? (
 		request->scheme(this->settings->SECURE_PROXY_SSL_HEADER.get()) + "://www." + host
 	) : "";
@@ -110,17 +107,13 @@ http::result_t CommonMiddleware::process_request(http::HttpRequest* request)
 	if (this->should_redirect_with_slash(request))
 	{
 		result = this->get_full_path_with_slash(request);
-		if (result.err)
+		if (result.second)
 		{
-			this->settings->LOGGER->trace(
-				"Method 'get_full_path_with_slash' returned an error", _ERROR_DETAILS_
-			);
-			return http::exception<http::DisallowedHostException>(
-				result.err.msg, result.err.line, result.err.func.c_str(), result.err.file.c_str()
-			);
+			this->settings->LOGGER->trace("Method 'get_full_path_with_slash' returned an error", _ERROR_DETAILS_);
+			return {nullptr, result.second};
 		}
 
-		path = result.value;
+		path = result.first;
 	}
 	else
 	{
@@ -137,7 +130,7 @@ http::result_t CommonMiddleware::process_request(http::HttpRequest* request)
 	return {};
 }
 
-http::result_t CommonMiddleware::process_response(http::HttpRequest* request, http::IHttpResponse* response)
+http::result_t Common::process_response(http::Request* request, http::abc::IHttpResponse* response)
 {
 	// If the given URL is "Not Found", then check if we
 	// should redirect to a path with a slash appended.
@@ -146,17 +139,13 @@ http::result_t CommonMiddleware::process_response(http::HttpRequest* request, ht
 		if (this->should_redirect_with_slash(request))
 		{
 			auto result = this->get_full_path_with_slash(request);
-			if (result.err)
+			if (result.second)
 			{
-				this->settings->LOGGER->trace(
-					"Method 'get_full_path_with_slash' returned an error", _ERROR_DETAILS_
-				);
-				return http::exception<http::DisallowedHostException>(
-					result.err.msg, result.err.line, result.err.func.c_str(), result.err.file.c_str()
-				);
+				this->settings->LOGGER->trace("Method 'get_full_path_with_slash' returned an error", _ERROR_DETAILS_);
+				return {nullptr, result.second};
 			}
 
-			return this->get_response_redirect(result.value);
+			return this->get_response_redirect(result.first);
 		}
 	}
 
@@ -164,9 +153,7 @@ http::result_t CommonMiddleware::process_response(http::HttpRequest* request, ht
 	// responses if not already set.
 	if (!response->is_streaming() && !response->has_header(http::CONTENT_LENGTH))
 	{
-		response->set_header(
-			http::CONTENT_LENGTH, std::to_string(response->content_length())
-		);
+		response->set_header(http::CONTENT_LENGTH, std::to_string(response->content_length()));
 	}
 
 	return {};
