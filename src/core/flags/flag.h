@@ -77,7 +77,7 @@ public:
 };
 
 template<class T>
-concept is_stringifiable_c = requires(T x) {
+concept stringifiable = requires(T x) {
 	std::to_string(x);
 };
 
@@ -119,7 +119,7 @@ public:
 			return {this->_name, this->_data};
 		}
 
-		if constexpr (is_stringifiable_c<FlagT>)
+		if constexpr (stringifiable<FlagT>)
 		{
 			return {this->_name, std::to_string(this->_default_val)};
 		}

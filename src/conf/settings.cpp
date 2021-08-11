@@ -11,7 +11,7 @@
 #include <xalwart.render/loaders.h>
 
 // Framework modules.
-#include "../render/default.h"
+#include "../render/default_library.h"
 #include "../middleware/clickjacking.h"
 #include "../middleware/common.h"
 #include "../middleware/cookies.h"

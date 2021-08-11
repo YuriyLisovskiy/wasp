@@ -18,13 +18,13 @@
 
 __CORE_FLAGS_INTERNAL_BEGIN__
 
-// TESTME: args_parser
-// TODO: docs for 'args_parser'
-struct args_parser
+// TESTME: ArgumentsParser
+// TODO: docs for 'ArgumentsParser'
+struct ArgumentsParser
 {
 	std::map<std::string, std::string> flags;
 
-	explicit args_parser(int argc, char** argv, size_t parse_from = 1, bool is_verbose = false);
+	explicit ArgumentsParser(int argc, char** argv, size_t parse_from=1, bool is_verbose=false);
 
 	[[nodiscard]]
 	inline bool exists(const std::string& label) const

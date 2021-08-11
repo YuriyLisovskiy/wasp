@@ -32,7 +32,7 @@ public:
 
 	virtual void add_namespace(const std::string& ns) = 0;
 
-	virtual http::result_t apply(http::Request* request, conf::Settings* settings) = 0;
+	virtual http::Response::Result apply(http::Request* request, conf::Settings* settings) = 0;
 
 	virtual bool match(const std::string& url) = 0;
 

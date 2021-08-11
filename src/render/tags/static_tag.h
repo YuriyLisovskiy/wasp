@@ -17,12 +17,12 @@
 
 __RENDER_TAGS_BEGIN__
 
-inline const std::string TAG_NAME_STATIC = "static";
-inline const std::string TAG_NAME_MEDIA = "media";
+inline const char* TAG_NAME_STATIC = "static";
+inline const char* TAG_NAME_MEDIA = "media";
 
 // TESTME: static_node
 // TODO: docs for 'static_node'
-struct static_node : public internal::node
+struct StaticNode : public internal::node
 {
 	std::string prefix;
 	std::string var_name;

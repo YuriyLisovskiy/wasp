@@ -15,7 +15,7 @@
 
 __CORE_FLAGS_INTERNAL_BEGIN__
 
-args_parser::args_parser(int argc, char** argv, size_t parse_from, bool is_verbose)
+ArgumentsParser::ArgumentsParser(int argc, char** argv, size_t parse_from, bool is_verbose)
 {
 	std::string last_arg;
 	bool is_received = true;

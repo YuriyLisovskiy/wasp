@@ -204,6 +204,13 @@ protected:
 	std::string _content;
 
 public:
+	struct Result
+	{
+		std::shared_ptr<abc::IHttpResponse> response = nullptr;
+		std::shared_ptr<BaseException> exception = nullptr;
+	};
+
+public:
 	explicit Response(
 		unsigned short int status=200,
 		const std::string& content="",
@@ -323,34 +330,28 @@ public:
 	}
 };
 
-struct result_t
-{
-	std::shared_ptr<abc::IHttpResponse> response = nullptr;
-	std::shared_ptr<BaseException> exception = nullptr;
-};
-
 // TESTME: result<HttpResponseT, ...ArgsT>
 // TODO: docs for 'result<HttpResponseT, ...ArgsT>'
 template <typename HttpResponseT, typename ...ArgsT>
-inline result_t result(ArgsT&& ...args)
+inline Response::Result result(ArgsT&& ...args)
 {
-	return result_t{std::make_shared<HttpResponseT>(std::forward<ArgsT>(args)...), nullptr};
+	return Response::Result{std::make_shared<HttpResponseT>(std::forward<ArgsT>(args)...), nullptr};
 }
 
 // TESTME: error
 // TODO: docs for 'error'
 template <typename ExceptionT, typename ...ArgsT>
-inline result_t exception(ArgsT&& ...args)
+inline Response::Result exception(ArgsT&& ...args)
 {
-	return result_t{nullptr, std::make_shared<ExceptionT>(std::forward<ArgsT>(args)...)};
+	return Response::Result{nullptr, std::make_shared<ExceptionT>(std::forward<ArgsT>(args)...)};
 }
 
 // TESTME: raise
 // TODO: docs for 'raise'
 template <typename ...ArgsT>
-inline result_t raise(unsigned short int status_code, ArgsT&& ...args)
+inline Response::Result raise(unsigned short int status_code, ArgsT&& ...args)
 {
-	return result_t{std::make_shared<http::Response>(status_code, std::forward<ArgsT...>(args)...), nullptr};
+	return Response::Result{std::make_shared<http::Response>(status_code, std::forward<ArgsT...>(args)...), nullptr};
 }
 
 __HTTP_END__

@@ -63,7 +63,7 @@ protected:
 		};
 	}
 
-	template <middleware::middleware_type_c MiddlewareT>
+	template <middleware::middleware_type MiddlewareT>
 	inline void middleware(const std::string& custom_name="")
 	{
 		auto name = this->get_name_or<MiddlewareT>(custom_name);
@@ -77,7 +77,7 @@ protected:
 		};
 	}
 
-	template <render::abc::library_type_c LibraryT>
+	template <render::abc::library_type LibraryT>
 	inline void library(const std::string& custom_name="")
 	{
 		auto name = this->get_name_or<LibraryT>(custom_name);
@@ -91,7 +91,7 @@ protected:
 		};
 	}
 
-	template <render::abc::loader_type_c LoaderT>
+	template <render::abc::loader_type LoaderT>
 	inline void loader(const std::string& custom_name="")
 	{
 		auto name = this->get_name_or<LoaderT>(custom_name);

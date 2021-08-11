@@ -30,7 +30,7 @@ public:
 	{
 	}
 
-	inline http::result_t process_request(http::Request* request) override
+	inline http::Response::Result process_request(http::Request* request) override
 	{
 		request->COOKIES = collections::Dictionary(
 			http::internal::parse_cookie(request->headers.get("Cookie", ""), "")

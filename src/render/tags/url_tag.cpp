@@ -22,7 +22,7 @@
 
 __RENDER_TAGS_BEGIN__
 
-std::string url_node::render(abc::IContext* ctx)
+std::string UrlNode::render(abc::IContext* ctx)
 {
 	using Fe = std::shared_ptr<internal::FilterExpression>;
 	auto built_url = this->pattern->build(
@@ -80,7 +80,7 @@ std::function<std::shared_ptr<internal::node>(
 		{
 			if (url_p->get_name() == url_name)
 			{
-				auto node = std::make_shared<url_node>();
+				auto node = std::make_shared<UrlNode>();
 				if (params.size() > 1)
 				{
 					for (size_t i = 1; i < params.size(); i++)

@@ -120,14 +120,14 @@ std::string ResponseBase::get_reason_phrase()
 		return this->_reason_phrase;
 	}
 
-	return internal::HTTP_STATUS.get(this->_status, {"Unknown Status Code", ""}).first;
+	return get_status_by_code(this->_status).phrase;
 }
 
 void ResponseBase::set_reason_phrase(std::string value)
 {
 	if (value.empty())
 	{
-		value = "Unknown Status Code";
+		value = "Unknown Status";
 	}
 
 	this->_reason_phrase = value;
@@ -301,7 +301,7 @@ RedirectBase::RedirectBase(
 		throw ArgumentError("invalid status: " + std::to_string(status), _ERROR_DETAILS_);
 	}
 
-	this->set_header("Location", encoding::encode_url(redirect_to));
+	this->set_header("Location", http::parse_url(redirect_to).str());
 	auto url = http::parse_url(redirect_to);
 	if (!url.scheme.empty() && this->_allowed_schemes.find(url.scheme) == this->_allowed_schemes.end())
 	{

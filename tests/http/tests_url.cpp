@@ -347,7 +347,7 @@ protected:
 		this->url->path = this->PATH_EXPECTED;
 		this->url->fragment = this->FRAGMENT_EXPECTED;
 		this->url->raw_query = this->QUERY_EXPECTED;
-		this->url->user = http::URL::user_info_t{this->USERNAME_EXPECTED, this->PASSWORD_EXPECTED};
+		this->url->user = http::URL::UserInfo{this->USERNAME_EXPECTED, this->PASSWORD_EXPECTED};
 	}
 
 	void TearDown() override

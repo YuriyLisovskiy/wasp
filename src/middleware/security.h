@@ -42,9 +42,9 @@ protected:
 public:
 	explicit Security(conf::Settings* settings);
 
-	http::result_t process_request(http::Request* request) override;
+	http::Response::Result process_request(http::Request* request) override;
 
-	http::result_t process_response(http::Request* request, http::abc::IHttpResponse* response) override;
+	http::Response::Result process_response(http::Request* request, http::abc::IHttpResponse* response) override;
 };
 
 __MIDDLEWARE_END__

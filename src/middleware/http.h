@@ -36,7 +36,7 @@ public:
 	{
 	}
 
-	http::result_t process_response(http::Request* request, http::abc::IHttpResponse* response) override;
+	http::Response::Result process_response(http::Request* request, http::abc::IHttpResponse* response) override;
 };
 
 __MIDDLEWARE_END__

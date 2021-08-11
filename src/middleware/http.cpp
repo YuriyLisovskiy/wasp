@@ -17,7 +17,7 @@
 
 __MIDDLEWARE_BEGIN__
 
-http::result_t ConditionalGet::process_response(http::Request* request, http::abc::IHttpResponse* response)
+http::Response::Result ConditionalGet::process_response(http::Request* request, http::abc::IHttpResponse* response)
 {
 	// It's too late to prevent an unsafe request with a 412 response, and
 	// for a HEAD request, the response body is always empty so computing

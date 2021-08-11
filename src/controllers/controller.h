@@ -28,7 +28,7 @@
 __CONTROLLERS_BEGIN__
 
 template <typename ...ArgsT>
-using Handler = std::function<http::result_t(
+using Handler = std::function<http::Response::Result(
 	http::Request*, const std::tuple<ArgsT...>&, conf::Settings*
 )>;
 
@@ -88,7 +88,7 @@ public:
 	// @param request: pointer to http request.
 	// @param args: pointer to requests' url arguments.
 	// @return pointer to http response instance.
-	virtual inline http::result_t get(URLArgsT ...args)
+	virtual inline http::Response::Result get(URLArgsT ...args)
 	{
 		return {};
 	}
@@ -99,7 +99,7 @@ public:
 	// @param request: pointer to http request.
 	// @param args: pointer to requests' url arguments.
 	// @return pointer to http response instance.
-	virtual inline http::result_t post(URLArgsT ...args)
+	virtual inline http::Response::Result post(URLArgsT ...args)
 	{
 		return {};
 	}
@@ -110,7 +110,7 @@ public:
 	// @param request: pointer to http request.
 	// @param args: pointer to requests' url arguments.
 	// @return pointer to http response instance.
-	virtual inline http::result_t put(URLArgsT ...args)
+	virtual inline http::Response::Result put(URLArgsT ...args)
 	{
 		return {};
 	}
@@ -121,7 +121,7 @@ public:
 	// @param request: pointer to http request.
 	// @param args: pointer to requests' url arguments.
 	// @return pointer to http response instance.
-	virtual inline http::result_t patch(URLArgsT ...args)
+	virtual inline http::Response::Result patch(URLArgsT ...args)
 	{
 		return {};
 	}
@@ -132,7 +132,7 @@ public:
 	// @param request: pointer to http request.
 	// @param args: pointer to requests' url arguments.
 	// @return pointer to http response instance.
-	virtual inline http::result_t delete_(URLArgsT ...args)
+	virtual inline http::Response::Result delete_(URLArgsT ...args)
 	{
 		return {};
 	}
@@ -143,7 +143,7 @@ public:
 	// @param request: pointer to http request.
 	// @param args: pointer to requests' url arguments.
 	// @return pointer to http response instance.
-	virtual inline http::result_t head(URLArgsT ...args)
+	virtual inline http::Response::Result head(URLArgsT ...args)
 	{
 		return this->get(args...);
 	}
@@ -154,7 +154,7 @@ public:
 	// @param request: pointer to http request.
 	// @param args: pointer to requests' url arguments.
 	// @return pointer to http response instance.
-	virtual inline http::result_t options(URLArgsT ...args)
+	virtual inline http::Response::Result options(URLArgsT ...args)
 	{
 		auto response = std::make_shared<http::Response>(200);
 		auto allowed_methods = this->allowed_methods();
@@ -171,7 +171,7 @@ public:
 	// @param request: pointer to http request.
 	// @param args: pointer to requests' url arguments.
 	// @return pointer to http response instance.
-	virtual inline http::result_t trace(URLArgsT ...args)
+	virtual inline http::Response::Result trace(URLArgsT ...args)
 	{
 		return {};
 	}
@@ -190,7 +190,7 @@ public:
 	//
 	// @param request: an actual http request from client.
 	// @return pointer to http response returned from handler.
-	virtual inline http::result_t dispatch(URLArgsT ...args)
+	virtual inline http::Response::Result dispatch(URLArgsT ...args)
 	{
 		if (this->request == nullptr)
 		{
@@ -203,7 +203,7 @@ public:
 		}
 
 		std::string method = str::lower(this->request->method());
-		http::result_t result;
+		http::Response::Result result;
 		if (std::find(
 			this->allowed_methods_list.begin(), this->allowed_methods_list.end(), str::lower(method)
 		) == this->allowed_methods_list.end())
@@ -257,7 +257,7 @@ public:
 	//
 	// @param request: pointer to http request.
 	// @return pointer to http response returned from handler.
-	inline http::result_t http_method_not_allowed()
+	inline http::Response::Result http_method_not_allowed()
 	{
 		if (!this->settings->LOGGER)
 		{

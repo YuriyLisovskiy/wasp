@@ -66,7 +66,7 @@ std::pair<std::string, std::shared_ptr<BaseException>> Common::get_full_path_wit
 	return {new_path, nullptr};
 }
 
-http::result_t Common::process_request(http::Request* request)
+http::Response::Result Common::process_request(http::Request* request)
 {
 	if (request->headers.contains(http::USER_AGENT))
 	{
@@ -130,7 +130,7 @@ http::result_t Common::process_request(http::Request* request)
 	return {};
 }
 
-http::result_t Common::process_response(http::Request* request, http::abc::IHttpResponse* response)
+http::Response::Result Common::process_response(http::Request* request, http::abc::IHttpResponse* response)
 {
 	// If the given URL is "Not Found", then check if we
 	// should redirect to a path with a slash appended.

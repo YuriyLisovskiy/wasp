@@ -25,7 +25,7 @@ protected:
 
 TEST_F(MultipartParserStaticTestCase, AssertBoundaryTestSuccess)
 {
-	ASSERT_NO_THROW(http::internal::multipart_parser::assert_boundary(
+	ASSERT_NO_THROW(http::internal::MultipartParser::assert_boundary(
 		this->ORIG_BOUNDARY,
 		this->ORIG_BOUNDARY
 	));
@@ -33,7 +33,7 @@ TEST_F(MultipartParserStaticTestCase, AssertBoundaryTestSuccess)
 
 TEST_F(MultipartParserStaticTestCase, AssertBoundaryTestThrows)
 {
-	ASSERT_THROW(http::internal::multipart_parser::assert_boundary(
+	ASSERT_THROW(http::internal::MultipartParser::assert_boundary(
 		this->ORIG_BOUNDARY,
 		this->DIFFERENT_BOUNDARY
 	), MultiPartParserError);
@@ -42,7 +42,7 @@ TEST_F(MultipartParserStaticTestCase, AssertBoundaryTestThrows)
 TEST_F(MultipartParserStaticTestCase, AssertGetBoundaryTestSuccess)
 {
 	ASSERT_EQ(
-		http::internal::multipart_parser::get_boundary(this->CONTENT_TYPE),
+		http::internal::MultipartParser::get_boundary(this->CONTENT_TYPE),
 		str::ltrim(this->ORIG_BOUNDARY, "-")
 	);
 }
@@ -50,7 +50,7 @@ TEST_F(MultipartParserStaticTestCase, AssertGetBoundaryTestSuccess)
 TEST_F(MultipartParserStaticTestCase, AssertGetBoundaryTestThrowsInvalidContentType)
 {
 	ASSERT_THROW(
-		http::internal::multipart_parser::get_boundary("application/x-www-urlencoded"),
+		http::internal::MultipartParser::get_boundary("application/x-www-urlencoded"),
 		MultiPartParserError
 	);
 }
@@ -58,7 +58,7 @@ TEST_F(MultipartParserStaticTestCase, AssertGetBoundaryTestThrowsInvalidContentT
 TEST_F(MultipartParserStaticTestCase, AssertGetBoundaryTestThrowsEmptyBoundary)
 {
 	ASSERT_THROW(
-		http::internal::multipart_parser::get_boundary("multipart/form-data"),
+		http::internal::MultipartParser::get_boundary("multipart/form-data"),
 		MultiPartParserError
 	);
 }
@@ -171,11 +171,11 @@ protected:
 
 	const std::string ROOT = path::cwd() + "/";
 
-	http::internal::multipart_parser* parser = nullptr;
+	http::internal::MultipartParser* parser = nullptr;
 
 	void SetUp() override
 	{
-		this->parser = new http::internal::multipart_parser(this->ROOT);
+		this->parser = new http::internal::MultipartParser(this->ROOT);
 	}
 
 	void TearDown() override

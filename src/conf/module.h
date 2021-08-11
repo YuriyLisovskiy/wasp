@@ -74,7 +74,7 @@ protected:
 	{
 		ctrl::Handler<ArgsT...> controller_handler = [this](
 			http::Request* request, const std::tuple<ArgsT...>& args, conf::Settings* settings_ptr
-		) -> http::result_t
+		) -> http::Response::Result
 		{
 			ControllerT controller(settings_ptr);
 			controller.setup(request);
@@ -105,13 +105,13 @@ protected:
 		});
 	}
 
-	template <cmd::command_type_c CommandT>
+	template <cmd::command_type CommandT>
 	inline void command()
 	{
 		this->_commands.push_back(std::make_shared<CommandT>(this, this->settings));
 	}
 
-	template <cmd::command_type_c CommandT, typename ...Args>
+	template <cmd::command_type CommandT, typename ...Args>
 	inline void command(Args&& ...args)
 	{
 		this->_commands.push_back(std::make_shared<CommandT>(std::forward<Args>(args)...));

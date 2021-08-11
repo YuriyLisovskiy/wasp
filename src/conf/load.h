@@ -24,18 +24,18 @@
 __CONF_BEGIN__
 
 template <typename T>
-concept settings_type_c = std::is_base_of_v<Settings, T>;
+concept settings_type = std::is_base_of_v<Settings, T>;
 
-// TESTME: loader
-// TODO: docs for 'loader<SettingLoaderT>'
+// TESTME: Loader
+// TODO: docs for 'Loader<SettingLoaderT>'
 template <typename SettingLoaderT>
-struct loader
+struct Loader
 {
 private:
 	std::shared_ptr<SettingLoaderT> _loader;
 
 public:
-	explicit loader(std::shared_ptr<SettingLoaderT> l) : _loader(l)
+	explicit Loader(std::shared_ptr<SettingLoaderT> l) : _loader(l)
 	{
 		if (!this->_loader)
 		{
@@ -43,7 +43,7 @@ public:
 		}
 	}
 
-	template<settings_type_c T, typename ...Args>
+	template<settings_type T, typename ...Args>
 	inline std::shared_ptr<T> load_settings(Args&& ...args)
 	{
 		auto settings = std::make_shared<T>(std::forward<Args>(args)...);
@@ -63,9 +63,9 @@ public:
 // TESTME: with_loader<SettingLoaderT, ...ArgsT>
 // TODO: docs for 'with_loader<SettingLoaderT, ...ArgsT>'
 template <typename SettingLoaderT, typename ...ArgsT>
-inline loader<SettingLoaderT> with_loader(ArgsT&& ...args)
+inline Loader<SettingLoaderT> with_loader(ArgsT&& ...args)
 {
-	return loader<SettingLoaderT>(std::make_shared<SettingLoaderT>(std::forward<ArgsT>(args)...));
+	return Loader<SettingLoaderT>(std::make_shared<SettingLoaderT>(std::forward<ArgsT>(args)...));
 }
 
 __CONF_END__

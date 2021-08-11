@@ -22,7 +22,7 @@ TEST(TestCase_args_parser, parseValid)
 	}
 
 	argv.push_back(nullptr);
-	core::flags::internal::args_parser parser((int)argv.size() - 1, argv.data(), 1, false);
+	core::flags::internal::ArgumentsParser parser((int)argv.size() - 1, argv.data(), 1, false);
 
 	std::map<std::string, std::string> expected = {
 		{"--host", "localhost"}, {"--retries", "5"}, {"-p", "1,2,3,4,5"}
@@ -46,7 +46,7 @@ TEST(TestCase_args_parser, parseInvalidValid)
 
 	argv.push_back(nullptr);
 
-	core::flags::internal::args_parser parser((int)argv.size() - 1, argv.data(), 0, false);
+	core::flags::internal::ArgumentsParser parser((int)argv.size() - 1, argv.data(), 0, false);
 	std::map<std::string, std::string> expected = {
 		{"--host", "localhost"}, {"--retries", "1,2,3,4,5"}
 	};

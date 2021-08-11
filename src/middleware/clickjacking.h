@@ -39,7 +39,7 @@ public:
 	{
 	}
 
-	http::result_t process_response(http::Request* request, http::abc::IHttpResponse* response) override;
+	http::Response::Result process_response(http::Request* request, http::abc::IHttpResponse* response) override;
 
 	// Get the value to set for the X_FRAME_OPTIONS header. Use the value from
 	// the X_FRAME_OPTIONS setting, or 'DENY' if not set.

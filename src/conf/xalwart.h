@@ -36,7 +36,7 @@ private:
 	);
 
 protected:
-	version_t version;
+	Version version;
 
 	conf::Settings* settings;
 
@@ -59,15 +59,15 @@ protected:
 	void build_module_patterns(std::vector<std::shared_ptr<urls::IPattern>>& patterns) const;
 
 	[[nodiscard]]
-	http::result_t process_request(std::shared_ptr<http::Request>& request) const;
+	http::Response::Result process_request(std::shared_ptr<http::Request>& request) const;
 
 	[[nodiscard]]
-	http::result_t process_urlpatterns(
+	http::Response::Result process_urlpatterns(
 		std::shared_ptr<http::Request>& request, std::vector<std::shared_ptr<urls::IPattern>>& urlpatterns
 	) const;
 
 	[[nodiscard]]
-	http::result_t process_response(
+	http::Response::Result process_response(
 		std::shared_ptr<http::Request>& request, std::shared_ptr<http::abc::IHttpResponse>& response
 	) const;
 
@@ -77,7 +77,7 @@ protected:
 	) const;
 
 	[[nodiscard]]
-	uint start_response(net::RequestContext* ctx, const http::result_t& result) const;
+	uint start_response(net::RequestContext* ctx, const http::Response::Result& result) const;
 
 	void finish_response(net::RequestContext* ctx, http::abc::IHttpResponse* response) const;
 

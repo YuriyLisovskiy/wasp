@@ -48,7 +48,7 @@ bool was_modified_since(const std::string& header, size_t time, size_t size)
 	return result;
 }
 
-http::result_t StaticController::get(const std::string& p)
+http::Response::Result StaticController::get(const std::string& p)
 {
 	if (!this->_kwargs.contains("document_root"))
 	{

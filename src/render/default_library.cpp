@@ -4,7 +4,7 @@
  * Copyright (c) 2020-2021 Yuriy Lisovskiy
  */
 
-#include "./default.h"
+#include "./default_library.h"
 
 // Framework libraries.
 #include "./tags/static_tag.h"

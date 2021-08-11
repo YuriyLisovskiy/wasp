@@ -27,15 +27,15 @@ public:
 	virtual ~IMiddleware() = default;
 
 	// An input http request before processing in controller.
-	virtual http::result_t process_request(http::Request* request) = 0;
+	virtual http::Response::Result process_request(http::Request* request) = 0;
 
 	// An output http request and response after processing in controller.
-	virtual http::result_t process_response(
+	virtual http::Response::Result process_response(
 		http::Request* request, http::abc::IHttpResponse* response
 	) = 0;
 };
 
 template <typename T>
-concept middleware_type_c = std::is_base_of_v<IMiddleware, T>;
+concept middleware_type = std::is_base_of_v<IMiddleware, T>;
 
 __MIDDLEWARE_END__

@@ -28,7 +28,7 @@
 
 __HTTP_INTERNAL_BEGIN__
 
-const inline std::string UPPER_HEX = "0123456789ABCDEF";
+inline constexpr char UPPER_HEX[] = "0123456789ABCDEF";
 
 // TESTME: valid_optional_port
 extern bool valid_optional_port(const std::string& port);
@@ -36,19 +36,19 @@ extern bool valid_optional_port(const std::string& port);
 // TESTME: split_host_port
 extern std::pair<std::string, std::string> split_host_port(const std::string& host_port);
 
-enum escape_mode
+enum class EscapeMode
 {
-	encode_host, encode_path, encode_fragment, encode_user_password,
-	encode_query_component, encode_zone, encode_path_segment
+	EncodeHost, EncodePath, EncodeFragment, EncodeUserPassword,
+	EncodeQueryComponent, EncodeZone, EncodePathSegment
 };
 
 // TESTME: should_escape
 // Return true if the specified character should be escaped when
 // appearing in a URL string, according to RFC 3986.
-extern bool should_escape(char c, escape_mode mode);
+extern bool should_escape(char c, EscapeMode mode);
 
 // TESTME: escape
-extern std::string escape(const std::string& s, escape_mode mode);
+extern std::string escape(const std::string& s, EscapeMode mode);
 
 // TESTME: is_hex
 extern bool is_hex(char c);
@@ -59,13 +59,13 @@ extern char unhex(char c);
 // TESTME: unescape
 // Unescapes a string; the mode specifies
 // which section of the URL string is being unescaped.
-extern std::string unescape(std::string s, escape_mode mode);
+extern std::string unescape(std::string s, EscapeMode mode);
 
 // TESTME: valid_encoded
 // Checks whether 's' is a valid encoded path or fragment,
 // according to mode. It must not contain any bytes that
 // require escaping during encoding.
-extern bool valid_encoded(const std::string& s, escape_mode mode);
+extern bool valid_encoded(const std::string& s, EscapeMode mode);
 
 // TESTME: split
 // Splits 's' into two substrings separated by the first occurrence of
@@ -101,7 +101,7 @@ __HTTP_INTERNAL_END__
 
 __HTTP_BEGIN__
 
-struct query_t : public collections::MultiDictionary<std::string, std::string>
+struct Query : public collections::MultiDictionary<std::string, std::string>
 {
 	// TESTME: encode
 	// Encodes the values into ``URL encoded'' form
@@ -115,7 +115,7 @@ struct query_t : public collections::MultiDictionary<std::string, std::string>
 // inside a URL query.
 inline std::string query_escape(const std::string& s)
 {
-	return internal::escape(s, internal::encode_query_component);
+	return internal::escape(s, internal::EscapeMode::EncodeQueryComponent);
 }
 
 // TESTME: query_unescape
@@ -126,7 +126,7 @@ inline std::string query_escape(const std::string& s)
 // digits.
 inline std::string query_unescape(const std::string& s)
 {
-	return internal::unescape(s, internal::encode_query_component);
+	return internal::unescape(s, internal::EscapeMode::EncodeQueryComponent);
 }
 
 // TESTME: parse_query
@@ -139,12 +139,12 @@ inline std::string query_unescape(const std::string& s)
 // Query is expected to be a list of key=value settings separated by
 // ampersands or semicolons. A setting without an equals sign is
 // interpreted as a key set to an empty value.
-extern query_t parse_query(std::string query);
+extern Query parse_query(std::string query);
 
 // TESTME: Url
 struct URL final
 {
-	struct user_info_t
+	struct UserInfo
 	{
 		std::string username;
 		std::string password;
@@ -162,10 +162,10 @@ struct URL final
 		[[nodiscard]]
 		inline std::string str() const
 		{
-			auto s = internal::escape(this->username, internal::encode_user_password);
+			auto s = internal::escape(this->username, internal::EscapeMode::EncodeUserPassword);
 			if (!this->password.empty())
 			{
-				s += ":" + internal::escape(this->password, internal::encode_user_password);
+				s += ":" + internal::escape(this->password, internal::EscapeMode::EncodeUserPassword);
 			}
 
 			return s;
@@ -174,7 +174,7 @@ struct URL final
 
 	std::string scheme;
 	std::string opaque;
-	user_info_t user;
+	UserInfo user;
 	std::string host;
 	std::string path;
 	std::string raw_path;
@@ -263,7 +263,7 @@ struct URL final
 
 	// Parses 'raw_query' and returns the corresponding values.
 	[[nodiscard]]
-	inline query_t query() const
+	inline Query query() const
 	{
 		return parse_query(this->raw_query);
 	}
@@ -278,13 +278,15 @@ struct URL final
 // error, due to parsing ambiguities.
 URL parse_url(const std::string& raw_url);
 
+
+
 __HTTP_END__
 
 
 __HTTP_INTERNAL_BEGIN__
 
 // TESTME: parse_authority
-extern std::pair<URL::user_info_t, std::string> parse_authority(const std::string& authority);
+extern std::pair<URL::UserInfo, std::string> parse_authority(const std::string& authority);
 
 // TESTME: parse
 extern URL parse_url(const std::string& raw_url, bool via_request);

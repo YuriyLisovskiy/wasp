@@ -20,11 +20,11 @@
 
 __RENDER_TAGS_BEGIN__
 
-inline const std::string TAG_NAME_URL = "url";
+inline const char* TAG_NAME_URL = "url";
 
 // TESTME: url_node
 // TODO: docs for 'url_node'
-struct url_node : public internal::node
+struct UrlNode : public internal::node
 {
 	std::shared_ptr<urls::IPattern> pattern;
 	std::vector<std::shared_ptr<internal::FilterExpression>> params;

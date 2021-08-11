@@ -25,7 +25,7 @@ std::string RedirectController::get_redirect_url()
 	return url;
 }
 
-http::result_t RedirectController::get()
+http::Response::Result RedirectController::get()
 {
 	std::string url = this->get_redirect_url();
 	if (url.empty())

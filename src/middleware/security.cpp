@@ -31,7 +31,7 @@ Security::Security(conf::Settings* settings) : BaseMiddleware(settings)
 	}
 }
 
-http::result_t Security::process_request(http::Request* request)
+http::Response::Result Security::process_request(http::Request* request)
 {
 	auto path = str::ltrim(request->path(), "/");
 	bool matched = false;
@@ -78,7 +78,7 @@ http::result_t Security::process_request(http::Request* request)
 	return {};
 }
 
-http::result_t Security::process_response(http::Request* request, http::abc::IHttpResponse* response)
+http::Response::Result Security::process_response(http::Request* request, http::abc::IHttpResponse* response)
 {
 	if (
 		this->sts_seconds &&

@@ -13,7 +13,7 @@
 
 __HTTP_INTERNAL_BEGIN__
 
-void multipart_parser::append_parameter(const std::string& key, const std::string& value)
+void MultipartParser::append_parameter(const std::string& key, const std::string& value)
 {
 	if (!this->post_values.contains(key))
 	{
@@ -23,7 +23,7 @@ void multipart_parser::append_parameter(const std::string& key, const std::strin
 	this->multi_post_value.add(key, value);
 }
 
-void multipart_parser::append_file(
+void MultipartParser::append_file(
 	const std::string& key,
 	const std::string& file_name,
 	const std::string& content_type,
@@ -50,7 +50,7 @@ void multipart_parser::append_file(
 	this->multi_file_value.add(key, uploaded_file);
 }
 
-std::string multipart_parser::get_boundary(const std::string& content_type)
+std::string MultipartParser::get_boundary(const std::string& content_type)
 {
 	if (!content_type.starts_with("multipart/"))
 	{
@@ -74,7 +74,7 @@ std::string multipart_parser::get_boundary(const std::string& content_type)
 	return str::ltrim(boundary, '-');
 }
 
-void multipart_parser::assert_boundary(const std::string& actual, const std::string& expected)
+void MultipartParser::assert_boundary(const std::string& actual, const std::string& expected)
 {
 	if (str::trim(actual, '-') != str::trim(expected, '-'))
 	{
@@ -84,26 +84,26 @@ void multipart_parser::assert_boundary(const std::string& actual, const std::str
 	}
 }
 
-multipart_parser::multipart_parser(const std::string& media_root)
+MultipartParser::MultipartParser(const std::string& media_root)
 {
 	this->media_root = str::rtrim(media_root, '/');
 }
 
-void multipart_parser::parse(const std::string& content_type, const std::string& body)
+void MultipartParser::parse(const std::string& content_type, const std::string& body)
 {
-	std::string boundary = multipart_parser::get_boundary(content_type);
+	std::string boundary = MultipartParser::get_boundary(content_type);
 	std::string current_boundary, content_disposition, key, value, file_content_type, file_name;
 	std::vector<unsigned char> file;
 	size_t end_pos = 0, content_idx = 0;
 	auto begin = body.begin();
 	auto end = body.end();
-	multipart_parser::state st = multipart_parser::state::s_boundary_begin;
+	MultipartParser::State st = MultipartParser::State::BoundaryBegin;
 	while (begin != end)
 	{
 		char input = *begin++;
 		switch (st)
 		{
-			case multipart_parser::state::s_boundary_begin:
+			case MultipartParser::State::BoundaryBegin:
 				if (input == '\r' || input == '\n')
 				{
 					throw MultiPartParserError(
@@ -118,28 +118,28 @@ void multipart_parser::parse(const std::string& content_type, const std::string&
 				else
 				{
 					current_boundary += input;
-					st = multipart_parser::state::s_boundary;
+					st = MultipartParser::State::Boundary;
 				}
 				break;
-			case multipart_parser::state::s_boundary:
+			case MultipartParser::State::Boundary:
 				if (input == '\r')
 				{
-					st = multipart_parser::state::s_boundary_end;
+					st = MultipartParser::State::BoundaryEnd;
 				}
 				else if (input == '-')
 				{
-					st = multipart_parser::state::s_body_end;
+					st = MultipartParser::State::BodyEnd;
 				}
 				else
 				{
 					current_boundary += input;
 				}
 				break;
-			case multipart_parser::state::s_boundary_end:
+			case MultipartParser::State::BoundaryEnd:
 				if (input == '\n')
 				{
 					this->assert_boundary(current_boundary, boundary);
-					st = multipart_parser::state::s_content_disposition_begin;
+					st = MultipartParser::State::ContentDispositionBegin;
 				}
 				else
 				{
@@ -149,20 +149,20 @@ void multipart_parser::parse(const std::string& content_type, const std::string&
 					);
 				}
 				break;
-			case multipart_parser::state::s_body_end:
+			case MultipartParser::State::BodyEnd:
 				if (input == '-')
 				{
 					this->assert_boundary(current_boundary, boundary);
 					return;
 				}
 				break;
-			case multipart_parser::state::s_content_disposition_begin:
+			case MultipartParser::State::ContentDispositionBegin:
 				if (input == ':')
 				{
 					input = *begin++;
 					if (input == ' ')
 					{
-						st = multipart_parser::state::s_content_disposition;
+						st = MultipartParser::State::ContentDisposition;
 					}
 					else
 					{
@@ -173,13 +173,13 @@ void multipart_parser::parse(const std::string& content_type, const std::string&
 					}
 				}
 				break;
-			case multipart_parser::state::s_content_disposition:
+			case MultipartParser::State::ContentDisposition:
 				if (input == ';')
 				{
 					input = *begin++;
 					if (input == ' ')
 					{
-						st = multipart_parser::state::s_name_begin;
+						st = MultipartParser::State::NameBegin;
 					}
 					else
 					{
@@ -194,13 +194,13 @@ void multipart_parser::parse(const std::string& content_type, const std::string&
 					content_disposition += input;
 				}
 				break;
-			case multipart_parser::state::s_name_begin:
+			case MultipartParser::State::NameBegin:
 				if (input == '=')
 				{
 					input = *begin++;
 					if (input == '"')
 					{
-						st = multipart_parser::state::s_name;
+						st = MultipartParser::State::Name;
 					}
 					else
 					{
@@ -211,23 +211,23 @@ void multipart_parser::parse(const std::string& content_type, const std::string&
 					}
 				}
 				break;
-			case multipart_parser::state::s_name:
+			case MultipartParser::State::Name:
 				if (input == '"')
 				{
-					st = multipart_parser::state::s_name_end;
+					st = MultipartParser::State::NameEnd;
 				}
 				else
 				{
 					key += input;
 				}
 				break;
-			case multipart_parser::state::s_name_end:
+			case MultipartParser::State::NameEnd:
 				if (input == ';')
 				{
 					input = *begin++;
 					if (input == ' ')
 					{
-						st = multipart_parser::state::s_file_name_begin;
+						st = MultipartParser::State::FileNameBegin;
 						file_name.clear();
 					}
 					else
@@ -243,7 +243,7 @@ void multipart_parser::parse(const std::string& content_type, const std::string&
 					input = *begin++;
 					if (input == '\n')
 					{
-						st = multipart_parser::state::s_content_begin;
+						st = MultipartParser::State::ContentBegin;
 					}
 					else
 					{
@@ -261,13 +261,13 @@ void multipart_parser::parse(const std::string& content_type, const std::string&
 					);
 				}
 				break;
-			case multipart_parser::state::s_file_name_begin:
+			case MultipartParser::State::FileNameBegin:
 				if (input == '=')
 				{
 					input = *begin++;
 					if (input == '"')
 					{
-						st = multipart_parser::state::s_file_name;
+						st = MultipartParser::State::FileName;
 					}
 					else
 					{
@@ -285,7 +285,7 @@ void multipart_parser::parse(const std::string& content_type, const std::string&
 					);
 				}
 				break;
-			case multipart_parser::state::s_file_name:
+			case MultipartParser::State::FileName:
 				if (input == '"')
 				{
 					input = *begin++;
@@ -294,7 +294,7 @@ void multipart_parser::parse(const std::string& content_type, const std::string&
 						input = *begin++;
 						if (input == '\n')
 						{
-							st = multipart_parser::state::s_content_type_begin;
+							st = MultipartParser::State::ContentTypeBegin;
 						}
 						else
 						{
@@ -317,13 +317,13 @@ void multipart_parser::parse(const std::string& content_type, const std::string&
 					file_name += input;
 				}
 				break;
-			case multipart_parser::state::s_content_type_begin:
+			case MultipartParser::State::ContentTypeBegin:
 				if (input == ':')
 				{
 					input = *begin++;
 					if (input == ' ')
 					{
-						st = multipart_parser::state::s_content_type;
+						st = MultipartParser::State::ContentType;
 					}
 					else
 					{
@@ -341,13 +341,13 @@ void multipart_parser::parse(const std::string& content_type, const std::string&
 					);
 				}
 				break;
-			case multipart_parser::state::s_content_type:
+			case MultipartParser::State::ContentType:
 				if (input == '\r')
 				{
 					input = *begin++;
 					if (input == '\n')
 					{
-						st = multipart_parser::state::s_content_begin;
+						st = MultipartParser::State::ContentBegin;
 					}
 					else
 					{
@@ -362,7 +362,7 @@ void multipart_parser::parse(const std::string& content_type, const std::string&
 					file_content_type += input;
 				}
 				break;
-			case multipart_parser::state::s_content_begin:
+			case MultipartParser::State::ContentBegin:
 				if (input == '\r')
 				{
 					input = *begin++;
@@ -378,7 +378,7 @@ void multipart_parser::parse(const std::string& content_type, const std::string&
 							);
 						}
 
-						st = multipart_parser::state::s_content;
+						st = MultipartParser::State::Content;
 					}
 					else
 					{
@@ -389,7 +389,7 @@ void multipart_parser::parse(const std::string& content_type, const std::string&
 					}
 				}
 				break;
-			case multipart_parser::state::s_content:
+			case MultipartParser::State::Content:
 				if (content_idx + 1 > end_pos)
 				{
 					if (input != '\r')
@@ -411,7 +411,7 @@ void multipart_parser::parse(const std::string& content_type, const std::string&
 
 					end_pos += 2;
 					current_boundary.clear();
-					st = multipart_parser::state::s_boundary_begin;
+					st = MultipartParser::State::BoundaryBegin;
 					if (file_content_type.empty())
 					{
 						this->append_parameter(key, value);

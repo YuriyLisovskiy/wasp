@@ -17,7 +17,7 @@
 
 __RENDER_TAGS_BEGIN__
 
-std::string static_node::render(abc::IContext* ctx)
+std::string StaticNode::render(abc::IContext* ctx)
 {
 	std::string result;
 	if (this->path)
@@ -67,7 +67,7 @@ std::function<std::shared_ptr<internal::node>(
 			internal::parser::invalid_syntax(token, curr_pos - 1);
 		}
 
-		auto node = std::make_shared<static_node>();
+		auto node = std::make_shared<StaticNode>();
 		node->path = parser->compile_filter(params[0]);
 		node->prefix = prefix;
 		node->var_name = var_name;

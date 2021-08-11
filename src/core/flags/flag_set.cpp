@@ -17,7 +17,7 @@ __CORE_FLAGS_BEGIN__
 
 void FlagSet::parse(int argc, char** argv, size_t parse_from, bool is_verbose)
 {
-	internal::args_parser ap(argc, argv, parse_from, is_verbose);
+	internal::ArgumentsParser ap(argc, argv, parse_from, is_verbose);
 	for (auto& flag : this->_flags)
 	{
 		std::string key;

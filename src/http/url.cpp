@@ -13,7 +13,7 @@
 
 __HTTP_BEGIN__
 
-std::string query_t::encode() const
+std::string Query::encode() const
 {
 	std::string buf;
 	auto keys = this->keys();
@@ -36,9 +36,9 @@ std::string query_t::encode() const
 	return buf;
 }
 
-query_t parse_query(std::string query)
+Query parse_query(std::string query)
 {
-	query_t m;
+	Query m;
 	while (!query.empty())
 	{
 		auto key = query;
@@ -81,17 +81,17 @@ query_t parse_query(std::string query)
 
 void URL::set_path(const std::string& p)
 {
-	this->path = internal::unescape(p, internal::encode_path);
-	this->raw_path = p == internal::escape(this->path, internal::encode_path) ? "" : p;
+	this->path = internal::unescape(p, internal::EscapeMode::EncodePath);
+	this->raw_path = p == internal::escape(this->path, internal::EscapeMode::EncodePath) ? "" : p;
 }
 
 std::string URL::escaped_path() const
 {
-	if (!this->raw_path.empty() && internal::valid_encoded(this->raw_path, internal::encode_path))
+	if (!this->raw_path.empty() && internal::valid_encoded(this->raw_path, internal::EscapeMode::EncodePath))
 	{
 		try
 		{
-			auto p = internal::unescape(this->raw_path, internal::encode_path);
+			auto p = internal::unescape(this->raw_path, internal::EscapeMode::EncodePath);
 			if (p == this->path)
 			{
 				return this->raw_path;
@@ -107,22 +107,23 @@ std::string URL::escaped_path() const
 		return "*"; // don't escape
 	}
 
-	return internal::escape(this->path, internal::encode_path);
+	return internal::escape(this->path, internal::EscapeMode::EncodePath);
 }
 
 void URL::set_fragment(const std::string& f)
 {
-	this->fragment = internal::unescape(f, internal::encode_fragment);
-	this->raw_fragment = f == internal::escape(this->fragment, internal::encode_fragment) ? "" : f;
+	this->fragment = internal::unescape(f, internal::EscapeMode::EncodeFragment);
+	this->raw_fragment = f == internal::escape(this->fragment, internal::EscapeMode::EncodeFragment) ? "" : f;
 }
 
 std::string URL::escaped_fragment() const
 {
-	if (!this->raw_fragment.empty() && internal::valid_encoded(this->raw_fragment, internal::encode_fragment))
+	auto is_valid = internal::valid_encoded(this->raw_fragment, internal::EscapeMode::EncodeFragment);
+	if (!this->raw_fragment.empty() && is_valid)
 	{
 		try
 		{
-			auto f = internal::unescape(this->raw_fragment, internal::encode_fragment);
+			auto f = internal::unescape(this->raw_fragment, internal::EscapeMode::EncodeFragment);
 			if (f == this->fragment)
 			{
 				return this->raw_fragment;
@@ -133,7 +134,7 @@ std::string URL::escaped_fragment() const
 		}
 	}
 
-	return internal::escape(this->fragment, internal::encode_fragment);
+	return internal::escape(this->fragment, internal::EscapeMode::EncodeFragment);
 }
 
 std::string URL::str() const
@@ -164,7 +165,7 @@ std::string URL::str() const
 
 			if (!this->host.empty())
 			{
-				result += internal::escape(this->host, internal::escape_mode::encode_host);
+				result += internal::escape(this->host, internal::EscapeMode::EncodeHost);
 			}
 		}
 
@@ -234,7 +235,7 @@ URL URL::resolve_reference(const URL& ref) const
 
 	if (!ref.opaque.empty())
 	{
-		url.user = URL::user_info_t{};
+		url.user = URL::UserInfo{};
 		url.host = "";
 		url.path = "";
 		return url;
@@ -338,7 +339,7 @@ std::pair<std::string, std::string> split_host_port(const std::string& host_port
 	return result;
 }
 
-bool should_escape(char c, escape_mode mode)
+bool should_escape(char c, EscapeMode mode)
 {
 	// §2.3 Unreserved characters (alphanum)
 	if ('a' <= c && c <= 'z' || 'A' <= c && c <= 'Z' || '0' <= c && c <= '9')
@@ -346,7 +347,7 @@ bool should_escape(char c, escape_mode mode)
 		return false;
 	}
 
-	if (mode == encode_host || mode == encode_zone)
+	if (mode == EscapeMode::EncodeHost || mode == EscapeMode::EncodeZone)
 	{
 		// §3.2.2 Host allows
 		// sub-delims = "!" / "$" / "&" / "'" / "(" / ")" / "*" / "+" / "," / ";" / "="
@@ -404,26 +405,26 @@ bool should_escape(char c, escape_mode mode)
 			// the reserved characters to appear unescaped.
 			switch (mode)
 			{
-				case encode_path: // §3.3
+				case EscapeMode::EncodePath: // §3.3
 					// The RFC allows : @ & = + $ but saves / ; , for assigning
 					// meaning to individual path segments. This package
 					// only manipulates the path as a whole, so we allow those
 					// last three as well. That leaves only ? to escape.
 					return c == '?';
-				case encode_path_segment: // §3.3
+				case EscapeMode::EncodePathSegment: // §3.3
 					// The RFC allows : @ & = + $ but saves / ; , for assigning
 					// meaning to individual path segments.
 					return c == '/' || c == ';' || c == ',' || c == '?';
-				case encode_user_password: // §3.2.1
+				case EscapeMode::EncodeUserPassword: // §3.2.1
 					// The RFC allows ';', ':', '&', '=', '+', '$', and ',' in
 					// userinfo, so we must escape only '@', '/', and '?'.
 					// The parsing of userinfo treats ':' as special so we must escape
 					// that too.
 					return c == '@' || c == '/' || c == '?' || c == ':';
-				case encode_query_component: // §3.4
+				case EscapeMode::EncodeQueryComponent: // §3.4
 					// The RFC reserves (so we must escape) everything.
 					return true;
-				case encode_fragment: // §4.1
+				case EscapeMode::EncodeFragment: // §4.1
 					// The RFC text is silent but the grammar allows
 					// everything, so escape nothing.
 					return false;
@@ -432,7 +433,7 @@ bool should_escape(char c, escape_mode mode)
 			}
 	}
 
-	if (mode == encode_fragment)
+	if (mode == EscapeMode::EncodeFragment)
 	{
 		// RFC 3986 §2.2 allows not escaping sub-delims. A subset of sub-delims are
 		// included in reserved from RFC 2396 §2.2. The remaining sub-delims do not
@@ -454,14 +455,14 @@ bool should_escape(char c, escape_mode mode)
 	return true;
 }
 
-std::string escape(const std::string& s, escape_mode mode)
+std::string escape(const std::string& s, EscapeMode mode)
 {
 	unsigned int space_count = 0, hex_count = 0;
 	for (char c : s)
 	{
 		if (should_escape(c, mode))
 		{
-			if (c == ' ' && mode == encode_query_component)
+			if (c == ' ' && mode == EscapeMode::EncodeQueryComponent)
 			{
 				space_count++;
 			}
@@ -496,7 +497,7 @@ std::string escape(const std::string& s, escape_mode mode)
 		size_t j = 0;
 		for (char c : s)
 		{
-			if (c == ' ' && mode == encode_query_component)
+			if (c == ' ' && mode == EscapeMode::EncodeQueryComponent)
 			{
 				t[j] = '+';
 				j++;
@@ -566,7 +567,7 @@ char unhex(char c)
 	return 0;
 }
 
-std::string unescape(std::string s, escape_mode mode)
+std::string unescape(std::string s, EscapeMode mode)
 {
 	// Count %, check that they're well-formed.
 	size_t n = 0;
@@ -594,12 +595,12 @@ std::string unescape(std::string s, escape_mode mode)
 				// But https://tools.ietf.org/html/rfc6874#section-2
 				// introduces %25 being allowed to escape a percent sign
 				// in IPv6 scoped-address literals. Yay.
-				if (mode == encode_host && unhex(s[i + 1]) < 8 && s.substr(i, 3) != "%25")
+				if (mode == EscapeMode::EncodeHost && unhex(s[i + 1]) < 8 && s.substr(i, 3) != "%25")
 				{
 					throw EscapeError(s.substr(i, 3), _ERROR_DETAILS_);
 				}
 
-				if (mode == encode_zone)
+				if (mode == EscapeMode::EncodeZone)
 				{
 					// RFC 6874 says basically "anything goes" for zone identifiers
 					// and that even non-ASCII can be redundantly escaped,
@@ -609,7 +610,7 @@ std::string unescape(std::string s, escape_mode mode)
 					// to introduce bytes you couldn't just write directly.
 					// But Windows puts spaces here! Yay.
 					auto v = (unhex(s[i + 1]) << 4) | unhex(s[i + 2]);
-					if (s.substr(i, 3) != "%25" && v != ' ' && should_escape(v, encode_host))
+					if (s.substr(i, 3) != "%25" && v != ' ' && should_escape(v, EscapeMode::EncodeHost))
 					{
 						throw EscapeError(s.substr(i, 3), _ERROR_DETAILS_);
 					}
@@ -618,11 +619,14 @@ std::string unescape(std::string s, escape_mode mode)
 				i += 3;
 				break;
 			case '+':
-				has_plus = mode == encode_query_component;
+				has_plus = mode == EscapeMode::EncodeQueryComponent;
 				i++;
 				break;
 			default:
-				if ((mode == encode_host || mode == encode_zone) && s[i] < 0x80 && should_escape(s[i], mode))
+				if (
+					(mode == EscapeMode::EncodeHost || mode == EscapeMode::EncodeZone) &&
+					s[i] < 0x80 && should_escape(s[i], mode)
+				)
 				{
 					throw EscapeError("invalid host: " + s.substr(i, 1), _ERROR_DETAILS_);
 				}
@@ -648,7 +652,7 @@ std::string unescape(std::string s, escape_mode mode)
 				i += 2;
 				break;
 			case '+':
-				if (mode == encode_query_component)
+				if (mode == EscapeMode::EncodeQueryComponent)
 				{
 					t += ' ';
 				}
@@ -666,7 +670,7 @@ std::string unescape(std::string s, escape_mode mode)
 	return t;
 }
 
-bool valid_encoded(const std::string& s, escape_mode mode)
+bool valid_encoded(const std::string& s, EscapeMode mode)
 {
 	for (char c : s)
 	{
@@ -791,9 +795,9 @@ std::string parse_host(std::string host)
 		auto zone = host.substr(0, i).find("%25");
 		if (zone != std::string::npos)
 		{
-			auto host1 = unescape(host.substr(0, zone), encode_host);
-			auto host2 = unescape(host.substr(zone, i - zone), encode_zone);
-			auto host3 = unescape(host.substr(i), encode_host);
+			auto host1 = unescape(host.substr(0, zone), EscapeMode::EncodeHost);
+			auto host2 = unescape(host.substr(zone, i - zone), EscapeMode::EncodeZone);
+			auto host3 = unescape(host.substr(i), EscapeMode::EncodeHost);
 			return host1 + host2 + host3;
 		}
 	}
@@ -810,7 +814,7 @@ std::string parse_host(std::string host)
 		}
 	}
 
-	host = unescape(host, encode_host);
+	host = unescape(host, EscapeMode::EncodeHost);
 	return host;
 }
 
@@ -912,7 +916,7 @@ std::string resolve_path(const std::string& base, const std::string& ref)
 	return "/" + str::ltrim(str::join("/", dst.begin(), dst.end()), '/');
 }
 
-std::pair<URL::user_info_t, std::string> parse_authority(const std::string& authority)
+std::pair<URL::UserInfo, std::string> parse_authority(const std::string& authority)
 {
 	auto i = authority.find_last_of('@');
 	std::string host;
@@ -936,17 +940,17 @@ std::pair<URL::user_info_t, std::string> parse_authority(const std::string& auth
 		throw ParseError("invalid user_info", _ERROR_DETAILS_);
 	}
 
-	URL::user_info_t user;
+	URL::UserInfo user;
 	if (!str::contains(user_info, ':'))
 	{
-		user_info = unescape(user_info, encode_user_password);
+		user_info = unescape(user_info, EscapeMode::EncodeUserPassword);
 		user.username = user_info;
 	}
 	else
 	{
 		auto [username, password] = split(user_info, ':', true);
-		username = unescape(username, encode_user_password);
-		password = unescape(password, encode_user_password);
+		username = unescape(username, EscapeMode::EncodeUserPassword);
+		password = unescape(password, EscapeMode::EncodeUserPassword);
 		user.username = username;
 		user.password = password;
 	}

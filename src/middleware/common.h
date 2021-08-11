@@ -36,7 +36,7 @@ public:
 	inline static const std::string FULL_NAME = "xw::middleware::Common";
 
 protected:
-	virtual inline http::result_t get_response_redirect(
+	virtual inline http::Response::Result get_response_redirect(
 		const std::string& redirect_to
 	)
 	{
@@ -59,11 +59,11 @@ public:
 
 	// Check for denied User-Agents and rewrite the URL based on
 	// settings.APPEND_SLASH and settings.PREPEND_WWW
-	http::result_t process_request(http::Request* request) override;
+	http::Response::Result process_request(http::Request* request) override;
 
 	// When the status code of the response is 404, it may redirect to a path
 	// with an appended slash if should_redirect_with_slash() returns true.
-	http::result_t process_response(http::Request* request, http::abc::IHttpResponse* response) override;
+	http::Response::Result process_response(http::Request* request, http::abc::IHttpResponse* response) override;
 };
 
 __MIDDLEWARE_END__

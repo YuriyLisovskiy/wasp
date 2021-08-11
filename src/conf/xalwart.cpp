@@ -167,7 +167,7 @@ net::HandlerFunc MainApplication::make_handler() const
 	return [this](net::RequestContext* ctx, const collections::Dictionary<std::string, std::string>& env) -> uint
 	{
 		auto request = this->build_request(ctx, env);
-		http::result_t result;
+		http::Response::Result result;
 		try
 		{
 			result = this->process_request(request);
@@ -217,12 +217,12 @@ net::HandlerFunc MainApplication::make_handler() const
 		catch (const http::exc::HttpError& e)
 		{
 			this->settings->LOGGER->trace("An error was caught as http::HttpException", _ERROR_DETAILS_);
-			result = http::result_t{nullptr, std::make_shared<http::exc::HttpError>(e)};
+			result = http::Response::Result{nullptr, std::make_shared<http::exc::HttpError>(e)};
 		}
 		catch (const BaseException& e)
 		{
 			this->settings->LOGGER->trace("An error was caught as core::BaseException", _ERROR_DETAILS_);
-			result = http::result_t{nullptr, std::make_shared<BaseException>(e)};
+			result = http::Response::Result{nullptr, std::make_shared<BaseException>(e)};
 		}
 		catch (const std::exception& e)
 		{
@@ -269,7 +269,7 @@ void MainApplication::build_module_patterns(std::vector<std::shared_ptr<urls::IP
 	}
 }
 
-http::result_t MainApplication::process_request(std::shared_ptr<http::Request>& request) const
+http::Response::Result MainApplication::process_request(std::shared_ptr<http::Request>& request) const
 {
 	for (auto& middleware : this->settings->MIDDLEWARE)
 	{
@@ -287,7 +287,7 @@ http::result_t MainApplication::process_request(std::shared_ptr<http::Request>& 
 	return {};
 }
 
-http::result_t MainApplication::process_urlpatterns(
+http::Response::Result MainApplication::process_urlpatterns(
 	std::shared_ptr<http::Request>& request, std::vector<std::shared_ptr<urls::IPattern>>& urlpatterns
 ) const
 {
@@ -301,7 +301,7 @@ http::result_t MainApplication::process_urlpatterns(
 	return http::raise(404, "<h2>404 - Not Found</h2>");
 }
 
-http::result_t MainApplication::process_response(
+http::Response::Result MainApplication::process_response(
 	std::shared_ptr<http::Request>& request, std::shared_ptr<http::abc::IHttpResponse>& response
 ) const
 {
@@ -347,7 +347,7 @@ std::shared_ptr<http::Request> MainApplication::build_request(
 		}
 		else if (cont_type.starts_with("multipart/form-data"))
 		{
-			http::internal::multipart_parser mp(this->settings->MEDIA_ROOT);
+			http::internal::MultipartParser mp(this->settings->MEDIA_ROOT);
 			mp.parse(ctx->headers.get("Content-Type"), ctx->content);
 			post_params = mp.multi_post_value;
 			files_params = mp.multi_file_value;
@@ -389,7 +389,7 @@ std::shared_ptr<http::Request> MainApplication::build_request(
 	);
 }
 
-uint MainApplication::start_response(net::RequestContext* ctx, const http::result_t& result) const
+uint MainApplication::start_response(net::RequestContext* ctx, const http::Response::Result& result) const
 {
 	std::shared_ptr<http::abc::IHttpResponse> response;
 	if (result.exception)

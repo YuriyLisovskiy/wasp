@@ -13,7 +13,7 @@
 #include <xalwart.render/engine.h>
 
 // Framework libraries.
-#include "../../render/default.h"
+#include "../../render/default_library.h"
 
 
 __CONF_BEGIN__

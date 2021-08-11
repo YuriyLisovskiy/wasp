@@ -40,12 +40,12 @@ public:
 
 	~BaseMiddleware() override = default;
 
-	inline http::result_t process_request(http::Request* request) override
+	inline http::Response::Result process_request(http::Request* request) override
 	{
 		return {};
 	}
 
-	inline http::result_t process_response(http::Request* request, http::abc::IHttpResponse* response) override
+	inline http::Response::Result process_response(http::Request* request, http::abc::IHttpResponse* response) override
 	{
 		return {};
 	}

@@ -21,8 +21,9 @@
 
 __HTTP_INTERNAL_BEGIN__
 
-// TESTME: multipart_parser
-struct multipart_parser final
+// TESTME: MultipartParser
+// TODO: docs for 'MultipartParser'
+struct MultipartParser final
 {
 	std::string media_root;
 
@@ -32,24 +33,23 @@ struct multipart_parser final
 	collections::Dictionary<std::string, files::UploadedFile> file_values;
 	collections::MultiDictionary<std::string, files::UploadedFile> multi_file_value;
 
-	enum state
+	enum class State
 	{
-		s_boundary_begin,
-		s_boundary,
-		s_boundary_end,
-		s_body_end,
-		s_content_disposition_begin,
-		s_content_disposition,
-		s_name_begin,
-		s_name,
-		s_name_end,
-		s_file_name_begin,
-		s_file_name,
-		s_content_type_begin,
-		s_content_type,
-		s_content_begin,
-		s_content
-
+		BoundaryBegin,
+		Boundary,
+		BoundaryEnd,
+		BodyEnd,
+		ContentDispositionBegin,
+		ContentDisposition,
+		NameBegin,
+		Name,
+		NameEnd,
+		FileNameBegin,
+		FileName,
+		ContentTypeBegin,
+		ContentType,
+		ContentBegin,
+		Content
 	};
 
 	// Constructs parser from media root.
@@ -58,7 +58,7 @@ struct multipart_parser final
 	//
 	// !IMPORTANT! The parser does not save file, but
 	// only builds path to future file location.
-	explicit multipart_parser(const std::string& media_root="");
+	explicit MultipartParser(const std::string& media_root="");
 
 	// Appends non-file parameter to the result.
 	//

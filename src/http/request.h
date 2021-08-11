@@ -112,7 +112,7 @@ public:
 	}
 
 	[[nodiscard]]
-	inline query_t query() const
+	inline Query query() const
 	{
 		return parse_query(this->_raw_query);
 	}
