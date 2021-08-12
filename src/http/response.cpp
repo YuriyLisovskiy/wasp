@@ -261,7 +261,7 @@ void FileResponse::_set_headers()
 	std::string file_name = path::basename(this->_file_path);
 	try
 	{
-		file_expr = "filename=\"" + encoding::encode(file_name, encoding::ascii) + "\"";
+		file_expr = "filename=\"" + encoding::encode(file_name, encoding::Encoding::ASCII) + "\"";
 	}
 	catch (const EncodingError& e)
 	{

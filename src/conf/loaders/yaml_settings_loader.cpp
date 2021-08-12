@@ -567,7 +567,7 @@ void YamlSettingsLoader::init_template_engine_setting(Settings* settings, const 
 		auto_escape && !auto_escape.IsNull() && auto_escape.as<bool>(false),
 		loaders_vec,
 		libs,
-		settings->LOGGER
+		settings->LOGGER.get()
 	);
 }
 

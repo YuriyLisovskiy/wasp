@@ -39,25 +39,22 @@ std::string UrlNode::render(abc::IContext* ctx)
 	return built_url;
 }
 
-std::function<std::shared_ptr<syntax::node>(
-	syntax::parser*, syntax::token_t& token
+std::function<std::shared_ptr<syntax::Node>(
+	syntax::Parser*, syntax::Token& token
 )> make_url_tag(const std::vector<std::shared_ptr<urls::IPattern>>& patterns)
 {
-	return [patterns](
-		syntax::parser* parser,
-		syntax::token_t& token
-	) -> std::shared_ptr<syntax::node>
+	return [patterns](syntax::Parser* parser, syntax::Token& token) -> std::shared_ptr<syntax::Node>
 	{
-		std::vector<syntax::token_t> params;
+		std::vector<syntax::Token> params;
 		size_t curr_pos;
 		if (!split_params(token.content, token.line_no, curr_pos, params))
 		{
-			syntax::parser::invalid_syntax(token, curr_pos);
+			syntax::Parser::invalid_syntax(token, curr_pos);
 		}
 
 		if (params.empty())
 		{
-			syntax::parser::throw_error("'url' tag takes, at least, one argument", token);
+			syntax::Parser::throw_error("'url' tag takes, at least, one argument", token);
 		}
 
 		std::string var_name;
@@ -65,13 +62,13 @@ std::function<std::shared_ptr<syntax::node>(
 		// parse variable name after tag (function) call
 		if (!syntax::parse_var_name(token, var_name, curr_pos, false))
 		{
-			syntax::parser::invalid_syntax(token, curr_pos - 1);
+			syntax::Parser::invalid_syntax(token, curr_pos - 1);
 		}
 
 		auto url_name = params[0].content;
 		if (!syntax::trim_quotes(url_name))
 		{
-			syntax::parser::throw_error("first parameter of 'url' tag must be constant string", token);
+			syntax::Parser::throw_error("first parameter of 'url' tag must be constant string", token);
 		}
 
 		for (const auto& url_p : patterns)
@@ -93,7 +90,7 @@ std::function<std::shared_ptr<syntax::node>(
 			}
 		}
 
-		syntax::parser::throw_error("url pattern '" + url_name + "' does not exist", token);
+		syntax::Parser::throw_error("url pattern '" + url_name + "' does not exist", token);
 		return nullptr;
 	};
 }

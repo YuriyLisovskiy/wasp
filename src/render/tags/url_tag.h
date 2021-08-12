@@ -24,7 +24,7 @@ inline const char* TAG_NAME_URL = "url";
 
 // TESTME: url_node
 // TODO: docs for 'url_node'
-struct UrlNode : public syntax::node
+struct UrlNode : public syntax::Node
 {
 	std::shared_ptr<urls::IPattern> pattern;
 	std::vector<std::shared_ptr<syntax::FilterExpression>> params;
@@ -35,8 +35,8 @@ struct UrlNode : public syntax::node
 
 // TESTME: make_url_tag
 // TODO: docs for 'make_url_tag'
-extern std::function<std::shared_ptr<syntax::node>(
-	syntax::parser*, syntax::token_t& token
+extern std::function<std::shared_ptr<syntax::Node>(
+	syntax::Parser*, syntax::Token& token
 )> make_url_tag(const std::vector<std::shared_ptr<urls::IPattern>>& patterns);
 
 __RENDER_TAGS_END__

@@ -22,7 +22,7 @@ inline const char* TAG_NAME_MEDIA = "media";
 
 // TESTME: static_node
 // TODO: docs for 'static_node'
-struct StaticNode : public syntax::node
+struct StaticNode : public syntax::Node
 {
 	std::string prefix;
 	std::string var_name;
@@ -33,8 +33,8 @@ struct StaticNode : public syntax::node
 
 // TESTME: make_static_tag
 // TODO: docs for 'make_static_tag'
-extern std::function<std::shared_ptr<syntax::node>(
-	syntax::parser*, syntax::token_t& token
+extern std::function<std::shared_ptr<syntax::Node>(
+	syntax::Parser*, syntax::Token& token
 )> make_static_tag(const std::string& name, const std::string& prefix);
 
 __RENDER_TAGS_END__

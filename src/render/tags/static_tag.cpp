@@ -37,22 +37,22 @@ std::string StaticNode::render(abc::IContext* ctx)
 	return result;
 }
 
-std::function<std::shared_ptr<syntax::node>(
-	syntax::parser*, syntax::token_t& token
+std::function<std::shared_ptr<syntax::Node>(
+	syntax::Parser*, syntax::Token& token
 )> make_static_tag(const std::string& name, const std::string& prefix)
 {
-	return [name, prefix](syntax::parser* parser, syntax::token_t& token) -> std::shared_ptr<syntax::node>
+	return [name, prefix](syntax::Parser* parser, syntax::Token& token) -> std::shared_ptr<syntax::Node>
 	{
-		std::vector<syntax::token_t> params;
+		std::vector<syntax::Token> params;
 		size_t curr_pos;
 		if (!split_params(token.content, token.line_no, curr_pos, params))
 		{
-			syntax::parser::invalid_syntax(token, curr_pos);
+			syntax::Parser::invalid_syntax(token, curr_pos);
 		}
 
 		if (params.size() != 1)
 		{
-			syntax::parser::throw_error("'" + name + "' tag takes exactly one argument", token);
+			syntax::Parser::throw_error("'" + name + "' tag takes exactly one argument", token);
 		}
 
 		std::string var_name;
@@ -60,7 +60,7 @@ std::function<std::shared_ptr<syntax::node>(
 		// parse variable name after tag (function) call
 		if (!syntax::parse_var_name(token, var_name, curr_pos, false))
 		{
-			syntax::parser::invalid_syntax(token, curr_pos - 1);
+			syntax::Parser::invalid_syntax(token, curr_pos - 1);
 		}
 
 		auto node = std::make_shared<StaticNode>();
