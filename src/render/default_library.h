@@ -19,21 +19,24 @@ __RENDER_BEGIN__
 class DefaultLibrary final : public Library
 {
 public:
-	inline static const std::string FULL_NAME = "xw::render::DefaultLibrary";
+	static inline constexpr const char* FULL_NAME = "xw::render::DefaultLibrary";
 
 public:
 	inline explicit DefaultLibrary(conf::Settings* settings) : Library(settings)
 	{
 	}
 
-	inline std::shared_ptr<collections::Dictionary<std::string, filter_t>> get_filters() override
+	[[nodiscard]]
+	inline std::map<std::string, Filter> get_filters() const override
 	{
-		return nullptr;
+		return {};
 	}
 
-	std::shared_ptr<collections::Dictionary<std::string, tag_t>> get_tags() override;
+	[[nodiscard]]
+	std::map<std::string, Tag> get_tags() const override;
 
-	inline std::string name() override
+	[[nodiscard]]
+	inline std::string name() const override
 	{
 		return DefaultLibrary::FULL_NAME;
 	}

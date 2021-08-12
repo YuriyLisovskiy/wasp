@@ -22,19 +22,19 @@ inline const char* TAG_NAME_MEDIA = "media";
 
 // TESTME: static_node
 // TODO: docs for 'static_node'
-struct StaticNode : public internal::node
+struct StaticNode : public syntax::node
 {
 	std::string prefix;
 	std::string var_name;
-	std::shared_ptr<internal::FilterExpression> path;
+	std::shared_ptr<syntax::FilterExpression> path;
 
 	std::string render(abc::IContext* ctx) override;
 };
 
 // TESTME: make_static_tag
 // TODO: docs for 'make_static_tag'
-extern std::function<std::shared_ptr<internal::node>(
-	internal::parser*, internal::token_t& token
+extern std::function<std::shared_ptr<syntax::node>(
+	syntax::parser*, syntax::token_t& token
 )> make_static_tag(const std::string& name, const std::string& prefix);
 
 __RENDER_TAGS_END__

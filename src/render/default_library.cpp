@@ -13,19 +13,18 @@
 
 __RENDER_BEGIN__
 
-std::shared_ptr<collections::Dictionary<std::string, tag_t>> DefaultLibrary::get_tags()
+std::map<std::string, Tag> DefaultLibrary::get_tags() const
 {
-	return std::make_shared<collections::Dictionary<std::string, tag_t>>(std::map<std::string, tag_t>{
-
+	return {
 		// Example: {% static('path/to/file.css') -> css_variable %}
-		{tags::TAG_NAME_STATIC, {tags::make_static_tag("static", this->settings->STATIC_URL)}},
+		{tags::TAG_NAME_STATIC, {tags::make_static_tag("static", this->settings()->STATIC_URL)}},
 
 		// Example: {% media('path/to/file.jpg') -> jpg_variable %}
-		{tags::TAG_NAME_MEDIA, {tags::make_static_tag("media", this->settings->MEDIA_URL)}},
+		{tags::TAG_NAME_MEDIA, {tags::make_static_tag("media", this->settings()->MEDIA_URL)}},
 
 		// Example: {% url('app_namespace::profile', 256) -> profile_256 %}
-		{tags::TAG_NAME_URL, {tags::make_url_tag(this->settings->URLPATTERNS)}}
-	});
+		{tags::TAG_NAME_URL, {tags::make_url_tag(this->settings()->URLPATTERNS)}}
+	};
 }
 
 __RENDER_END__

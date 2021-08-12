@@ -21,26 +21,33 @@ __RENDER_BEGIN__
 // TODO: docs for 'Library'
 class Library : public abc::ILibrary
 {
-protected:
-	conf::Settings* settings;
+private:
+	conf::Settings* _settings;
 
-public:
-	inline explicit Library(conf::Settings* settings) : settings(settings)
+protected:
+	inline conf::Settings* settings() const
 	{
-		if (!this->settings)
+		if (!this->_settings)
 		{
 			throw NullPointerException("'settings' is nullptr", _ERROR_DETAILS_);
 		}
+
+		return this->_settings;
 	}
 
-	inline std::shared_ptr<collections::Dictionary<std::string, filter_t>> get_filters() override
+public:
+	inline explicit Library(conf::Settings* settings) : _settings(settings)
 	{
-		return nullptr;
 	}
 
-	inline std::shared_ptr<collections::Dictionary<std::string, tag_t>> get_tags() override
+	inline std::map<std::string, Filter> get_filters() const override
 	{
-		return nullptr;
+		return {};
+	}
+
+	inline std::map<std::string, Tag> get_tags() const override
+	{
+		return {};
 	}
 };
 
