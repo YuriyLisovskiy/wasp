@@ -10,9 +10,9 @@
 #include <xalwart.base/path.h>
 #include <xalwart.base/string_utils.h>
 #include <xalwart.base/encoding.h>
+#include <xalwart.base/net/status.h>
 
 // Framework libraries.
-#include "./status.h"
 #include "./url.h"
 #include "./utility.h"
 #include "./exceptions.h"
@@ -120,7 +120,7 @@ std::string ResponseBase::get_reason_phrase()
 		return this->_reason_phrase;
 	}
 
-	return get_status_by_code(this->_status).phrase;
+	return net::get_status_by_code(this->_status).first.phrase;
 }
 
 void ResponseBase::set_reason_phrase(std::string value)

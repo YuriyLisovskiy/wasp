@@ -40,7 +40,7 @@ protected:
 
 	conf::Settings* settings;
 
-	std::function<std::shared_ptr<net::abc::IServer>(
+	std::function<std::unique_ptr<net::abc::IServer>(
 		log::ILogger*, const Kwargs&, std::shared_ptr<dt::Timezone>
 	)> server_initializer;
 
@@ -85,7 +85,7 @@ public:
 	explicit MainApplication(
 		const std::string& version,
 		conf::Settings* settings,
-		std::function<std::shared_ptr<net::abc::IServer>(
+		std::function<std::unique_ptr<net::abc::IServer>(
 			log::ILogger*, const Kwargs&, std::shared_ptr<dt::Timezone>
 		)> server_initializer
 	);

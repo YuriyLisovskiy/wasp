@@ -16,7 +16,7 @@ __MANAGEMENT_COMMANDS_BEGIN__
 StartServerCommand::StartServerCommand(
 	conf::IModuleConfig* config,
 	conf::Settings* settings,
-	std::function<std::shared_ptr<net::abc::IServer>(
+	std::function<std::unique_ptr<net::abc::IServer>(
 		log::ILogger*, const Kwargs&, std::shared_ptr<dt::Timezone>
 	)> make_server
 ) : Command(

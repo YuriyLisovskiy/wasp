@@ -51,7 +51,7 @@ private:
 	re::Regex _ipv4_regex;
 	re::Regex _ipv6_regex;
 
-	std::function<std::shared_ptr<net::abc::IServer>(
+	std::function<std::unique_ptr<net::abc::IServer>(
 		log::ILogger*, const Kwargs&, std::shared_ptr<dt::Timezone>
 	)> make_server;
 
@@ -64,12 +64,13 @@ public:
 	explicit StartServerCommand(
 		conf::IModuleConfig* config,
 		conf::Settings* settings,
-		std::function<std::shared_ptr<net::abc::IServer>(
+		std::function<std::unique_ptr<net::abc::IServer>(
 			log::ILogger*, const Kwargs&, std::shared_ptr<dt::Timezone>
 		)> make_server
 	);
 
 	// Returns command flags.
+	[[nodiscard]]
 	Kwargs get_kwargs() const override;
 };
 

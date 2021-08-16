@@ -71,7 +71,7 @@ void UploadedFile::save()
 {
 	if (this->_name != "/")
 	{
-		File file(this->_name, File::wb);
+		File file(this->_name, File::OpenMode::WriteBinary);
 		file.open();
 		if (file.is_open())
 		{

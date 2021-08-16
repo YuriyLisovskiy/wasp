@@ -8,6 +8,9 @@
 
 #pragma once
 
+// C++ libraries.
+#include <memory>
+
 // Base libraries.
 #include <xalwart.base/net/abc.h>
 
@@ -20,7 +23,7 @@
 
 __MANAGEMENT_BEGIN__
 
-using make_server_func_t = std::function<std::shared_ptr<net::abc::IServer>(
+using MakeServerFunction = std::function<std::unique_ptr<net::abc::IServer>(
 	log::ILogger*, const Kwargs&, std::shared_ptr<dt::Timezone>
 )>;
 
@@ -29,10 +32,10 @@ using make_server_func_t = std::function<std::shared_ptr<net::abc::IServer>(
 class CoreModuleConfig final : public conf::ModuleConfig
 {
 private:
-	make_server_func_t _make_server;
+	MakeServerFunction _make_server;
 
 public:
-	explicit CoreModuleConfig(conf::Settings* settings, make_server_func_t make_server) :
+	explicit CoreModuleConfig(conf::Settings* settings, MakeServerFunction make_server) :
 		ModuleConfig(settings), _make_server(std::move(make_server))
 	{
 	}

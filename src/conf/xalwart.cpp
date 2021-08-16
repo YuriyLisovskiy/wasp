@@ -7,8 +7,8 @@
 #include "./xalwart.h"
 
 // Framework libraries.
-#include "../management/module.h"
 #include "../http/url.h"
+#include "../management/module.h"
 #include "../http/exceptions.h"
 #include "../http/internal/multipart_parser.h"
 #include "../urls/resolver.h"
@@ -22,7 +22,7 @@ void MainApplication::_setup_commands(net::HandlerFunc handler)
 	auto core_module = mgmt::CoreModuleConfig(
 		this->settings, [this, handler](
 			log::ILogger* logger, const Kwargs& kwargs, std::shared_ptr<dt::Timezone> tz
-		) mutable -> std::shared_ptr<net::abc::IServer>
+		) mutable -> std::unique_ptr<net::abc::IServer>
 		{
 			auto server = this->server_initializer(logger, kwargs, std::move(tz));
 			server->setup_handler(std::move(handler));
@@ -62,7 +62,7 @@ void MainApplication::_extend_settings_commands(
 MainApplication::MainApplication(
 	const std::string& version,
 	conf::Settings* settings,
-	std::function<std::shared_ptr<net::abc::IServer>(
+	std::function<std::unique_ptr<net::abc::IServer>(
 		log::ILogger*, const Kwargs&, std::shared_ptr<dt::Timezone>
 	)> server_initializer
 ) : server_initializer(std::move(server_initializer)), version(version)
@@ -332,7 +332,8 @@ std::shared_ptr<http::Request> MainApplication::build_request(
 	collections::MultiDictionary<std::string, files::UploadedFile> files_params;
 	if (ctx->content_size)
 	{
-		auto cont_type = str::lower(ctx->headers.get("Content-Type"));
+		auto cont_type = ctx->headers.contains("Content-Type") ?
+			str::lower(ctx->headers.at("Content-Type")) : "";
 		if (cont_type.starts_with("application/x-www-form-urlencoded"))
 		{
 			auto query = http::parse_query(ctx->content);
@@ -348,7 +349,7 @@ std::shared_ptr<http::Request> MainApplication::build_request(
 		else if (cont_type.starts_with("multipart/form-data"))
 		{
 			http::internal::MultipartParser mp(this->settings->MEDIA_ROOT);
-			mp.parse(ctx->headers.get("Content-Type"), ctx->content);
+			mp.parse(ctx->headers.contains("Content-Type") ? ctx->headers.at("Content-Type") : "", ctx->content);
 			post_params = mp.multi_post_value;
 			files_params = mp.multi_file_value;
 		}
