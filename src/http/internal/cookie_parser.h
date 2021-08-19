@@ -13,10 +13,14 @@
 
 // C++ libraries.
 #include <string>
+#include <vector>
 #include <map>
 
 // Module definitions.
 #include "./_def_.h"
+
+// Framework libraries.
+#include "../cookie.h"
 
 
 __HTTP_INTERNAL_BEGIN__
@@ -40,6 +44,8 @@ extern bool is_cookie_name_valid(const std::string& raw);
 // returns the successfully parsed Cookies.
 //
 // if filter isn't empty, only cookies of that name are returned
-extern std::map<std::string, std::string> parse_cookie(std::string raw_cookie, const std::string& filter);
+extern std::vector<Cookie> read_cookies(
+	const std::vector<std::string>& raw_cookie, const std::string& filter
+);
 
 __HTTP_INTERNAL_END__

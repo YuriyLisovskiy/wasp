@@ -139,7 +139,7 @@ inline std::string query_unescape(const std::string& s)
 // Query is expected to be a list of key=value settings separated by
 // ampersands or semicolons. A setting without an equals sign is
 // interpreted as a key set to an empty value.
-extern Query parse_query(std::string query);
+extern Query parse_query(std::string_view query);
 
 // TESTME: Url
 struct URL final

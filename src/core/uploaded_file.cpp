@@ -9,21 +9,13 @@
 
 __CORE_FILES_BEGIN__
 
-UploadedFile::UploadedFile(
-	const std::string& name,
-	size_t size,
-	std::vector<unsigned char>& data,
-	const std::string& content_type,
-	const std::string& charset,
-	const std::string& boundary,
-	const std::string& content_disposition
-)
+UploadedFile::UploadedFile(const std::string& read_from)
 {
-	this->_name = name;
-	this->_boundary = boundary;
-	this->_content_disposition = content_disposition;
-	this->_content_type = content_type;
-	this->_charset = charset;
+	this->_read_from_name = read_from;
+}
+
+UploadedFile::UploadedFile(size_t size, std::string data)
+{
 	this->_size = size;
 	if (this->_size > 0)
 	{
@@ -35,11 +27,7 @@ UploadedFile::UploadedFile(const UploadedFile& other)
 {
 	if (this != &other)
 	{
-		this->_name = other._name;
-		this->_boundary = other._boundary;
-		this->_content_disposition = other._content_disposition;
-		this->_charset = other._charset;
-		this->_content_type = other._content_type;
+		this->_read_from_name = other._read_from_name;
 		this->_size = other._size;
 		if (this->_size > 0)
 		{
@@ -52,11 +40,7 @@ UploadedFile& UploadedFile::operator= (const UploadedFile& other)
 {
 	if (this != &other)
 	{
-		this->_name = other._name;
-		this->_boundary = other._boundary;
-		this->_content_disposition = other._content_disposition;
-		this->_charset = other._charset;
-		this->_content_type = other._content_type;
+		this->_read_from_name = other._read_from_name;
 		this->_size = other._size;
 		if (this->_size > 0)
 		{
@@ -67,17 +51,31 @@ UploadedFile& UploadedFile::operator= (const UploadedFile& other)
 	return *this;
 }
 
-void UploadedFile::save()
+std::string UploadedFile::content()
 {
-	if (this->_name != "/")
+	if (!this->_read_from_name.empty())
 	{
-		File file(this->_name, File::OpenMode::WriteBinary);
+		File file(this->_read_from_name, File::OpenMode::ReadBinary);
 		file.open();
 		if (file.is_open())
 		{
-			file.write(this->_data);
-			file.save();
+			this->_data = file.read_str();
+			file.close();
+			this->_size = this->_data.size();
 		}
+	}
+
+	return this->_data;
+}
+
+void UploadedFile::save(const std::string& to)
+{
+	File file(to, File::OpenMode::WriteBinary);
+	file.open();
+	if (file.is_open())
+	{
+		file.write(this->content());
+		file.save();
 	}
 }
 

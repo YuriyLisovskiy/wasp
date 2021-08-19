@@ -36,7 +36,7 @@ std::string Query::encode() const
 	return buf;
 }
 
-Query parse_query(std::string query)
+Query parse_query(std::string_view query)
 {
 	Query m;
 	while (!query.empty())
@@ -71,9 +71,9 @@ Query parse_query(std::string query)
 			key = key.substr(0, i);
 		}
 
-		key = query_unescape(key);
+		key = query_unescape(std::string(key));
 		value = query_unescape(value);
-		m.add(key, value);
+		m.add(std::string(key), value);
 	}
 
 	return m;

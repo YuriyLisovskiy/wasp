@@ -22,59 +22,37 @@ __CORE_FILES_BEGIN__
 class UploadedFile
 {
 private:
-	std::string _name;
-	std::string _boundary;
-	std::string _content_disposition;
-	std::string _charset;
-	std::string _content_type;
+	std::string _read_from_name;
 	size_t _size{};
-	std::vector<unsigned char> _data;
+	std::string _data;
+
+	explicit UploadedFile(const std::string& name);
+
+	explicit UploadedFile(size_t size, std::string data);
 
 public:
-	UploadedFile() = default;
+	inline static UploadedFile from_path(const std::string& name)
+	{
+		return UploadedFile(name);
+	}
 
-	UploadedFile(
-		const std::string& name,
-		size_t size,
-		std::vector<unsigned char>& data,
-		const std::string& content_type = "",
-		const std::string& charset = "",
-		const std::string& boundary = "",
-		const std::string& content_disposition = ""
-	);
+	inline static UploadedFile from_content(const std::string& content)
+	{
+		return UploadedFile(content.size(), content);
+	}
+
+	UploadedFile() = default;
 
 	UploadedFile(const UploadedFile& other);
 
 	UploadedFile& operator=(const UploadedFile& other);
 
-	[[nodiscard]]
-	inline std::string name() const
-	{
-		return this->_name;
-	}
+	std::string content();
 
 	[[nodiscard]]
-	inline std::string boundary() const
+	inline std::string read_from_name() const
 	{
-		return this->_boundary;
-	}
-
-	[[nodiscard]]
-	inline std::string content_disposition() const
-	{
-		return this->_content_disposition;
-	}
-
-	[[nodiscard]]
-	inline std::string charset() const
-	{
-		return this->_charset;
-	}
-
-	[[nodiscard]]
-	inline std::string content_type() const
-	{
-		return this->_content_type;
+		return this->_read_from_name;
 	}
 
 	[[nodiscard]]
@@ -89,7 +67,7 @@ public:
 		return this->_size != 0;
 	}
 
-	void save();
+	void save(const std::string& to);
 };
 
 __CORE_FILES_END__

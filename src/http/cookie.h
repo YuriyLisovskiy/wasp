@@ -26,7 +26,12 @@ private:
 
 	std::string _name;
 	std::string _value;
+
+	// _max_age = 0 means no 'Max-Age' attribute specified.
+	// _max_age < 0 means delete cookie now, equivalently 'Max-Age: 0'
+	// _max_age > 0 means Max-Age attribute present and given in seconds
 	long _max_age;
+
 	std::string _expires;
 	std::string _domain;
 	std::string _path;
@@ -50,7 +55,7 @@ public:
 	Cookie(
 		std::string name,
 		std::string value,
-		long max_age,
+		long max_age=0,
 		std::string expires="",
 		std::string domain="",
 		std::string path="/",
