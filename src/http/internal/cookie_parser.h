@@ -40,12 +40,10 @@ extern std::pair<std::string, bool> parse_cookie_value(std::string raw_val, bool
 extern bool is_cookie_name_valid(const std::string& raw);
 
 // TESTME: parse_cookie
-// Parses all "Cookie" values from the header h and
+// Parses all "Cookie" values from the header and
 // returns the successfully parsed Cookies.
 //
 // if filter isn't empty, only cookies of that name are returned
-extern std::vector<Cookie> read_cookies(
-	const std::vector<std::string>& raw_cookie, const std::string& filter
-);
+extern std::vector<Cookie> read_cookies(std::string raw_cookie, const std::string& filter);
 
 __HTTP_INTERNAL_END__

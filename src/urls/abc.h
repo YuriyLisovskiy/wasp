@@ -14,6 +14,14 @@
 // Other libraries.
 #include "../http/request.h"
 #include "../http/response.h"
+#include "../conf/_def_.h"
+
+
+__CONF_BEGIN__
+
+struct Settings;
+
+__CONF_END__
 
 
 __URLS_BEGIN__

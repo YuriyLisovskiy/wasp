@@ -51,9 +51,9 @@ private:
 	re::Regex _ipv4_regex;
 	re::Regex _ipv6_regex;
 
-	std::function<std::unique_ptr<net::abc::IServer>(
-		log::ILogger*, const Kwargs&, std::shared_ptr<dt::Timezone>
-	)> make_server;
+	std::function<net::StatusCode(
+		net::RequestContext*, const std::map<std::string, std::string>& /* environment */
+	)> _handler_function;
 
 protected:
 	void add_flags() override;
@@ -62,11 +62,9 @@ protected:
 
 public:
 	explicit StartServerCommand(
-		conf::IModuleConfig* config,
-		conf::Settings* settings,
-		std::function<std::unique_ptr<net::abc::IServer>(
-			log::ILogger*, const Kwargs&, std::shared_ptr<dt::Timezone>
-		)> make_server
+		conf::IModuleConfig* config, conf::Settings* settings, std::function<net::StatusCode(
+			net::RequestContext*, const std::map<std::string, std::string>& /* environment */
+		)> handler
 	);
 
 	// Returns command flags.

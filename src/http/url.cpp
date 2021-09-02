@@ -9,6 +9,7 @@
 // Base libraries.
 #include <xalwart.base/exceptions.h>
 #include <xalwart.base/string_utils.h>
+#include <xalwart.base/encoding.h>
 
 
 __HTTP_BEGIN__
@@ -527,46 +528,6 @@ std::string escape(const std::string& s, EscapeMode mode)
 	}
 }
 
-bool is_hex(char c)
-{
-	if ('0' <= c && c <= '9')
-	{
-		return true;
-	}
-
-	if ('a' <= c && c <= 'f')
-	{
-		return true;
-	}
-
-	if ('A' <= c && c <= 'F')
-	{
-		return true;
-	}
-
-	return false;
-}
-
-char unhex(char c)
-{
-	if ('0' <= c && c <= '9')
-	{
-		return c - '0';
-	}
-
-	if ('a' <= c && c <= 'f')
-	{
-		return c - 'a' + 10;
-	}
-
-	if ('A' <= c && c <= 'F')
-	{
-		return c - 'A' + 10;
-	}
-
-	return 0;
-}
-
 std::string unescape(std::string s, EscapeMode mode)
 {
 	// Count %, check that they're well-formed.
@@ -578,7 +539,7 @@ std::string unescape(std::string s, EscapeMode mode)
 		{
 			case '%':
 				n++;
-				if (i + 2 >= s.size() || !is_hex(s[i + 1]) || !is_hex(s[i + 2]))
+				if (i + 2 >= s.size() || !encoding::is_hex(s[i + 1]) || !encoding::is_hex(s[i + 2]))
 				{
 					s = s.substr(i);
 					if (s.size() > 3)
@@ -595,7 +556,7 @@ std::string unescape(std::string s, EscapeMode mode)
 				// But https://tools.ietf.org/html/rfc6874#section-2
 				// introduces %25 being allowed to escape a percent sign
 				// in IPv6 scoped-address literals. Yay.
-				if (mode == EscapeMode::EncodeHost && unhex(s[i + 1]) < 8 && s.substr(i, 3) != "%25")
+				if (mode == EscapeMode::EncodeHost && encoding::unhex(s[i + 1]) < 8 && s.substr(i, 3) != "%25")
 				{
 					throw EscapeError(s.substr(i, 3), _ERROR_DETAILS_);
 				}
@@ -609,7 +570,7 @@ std::string unescape(std::string s, EscapeMode mode)
 					// That is, you can use escaping in the zone identifier but not
 					// to introduce bytes you couldn't just write directly.
 					// But Windows puts spaces here! Yay.
-					auto v = (unhex(s[i + 1]) << 4) | unhex(s[i + 2]);
+					auto v = (encoding::unhex(s[i + 1]) << 4) | encoding::unhex(s[i + 2]);
 					if (s.substr(i, 3) != "%25" && v != ' ' && should_escape(v, EscapeMode::EncodeHost))
 					{
 						throw EscapeError(s.substr(i, 3), _ERROR_DETAILS_);
@@ -648,7 +609,7 @@ std::string unescape(std::string s, EscapeMode mode)
 		switch (s[i])
 		{
 			case '%':
-				t += unhex(s[i + 1]) << 4 | unhex(s[i + 2]);
+				t += encoding::unhex(s[i + 1]) << 4 | encoding::unhex(s[i + 2]);
 				i += 2;
 				break;
 			case '+':

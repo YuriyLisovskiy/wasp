@@ -61,7 +61,7 @@ protected:
 
 		for (const auto& method : allowed_methods)
 		{
-			this->allowed_methods_list.push_back(str::lower(method));
+			this->allowed_methods_list.push_back(str::to_lower(method));
 		}
 
 		auto options = std::find(this->allowed_methods_list.begin(), this->allowed_methods_list.end(), "options");
@@ -202,10 +202,10 @@ public:
 			);
 		}
 
-		std::string method = str::lower(this->request->method());
+		std::string method = str::to_lower(this->request->method);
 		http::Response::Result result;
 		if (std::find(
-			this->allowed_methods_list.begin(), this->allowed_methods_list.end(), str::lower(method)
+			this->allowed_methods_list.begin(), this->allowed_methods_list.end(), str::to_lower(method)
 		) == this->allowed_methods_list.end())
 		{
 			result = this->http_method_not_allowed();
@@ -265,7 +265,7 @@ public:
 		}
 
 		this->settings->LOGGER->warning(
-			"Method Not Allowed (" + this->request->method() + "): " + this->request->path(),
+			"Method Not Allowed (" + this->request->method + "): " + this->request->url.path,
 			_ERROR_DETAILS_
 		);
 		return http::result<http::resp::NotAllowed>("", this->allowed_methods());
@@ -281,11 +281,11 @@ public:
 		for (const auto& method : this->allowed_methods_list)
 		{
 			bool found = std::find(
-				this->http_method_names.begin(), this->http_method_names.end(), str::lower(method)
+				this->http_method_names.begin(), this->http_method_names.end(), str::to_lower(method)
 			) != this->http_method_names.end();
 			if (found)
 			{
-				result.push_back(str::upper(method));
+				result.push_back(str::to_upper(method));
 			}
 		}
 

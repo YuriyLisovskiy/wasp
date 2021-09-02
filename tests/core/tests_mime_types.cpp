@@ -6,7 +6,7 @@
 
 #include <gtest/gtest.h>
 
-#include "../../src/core/mime_types.h"
+#include "../../src/core/media_type.h"
 
 using namespace xw;
 

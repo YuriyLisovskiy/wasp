@@ -17,19 +17,11 @@
 
 __CONF_BEGIN__
 
-void MainApplication::_setup_commands(net::HandlerFunc handler)
+void MainApplication::_setup_commands(std::function<net::StatusCode(
+	xw::net::RequestContext*, const std::map<std::string, std::string>& /* environment */
+)> handler)
 {
-	auto core_module = mgmt::CoreModuleConfig(
-		this->settings, [this, handler](
-			log::ILogger* logger, const Kwargs& kwargs, std::shared_ptr<dt::Timezone> tz
-		) mutable -> std::unique_ptr<net::abc::IServer>
-		{
-			auto server = this->server_initializer(logger, kwargs, std::move(tz));
-			server->setup_handler(std::move(handler));
-			return server;
-		}
-	);
-
+	auto core_module = mgmt::CoreModuleConfig(this->settings, std::move(handler));
 	this->_extend_settings_commands(core_module.get_commands(), core_module.get_name());
 	for (auto& installed_module : this->settings->MODULES)
 	{
@@ -59,13 +51,7 @@ void MainApplication::_extend_settings_commands(
 	}
 }
 
-MainApplication::MainApplication(
-	const std::string& version,
-	conf::Settings* settings,
-	std::function<std::unique_ptr<net::abc::IServer>(
-		log::ILogger*, const Kwargs&, std::shared_ptr<dt::Timezone>
-	)> server_initializer
-) : server_initializer(std::move(server_initializer)), version(version)
+MainApplication::MainApplication(const std::string& version, conf::Settings* settings) : version(version)
 {
 	InterruptException::initialize();
 	if (!settings)
@@ -162,11 +148,11 @@ void MainApplication::execute(int argc, char** argv)
 	}
 }
 
-net::HandlerFunc MainApplication::make_handler() const
+HandlerFunction MainApplication::make_handler() const
 {
-	return [this](net::RequestContext* ctx, const collections::Dictionary<std::string, std::string>& env) -> uint
+	return [this](net::RequestContext* context, const std::map<std::string, std::string>& env) -> net::StatusCode
 	{
-		auto request = this->build_request(ctx, env);
+		auto request = this->build_request(context, env);
 		http::Response::Result result;
 		try
 		{
@@ -230,7 +216,7 @@ net::HandlerFunc MainApplication::make_handler() const
 			result = http::raise(500, e.what());
 		}
 
-		return start_response(ctx, result);
+		return start_response(context, result);
 	};
 }
 
@@ -291,7 +277,7 @@ http::Response::Result MainApplication::process_urlpatterns(
 	std::shared_ptr<http::Request>& request, std::vector<std::shared_ptr<urls::IPattern>>& urlpatterns
 ) const
 {
-	auto apply = urls::resolve(request->path(), this->settings->URLPATTERNS);
+	auto apply = urls::resolve(request->url.path, this->settings->URLPATTERNS);
 	if (apply)
 	{
 		return apply(request.get(), this->settings);
@@ -325,68 +311,18 @@ http::Response::Result MainApplication::process_response(
 }
 
 std::shared_ptr<http::Request> MainApplication::build_request(
-	net::RequestContext* ctx, collections::Dictionary<std::string, std::string> env
+	net::RequestContext* ctx, collections::Dictionary<std::string, std::string> /* environment */
 ) const
 {
-	collections::MultiDictionary<std::string, std::string> get_params, post_params;
-	collections::MultiDictionary<std::string, files::UploadedFile> files_params;
-	if (ctx->content_size)
-	{
-		auto cont_type = ctx->headers.contains("Content-Type") ?
-			str::lower(ctx->headers.at("Content-Type")) : "";
-		if (cont_type.starts_with("application/x-www-form-urlencoded"))
-		{
-			auto query = http::parse_query(ctx->content);
-			if (ctx->method == "GET")
-			{
-				get_params = query;
-			}
-			else if (ctx->method == "POST")
-			{
-				post_params = query;
-			}
-		}
-		else if (cont_type.starts_with("multipart/form-data"))
-		{
-			http::internal::MultipartParser mp(this->settings->MEDIA_ROOT);
-			mp.parse(ctx->headers.contains("Content-Type") ? ctx->headers.at("Content-Type") : "", ctx->content);
-			post_params = mp.multi_post_value;
-			files_params = mp.multi_file_value;
-		}
-	}
-	else
-	{
-		auto query = http::parse_query(ctx->query);
-		if (ctx->method == "GET")
-		{
-			get_params = query;
-		}
-		else if (ctx->method == "POST")
-		{
-			post_params = query;
-		}
-	}
-
-	for (const auto& header : ctx->headers)
-	{
-		auto key = str::replace(header.first, "-", "_");
-		env.set("HTTP_" + str::upper(key), header.second);
-	}
-
 	return std::make_shared<http::Request>(
-		this->settings,
 		ctx->method,
 		ctx->path,
-		ctx->major_v,
-		ctx->minor_v,
-		ctx->query,
-		ctx->keep_alive,
-		ctx->content,
+		"HTTP/" + std::to_string(ctx->protocol_version.major) + "." + std::to_string(ctx->protocol_version.minor),
+		ctx->protocol_version.major,
+		ctx->protocol_version.minor,
 		ctx->headers,
-		get_params,
-		post_params,
-		files_params,
-		env
+		ctx->body,
+		ctx->content_size
 	);
 }
 

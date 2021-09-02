@@ -25,6 +25,16 @@ inline const char* CACHE_CONTROL = "Cache-Control";
 
 inline const char* CONTENT_LOCATION = "Content-Location";
 
+inline const char* COOKIE = "Cookie";
+
+inline const char* REFERER = "Referer";
+
+inline const char* CONTENT_TYPE = "Content-Type";
+
+inline const char* CONTENT_DISPOSITION = "Content-Disposition";
+
+inline const char* CONTENT_TRANSFER_ENCODING = "Content-Transfer-Encoding";
+
 inline const char* DATE = "Date";
 
 inline const char* EXPIRES = "Expires";

@@ -19,7 +19,7 @@ std::string RedirectController::get_redirect_url()
 
 	if (this->_query_string)
 	{
-		url += "?" + this->request->raw_query();
+		url += "?" + this->request->url.raw_query;
 	}
 
 	return url;
@@ -32,7 +32,7 @@ http::Response::Result RedirectController::get()
 	{
 		if (this->settings->LOGGER != nullptr)
 		{
-			this->settings->LOGGER->warning("Gone: " + request->path());
+			this->settings->LOGGER->warning("Gone: " + request->url.path);
 		}
 
 		return http::result<http::resp::Gone>("");

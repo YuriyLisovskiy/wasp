@@ -16,7 +16,7 @@
 #include "./url.h"
 #include "./utility.h"
 #include "./exceptions.h"
-#include "../core/mime_types.h"
+#include "../core/media_type.h"
 
 
 __HTTP_BEGIN__

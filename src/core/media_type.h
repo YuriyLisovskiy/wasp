@@ -1,104 +1,126 @@
 /**
- * core/mime_types.cpp
+ * core/media_type.h
  *
  * Copyright (c) 2019-2021 Yuriy Lisovskiy
+ *
+ * Media types utilities.
  */
 
-#include "./mime_types.h"
+#pragma once
+
+// C++ libraries.
+#include <string>
+#include <map>
+#include <tuple>
 
 // Base libraries.
-#include <xalwart.base/path.h>
+#include <xalwart.base/collections/dictionary.h>
 #include <xalwart.base/string_utils.h>
+
+// Module definitions.
+#include "./_def_.h"
 
 
 __CORE_MIME_BEGIN__
 
-std::string ext_from_file_name(const std::string& file_name)
-{
-	std::string result;
-	size_t pos = file_name.find_last_of('.');
-	if (pos != std::string::npos)
-	{
-		result = pos + 1 < file_name.size() ? file_name.substr(pos + 1) : "";
-	}
+// TESTME: ext_from_file_name
+//
+// Returns extension from file name,
+//		i.e. 'foo.bar' - 'bar' will be returned.
+//
+// `file_name`: name to analyze.
+extern std::string ext_from_file_name(const std::string& file_name);
 
-	return result;
+// TESTME: ext_from_path
+//
+// Returns extension from file path,
+//		i.e. 'path/to/foo.bar' - 'bar' will be returned.
+//
+// `path`: path to analyze.
+extern std::string ext_from_path(const std::string& path);
+
+// TESTME: guess_content_type
+//
+// Returns content type from file path.
+//
+// `_path`: path to analyze.
+// `type`: guessed file type.
+// `encoding`: guessed file encoding.
+extern void guess_content_type(const std::string& _path, std::string& type, std::string& encoding);
+
+// TESTME: _consume_token
+// Consumes a token from the beginning of provided
+// string, per RFC 2045 section 5.1 (referenced from 2183), and return
+// the token consumed and the rest of the string. Returns {"", v} on
+// failure to consume at least one character.
+//
+// The original implementation is in Golang 1.15.8: mime/mediatype.go
+extern std::tuple<std::wstring, std::wstring> _consume_token(const std::wstring& s);
+
+// TESTME: _is_t_special
+//
+// The original implementation is in Golang 1.15.8: mime/grammar.go
+inline bool _is_t_special(wchar_t c)
+{
+	std::wstring s = L"()<>@,;:\"/[]?=";
+	return s.find(c) != std::wstring::npos;
 }
 
-std::string ext_from_path(const std::string& path)
+// TESTME: _is_token_char
+// Reports whether rune is in 'token' as defined by RFC
+// 1521 and RFC 2045.
+//
+// The original implementation is in Golang 1.15.8: mime/grammar.go
+inline bool _is_token_char(wchar_t c)
 {
-	std::string file_name;
-	size_t pos = path.find_last_of('/');
-	if (pos != std::string::npos)
-	{
-		file_name = pos + 1 < path.size() ? path.substr(pos + 1) : "";
-	}
-	else
-	{
-		pos = path.find_last_of('\\');
-		if (pos != std::string::npos)
-		{
-			file_name = pos + 1 < path.size() ? path.substr(pos + 1) : "";
-		}
-		else
-		{
-			file_name = path;
-		}
-	}
-
-	return file_name.empty() ? "" : ext_from_file_name(file_name);
+	// token := 1*<any (US-ASCII) CHAR except SPACE, CTLs, or tspecials>
+	return c > 0x20 && c < 0x7f && !_is_t_special(c);
 }
 
-void guess_content_type(const std::string& _path, std::string& type, std::string& encoding)
+// TESTME: _is_not_token_char
+//
+// The original implementation is in Golang 1.15.8: mime/mediatype.go
+inline bool _is_not_token_char(wchar_t c)
 {
-	std::string scheme, url;
-	str::url_split_type(_path, scheme, url);
-	if (scheme == "data")
-	{
-		size_t comma = url.find(',');
-		if (comma >= 0)
-		{
-			size_t semi = url.substr(0, comma).find(';');
-			if (semi >= 0)
-			{
-				type = url.substr(0, semi);
-			}
-			else
-			{
-				type = url.substr(0, comma);
-			}
-
-			if (str::contains(type, '=') || !str::contains(type, '/'))
-			{
-				type = "text/plain";
-			}
-		}
-	}
-	else
-	{
-		std::string base, ext;
-		path::split_text(url, base, ext);
-		while (SUFFIX_MAP.contains(ext))
-		{
-			path::split_text(base + SUFFIX_MAP.get(ext, ""), base, ext);
-		}
-
-		encoding = ENCODINGS_MAP.get(ext, "");
-		//	path::split_text(base, base, ext);
-
-		std::string lower_ext = str::lower(ext);
-		if (TYPES_MAP.contains(ext))
-		{
-			type = TYPES_MAP.get(ext, "");
-		}
-		else
-		{
-			type = TYPES_MAP.get(lower_ext, "");
-		}
-	}
+	return !_is_token_char(c);
 }
 
-collections::Dictionary<std::string, std::string> SUFFIX_MAP({
+// TESTME: _consume_value
+// Consumes a "value" per RFC 2045, where a value is
+// either a 'token' or a 'quoted-string'.  On success, `consume_value`
+// returns the value consumed (and de-quoted/escaped, if a
+// quoted-string) and the rest of the string. On failure, returns
+// {"", v}.
+//
+// The original implementation is in Golang 1.15.8: mime/mediatype.go
+extern std::tuple<std::wstring, std::wstring> _consume_value(const std::wstring& s);
+
+// TESTME: check_media_type_disposition
+//
+// The original implementation is in Golang 1.15.8: mime/mediatype.go
+extern void _check_media_type_disposition(const std::wstring& s);
+
+// TESTME: consume_media_parameter
+//
+// The original implementation is in Golang 1.15.8: mime/mediatype.go
+extern std::tuple<std::wstring, std::wstring, std::wstring> _consume_media_parameter(const std::wstring& s);
+
+// TESTME: parse_media_type
+//
+// Parses a media type value and any optional
+// parameters, per RFC 1521. Media types are the values in
+// Content-Type and Content-Disposition headers (RFC 2183).
+// On success, parse_media_type returns the media type converted
+// to lowercase and trimmed of white space map.
+// The returned map, params, maps from the lowercase
+// attribute to the attribute value with its case preserved.
+//
+// The original implementation is in Golang 1.15.8: mime/mediatype.go
+extern std::tuple<std::wstring, std::map<std::wstring, std::wstring>, bool> parse_media_type(std::wstring content_type);
+
+// Dictionary which maps reduced archives' extensions to
+// their full variants.
+inline static const collections::Dictionary<std::string, std::string> SUFFIX_MAP({
 	{".svgz", ".svg.gz"},
 	{".tgz", ".tar.gz"},
 	{".taz", ".tar.gz"},
@@ -107,15 +129,21 @@ collections::Dictionary<std::string, std::string> SUFFIX_MAP({
 	{".txz", ".tar.xz"}
 });
 
-collections::Dictionary<std::string, std::string> ENCODINGS_MAP({
+// Dictionary which maps archives' extensions to
+//	encoding names.
+inline static const collections::Dictionary<std::string, std::string> ENCODINGS_MAP({
 	{".gz", "gzip"},
 	{".Z", "compress"},
 	{".bz2", "bzip2"},
 	{".xz", "xz"},
 });
 
+// Before adding new types, make sure they are either registered with IANA,
+// at http://www.iana.org/assignments/media-types
+// or extensions, i.e. using the x- prefix
+//
 // If you add to these, please keep them sorted!
-collections::Dictionary<std::string, std::string> TYPES_MAP({
+inline static const collections::Dictionary<std::string, std::string> TYPES_MAP({
 	{".3gp", "video/3gpp"},
 	{".3gpp", "video/3gpp"},
 	{".7z", "application/x-7z-compressed"},

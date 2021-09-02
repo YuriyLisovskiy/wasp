@@ -20,6 +20,10 @@
 
 __CONF_BEGIN__
 
+using HandlerFunction = std::function<net::StatusCode(
+	net::RequestContext*, const std::map<std::string, std::string>& /* environment */
+)>;
+
 class MainApplication
 {
 private:
@@ -29,7 +33,7 @@ private:
 	std::map<std::string, std::shared_ptr<cmd::BaseCommand>> _commands;
 
 private:
-	void _setup_commands(net::HandlerFunc handler);
+	void _setup_commands(HandlerFunction handler);
 
 	void _extend_settings_commands(
 		const std::vector<std::shared_ptr<cmd::BaseCommand>>& from, const std::string& module_name
@@ -40,13 +44,13 @@ protected:
 
 	conf::Settings* settings;
 
-	std::function<std::unique_ptr<net::abc::IServer>(
-		log::ILogger*, const Kwargs&, std::shared_ptr<dt::Timezone>
-	)> server_initializer;
+//	std::function<std::unique_ptr<net::abc::IServer>(
+//		log::ILogger*, const Kwargs&, std::shared_ptr<dt::Timezone>
+//	)> server_initializer;
 
 protected:
 	[[nodiscard]]
-	net::HandlerFunc make_handler() const;
+	HandlerFunction make_handler() const;
 
 	[[nodiscard]]
 	bool static_is_allowed(const std::string& static_url) const;
@@ -82,13 +86,7 @@ protected:
 	void finish_response(net::RequestContext* ctx, http::abc::IHttpResponse* response) const;
 
 public:
-	explicit MainApplication(
-		const std::string& version,
-		conf::Settings* settings,
-		std::function<std::unique_ptr<net::abc::IServer>(
-			log::ILogger*, const Kwargs&, std::shared_ptr<dt::Timezone>
-		)> server_initializer
-	);
+	explicit MainApplication(const std::string& version, conf::Settings* settings);
 
 	void execute(int argc, char** argv);
 };

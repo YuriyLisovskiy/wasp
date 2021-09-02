@@ -36,7 +36,7 @@ protected:
 	)
 	{
 		std::regex file_name_regex(file_name);
-		auto dir_sep = std::string(1, path::sep);
+		auto dir_sep = std::string(1, path::path_sep);
 		for (const auto& entry : std::filesystem::directory_iterator(base_dir))
 		{
 			if (!entry.is_directory())

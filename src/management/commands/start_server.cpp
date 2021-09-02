@@ -14,23 +14,12 @@
 __MANAGEMENT_COMMANDS_BEGIN__
 
 StartServerCommand::StartServerCommand(
-	conf::IModuleConfig* config,
-	conf::Settings* settings,
-	std::function<std::unique_ptr<net::abc::IServer>(
-		log::ILogger*, const Kwargs&, std::shared_ptr<dt::Timezone>
-	)> make_server
-) : Command(
-	config, settings, "start-server", "Starts a web application"
-), make_server(std::move(make_server))
+	conf::IModuleConfig* config, conf::Settings* settings, std::function<net::StatusCode(
+		net::RequestContext*, const std::map<std::string, std::string>& /* environment */
+	)> handler
+) : Command(config, settings, "start-server", "Starts a web application"),
+	_handler_function(std::move(handler))
 {
-	if (!this->make_server)
-	{
-		throw ImproperlyConfigured(
-			"xw::mgmt::cmd::StartServerCommand: server initializer must be instantiated in order to use the application",
-			_ERROR_DETAILS_
-		);
-	}
-
 	std::string ipv4 = R"((\d{1,3}(?:\.\d{1,3}){3})|localhost)";
 	this->_ipv4_regex = re::Regex(ipv4);
 
@@ -104,9 +93,14 @@ void StartServerCommand::handle()
 	}
 
 	this->retrieve_args();
-	auto server = this->make_server(this->settings->LOGGER.get(), this->get_kwargs(), this->settings->TIME_ZONE);
+	auto server = this->settings->build_server(this->_handler_function, this->get_kwargs());
 	try
 	{
+		if (!server)
+		{
+			throw NullPointerException("server is not initialized", _ERROR_DETAILS_);
+		}
+
 		server->bind(this->_host, this->_port);
 		std::string message = dt::Datetime::now(this->settings->TIME_ZONE).strftime("%B %d, %Y - %T") + "\n" +
 		                      v::framework_name + " version " + v::version.to_string() + "\n" +

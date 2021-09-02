@@ -10,8 +10,7 @@
  * search old issues for history on decisions. Unit tests should also
  * contain references to issue numbers with details.
  *
- * Implementation is based on Golang 1.15.8 linux/amd64:
- * https://github.com/golang/go/blob/master/src/net/url/url.go
+ * Implementation is based on Golang 1.15.8: net/url/url.go
  */
 
 #pragma once
@@ -49,12 +48,6 @@ extern bool should_escape(char c, EscapeMode mode);
 
 // TESTME: escape
 extern std::string escape(const std::string& s, EscapeMode mode);
-
-// TESTME: is_hex
-extern bool is_hex(char c);
-
-// TESTME: unhex
-extern char unhex(char c);
 
 // TESTME: unescape
 // Unescapes a string; the mode specifies
@@ -266,6 +259,13 @@ struct URL final
 	inline Query query() const
 	{
 		return parse_query(this->raw_query);
+	}
+
+	[[nodiscard]]
+	inline std::string full_path(bool force_append_slash=false) const
+	{
+		return this->path + (force_append_slash && !this->path.ends_with("/") ? "/" : "") +
+			(this->raw_query.empty() ? "" : "?" + this->raw_query);
 	}
 };
 

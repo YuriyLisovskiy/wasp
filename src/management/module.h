@@ -23,20 +23,20 @@
 
 __MANAGEMENT_BEGIN__
 
-using MakeServerFunction = std::function<std::unique_ptr<net::abc::IServer>(
-	log::ILogger*, const Kwargs&, std::shared_ptr<dt::Timezone>
-)>;
-
 // TESTME: CoreModuleConfig
 // TODO: docs for 'CoreModuleConfig'
 class CoreModuleConfig final : public conf::ModuleConfig
 {
 private:
-	MakeServerFunction _make_server;
+	using HandlerFunction = std::function<net::StatusCode(
+		net::RequestContext*, const std::map<std::string, std::string>& /* environment */
+	)>;
+
+	HandlerFunction _handler_function;
 
 public:
-	explicit CoreModuleConfig(conf::Settings* settings, MakeServerFunction make_server) :
-		ModuleConfig(settings), _make_server(std::move(make_server))
+	explicit CoreModuleConfig(conf::Settings* settings, HandlerFunction handler) :
+		ModuleConfig(settings), _handler_function(std::move(handler))
 	{
 	}
 

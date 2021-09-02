@@ -10,9 +10,9 @@
 #include <xalwart.base/path.h>
 
 // Framework libraries.
-#include "../http/headers.h"
 #include "../http/utility.h"
-#include "../core/mime_types.h"
+#include "../core/media_type.h"
+#include "../http/headers.h"
 
 
 __CONTROLLERS_BEGIN__
@@ -64,7 +64,7 @@ http::Response::Result StaticController::get(const std::string& p)
 
 	auto stat_info = file_stat(full_path);
 	if (!was_modified_since(
-		request->headers.get(http::IF_MODIFIED_SINCE, ""), stat_info.st_mtime, stat_info.st_size
+		request->get_header(http::IF_MODIFIED_SINCE, ""), stat_info.st_mtime, stat_info.st_size
 	))
 	{
 		return http::result<http::resp::NotModified>("");
