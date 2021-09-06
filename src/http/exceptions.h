@@ -205,4 +205,16 @@ public:
 	}
 };
 
+// TESTME: RequestHeaderFieldsTooLarge
+// TODO: docs for 'RequestHeaderFieldsTooLarge'
+class RequestHeaderFieldsTooLarge : public HttpError
+{
+public:
+	inline explicit RequestHeaderFieldsTooLarge(
+		const std::string& message, int line=0, const char* function="", const char* file=""
+	) : HttpError(431, message, line, function, file, "xw::http::exc::RequestHeaderFieldsTooLarge")
+	{
+	}
+};
+
 __HTTP_EXC_END__

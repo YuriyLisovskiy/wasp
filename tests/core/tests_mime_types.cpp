@@ -138,3 +138,51 @@ TEST(MimeTypesTestCase, guessContentTypeTestTextZ)
 	ASSERT_EQ(type, "application/x-z");
 	ASSERT_EQ(encoding, "compress");
 }
+
+TEST(MimeTypesTestCase, _consume_value)
+{
+	std::vector<std::vector<std::string>> data = {
+		{"foo bar", "foo", " bar"},
+		{"bar", "bar", ""},
+		{" bar ", "", " bar "},
+		{"\"My value\"end", "My value", "end"},
+		{"\"My value\" end", "My value", " end"},
+		{R"("\\" rest)", "\\", " rest"},
+		{R"("My \" value"end)", "My \" value", "end"},
+		{R"("\" rest)", "", R"("\" rest)"},
+		{R"("C:\dev\go\robots.txt")", R"(C:\dev\go\robots.txt)", ""},
+		{"\"C:\\新建文件件\\中文第二次测试.mp4\"", "C:\\新建文件件\\中文第二次测试.mp4", ""},
+	};
+	for (const auto& test : data)
+	{
+		auto [value, rest] = core::mime::_consume_value(str::string_to_wstring(test[0]));
+		ASSERT_EQ(value, str::string_to_wstring(test[1]));
+		ASSERT_EQ(rest, str::string_to_wstring(test[2]));
+	}
+}
+
+TEST(MimeTypesTestCase, _consume_media_parameter)
+{
+	std::vector<std::vector<std::string>> data = {
+		{" ; foo=bar", "foo", "bar", ""},
+		{"; foo=bar", "foo", "bar", ""},
+		{";foo=bar", "foo", "bar", ""},
+		{";FOO=bar", "foo", "bar", ""},
+		{R"(;foo="bar")", "foo", "bar", ""},
+		{R"(;foo="bar"; )", "foo", "bar", "; "},
+		{R"(;foo="bar"; foo=baz)", "foo", "bar", "; foo=baz"},
+		{R"( ; boundary=----CUT;)", "boundary", "----CUT", ";"},
+		{R"( ; key=value;  blah="value";name="foo" )", "key", "value", R"(;  blah="value";name="foo" )"},
+		{R"(;  blah="value";name="foo" )", "blah", "value", R"(;name="foo" )"},
+		{R"(;name="foo" )", "name", "foo", R"( )"},
+	};
+	size_t i = 0;
+	for (const auto& test : data)
+	{
+		std::cerr << i++ << '\n';
+		auto [param, value, rest] = core::mime::_consume_media_parameter(str::string_to_wstring(test[0]));
+		ASSERT_EQ(param, str::string_to_wstring(test[1]));
+		ASSERT_EQ(value, str::string_to_wstring(test[2]));
+		ASSERT_EQ(rest, str::string_to_wstring(test[3]));
+	}
+}

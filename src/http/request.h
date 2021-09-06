@@ -19,6 +19,7 @@
 // Base libraries.
 #include <xalwart.base/exceptions.h>
 #include <xalwart.base/io.h>
+#include <xalwart.base/net/request_context.h>
 
 // Module definitions.
 #include "./_def_.h"
@@ -84,13 +85,13 @@ public:
 	std::map<std::string, std::string> header;
 
 	// Body is the request's body.
-	std::shared_ptr<io::IReader> body = nullptr;
+	std::shared_ptr<io::IBufferedReader> body = nullptr;
 
 	// 'content_length' records the length of the associated content.
 	// The value -1 indicates that the length is unknown.
 	// Values >= 0 indicate that the given number of bytes were
 	// written to body.
-	long long int content_length;
+	ssize_t content_length;
 
 	// 'transfer_encoding' lists the transfer encodings from outermost to
 	// innermost. An empty list denotes the "identity" encoding.
@@ -123,20 +124,39 @@ public:
 	// This field is only available after 'parse_multipart_form' is called.
 	std::unique_ptr<multipart::Form> multipart_form = nullptr;
 
+	// TODO: docs for Request::environment
+	std::map<std::string, std::string> environment;
+
 protected:
+	ssize_t max_file_upload_size;
+	ssize_t max_fields_count;
+	ssize_t max_header_length;
+	ssize_t max_headers_count;
+
 	[[nodiscard]]
 	std::unique_ptr<multipart::Reader> multipart_reader(bool allow_mixed) const;
 
 	// Return the HTTP host using the environment or request headers. Skip
 	// allowed hosts protection, so may return an insecure host.
 	[[nodiscard]]
-	std::string get_raw_host(bool use_x_forwarded_host, bool use_x_forwarded_port) const;
+	std::string get_raw_host(
+		bool use_x_forwarded_host, bool use_x_forwarded_port,
+		const std::optional<std::pair<std::string, std::string>>& secure_proxy_ssl_header
+	) const;
+
+	// TODO: dos for 'get_port'
+	[[nodiscard]]
+	std::string get_port(bool use_x_forwarded_port) const;
 
 public:
 	explicit Request(
-		std::string method, const std::string& raw_url, std::string proto,
-		int proto_major, int proto_minor, std::map<std::string, std::string> header,
-		std::shared_ptr<io::IReader> body_reader, long long int content_length
+		const net::RequestContext& context,
+//		std::string method, const std::string& raw_url, std::string proto,
+//		int proto_major, int proto_minor, std::map<std::string, std::string> header,
+//		std::shared_ptr<io::IBufferedReader> body_reader, long long int content_length,
+		ssize_t max_file_upload_size, ssize_t max_fields_count,
+		ssize_t max_header_length, ssize_t max_headers_count,
+		std::map<std::string, std::string> environment
 	);
 
 	// 'proto_at_least' reports whether the HTTP protocol used
@@ -223,12 +243,22 @@ public:
 	// After one call to ParseMultipartForm, subsequent calls have no effect.
 	void parse_multipart_form(long long int max_memory);
 
-	std::string scheme(std::optional<std::pair<std::string, std::string>> secure_proxy_ssl_header) const;
+	// TODO: docs for 'scheme'
+	[[nodiscard]]
+	std::string scheme(const std::optional<std::pair<std::string, std::string>>& secure_proxy_ssl_header) const;
 
 	// Return the HTTP host using the environment or request headers.
 	std::string get_host(
+		const std::optional<std::pair<std::string, std::string>>& secure_proxy_ssl_header,
 		bool use_x_forwarded_host, bool use_x_forwarded_port, bool debug, std::vector<std::string> allowed_hosts
 	);
+
+	// TODO: docs for 'is_secure'
+	[[nodiscard]]
+	inline bool is_secure(const std::optional<std::pair<std::string, std::string>>& secure_proxy_ssl_header) const
+	{
+		return this->scheme(secure_proxy_ssl_header) == "https";
+	}
 };
 
 // TESTME: valid_method

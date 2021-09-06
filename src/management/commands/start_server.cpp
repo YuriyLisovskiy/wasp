@@ -113,6 +113,11 @@ void StartServerCommand::handle()
 	{
 		this->settings->LOGGER->debug("Interrupted");
 	}
+	catch (const NullPointerException& exc)
+	{
+		this->settings->LOGGER->error(exc);
+		return;
+	}
 	catch (const BaseException& exc)
 	{
 		this->settings->LOGGER->error(exc);

@@ -107,7 +107,7 @@ std::tuple<std::wstring, std::wstring> _consume_token(const std::wstring& s)
 		return {s, L""};
 	}
 
-	if (str::is_end_position(not_pos))
+	if (not_pos == 0)
 	{
 		return {L"", s};
 	}
@@ -122,7 +122,7 @@ std::tuple<std::wstring, std::wstring> _consume_value(const std::wstring& s)
 		return {L"", L""};
 	}
 
-	if (s[0] == '"')
+	if (s[0] != '"')
 	{
 		return _consume_token(s);
 	}
@@ -230,6 +230,7 @@ std::tuple<std::wstring, std::wstring, std::wstring> _consume_media_parameter(co
 		return {L"", L"", s};
 	}
 
+	rest = rest2;
 	return {parameter, value, rest};
 }
 
@@ -244,12 +245,15 @@ std::tuple<std::wstring, std::map<std::wstring, std::wstring>, bool> parse_media
 	// for parameters containing a '*' character.
 	std::map<std::wstring, std::map<std::wstring, std::wstring>> continuation;
 
-	if (semicolon_position == std::wstring::npos)
+	if (semicolon_position != std::wstring::npos)
 	{
-		semicolon_position = content_type.size();
+		content_type = content_type.substr(semicolon_position);
+	}
+	else
+	{
+		content_type = L"";
 	}
 
-	content_type = content_type.substr(semicolon_position);
 	while (!content_type.empty())
 	{
 		content_type = str::trim_left_func(content_type, encoding::is_space);
@@ -264,13 +268,15 @@ std::tuple<std::wstring, std::map<std::wstring, std::wstring>, bool> parse_media
 			if (str::trim(rest, ' ') == L";")
 			{
 				// Ignore trailing semicolons.
+				// Not an error.
 				return {media_type, params, true};
 			}
 
+			// Parse error.
 			return {media_type, {}, false};
 		}
 
-		auto params_map = params;
+		auto& params_map = params;
 		auto idx = key.find('*');
 		if (idx != std::string::npos)
 		{
@@ -341,8 +347,14 @@ std::tuple<std::wstring, std::map<std::wstring, std::wstring>, bool> parse_media
 			}
 			else
 			{
-				auto decoded_value = encoding::percent_hex_unescape(str::wstring_to_string(v));
-				buffer += str::string_to_wstring(decoded_value);
+				try
+				{
+					auto decoded_value = encoding::percent_hex_unescape(str::wstring_to_string(v));
+					buffer += str::string_to_wstring(decoded_value);
+				}
+				catch (const ValueError&)
+				{
+				}
 			}
 		}
 

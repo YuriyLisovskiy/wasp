@@ -8,6 +8,7 @@
 
 // Base libraries.
 #include <xalwart.base/string_utils.h>
+#include <xalwart.base/net/meta.h>
 
 // Framework libraries.
 #include "./exceptions.h"
@@ -38,11 +39,15 @@ std::unique_ptr<multipart::Reader> Request::multipart_reader(bool allow_mixed) c
 
 	auto boundary = str::wstring_to_string(parameters.at(L"boundary"));
 	return std::make_unique<multipart::Reader>(
-		this->body, boundary, std::stoll(this->get_header(CONTENT_LENGTH, "0"))
+		this->body, boundary, std::stoll(this->get_header(CONTENT_LENGTH, "0")),
+		this->max_file_upload_size, this->max_fields_count, this->max_header_length, this->max_headers_count
 	);
 }
 
-std::string Request::get_raw_host(bool use_x_forwarded_host, bool use_x_forwarded_port) const
+std::string Request::get_raw_host(
+	bool use_x_forwarded_host, bool use_x_forwarded_port,
+	const std::optional<std::pair<std::string, std::string>>& secure_proxy_ssl_header
+) const
 {
 	std::string raw_host;
 	if (use_x_forwarded_host && this->header.contains(http::X_FORWARDED_HOST))
@@ -51,9 +56,14 @@ std::string Request::get_raw_host(bool use_x_forwarded_host, bool use_x_forwarde
 	}
 	else
 	{
-		raw_host = this->META.get(net::meta::SERVER_NAME);
+		if (!this->environment.contains(net::meta::SERVER_NAME))
+		{
+			throw KeyError("'environment' does not contain " + std::string(net::meta::SERVER_NAME));
+		}
+
+		raw_host = this->environment.at(net::meta::SERVER_NAME);
 		auto port = this->get_port(use_x_forwarded_port);
-		if (port != (this->is_secure(this->settings->SECURE_PROXY_SSL_HEADER.get()) ? "443" : "80"))
+		if (port != (this->is_secure(secure_proxy_ssl_header) ? "443" : "80"))
 		{
 			raw_host = raw_host + ":" + port;
 		}
@@ -62,13 +72,41 @@ std::string Request::get_raw_host(bool use_x_forwarded_host, bool use_x_forwarde
 	return raw_host;
 }
 
+std::string Request::get_port(bool use_x_forwarded_port) const
+{
+	std::string port;
+	if (use_x_forwarded_port && this->header.contains(http::X_FORWARDED_PORT))
+	{
+		port = this->header.at(http::X_FORWARDED_PORT);
+	}
+	else
+	{
+		if (!this->environment.contains(net::meta::SERVER_PORT))
+		{
+			throw KeyError("'environment' does not contain " + std::string(net::meta::SERVER_PORT));
+		}
+
+		port = this->environment.at(net::meta::SERVER_PORT);
+	}
+
+	return port;
+}
+
 Request::Request(
-	std::string method, const std::string& raw_url, std::string proto,
-	int proto_major, int proto_minor, std::map<std::string, std::string> header,
-	std::shared_ptr<io::IReader> body_reader, long long int content_length
-) : method(std::move(method)), url(std::move(parse_url(raw_url))), proto(std::move(proto)),
-	proto_major(proto_major), proto_minor(proto_minor), header(std::move(header)),
-	body(std::move(body_reader)), content_length(content_length)
+	const net::RequestContext& context,
+//	std::string method, const std::string& raw_url, std::string proto,
+//	int proto_major, int proto_minor, std::map<std::string, std::string> header,
+//	std::shared_ptr<io::IBufferedReader> body_reader, long long int content_length,
+	ssize_t max_file_upload_size, ssize_t max_fields_count,
+	ssize_t max_header_length, ssize_t max_headers_count,
+	std::map<std::string, std::string> environment
+) : method(context.method), url(std::move(parse_url(context.path))),
+	proto("HTTP/" + std::to_string(context.protocol_version.major) + "." + std::to_string(context.protocol_version.minor)),
+	proto_major((int)context.protocol_version.major), proto_minor((int)context.protocol_version.minor),
+	header(context.headers), body(context.body), content_length((ssize_t)context.content_size),
+	max_file_upload_size(max_file_upload_size), max_fields_count(max_fields_count),
+	max_headers_count(max_headers_count), max_header_length(max_header_length),
+	environment(std::move(environment))
 {
 	if (!valid_method(this->method))
 	{
@@ -103,9 +141,16 @@ void Request::parse_form()
 		}
 
 		auto new_query = std::make_unique<Query>(parse_query(this->url.raw_query));
-		for (auto it = new_query->begin(); it != new_query->end(); it++)
+		if (!this->form)
 		{
-			this->form->add(it->first, it->second);
+			this->form = std::move(new_query);
+		}
+		else
+		{
+			for (auto it = new_query->begin(); it != new_query->end(); it++)
+			{
+				this->form->add(it->first, it->second);
+			}
 		}
 	}
 }
@@ -140,7 +185,7 @@ void Request::parse_multipart_form(long long int max_memory)
 	this->multipart_form = std::move(target_form);
 }
 
-std::string Request::scheme(std::optional<std::pair<std::string, std::string>> secure_proxy_ssl_header) const
+std::string Request::scheme(const std::optional<std::pair<std::string, std::string>>& secure_proxy_ssl_header) const
 {
 	if (secure_proxy_ssl_header.has_value())
 	{
@@ -155,10 +200,11 @@ std::string Request::scheme(std::optional<std::pair<std::string, std::string>> s
 }
 
 std::string Request::get_host(
+	const std::optional<std::pair<std::string, std::string>>& secure_proxy_ssl_header,
 	bool use_x_forwarded_host, bool use_x_forwarded_port, bool debug, std::vector<std::string> allowed_hosts
 )
 {
-	auto raw_host = this->get_raw_host(use_x_forwarded_host, use_x_forwarded_port);
+	auto raw_host = this->get_raw_host(use_x_forwarded_host, use_x_forwarded_port, secure_proxy_ssl_header);
 	if (debug && allowed_hosts.empty())
 	{
 		allowed_hosts = {".localhost", "127.0.0.1", "::1"};
@@ -181,7 +227,7 @@ std::string Request::get_host(
 		msg += " The domain name provided is not valid according to RFC 1034/1035.";
 	}
 
-	throw std::make_shared<exc::DisallowedHost>(msg, _ERROR_DETAILS_);
+	throw exc::DisallowedHost(msg, _ERROR_DETAILS_);
 }
 
 bool has_port(const std::string& host)

@@ -74,9 +74,16 @@ class Part
 {
 public:
 	std::map<std::string, std::string> header;
-	std::string remaining_bytes;
+	Reader* multipart_reader = nullptr;
+	ssize_t n = 0;
 
-	explicit Part(Reader* reader, ssize_t content_length, bool raw_part, std::string remaining_bytes);
+	// total data bytes read already
+	ssize_t total = 0;
+
+	explicit Part(
+		Reader* reader, ssize_t content_length, bool raw_part,
+		ssize_t max_header_length, ssize_t max_headers_count
+	);
 
 	// Returns the name parameter if p has a Content-Disposition
 	// of type "form-data". Otherwise it returns the empty string.
@@ -103,11 +110,17 @@ public:
 
 	long long int read(std::string& buffer, long long int max_n);
 
-protected:
-	friend class PartReader;
+	[[nodiscard]]
+	inline ssize_t get_total() const
+	{
+		return this->total;
+	}
 
-	ssize_t content_length = 0;
-	Reader* multipart_reader = nullptr;
+protected:
+	ssize_t max_headers_count;
+	ssize_t max_header_length;
+
+	ssize_t remaining_content_length = 0;
 
 	// It is either a reader directly reading from `multipart_reader`, or it's a
 	// wrapper around such a reader, decoding the Content-Transfer-Encoding
@@ -115,9 +128,6 @@ protected:
 
 	std::wstring disposition;
 	std::optional<std::map<std::wstring, std::wstring>> disposition_params;
-
-	// total data bytes read already
-	ssize_t total = 0;
 
 	void parse_content_disposition();
 
@@ -129,15 +139,19 @@ protected:
 class Reader
 {
 public:
-	inline Reader(std::shared_ptr<io::IReader> reader, const std::string& boundary, ssize_t content_length) :
-		buffer_reader(std::move(reader)), content_length(content_length)
+	inline Reader(
+		std::shared_ptr<io::IBufferedReader> reader, const std::string& boundary, ssize_t content_length,
+		ssize_t max_file_upload_size, ssize_t max_fields_count, ssize_t max_header_length, ssize_t max_headers_count
+	) :
+		buffer_reader(std::move(reader)), remaining_content_length(content_length),
+		max_file_upload_size(max_file_upload_size), max_fields_count(max_fields_count),
+		max_header_length(max_header_length), max_headers_count(max_headers_count)
 	{
-	}
-
-	[[nodiscard]]
-	inline ssize_t get_content_length() const
-	{
-		return this->content_length;
+		auto b = "\r\n--" + boundary + "--";
+		this->nl = b.substr(0, 2);
+		this->nl_dash_boundary = b.substr(0, b.size() - 2);
+		this->dash_boundary_dash = b.substr(2);
+		this->dash_boundary = b.substr(2, b.size() - 4);
 	}
 
 	std::unique_ptr<Form> read_form(long long int max_memory);
@@ -157,8 +171,12 @@ protected:
 	friend class Part;
 	friend class PartReader;
 
-	ssize_t content_length;
-	std::shared_ptr<io::IReader> buffer_reader;
+	ssize_t max_file_upload_size;
+	ssize_t max_fields_count;
+	ssize_t max_header_length;
+	ssize_t max_headers_count;
+	ssize_t remaining_content_length;
+	std::shared_ptr<io::IBufferedReader> buffer_reader;
 
 	std::shared_ptr<Part> current_part;
 	int parts_read{};
@@ -176,39 +194,8 @@ protected:
 	bool is_final_boundary(const std::string& line);
 
 	bool is_boundary_delimiter_line(const std::string& line);
-};
 
-// TESTME: PartReader
-//
-// Implements `io::IReader` by reading raw bytes directly from the
-// wrapped `Part*`, without doing any Transfer-Encoding decoding.
-class PartReader : public io::IReader
-{
-public:
-	inline explicit PartReader(Part* part, std::string remaining_bytes) :
-		part(part), remaining_bytes(std::move(remaining_bytes))
-	{
-		if (!this->part)
-		{
-			throw NullPointerException("'part' is nullptr", _ERROR_DETAILS_);
-		}
-	}
-
-	inline ssize_t read_line(std::string& buffer) override
-	{
-		throw NotImplementedException("PartReader::read_line(std::string& buffer)", _ERROR_DETAILS_);
-	}
-
-	ssize_t read(std::string& buffer, size_t max_count) override;
-
-	inline bool close_reader() override
-	{
-		throw NotImplementedException("PartReader::close_reader()", _ERROR_DETAILS_);
-	}
-
-protected:
-	Part* part;
-	std::string remaining_bytes;
+	void check_part_upload_size(Part* part, FileHeader* header) const;
 };
 
 // TESTME: skip_lwsp_char
@@ -224,32 +211,5 @@ inline std::string skip_lwsp_char(std::string s)
 
 	return s;
 }
-
-// TESTME: _scan_until_boundary
-//
-// Scans `buf` to identify how much of it can be safely
-// returned as part of the `Part` body.
-// `dash_boundary` is "--boundary".
-// `nl_dash_boundary` is "\r\n--boundary" or "\n--boundary", depending on what mode we are in.
-// The comments below (and the name) assume "\n--boundary", but either is accepted.
-// total is the number of bytes read out so far. If total == 0, then a leading "--boundary" is recognized.
-extern std::pair<ssize_t, bool> _scan_until_boundary(
-	const std::string& buf, const std::string& dash_boundary, const std::string& nl_dash_boundary, ssize_t total
-);
-
-// TESTME: _match_after_prefix
-//
-// Checks whether `buf` should be considered to match the boundary.
-// The `prefix` is "--boundary" or "\r\n--boundary" or "\n--boundary",
-// and the caller has verified already that `buf.starts_with(prefix)` is true.
-//
-// Returns +1 if the buffer does match the boundary,
-// meaning the prefix is followed by a dash, space, tab, cr, nl, or end of input.
-// It returns -1 if the buffer definitely does NOT match the boundary,
-// meaning the `prefix` is followed by some other character.
-// For example, "--foobar" does not match "--foo".
-// It returns 0 more input needs to be read to make the decision,
-// meaning that `buf.size() == prefix.size()`.
-extern ssize_t _match_after_prefix(const std::string& buf, const std::string& prefix);
 
 __HTTP_MULTIPART_END__

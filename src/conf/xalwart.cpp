@@ -311,18 +311,19 @@ http::Response::Result MainApplication::process_response(
 }
 
 std::shared_ptr<http::Request> MainApplication::build_request(
-	net::RequestContext* ctx, collections::Dictionary<std::string, std::string> /* environment */
+	net::RequestContext* context, std::map<std::string, std::string> environment
 ) const
 {
+	util::require_non_null(context, "'context' is nullptr", _ERROR_DETAILS_);
 	return std::make_shared<http::Request>(
-		ctx->method,
-		ctx->path,
-		"HTTP/" + std::to_string(ctx->protocol_version.major) + "." + std::to_string(ctx->protocol_version.minor),
-		ctx->protocol_version.major,
-		ctx->protocol_version.minor,
-		ctx->headers,
-		ctx->body,
-		ctx->content_size
+		*context,
+		this->settings->FILE_UPLOAD_MAX_MEMORY_SIZE,
+		this->settings->DATA_UPLOAD_MAX_NUMBER_FIELDS,
+		65535, // TODO: settings->MAX_HEADER_LENGTH
+		100,   // TODO: settings->MAX_HEADERS_COUNT
+//		this->settings->MAX_HEADER_LENGTH,
+//		this->settings->MAX_HEADERS_COUNT,
+		std::move(environment)
 	);
 }
 

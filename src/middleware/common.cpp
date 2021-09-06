@@ -41,6 +41,7 @@ std::pair<std::string, std::shared_ptr<BaseException>> Common::get_full_path_wit
 	{
 		auto method = request->method;
 		auto host = request->get_host(
+			this->settings->SECURE_PROXY_SSL_HEADER,
 			this->settings->USE_X_FORWARDED_HOST,
 			this->settings->USE_X_FORWARDED_PORT,
 			this->settings->DEBUG,
@@ -77,6 +78,7 @@ http::Response::Result Common::process_request(http::Request* request)
 
 	// Check for a redirect based on settings.PREPEND_WWW
 	auto host = request->get_host(
+		this->settings->SECURE_PROXY_SSL_HEADER,
 		this->settings->USE_X_FORWARDED_HOST,
 		this->settings->USE_X_FORWARDED_PORT,
 		this->settings->DEBUG,

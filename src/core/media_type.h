@@ -48,21 +48,12 @@ extern std::string ext_from_path(const std::string& path);
 // `encoding`: guessed file encoding.
 extern void guess_content_type(const std::string& _path, std::string& type, std::string& encoding);
 
-// TESTME: _consume_token
-// Consumes a token from the beginning of provided
-// string, per RFC 2045 section 5.1 (referenced from 2183), and return
-// the token consumed and the rest of the string. Returns {"", v} on
-// failure to consume at least one character.
-//
-// The original implementation is in Golang 1.15.8: mime/mediatype.go
-extern std::tuple<std::wstring, std::wstring> _consume_token(const std::wstring& s);
-
 // TESTME: _is_t_special
 //
 // The original implementation is in Golang 1.15.8: mime/grammar.go
 inline bool _is_t_special(wchar_t c)
 {
-	std::wstring s = L"()<>@,;:\"/[]?=";
+	std::wstring s = L"()<>@,;:\\\"/[]?=";
 	return s.find(c) != std::wstring::npos;
 }
 
@@ -84,6 +75,15 @@ inline bool _is_not_token_char(wchar_t c)
 {
 	return !_is_token_char(c);
 }
+
+// TESTME: _consume_token
+// Consumes a token from the beginning of provided
+// string, per RFC 2045 section 5.1 (referenced from 2183), and return
+// the token consumed and the rest of the string. Returns {"", v} on
+// failure to consume at least one character.
+//
+// The original implementation is in Golang 1.15.8: mime/mediatype.go
+extern std::tuple<std::wstring, std::wstring> _consume_token(const std::wstring& s);
 
 // TESTME: _consume_value
 // Consumes a "value" per RFC 2045, where a value is

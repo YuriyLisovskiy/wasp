@@ -76,8 +76,8 @@ protected:
 	) const;
 
 	[[nodiscard]]
-	std::shared_ptr<http::Request> build_request(
-		net::RequestContext* ctx, collections::Dictionary<std::string, std::string> env
+	virtual std::shared_ptr<http::Request> build_request(
+		net::RequestContext* context, std::map<std::string, std::string> env
 	) const;
 
 	[[nodiscard]]

@@ -15,6 +15,7 @@
 
 // Framework libraries.
 #include "./quote_printable_reader.h"
+#include "./part_reader.h"
 #include "../exceptions.h"
 #include "../headers.h"
 #include "../../core/media_type.h"
@@ -46,8 +47,14 @@ void Form::remove_all() const
 	}
 }
 
-Part::Part(Reader* multipart_reader, ssize_t content_length, bool raw_part, std::string remaining_bytes) :
-	content_length(content_length), multipart_reader(multipart_reader), remaining_bytes(std::move(remaining_bytes))
+Part::Part(
+	Reader* multipart_reader, ssize_t remaining_content_length, bool raw_part,
+	ssize_t max_header_length, ssize_t max_headers_count
+) :
+	remaining_content_length(remaining_content_length),
+	multipart_reader(multipart_reader),
+	max_header_length(max_header_length),
+	max_headers_count(max_headers_count)
 {
 	if (!this->multipart_reader)
 	{
@@ -55,7 +62,7 @@ Part::Part(Reader* multipart_reader, ssize_t content_length, bool raw_part, std:
 	}
 
 	this->populate_headers();
-	this->reader = std::make_shared<PartReader>(this, this->remaining_bytes);
+	this->reader = std::make_shared<PartReader>(this);
 
 	// `raw_part` is used to switch between `next_part` and `next_raw_part`.
 	if (!raw_part)
@@ -84,6 +91,11 @@ std::string Part::form_name()
 		return "";
 	}
 
+	if (!this->disposition_params->contains(L"name"))
+	{
+		throw KeyError("disposition does not contain 'name'", _ERROR_DETAILS_);
+	}
+
 	return str::wstring_to_string(this->disposition_params->at(L"name"));
 }
 
@@ -94,7 +106,8 @@ std::string Part::file_name()
 		this->parse_content_disposition();
 	}
 
-	auto filename = str::wstring_to_string(this->disposition_params->at(L"filename"));
+	auto filename = this->disposition_params->contains(L"filename") ?
+		str::wstring_to_string(this->disposition_params->at(L"filename")) : "";
 	if (filename.empty())
 	{
 		return "";
@@ -107,37 +120,39 @@ std::string Part::file_name()
 
 long long int Part::read(std::string& buffer, long long int max_n)
 {
-	auto total_bytes = std::min<ssize_t>(this->content_length, max_n);
-	auto bytes_to_read = total_bytes;
+	auto bytes_to_read = std::min<ssize_t>(this->remaining_content_length, max_n);
+	ssize_t total_bytes_read = 0;
 	std::string bytes;
 	while (bytes_to_read > 0)
 	{
-		auto n = this->reader->read(bytes, bytes_to_read);
-		bytes_to_read -= n;
+		auto n_ = this->reader->read(bytes, bytes_to_read);
+		if (n_ == 0)
+		{
+			break;
+		}
+
+		total_bytes_read += n_;
+		bytes_to_read -= n_;
 		buffer += bytes;
+		this->remaining_content_length -= n_;
 	}
 
-	return total_bytes;
+	return total_bytes_read;
 }
 
 void Part::parse_content_disposition()
 {
-	auto v = this->get_header(CONTENT_DISPOSITION, "");
-	auto [disposition_string, disposition_map, ok] = core::mime::parse_media_type(str::string_to_wstring(v));
+	auto content_disposition = str::string_to_wstring(this->get_header(CONTENT_DISPOSITION, ""));
+	auto [disposition_string, disposition_map, ok] = core::mime::parse_media_type(content_disposition);
 	this->disposition = disposition_string;
-	if (!ok)
-	{
-		this->disposition_params = disposition_map;
-	}
-	else
-	{
-		this->disposition_params = std::map<std::wstring, std::wstring>{};
-	}
+	this->disposition_params = ok ? disposition_map : std::map<std::wstring, std::wstring>{};
 }
 
 void Part::populate_headers()
 {
-	net::parse_headers(this->header, this->multipart_reader->buffer_reader.get(), -1);
+	net::parse_headers(
+		this->header, this->multipart_reader->buffer_reader.get(), this->max_header_length, this->max_headers_count
+	);
 }
 
 std::unique_ptr<Form> Reader::read_form(long long int max_memory)
@@ -173,6 +188,7 @@ std::unique_ptr<Form> Reader::read_form(long long int max_memory)
 				throw exc::PayloadTooLarge("message is too large", _ERROR_DETAILS_);
 			}
 
+			this->remaining_content_length -= n;
 			form->values.add(name, buffer);
 			continue;
 		}
@@ -182,6 +198,8 @@ std::unique_ptr<Form> Reader::read_form(long long int max_memory)
 		fh->filename = filename;
 		fh->header = part->header;
 		auto n = part->read(buffer, max_memory + 1);
+		this->check_part_upload_size(part.get(), fh.get());
+		this->remaining_content_length -= n;
 		if (n > max_memory)
 		{
 			// too big, write to disk and flush buffer
@@ -195,12 +213,15 @@ std::unique_ptr<Form> Reader::read_form(long long int max_memory)
 					while (true)
 					{
 						auto n_ = part->read(buffer, max_memory + 1);
+						this->check_part_upload_size(part.get(), fh.get());
 						size += n_;
 						if (n_ == 0)
 						{
 							// EOF
 							break;
 						}
+
+						this->remaining_content_length -= n;
 					}
 
 					file->save();
@@ -236,11 +257,6 @@ std::unique_ptr<Form> Reader::read_form(long long int max_memory)
 
 std::shared_ptr<Part> Reader::next_part(bool raw_part)
 {
-//	if (this->current_part)
-//	{
-//		this->current_part->close();
-//	}
-
 	if (this->dash_boundary == "--")
 	{
 		throw ParseError("multipart: boundary is empty", _ERROR_DETAILS_);
@@ -250,7 +266,7 @@ std::shared_ptr<Part> Reader::next_part(bool raw_part)
 	while (true)
 	{
 		std::string line;
-		this->buffer_reader->read_line(line);
+		this->remaining_content_length -= this->buffer_reader->read_line(line);
 		if (this->is_final_boundary(line))
 		{
 			// EOF
@@ -260,13 +276,14 @@ std::shared_ptr<Part> Reader::next_part(bool raw_part)
 		if (this->is_boundary_delimiter_line(line))
 		{
 			this->parts_read++;
-			std::string remaining_bytes;
-			if (this->current_part)
+			if (this->parts_read > this->max_fields_count)
 			{
-				remaining_bytes = this->current_part->remaining_bytes;
+				throw exc::PayloadTooLarge("too much fields", _ERROR_DETAILS_);
 			}
 
-			auto bp = std::make_shared<Part>(this, this->content_length, raw_part, remaining_bytes);
+			auto bp = std::make_shared<Part>(
+				this, this->remaining_content_length, raw_part, this->max_header_length, this->max_headers_count
+			);
 			this->current_part = bp;
 			return bp;
 		}
@@ -342,97 +359,12 @@ bool Reader::is_boundary_delimiter_line(const std::string& line)
 	return rest == this->nl;
 }
 
-ssize_t PartReader::read(std::string& buffer, size_t max_count)
+void Reader::check_part_upload_size(Part* part, FileHeader* header) const
 {
-	auto mr = this->part->multipart_reader;
-	std::string bytes;
-	mr->buffer_reader->read(bytes, max_count);
-	bytes = this->remaining_bytes + bytes;
-	auto [n, ok] = _scan_until_boundary(bytes, mr->dash_boundary, mr->nl_dash_boundary, this->part->total);
-	if (n == 0)
+	if (part->total > this->max_file_upload_size)
 	{
-		return 0;
+		throw exc::PayloadTooLarge("file too large: '" + header->filename + "'", _ERROR_DETAILS_);
 	}
-
-	buffer = bytes.substr(0, n);
-	this->remaining_bytes = bytes.substr(n);
-	this->part->total += n;
-	return n;
-}
-
-std::pair<ssize_t, bool> _scan_until_boundary(
-	const std::string& buf, const std::string& dash_boundary, const std::string& nl_dash_boundary, ssize_t total
-)
-{
-	if (total == 0)
-	{
-		// At beginning of body, allow dash_boundary.
-		if (buf.starts_with(dash_boundary))
-		{
-			switch (_match_after_prefix(buf, dash_boundary))
-			{
-				case -1:
-					return {dash_boundary.size(), true};
-				case 0:
-					return {0, true};
-				case +1:
-					return {0, false};
-			}
-		}
-
-		if (dash_boundary.starts_with(buf))
-		{
-			return {0, false};
-		}
-	}
-
-	// Search for "\n--boundary".
-	auto i = buf.find(nl_dash_boundary);
-	if (i != std::string::npos)
-	{
-		switch (_match_after_prefix(buf.substr(i), nl_dash_boundary))
-		{
-			case -1:
-				return {i + nl_dash_boundary.size(), true};
-			case 0:
-				return {i, true};
-			case +1:
-				return {i, false};
-		}
-	}
-
-	if (nl_dash_boundary.starts_with(buf))
-	{
-		return {0, false};
-	}
-
-	// Otherwise, anything up to the final \n is not part of the boundary
-	// and so must be part of the body.
-	// Also if the section from the final \n onward is not a prefix of the boundary,
-	// it too must be part of the body.
-	i = buf.find_last_of(nl_dash_boundary[0]);
-	if (i != std::string::npos && nl_dash_boundary.starts_with(buf.substr(i)))
-	{
-		return {i, true};
-	}
-
-	return {buf.size(), false};
-}
-
-ssize_t _match_after_prefix(const std::string& buf, const std::string& prefix)
-{
-	if (buf.size() == prefix.size())
-	{
-		return 0;
-	}
-
-	auto c = buf[prefix.size()];
-	if (c == ' ' || c == '\t' || c == '\r' || c == '\n' || c == '-')
-	{
-		return +1;
-	}
-
-	return -1;
 }
 
 __HTTP_MULTIPART_END__
