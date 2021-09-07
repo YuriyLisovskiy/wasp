@@ -81,7 +81,7 @@ public:
 	ssize_t total = 0;
 
 	explicit Part(
-		Reader* reader, ssize_t content_length, bool raw_part,
+		Reader* reader, ssize_t remaining_content_length, bool raw_part,
 		ssize_t max_header_length, ssize_t max_headers_count
 	);
 
@@ -108,7 +108,7 @@ public:
 		}
 	}
 
-	long long int read(std::string& buffer, long long int max_n);
+	ssize_t read(std::string& buffer, size_t max_count);
 
 	[[nodiscard]]
 	inline ssize_t get_total() const

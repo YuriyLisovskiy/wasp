@@ -118,16 +118,20 @@ std::string Part::file_name()
 	return path::basename(filename);
 }
 
-long long int Part::read(std::string& buffer, long long int max_n)
+ssize_t Part::read(std::string& buffer, size_t max_count)
 {
-	auto bytes_to_read = std::min<ssize_t>(this->remaining_content_length, max_n);
+	auto bytes_to_read = std::min<ssize_t>(this->remaining_content_length, max_count);
 	ssize_t total_bytes_read = 0;
 	std::string bytes;
 	while (bytes_to_read > 0)
 	{
 		auto n_ = this->reader->read(bytes, bytes_to_read);
+
+//		std::cerr << "REM CONTENT LEN (TO READ): " << bytes_to_read << ", N: " << n_ << '\n';
+
 		if (n_ == 0)
 		{
+			// EOF
 			break;
 		}
 
@@ -265,6 +269,8 @@ std::shared_ptr<Part> Reader::next_part(bool raw_part)
 	auto expect_new_part = false;
 	while (true)
 	{
+//		std::cerr << "REM CL: " << this->remaining_content_length << '\n';
+
 		std::string line;
 		this->remaining_content_length -= this->buffer_reader->read_line(line);
 		if (this->is_final_boundary(line))
@@ -288,11 +294,11 @@ std::shared_ptr<Part> Reader::next_part(bool raw_part)
 			return bp;
 		}
 
-		if (this->is_final_boundary(line))
-		{
+//		if (this->is_final_boundary(line))
+//		{
 			// EOF
-			return nullptr;
-		}
+//			return nullptr;
+//		}
 
 		if (expect_new_part)
 		{

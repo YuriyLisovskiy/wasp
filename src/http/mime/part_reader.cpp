@@ -6,12 +6,8 @@
 
 #include "./part_reader.h"
 
-// C++ libraries.
-// TODO: remove!
-#include <iostream>
-
 // Base libraries.
-// TODO:
+#include <xalwart.base/net/_def_.h>
 
 // Framework libraries.
 #include "./multipart.h"
@@ -24,23 +20,31 @@ ssize_t PartReader::read(std::string& buffer, size_t max_count)
 	auto mr = this->part->multipart_reader;
 
 	std::string peek;
-//	ssize_t buffered = std::min<ssize_t>(5120, (ssize_t)max_count);
-	auto buffered = (ssize_t)max_count;
+//	ssize_t buffered = std::min<ssize_t>(1024, (ssize_t)max_count);
+//	auto buffered = (ssize_t)max_count;
 	bool ok = true;
 	while (this->part->n == 0 && ok)
 	{
+		auto limit = (dynamic_cast<io::ILimiter*>(mr->buffer_reader.get()))->limit();
+//		std::cerr << "PEEKING: " << max_count << "..., LIMIT: " << limit << "\n";
+
+		auto buffered = mr->buffer_reader->buffered();
 		mr->buffer_reader->peek(peek, buffered);
 		auto [n, is_ok] = _scan_until_boundary(peek, mr->dash_boundary, mr->nl_dash_boundary, this->part->total);
 
-		std::cerr << "BUFFERED: " << buffered << ", NN: " << n << ", MAX COUNT: " << max_count << '\n';
+//		std::cerr << "PEEK: [" << peek << "], BUFFERED: " << mr->buffer_reader->buffered() << ", N: " << n << "\n";
+
+//		std::cerr << "BUFFERED: " << mr->buffer_reader->buffered() << ", N: " << n << ", MAX COUNT: " << max_count << '\n';
 
 		this->part->n = n;
-		buffered = (ssize_t)peek.size();
+//		buffered = (ssize_t)peek.size();
 		ok = is_ok;
 		if (this->part->n == 0 && ok)
 		{
 			// Force buffered I/O to read more into buffer.
-			buffered = mr->buffer_reader->peek(peek, (ssize_t)std::min<size_t>(peek.size() + 128, max_count));
+			auto count = std::min<size_t>(buffered + limit, max_count);
+			count = std::min(count, net::DEFAULT_BUFFER_SIZE);
+			mr->buffer_reader->peek(peek, count);
 		}
 	}
 
@@ -75,7 +79,7 @@ std::pair<ssize_t, bool> _scan_until_boundary(
 	const std::string& buf, const std::string& dash_boundary, const std::string& nl_dash_boundary, ssize_t total
 )
 {
-	std::cerr << "TOTAL: " << total << '\n';
+//	std::cerr << "TOTAL: " << total << '\n';
 
 	if (total == 0)
 	{
@@ -95,7 +99,7 @@ std::pair<ssize_t, bool> _scan_until_boundary(
 
 		if (dash_boundary.starts_with(buf))
 		{
-			std::cerr << "dash_boundary.starts_with(buf)\n";
+//			std::cerr << "dash_boundary.starts_with(buf)\n";
 			return {0, true};
 		}
 	}
@@ -117,7 +121,7 @@ std::pair<ssize_t, bool> _scan_until_boundary(
 
 	if (nl_dash_boundary.starts_with(buf))
 	{
-		std::cerr << "nl_dash_boundary.starts_with(buf)\n";
+//		std::cerr << "nl_dash_boundary.starts_with(buf)\n";
 		return {0, true};
 	}
 
@@ -128,11 +132,11 @@ std::pair<ssize_t, bool> _scan_until_boundary(
 	i = buf.find_last_of(nl_dash_boundary[0]);
 	if (i != std::string::npos && nl_dash_boundary.starts_with(buf.substr(i)))
 	{
-		std::cerr << "i != std::string::npos && nl_dash_boundary.starts_with(buf.substr(i))\n";
+//		std::cerr << "i != std::string::npos && nl_dash_boundary.starts_with(buf.substr(i))\n";
 		return {i, true};
 	}
 
-	std::cerr << "ENDING!\n";
+//	std::cerr << "ENDING!\n";
 	return {buf.size(), true};
 }
 

@@ -315,6 +315,8 @@ std::shared_ptr<http::Request> MainApplication::build_request(
 ) const
 {
 	util::require_non_null(context, "'context' is nullptr", _ERROR_DETAILS_);
+	context->body->set_limit((ssize_t)context->content_size);
+
 	return std::make_shared<http::Request>(
 		*context,
 		this->settings->FILE_UPLOAD_MAX_MEMORY_SIZE,
