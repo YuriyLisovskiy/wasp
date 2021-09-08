@@ -8,6 +8,9 @@
 
 #pragma once
 
+// C++ libraries.
+#include <memory>
+
 // Module definitions.
 #include "./_def_.h"
 
@@ -40,36 +43,37 @@ public:
 	}
 
 	// Return the URL redirect to.
-	std::string get_redirect_url();
+	[[nodiscard]]
+	std::string get_redirect_url() const;
 
-	http::Response::Result get() override;
+	std::unique_ptr<http::abc::IHttpResponse> get() override;
 
-	inline http::Response::Result post() override
+	inline std::unique_ptr<http::abc::IHttpResponse> post() override
 	{
 		return this->get();
 	}
 
-	inline http::Response::Result head() override
+	inline std::unique_ptr<http::abc::IHttpResponse> head() override
 	{
 		return this->get();
 	}
 
-	inline http::Response::Result options() override
+	inline std::unique_ptr<http::abc::IHttpResponse> options() override
 	{
 		return this->get();
 	}
 
-	inline http::Response::Result put() override
+	inline std::unique_ptr<http::abc::IHttpResponse> put() override
 	{
 		return this->get();
 	}
 
-	inline http::Response::Result delete_() override
+	inline std::unique_ptr<http::abc::IHttpResponse> delete_() override
 	{
 		return this->get();
 	}
 
-	inline http::Response::Result patch() override
+	inline std::unique_ptr<http::abc::IHttpResponse> patch() override
 	{
 		return this->get();
 	}

@@ -13,6 +13,7 @@
 
 // Framework libraries.
 #include "../../commands/command.h"
+#include "../../commands/flags/default.h"
 
 
 __MANAGEMENT_COMMANDS_BEGIN__
@@ -21,12 +22,11 @@ __MANAGEMENT_COMMANDS_BEGIN__
 // TODO: docs for 'MigrateCommand'
 class MigrateCommand final : public xw::cmd::Command
 {
-private:
-	std::shared_ptr<core::flags::StringFlag> _db_flag;
-	std::shared_ptr<core::flags::StringFlag> _migration_flag;
-	std::shared_ptr<core::flags::BoolFlag> _rollback_flag;
-	std::shared_ptr<core::flags::BoolFlag> _no_colors_flag;
-	std::shared_ptr<core::flags::BoolFlag> _print_help_flag;
+public:
+	inline explicit MigrateCommand(conf::IModuleConfig* config, conf::Settings* settings) :
+		Command(config, settings, "migrate", "Migrates changes to the database")
+	{
+	}
 
 protected:
 	inline void log_progress(const std::string& msg, const std::string& end) const
@@ -39,11 +39,12 @@ protected:
 
 	void handle() final;
 
-public:
-	inline explicit MigrateCommand(conf::IModuleConfig* config, conf::Settings* settings) :
-		Command(config, settings, "migrate", "Migrates changes to the database")
-	{
-	}
+private:
+	std::shared_ptr<xw::cmd::flags::StringFlag> _db_flag = nullptr;
+	std::shared_ptr<xw::cmd::flags::StringFlag> _migration_flag = nullptr;
+	std::shared_ptr<xw::cmd::flags::BoolFlag> _rollback_flag = nullptr;
+	std::shared_ptr<xw::cmd::flags::BoolFlag> _no_colors_flag = nullptr;
+	std::shared_ptr<xw::cmd::flags::BoolFlag> _print_help_flag = nullptr;
 };
 
 __MANAGEMENT_COMMANDS_END__

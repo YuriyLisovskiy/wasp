@@ -79,7 +79,7 @@ bool if_none_match_passes(
 	}
 }
 
-std::shared_ptr<http::abc::IHttpResponse> not_modified(http::Request* request, http::abc::IHttpResponse* response)
+std::unique_ptr<http::abc::IHttpResponse> not_modified(http::Request* request, http::abc::IHttpResponse* response)
 {
 	auto new_response = std::make_unique<http::resp::NotModified>("");
 	if (response)
@@ -128,7 +128,7 @@ void set_response_etag(http::abc::IHttpResponse* response)
 	}
 }
 
-std::shared_ptr<http::abc::IHttpResponse> get_conditional_response(
+std::unique_ptr<http::abc::IHttpResponse> get_conditional_response(
 	http::Request* request,
 	const std::string& etag,
 	long last_modified,
@@ -136,16 +136,16 @@ std::shared_ptr<http::abc::IHttpResponse> get_conditional_response(
 )
 {
 	// Only return conditional responses on successful requests.
-	if (response && !(response->status() >= 200 && response->status() < 300))
+	if (response && !(response->get_status() >= 200 && response->get_status() < 300))
 	{
 		return nullptr;
 	}
 
 	// Get HTTP request headers.
-	auto if_match_etags = http::parse_etags(request->headers.get(http::IF_MATCH, ""));
-	long if_unmodified_since = http::parse_http_date(request->headers.get(http::IF_UNMODIFIED_SINCE, ""));
-	auto if_none_match_etags = http::parse_etags(request->headers.get(http::IF_NONE_MATCH, ""));
-	long if_modified_since = http::parse_http_date(request->headers.get(http::IF_MODIFIED_SINCE));
+	auto if_match_etags = http::parse_etags(request->get_header(http::IF_MATCH, ""));
+	long if_unmodified_since = http::parse_http_date(request->get_header(http::IF_UNMODIFIED_SINCE, ""));
+	auto if_none_match_etags = http::parse_etags(request->get_header(http::IF_NONE_MATCH, ""));
+	long if_modified_since = http::parse_http_date(request->get_header(http::IF_MODIFIED_SINCE));
 
 	// Step 1 of section 6 of RFC 7232: Test the If-Match precondition.
 	if (!if_match_etags.empty() && !internal::if_match_passes(etag, if_match_etags))
@@ -166,7 +166,7 @@ std::shared_ptr<http::abc::IHttpResponse> get_conditional_response(
 	// Step 3: Test the If-None-Match precondition.
 	if (!if_none_match_etags.empty() && !internal::if_none_match_passes(etag, if_none_match_etags))
 	{
-		if (request->method() == "GET" || request->method() == "HEAD")
+		if (request->method == "GET" || request->method == "HEAD")
 		{
 			return internal::not_modified(request, response);
 		}
@@ -183,7 +183,7 @@ std::shared_ptr<http::abc::IHttpResponse> get_conditional_response(
 		!internal::if_modified_since_passes(last_modified, if_modified_since)
 	)
 	{
-		if (request->method() == "GET" || request->method() == "HEAD")
+		if (request->method == "GET" || request->method == "HEAD")
 		{
 			return internal::not_modified(request, response);
 		}

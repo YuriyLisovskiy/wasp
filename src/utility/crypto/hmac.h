@@ -87,11 +87,11 @@ public:
 // 'secret_key'. Default algorithm is 'MD5', but any algorithm witch inherits
 // 'abc::IHash' is supported and can be passed. A different 'salt' should be
 // passed in for every application of 'HMAC'.
-extern std::shared_ptr<HMAC> salted_hmac(
+extern std::string salted_hmac_hex_digest(
 	const std::string& salt,
 	const std::string& value,
 	const std::string& secret_key,
-	abc::IHash* hash_func = nullptr
+	abc::IHash* hash_func=nullptr
 );
 
 __CRYPTO_END__

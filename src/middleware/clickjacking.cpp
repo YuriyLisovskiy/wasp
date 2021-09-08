@@ -12,7 +12,9 @@
 
 __MIDDLEWARE_BEGIN__
 
-http::Response::Result XFrameOptions::process_response(http::Request* request, http::abc::IHttpResponse* response)
+std::unique_ptr<http::abc::IHttpResponse> XFrameOptions::process_response(
+	http::Request* request, http::abc::IHttpResponse* response
+)
 {
 	// Set it if it's not already in the response.
 	if (!response->has_header(http::X_FRAME_OPTIONS))
@@ -20,7 +22,7 @@ http::Response::Result XFrameOptions::process_response(http::Request* request, h
 		response->set_header(http::X_FRAME_OPTIONS, this->get_x_frame_options_value(request, response));
 	}
 
-	return {};
+	return nullptr;
 }
 
 __MIDDLEWARE_END__

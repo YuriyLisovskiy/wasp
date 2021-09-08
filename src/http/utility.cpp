@@ -21,7 +21,7 @@ __HTTP_BEGIN__
 
 void split_domain_port(const std::string& host, std::string& domain, std::string& port)
 {
-	auto host_lower = str::lower(host);
+	auto host_lower = str::to_lower(host);
 	if (!internal::host_validation_regex.match(host_lower))
 	{
 		return;
@@ -72,7 +72,7 @@ bool is_same_domain(const std::string& host, const std::string& pattern)
 		return false;
 	}
 
-	auto lc_pattern  = str::lower(pattern);
+	auto lc_pattern  = str::to_lower(pattern);
 	return (lc_pattern[0] == '.' && (
 		host.ends_with(lc_pattern) || host == lc_pattern.substr(1, lc_pattern.size() - 1)
 	)) || lc_pattern == host;
@@ -132,7 +132,7 @@ long parse_http_date(const std::string& date)
 	}
 
 	int month = (int) util::index_of(
-			str::lower(match["mon"]),
+			str::to_lower(match["mon"]),
 			internal::MONTHS.begin(),
 			internal::MONTHS.end()
 	) + 1;

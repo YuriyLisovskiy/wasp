@@ -20,6 +20,10 @@
 
 __CONF_BEGIN__
 
+using HandlerFunction = std::function<net::StatusCode(
+	net::RequestContext*, const std::map<std::string, std::string>& /* environment */
+)>;
+
 class MainApplication
 {
 private:
@@ -29,7 +33,7 @@ private:
 	std::map<std::string, std::shared_ptr<cmd::BaseCommand>> _commands;
 
 private:
-	void _setup_commands(net::HandlerFunc handler);
+	void _setup_commands(HandlerFunction handler);
 
 	void _extend_settings_commands(
 		const std::vector<std::shared_ptr<cmd::BaseCommand>>& from, const std::string& module_name
@@ -37,16 +41,11 @@ private:
 
 protected:
 	Version version;
-
 	conf::Settings* settings;
-
-	std::function<std::unique_ptr<net::abc::IServer>(
-		log::ILogger*, const Kwargs&, std::shared_ptr<dt::Timezone>
-	)> server_initializer;
 
 protected:
 	[[nodiscard]]
-	net::HandlerFunc make_handler() const;
+	HandlerFunction make_handler() const;
 
 	[[nodiscard]]
 	bool static_is_allowed(const std::string& static_url) const;
@@ -59,36 +58,30 @@ protected:
 	void build_module_patterns(std::vector<std::shared_ptr<urls::IPattern>>& patterns) const;
 
 	[[nodiscard]]
-	http::Response::Result process_request(std::shared_ptr<http::Request>& request) const;
+	std::unique_ptr<http::abc::IHttpResponse> process_request(std::shared_ptr<http::Request>& request) const;
 
 	[[nodiscard]]
-	http::Response::Result process_urlpatterns(
+	std::unique_ptr<http::abc::IHttpResponse> process_urlpatterns(
 		std::shared_ptr<http::Request>& request, std::vector<std::shared_ptr<urls::IPattern>>& urlpatterns
 	) const;
 
 	[[nodiscard]]
-	http::Response::Result process_response(
-		std::shared_ptr<http::Request>& request, std::shared_ptr<http::abc::IHttpResponse>& response
+	std::unique_ptr<http::abc::IHttpResponse> process_response(
+		std::shared_ptr<http::Request>& request, std::unique_ptr<http::abc::IHttpResponse>& response
 	) const;
 
 	[[nodiscard]]
-	std::shared_ptr<http::Request> build_request(
-		net::RequestContext* ctx, collections::Dictionary<std::string, std::string> env
+	virtual std::shared_ptr<http::Request> build_request(
+		net::RequestContext* context, std::map<std::string, std::string> env
 	) const;
 
 	[[nodiscard]]
-	uint start_response(net::RequestContext* ctx, const http::Response::Result& result) const;
+	uint start_response(net::RequestContext* ctx, const std::unique_ptr<http::abc::IHttpResponse>& response) const;
 
-	void finish_response(net::RequestContext* ctx, http::abc::IHttpResponse* response) const;
+	net::StatusCode finish_response(net::RequestContext* ctx, http::abc::IHttpResponse* response) const;
 
 public:
-	explicit MainApplication(
-		const std::string& version,
-		conf::Settings* settings,
-		std::function<std::unique_ptr<net::abc::IServer>(
-			log::ILogger*, const Kwargs&, std::shared_ptr<dt::Timezone>
-		)> server_initializer
-	);
+	explicit MainApplication(const std::string& version, conf::Settings* settings);
 
 	void execute(int argc, char** argv);
 };

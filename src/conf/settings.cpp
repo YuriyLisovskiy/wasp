@@ -14,7 +14,6 @@
 #include "../render/default_library.h"
 #include "../middleware/clickjacking.h"
 #include "../middleware/common.h"
-#include "../middleware/cookies.h"
 #include "../middleware/http.h"
 #include "../middleware/security.h"
 
@@ -30,9 +29,6 @@ Settings::Settings(const std::string& base_dir)
 		}},
 		{middleware::Common::FULL_NAME, [this]() -> std::shared_ptr<middleware::IMiddleware> {
 			return std::make_shared<middleware::Common>(this);
-		}},
-		{middleware::Cookie::FULL_NAME, [this]() -> std::shared_ptr<middleware::IMiddleware> {
-			return std::make_shared<middleware::Cookie>(this);
 		}},
 		{middleware::ConditionalGet::FULL_NAME, [this]() -> std::shared_ptr<middleware::IMiddleware> {
 			return std::make_shared<middleware::ConditionalGet>(this);

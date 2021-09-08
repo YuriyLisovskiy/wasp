@@ -11,6 +11,7 @@
 
 // Framework libraries.
 #include "./md5.h"
+#include "./utility.h"
 
 
 __CRYPTO_BEGIN__
@@ -70,7 +71,7 @@ void HMAC::_prepare_outer()
 	this->_outer->update(inner_sum, this->_inner->size());
 }
 
-std::shared_ptr<HMAC> salted_hmac(
+std::string salted_hmac_hex_digest(
 	const std::string& salt,
 	const std::string& value,
 	const std::string& secret_key,
@@ -82,10 +83,11 @@ std::shared_ptr<HMAC> salted_hmac(
 		throw ValueError("'secret_key' can not be empty", _ERROR_DETAILS_);
 	}
 
-	bool is_default_hf = !hash_func;
-	if (is_default_hf)
+	std::unique_ptr<abc::IHash> default_hash_function = nullptr;
+	if (!hash_func)
 	{
-		hash_func = new MD5();
+		default_hash_function = _get_default_hash_function();
+		hash_func = default_hash_function.get();
 	}
 
 	// We need to generate a derived key from our base key.  We can do this by
@@ -99,13 +101,9 @@ std::shared_ptr<HMAC> salted_hmac(
 	// However, we need to ensure that we *always* do this.
 	hash_func->reset();
 	auto hmac = std::make_shared<HMAC>(salted_key, hash_func);
-	if (is_default_hf)
-	{
-		delete hash_func;
-	}
 
 	hmac->update(value);
-	return hmac;
+	return hmac->hex_digest();
 }
 
 __CRYPTO_END__

@@ -27,10 +27,10 @@ public:
 	virtual ~IMiddleware() = default;
 
 	// An input http request before processing in controller.
-	virtual http::Response::Result process_request(http::Request* request) = 0;
+	virtual std::unique_ptr<http::abc::IHttpResponse> process_request(http::Request* request) = 0;
 
 	// An output http request and response after processing in controller.
-	virtual http::Response::Result process_response(
+	virtual std::unique_ptr<http::abc::IHttpResponse> process_response(
 		http::Request* request, http::abc::IHttpResponse* response
 	) = 0;
 };

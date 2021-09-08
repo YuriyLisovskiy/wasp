@@ -11,7 +11,7 @@ __COMMANDS_BEGIN__
 
 BaseCommand::BaseCommand(const std::string& cmd_name, const std::string& help)
 {
-	this->flag_set = std::make_shared<core::flags::FlagSet>(cmd_name);
+	this->flag_set = std::make_shared<flags::FlagSet>(cmd_name);
 	this->is_created = false;
 	this->parse_from = 2;
 	this->help = help;

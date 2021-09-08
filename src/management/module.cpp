@@ -16,7 +16,7 @@ __MANAGEMENT_BEGIN__
 void CoreModuleConfig::commands()
 {
 	this->command<cmd::MigrateCommand>(this, this->settings);
-	this->command<cmd::StartServerCommand>(this, this->settings, this->_make_server);
+	this->command<cmd::StartServerCommand>(this, this->settings, this->_handler_function);
 }
 
 __MANAGEMENT_END__

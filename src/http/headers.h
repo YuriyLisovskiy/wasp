@@ -17,6 +17,8 @@
 
 __HTTP_BEGIN__
 
+inline const char* ALLOW = "Allow";
+
 inline const char* HOST = "Host";
 
 inline const char* USER_AGENT = "User-Agent";
@@ -24,6 +26,18 @@ inline const char* USER_AGENT = "User-Agent";
 inline const char* CACHE_CONTROL = "Cache-Control";
 
 inline const char* CONTENT_LOCATION = "Content-Location";
+
+inline const char* LOCATION = "Location";
+
+inline const char* COOKIE = "Cookie";
+
+inline const char* REFERER = "Referer";
+
+inline const char* CONTENT_TYPE = "Content-Type";
+
+inline const char* CONTENT_DISPOSITION = "Content-Disposition";
+
+inline const char* CONTENT_TRANSFER_ENCODING = "Content-Transfer-Encoding";
 
 inline const char* DATE = "Date";
 

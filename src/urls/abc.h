@@ -14,6 +14,14 @@
 // Other libraries.
 #include "../http/request.h"
 #include "../http/response.h"
+#include "../conf/_def_.h"
+
+
+__CONF_BEGIN__
+
+struct Settings;
+
+__CONF_END__
 
 
 __URLS_BEGIN__
@@ -32,7 +40,7 @@ public:
 
 	virtual void add_namespace(const std::string& ns) = 0;
 
-	virtual http::Response::Result apply(http::Request* request, conf::Settings* settings) = 0;
+	virtual std::unique_ptr<http::abc::IHttpResponse> apply(http::Request* request, conf::Settings* settings) = 0;
 
 	virtual bool match(const std::string& url) = 0;
 

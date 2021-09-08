@@ -173,4 +173,48 @@ public:
 	}
 };
 
+// TESTME: PayloadTooLarge
+// TODO: docs for 'PayloadTooLarge'
+class PayloadTooLarge : public HttpError
+{
+public:
+	inline explicit PayloadTooLarge(
+		const std::string& message, int line=0, const char* function="", const char* file=""
+	) : HttpError(413, message, line, function, file, "xw::http::exc::PayloadTooLarge")
+	{
+	}
+};
+
+// TESTME: NotMultipart
+// TODO: docs for 'NotMultipart'
+class NotMultipart : public ParseError
+{
+protected:
+	// Use only when initializing of a derived exception!
+	inline NotMultipart(
+		const std::string& message, int line, const char* function, const char* file, const char* type
+	) : ParseError(message.c_str(), line, function, file, type)
+	{
+	}
+
+public:
+	inline explicit NotMultipart(
+		const std::string& message, int line=0, const char* function="", const char* file=""
+	) : NotMultipart(message, line, function, file, "xw::http::exc::NotMultipart")
+	{
+	}
+};
+
+// TESTME: RequestHeaderFieldsTooLarge
+// TODO: docs for 'RequestHeaderFieldsTooLarge'
+class RequestHeaderFieldsTooLarge : public HttpError
+{
+public:
+	inline explicit RequestHeaderFieldsTooLarge(
+		const std::string& message, int line=0, const char* function="", const char* file=""
+	) : HttpError(431, message, line, function, file, "xw::http::exc::RequestHeaderFieldsTooLarge")
+	{
+	}
+};
+
 __HTTP_EXC_END__

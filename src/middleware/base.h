@@ -40,14 +40,16 @@ public:
 
 	~BaseMiddleware() override = default;
 
-	inline http::Response::Result process_request(http::Request* request) override
+	inline std::unique_ptr<http::abc::IHttpResponse> process_request(http::Request* request) override
 	{
-		return {};
+		return nullptr;
 	}
 
-	inline http::Response::Result process_response(http::Request* request, http::abc::IHttpResponse* response) override
+	inline std::unique_ptr<http::abc::IHttpResponse> process_response(
+		http::Request* request, http::abc::IHttpResponse* response
+	) override
 	{
-		return {};
+		return nullptr;
 	}
 };
 

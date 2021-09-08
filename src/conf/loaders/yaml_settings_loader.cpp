@@ -141,7 +141,7 @@ void YamlSettingsLoader::_init_secure(Settings* settings, const YAML::Node& secu
 	auto psslh = secure["proxy_ssl_header"];
 	if (psslh && psslh.IsMap())
 	{
-		settings->SECURE_PROXY_SSL_HEADER = std::make_shared<std::pair<std::string, std::string>>(
+		settings->SECURE_PROXY_SSL_HEADER = std::pair<std::string, std::string>(
 			psslh["name"].as<std::string>("X-Forwarded-Proto"),
 			psslh["value"].as<std::string>("https")
 		);
@@ -1091,7 +1091,7 @@ void YamlSettingsLoader::init_settings(Settings* settings, const YAML::Node& con
 	}
 	else
 	{
-		auto timezone_name = str::upper(timezone["name"].as<std::string>("UTC"));
+		auto timezone_name = str::to_upper(timezone["name"].as<std::string>("UTC"));
 		if (timezone_name == "UTC")
 		{
 			settings->TIME_ZONE = std::make_shared<dt::Timezone>(dt::Timezone::UTC);

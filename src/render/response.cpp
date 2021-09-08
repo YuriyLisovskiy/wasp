@@ -34,16 +34,16 @@ void TemplateResponse::render()
 		return;
 	}
 
-	auto t = this->engine->get_template(this->template_name);
-	this->_content = t->render(this->context);
+	auto template_ = this->engine->get_template(this->template_name);
+	this->set_content(template_->render(this->context));
 	this->is_rendered = true;
 }
 
-std::string TemplateResponse::get_content()
+std::string TemplateResponse::get_content() const
 {
 	if (this->is_rendered)
 	{
-		return this->_content;
+		return this->content;
 	}
 
 	throw ContentNotRenderedError(

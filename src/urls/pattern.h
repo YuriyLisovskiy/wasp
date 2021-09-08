@@ -32,7 +32,7 @@ __CONF_END__
 __URLS_BEGIN__
 
 template <typename ...ArgsT>
-using ControllerHandler = std::function<http::Response::Result(
+using ControllerHandler = std::function<std::unique_ptr<http::abc::IHttpResponse>(
 	http::Request*, const std::tuple<ArgsT...>&, conf::Settings*
 )>;
 
@@ -99,7 +99,7 @@ public:
 		this->_name = ns + "::" + this->_name;
 	}
 
-	inline http::Response::Result apply(http::Request* request, conf::Settings* settings) override
+	inline std::unique_ptr<http::abc::IHttpResponse> apply(http::Request* request, conf::Settings* settings) override
 	{
 		return this->_handler(request, this->_regex.template tuple<ArgsT...>(), settings);
 	}

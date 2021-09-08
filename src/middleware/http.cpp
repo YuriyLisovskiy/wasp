@@ -10,19 +10,21 @@
 #include <xalwart.base/string_utils.h>
 
 // Framework libraries.
-#include "../utility/cache.h"
-#include "../http/utility.h"
 #include "../http/headers.h"
+#include "../http/utility.h"
+#include "../utility/cache.h"
 
 
 __MIDDLEWARE_BEGIN__
 
-http::Response::Result ConditionalGet::process_response(http::Request* request, http::abc::IHttpResponse* response)
+std::unique_ptr<http::abc::IHttpResponse> ConditionalGet::process_response(
+	http::Request* request, http::abc::IHttpResponse* response
+)
 {
 	// It's too late to prevent an unsafe request with a 412 response, and
 	// for a HEAD request, the response body is always empty so computing
 	// an accurate ETag isn't possible.
-	if (request->method() != "GET")
+	if (request->method != "GET")
 	{
 		return {};
 	}
@@ -41,7 +43,7 @@ http::Response::Result ConditionalGet::process_response(http::Request* request, 
 		);
 		if (conditional_response)
 		{
-			return {conditional_response, nullptr};
+			return conditional_response;
 		}
 	}
 
@@ -54,7 +56,7 @@ bool ConditionalGet::needs_etag(http::abc::IHttpResponse* response)
 	bool result = true;
 	for (const auto& directive : cache_control)
 	{
-		if (str::lower(str::trim(directive)) == "no-store")
+		if (str::to_lower(str::trim(directive)) == "no-store")
 		{
 			result = false;
 			break;

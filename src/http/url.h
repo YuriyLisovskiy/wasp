@@ -10,8 +10,7 @@
  * search old issues for history on decisions. Unit tests should also
  * contain references to issue numbers with details.
  *
- * Implementation is based on Golang 1.15.8 linux/amd64:
- * https://github.com/golang/go/blob/master/src/net/url/url.go
+ * Implementation is based on Golang 1.15.8: net/url/url.go
  */
 
 #pragma once
@@ -21,6 +20,7 @@
 
 // Base libraries.
 #include <xalwart.base/collections/multi_dictionary.h>
+#include <xalwart.base/string_utils.h>
 
 // Module definitions.
 #include "./_def_.h"
@@ -45,21 +45,15 @@ enum class EscapeMode
 // TESTME: should_escape
 // Return true if the specified character should be escaped when
 // appearing in a URL string, according to RFC 3986.
-extern bool should_escape(char c, EscapeMode mode);
+extern bool should_escape(wchar_t c, EscapeMode mode);
 
 // TESTME: escape
-extern std::string escape(const std::string& s, EscapeMode mode);
-
-// TESTME: is_hex
-extern bool is_hex(char c);
-
-// TESTME: unhex
-extern char unhex(char c);
+extern std::string escape(const std::string& string, EscapeMode mode);
 
 // TESTME: unescape
 // Unescapes a string; the mode specifies
 // which section of the URL string is being unescaped.
-extern std::string unescape(std::string s, EscapeMode mode);
+extern std::string unescape(const std::string& string, EscapeMode mode);
 
 // TESTME: valid_encoded
 // Checks whether 's' is a valid encoded path or fragment,
@@ -74,13 +68,13 @@ extern bool valid_encoded(const std::string& s, EscapeMode mode);
 extern std::pair<std::string, std::string> split(const std::string& s, char sep, bool cut_sep=true);
 
 // TESTME: get_scheme
-extern std::pair<std::string, std::string> get_scheme(const std::string& raw_url);
+extern std::pair<std::wstring, std::wstring> get_scheme(const std::wstring& raw_url);
 
 // TESTME: string_contains_ctl_byte
 // Reports whether s contains any ASCII control character.
-inline bool string_contains_ctl_byte(const std::string& s)
+inline bool string_contains_ctl_byte(const std::wstring& s)
 {
-	return std::any_of(s.begin(), s.end(), [](const char& b) -> bool { return b < ' ' || b == 0x7f; });
+	return std::any_of(s.begin(), s.end(), [](const wchar_t& b) -> bool { return b < ' ' || b == 0x7f; });
 }
 
 // TESTME: parse_host
@@ -267,6 +261,13 @@ struct URL final
 	{
 		return parse_query(this->raw_query);
 	}
+
+	[[nodiscard]]
+	inline std::string full_path(bool force_append_slash=false) const
+	{
+		return this->path + (force_append_slash && !this->path.ends_with("/") ? "/" : "") +
+			(this->raw_query.empty() ? "" : "?" + this->raw_query);
+	}
 };
 
 // TESTME: parse_url
@@ -278,8 +279,6 @@ struct URL final
 // error, due to parsing ambiguities.
 URL parse_url(const std::string& raw_url);
 
-
-
 __HTTP_END__
 
 
@@ -289,6 +288,6 @@ __HTTP_INTERNAL_BEGIN__
 extern std::pair<URL::UserInfo, std::string> parse_authority(const std::string& authority);
 
 // TESTME: parse
-extern URL parse_url(const std::string& raw_url, bool via_request);
+extern URL parse_url(const std::wstring& raw_url, bool via_request);
 
 __HTTP_INTERNAL_END__

@@ -11,18 +11,15 @@
 
 // Framework libraries.
 #include "../urls/resolver.h"
-#include "../http/headers.h"
-#include "../http/utility.h"
-#include "../http/exceptions.h"
 
 
 __MIDDLEWARE_BEGIN__
 
 bool Common::should_redirect_with_slash(http::Request* request)
 {
-	if (this->settings->APPEND_SLASH && !request->path().ends_with("/"))
+	if (this->settings->APPEND_SLASH && !request->url.path.ends_with("/"))
 	{
-		auto path = request->path();
+		auto path = request->url.path;
 		return !urls::is_valid_path(path, this->settings->URLPATTERNS) &&
 			urls::is_valid_path(path + "/", this->settings->URLPATTERNS);
 	}
@@ -30,30 +27,24 @@ bool Common::should_redirect_with_slash(http::Request* request)
 	return false;
 }
 
-std::pair<std::string, std::shared_ptr<BaseException>> Common::get_full_path_with_slash(http::Request* request)
+std::string Common::get_full_path_with_slash(http::Request* request)
 {
-	auto new_path = request->full_path(true);
+	auto new_path = request->url.full_path(true);
 
 	// Prevent construction of scheme relative urls.
 	http::escape_leading_slashes(new_path);
 	if (this->settings->DEBUG && util::contains<std::string>(
-		request->method(), {"POST", "PUT", "PATCH"}
+		request->method, {"POST", "PUT", "PATCH"}
 	))
 	{
-		auto method = request->method();
-		auto result = request->get_host(
+		auto method = request->method;
+		auto host = request->get_host(
+			this->settings->SECURE_PROXY_SSL_HEADER,
 			this->settings->USE_X_FORWARDED_HOST,
 			this->settings->USE_X_FORWARDED_PORT,
 			this->settings->DEBUG,
 			this->settings->ALLOWED_HOSTS
 		);
-		if (result.second)
-		{
-			this->settings->LOGGER->trace("Method 'get_host' returned an error", _ERROR_DETAILS_);
-			return result;
-		}
-
-		auto host = result.first;
 		throw RuntimeError(
 			"You called this URL via " + method + "s, but the URL doesn't end "
 			"in a slash and you have APPEND_SLASH set. Xalwart can't "
@@ -63,14 +54,14 @@ std::pair<std::string, std::shared_ptr<BaseException>> Common::get_full_path_wit
 		);
 	}
 
-	return {new_path, nullptr};
+	return new_path;
 }
 
-http::Response::Result Common::process_request(http::Request* request)
+std::unique_ptr<http::abc::IHttpResponse> Common::process_request(http::Request* request)
 {
-	if (request->headers.contains(http::USER_AGENT))
+	if (request->header.contains(http::USER_AGENT))
 	{
-		auto user_agent = request->headers.get(http::USER_AGENT);
+		auto user_agent = request->header.at(http::USER_AGENT);
 		for (auto& rgx : this->settings->DISALLOWED_USER_AGENTS)
 		{
 			if (rgx.search(user_agent))
@@ -78,50 +69,38 @@ http::Response::Result Common::process_request(http::Request* request)
 				this->settings->LOGGER->trace(
 					"Found user agent which is not allowed: '" + user_agent + "'", _ERROR_DETAILS_
 				);
-				return http::raise(403, "Forbidden user agent");
+
+				http::raise(403, "Forbidden user agent");
 			}
 		}
 	}
 
 	// Check for a redirect based on settings.PREPEND_WWW
-	auto result = request->get_host(
+	auto host = request->get_host(
+		this->settings->SECURE_PROXY_SSL_HEADER,
 		this->settings->USE_X_FORWARDED_HOST,
 		this->settings->USE_X_FORWARDED_PORT,
 		this->settings->DEBUG,
 		this->settings->ALLOWED_HOSTS
 	);
-	if (result.second)
-	{
-		this->settings->LOGGER->trace("Method 'get_host' returned an error", _ERROR_DETAILS_);
-		return {nullptr, result.second};
-	}
-
-	auto host = result.first;
 	bool must_prepend = this->settings->PREPEND_WWW && !host.empty() && !host.starts_with("www.");
 	auto redirect_url = must_prepend ? (
-		request->scheme(this->settings->SECURE_PROXY_SSL_HEADER.get()) + "://www." + host
+		request->scheme(this->settings->SECURE_PROXY_SSL_HEADER) + "://www." + host
 	) : "";
 
 	// Check if a slash should be appended.
 	std::string path;
 	if (this->should_redirect_with_slash(request))
 	{
-		result = this->get_full_path_with_slash(request);
-		if (result.second)
-		{
-			this->settings->LOGGER->trace("Method 'get_full_path_with_slash' returned an error", _ERROR_DETAILS_);
-			return {nullptr, result.second};
-		}
-
-		path = result.first;
+		path = this->get_full_path_with_slash(request);
 	}
 	else
 	{
-		path = request->full_path();
+		path = request->url.full_path();
 	}
 
 	// Return a redirect if necessary.
-	if (!redirect_url.empty() || path != request->full_path())
+	if (!redirect_url.empty() || path != request->url.full_path())
 	{
 		redirect_url += path;
 		return this->get_response_redirect(redirect_url);
@@ -130,22 +109,17 @@ http::Response::Result Common::process_request(http::Request* request)
 	return {};
 }
 
-http::Response::Result Common::process_response(http::Request* request, http::abc::IHttpResponse* response)
+std::unique_ptr<http::abc::IHttpResponse> Common::process_response(
+	http::Request* request, http::abc::IHttpResponse* response
+)
 {
 	// If the given URL is "Not Found", then check if we
 	// should redirect to a path with a slash appended.
-	if (response->status() == 404)
+	if (response->get_status() == 404)
 	{
 		if (this->should_redirect_with_slash(request))
 		{
-			auto result = this->get_full_path_with_slash(request);
-			if (result.second)
-			{
-				this->settings->LOGGER->trace("Method 'get_full_path_with_slash' returned an error", _ERROR_DETAILS_);
-				return {nullptr, result.second};
-			}
-
-			return this->get_response_redirect(result.first);
+			return this->get_response_redirect(this->get_full_path_with_slash(request));
 		}
 	}
 

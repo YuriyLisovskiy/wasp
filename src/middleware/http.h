@@ -36,7 +36,9 @@ public:
 	{
 	}
 
-	http::Response::Result process_response(http::Request* request, http::abc::IHttpResponse* response) override;
+	std::unique_ptr<http::abc::IHttpResponse> process_response(
+		http::Request* request, http::abc::IHttpResponse* response
+	) override;
 };
 
 __MIDDLEWARE_END__

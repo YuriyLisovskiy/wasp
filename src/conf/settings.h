@@ -8,6 +8,9 @@
 
 #pragma once
 
+// C++ libraries.
+#include <optional>
+
 // Base libraries.
 #include <xalwart.base/kwargs.h>
 #include <xalwart.base/datetime.h>
@@ -304,8 +307,8 @@ public:
 	// that header/value, request.is_secure() will return true.
 	// WARNING! Only set this if you fully understand what you're doing. Otherwise,
 	// you may be opening yourself up to a security risk.
-	std::shared_ptr<std::pair<std::string, std::string>> SECURE_PROXY_SSL_HEADER =
-		std::make_shared<std::pair<std::string, std::string>>("X-Forwarded-Proto", "https");
+	std::optional<std::pair<std::string, std::string>> SECURE_PROXY_SSL_HEADER =
+		std::pair<std::string, std::string>("X-Forwarded-Proto", "https");
 
 public:
 	explicit Settings(const std::string& base_dir);
@@ -357,7 +360,12 @@ public:
 		return nullptr;
 	}
 
-	inline virtual std::shared_ptr<net::abc::IServer> build_server(const Kwargs& kwargs)
+	inline virtual std::shared_ptr<net::abc::IServer> build_server(
+		std::function<net::StatusCode(
+			net::RequestContext*, const std::map<std::string, std::string>& /* environment */
+		)> handler,
+		const Kwargs& kwargs
+	)
 	{
 		return nullptr;
 	}
