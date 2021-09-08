@@ -12,13 +12,12 @@
 
 // Framework libraries.
 #include "./exceptions.h"
-#include "./utility.h"
-#include "../core/media_type.h"
+#include "./mime/media_type.h"
 
 
 __HTTP_BEGIN__
 
-std::unique_ptr<multipart::Reader> Request::multipart_reader(bool allow_mixed) const
+std::unique_ptr<mime::multipart::BodyReader> Request::multipart_reader(bool allow_mixed) const
 {
 	auto content_type = this->get_header(CONTENT_TYPE, "");
 	if (content_type.empty())
@@ -26,7 +25,7 @@ std::unique_ptr<multipart::Reader> Request::multipart_reader(bool allow_mixed) c
 		throw exc::NotMultipart("request content is not 'multipart/form-data'", _ERROR_DETAILS_);
 	}
 
-	auto [media_type, parameters, ok] = core::mime::parse_media_type(str::string_to_wstring(content_type));
+	auto [media_type, parameters, ok] = mime::parse_media_type(str::string_to_wstring(content_type));
 	if (!ok || !(media_type == L"multipart/form-data" || allow_mixed && media_type == L"multipart/mixed"))
 	{
 		throw exc::NotMultipart("request content is not 'multipart/form-data'", _ERROR_DETAILS_);
@@ -38,7 +37,7 @@ std::unique_ptr<multipart::Reader> Request::multipart_reader(bool allow_mixed) c
 	}
 
 	auto boundary = str::wstring_to_string(parameters.at(L"boundary"));
-	return std::make_unique<multipart::Reader>(
+	return std::make_unique<mime::multipart::BodyReader>(
 		this->body, boundary, std::stoll(this->get_header(CONTENT_LENGTH, "0")),
 		this->max_file_upload_size, this->max_fields_count, this->max_header_length, this->max_headers_count
 	);
@@ -94,13 +93,10 @@ std::string Request::get_port(bool use_x_forwarded_port) const
 
 Request::Request(
 	const net::RequestContext& context,
-//	std::string method, const std::string& raw_url, std::string proto,
-//	int proto_major, int proto_minor, std::map<std::string, std::string> header,
-//	std::shared_ptr<io::IBufferedReader> body_reader, long long int content_length,
 	ssize_t max_file_upload_size, ssize_t max_fields_count,
 	ssize_t max_header_length, ssize_t max_headers_count,
 	std::map<std::string, std::string> environment
-) : method(context.method), url(std::move(parse_url(context.path))),
+) : method(context.method), url(std::move(parse_url(context.path + (context.query.empty() ? "" : "?" + context.query)))),
 	proto("HTTP/" + std::to_string(context.protocol_version.major) + "." + std::to_string(context.protocol_version.minor)),
 	proto_major((int)context.protocol_version.major), proto_minor((int)context.protocol_version.minor),
 	header(context.headers), body(context.body), content_length((ssize_t)context.content_size),
@@ -310,7 +306,7 @@ Query parse_post_form(Request* request)
 	}
 
 	Query query;
-	auto [ct, _, ok] = core::mime::parse_media_type(str::string_to_wstring(content_type));
+	auto [ct, _, ok] = mime::parse_media_type(str::string_to_wstring(content_type));
 	if (ct == L"application/x-www-form-urlencoded")
 	{
 		auto content_length_string = request->get_header(CONTENT_LENGTH, "");

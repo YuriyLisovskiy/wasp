@@ -36,7 +36,7 @@ std::string Query::encode() const
 	return buf;
 }
 
-Query parse_query(std::string_view query)
+Query parse_query(std::string query)
 {
 	Query m;
 	while (!query.empty())
@@ -287,14 +287,14 @@ std::string URL::request_uri() const
 
 URL parse_url(const std::string& raw_url)
 {
-	auto [u, frag] = internal::split(raw_url, '#', true);
-	auto url = internal::parse_url(u, false);
-	if (frag.empty())
+	auto [string_url, fragment] = internal::split(raw_url, '#', true);
+	auto url = internal::parse_url(str::string_to_wstring(string_url), false);
+	if (fragment.empty())
 	{
 		return url;
 	}
 
-	url.set_fragment(frag);
+	url.set_fragment(fragment);
 	return url;
 }
 
@@ -695,7 +695,7 @@ std::pair<std::string, std::string> split(const std::string& s, char sep, bool c
 	return {s.substr(0, i), s.substr(i)};
 }
 
-std::pair<std::string, std::string> get_scheme(const std::string& raw_url)
+std::pair<std::wstring, std::wstring> get_scheme(const std::wstring& raw_url)
 {
 	for (size_t i = 0; i < raw_url.size(); i++)
 	{
@@ -708,7 +708,7 @@ std::pair<std::string, std::string> get_scheme(const std::string& raw_url)
 		{
 			if (i == 0)
 			{
-				return {"", raw_url};
+				return {L"", raw_url};
 			}
 		}
 		else if (c == ':')
@@ -724,11 +724,11 @@ std::pair<std::string, std::string> get_scheme(const std::string& raw_url)
 		{
 			// we have encountered an invalid character,
 			// so there is no valid scheme
-			return {"", raw_url};
+			return {L"", raw_url};
 		}
 	}
 
-	return {"", raw_url};
+	return {L"", raw_url};
 }
 
 std::string parse_host(std::string host)
@@ -923,7 +923,7 @@ std::pair<URL::UserInfo, std::string> parse_authority(const std::string& authori
 	return {user, host};
 }
 
-URL parse_url(const std::string& raw_url, bool via_request)
+URL parse_url(const std::wstring& raw_url, bool via_request)
 {
 	if (string_contains_ctl_byte(raw_url))
 	{
@@ -936,7 +936,7 @@ URL parse_url(const std::string& raw_url, bool via_request)
 	}
 
 	URL url;
-	if (raw_url == "*")
+	if (raw_url == L"*")
 	{
 		url.path = "*";
 		return url;
@@ -945,16 +945,16 @@ URL parse_url(const std::string& raw_url, bool via_request)
 	// Split off possible leading "http:", "mailto:", etc.
 	// Cannot contain escaped characters.
 	auto [scheme, rest] = get_scheme(raw_url);
-	url.scheme = str::to_lower(scheme);
-	if (rest.ends_with("?") && str::count(rest, '?') == 1)
+	url.scheme = str::wstring_to_string(str::to_lower(scheme));
+	if (rest.ends_with(L"?") && std::count(rest.begin(),  rest.end(), '?') == 1)
 	{
 		url.force_query = true;
 		rest = rest.substr(0, rest.size() - 1);
 	}
 	else
 	{
-		auto [new_rest, raw_query] = split(rest, '?', true);
-		rest = new_rest;
+		auto [new_rest, raw_query] = split(str::wstring_to_string(rest), '?', true);
+		rest = str::string_to_wstring(new_rest);
 		url.raw_query = raw_query;
 	}
 
@@ -963,7 +963,7 @@ URL parse_url(const std::string& raw_url, bool via_request)
 		if (!url.scheme.empty())
 		{
 			// We consider rootless paths per RFC 3986 as opaque.
-			url.opaque = rest;
+			url.opaque = str::wstring_to_string(rest);
 			return url;
 		}
 
@@ -986,10 +986,10 @@ URL parse_url(const std::string& raw_url, bool via_request)
 		}
 	}
 
-	if ((!url.scheme.empty() || !via_request && !rest.starts_with("///")) && rest.starts_with("//"))
+	if ((!url.scheme.empty() || !via_request && !rest.starts_with(L"///")) && rest.starts_with(L"//"))
 	{
-		auto [authority, new_rest] = split(rest.substr(2), '/', false);
-		rest = new_rest;
+		auto [authority, new_rest] = split(str::wstring_to_string(rest.substr(2)), '/', false);
+		rest = str::string_to_wstring(new_rest);
 		auto [user, host] = parse_authority(authority);
 		url.user = user;
 		url.host = host;
@@ -999,7 +999,7 @@ URL parse_url(const std::string& raw_url, bool via_request)
 	// 'raw_path' is a hint of the encoding of 'path'. We don't want to set it if
 	// the default escaping of 'path' is equivalent, to help make sure that people
 	// don't rely on it in general.
-	url.set_path(rest);
+	url.set_path(str::wstring_to_string(rest));
 	return url;
 }
 

@@ -20,7 +20,7 @@
 
 __HTTP_BEGIN__
 
-static inline constexpr const char* COOKIE_DATE_TIME_FORMAT = "%a, %e %b %Y %T %Z";
+static inline constexpr const char* COOKIE_DATE_TIME_FORMAT = "%a, %d %b %Y %T %Z";
 static inline constexpr const char* COOKIE_DELETE_DATETIME = "Thu, 01 Jan 1970 00:00:00 GMT";
 
 extern dt::Datetime _get_expires(long max_age);
@@ -97,11 +97,13 @@ public:
 	[[nodiscard]]
 	std::string to_string() const;
 
+	[[nodiscard]]
 	inline std::string name() const
 	{
 		return this->_name;
 	}
 
+	[[nodiscard]]
 	inline std::string value() const
 	{
 		return this->_value;

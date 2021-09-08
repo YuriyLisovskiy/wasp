@@ -15,7 +15,7 @@
 // Framework libraries.
 #include "./url.h"
 #include "./utility.h"
-#include "../core/media_type.h"
+#include "./mime/media_type.h"
 
 
 __HTTP_BEGIN__
@@ -210,7 +210,7 @@ void FileResponse::_set_headers()
 	if (this->get_header(CONTENT_TYPE, "").starts_with("text/html"))
 	{
 		std::string content_type, encoding;
-		core::mime::guess_content_type(this->_file_path, content_type, encoding);
+		mime::guess_content_type(this->_file_path, content_type, encoding);
 		content_type = encoding_map.get(encoding, content_type);
 		this->set_header(CONTENT_TYPE, !content_type.empty() ? content_type : "application/octet-stream");
 	}

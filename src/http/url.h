@@ -68,13 +68,13 @@ extern bool valid_encoded(const std::string& s, EscapeMode mode);
 extern std::pair<std::string, std::string> split(const std::string& s, char sep, bool cut_sep=true);
 
 // TESTME: get_scheme
-extern std::pair<std::string, std::string> get_scheme(const std::string& raw_url);
+extern std::pair<std::wstring, std::wstring> get_scheme(const std::wstring& raw_url);
 
 // TESTME: string_contains_ctl_byte
 // Reports whether s contains any ASCII control character.
-inline bool string_contains_ctl_byte(const std::string& s)
+inline bool string_contains_ctl_byte(const std::wstring& s)
 {
-	return std::any_of(s.begin(), s.end(), [](const char& b) -> bool { return b < ' ' || b == 0x7f; });
+	return std::any_of(s.begin(), s.end(), [](const wchar_t& b) -> bool { return b < ' ' || b == 0x7f; });
 }
 
 // TESTME: parse_host
@@ -133,7 +133,7 @@ inline std::string query_unescape(const std::string& s)
 // Query is expected to be a list of key=value settings separated by
 // ampersands or semicolons. A setting without an equals sign is
 // interpreted as a key set to an empty value.
-extern Query parse_query(std::string_view query);
+extern Query parse_query(std::string query);
 
 // TESTME: Url
 struct URL final
@@ -288,6 +288,6 @@ __HTTP_INTERNAL_BEGIN__
 extern std::pair<URL::UserInfo, std::string> parse_authority(const std::string& authority);
 
 // TESTME: parse
-extern URL parse_url(const std::string& raw_url, bool via_request);
+extern URL parse_url(const std::wstring& raw_url, bool via_request);
 
 __HTTP_INTERNAL_END__

@@ -9,3 +9,7 @@
 #pragma once
 
 #include "../_def_.h"
+
+// xw::http::mime
+#define __HTTP_MIME_BEGIN__ __HTTP_BEGIN__ namespace mime {
+#define __HTTP_MIME_END__ } __HTTP_END__

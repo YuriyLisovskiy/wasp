@@ -18,7 +18,7 @@
 #include "./_def_.h"
 
 // Framework libraries.
-#include "../core/flags/flag_set.h"
+#include "./flags/flag_set.h"
 
 
 __COMMANDS_BEGIN__
@@ -31,7 +31,7 @@ __COMMANDS_BEGIN__
 class BaseCommand
 {
 protected:
-	std::shared_ptr<core::flags::FlagSet> flag_set;
+	std::shared_ptr<flags::FlagSet> flag_set;
 	bool is_created;
 
 	// Index of item in argv to parse from.
@@ -65,7 +65,7 @@ public:
 	[[nodiscard]]
 	virtual inline Kwargs get_kwargs() const
 	{
-		return Kwargs();
+		return {};
 	}
 
 	// Returns usage based on flag_set.

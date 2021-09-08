@@ -29,7 +29,3 @@
 // xw::http::internal
 #define __HTTP_INTERNAL_BEGIN__ __HTTP_BEGIN__ namespace internal {
 #define __HTTP_INTERNAL_END__ } __HTTP_END__
-
-// xw::http::multipart
-#define __HTTP_MULTIPART_BEGIN__ __HTTP_BEGIN__ namespace multipart {
-#define __HTTP_MULTIPART_END__ } __HTTP_END__

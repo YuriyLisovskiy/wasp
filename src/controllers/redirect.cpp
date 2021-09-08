@@ -9,7 +9,7 @@
 
 __CONTROLLERS_BEGIN__
 
-std::string RedirectController::get_redirect_url()
+std::string RedirectController::get_redirect_url() const
 {
 	std::string url = this->_url;
 	if (this->_url.empty())

@@ -10,7 +10,7 @@
 #include <xalwart.base/path.h>
 
 // Framework libraries.
-#include "../core/media_type.h"
+#include "../http/mime/media_type.h"
 
 
 __CONTROLLERS_BEGIN__
@@ -69,7 +69,7 @@ std::unique_ptr<http::abc::IHttpResponse> StaticController::get(const std::strin
 	}
 
 	std::string content_type, encoding;
-	core::mime::guess_content_type(full_path, content_type, encoding);
+	http::mime::guess_content_type(full_path, content_type, encoding);
 	if (content_type.empty())
 	{
 		content_type = "application/octet-stream";

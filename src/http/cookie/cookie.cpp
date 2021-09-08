@@ -98,6 +98,12 @@ Cookie::Cookie(
 		throw ValueError("cookie's Max-age can not be less than zero", _ERROR_DETAILS_);
 	}
 
+	auto tz_name = this->_expires.tz_name();
+	if (!tz_name.empty() && tz_name != dt::Timezone::UTC.tz_name(nullptr))
+	{
+		throw ValueError("'expires' should have UTC timezone or created without it", _ERROR_DETAILS_);
+	}
+
 	this->_max_age = _get_max_age(this->_expires);
 	if (this->_max_age == 0)
 	{
@@ -119,7 +125,9 @@ std::string Cookie::to_string() const
 	// Sets expiration time in '%a, %e %b %Y %T %Z' format,
 	// for instance, 'Thu, 18 Jul 2019 16:25:19 GMT'.
 	result += "; Max-Age=" + std::to_string(this->_max_age);
-	result += "; Expires=" + this->_expires.strftime(COOKIE_DATE_TIME_FORMAT);
+
+	auto string_expires = this->_expires.strftime(COOKIE_DATE_TIME_FORMAT);
+	result += "; Expires=" + (string_expires.ends_with("GMT") ? string_expires : string_expires + "GMT");
 
 	if (!this->_same_site.empty())
 	{

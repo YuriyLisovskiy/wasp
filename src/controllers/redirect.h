@@ -43,7 +43,8 @@ public:
 	}
 
 	// Return the URL redirect to.
-	std::string get_redirect_url();
+	[[nodiscard]]
+	std::string get_redirect_url() const;
 
 	std::unique_ptr<http::abc::IHttpResponse> get() override;
 

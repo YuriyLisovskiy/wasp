@@ -29,7 +29,8 @@
 #include "./headers.h"
 #include "./cookie/cookie.h"
 #include "./cookie/parser.h"
-#include "./mime/multipart.h"
+#include "./mime/multipart/form.h"
+#include "./mime/multipart/body_reader.h"
 #include "../conf/_def_.h"
 
 
@@ -84,7 +85,7 @@ public:
 	std::map<std::string, std::string> header;
 
 	// Body is the request's body.
-	std::shared_ptr<io::IBufferedReader> body = nullptr;
+	std::shared_ptr<io::ILimitedBufferedReader> body = nullptr;
 
 	// 'content_length' records the length of the associated content.
 	// The value -1 indicates that the length is unknown.
@@ -121,7 +122,7 @@ public:
 
 	// 'multipart_form' is the parsed multipart form, including file uploads.
 	// This field is only available after 'parse_multipart_form' is called.
-	std::unique_ptr<multipart::Form> multipart_form = nullptr;
+	std::unique_ptr<mime::multipart::Form> multipart_form = nullptr;
 
 	// TODO: docs for Request::environment
 	std::map<std::string, std::string> environment;
@@ -133,7 +134,7 @@ protected:
 	ssize_t max_headers_count;
 
 	[[nodiscard]]
-	std::unique_ptr<multipart::Reader> multipart_reader(bool allow_mixed) const;
+	std::unique_ptr<mime::multipart::BodyReader> multipart_reader(bool allow_mixed) const;
 
 	// Return the HTTP host using the environment or request headers. Skip
 	// allowed hosts protection, so may return an insecure host.
@@ -150,9 +151,6 @@ protected:
 public:
 	explicit Request(
 		const net::RequestContext& context,
-//		std::string method, const std::string& raw_url, std::string proto,
-//		int proto_major, int proto_minor, std::map<std::string, std::string> header,
-//		std::shared_ptr<io::IBufferedReader> body_reader, long long int content_length,
 		ssize_t max_file_upload_size, ssize_t max_fields_count,
 		ssize_t max_header_length, ssize_t max_headers_count,
 		std::map<std::string, std::string> environment
