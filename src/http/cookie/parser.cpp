@@ -1,19 +1,16 @@
 /**
- * http/internal/cookie_parser.cpp
+ * http/cookie/parser.cpp
  *
  * Copyright (c) 2021 Yuriy Lisovskiy
  */
 
-#include "./cookie_parser.h"
+#include "./parser.h"
 
 // Base libraries.
 #include <xalwart.base/string_utils.h>
 
-// Framework libraries.
-#include "./utilities.h"
 
-
-__HTTP_INTERNAL_BEGIN__
+__HTTP_BEGIN__
 
 std::pair<std::string, bool> parse_cookie_value(std::string raw_val, bool allow_double_quote)
 {
@@ -33,20 +30,10 @@ std::pair<std::string, bool> parse_cookie_value(std::string raw_val, bool allow_
 	return {raw_val, true};
 }
 
-bool is_cookie_name_valid(const std::string& raw)
-{
-	if (raw.empty())
-	{
-		return false;
-	}
-
-	return std::find_if(raw.begin(), raw.end(), util::is_not_token) == std::end(raw);
-}
-
-std::vector<Cookie> read_cookies(std::string raw_cookie, const std::string& filter)
+std::vector<Cookie> parse_cookies(std::string raw_cookie, const std::string& filter)
 {
 	std::vector<Cookie> cookies;
-	util::trim_ascii_space(raw_cookie);
+	raw_cookie = str::trim_func(raw_cookie, is_ascii_space);
 	std::string part;
 	while (!raw_cookie.empty())
 	{
@@ -62,7 +49,7 @@ std::vector<Cookie> read_cookies(std::string raw_cookie, const std::string& filt
 			raw_cookie = "";
 		}
 
-		util::trim_ascii_space(part);
+		part = str::trim_func(part, is_ascii_space);
 		if (part.empty())
 		{
 			continue;
@@ -98,4 +85,4 @@ std::vector<Cookie> read_cookies(std::string raw_cookie, const std::string& filt
 	return cookies;
 }
 
-__HTTP_INTERNAL_END__
+__HTTP_END__

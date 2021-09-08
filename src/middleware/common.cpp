@@ -11,8 +11,6 @@
 
 // Framework libraries.
 #include "../urls/resolver.h"
-#include "../http/utility.h"
-#include "../http/exceptions.h"
 
 
 __MIDDLEWARE_BEGIN__
@@ -29,7 +27,7 @@ bool Common::should_redirect_with_slash(http::Request* request)
 	return false;
 }
 
-std::pair<std::string, std::shared_ptr<BaseException>> Common::get_full_path_with_slash(http::Request* request)
+std::string Common::get_full_path_with_slash(http::Request* request)
 {
 	auto new_path = request->url.full_path(true);
 
@@ -56,10 +54,10 @@ std::pair<std::string, std::shared_ptr<BaseException>> Common::get_full_path_wit
 		);
 	}
 
-	return {new_path, nullptr};
+	return new_path;
 }
 
-http::Response::Result Common::process_request(http::Request* request)
+std::unique_ptr<http::abc::IHttpResponse> Common::process_request(http::Request* request)
 {
 	if (request->header.contains(http::USER_AGENT))
 	{
@@ -71,7 +69,8 @@ http::Response::Result Common::process_request(http::Request* request)
 				this->settings->LOGGER->trace(
 					"Found user agent which is not allowed: '" + user_agent + "'", _ERROR_DETAILS_
 				);
-				return http::raise(403, "Forbidden user agent");
+
+				http::raise(403, "Forbidden user agent");
 			}
 		}
 	}
@@ -93,14 +92,7 @@ http::Response::Result Common::process_request(http::Request* request)
 	std::string path;
 	if (this->should_redirect_with_slash(request))
 	{
-		auto result = this->get_full_path_with_slash(request);
-		if (result.second)
-		{
-			this->settings->LOGGER->trace("Method 'get_full_path_with_slash' returned an error", _ERROR_DETAILS_);
-			return {nullptr, result.second};
-		}
-
-		path = result.first;
+		path = this->get_full_path_with_slash(request);
 	}
 	else
 	{
@@ -117,22 +109,17 @@ http::Response::Result Common::process_request(http::Request* request)
 	return {};
 }
 
-http::Response::Result Common::process_response(http::Request* request, http::abc::IHttpResponse* response)
+std::unique_ptr<http::abc::IHttpResponse> Common::process_response(
+	http::Request* request, http::abc::IHttpResponse* response
+)
 {
 	// If the given URL is "Not Found", then check if we
 	// should redirect to a path with a slash appended.
-	if (response->status() == 404)
+	if (response->get_status() == 404)
 	{
 		if (this->should_redirect_with_slash(request))
 		{
-			auto result = this->get_full_path_with_slash(request);
-			if (result.second)
-			{
-				this->settings->LOGGER->trace("Method 'get_full_path_with_slash' returned an error", _ERROR_DETAILS_);
-				return {nullptr, result.second};
-			}
-
-			return this->get_response_redirect(result.first);
+			return this->get_response_redirect(this->get_full_path_with_slash(request));
 		}
 	}
 

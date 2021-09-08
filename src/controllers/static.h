@@ -43,7 +43,7 @@ public:
 		this->_kwargs = kwargs;
 	}
 
-	http::Response::Result get(const std::string& p) final;
+	std::unique_ptr<http::abc::IHttpResponse> get(const std::string& p) final;
 };
 
 __CONTROLLERS_END__

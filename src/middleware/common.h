@@ -36,11 +36,11 @@ public:
 	inline static const std::string FULL_NAME = "xw::middleware::Common";
 
 protected:
-	virtual inline http::Response::Result get_response_redirect(
+	virtual inline std::unique_ptr<http::abc::IHttpResponse> get_response_redirect(
 		const std::string& redirect_to
 	)
 	{
-		return http::result<http::resp::PermanentRedirect>(redirect_to);
+		return std::make_unique<http::resp::PermanentRedirect>(redirect_to);
 	}
 
 	// Return true if settings.APPEND_SLASH is true and appending a slash to
@@ -50,7 +50,7 @@ protected:
 	// Return the full path of the request with a trailing slash appended.
 	// Raise a RuntimeError if settings.DEBUG is true and request method is
 	// POST, PUT, or PATCH.
-	std::pair<std::string, std::shared_ptr<BaseException>> get_full_path_with_slash(http::Request* request);
+	std::string get_full_path_with_slash(http::Request* request);
 
 public:
 	inline explicit Common(conf::Settings* settings) : BaseMiddleware(settings)
@@ -59,11 +59,13 @@ public:
 
 	// Check for denied User-Agents and rewrite the URL based on
 	// settings.APPEND_SLASH and settings.PREPEND_WWW
-	http::Response::Result process_request(http::Request* request) override;
+	std::unique_ptr<http::abc::IHttpResponse> process_request(http::Request* request) override;
 
 	// When the status code of the response is 404, it may redirect to a path
 	// with an appended slash if should_redirect_with_slash() returns true.
-	http::Response::Result process_response(http::Request* request, http::abc::IHttpResponse* response) override;
+	std::unique_ptr<http::abc::IHttpResponse> process_response(
+		http::Request* request, http::abc::IHttpResponse* response
+	) override;
 };
 
 __MIDDLEWARE_END__

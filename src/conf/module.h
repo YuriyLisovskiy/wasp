@@ -74,7 +74,7 @@ protected:
 	{
 		ctrl::Handler<ArgsT...> controller_handler = [this](
 			http::Request* request, const std::tuple<ArgsT...>& args, conf::Settings* settings_ptr
-		) -> http::Response::Result
+		) -> std::unique_ptr<http::abc::IHttpResponse>
 		{
 			ControllerT controller(settings_ptr);
 			controller.setup(request);

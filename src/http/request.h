@@ -26,11 +26,10 @@
 
 // Framework libraries.
 #include "./url.h"
-#include "./cookie.h"
 #include "./headers.h"
-#include "mime/multipart.h"
-#include "./internal/cookie_parser.h"
-#include "./internal/utilities.h"
+#include "./cookie/cookie.h"
+#include "./cookie/parser.h"
+#include "./mime/multipart.h"
 #include "../conf/_def_.h"
 
 
@@ -185,7 +184,7 @@ public:
 	[[nodiscard]]
 	inline std::vector<Cookie> cookies() const
 	{
-		return internal::read_cookies(this->get_header(COOKIE, ""), "");
+		return parse_cookies(this->get_header(COOKIE, ""), "");
 	}
 
 	// 'cookie' returns the named cookie provided in the request or
@@ -195,7 +194,7 @@ public:
 	[[nodiscard]]
 	inline std::unique_ptr<Cookie> cookie(const std::string& name) const
 	{
-		auto cookies = internal::read_cookies(this->get_header(COOKIE), "");
+		auto cookies = parse_cookies(this->get_header(COOKIE), "");
 		if (cookies.empty())
 		{
 			return nullptr;
@@ -276,7 +275,7 @@ public:
 //    token          = 1*<any CHAR except CTLs or separators>
 inline bool valid_method(const std::string& method)
 {
-	return !method.empty() && !std::any_of(method.begin(),  method.end(), internal::util::is_not_token);
+	return !method.empty() && !std::any_of(method.begin(),  method.end(), is_not_token);
 }
 
 // TESTME: has_port

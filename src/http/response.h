@@ -12,9 +12,9 @@
 #include <set>
 #include <fstream>
 #include <memory>
+#include <map>
 
 // Base libraries.
-#include <xalwart.base/collections/dictionary.h>
 #include <xalwart.base/exceptions.h>
 
 // Module definitions.
@@ -22,6 +22,8 @@
 
 // Framework libraries.
 #include "./abc.h"
+#include "./headers.h"
+#include "exceptions.h"
 
 
 __HTTP_BEGIN__
@@ -34,129 +36,112 @@ __HTTP_BEGIN__
 // Use the HttpResponse subclass instead.
 class ResponseBase : public abc::IHttpResponse
 {
-protected:
-	collections::Dictionary<std::string, std::string> _headers;
-	collections::Dictionary<std::string, Cookie> _cookies;
-	std::string _body;
-	bool _closed;
-	unsigned short int _status;
-	std::string _charset;
-	std::string _reason_phrase;
-	bool _streaming;
-
-protected:
-	std::string serialize_headers();
-
 public:
 	explicit ResponseBase(
-		unsigned short int status=0,
-		std::string content_type="",
-		const std::string& reason="",
-		const std::string& charset="utf-8"
+		unsigned short int status=0, std::string content_type="", std::string reason="", std::string charset="utf-8"
 	);
 
 	~ResponseBase() override = default;
 
-	inline std::string get_header(const std::string& key, const std::string& default_value) final
+	[[nodiscard]]
+	inline std::string get_header(const std::string& key, const std::string& default_value) const final
 	{
-		return this->_headers.get(key, default_value);
+		return this->has_header(key) ? this->headers.at(key) : default_value;
 	}
 
 	inline void set_header(const std::string& key, const std::string& value) final
 	{
-		this->_headers.set(key, value);
+		if (this->has_header(key))
+		{
+			this->headers[key] = value;
+		}
+
+		this->headers.insert(std::make_pair(key, value));
 	}
 
 	inline void remove_header(const std::string& key) final
 	{
-		this->_headers.remove(key);
+		if (this->has_header(key))
+		{
+			this->headers.erase(key);
+		}
 	}
 
-	inline bool has_header(const std::string& key) final
+	[[nodiscard]]
+	inline bool has_header(const std::string& key) const final
 	{
-		return this->_headers.contains(key);
+		return this->headers.contains(key);
 	}
 
 	inline void set_content(const std::string& content) override
 	{
 	}
 
-	inline std::string get_content() override
+	[[nodiscard]]
+	inline std::string get_content() const override
 	{
 		return "";
 	}
 
-	void set_cookie(
-		const std::string& name,
-		const std::string& value,
-		long max_age=-1,
-		const std::string& expires="",
-		const std::string& domain="",
-		const std::string& path="/",
-		bool is_secure=false,
-		bool is_http_only=false,
-		const std::string& same_site=""
-	) final;
+	void set_cookie(const Cookie& cookie) final;
 
-	void set_signed_cookie(
-		const std::string& secret_key,
-		const std::string& name,
-		const std::string& value,
-		const std::string& salt="",
-		long max_age=-1,
-		const std::string& expires="",
-		const std::string& domain="",
-		const std::string& path="/",
-		bool is_secure=false,
-		bool is_http_only=false,
-		const std::string& same_site=""
-	) final;
+	void set_signed_cookie(const std::string& secret_key, const std::string& salt, const Cookie& cookie) final;
 
-	inline const collections::Dictionary<std::string, Cookie>& get_cookies() final
+	[[nodiscard]]
+	inline const std::map<std::string, Cookie>& get_cookies() const final
 	{
-		return this->_cookies;
+		return this->cookies;
 	}
 
-	inline void set_cookies(const collections::Dictionary<std::string, Cookie>& cookies) final
+	inline void set_cookies(const std::map<std::string, Cookie>& new_cookies) final
 	{
-		this->_cookies = cookies;
+		this->cookies = new_cookies;
 	}
 
 	void delete_cookie(const std::string& name, const std::string& path, const std::string& domain) final;
 
-	std::string get_reason_phrase() final;
+	[[nodiscard]]
+	std::string get_reason_phrase() const final;
 
-	void set_reason_phrase(std::string value) final;
-
-	inline unsigned short int status() final
+	inline void set_reason_phrase(const std::string& value) final
 	{
-		return this->_status;
+		this->reason_phrase = value.empty() ? "Unknown Status" : value;
 	}
 
-	inline std::string content_type() final
+	[[nodiscard]]
+	inline unsigned short int get_status() const final
 	{
-		return this->_headers.get("Content-Type", "");
+		return this->status;
 	}
 
-	inline size_t content_length() override
+	[[nodiscard]]
+	inline std::string content_type() const final
+	{
+		return this->get_header(CONTENT_TYPE, "");
+	}
+
+	[[nodiscard]]
+	inline size_t content_length() const override
 	{
 		return 0;
 	}
 
-	inline std::string charset() final
+	[[nodiscard]]
+	inline std::string get_charset() const final
 	{
-		return this->_charset;
+		return this->charset;
 	}
 
-	inline bool is_streaming() final
+	[[nodiscard]]
+	inline bool is_streaming() const final
 	{
-		return this->_streaming;
+		return this->streaming;
 	}
 
 	// These methods partially implement the file-like object interface.
 	inline void close() override
 	{
-		this->_closed = true;
+		this->closed = true;
 	}
 
 	inline void write(const std::string& content) override
@@ -193,6 +178,17 @@ public:
 	{
 		throw RuntimeError("This 'xw::http::ResponseBase' instance is not writable", _ERROR_DETAILS_);
 	}
+
+protected:
+	std::map<std::string, std::string> headers;
+	std::map<std::string, Cookie> cookies;
+	bool closed;
+	unsigned short int status;
+	std::string charset;
+	std::string reason_phrase;
+	bool streaming;
+
+	std::string serialize_headers();
 };
 
 // TESTME: Response
@@ -200,52 +196,44 @@ public:
 // An HTTP response class with a string as content.
 class Response : public ResponseBase
 {
-protected:
-	std::string _content;
-
-public:
-	struct Result
-	{
-		std::shared_ptr<abc::IHttpResponse> response = nullptr;
-		std::shared_ptr<BaseException> exception = nullptr;
-	};
-
 public:
 	explicit Response(
 		unsigned short int status=200,
-		const std::string& content="",
+		std::string content="",
 		const std::string& content_type="",
 		const std::string& reason="",
 		const std::string& charset="utf-8"
 	) : ResponseBase(status, content_type, reason, charset)
 	{
-		this->_content = content;
-		this->_streaming = false;
+		this->content = std::move(content);
+		this->streaming = false;
 	}
 
-	inline size_t content_length() override
+	[[nodiscard]]
+	inline size_t content_length() const override
 	{
-		return this->_content.size();
+		return this->content.size();
 	}
 
-	inline void set_content(const std::string& content) override
+	inline void set_content(const std::string& new_content) override
 	{
-		this->_content = content;
+		this->content = new_content;
 	}
 
-	inline std::string get_content() override
+	[[nodiscard]]
+	inline std::string get_content() const override
 	{
-		return this->_content;
+		return this->content;
 	}
 
-	inline void write(const std::string& content) override
+	inline void write(const std::string& data) override
 	{
-		this->_content.append(content);
+		this->content.append(data);
 	}
 
 	inline unsigned long int tell() override
 	{
-		return this->_content.size();
+		return this->content.size();
 	}
 
 	inline bool writable() override
@@ -253,9 +241,18 @@ public:
 		return true;
 	}
 
-	void write_lines(const std::vector<std::string>& lines) override;
+	inline void write_lines(const std::vector<std::string>& lines) override
+	{
+		for (const auto & line : lines)
+		{
+			this->write(line);
+		}
+	}
 
 	std::string serialize() override;
+
+protected:
+	std::string content;
 };
 
 // TESTME: StreamingResponse
@@ -270,7 +267,7 @@ public:
 		const std::string& charset="utf-8"
 	) : ResponseBase(status, content_type, reason, charset)
 	{
-		this->_streaming = true;
+		this->streaming = true;
 	}
 
 	inline std::string serialize() final
@@ -287,25 +284,6 @@ public:
 // TODO: docs for 'FileResponse'
 class FileResponse final : public StreamingResponse
 {
-private:
-	static const size_t CHUNK_SIZE = 1024 * 1024;   // 1 mb per chunk
-
-	bool _as_attachment;
-	std::string _file_path;
-
-	size_t _bytes_read;
-	size_t _total_bytes_read;
-	size_t _file_size;
-	std::ifstream _file_stream;
-
-	// Identifies whether headers where read or not.
-	bool _headers_is_got;
-
-private:
-	void _set_headers();
-
-	std::string _get_headers_chunk();
-
 public:
 	explicit FileResponse(
 		std::string file_path,
@@ -328,30 +306,32 @@ public:
 		StreamingResponse::close();
 		this->_file_stream.close();
 	}
+
+private:
+	static const size_t CHUNK_SIZE = 1024 * 1024;   // 1 mb per chunk
+
+	bool _as_attachment;
+	std::string _file_path;
+
+	size_t _bytes_read;
+	size_t _total_bytes_read;
+	size_t _file_size;
+	std::ifstream _file_stream;
+
+	// Identifies whether headers where read or not.
+	bool _headers_is_got;
+
+	void _set_headers();
+
+	std::string _get_headers_chunk();
 };
-
-// TESTME: result<HttpResponseT, ...ArgsT>
-// TODO: docs for 'result<HttpResponseT, ...ArgsT>'
-template <typename HttpResponseT, typename ...ArgsT>
-inline Response::Result result(ArgsT&& ...args)
-{
-	return Response::Result{std::make_shared<HttpResponseT>(std::forward<ArgsT>(args)...), nullptr};
-}
-
-// TESTME: error
-// TODO: docs for 'error'
-template <typename ExceptionT, typename ...ArgsT>
-inline Response::Result exception(ArgsT&& ...args)
-{
-	return Response::Result{nullptr, std::make_shared<ExceptionT>(std::forward<ArgsT>(args)...)};
-}
 
 // TESTME: raise
 // TODO: docs for 'raise'
 template <typename ...ArgsT>
-inline Response::Result raise(unsigned short int status_code, ArgsT&& ...args)
+inline void raise(unsigned short int status_code, ArgsT&& ...args)
 {
-	return Response::Result{std::make_shared<http::Response>(status_code, std::forward<ArgsT...>(args)...), nullptr};
+	throw exc::HttpError(status_code, std::forward<ArgsT...>(args)...);
 }
 
 __HTTP_END__
@@ -363,9 +343,6 @@ __HTTP_RESP_BEGIN__
 // TODO: docs for 'RedirectBase'
 class RedirectBase : public Response
 {
-protected:
-	const std::set<std::string> _allowed_schemes = {"http", "https", "ftp"};
-
 public:
 	explicit RedirectBase(
 		const std::string& redirect_to,
@@ -378,8 +355,11 @@ public:
 	[[nodiscard]]
 	inline std::string url() const
 	{
-		return this->_headers.get("Location");
+		return this->get_header(LOCATION, "");
 	}
+
+protected:
+	inline static const std::set<std::string> ALLOWED_SCHEMES = {"http", "https", "ftp"};
 };
 
 // TESTME: Redirect

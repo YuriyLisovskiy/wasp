@@ -1,5 +1,5 @@
 /**
- * http/internal/cookie_parser.h
+ * http/cookie/parser.h
  *
  * Copyright (c) 2021 Yuriy Lisovskiy
  *
@@ -17,13 +17,20 @@
 #include <map>
 
 // Module definitions.
-#include "./_def_.h"
+#include "../_def_.h"
 
 // Framework libraries.
-#include "../cookie.h"
+#include "./cookie.h"
+#include "../utility.h"
 
 
-__HTTP_INTERNAL_BEGIN__
+__HTTP_BEGIN__
+
+// TESTME: is_ascii_space
+inline bool is_ascii_space(char b)
+{
+	return b == ' ' || b == '\t' || b == '\n' || b == '\r';
+}
 
 // TESTME: valid_cookie_value_byte
 inline bool valid_cookie_value_byte(char b)
@@ -37,13 +44,16 @@ extern std::pair<std::string, bool> parse_cookie_value(std::string raw_val, bool
 //extern bool is_token_table();
 
 // TESTME: is_cookie_name_valid
-extern bool is_cookie_name_valid(const std::string& raw);
+inline bool is_cookie_name_valid(const std::string& raw)
+{
+	return !raw.empty() && std::find_if(raw.begin(), raw.end(), is_not_token) == std::end(raw);
+}
 
-// TESTME: parse_cookie
+// TESTME: parse_cookies
 // Parses all "Cookie" values from the header and
 // returns the successfully parsed Cookies.
 //
 // if filter isn't empty, only cookies of that name are returned
-extern std::vector<Cookie> read_cookies(std::string raw_cookie, const std::string& filter);
+extern std::vector<Cookie> parse_cookies(std::string raw_cookie, const std::string& filter);
 
-__HTTP_INTERNAL_END__
+__HTTP_END__

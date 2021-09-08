@@ -39,7 +39,9 @@ public:
 	{
 	}
 
-	http::Response::Result process_response(http::Request* request, http::abc::IHttpResponse* response) override;
+	std::unique_ptr<http::abc::IHttpResponse> process_response(
+		http::Request* request, http::abc::IHttpResponse* response
+	) override;
 
 	// Get the value to set for the X_FRAME_OPTIONS header. Use the value from
 	// the X_FRAME_OPTIONS setting, or 'DENY' if not set.

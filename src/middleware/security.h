@@ -42,9 +42,11 @@ protected:
 public:
 	explicit Security(conf::Settings* settings);
 
-	http::Response::Result process_request(http::Request* request) override;
+	std::unique_ptr<http::abc::IHttpResponse> process_request(http::Request* request) override;
 
-	http::Response::Result process_response(http::Request* request, http::abc::IHttpResponse* response) override;
+	std::unique_ptr<http::abc::IHttpResponse> process_response(
+		http::Request* request, http::abc::IHttpResponse* response
+	) override;
 };
 
 __MIDDLEWARE_END__

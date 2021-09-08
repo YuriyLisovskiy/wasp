@@ -169,7 +169,7 @@ protected:
 	[[nodiscard]]
 	inline bool from_string() const override
 	{
-		auto lower = str::lower(this->_data);
+		auto lower = str::to_lower(this->_data);
 		return lower == "true" || lower == "yes" || lower == "1" || lower == "on";
 	}
 

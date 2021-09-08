@@ -7,10 +7,7 @@
 #include "./xalwart.h"
 
 // Framework libraries.
-#include "../http/url.h"
 #include "../management/module.h"
-#include "../http/exceptions.h"
-#include "../http/internal/multipart_parser.h"
 #include "../urls/resolver.h"
 #include "../urls/utilities.h"
 
@@ -153,67 +150,45 @@ HandlerFunction MainApplication::make_handler() const
 	return [this](net::RequestContext* context, const std::map<std::string, std::string>& env) -> net::StatusCode
 	{
 		auto request = this->build_request(context, env);
-		http::Response::Result result;
+		std::unique_ptr<http::abc::IHttpResponse> result;
 		try
 		{
 			result = this->process_request(request);
-			if (!result.exception && !result.response)
+			if (!result)
 			{
 				result = this->process_urlpatterns(request, this->settings->URLPATTERNS);
 
 				// TODO: check if it is required to process response middleware in case of controller error.
-				if (!result.exception)
+				if (!result)
 				{
-					if (!result.response)
-					{
-						// If controller returns empty result, return 204 - No Content.
-						result.response = std::make_shared<http::Response>(204);
-						this->settings->LOGGER->warning("Response was not instantiated, returned 204", _ERROR_DETAILS_);
-					}
-					else
-					{
-						auto middleware_result = this->process_response(request, result.response);
-						if (middleware_result.exception || middleware_result.response)
-						{
-							if (middleware_result.exception)
-							{
-								this->settings->LOGGER->trace(
-									"Method 'process_response_middleware' returned an error", _ERROR_DETAILS_
-								);
-							}
-
-							result = middleware_result;
-						}
-					}
+					// If controller returns empty result, return 204 - No Content.
+					result = std::make_unique<http::Response>(204);
+					this->settings->LOGGER->warning("Response was not instantiated, returned 204", _ERROR_DETAILS_);
 				}
 				else
 				{
-					this->settings->LOGGER->trace(
-						"Method 'process_urlpatterns' returned an error", _ERROR_DETAILS_
-					);
+					auto middleware_result = this->process_response(request, result);
+					if (middleware_result)
+					{
+						result = std::move(middleware_result);
+					}
 				}
-			}
-			else
-			{
-				this->settings->LOGGER->trace(
-					"Method 'process_request_middleware' returned an error", _ERROR_DETAILS_
-				);
 			}
 		}
 		catch (const http::exc::HttpError& e)
 		{
 			this->settings->LOGGER->trace("An error was caught as http::HttpException", _ERROR_DETAILS_);
-			result = http::Response::Result{nullptr, std::make_shared<http::exc::HttpError>(e)};
+			result = std::make_unique<http::Response>(e.status_code(), e.get_message());
 		}
 		catch (const BaseException& e)
 		{
 			this->settings->LOGGER->trace("An error was caught as core::BaseException", _ERROR_DETAILS_);
-			result = http::Response::Result{nullptr, std::make_shared<BaseException>(e)};
+			result = std::make_unique<http::Response>(500, e.get_message());
 		}
 		catch (const std::exception& e)
 		{
 			this->settings->LOGGER->error(e.what(), _ERROR_DETAILS_);
-			result = http::raise(500, e.what());
+			result = std::make_unique<http::Response>(500, e.what());
 		}
 
 		return start_response(context, result);
@@ -255,17 +230,15 @@ void MainApplication::build_module_patterns(std::vector<std::shared_ptr<urls::IP
 	}
 }
 
-http::Response::Result MainApplication::process_request(std::shared_ptr<http::Request>& request) const
+std::unique_ptr<http::abc::IHttpResponse> MainApplication::process_request(
+	std::shared_ptr<http::Request>& request
+) const
 {
 	for (auto& middleware : this->settings->MIDDLEWARE)
 	{
 		auto result = middleware->process_request(request.get());
-		if (result.exception)
+		if (result)
 		{
-			// TODO: print middleware name.
-			this->settings->LOGGER->trace(
-				"Method 'process_request' of 'unknown' middleware returned an error", _ERROR_DETAILS_
-			);
 			return result;
 		}
 	}
@@ -273,7 +246,7 @@ http::Response::Result MainApplication::process_request(std::shared_ptr<http::Re
 	return {};
 }
 
-http::Response::Result MainApplication::process_urlpatterns(
+std::unique_ptr<http::abc::IHttpResponse> MainApplication::process_urlpatterns(
 	std::shared_ptr<http::Request>& request, std::vector<std::shared_ptr<urls::IPattern>>& urlpatterns
 ) const
 {
@@ -284,25 +257,19 @@ http::Response::Result MainApplication::process_urlpatterns(
 	}
 
 	this->settings->LOGGER->trace("The requested resource was not found", _ERROR_DETAILS_);
-	return http::raise(404, "<h2>404 - Not Found</h2>");
+	return std::make_unique<http::Response>(404, "<h2>404 - Not Found</h2>");
 }
 
-http::Response::Result MainApplication::process_response(
-	std::shared_ptr<http::Request>& request, std::shared_ptr<http::abc::IHttpResponse>& response
+std::unique_ptr<http::abc::IHttpResponse> MainApplication::process_response(
+	std::shared_ptr<http::Request>& request, std::unique_ptr<http::abc::IHttpResponse>& response
 ) const
 {
 	auto size = (long long)this->settings->MIDDLEWARE.size();
 	for (long long i = size - 1; i >= 0; i--)
 	{
-		auto result = this->settings->MIDDLEWARE[i]->process_response(
-			request.get(), response.get()
-		);
-		if (result.exception)
+		auto result = this->settings->MIDDLEWARE[i]->process_response(request.get(), response.get());
+		if (result)
 		{
-			// TODO: print middleware name.
-			this->settings->LOGGER->trace(
-				"Method 'process_response' of 'unknown' middleware returned an error", _ERROR_DETAILS_
-			);
 			return result;
 		}
 	}
@@ -329,30 +296,22 @@ std::shared_ptr<http::Request> MainApplication::build_request(
 	);
 }
 
-uint MainApplication::start_response(net::RequestContext* ctx, const http::Response::Result& result) const
+net::StatusCode MainApplication::start_response(
+	net::RequestContext* ctx, const std::unique_ptr<http::abc::IHttpResponse>& response
+) const
 {
-	std::shared_ptr<http::abc::IHttpResponse> response;
-	if (result.exception)
-	{
-		this->settings->LOGGER->trace(result.exception->get_message(), _ERROR_DETAILS_);
-		response = std::make_shared<http::resp::ServerError>(result.exception->get_message());
-	}
-	else if (!result.response)
+	std::unique_ptr<http::abc::IHttpResponse> result = nullptr;
+	if (!response)
 	{
 		// Response was not instantiated, so return 204 - No Content.
-		response = std::make_shared<http::Response>(204);
+		result = std::make_unique<http::Response>(204);
 		this->settings->LOGGER->warning("Response was not instantiated, returned 204.", _ERROR_DETAILS_);
 	}
-	else
-	{
-		response = result.response;
-	}
 
-	this->finish_response(ctx, response.get());
-	return response->status();
+	return this->finish_response(ctx, response ? response.get() : result.get());
 }
 
-void MainApplication::finish_response(net::RequestContext* ctx, http::abc::IHttpResponse* response) const
+net::StatusCode MainApplication::finish_response(net::RequestContext* ctx, http::abc::IHttpResponse* response) const
 {
 	if (response->is_streaming())
 	{
@@ -376,6 +335,8 @@ void MainApplication::finish_response(net::RequestContext* ctx, http::abc::IHttp
 			this->settings->LOGGER->trace("Unable to send response", _ERROR_DETAILS_);
 		}
 	}
+
+	return response->get_status();
 }
 
 __CONF_END__

@@ -20,6 +20,7 @@
 
 // Base libraries.
 #include <xalwart.base/collections/multi_dictionary.h>
+#include <xalwart.base/string_utils.h>
 
 // Module definitions.
 #include "./_def_.h"
@@ -44,15 +45,15 @@ enum class EscapeMode
 // TESTME: should_escape
 // Return true if the specified character should be escaped when
 // appearing in a URL string, according to RFC 3986.
-extern bool should_escape(char c, EscapeMode mode);
+extern bool should_escape(wchar_t c, EscapeMode mode);
 
 // TESTME: escape
-extern std::string escape(const std::string& s, EscapeMode mode);
+extern std::string escape(const std::string& string, EscapeMode mode);
 
 // TESTME: unescape
 // Unescapes a string; the mode specifies
 // which section of the URL string is being unescaped.
-extern std::string unescape(std::string s, EscapeMode mode);
+extern std::string unescape(const std::string& string, EscapeMode mode);
 
 // TESTME: valid_encoded
 // Checks whether 's' is a valid encoded path or fragment,
@@ -277,8 +278,6 @@ struct URL final
 // without a scheme is invalid but may not necessarily return an
 // error, due to parsing ambiguities.
 URL parse_url(const std::string& raw_url);
-
-
 
 __HTTP_END__
 

@@ -24,7 +24,7 @@ TemplateResponseMixin::TemplateResponseMixin(render::abc::IEngine* engine)
 	this->engine = engine;
 }
 
-xw::http::Response::Result TemplateResponseMixin::render(
+std::unique_ptr<http::abc::IHttpResponse> TemplateResponseMixin::render(
 	http::Request* request,
 	const std::shared_ptr<render::abc::IContext>& context,
 	const std::string& template_name,
@@ -33,7 +33,7 @@ xw::http::Response::Result TemplateResponseMixin::render(
 	const std::string& charset
 )
 {
-	auto response = std::make_shared<render::TemplateResponse>(
+	auto response = std::make_unique<render::TemplateResponse>(
 		this->engine,
 		template_name.empty() ? this->get_template_name() : template_name,
 		context.get(),
@@ -42,7 +42,7 @@ xw::http::Response::Result TemplateResponseMixin::render(
 		charset
 	);
 	response->render();
-	return {response, nullptr};
+	return response;
 }
 
 std::string TemplateResponseMixin::get_template_name()

@@ -41,12 +41,7 @@ private:
 
 protected:
 	Version version;
-
 	conf::Settings* settings;
-
-//	std::function<std::unique_ptr<net::abc::IServer>(
-//		log::ILogger*, const Kwargs&, std::shared_ptr<dt::Timezone>
-//	)> server_initializer;
 
 protected:
 	[[nodiscard]]
@@ -63,16 +58,16 @@ protected:
 	void build_module_patterns(std::vector<std::shared_ptr<urls::IPattern>>& patterns) const;
 
 	[[nodiscard]]
-	http::Response::Result process_request(std::shared_ptr<http::Request>& request) const;
+	std::unique_ptr<http::abc::IHttpResponse> process_request(std::shared_ptr<http::Request>& request) const;
 
 	[[nodiscard]]
-	http::Response::Result process_urlpatterns(
+	std::unique_ptr<http::abc::IHttpResponse> process_urlpatterns(
 		std::shared_ptr<http::Request>& request, std::vector<std::shared_ptr<urls::IPattern>>& urlpatterns
 	) const;
 
 	[[nodiscard]]
-	http::Response::Result process_response(
-		std::shared_ptr<http::Request>& request, std::shared_ptr<http::abc::IHttpResponse>& response
+	std::unique_ptr<http::abc::IHttpResponse> process_response(
+		std::shared_ptr<http::Request>& request, std::unique_ptr<http::abc::IHttpResponse>& response
 	) const;
 
 	[[nodiscard]]
@@ -81,9 +76,9 @@ protected:
 	) const;
 
 	[[nodiscard]]
-	uint start_response(net::RequestContext* ctx, const http::Response::Result& result) const;
+	uint start_response(net::RequestContext* ctx, const std::unique_ptr<http::abc::IHttpResponse>& response) const;
 
-	void finish_response(net::RequestContext* ctx, http::abc::IHttpResponse* response) const;
+	net::StatusCode finish_response(net::RequestContext* ctx, http::abc::IHttpResponse* response) const;
 
 public:
 	explicit MainApplication(const std::string& version, conf::Settings* settings);

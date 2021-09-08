@@ -15,23 +15,15 @@
 // Framework libraries.
 #include "./url.h"
 #include "./utility.h"
-#include "./exceptions.h"
 #include "../core/media_type.h"
 
 
 __HTTP_BEGIN__
 
 ResponseBase::ResponseBase(
-	unsigned short int status,
-	std::string content_type,
-	const std::string& reason,
-	const std::string& charset
-)
+	unsigned short int status, std::string content_type, std::string reason, std::string charset
+) : streaming(false), headers({}), closed(false), reason_phrase(std::move(reason)), charset(std::move(charset))
 {
-	this->_streaming = false;
-	this->_headers = collections::Dictionary<std::string, std::string>();
-	this->_closed = false;
-
 	if (status != 0)
 	{
 		if (status < 100 || status > 599)
@@ -39,98 +31,73 @@ ResponseBase::ResponseBase(
 			throw ValueError("HTTP status code must be an integer from 100 to 599.", _ERROR_DETAILS_);
 		}
 
-		this->_status = status;
+		this->status = status;
 	}
 	else
 	{
-		this->_status = 200;
+		this->status = 200;
 	}
-
-	this->_reason_phrase = reason;
-	this->_charset = charset;
 
 	if (content_type.empty())
 	{
-		content_type = "text/html; charset=" + this->_charset;
+		content_type = "text/html; charset=" + this->charset;
 	}
 
-	this->_headers.set("Content-Type", content_type);
+	this->set_header(CONTENT_TYPE, content_type);
 }
 
-void ResponseBase::set_cookie(
-	const std::string& name,
-	const std::string& value,
-	long max_age,
-	const std::string& expires,
-	const std::string& domain,
-	const std::string& path,
-	bool is_secure,
-	bool is_http_only,
-	const std::string& same_site
-)
+void ResponseBase::set_cookie(const Cookie& cookie)
 {
-	std::string same_site_;
-	if (!same_site.empty())
+	if (!cookie.same_site().empty())
 	{
-		auto ss_lower = str::lower(same_site_);
-		if (ss_lower != "lax" && ss_lower != "strict")
+		auto same_site_lower = str::to_lower(cookie.same_site());
+		if (same_site_lower != "lax" && same_site_lower != "strict")
 		{
 			throw ValueError(R"(samesite must be "lax" or "strict".)", _ERROR_DETAILS_);
 		}
-
-		same_site_ = same_site;
 	}
 
-	auto cookie = Cookie(
-		name, value, max_age, expires, domain, path, is_secure, is_http_only, same_site_
-	);
-	this->_cookies.set(name, cookie);
-}
-
-void ResponseBase::set_signed_cookie(
-	const std::string& secret_key,
-	const std::string& name,
-	const std::string& value,
-	const std::string& salt,
-	long max_age,
-	const std::string& expires,
-	const std::string& domain,
-	const std::string& path,
-	bool is_secure,
-	bool is_http_only,
-	const std::string& same_site
-)
-{
-	auto signed_value = get_cookie_signer(secret_key, name + salt).sign(value);
-	this->set_cookie(name, signed_value, max_age, expires, domain, path, is_secure, is_http_only, same_site);
-}
-
-void ResponseBase::delete_cookie(
-	const std::string& name, const std::string& path, const std::string& domain
-)
-{
-	bool is_secure = std::strncmp(name.c_str(), "__Secure-", 9) == 0 || std::strncmp(name.c_str(), "__Host-", 7) == 0;
-	this->_cookies.set(name, Cookie(name, "", 0, "Thu, 01 Jan 1970 00:00:00 GMT", domain, path, is_secure));
-}
-
-std::string ResponseBase::get_reason_phrase()
-{
-	if (!this->_reason_phrase.empty())
+	if (this->cookies.contains(cookie.name()))
 	{
-		return this->_reason_phrase;
+		this->cookies[cookie.name()] = cookie;
 	}
-
-	return net::get_status_by_code(this->_status).first.phrase;
+	else
+	{
+		this->cookies.insert(std::make_pair(cookie.name(), cookie));
+	}
 }
 
-void ResponseBase::set_reason_phrase(std::string value)
+void ResponseBase::set_signed_cookie(const std::string& secret_key, const std::string& salt, const Cookie& cookie)
 {
-	if (value.empty())
+	auto signed_value = get_cookie_signer(secret_key, cookie.name() + salt).sign(cookie.value());
+	this->set_cookie(Cookie(
+		cookie.name(), signed_value, cookie.max_age(), cookie.domain(),
+		cookie.path(), cookie.is_secure(), cookie.is_http_only(), cookie.same_site()
+	));
+}
+
+void ResponseBase::delete_cookie(const std::string& name, const std::string& path, const std::string& domain)
+{
+	bool is_secure = name.starts_with("__Secure-") || name.starts_with("__Host-");
+	auto cookie = Cookie(name, "", 0, domain, path, is_secure);
+	if (this->cookies.contains(name))
 	{
-		value = "Unknown Status";
+		this->cookies[name] = cookie;
+	}
+	else
+	{
+		this->cookies.insert(std::make_pair(name, cookie));
+	}
+}
+
+std::string ResponseBase::get_reason_phrase() const
+{
+	if (!this->reason_phrase.empty())
+	{
+		return this->reason_phrase;
 	}
 
-	this->_reason_phrase = value;
+	return net::get_status_by_code(this->status).first.phrase;
 }
 
 std::string ResponseBase::serialize_headers()
@@ -141,19 +108,19 @@ std::string ResponseBase::serialize_headers()
 	};
 
 	std::string result;
-	for (auto it = this->_headers.begin(); it != this->_headers.end(); it++)
+	for (auto it = this->headers.begin(); it != this->headers.end(); it++)
 	{
 		result.append(expr(*it));
-		if (std::next(it) != this->_headers.end())
+		if (std::next(it) != this->headers.end())
 		{
 			result.append("\r\n");
 		}
 	}
 
-	for (auto it = this->_cookies.begin(); it != this->_cookies.end(); it++)
+	for (auto it = this->cookies.begin(); it != this->cookies.end(); it++)
 	{
 		result.append(it->second.to_string());
-		if (std::next(it) != this->_cookies.end())
+		if (std::next(it) != this->cookies.end())
 		{
 			result.append("\r\n");
 		}
@@ -162,22 +129,14 @@ std::string ResponseBase::serialize_headers()
 	return result;
 }
 
-void Response::write_lines(const std::vector<std::string>& lines)
-{
-	for (const auto & line : lines)
-	{
-		this->write(line);
-	}
-}
-
 std::string Response::serialize()
 {
 	this->set_header("Date", dt::Datetime::utc_now().strftime("%a, %d %b %Y %T GMT"));
-	this->set_header("Content-Length", std::to_string(this->_content.size()));
+	this->set_header("Content-Length", std::to_string(this->content.size()));
 	auto reason_phrase = this->get_reason_phrase();
 	auto headers = this->serialize_headers();
-	return "HTTP/1.1 " + std::to_string(this->_status) + " " + reason_phrase + "\r\n" +
-	   headers + "\r\n\r\n" + this->_content;
+	return "HTTP/1.1 " + std::to_string(this->status) + " " + reason_phrase + "\r\n" +
+	   headers + "\r\n\r\n" + this->content;
 }
 
 FileResponse::FileResponse(
@@ -247,13 +206,13 @@ void FileResponse::_set_headers()
 		{"gzip", "application/gzip"},
 		{"xz", "application/x-xz"}
 	});
-	this->set_header("Content-Length", std::to_string(path::get_size(this->_file_path)));
-	if (this->_headers.get("Content-Type", "").starts_with("text/html"))
+	this->set_header(CONTENT_LENGTH, std::to_string(path::get_size(this->_file_path)));
+	if (this->get_header(CONTENT_TYPE, "").starts_with("text/html"))
 	{
 		std::string content_type, encoding;
 		core::mime::guess_content_type(this->_file_path, content_type, encoding);
 		content_type = encoding_map.get(encoding, content_type);
-		this->_headers.set("Content-Type", !content_type.empty() ? content_type : "application/octet-stream");
+		this->set_header(CONTENT_TYPE, !content_type.empty() ? content_type : "application/octet-stream");
 	}
 
 	std::string disposition = this->_as_attachment ? "attachment" : "inline";
@@ -268,7 +227,7 @@ void FileResponse::_set_headers()
 		file_expr = "filename*=utf-8''" + encoding::quote(file_name);
 	}
 
-	this->_headers.set("Content-Disposition", disposition + "; " + file_expr);
+	this->set_header(CONTENT_DISPOSITION, disposition + "; " + file_expr);
 }
 
 std::string FileResponse::_get_headers_chunk()
@@ -277,7 +236,7 @@ std::string FileResponse::_get_headers_chunk()
 	this->_set_headers();
 	this->set_header("Date", dt::Datetime::utc_now().strftime("%a, %d %b %Y %T GMT"));
 	auto headers = this->serialize_headers();
-	std::string headers_chunk = "HTTP/1.1 " + std::to_string(this->_status) + " " + reason_phrase + "\r\n"
+	std::string headers_chunk = "HTTP/1.1 " + std::to_string(this->status) + " " + reason_phrase + "\r\n"
 		+ headers + "\r\n\r\n";
 	this->_bytes_read = headers_chunk.size();
 	return headers_chunk;
@@ -301,9 +260,9 @@ RedirectBase::RedirectBase(
 		throw ArgumentError("invalid status: " + std::to_string(status), _ERROR_DETAILS_);
 	}
 
-	this->set_header("Location", http::parse_url(redirect_to).str());
+	this->set_header(LOCATION, http::parse_url(redirect_to).str());
 	auto url = http::parse_url(redirect_to);
-	if (!url.scheme.empty() && this->_allowed_schemes.find(url.scheme) == this->_allowed_schemes.end())
+	if (!url.scheme.empty() && ALLOWED_SCHEMES.find(url.scheme) == ALLOWED_SCHEMES.end())
 	{
 		throw exc::DisallowedRedirect("unsafe redirect to URL with protocol " + url.scheme, _ERROR_DETAILS_);
 	}
@@ -316,7 +275,7 @@ void NotModified::set_content(const std::string& content)
 		throw ArgumentError("You cannot set content to a 304 (Not Modified) response.", _ERROR_DETAILS_);
 	}
 
-	this->_content = "";
+	this->content = "";
 }
 
 NotAllowed::NotAllowed(
@@ -336,7 +295,7 @@ NotAllowed::NotAllowed(
 		}
 	}
 
-	this->set_header("Allow", methods);
+	this->set_header(ALLOW, methods);
 }
 
 __HTTP_RESP_END__

@@ -1091,7 +1091,7 @@ void YamlSettingsLoader::init_settings(Settings* settings, const YAML::Node& con
 	}
 	else
 	{
-		auto timezone_name = str::upper(timezone["name"].as<std::string>("UTC"));
+		auto timezone_name = str::to_upper(timezone["name"].as<std::string>("UTC"));
 		if (timezone_name == "UTC")
 		{
 			settings->TIME_ZONE = std::make_shared<dt::Timezone>(dt::Timezone::UTC);

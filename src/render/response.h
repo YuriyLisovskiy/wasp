@@ -40,7 +40,8 @@ public:
 
 	void render();
 
-	std::string get_content() override;
+	[[nodiscard]]
+	std::string get_content() const override;
 };
 
 __RENDER_END__

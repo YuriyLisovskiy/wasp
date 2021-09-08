@@ -36,7 +36,7 @@ public:
 
 	// Returns a response with a template rendered with
 	// the given context.
-	virtual xw::http::Response::Result render(
+	virtual std::unique_ptr<http::abc::IHttpResponse> render(
 		http::Request* request,
 		const std::shared_ptr<render::abc::IContext>& context,
 		const std::string& template_name="",
@@ -70,7 +70,7 @@ public:
 		return nullptr;
 	}
 
-	inline xw::http::Response::Result get(UrlArgsT ...args) override
+	inline std::unique_ptr<http::abc::IHttpResponse> get(UrlArgsT ...args) override
 	{
 		return this->render(this->request, this->get_context(args...), "", 200, "", "utf-8");
 	}

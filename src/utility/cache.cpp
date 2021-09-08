@@ -79,7 +79,7 @@ bool if_none_match_passes(
 	}
 }
 
-std::shared_ptr<http::abc::IHttpResponse> not_modified(http::Request* request, http::abc::IHttpResponse* response)
+std::unique_ptr<http::abc::IHttpResponse> not_modified(http::Request* request, http::abc::IHttpResponse* response)
 {
 	auto new_response = std::make_unique<http::resp::NotModified>("");
 	if (response)
@@ -128,7 +128,7 @@ void set_response_etag(http::abc::IHttpResponse* response)
 	}
 }
 
-std::shared_ptr<http::abc::IHttpResponse> get_conditional_response(
+std::unique_ptr<http::abc::IHttpResponse> get_conditional_response(
 	http::Request* request,
 	const std::string& etag,
 	long last_modified,
@@ -136,7 +136,7 @@ std::shared_ptr<http::abc::IHttpResponse> get_conditional_response(
 )
 {
 	// Only return conditional responses on successful requests.
-	if (response && !(response->status() >= 200 && response->status() < 300))
+	if (response && !(response->get_status() >= 200 && response->get_status() < 300))
 	{
 		return nullptr;
 	}

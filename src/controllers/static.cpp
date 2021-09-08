@@ -10,9 +10,7 @@
 #include <xalwart.base/path.h>
 
 // Framework libraries.
-#include "../http/utility.h"
 #include "../core/media_type.h"
-#include "../http/headers.h"
 
 
 __CONTROLLERS_BEGIN__
@@ -48,7 +46,7 @@ bool was_modified_since(const std::string& header, size_t time, size_t size)
 	return result;
 }
 
-http::Response::Result StaticController::get(const std::string& p)
+std::unique_ptr<http::abc::IHttpResponse> StaticController::get(const std::string& p)
 {
 	if (!this->_kwargs.contains("document_root"))
 	{
@@ -59,7 +57,7 @@ http::Response::Result StaticController::get(const std::string& p)
 	if (!path::exists(full_path))
 	{
 		// TODO: add default http 404 error content!
-		return http::raise(404, this->_kwargs.get<std::string>("http_404", "404 Not Found"));
+		http::raise(404, this->_kwargs.get<std::string>("http_404", "404 Not Found"));
 	}
 
 	auto stat_info = file_stat(full_path);
@@ -67,7 +65,7 @@ http::Response::Result StaticController::get(const std::string& p)
 		request->get_header(http::IF_MODIFIED_SINCE, ""), stat_info.st_mtime, stat_info.st_size
 	))
 	{
-		return http::result<http::resp::NotModified>("");
+		return std::make_unique<http::resp::NotModified>("");
 	}
 
 	std::string content_type, encoding;
@@ -77,14 +75,14 @@ http::Response::Result StaticController::get(const std::string& p)
 		content_type = "application/octet-stream";
 	}
 
-	auto response = std::make_shared<http::FileResponse>(full_path, false, 0, content_type);
+	auto response = std::make_unique<http::FileResponse>(full_path, false, 0, content_type);
 	response->set_header(http::LAST_MODIFIED, http::http_date(stat_info.st_mtime));
 	if (!encoding.empty())
 	{
 		response->set_header(http::CONTENT_ENCODING, encoding);
 	}
 
-	return {response, nullptr};
+	return response;
 }
 
 __CONTROLLERS_END__

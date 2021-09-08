@@ -17,10 +17,32 @@
 #include "./_def_.h"
 
 // Framework libraries.
-#include "../core/signing/signer.h"
+#include "../utility/crypto/signer.h"
 
 
 __HTTP_BEGIN__
+
+inline const short token_table_size = 77;
+inline const char token_table[token_table_size] = {
+	'!', '#', '$', '%', '&', '\'', '*', '+', '-', '.',
+	'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+	'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+	'^', '_', '`',
+	'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+	'|', '~'
+};
+
+// TESTME: is_token_byte
+inline bool is_token_byte(char b)
+{
+	return b < 127 && std::binary_search(token_table, token_table + token_table_size, b);
+}
+
+// TESTME: is_not_token
+inline bool is_not_token(char b)
+{
+	return !is_token_byte(b);
+}
 
 // TESTME: parse_http_datetime
 // Converts std::string datetime to utc epoch in seconds.
@@ -82,11 +104,12 @@ extern void escape_leading_slashes(std::string& url);
 
 // TESTME: get_cookie_signer
 // TODO: docs for 'get_cookie_signer'
-inline core::signing::Signer get_cookie_signer(
-	const std::string& secret_key, const std::string& salt="xw::http::get_cookie_signer"
+inline util::crypto::Signer get_cookie_signer(
+	const std::string& secret_key,
+	const std::string& salt="xw::http::get_cookie_signer"
 )
 {
-	return core::signing::Signer("" + secret_key, ':', salt);
+	return util::crypto::Signer("" + secret_key, ':', salt);
 }
 
 // TESTME: parse_http_date

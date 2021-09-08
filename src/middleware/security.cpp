@@ -31,7 +31,7 @@ Security::Security(conf::Settings* settings) : BaseMiddleware(settings)
 	}
 }
 
-http::Response::Result Security::process_request(http::Request* request)
+std::unique_ptr<http::abc::IHttpResponse> Security::process_request(http::Request* request)
 {
 	auto path = str::ltrim(request->url.path, "/");
 	bool matched = false;
@@ -66,13 +66,15 @@ http::Response::Result Security::process_request(http::Request* request)
 			host = this->redirect_host;
 		}
 
-		return http::result<http::resp::PermanentRedirect>("https://" + host + request->url.full_path());
+		return std::make_unique<http::resp::PermanentRedirect>("https://" + host + request->url.full_path());
 	}
 
-	return {};
+	return nullptr;
 }
 
-http::Response::Result Security::process_response(http::Request* request, http::abc::IHttpResponse* response)
+std::unique_ptr<http::abc::IHttpResponse> Security::process_response(
+	http::Request* request, http::abc::IHttpResponse* response
+)
 {
 	if (
 		this->sts_seconds &&
