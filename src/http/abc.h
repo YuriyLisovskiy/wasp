@@ -71,6 +71,8 @@ public:
 	[[nodiscard]]
 	virtual std::string get_charset() const = 0;
 
+	virtual void set_charset(const std::string& value) = 0;
+
 	[[nodiscard]]
 	virtual bool is_streaming() const = 0;
 

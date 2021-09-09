@@ -9,29 +9,31 @@
 // Base libraries.
 #include <xalwart.base/string_utils.h>
 
-// Framework libraries.
-#include "../http/headers.h"
-
 
 __MIDDLEWARE_BEGIN__
 
-Security::Security(conf::Settings* settings) : BaseMiddleware(settings)
+Function Security::operator() (const Function& next)
 {
-	this->sts_seconds = settings->SECURE_HSTS_SECONDS;
-	this->sts_include_subdomains = settings->SECURE_HSTS_INCLUDE_SUBDOMAINS;
-	this->sts_preload = settings->SECURE_HSTS_PRELOAD;
-	this->content_type_no_sniff = settings->SECURE_CONTENT_TYPE_NO_SNIFF;
-	this->xss_filter = settings->SECURE_BROWSER_XSS_FILTER;
-	this->redirect = settings->SECURE_SSL_REDIRECT;
-	this->redirect_host = settings->SECURE_SSL_HOST;
-	this->referrer_policy = settings->SECURE_REFERRER_POLICY;
-	for (auto& pattern : settings->SECURE_REDIRECT_EXEMPT)
+	return [this, next](http::Request* request) -> std::unique_ptr<http::abc::IHttpResponse>
 	{
-		this->redirect_exempt.emplace_back(pattern);
-	}
+		auto response = this->preprocess(request);
+		if (response)
+		{
+			return response;
+		}
+
+		response = next(request);
+		auto postprocess_response = this->postprocess(request, response.get());
+		if (postprocess_response)
+		{
+			return postprocess_response;
+		}
+
+		return response;
+	};
 }
 
-std::unique_ptr<http::abc::IHttpResponse> Security::process_request(http::Request* request)
+std::unique_ptr<http::abc::IHttpResponse> Security::preprocess(http::Request* request)
 {
 	auto path = str::ltrim(request->url.path, "/");
 	bool matched = false;
@@ -45,16 +47,16 @@ std::unique_ptr<http::abc::IHttpResponse> Security::process_request(http::Reques
 	}
 
 	if (
-		this->redirect &&
-		!request->is_secure(this->settings->SECURE_PROXY_SSL_HEADER) &&
+		this->secure.SSL_REDIRECT &&
+		!request->is_secure(this->secure.PROXY_SSL_HEADER) &&
 		!matched
 	)
 	{
 		std::string host;
-		if (this->redirect_host.empty())
+		if (this->secure.SSL_HOST.empty())
 		{
 			host = request->get_host(
-				this->settings->SECURE_PROXY_SSL_HEADER,
+				this->secure.PROXY_SSL_HEADER,
 				this->settings->USE_X_FORWARDED_HOST,
 				this->settings->USE_X_FORWARDED_PORT,
 				this->settings->DEBUG,
@@ -63,7 +65,7 @@ std::unique_ptr<http::abc::IHttpResponse> Security::process_request(http::Reques
 		}
 		else
 		{
-			host = this->redirect_host;
+			host = this->secure.SSL_HOST;
 		}
 
 		return std::make_unique<http::resp::PermanentRedirect>("https://" + host + request->url.full_path());
@@ -72,23 +74,24 @@ std::unique_ptr<http::abc::IHttpResponse> Security::process_request(http::Reques
 	return nullptr;
 }
 
-std::unique_ptr<http::abc::IHttpResponse> Security::process_response(
+std::unique_ptr<http::abc::IHttpResponse> Security::postprocess(
 	http::Request* request, http::abc::IHttpResponse* response
 )
 {
+	require_non_null(response, _ERROR_DETAILS_);
 	if (
-		this->sts_seconds &&
-		request->is_secure(this->settings->SECURE_PROXY_SSL_HEADER) &&
+		this->secure.HSTS_SECONDS &&
+		request->is_secure(this->secure.PROXY_SSL_HEADER) &&
 		!response->has_header(http::STRICT_TRANSPORT_SECURITY)
 	)
 	{
-		auto sts_header = "max-age=" + std::to_string(this->sts_seconds);
-		if (this->sts_include_subdomains)
+		auto sts_header = "max-age=" + std::to_string(this->secure.HSTS_SECONDS);
+		if (this->secure.HSTS_INCLUDE_SUBDOMAINS)
 		{
 			sts_header += "; includeSubDomains";
 		}
 
-		if (this->sts_preload)
+		if (this->secure.HSTS_PRELOAD)
 		{
 			sts_header += "; preload";
 		}
@@ -96,32 +99,30 @@ std::unique_ptr<http::abc::IHttpResponse> Security::process_response(
 		response->set_header(http::STRICT_TRANSPORT_SECURITY, sts_header);
 	}
 
-	if (this->content_type_no_sniff)
+	if (this->secure.CONTENT_TYPE_NO_SNIFF)
 	{
 		response->set_header(http::X_CONTENT_TYPE_OPTIONS, "nosniff");
 	}
 
-	if (this->xss_filter)
+	if (this->secure.BROWSER_XSS_FILTER)
 	{
 		response->set_header(http::X_XSS_PROTECTION, "1; mode=block");
 	}
 
-	if (!this->referrer_policy.empty())
+	if (!this->secure.REFERRER_POLICY.empty())
 	{
 		// Support a comma-separated string or iterable of
 		// values to allow fallback.
-		auto split = str::split(this->referrer_policy, ',');
+		auto split = str::split(this->secure.REFERRER_POLICY, ',');
 		for (auto& item : split)
 		{
 			item = str::trim(item);
 		}
 
-		response->set_header(
-			http::REFERRER_POLICY, str::join(",", split.begin(), split.end())
-		);
+		response->set_header(http::REFERRER_POLICY, str::join(",", split.begin(), split.end()));
 	}
 
-	return {};
+	return nullptr;
 }
 
 __MIDDLEWARE_END__

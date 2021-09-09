@@ -86,7 +86,7 @@ protected:
 		this->_urlpatterns.push_back(std::make_shared<urls::Pattern<ArgsT...>>(
 			pattern.starts_with("/") ? pattern : "/" + pattern,
 			controller_handler,
-			name.empty() ? util::demangle(typeid(ControllerT).name()) : name
+			name.empty() ? demangle(typeid(ControllerT).name()) : name
 		));
 	}
 

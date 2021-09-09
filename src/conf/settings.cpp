@@ -24,18 +24,10 @@ Settings::Settings(const std::string& base_dir)
 {
 	this->BASE_DIR = base_dir;
 	this->_middleware = {
-		{middleware::XFrameOptions::FULL_NAME, [this]() -> std::shared_ptr<middleware::IMiddleware> {
-			return std::make_shared<middleware::XFrameOptions>(this);
-		}},
-		{middleware::Common::FULL_NAME, [this]() -> std::shared_ptr<middleware::IMiddleware> {
-			return std::make_shared<middleware::Common>(this);
-		}},
-		{middleware::ConditionalGet::FULL_NAME, [this]() -> std::shared_ptr<middleware::IMiddleware> {
-			return std::make_shared<middleware::ConditionalGet>(this);
-		}},
-		{middleware::Security::FULL_NAME, [this]() -> std::shared_ptr<middleware::IMiddleware> {
-			return std::make_shared<middleware::Security>(this);
-		}}
+		{middleware::XFrameOptions::NAME, middleware::XFrameOptions(this)},
+		{middleware::Common::NAME, middleware::Common(this)},
+		{middleware::ConditionalGet::NAME, middleware::ConditionalGet()},
+		{middleware::Security::NAME, middleware::Security(this)}
 	};
 
 	this->_libraries = {
@@ -49,6 +41,48 @@ Settings::Settings(const std::string& base_dir)
 			return std::make_shared<render::DefaultLoader>();
 		}}
 	};
+}
+
+std::string Settings::render_html_error_template(const net::Status& status, const std::string& message) const
+{
+	auto title = std::to_string(status.code) + " - " + status.phrase;
+	return "<!doctype html>\n"
+	       "\n"
+	       "<html lang=\"en\">\n"
+	       "<head>\n"
+	       "  <meta charset=\"utf-8\">\n"
+	       "  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n"
+	       "\n"
+		   "  <title>" + title + "</title>\n"
+	       "\n"
+	       "  <link rel=\"icon\" href=\"/favicon.ico\">\n"
+	       "  <link rel=\"icon\" href=\"/favicon.svg\" type=\"image/svg+xml\">\n"
+	       "  <link rel=\"apple-touch-icon\" href=\"/apple-touch-icon.png\">\n"
+	       "\n"
+		   "  <style>\n"
+		   "    h1, h2, h3 {\n"
+	       "      text-align: center;\n"
+	       "    }"
+		   "  </style>\n"
+		   "\n"
+	       "</head>\n"
+	       "\n"
+	       "<body>\n"
+		   "  <h1>" + title + "</h1>\n"
+		   "  <h3>" + status.description + "</h3>\n"
+		   "  <h2>" + message + "</h2>\n"
+	       "</body>\n"
+	       "</html>";
+}
+
+std::string Settings::render_json_error_template(const net::Status& status, const std::string& message) const
+{
+	return "{\n"
+//	       "  \"exception\" : \"org.springframework.web.bind.MissingServletRequestParameterException\",\n"
+	       "  \"status\" : " + std::to_string(status.code) + ",\n"
+	       "  \"error\" : \"" + status.phrase + "\",\n"
+	       "  \"message\" : \"" + message + "\"\n"
+	       "}";
 }
 
 void Settings::prepare()
@@ -144,16 +178,6 @@ std::shared_ptr<IModuleConfig> Settings::get_module(const std::string& full_name
 	return nullptr;
 }
 
-std::shared_ptr<middleware::IMiddleware> Settings::get_middleware(const std::string& full_name) const
-{
-	if (this->_middleware.find(full_name) != this->_middleware.end())
-	{
-		return this->_middleware.at(full_name)();
-	}
-
-	return nullptr;
-}
-
 std::shared_ptr<render::abc::ILibrary> Settings::get_library(const std::string& full_name) const
 {
 	if (this->_libraries.find(full_name) != this->_libraries.end())
@@ -172,6 +196,21 @@ std::shared_ptr<render::abc::ILoader> Settings::get_loader(const std::string& fu
 	}
 
 	return nullptr;
+}
+
+void Settings::middleware(const std::string& name, middleware::Handler handler)
+{
+	if (name.empty())
+	{
+		throw ImproperlyConfigured("middleware should have non-empty name");
+	}
+
+	if (this->LOGGER && this->_middleware.find(name) != this->_middleware.end())
+	{
+		this->LOGGER->warning("middleware '" + name + "' will be overwritten");
+	}
+
+	this->_middleware[name] = std::move(handler);
 }
 
 __CONF_END__

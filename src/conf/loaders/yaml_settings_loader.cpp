@@ -18,256 +18,6 @@
 
 __CONF_BEGIN__
 
-void YamlSettingsLoader::_init_allowed_hosts(Settings* settings, const YAML::Node& allowed_hosts)
-{
-	for (auto it = allowed_hosts.begin(); it != allowed_hosts.end(); it++)
-	{
-		if (it->IsDefined() && it->IsScalar())
-		{
-			auto value = it->as<std::string>();
-			if (!value.empty())
-			{
-				settings->ALLOWED_HOSTS.push_back(value);
-			}
-		}
-	}
-}
-
-void YamlSettingsLoader::_init_disallowed_user_agents(Settings* settings, const YAML::Node& agents)
-{
-	for (auto it = agents.begin(); it != agents.end(); it++)
-	{
-		if (it->IsDefined() && it->IsScalar())
-		{
-			auto value = it->as<std::string>();
-			if (!value.empty())
-			{
-				settings->DISALLOWED_USER_AGENTS.emplace_back(value);
-			}
-		}
-	}
-}
-
-void YamlSettingsLoader::_init_ignorable_404_urls(Settings* settings, const YAML::Node& urls)
-{
-	for (auto it = urls.begin(); it != urls.end(); it++)
-	{
-		if (it->IsDefined() && it->IsScalar())
-		{
-			auto value = it->as<std::string>();
-			if (!value.empty())
-			{
-				settings->IGNORABLE_404_URLS.emplace_back(value);
-			}
-		}
-	}
-}
-
-void YamlSettingsLoader::_init_formats(Settings* settings, const YAML::Node& formats)
-{
-	settings->DATE_FORMAT = formats["date"].as<std::string>("%b %d, %Y");
-	settings->DATETIME_FORMAT = formats["datetime"].as<std::string>("%b %d, %Y, %T");
-	settings->TIME_FORMAT = formats["time"].as<std::string>("%T");
-	settings->YEAR_MONTH_FORMAT = formats["year_month"].as<std::string>("%B %Y");
-	settings->MONTH_DAY_FORMAT = formats["month_day"].as<std::string>("%B %d");
-	settings->SHORT_DATE_FORMAT = formats["short_date"].as<std::string>("%m/%d/%Y");
-	settings->SHORT_DATETIME_FORMAT = formats["short_datetime"].as<std::string>("%m/%d/%Y %T");
-}
-
-void YamlSettingsLoader::_init_csrf(Settings* settings, const YAML::Node& csrf)
-{
-	auto cookie = csrf["cookie"];
-	if (cookie && cookie.IsMap())
-	{
-		settings->CSRF_COOKIE_NAME = cookie["name"].as<std::string>("csrftoken");
-		settings->CSRF_COOKIE_AGE = cookie["age"].as<size_t>(60 * 60 * 24 * 7 * 52);
-		settings->CSRF_COOKIE_DOMAIN = cookie["domain"].as<std::string>("");
-		settings->CSRF_COOKIE_PATH = cookie["path"].as<std::string>("/");
-		settings->CSRF_COOKIE_SECURE = cookie["secure"].as<bool>(false);
-		settings->CSRF_COOKIE_HTTP_ONLY = cookie["http_only"].as<bool>(false);
-		settings->CSRF_COOKIE_SAME_SITE = cookie["same_site"].as<std::string>("Lax");
-	}
-
-	settings->CSRF_HEADER_NAME = csrf["header_name"].as<std::string>("X-XSRF-TOKEN");
-	settings->CSRF_USE_SESSIONS = csrf["use_sessions"].as<bool>(false);
-
-	auto origins = csrf["trusted_origins"];
-	if (origins && origins.IsSequence())
-	{
-		for (auto it = origins.begin(); it != origins.end(); it++)
-		{
-			if (it->IsDefined() && it->IsScalar())
-			{
-				auto value = it->as<std::string>();
-				if (!value.empty())
-				{
-					settings->CSRF_TRUSTED_ORIGINS.push_back(value);
-				}
-			}
-		}
-	}
-}
-
-void YamlSettingsLoader::_init_secure(Settings* settings, const YAML::Node& secure)
-{
-	settings->SECURE_BROWSER_XSS_FILTER = secure["browser_xss_filter"].as<bool>(false);
-
-	auto content_type_no_sniff = secure["content_type_no_sniff"];
-	settings->SECURE_CONTENT_TYPE_NO_SNIFF = !content_type_no_sniff ||
-		(!content_type_no_sniff.IsNull() && content_type_no_sniff.as<bool>(true));
-
-	settings->SECURE_HSTS_INCLUDE_SUBDOMAINS = secure["hsts_include_subdomains"].as<bool>(false);
-	settings->SECURE_HSTS_PRELOAD = secure["hsts_preload"].as<bool>(false);
-	settings->SECURE_HSTS_SECONDS = secure["hsts_seconds"].as<size_t>(0);
-	auto redirect_exempt = secure["redirect_exempt"];
-	if (redirect_exempt && redirect_exempt.IsSequence())
-	{
-		for (auto it = redirect_exempt.begin(); it != redirect_exempt.end(); it++)
-		{
-			if (it->IsDefined() && it->IsScalar())
-			{
-				auto value = it->as<std::string>();
-				if (!value.empty())
-				{
-					settings->SECURE_REDIRECT_EXEMPT.push_back(value);
-				}
-			}
-		}
-	}
-
-	settings->SECURE_REFERRER_POLICY = secure["referrer_policy"].as<std::string>("");
-	settings->SECURE_SSL_HOST = secure["ssl_host"].as<std::string>("");
-	settings->SECURE_SSL_REDIRECT = secure["ssl_redirect"].as<bool>(false);
-	auto psslh = secure["proxy_ssl_header"];
-	if (psslh && psslh.IsMap())
-	{
-		settings->SECURE_PROXY_SSL_HEADER = std::pair<std::string, std::string>(
-			psslh["name"].as<std::string>("X-Forwarded-Proto"),
-			psslh["value"].as<std::string>("https")
-		);
-	}
-}
-
-void YamlSettingsLoader::_init_modules(Settings* settings, const YAML::Node& modules)
-{
-	for (auto it = modules.begin(); it != modules.end(); it++)
-	{
-		if (it->IsDefined() && it->IsScalar())
-		{
-			auto item = settings->get_module(it->as<std::string>());
-			if (item)
-			{
-				settings->MODULES.push_back(item);
-			}
-		}
-	}
-}
-
-void YamlSettingsLoader::_init_middleware(Settings* settings, const YAML::Node& middleware)
-{
-	for (auto it = middleware.begin(); it != middleware.end(); it++)
-	{
-		if (it->IsDefined() && it->IsScalar())
-		{
-			auto item = settings->get_middleware(it->as<std::string>());
-			if (item)
-			{
-				settings->MIDDLEWARE.push_back(item);
-			}
-		}
-	}
-}
-
-void YamlSettingsLoader::_init_databases(Settings* settings, const YAML::Node& databases)
-{
-	for (auto it = databases.begin(); it != databases.end(); it++)
-	{
-		if (it->IsDefined() && it->IsMap())
-		{
-			auto db_info = *it;
-			if (!db_info || !db_info.IsMap())
-			{
-				throw ImproperlyConfigured(
-					"databases: parameter must be non-empty map", _ERROR_DETAILS_
-				);
-			}
-
-			auto driver_node = db_info["driver"];
-			if (!driver_node || !driver_node.IsScalar())
-			{
-				throw ImproperlyConfigured(
-					"databases: the 'driver' parameter is required and must have a string type",
-					_ERROR_DETAILS_
-				);
-			}
-
-			auto name_node = db_info["name"];
-			if (!name_node || !name_node.IsScalar())
-			{
-				throw ImproperlyConfigured(
-					"databases: the 'name' parameter is required and must have a string type",
-					_ERROR_DETAILS_
-				);
-			}
-
-			auto db_name = name_node.as<std::string>();
-			auto driver_name = driver_node.as<std::string>();
-			std::shared_ptr<orm::abc::ISQLDriver> driver;
-			if (driver_name == "sqlite3")
-			{
-				_init_sqlite3_database(db_name, settings, driver, db_info);
-			}
-			else
-			{
-				// TODO: add more driver initializations.
-				driver = settings->build_database(db_name, db_info);
-			}
-
-			if (driver)
-			{
-				settings->DATABASES[db_name] = std::make_shared<orm::Client>(driver);
-//				if (db_name == "default")
-//				{
-//					settings->DB = std::make_shared<orm::Client>(driver);
-//				}
-//				else
-//				{
-//					settings->DATABASES.push_back();
-//				}
-			}
-		}
-	}
-
-	if (settings->DATABASES.find("default") != settings->DATABASES.end())
-	{
-		settings->DB = settings->DATABASES["default"];
-	}
-	else
-	{
-		throw ImproperlyConfigured(
-			"databases: default database is required to be configured",
-			_ERROR_DETAILS_
-		);
-	}
-}
-
-void YamlSettingsLoader::_init_sqlite3_database(
-	const std::string& name, Settings* settings,
-	std::shared_ptr<orm::abc::ISQLDriver>& driver, const YAML::Node& database
-)
-{
-	auto filepath = database["file"];
-	if (!filepath || !filepath.IsScalar())
-	{
-		throw ImproperlyConfigured(
-			"databases: the 'file' parameter of SQLite3 database info is required and must have a string type",
-			_ERROR_DETAILS_
-		);
-	}
-
-	driver = settings->build_sqlite3_database(name, filepath.as<std::string>());
-}
-
 void YamlSettingsLoader::check_config(const YAML::Node& config, const std::string& file_path)
 {
 	if (config && config.IsMap())
@@ -1181,7 +931,7 @@ void YamlSettingsLoader::init_settings(Settings* settings, const YAML::Node& con
 
 	settings->THOUSAND_SEPARATOR = config["thousand_separator"].as<char>(',');
 
-	settings->X_FRAME_OPTIONS = config["x_frame_options"].as<std::string>("SAMEORIGIN");
+	settings->X_FRAME_OPTIONS = XFrameOptions::from_string(config["x_frame_options"].as<std::string>("SAMEORIGIN"));
 
 	settings->USE_X_FORWARDED_HOST = config["use_x_forwarded_host"].as<bool>(false);
 
@@ -1230,6 +980,265 @@ void YamlSettingsLoader::init_settings(Settings* settings, const YAML::Node& con
 	{
 		this->init_template_engine_setting(settings, template_engine);
 	}
+}
+
+void YamlSettingsLoader::_init_allowed_hosts(Settings* settings, const YAML::Node& allowed_hosts)
+{
+	for (auto it = allowed_hosts.begin(); it != allowed_hosts.end(); it++)
+	{
+		if (it->IsDefined() && it->IsScalar())
+		{
+			auto value = it->as<std::string>();
+			if (!value.empty())
+			{
+				settings->ALLOWED_HOSTS.push_back(value);
+			}
+		}
+	}
+}
+
+void YamlSettingsLoader::_init_disallowed_user_agents(Settings* settings, const YAML::Node& agents)
+{
+	for (auto it = agents.begin(); it != agents.end(); it++)
+	{
+		if (it->IsDefined() && it->IsScalar())
+		{
+			auto value = it->as<std::string>();
+			if (!value.empty())
+			{
+				settings->DISALLOWED_USER_AGENTS.emplace_back(value);
+			}
+		}
+	}
+}
+
+void YamlSettingsLoader::_init_ignorable_404_urls(Settings* settings, const YAML::Node& urls)
+{
+	for (auto it = urls.begin(); it != urls.end(); it++)
+	{
+		if (it->IsDefined() && it->IsScalar())
+		{
+			auto value = it->as<std::string>();
+			if (!value.empty())
+			{
+				settings->IGNORABLE_404_URLS.emplace_back(value);
+			}
+		}
+	}
+}
+
+void YamlSettingsLoader::_init_formats(Settings* settings, const YAML::Node& formats)
+{
+	settings->DATE_FORMAT = formats["date"].as<std::string>("%b %d, %Y");
+	settings->DATETIME_FORMAT = formats["datetime"].as<std::string>("%b %d, %Y, %T");
+	settings->TIME_FORMAT = formats["time"].as<std::string>("%T");
+	settings->YEAR_MONTH_FORMAT = formats["year_month"].as<std::string>("%B %Y");
+	settings->MONTH_DAY_FORMAT = formats["month_day"].as<std::string>("%B %d");
+	settings->SHORT_DATE_FORMAT = formats["short_date"].as<std::string>("%m/%d/%Y");
+	settings->SHORT_DATETIME_FORMAT = formats["short_datetime"].as<std::string>("%m/%d/%Y %T");
+}
+
+void YamlSettingsLoader::_init_csrf(Settings* settings, const YAML::Node& csrf)
+{
+	auto cookie = csrf["cookie"];
+	if (cookie && cookie.IsMap())
+	{
+		settings->CSRF_COOKIE_NAME = cookie["name"].as<std::string>("csrftoken");
+		settings->CSRF_COOKIE_AGE = cookie["age"].as<size_t>(60 * 60 * 24 * 7 * 52);
+		settings->CSRF_COOKIE_DOMAIN = cookie["domain"].as<std::string>("");
+		settings->CSRF_COOKIE_PATH = cookie["path"].as<std::string>("/");
+		settings->CSRF_COOKIE_SECURE = cookie["secure"].as<bool>(false);
+		settings->CSRF_COOKIE_HTTP_ONLY = cookie["http_only"].as<bool>(false);
+		settings->CSRF_COOKIE_SAME_SITE = cookie["same_site"].as<std::string>("Lax");
+	}
+
+	settings->CSRF_HEADER_NAME = csrf["header_name"].as<std::string>("X-XSRF-TOKEN");
+	settings->CSRF_USE_SESSIONS = csrf["use_sessions"].as<bool>(false);
+
+	auto origins = csrf["trusted_origins"];
+	if (origins && origins.IsSequence())
+	{
+		for (auto it = origins.begin(); it != origins.end(); it++)
+		{
+			if (it->IsDefined() && it->IsScalar())
+			{
+				auto value = it->as<std::string>();
+				if (!value.empty())
+				{
+					settings->CSRF_TRUSTED_ORIGINS.push_back(value);
+				}
+			}
+		}
+	}
+}
+
+void YamlSettingsLoader::_init_secure(Settings* settings, const YAML::Node& secure)
+{
+	auto content_type_no_sniff = secure["content_type_no_sniff"];
+	settings->SECURE = {
+		.BROWSER_XSS_FILTER = secure["browser_xss_filter"].as<bool>(false),
+		.CONTENT_TYPE_NO_SNIFF = !content_type_no_sniff ||
+			(!content_type_no_sniff.IsNull() && content_type_no_sniff.as<bool>(true)),
+		.HSTS_INCLUDE_SUBDOMAINS = secure["hsts_include_subdomains"].as<bool>(false),
+		.HSTS_PRELOAD = secure["hsts_preload"].as<bool>(false),
+		.HSTS_SECONDS = secure["hsts_seconds"].as<size_t>(0),
+		.REFERRER_POLICY = secure["referrer_policy"].as<std::string>(""),
+		.SSL_HOST = secure["ssl_host"].as<std::string>(""),
+		.SSL_REDIRECT = secure["ssl_redirect"].as<bool>(false)
+	};
+
+	auto redirect_exempt = secure["redirect_exempt"];
+	if (redirect_exempt && redirect_exempt.IsSequence())
+	{
+		for (auto it = redirect_exempt.begin(); it != redirect_exempt.end(); it++)
+		{
+			if (it->IsDefined() && it->IsScalar())
+			{
+				auto value = it->as<std::string>();
+				if (!value.empty())
+				{
+					settings->SECURE.REDIRECT_EXEMPT.push_back(value);
+				}
+			}
+		}
+	}
+
+	auto proxy_ssl_header = secure["proxy_ssl_header"];
+	if (proxy_ssl_header && proxy_ssl_header.IsMap())
+	{
+		settings->SECURE.PROXY_SSL_HEADER = std::pair<std::string, std::string>(
+			proxy_ssl_header["name"].as<std::string>("X-Forwarded-Proto"),
+			proxy_ssl_header["value"].as<std::string>("https")
+		);
+	}
+}
+
+void YamlSettingsLoader::_init_modules(Settings* settings, const YAML::Node& modules)
+{
+	for (auto it = modules.begin(); it != modules.end(); it++)
+	{
+		if (it->IsDefined() && it->IsScalar())
+		{
+			auto item = settings->get_module(it->as<std::string>());
+			if (item)
+			{
+				settings->MODULES.push_back(item);
+			}
+		}
+	}
+}
+
+void YamlSettingsLoader::_init_middleware(Settings* settings, const YAML::Node& middleware)
+{
+	for (auto it = middleware.begin(); it != middleware.end(); it++)
+	{
+		if (it->IsDefined() && it->IsScalar())
+		{
+			auto name = it->as<std::string>();
+			auto item = settings->get_middleware_by_name(name);
+			if (item)
+			{
+				settings->MIDDLEWARE.push_back(item);
+			}
+			else
+			{
+				if (settings->LOGGER)
+				{
+					settings->LOGGER->warning("Middleware not registered: '" + name + "'");
+				}
+			}
+		}
+	}
+}
+
+void YamlSettingsLoader::_init_databases(Settings* settings, const YAML::Node& databases)
+{
+	for (auto it = databases.begin(); it != databases.end(); it++)
+	{
+		if (it->IsDefined() && it->IsMap())
+		{
+			auto db_info = *it;
+			if (!db_info || !db_info.IsMap())
+			{
+				throw ImproperlyConfigured(
+					"databases: parameter must be non-empty map", _ERROR_DETAILS_
+				);
+			}
+
+			auto driver_node = db_info["driver"];
+			if (!driver_node || !driver_node.IsScalar())
+			{
+				throw ImproperlyConfigured(
+					"databases: the 'driver' parameter is required and must have a string type",
+					_ERROR_DETAILS_
+				);
+			}
+
+			auto name_node = db_info["name"];
+			if (!name_node || !name_node.IsScalar())
+			{
+				throw ImproperlyConfigured(
+					"databases: the 'name' parameter is required and must have a string type",
+					_ERROR_DETAILS_
+				);
+			}
+
+			auto db_name = name_node.as<std::string>();
+			auto driver_name = driver_node.as<std::string>();
+			std::shared_ptr<orm::abc::ISQLDriver> driver;
+			if (driver_name == "sqlite3")
+			{
+				_init_sqlite3_database(db_name, settings, driver, db_info);
+			}
+			else
+			{
+				// TODO: add more driver initializations.
+				driver = settings->build_database(db_name, db_info);
+			}
+
+			if (driver)
+			{
+				settings->DATABASES[db_name] = std::make_shared<orm::Client>(driver);
+//				if (db_name == "default")
+//				{
+//					settings->DB = std::make_shared<orm::Client>(driver);
+//				}
+//				else
+//				{
+//					settings->DATABASES.push_back();
+//				}
+			}
+		}
+	}
+
+	if (settings->DATABASES.find("default") != settings->DATABASES.end())
+	{
+		settings->DB = settings->DATABASES["default"];
+	}
+	else
+	{
+		throw ImproperlyConfigured(
+			"databases: default database is required to be configured",
+			_ERROR_DETAILS_
+		);
+	}
+}
+
+void YamlSettingsLoader::_init_sqlite3_database(
+	const std::string& name, Settings* settings,
+	std::shared_ptr<orm::abc::ISQLDriver>& driver, const YAML::Node& database
+)
+{
+	auto filepath = database["file"];
+	if (!filepath || !filepath.IsScalar())
+	{
+		throw ImproperlyConfigured(
+			"databases: the 'file' parameter of SQLite3 database info is required and must have a string type",
+			_ERROR_DETAILS_
+		);
+	}
+
+	driver = settings->build_sqlite3_database(name, filepath.as<std::string>());
 }
 
 __CONF_END__

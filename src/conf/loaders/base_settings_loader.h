@@ -27,34 +27,30 @@
 
 __CONF_BEGIN__
 
-template <typename ConfigT>
+template <typename T>
+concept settings_type = std::is_base_of_v<Settings, T>;
+
+template <typename ConfigType>
 class BaseSettingsLoader
 {
-protected:
-	std::filesystem::directory_entry find_file(
-		const std::string& base_dir, const std::string& file_name
-	)
+public:
+	template<settings_type SettingsType, typename ...Args>
+	inline SettingsType load(Args&& ...args)
 	{
-		std::regex file_name_regex(file_name);
-		auto dir_sep = std::string(1, path::path_sep);
-		for (const auto& entry : std::filesystem::directory_iterator(base_dir))
+		SettingsType settings(std::forward<Args>(args)...);
+		auto config = this->load_file(settings.BASE_DIR, this->config_name());
+		if (!config)
 		{
-			if (!entry.is_directory())
-			{
-				auto str_path = entry.path().string();
-				std::string curr_file_name(str_path.begin() + base_dir.size(), str_path.end());
-				curr_file_name = str::ltrim(curr_file_name, dir_sep);
-				if (std::regex_match(curr_file_name, file_name_regex))
-				{
-					return entry;
-				}
-			}
+			throw RuntimeError("'" + this->config_name() + "' is not found");
 		}
 
-		return std::filesystem::directory_entry();
+		auto local_config = this->load_file(settings.BASE_DIR, this->local_config_name());
+		this->overwrite_config(config, local_config);
+		this->init_settings(&settings, config);
+		return settings;
 	}
 
-public:
+protected:
 	[[nodiscard]]
 	virtual std::string config_name() const = 0;
 
@@ -62,11 +58,31 @@ public:
 	virtual std::string local_config_name() const = 0;
 
 	// Reads and loads config from file.
-	virtual ConfigT load_file(const std::string& base_dir, const std::string& file_name) = 0;
+	virtual ConfigType load_file(const std::string& base_dir, const std::string& file_name) = 0;
 
-	virtual void overwrite_config(ConfigT& config, const ConfigT& local_config) = 0;
+	virtual void overwrite_config(ConfigType& config, const ConfigType& local_config) = 0;
 
-	virtual void init_settings(Settings* settings, const ConfigT& config) = 0;
+	virtual void init_settings(Settings* settings, const ConfigType& config) = 0;
+
+	inline std::filesystem::directory_entry find_file(const std::string& base_dir, const std::string& file_name)
+	{
+		std::regex file_name_regex(file_name);
+		auto dir_sep = std::string(1, path::path_sep);
+		for (const auto& path_entry : std::filesystem::directory_iterator(base_dir))
+		{
+			if (!path_entry.is_directory())
+			{
+				auto current_file_name = path_entry.path().string().substr(base_dir.size());
+				current_file_name = str::ltrim(current_file_name, dir_sep);
+				if (std::regex_match(current_file_name, file_name_regex))
+				{
+					return path_entry;
+				}
+			}
+		}
+
+		return {};
+	}
 };
 
 __CONF_END__

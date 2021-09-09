@@ -6,6 +6,9 @@
 
 #include "./common.h"
 
+// C++ libraries.
+#include <memory>
+
 // Base libraries.
 #include <xalwart.base/utility.h>
 
@@ -14,6 +17,27 @@
 
 
 __MIDDLEWARE_BEGIN__
+
+Function Common::operator() (const Function& next)
+{
+	return [this, next](http::Request* request) -> std::unique_ptr<http::abc::IHttpResponse>
+	{
+		auto response = this->preprocess(request);
+		if (response)
+		{
+			return response;
+		}
+
+		response = next(request);
+		auto postprocess_response = this->postprocess(request, response.get());
+		if (postprocess_response)
+		{
+			return postprocess_response;
+		}
+
+		return response;
+	};
+}
 
 bool Common::should_redirect_with_slash(http::Request* request)
 {
@@ -39,7 +63,7 @@ std::string Common::get_full_path_with_slash(http::Request* request)
 	{
 		auto method = request->method;
 		auto host = request->get_host(
-			this->settings->SECURE_PROXY_SSL_HEADER,
+			this->settings->SECURE.PROXY_SSL_HEADER,
 			this->settings->USE_X_FORWARDED_HOST,
 			this->settings->USE_X_FORWARDED_PORT,
 			this->settings->DEBUG,
@@ -47,37 +71,38 @@ std::string Common::get_full_path_with_slash(http::Request* request)
 		);
 		throw RuntimeError(
 			"You called this URL via " + method + "s, but the URL doesn't end "
-			"in a slash and you have APPEND_SLASH set. Xalwart can't "
+			"in a slash and 'settings->APPEND_SLASH' is 'true'. " + v::framework_name + " can't "
 			"redirect to the slash URL while maintaining " + method + "s data. "
 			"Change your form to point to " + host + new_path + "s (note the trailing "
-			"slash), or set APPEND_SLASH to false in your Xalwart settings."
+			"slash), or set 'settings->APPEND_SLASH' to 'false' in your Xalwart settings."
 		);
 	}
 
 	return new_path;
 }
 
-std::unique_ptr<http::abc::IHttpResponse> Common::process_request(http::Request* request)
+std::unique_ptr<http::abc::IHttpResponse> Common::preprocess(http::Request* request)
 {
+	require_non_null(request, _ERROR_DETAILS_);
 	if (request->header.contains(http::USER_AGENT))
 	{
 		auto user_agent = request->header.at(http::USER_AGENT);
-		for (auto& rgx : this->settings->DISALLOWED_USER_AGENTS)
+		for (const auto& rgx : this->settings->DISALLOWED_USER_AGENTS)
 		{
-			if (rgx.search(user_agent))
+			auto to_search = rgx;
+			if (to_search.search(user_agent))
 			{
-				this->settings->LOGGER->trace(
+				require_non_null(this->settings->LOGGER.get(), _ERROR_DETAILS_)->trace(
 					"Found user agent which is not allowed: '" + user_agent + "'", _ERROR_DETAILS_
 				);
-
-				http::raise(403, "Forbidden user agent");
+				return std::make_unique<http::resp::Forbidden>("Forbidden user agent");
 			}
 		}
 	}
 
-	// Check for a redirect based on settings.PREPEND_WWW
+	// Check for a redirect based on `settings->PREPEND_WWW`
 	auto host = request->get_host(
-		this->settings->SECURE_PROXY_SSL_HEADER,
+		this->settings->SECURE.PROXY_SSL_HEADER,
 		this->settings->USE_X_FORWARDED_HOST,
 		this->settings->USE_X_FORWARDED_PORT,
 		this->settings->DEBUG,
@@ -85,7 +110,7 @@ std::unique_ptr<http::abc::IHttpResponse> Common::process_request(http::Request*
 	);
 	bool must_prepend = this->settings->PREPEND_WWW && !host.empty() && !host.starts_with("www.");
 	auto redirect_url = must_prepend ? (
-		request->scheme(this->settings->SECURE_PROXY_SSL_HEADER) + "://www." + host
+		request->scheme(this->settings->SECURE.PROXY_SSL_HEADER) + "://www." + host
 	) : "";
 
 	// Check if a slash should be appended.
@@ -106,13 +131,15 @@ std::unique_ptr<http::abc::IHttpResponse> Common::process_request(http::Request*
 		return this->get_response_redirect(redirect_url);
 	}
 
-	return {};
+	return nullptr;
 }
 
-std::unique_ptr<http::abc::IHttpResponse> Common::process_response(
+std::unique_ptr<http::abc::IHttpResponse> Common::postprocess(
 	http::Request* request, http::abc::IHttpResponse* response
 )
 {
+	require_non_null(response, _ERROR_DETAILS_);
+
 	// If the given URL is "Not Found", then check if we
 	// should redirect to a path with a slash appended.
 	if (response->get_status() == 404)
@@ -123,6 +150,11 @@ std::unique_ptr<http::abc::IHttpResponse> Common::process_response(
 		}
 	}
 
+	if (response->get_charset().empty())
+	{
+		response->set_charset(this->settings->CHARSET);
+	}
+
 	// Add the Content-Length header to non-streaming
 	// responses if not already set.
 	if (!response->is_streaming() && !response->has_header(http::CONTENT_LENGTH))
@@ -130,7 +162,7 @@ std::unique_ptr<http::abc::IHttpResponse> Common::process_response(
 		response->set_header(http::CONTENT_LENGTH, std::to_string(response->content_length()));
 	}
 
-	return {};
+	return nullptr;
 }
 
 __MIDDLEWARE_END__

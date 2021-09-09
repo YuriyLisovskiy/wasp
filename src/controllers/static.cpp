@@ -56,8 +56,11 @@ std::unique_ptr<http::abc::IHttpResponse> StaticController::get(const std::strin
 	auto full_path = path::join(this->_kwargs.get<std::string>("document_root", ""), p);
 	if (!path::exists(full_path))
 	{
-		// TODO: add default http 404 error content!
-		http::raise(404, this->_kwargs.get<std::string>("http_404", "404 Not Found"));
+		auto [status, _] = net::get_status_by_code(404);
+		std::string response_content = this->request->is_json() ?
+			this->settings->render_json_error_template(status, "") :
+			this->settings->render_json_error_template(status, "");
+		return std::make_unique<http::resp::NotFound>(response_content);
 	}
 
 	auto stat_info = file_stat(full_path);

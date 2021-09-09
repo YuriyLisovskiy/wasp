@@ -8,6 +8,11 @@
 
 #pragma once
 
+// C++ libraries.
+#include <string>
+#include <vector>
+#include <memory>
+
 // Base libraries.
 #include <xalwart.base/re/regex.h>
 

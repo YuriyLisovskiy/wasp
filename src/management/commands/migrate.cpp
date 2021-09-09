@@ -54,7 +54,7 @@ void MigrateCommand::handle()
 		this->settings->get_migrations(driver),
 		[this] (auto msg, auto end) { this->log_progress(msg, end); }
 	);
-	auto editor = util::require_non_null(driver)->schema_editor();
+	auto editor = require_non_null(driver)->schema_editor();
 	auto migration_name = this->_migration_flag->get();
 	if (this->_rollback_flag->get())
 	{
