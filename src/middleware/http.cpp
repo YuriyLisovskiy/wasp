@@ -10,47 +10,48 @@
 #include <xalwart.base/string_utils.h>
 
 // Framework libraries.
-#include "../http/headers.h"
-#include "../http/utility.h"
 #include "../utility/cache.h"
 
 
 __MIDDLEWARE_BEGIN__
 
-std::unique_ptr<http::abc::IHttpResponse> ConditionalGet::process_response(
-	http::Request* request, http::abc::IHttpResponse* response
-)
+Function ConditionalGet::operator() (const Function& next)
 {
-	// It's too late to prevent an unsafe request with a 412 response, and
-	// for a HEAD request, the response body is always empty so computing
-	// an accurate ETag isn't possible.
-	if (request->method != "GET")
+	return [this, next](http::Request* request) -> std::unique_ptr<http::abc::IHttpResponse>
 	{
-		return {};
-	}
+		auto response = next(request);
 
-	if (needs_etag(response) && !response->has_header(http::E_TAG))
-	{
-		util::cache::set_response_etag(response);
-	}
-
-	auto etag = response->get_header(http::E_TAG, "");
-	long last_modified = http::parse_http_date(response->get_header(http::LAST_MODIFIED, ""));
-	if (!etag.empty() || last_modified != -1)
-	{
-		auto conditional_response = util::cache::get_conditional_response(
-			request, etag, last_modified, response
-		);
-		if (conditional_response)
+		// It's too late to prevent an unsafe request with a 412 response, and
+		// for a HEAD request, the response body is always empty so computing
+		// an accurate ETag isn't possible.
+		if (request->method != "GET")
 		{
-			return conditional_response;
+			return response;
 		}
-	}
 
-	return {};
+		if (this->needs_etag(response) && !response->has_header(http::E_TAG))
+		{
+			util::cache::set_response_etag(response.get());
+		}
+
+		auto etag = response->get_header(http::E_TAG, "");
+		long last_modified = http::parse_http_date(response->get_header(http::LAST_MODIFIED, ""));
+		if (!etag.empty() || last_modified != -1)
+		{
+			auto conditional_response = util::cache::get_conditional_response(
+				request, etag, last_modified, response.get()
+			);
+			if (conditional_response)
+			{
+				return conditional_response;
+			}
+		}
+
+		return response;
+	};
 }
 
-bool ConditionalGet::needs_etag(http::abc::IHttpResponse* response)
+bool ConditionalGet::needs_etag(const std::unique_ptr<http::abc::IHttpResponse>& response) const
 {
 	auto cache_control = str::split(response->get_header(http::CACHE_CONTROL, ""), ',');
 	bool result = true;

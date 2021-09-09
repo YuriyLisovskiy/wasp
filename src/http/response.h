@@ -38,7 +38,7 @@ class ResponseBase : public abc::IHttpResponse
 {
 public:
 	explicit ResponseBase(
-		unsigned short int status=0, std::string content_type="", std::string reason="", std::string charset="utf-8"
+		unsigned short int status=0, std::string content_type="", std::string reason="", std::string charset=""
 	);
 
 	~ResponseBase() override = default;
@@ -132,6 +132,11 @@ public:
 		return this->charset;
 	}
 
+	inline void set_charset(const std::string& value) final
+	{
+		this->charset = value;
+	}
+
 	[[nodiscard]]
 	inline bool is_streaming() const final
 	{
@@ -202,7 +207,7 @@ public:
 		std::string content="",
 		const std::string& content_type="",
 		const std::string& reason="",
-		const std::string& charset="utf-8"
+		const std::string& charset=""
 	) : ResponseBase(status, content_type, reason, charset)
 	{
 		this->content = std::move(content);
@@ -264,7 +269,7 @@ public:
 		unsigned short int status=0,
 		const std::string& content_type="",
 		const std::string& reason="",
-		const std::string& charset="utf-8"
+		const std::string& charset=""
 	) : ResponseBase(status, content_type, reason, charset)
 	{
 		this->streaming = true;
@@ -291,7 +296,7 @@ public:
 		unsigned short int status=0,
 		const std::string& content_type="",
 		const std::string& reason="",
-		const std::string& charset="utf-8"
+		const std::string& charset=""
 	);
 
 	std::string get_chunk() override;
@@ -326,14 +331,6 @@ private:
 	std::string _get_headers_chunk();
 };
 
-// TESTME: raise
-// TODO: docs for 'raise'
-template <typename ...ArgsT>
-inline void raise(unsigned short int status_code, ArgsT&& ...args)
-{
-	throw exc::HttpError(status_code, std::forward<ArgsT...>(args)...);
-}
-
 __HTTP_END__
 
 
@@ -345,11 +342,9 @@ class RedirectBase : public Response
 {
 public:
 	explicit RedirectBase(
-		const std::string& redirect_to,
-		unsigned short int status,
-		const std::string& content_type="",
-		const std::string& reason="",
-		const std::string& charset="utf-8"
+		const std::string& redirect_to, unsigned short int status,
+		const std::string& content_type="", const std::string& reason="",
+		const std::string& charset=""
 	);
 
 	[[nodiscard]]
@@ -368,9 +363,7 @@ class Redirect : public RedirectBase
 {
 public:
 	inline explicit Redirect(
-		const std::string& redirect_to,
-		const std::string& content_type="",
-		const std::string& charset="utf-8"
+		const std::string& redirect_to, const std::string& content_type="", const std::string& charset=""
 	) : RedirectBase(redirect_to, 302, content_type, "", charset)
 	{
 	}
@@ -382,9 +375,7 @@ class PermanentRedirect : public RedirectBase
 {
 public:
 	inline explicit PermanentRedirect(
-		const std::string& redirect_to,
-		const std::string& content_type="",
-		const std::string& charset="utf-8"
+		const std::string& redirect_to, const std::string& content_type="", const std::string& charset=""
 	) : RedirectBase(redirect_to, 301, content_type, "", charset)
 	{
 	}
@@ -396,12 +387,10 @@ class NotModified : public Response
 {
 public:
 	inline explicit NotModified(
-		const std::string& content,
-		const std::string& content_type="",
-		const std::string& charset="utf-8"
+		const std::string& content, const std::string& content_type="", const std::string& charset=""
 	) : Response(304, content, content_type, "", charset)
 	{
-		this->remove_header("Content-Type");
+		this->remove_header(http::CONTENT_TYPE);
 	}
 
 	void set_content(const std::string& content) override;
@@ -413,9 +402,7 @@ class BadRequest : public Response
 {
 public:
 	inline explicit BadRequest(
-		const std::string& content,
-		const std::string& content_type="",
-		const std::string& charset="utf-8"
+		const std::string& content, const std::string& content_type="", const std::string& charset=""
 	) : Response(400, content, content_type, "", charset)
 	{
 	}
@@ -427,9 +414,7 @@ class NotFound : public Response
 {
 public:
 	inline explicit NotFound(
-		const std::string& content,
-		const std::string& content_type="",
-		const std::string& charset="utf-8"
+		const std::string& content, const std::string& content_type="", const std::string& charset=""
 	) : Response(404, content, content_type, "", charset)
 	{
 	}
@@ -441,9 +426,7 @@ class Forbidden : public Response
 {
 public:
 	inline explicit Forbidden(
-		const std::string& content,
-		const std::string& content_type="",
-		const std::string& charset="utf-8"
+		const std::string& content, const std::string& content_type="", const std::string& charset=""
 	) : Response(403, content, content_type, "", charset)
 	{
 	}
@@ -455,10 +438,8 @@ class NotAllowed : public Response
 {
 public:
 	explicit NotAllowed(
-		const std::string& content,
-		const std::vector<std::string>& permitted_methods,
-		const std::string& content_type="",
-		const std::string& charset="utf-8"
+		const std::string& content, const std::vector<std::string>& permitted_methods,
+		const std::string& content_type="", const std::string& charset=""
 	);
 };
 
@@ -468,9 +449,7 @@ class Gone : public Response
 {
 public:
 	inline explicit Gone(
-		const std::string& content,
-		const std::string& content_type="",
-		const std::string& charset="utf-8"
+		const std::string& content, const std::string& content_type="", const std::string& charset=""
 	) : Response(410, content, content_type, "", charset)
 	{
 	}
@@ -482,9 +461,7 @@ class EntityTooLarge : public Response
 {
 public:
 	inline explicit EntityTooLarge(
-		const std::string& content,
-		const std::string& content_type="",
-		const std::string& charset="utf-8"
+		const std::string& content, const std::string& content_type="", const std::string& charset=""
 	) : Response(413, content, content_type, "", charset)
 	{
 	}
@@ -496,9 +473,7 @@ class ServerError : public Response
 {
 public:
 	inline explicit ServerError(
-		const std::string& content,
-		const std::string& content_type="",
-		const std::string& charset="utf-8"
+		const std::string& content, const std::string& content_type="", const std::string& charset=""
 	) : Response(500, content, content_type, "", charset)
 	{
 	}

@@ -10,7 +10,7 @@
 __URLS_BEGIN__
 
 std::function<std::unique_ptr<http::abc::IHttpResponse>(http::Request* request, conf::Settings* settings)> resolve(
-	const std::string& path, std::vector<std::shared_ptr<IPattern>>& urlpatterns
+	const std::string& path, const std::vector<std::shared_ptr<IPattern>>& urlpatterns
 )
 {
 	std::function<std::unique_ptr<http::abc::IHttpResponse>(http::Request*, conf::Settings*)> fn = nullptr;

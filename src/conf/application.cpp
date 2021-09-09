@@ -1,24 +1,27 @@
 /**
- * conf/xalwart.cpp
+ * conf/application.cpp
  *
  * Copyright (c) 2019-2021 Yuriy Lisovskiy
  */
 
-#include "./xalwart.h"
+#include "./application.h"
+
+// C++ libraries.
+#include <iostream>
 
 // Framework libraries.
 #include "../management/module.h"
 #include "../urls/resolver.h"
 #include "../urls/utilities.h"
+#include "../middleware/exception.h"
 
 
 __CONF_BEGIN__
 
-void MainApplication::_setup_commands(std::function<net::StatusCode(
-	xw::net::RequestContext*, const std::map<std::string, std::string>& /* environment */
-)> handler)
+void Application::_setup_commands()
 {
-	auto core_module = mgmt::CoreModuleConfig(this->settings, std::move(handler));
+	auto request_handler = this->build_server_handler();
+	auto core_module = mgmt::CoreModuleConfig(this->settings, std::move(request_handler));
 	this->_extend_settings_commands(core_module.get_commands(), core_module.get_name());
 	for (auto& installed_module : this->settings->MODULES)
 	{
@@ -26,7 +29,7 @@ void MainApplication::_setup_commands(std::function<net::StatusCode(
 	}
 }
 
-void MainApplication::_extend_settings_commands(
+void Application::_extend_settings_commands(
 	const std::vector<std::shared_ptr<cmd::BaseCommand>>& from, const std::string& module_name
 )
 {
@@ -48,15 +51,10 @@ void MainApplication::_extend_settings_commands(
 	}
 }
 
-MainApplication::MainApplication(const std::string& version, conf::Settings* settings) : version(version)
+Application::Application(const std::string& version, conf::Settings* settings) : version(version)
 {
 	InterruptException::initialize();
-	if (!settings)
-	{
-		throw ImproperlyConfigured(
-			"Settings must be configured in order to use the application.", _ERROR_DETAILS_
-		);
-	}
+	require_non_null(settings, "'settings' is not instantiated", _ERROR_DETAILS_);
 
 	this->settings = settings;
 	this->settings->prepare();
@@ -81,7 +79,7 @@ MainApplication::MainApplication(const std::string& version, conf::Settings* set
 
 	this->settings->TEMPLATE_ENGINE->load_libraries();
 
-	this->_setup_commands(this->make_handler());
+	this->_setup_commands();
 
 	size_t max_len = 0;
 	for (auto& command : this->_commands)
@@ -111,15 +109,15 @@ MainApplication::MainApplication(const std::string& version, conf::Settings* set
 	}
 }
 
-void MainApplication::execute(int argc, char** argv)
+void Application::execute(int argc, char** argv) const
 {
 	if (argc > 1)
 	{
 		try
 		{
-			if (this->_commands.find(argv[1]) != this->_commands.end())
+			if (this->_commands.contains(argv[1]))
 			{
-				this->_commands[argv[1]]->run_from_argv(argc, argv);
+				this->_commands.at(argv[1])->run_from_argv(argc, argv);
 			}
 			else
 			{
@@ -136,7 +134,7 @@ void MainApplication::execute(int argc, char** argv)
 		}
 		catch (...)
 		{
-			this->settings->LOGGER->error("xw::conf::MainApplication: unknown error", _ERROR_DETAILS_);
+			this->settings->LOGGER->error("Unknown error", _ERROR_DETAILS_);
 		}
 	}
 	else
@@ -145,57 +143,70 @@ void MainApplication::execute(int argc, char** argv)
 	}
 }
 
-HandlerFunction MainApplication::make_handler() const
+Application::HandlerFunction Application::build_server_handler() const
 {
-	return [this](net::RequestContext* context, const std::map<std::string, std::string>& env) -> net::StatusCode
+	return [this](
+		net::RequestContext* context, const std::map<std::string, std::string>& environment
+	) -> net::StatusCode
 	{
-		auto request = this->build_request(context, env);
-		std::unique_ptr<http::abc::IHttpResponse> result;
-		try
-		{
-			result = this->process_request(request);
-			if (!result)
-			{
-				result = this->process_urlpatterns(request, this->settings->URLPATTERNS);
-
-				// TODO: check if it is required to process response middleware in case of controller error.
-				if (!result)
-				{
-					// If controller returns empty result, return 204 - No Content.
-					result = std::make_unique<http::Response>(204);
-					this->settings->LOGGER->warning("Response was not instantiated, returned 204", _ERROR_DETAILS_);
-				}
-				else
-				{
-					auto middleware_result = this->process_response(request, result);
-					if (middleware_result)
-					{
-						result = std::move(middleware_result);
-					}
-				}
-			}
-		}
-		catch (const http::exc::HttpError& e)
-		{
-			this->settings->LOGGER->trace("An error was caught as http::HttpException", _ERROR_DETAILS_);
-			result = std::make_unique<http::Response>(e.status_code(), e.get_message());
-		}
-		catch (const BaseException& e)
-		{
-			this->settings->LOGGER->trace("An error was caught as core::BaseException", _ERROR_DETAILS_);
-			result = std::make_unique<http::Response>(500, e.get_message());
-		}
-		catch (const std::exception& e)
-		{
-			this->settings->LOGGER->error(e.what(), _ERROR_DETAILS_);
-			result = std::make_unique<http::Response>(500, e.what());
-		}
-
-		return start_response(context, result);
+		auto request = this->build_request(context, environment);
+		auto middleware_chain = this->build_middleware_chain();
+		auto response = middleware_chain(request.get());
+		return start_response(context, response);
 	};
 }
 
-bool MainApplication::static_is_allowed(const std::string& static_url) const
+std::unique_ptr<http::abc::IHttpResponse> Application::error_response(
+	http::Request* request, net::StatusCode status_code, const std::string& message
+) const
+{
+	auto [status, status_is_found] = net::get_status_by_code(status_code);
+	if (!status_is_found)
+	{
+		require_non_null(this->settings->LOGGER.get(), _ERROR_DETAILS_)->warning(
+			"Unknown status code: " + std::to_string(status_code)
+		);
+	}
+
+	bool is_json = require_non_null(request, _ERROR_DETAILS_)->is_json();
+	std::string content;
+	if (is_json)
+	{
+		content = this->settings->render_json_error_template(status, message);
+	}
+
+	content = this->settings->render_html_error_template(status, message);
+	return std::make_unique<http::Response>(status_code, content, is_json ? http::mime::APPLICATION_JSON : "");
+}
+
+middleware::Function Application::build_controller_handler() const
+{
+	return [this](http::Request* request) -> std::unique_ptr<http::abc::IHttpResponse>
+	{
+		require_non_null(request, _ERROR_DETAILS_);
+		auto apply = urls::resolve(request->url.path, this->settings->URLPATTERNS);
+		if (apply)
+		{
+			return apply(request, this->settings);
+		}
+
+		return this->error_response(request, 404, "The requested resource was not found.");
+	};
+}
+
+middleware::Function Application::build_middleware_chain() const
+{
+	middleware::Function chain = this->build_controller_handler();
+	auto middleware_count = (long long)this->settings->MIDDLEWARE.size();
+	for (long long i = middleware_count; i >= 0; i--)
+	{
+		chain = this->settings->MIDDLEWARE[i](chain);
+	}
+
+	return middleware::Exception(this->settings)(chain);
+}
+
+bool Application::static_is_allowed(const std::string& static_url) const
 {
 	auto url = http::parse_url(static_url);
 
@@ -204,7 +215,7 @@ bool MainApplication::static_is_allowed(const std::string& static_url) const
 	return this->settings->DEBUG && url.hostname().empty();
 }
 
-void MainApplication::build_static_pattern(
+void Application::build_static_pattern(
 	std::vector<std::shared_ptr<urls::IPattern>>& patterns,
 	const std::string& root, const std::string& url, const std::string& name
 ) const
@@ -215,7 +226,7 @@ void MainApplication::build_static_pattern(
 	}
 }
 
-void MainApplication::build_module_patterns(std::vector<std::shared_ptr<urls::IPattern>>& patterns) const
+void Application::build_module_patterns(std::vector<std::shared_ptr<urls::IPattern>>& patterns) const
 {
 	if (!this->settings->MODULES.empty())
 	{
@@ -230,58 +241,11 @@ void MainApplication::build_module_patterns(std::vector<std::shared_ptr<urls::IP
 	}
 }
 
-std::unique_ptr<http::abc::IHttpResponse> MainApplication::process_request(
-	std::shared_ptr<http::Request>& request
-) const
-{
-	for (auto& middleware : this->settings->MIDDLEWARE)
-	{
-		auto result = middleware->process_request(request.get());
-		if (result)
-		{
-			return result;
-		}
-	}
-
-	return {};
-}
-
-std::unique_ptr<http::abc::IHttpResponse> MainApplication::process_urlpatterns(
-	std::shared_ptr<http::Request>& request, std::vector<std::shared_ptr<urls::IPattern>>& urlpatterns
-) const
-{
-	auto apply = urls::resolve(request->url.path, this->settings->URLPATTERNS);
-	if (apply)
-	{
-		return apply(request.get(), this->settings);
-	}
-
-	this->settings->LOGGER->trace("The requested resource was not found", _ERROR_DETAILS_);
-	return std::make_unique<http::Response>(404, "<h2>404 - Not Found</h2>");
-}
-
-std::unique_ptr<http::abc::IHttpResponse> MainApplication::process_response(
-	std::shared_ptr<http::Request>& request, std::unique_ptr<http::abc::IHttpResponse>& response
-) const
-{
-	auto size = (long long)this->settings->MIDDLEWARE.size();
-	for (long long i = size - 1; i >= 0; i--)
-	{
-		auto result = this->settings->MIDDLEWARE[i]->process_response(request.get(), response.get());
-		if (result)
-		{
-			return result;
-		}
-	}
-
-	return {};
-}
-
-std::shared_ptr<http::Request> MainApplication::build_request(
+std::shared_ptr<http::Request> Application::build_request(
 	net::RequestContext* context, std::map<std::string, std::string> environment
 ) const
 {
-	util::require_non_null(context, "'context' is nullptr", _ERROR_DETAILS_);
+	require_non_null(context, "'context' is nullptr", _ERROR_DETAILS_);
 	context->body->set_limit((ssize_t)context->content_size);
 
 	return std::make_shared<http::Request>(
@@ -296,22 +260,20 @@ std::shared_ptr<http::Request> MainApplication::build_request(
 	);
 }
 
-net::StatusCode MainApplication::start_response(
+net::StatusCode Application::start_response(
 	net::RequestContext* ctx, const std::unique_ptr<http::abc::IHttpResponse>& response
 ) const
 {
-	std::unique_ptr<http::abc::IHttpResponse> result = nullptr;
+	http::Response no_content(204);
 	if (!response)
 	{
-		// Response was not instantiated, so return 204 - No Content.
-		result = std::make_unique<http::Response>(204);
 		this->settings->LOGGER->warning("Response was not instantiated, returned 204.", _ERROR_DETAILS_);
 	}
 
-	return this->finish_response(ctx, response ? response.get() : result.get());
+	return this->finish_response(ctx, response ? response.get() : &no_content);
 }
 
-net::StatusCode MainApplication::finish_response(net::RequestContext* ctx, http::abc::IHttpResponse* response) const
+net::StatusCode Application::finish_response(net::RequestContext* ctx, http::abc::IHttpResponse* response) const
 {
 	if (response->is_streaming())
 	{

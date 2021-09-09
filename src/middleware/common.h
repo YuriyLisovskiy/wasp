@@ -3,18 +3,7 @@
  *
  * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
- * "Common" middleware takes care of some basic operations:
- *  - Forbid access to User-Agents in settings.DISALLOWED_USER_AGENTS
- *  - URL rewriting: Based on the APPEND_SLASH and PREPEND_WWW settings,
- * 	  append missing slashes and/or prepends missing "www."s.
- * 	- If APPEND_SLASH is set and the initial URL doesn't end with a
- * 	  slash, and it is not found in urlpatterns, form a new URL by
- * 	  appending a slash at the end. If this new URL is found in
- * 	  urlpatterns, return an HTTP redirect to this new URL; otherwise
- * 	  process the initial URL as usual.
- *
- * This behavior can be customized by subclassing CommonMiddleware and
- * overriding the get_response_redirect method.
+ * Perform common operations with request and response.
  */
 
 #pragma once
@@ -23,17 +12,37 @@
 #include "./_def_.h"
 
 // Framework libraries.
+#include "./types.h"
 #include "./base.h"
 
 
 __MIDDLEWARE_BEGIN__
 
 // TESTME: Common
-// TODO: docs for 'Common'
-class Common : public BaseMiddleware
+/** "Common" middleware takes care of some basic operations:
+ *  - Forbid access to User-Agents in `settings->get_disallowed_user_agents()`
+ *  - URL rewriting: Based on the `settings->APPEND_SLASH` and
+ *    `settings->PREPEND_WWW` settings, append missing slashes and/or prepends
+ *    missing "www."s.
+ * 	- If `settings->APPEND_SLASH` is `true` and the initial URL doesn't end with a
+ * 	  slash, and it is not found in urlpatterns, form a new URL by
+ * 	  appending a slash at the end. If this new URL is found in
+ * 	  urlpatterns, return an HTTP redirect to this new URL; otherwise
+ * 	  process the initial URL as usual.
+ *
+ * This behavior can be customized by subclassing `Common` and
+ * overriding the `get_response_redirect` method.
+ */
+class Common : public MiddlewareWithConstantSettings
 {
 public:
-	inline static const std::string FULL_NAME = "xw::middleware::Common";
+	static inline constexpr const char* NAME = "xw::middleware::Common";
+
+	explicit inline Common(const conf::Settings* settings) : MiddlewareWithConstantSettings(settings)
+	{
+	}
+
+	virtual Function operator() (const Function& next);
 
 protected:
 	virtual inline std::unique_ptr<http::abc::IHttpResponse> get_response_redirect(
@@ -43,29 +52,24 @@ protected:
 		return std::make_unique<http::resp::PermanentRedirect>(redirect_to);
 	}
 
-	// Return true if settings.APPEND_SLASH is true and appending a slash to
+	// Return `true` if `settings->APPEND_SLASH` is `true` and appending a slash to
 	// the request path turns an invalid path into a valid one.
-	bool should_redirect_with_slash(http::Request* request);
+	virtual bool should_redirect_with_slash(http::Request* request);
 
-	// Return the full path of the request with a trailing slash appended.
-	// Raise a RuntimeError if settings.DEBUG is true and request method is
+	// Return the full path of the `request` with a trailing slash appended.
+	// Throws a `RuntimeError` if `settings->DEBUG` is `true` and request method is
 	// POST, PUT, or PATCH.
-	std::string get_full_path_with_slash(http::Request* request);
-
-public:
-	inline explicit Common(conf::Settings* settings) : BaseMiddleware(settings)
-	{
-	}
+	virtual std::string get_full_path_with_slash(http::Request* request);
 
 	// Check for denied User-Agents and rewrite the URL based on
-	// settings.APPEND_SLASH and settings.PREPEND_WWW
-	std::unique_ptr<http::abc::IHttpResponse> process_request(http::Request* request) override;
+	// `settings->APPEND_SLASH` and `settings->PREPEND_WWW`.
+	virtual std::unique_ptr<http::abc::IHttpResponse> preprocess(http::Request* request);
 
 	// When the status code of the response is 404, it may redirect to a path
-	// with an appended slash if should_redirect_with_slash() returns true.
-	std::unique_ptr<http::abc::IHttpResponse> process_response(
+	// with an appended slash if `should_redirect_with_slash` returns `true`.
+	virtual std::unique_ptr<http::abc::IHttpResponse> postprocess(
 		http::Request* request, http::abc::IHttpResponse* response
-	) override;
+	);
 };
 
 __MIDDLEWARE_END__

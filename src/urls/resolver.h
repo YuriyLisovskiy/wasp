@@ -27,13 +27,13 @@ __URLS_BEGIN__
 extern std::function<std::unique_ptr<http::abc::IHttpResponse>(
 	http::Request* request, conf::Settings* settings
 )> resolve(
-	const std::string& path, std::vector<std::shared_ptr<IPattern>>& urlpatterns
+	const std::string& path, const std::vector<std::shared_ptr<IPattern>>& urlpatterns
 );
 
 // TESTME: is_valid_path
 // Return true if the given path can be found in urlpatterns,
 // false otherwise.
-inline bool is_valid_path(const std::string& path, std::vector<std::shared_ptr<IPattern>>& urlpatterns)
+inline bool is_valid_path(const std::string& path, const std::vector<std::shared_ptr<IPattern>>& urlpatterns)
 {
 	return resolve(path, urlpatterns) != nullptr;
 }

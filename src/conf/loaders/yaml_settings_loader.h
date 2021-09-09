@@ -22,42 +22,18 @@ __CONF_BEGIN__
 
 class YamlSettingsLoader : public BaseSettingsLoader<YAML::Node>
 {
-private:
-	static void _init_allowed_hosts(Settings* settings, const YAML::Node& allowed_hosts);
-
-	static void _init_disallowed_user_agents(Settings* settings, const YAML::Node& agents);
-
-	static void _init_ignorable_404_urls(Settings* settings, const YAML::Node& urls);
-
-	static void _init_formats(Settings* settings, const YAML::Node& config);
-
-	static void _init_csrf(Settings* settings, const YAML::Node& config);
-
-	static void _init_secure(Settings* settings, const YAML::Node& config);
-
-	static void _init_modules(Settings* settings, const YAML::Node& modules);
-
-	static void _init_middleware(Settings* settings, const YAML::Node& middleware);
-
-	static void _init_databases(Settings* settings, const YAML::Node& databases);
-
-	static void _init_sqlite3_database(
-		const std::string& name, Settings* settings,
-		std::shared_ptr<orm::abc::ISQLDriver>& driver, const YAML::Node& database
-	);
-
 protected:
 
 	// Returns YAML::Node of type Null
 	[[nodiscard]]
-	inline YAML::Node null() const
+	static inline YAML::Node null()
 	{
 		return YAML::Node(YAML::NodeType::Null);
 	}
 
 	// Returns YAML::Node of type Map
 	[[nodiscard]]
-	inline YAML::Node map_node() const
+	static inline YAML::Node map_node()
 	{
 		return YAML::Node(YAML::NodeType::Map);
 	}
@@ -83,8 +59,6 @@ protected:
 
 	virtual void init_template_engine_setting(Settings* settings, const YAML::Node& engine_config);
 
-public:
-
 	// Override this method to change the default config name.
 	[[nodiscard]]
 	std::string config_name() const override;
@@ -99,6 +73,30 @@ public:
 	void overwrite_config(YAML::Node& config, const YAML::Node& local_config) override;
 
 	void init_settings(Settings* settings, const YAML::Node& config) override;
+
+private:
+	static void _init_allowed_hosts(Settings* settings, const YAML::Node& allowed_hosts);
+
+	static void _init_disallowed_user_agents(Settings* settings, const YAML::Node& agents);
+
+	static void _init_ignorable_404_urls(Settings* settings, const YAML::Node& urls);
+
+	static void _init_formats(Settings* settings, const YAML::Node& config);
+
+	static void _init_csrf(Settings* settings, const YAML::Node& config);
+
+	static void _init_secure(Settings* settings, const YAML::Node& config);
+
+	static void _init_modules(Settings* settings, const YAML::Node& modules);
+
+	static void _init_middleware(Settings* settings, const YAML::Node& middleware);
+
+	static void _init_databases(Settings* settings, const YAML::Node& databases);
+
+	static void _init_sqlite3_database(
+		const std::string& name, Settings* settings,
+		std::shared_ptr<orm::abc::ISQLDriver>& driver, const YAML::Node& database
+	);
 };
 
 __CONF_END__

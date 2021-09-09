@@ -6,23 +6,31 @@
 
 #include "./clickjacking.h"
 
-// Framework libraries.
-#include "../http/headers.h"
+// C++ libraries.
+#include <memory>
 
 
 __MIDDLEWARE_BEGIN__
 
-std::unique_ptr<http::abc::IHttpResponse> XFrameOptions::process_response(
-	http::Request* request, http::abc::IHttpResponse* response
-)
+Function XFrameOptions::operator() (const Function& next)
 {
-	// Set it if it's not already in the response.
-	if (!response->has_header(http::X_FRAME_OPTIONS))
+	return [this, next](http::Request* request) -> std::unique_ptr<http::abc::IHttpResponse>
 	{
-		response->set_header(http::X_FRAME_OPTIONS, this->get_x_frame_options_value(request, response));
-	}
+		auto response = next(request);
 
-	return nullptr;
+		// Set it if it's not already in the response.
+		if (!response->has_header(http::X_FRAME_OPTIONS))
+		{
+			require_non_null(
+				response.get(),
+				"Got nullptr response in '" + std::string(NAME) +
+				"' middleware while setting " + std::string(http::X_FRAME_OPTIONS)
+			);
+			response->set_header(http::X_FRAME_OPTIONS, this->get_x_frame_options_value(request, response.get()));
+		}
+
+		return response;
+	};
 }
 
 __MIDDLEWARE_END__

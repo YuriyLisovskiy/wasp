@@ -53,7 +53,7 @@ protected:
 		const std::vector<std::string>& allowed_methods, conf::Settings* settings
 	) : settings(settings)
 	{
-		util::require_non_null(this->settings, "'settings' is nullptr", _ERROR_DETAILS_);
+		require_non_null(this->settings, "'settings' is nullptr", _ERROR_DETAILS_);
 		for (const auto& method : allowed_methods)
 		{
 			this->allowed_methods_list.push_back(str::to_lower(method));
@@ -182,7 +182,7 @@ public:
 		if (this->request == nullptr)
 		{
 			throw NullPointerException(
-				util::demangle(typeid(*this).name()) +
+				demangle(typeid(*this).name()) +
 				" instance has not initialized request."
 				" Did you override setup() and forget to call base method?",
 				_ERROR_DETAILS_

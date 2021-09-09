@@ -31,6 +31,7 @@
 #include "./cookie/parser.h"
 #include "./mime/multipart/form.h"
 #include "./mime/multipart/body_reader.h"
+#include "./mime/content_types/application.h"
 #include "../conf/_def_.h"
 
 
@@ -176,6 +177,12 @@ public:
 	inline std::string get_header(const std::string& key, const std::string& default_value="") const
 	{
 		return this->header.contains(key) ? this->header.at(key) : default_value;
+	}
+
+	[[nodiscard]]
+	inline bool is_json() const
+	{
+		return this->get_header(CONTENT_TYPE, "").find(mime::APPLICATION_JSON) != std::string::npos;
 	}
 
 	// 'cookies' parses and returns the HTTP cookies sent with the request.

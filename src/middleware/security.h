@@ -10,12 +10,16 @@
 
 // C++ libraries.
 #include <vector>
-#include <string>
+#include <memory>
+
+// Base libraries.
+#include <xalwart.base/re/regex.h>
 
 // Module definitions.
 #include "./_def_.h"
 
 // Framework libraries.
+#include "./types.h"
 #include "./base.h"
 
 
@@ -23,30 +27,31 @@ __MIDDLEWARE_BEGIN__
 
 // TESTME: Security
 // TODO: docs for 'Security'
-class Security : public BaseMiddleware
+class Security : public MiddlewareWithConstantSettings
 {
 public:
-	inline static const std::string FULL_NAME = "xw::middleware::Security";
+	static inline constexpr const char* NAME = "xw::middleware::Security";
+
+	explicit inline Security(conf::Settings* settings) : MiddlewareWithConstantSettings(settings)
+	{
+		this->secure = this->settings->SECURE;
+		for (auto& pattern : this->secure.REDIRECT_EXEMPT)
+		{
+			this->redirect_exempt.emplace_back(pattern);
+		}
+	}
+
+	virtual Function operator() (const Function& next);
 
 protected:
-	size_t sts_seconds;
-	bool sts_include_subdomains;
-	bool sts_preload;
-	bool content_type_no_sniff;
-	bool xss_filter;
-	bool redirect;
-	std::string redirect_host;
-	std::string referrer_policy;
+	conf::Secure secure;
 	std::vector<re::Regex> redirect_exempt;
 
-public:
-	explicit Security(conf::Settings* settings);
+	virtual std::unique_ptr<http::abc::IHttpResponse> preprocess(http::Request* request);
 
-	std::unique_ptr<http::abc::IHttpResponse> process_request(http::Request* request) override;
-
-	std::unique_ptr<http::abc::IHttpResponse> process_response(
+	virtual std::unique_ptr<http::abc::IHttpResponse> postprocess(
 		http::Request* request, http::abc::IHttpResponse* response
-	) override;
+	);
 };
 
 __MIDDLEWARE_END__

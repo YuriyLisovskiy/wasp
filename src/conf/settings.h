@@ -20,6 +20,7 @@
 #include <xalwart.base/path.h>
 #include <xalwart.base/yaml/yaml-cpp/yaml.h>
 #include <xalwart.base/net/abc.h>
+#include <xalwart.base/net/status.h>
 
 // Render libraries.
 #include <xalwart.render/abc.h>
@@ -35,88 +36,14 @@
 
 // Framework libraries.
 #include "./abc.h"
-#include "../middleware/abc.h"
+#include "./types.h"
+#include "../middleware/types.h"
 
 
 __CONF_BEGIN__
 
-struct Settings
+class Settings
 {
-private:
-	std::map<std::string, std::function<std::shared_ptr<middleware::IMiddleware>()>> _middleware;
-	std::map<std::string, std::function<std::shared_ptr<render::abc::ILibrary>()>> _libraries;
-	std::map<std::string, std::function<std::shared_ptr<IModuleConfig>()>> _modules;
-	std::map<std::string, std::function<std::shared_ptr<render::abc::ILoader>()>> _loaders;
-	std::list<std::function<std::shared_ptr<orm::db::Migration>(orm::abc::ISQLDriver* driver)>> _migrations;
-
-protected:
-	template <module_config_type ModuleConfigT>
-	inline void module(const std::string& custom_name="")
-	{
-		auto name = this->get_name_or<ModuleConfigT>(custom_name);
-		if (this->LOGGER && this->_modules.find(name) != this->_modules.end())
-		{
-			this->LOGGER->warning("module '" + name + "' will be overwritten");
-		}
-
-		this->_modules[name] = [this, name]() -> std::shared_ptr<IModuleConfig> {
-			auto module = std::make_shared<ModuleConfigT>(this);
-			module->init(name);
-			return module;
-		};
-	}
-
-	template <middleware::middleware_type MiddlewareT>
-	inline void middleware(const std::string& custom_name="")
-	{
-		auto name = this->get_name_or<MiddlewareT>(custom_name);
-		if (this->LOGGER && this->_middleware.find(name) != this->_middleware.end())
-		{
-			this->LOGGER->warning("middleware '" + name + "' will be overwritten");
-		}
-
-		this->_middleware[name] = [this]() -> std::shared_ptr<middleware::IMiddleware> {
-			return std::make_shared<MiddlewareT>(this);
-		};
-	}
-
-	template <render::abc::library_type LibraryT>
-	inline void library(const std::string& custom_name="")
-	{
-		auto name = this->get_name_or<LibraryT>(custom_name);
-		if (this->LOGGER && this->_libraries.find(name) != this->_libraries.end())
-		{
-			this->LOGGER->warning("library '" + name + "' will be overwritten");
-		}
-
-		this->_libraries[name] = [this]() -> std::shared_ptr<render::abc::ILibrary> {
-			return std::make_shared<LibraryT>(this);
-		};
-	}
-
-	template <render::abc::loader_type LoaderT>
-	inline void loader(const std::string& custom_name="")
-	{
-		auto name = this->get_name_or<LoaderT>(custom_name);
-		if (this->LOGGER && this->_loaders.find(name) != this->_loaders.end())
-		{
-			this->LOGGER->warning("loader '" + name + "' will be overwritten");
-		}
-
-		this->_loaders[name] = [this]() -> std::shared_ptr<render::abc::ILoader> {
-			return std::make_shared<LoaderT>(this);
-		};
-	}
-
-	template <class MigrationT, class ...Args>
-	inline void migration(Args&& ...args)
-	{
-		this->_migrations.push_back([args...](auto* driver) -> std::shared_ptr<orm::db::Migration>
-		{
-			return std::make_shared<MigrationT>(driver, std::forward<Args>(args)...);
-		});
-	}
-
 public:
 	// For development purposes only.
 	bool DEBUG = false;
@@ -264,7 +191,7 @@ public:
 	char THOUSAND_SEPARATOR = ',';
 
 	// Default X-Frame-Options header value
-	std::string X_FRAME_OPTIONS = "SAMEORIGIN";
+	XFrameOptions X_FRAME_OPTIONS = XFrameOptions::SameOrigin;
 
 	bool USE_X_FORWARDED_HOST = false;
 	bool USE_X_FORWARDED_PORT = false;
@@ -272,7 +199,7 @@ public:
 	// List of middleware to use. Order is important; in the request phase, these
 	// middleware will be applied in the order given, and in the response
 	// phase the middleware will be applied in reverse order.
-	std::vector<std::shared_ptr<middleware::IMiddleware>> MIDDLEWARE;
+	std::vector<middleware::Handler> MIDDLEWARE;
 
 	// Settings for CSRF cookie.
 	std::string CSRF_COOKIE_NAME = "csrftoken";
@@ -289,31 +216,38 @@ public:
 	// SSL settings (will be added in future).
 	bool USE_SSL = false;
 
-	// Security middleware.
-	bool SECURE_BROWSER_XSS_FILTER = false;
-	bool SECURE_CONTENT_TYPE_NO_SNIFF = true;
-	bool SECURE_HSTS_INCLUDE_SUBDOMAINS = false;
-	bool SECURE_HSTS_PRELOAD = false;
-	size_t SECURE_HSTS_SECONDS = 0;
-	std::vector<std::string> SECURE_REDIRECT_EXEMPT;
-	std::string SECURE_REFERRER_POLICY;
-	std::string SECURE_SSL_HOST;
-	bool SECURE_SSL_REDIRECT = false;
+	// Used in `Security` middleware.
+	Secure SECURE = {
+		.BROWSER_XSS_FILTER = false,
+		.CONTENT_TYPE_NO_SNIFF = true,
+		.HSTS_INCLUDE_SUBDOMAINS = false,
+		.HSTS_PRELOAD = false,
+		.HSTS_SECONDS = 0,
+		.REDIRECT_EXEMPT = {},
+		.REFERRER_POLICY = "",
+		.SSL_HOST = "",
+		.SSL_REDIRECT = false,
 
-	// If your module is behind a proxy that sets a header to specify secure
-	// connections, AND that proxy ensures that user-submitted headers with the
-	// same name are ignored (so that people can't spoof it), set this value to
-	// a std::pair of (header_name, header_value). For any requests that come in with
-	// that header/value, request.is_secure() will return true.
-	// WARNING! Only set this if you fully understand what you're doing. Otherwise,
-	// you may be opening yourself up to a security risk.
-	std::optional<std::pair<std::string, std::string>> SECURE_PROXY_SSL_HEADER =
-		std::pair<std::string, std::string>("X-Forwarded-Proto", "https");
+		// If your module is behind a proxy that sets a header to specify secure
+		// connections, AND that proxy ensures that user-submitted headers with the
+		// same name are ignored (so that people can't spoof it), set this value to
+		// a `std::pair` of (header_name, header_value). For any requests that come in with
+		// that header/value, request.is_secure() will return true.
+		// WARNING! Only set this if you fully understand what you're doing. Otherwise,
+		// you may be opening yourself up to a security risk.
+		.PROXY_SSL_HEADER = std::pair<std::string, std::string>("X-Forwarded-Proto", "https")
+	};
 
 public:
 	explicit Settings(const std::string& base_dir);
 
 	virtual ~Settings() = default;
+
+	[[nodiscard]]
+	virtual std::string render_html_error_template(const net::Status& status, const std::string& message) const;
+
+	[[nodiscard]]
+	virtual std::string render_json_error_template(const net::Status& status, const std::string& message) const;
 
 	void prepare();
 
@@ -374,7 +308,10 @@ public:
 	std::shared_ptr<IModuleConfig> get_module(const std::string& full_name) const;
 
 	[[nodiscard]]
-	std::shared_ptr<middleware::IMiddleware> get_middleware(const std::string& full_name) const;
+	inline middleware::Handler get_middleware_by_name(const std::string& name) const
+	{
+		return this->_middleware.contains(name) ? this->_middleware.at(name) : nullptr;
+	}
 
 	[[nodiscard]]
 	std::shared_ptr<render::abc::ILibrary> get_library(const std::string& full_name) const;
@@ -404,11 +341,74 @@ public:
 	{
 		if (full_name.empty())
 		{
-			return util::demangle(typeid(T).name());
+			return demangle(typeid(T).name());
 		}
 
 		return full_name;
 	}
+
+protected:
+	template <module_config_type ModuleConfigT>
+	inline void module(const std::string& custom_name="")
+	{
+		auto name = this->get_name_or<ModuleConfigT>(custom_name);
+		if (this->LOGGER && this->_modules.find(name) != this->_modules.end())
+		{
+			this->LOGGER->warning("module '" + name + "' will be overwritten");
+		}
+
+		this->_modules[name] = [this, name]() -> std::shared_ptr<IModuleConfig> {
+			auto module = std::make_shared<ModuleConfigT>(this);
+			module->init(name);
+			return module;
+		};
+	}
+
+	void middleware(const std::string& name, middleware::Handler handler);
+
+	template <render::abc::library_type LibraryT>
+	inline void library(const std::string& custom_name="")
+	{
+		auto name = this->get_name_or<LibraryT>(custom_name);
+		if (this->LOGGER && this->_libraries.find(name) != this->_libraries.end())
+		{
+			this->LOGGER->warning("library '" + name + "' will be overwritten");
+		}
+
+		this->_libraries[name] = [this]() -> std::shared_ptr<render::abc::ILibrary> {
+			return std::make_shared<LibraryT>(this);
+		};
+	}
+
+	template <render::abc::loader_type LoaderT>
+	inline void loader(const std::string& custom_name="")
+	{
+		auto name = this->get_name_or<LoaderT>(custom_name);
+		if (this->LOGGER && this->_loaders.find(name) != this->_loaders.end())
+		{
+			this->LOGGER->warning("loader '" + name + "' will be overwritten");
+		}
+
+		this->_loaders[name] = [this]() -> std::shared_ptr<render::abc::ILoader> {
+			return std::make_shared<LoaderT>(this);
+		};
+	}
+
+	template <class MigrationT, class ...Args>
+	inline void migration(Args&& ...args)
+	{
+		this->_migrations.push_back([args...](auto* driver) -> std::shared_ptr<orm::db::Migration>
+		{
+			return std::make_shared<MigrationT>(driver, std::forward<Args>(args)...);
+		});
+	}
+
+private:
+	std::map<std::string, middleware::Handler> _middleware;
+	std::map<std::string, std::function<std::shared_ptr<render::abc::ILibrary>()>> _libraries;
+	std::map<std::string, std::function<std::shared_ptr<IModuleConfig>()>> _modules;
+	std::map<std::string, std::function<std::shared_ptr<render::abc::ILoader>()>> _loaders;
+	std::list<std::function<std::shared_ptr<orm::db::Migration>(orm::abc::ISQLDriver* driver)>> _migrations;
 };
 
 __CONF_END__
