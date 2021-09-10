@@ -78,7 +78,6 @@ std::string Settings::render_html_error_template(const net::Status& status, cons
 std::string Settings::render_json_error_template(const net::Status& status, const std::string& message) const
 {
 	return "{\n"
-//	       "  \"exception\" : \"org.springframework.web.bind.MissingServletRequestParameterException\",\n"
 	       "  \"status\" : " + std::to_string(status.code) + ",\n"
 	       "  \"error\" : \"" + status.phrase + "\",\n"
 	       "  \"message\" : \"" + message + "\"\n"
@@ -98,13 +97,15 @@ void Settings::prepare()
 	}
 }
 
-void Settings::perform_checks()
+void Settings::check()
 {
 	std::cout << "Performing checks..." << std::endl;
 	if (!this->LOGGER)
 	{
 		throw ImproperlyConfigured("'LOGGER' must be configured", _ERROR_DETAILS_);
 	}
+
+	this->LOGGER->use_colors(this->USE_COLORS_IN_LOGGER);
 
 	size_t err_count = 0;
 	if (this->BASE_DIR.empty())
@@ -168,7 +169,7 @@ void Settings::perform_checks()
 	std::cout << "Done." << std::endl;
 }
 
-std::shared_ptr<IModuleConfig> Settings::get_module(const std::string& full_name) const
+std::shared_ptr<IModuleConfig> Settings::build_module(const std::string& full_name) const
 {
 	if (this->_modules.find(full_name) != this->_modules.end())
 	{
@@ -178,7 +179,7 @@ std::shared_ptr<IModuleConfig> Settings::get_module(const std::string& full_name
 	return nullptr;
 }
 
-std::shared_ptr<render::abc::ILibrary> Settings::get_library(const std::string& full_name) const
+std::shared_ptr<render::abc::ILibrary> Settings::build_library(const std::string& full_name) const
 {
 	if (this->_libraries.find(full_name) != this->_libraries.end())
 	{
@@ -188,7 +189,7 @@ std::shared_ptr<render::abc::ILibrary> Settings::get_library(const std::string& 
 	return nullptr;
 }
 
-std::shared_ptr<render::abc::ILoader> Settings::get_loader(const std::string& full_name) const
+std::shared_ptr<render::abc::ILoader> Settings::build_loader(const std::string& full_name) const
 {
 	if (this->_loaders.find(full_name) != this->_loaders.end())
 	{
@@ -196,6 +197,22 @@ std::shared_ptr<render::abc::ILoader> Settings::get_loader(const std::string& fu
 	}
 
 	return nullptr;
+}
+
+std::list<std::shared_ptr<orm::db::Migration>> Settings::build_migrations(orm::abc::ISQLDriver* driver)
+{
+	if (this->_migrations.empty())
+	{
+		this->register_migrations();
+	}
+
+	std::list<std::shared_ptr<orm::db::Migration>> migrations;
+	for (const auto& migration : this->_migrations)
+	{
+		migrations.push_back(migration(driver));
+	}
+
+	return migrations;
 }
 
 void Settings::middleware(const std::string& name, middleware::Handler handler)

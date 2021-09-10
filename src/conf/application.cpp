@@ -18,95 +18,17 @@
 
 __CONF_BEGIN__
 
-void Application::_setup_commands()
-{
-	auto request_handler = this->build_server_handler();
-	auto core_module = mgmt::CoreModuleConfig(this->settings, std::move(request_handler));
-	this->_extend_settings_commands(core_module.get_commands(), core_module.get_name());
-	for (auto& installed_module : this->settings->MODULES)
-	{
-		this->_extend_settings_commands(installed_module->get_commands(), installed_module->get_name());
-	}
-}
-
-void Application::_extend_settings_commands(
-	const std::vector<std::shared_ptr<cmd::BaseCommand>>& from, const std::string& module_name
-)
-{
-	for (auto& command : from)
-	{
-		if (std::find_if(
-			this->_commands.begin(), this->_commands.end(),
-			[command](const std::pair<std::string, std::shared_ptr<cmd::BaseCommand>>& pair) -> bool {
-				return command->name() == pair.first;
-			}
-		) != this->_commands.end())
-		{
-			this->settings->LOGGER->warning(
-				"Module with name '" + module_name + "' overrides commands with '" + command->name() + "' command"
-			);
-		}
-
-		this->_commands[command->name()] = command;
-	}
-}
-
-Application::Application(const std::string& version, conf::Settings* settings) : version(version)
+Application::Application(conf::Settings* settings)
 {
 	InterruptException::initialize();
-	require_non_null(settings, "'settings' is not instantiated", _ERROR_DETAILS_);
-
-	this->settings = settings;
-	this->settings->prepare();
-	this->settings->perform_checks();
-
-	// Check if static files can be served and create necessary urls.
-	this->build_static_pattern(
-		this->settings->URLPATTERNS, this->settings->STATIC_ROOT, this->settings->STATIC_URL, "static"
-	);
-	this->build_static_pattern(
-		this->settings->URLPATTERNS, this->settings->MEDIA_ROOT, this->settings->MEDIA_URL, "media"
-	);
+	this->setup_settings(settings);
+	this->build_static_patterns();
 
 	// Retrieve main module patterns and append them to result.
 	this->build_module_patterns(this->settings->URLPATTERNS);
 
-	// Initialize template engine's libraries.
-	if (this->settings->TEMPLATE_ENGINE == nullptr)
-	{
-		throw NullPointerException("'settings->TEMPLATE_ENGINE' is nullptr", _ERROR_DETAILS_);
-	}
-
-	this->settings->TEMPLATE_ENGINE->load_libraries();
-
-	this->_setup_commands();
-
-	size_t max_len = 0;
-	for (auto& command : this->_commands)
-	{
-		auto new_len = command.second->name().size();
-		if (new_len > max_len)
-		{
-			max_len = new_len;
-		}
-	}
-
-	for (auto& command : this->_commands)
-	{
-		std::string indent(max_len - command.second->name().size(), ' ');
-		this->_help_message += "  " + command.second->name() + indent + "  " + command.second->help_message() + '\n';
-	}
-
-	if (!this->_help_message.empty())
-	{
-		this->_help_message = "Usage:\n  application [command]\n\n"
-			"Available Commands:\n" + this->_help_message +
-			"\nUse \"application [command] --help\" for more information about a command.";
-	}
-	else
-	{
-		this->_help_message = "Application has not commands.\n\n";
-	}
+	this->setup_template_engine();
+	this->setup_commands();
 }
 
 void Application::execute(int argc, char** argv) const
@@ -115,14 +37,7 @@ void Application::execute(int argc, char** argv) const
 	{
 		try
 		{
-			if (this->_commands.contains(argv[1]))
-			{
-				this->_commands.at(argv[1])->run_from_argv(argc, argv);
-			}
-			else
-			{
-				std::cout << "Command \"" << argv[1] << "\" is not found.\n\n";
-			}
+			this->execute_command(argv[1], argc, argv);
 		}
 		catch (const BaseException& exc)
 		{
@@ -139,20 +54,32 @@ void Application::execute(int argc, char** argv) const
 	}
 	else
 	{
-		std::cout << this->_help_message;
+		std::cout << this->build_usage_message();
 	}
 }
 
-Application::HandlerFunction Application::build_server_handler() const
+void Application::execute_command(const std::string& command_name, int argc, char** argv) const
+{
+	if (this->commands.contains(command_name))
+	{
+		this->commands.at(command_name)->run_from_argv(argc, argv);
+	}
+	else
+	{
+		std::cout << "Command \"" << command_name << "\" is not found.\n\n";
+	}
+}
+
+Application::ServerHandler Application::build_server_handler() const
 {
 	return [this](
 		net::RequestContext* context, const std::map<std::string, std::string>& environment
 	) -> net::StatusCode
 	{
 		auto request = this->build_request(context, environment);
-		auto middleware_chain = this->build_middleware_chain();
+		auto middleware_chain = middleware::Exception(this->settings)(this->build_middleware_chain());
 		auto response = middleware_chain(request.get());
-		return start_response(context, response);
+		return this->send_response(context, response);
 	};
 }
 
@@ -197,22 +124,17 @@ middleware::Function Application::build_controller_handler() const
 middleware::Function Application::build_middleware_chain() const
 {
 	middleware::Function chain = this->build_controller_handler();
-	auto middleware_count = (long long)this->settings->MIDDLEWARE.size();
+	auto middleware_count = (long long)this->settings->MIDDLEWARE.size() - 1;
 	for (long long i = middleware_count; i >= 0; i--)
 	{
-		chain = this->settings->MIDDLEWARE[i](chain);
+		auto next_middleware = this->settings->MIDDLEWARE[i];
+		if (next_middleware)
+		{
+			chain = next_middleware(chain);
+		}
 	}
 
-	return middleware::Exception(this->settings)(chain);
-}
-
-bool Application::static_is_allowed(const std::string& static_url) const
-{
-	auto url = http::parse_url(static_url);
-
-	// Allow serving local static files if debug and
-	// static url is local.
-	return this->settings->DEBUG && url.hostname().empty();
+	return chain;
 }
 
 void Application::build_static_pattern(
@@ -220,7 +142,7 @@ void Application::build_static_pattern(
 	const std::string& root, const std::string& url, const std::string& name
 ) const
 {
-	if (!root.empty() && this->static_is_allowed(url))
+	if (!root.empty() && this->_static_is_allowed(url))
 	{
 		patterns.push_back(urls::make_static(url, root, name));
 	}
@@ -247,20 +169,28 @@ std::shared_ptr<http::Request> Application::build_request(
 {
 	require_non_null(context, "'context' is nullptr", _ERROR_DETAILS_);
 	context->body->set_limit((ssize_t)context->content_size);
-
 	return std::make_shared<http::Request>(
 		*context,
-		this->settings->FILE_UPLOAD_MAX_MEMORY_SIZE,
-		this->settings->DATA_UPLOAD_MAX_NUMBER_FIELDS,
-		65535, // TODO: settings->MAX_HEADER_LENGTH
-		100,   // TODO: settings->MAX_HEADERS_COUNT
-//		this->settings->MAX_HEADER_LENGTH,
-//		this->settings->MAX_HEADERS_COUNT,
+		this->settings->LIMITS.FILE_UPLOAD_MAX_MEMORY_SIZE,
+		this->settings->LIMITS.DATA_UPLOAD_MAX_NUMBER_FIELDS,
+		settings->LIMITS.MAX_HEADER_LENGTH,
+		settings->LIMITS.MAX_HEADERS_COUNT,
 		std::move(environment)
 	);
 }
 
-net::StatusCode Application::start_response(
+void Application::build_static_patterns()
+{
+	// Check if static files can be served and create necessary urls.
+	this->build_static_pattern(
+		this->settings->URLPATTERNS, this->settings->STATIC.ROOT, this->settings->STATIC.URL, "static"
+	);
+	this->build_static_pattern(
+		this->settings->URLPATTERNS, this->settings->MEDIA.ROOT, this->settings->MEDIA.URL, "media"
+	);
+}
+
+net::StatusCode Application::send_response(
 	net::RequestContext* ctx, const std::unique_ptr<http::abc::IHttpResponse>& response
 ) const
 {
@@ -273,32 +203,103 @@ net::StatusCode Application::start_response(
 	return this->finish_response(ctx, response ? response.get() : &no_content);
 }
 
-net::StatusCode Application::finish_response(net::RequestContext* ctx, http::abc::IHttpResponse* response) const
+net::StatusCode Application::finish_response(net::RequestContext* context, http::abc::IHttpResponse* response) const
 {
+	require_non_null(context, "'context' is nullptr", _ERROR_DETAILS_);
+	if (!context->response_writer)
+	{
+		throw NullPointerException("Unable to send response, response writer is nullptr", _ERROR_DETAILS_);
+	}
+
+	require_non_null(response, "'response' is nullptr", _ERROR_DETAILS_);
 	if (response->is_streaming())
 	{
-		auto* streaming_response = dynamic_cast<http::StreamingResponse*>(response);
-		std::string chunk;
-		while (!(chunk = streaming_response->get_chunk()).empty())
-		{
-			if (!ctx->write(chunk.c_str(), chunk.size()))
-			{
-				this->settings->LOGGER->trace("Unable to send chunk", _ERROR_DETAILS_);
-			}
-		}
-
-		response->close();
+		this->finish_streaming_response(context, response);
 	}
 	else
 	{
 		auto data = response->serialize();
-		if (!ctx->write(data.c_str(), data.size()))
+		if (!context->response_writer->write(data.c_str(), data.size()))
 		{
 			this->settings->LOGGER->trace("Unable to send response", _ERROR_DETAILS_);
 		}
 	}
 
 	return response->get_status();
+}
+
+void Application::finish_streaming_response(net::RequestContext* context, http::abc::IHttpResponse* response) const
+{
+	auto* streaming_response = dynamic_cast<http::StreamingResponse*>(response);
+	std::string chunk;
+	while (!(chunk = streaming_response->get_chunk()).empty())
+	{
+		if (!context->response_writer->write(chunk.c_str(), chunk.size()))
+		{
+			this->settings->LOGGER->trace("Unable to send chunk", _ERROR_DETAILS_);
+		}
+	}
+
+	response->close();
+}
+
+void Application::setup_commands()
+{
+	auto core_module = mgmt::CoreModuleConfig(this->settings, std::move(this->build_server_handler()));
+	this->_append_commands(core_module.get_commands(), core_module.get_name());
+	for (auto& installed_module : this->settings->MODULES)
+	{
+		this->_append_commands(installed_module->get_commands(), installed_module->get_name());
+	}
+}
+
+std::string Application::build_usage_message() const
+{
+	size_t max_command_length = 0;
+	for (auto& command : this->commands)
+	{
+		auto current_length = command.second->name().size();
+		if (current_length > max_command_length)
+		{
+			max_command_length = current_length;
+		}
+	}
+
+	std::string usage_message;
+	for (const auto& command : this->commands)
+	{
+		std::string indent(max_command_length - command.second->name().size(), ' ');
+		usage_message += "  " + command.second->name() + indent + "  " + command.second->help_message() + '\n';
+	}
+
+	if (!usage_message.empty())
+	{
+		usage_message = "Usage:\n  application [command]\n\n"
+						"Available Commands:\n" + usage_message +
+						"\nUse \"application [command] --help\" for more information about a command.";
+	}
+	else
+	{
+		usage_message = "Application has not commands.\n\n";
+	}
+
+	return usage_message;
+}
+
+void Application::_append_command(const std::shared_ptr<cmd::BaseCommand>& command, const std::string& module_name)
+{
+	if (this->_has_command(command))
+	{
+		this->settings->LOGGER->warning(
+			"Module with name '" + module_name + "' overrides commands with '" + command->name() + "' command"
+		);
+
+		this->commands[command->name()] = command;
+	}
+	else
+	{
+		this->commands.insert(std::make_pair(command->name(), command));
+	}
 }
 
 __CONF_END__

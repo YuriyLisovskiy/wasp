@@ -35,7 +35,7 @@ void YamlSettingsLoader::overwrite_scalar_or_remove_if_null(
 	auto value = local_config[key];
 	if (!value || value.IsNull())
 	{
-		config[key] = this->null();
+		config[key] = YamlSettingsLoader::null();
 	}
 	else if (value.IsScalar())
 	{
@@ -50,7 +50,7 @@ void YamlSettingsLoader::overwrite_sequence_or_remove_if_null(
 	auto value = local_config[key];
 	if (!value || value.IsNull())
 	{
-		config[key] = this->null();
+		config[key] = YamlSettingsLoader::null();
 	}
 	else if (value.IsSequence())
 	{
@@ -62,15 +62,16 @@ void YamlSettingsLoader::overwrite_logger(YAML::Node& logger, const YAML::Node& 
 {
 	if (local_logger.IsNull())
 	{
-		logger = this->null();
+		logger = YamlSettingsLoader::null();
 	}
 	else if (local_logger.IsMap())
 	{
 		if (!logger)
 		{
-			logger = this->map_node();
+			logger = YamlSettingsLoader::map_node();
 		}
 
+		this->overwrite_scalar_or_remove_if_null(logger, local_logger, "use_colors");
 		auto local_levels = local_logger["levels"];
 		if (!local_levels)
 		{
@@ -78,7 +79,7 @@ void YamlSettingsLoader::overwrite_logger(YAML::Node& logger, const YAML::Node& 
 		}
 		else if (local_levels.IsNull())
 		{
-			logger["levels"] = this->null();
+			logger["levels"] = YamlSettingsLoader::null();
 		}
 		else if (local_levels.IsScalar() && local_levels.as<std::string>() == "*")
 		{
@@ -95,7 +96,7 @@ void YamlSettingsLoader::overwrite_logger(YAML::Node& logger, const YAML::Node& 
 			{
 				if (!levels)
 				{
-					levels = this->map_node();
+					levels = YamlSettingsLoader::map_node();
 				}
 
 				this->overwrite_scalar_or_remove_if_null(levels, local_levels, "info");
@@ -115,7 +116,7 @@ void YamlSettingsLoader::overwrite_logger(YAML::Node& logger, const YAML::Node& 
 		}
 		else if (local_out.IsNull())
 		{
-			logger["out"] = this->null();
+			logger["out"] = YamlSettingsLoader::null();
 		}
 		else if (local_out.IsMap())
 		{
@@ -128,7 +129,7 @@ void YamlSettingsLoader::overwrite_logger(YAML::Node& logger, const YAML::Node& 
 			{
 				if (!out)
 				{
-					out = this->map_node();
+					out = YamlSettingsLoader::map_node();
 				}
 
 				this->overwrite_scalar_or_remove_if_null(out, local_out, "console");
@@ -146,13 +147,13 @@ void YamlSettingsLoader::overwrite_template_engine(
 {
 	if (local_template_engine.IsNull())
 	{
-		template_engine = this->null();
+		template_engine = YamlSettingsLoader::null();
 	}
 	else if (local_template_engine.IsMap())
 	{
 		if (!template_engine)
 		{
-			template_engine = this->map_node();
+			template_engine = YamlSettingsLoader::map_node();
 		}
 
 		this->overwrite_sequence_or_remove_if_null(
@@ -260,6 +261,8 @@ void YamlSettingsLoader::init_logger_setting(Settings* settings, const YAML::Nod
 	}
 
 	settings->LOGGER = std::make_shared<log::Logger>(logger_config);
+	auto use_colors = config["use_colors"];
+	settings->LOGGER->use_colors(!use_colors || (!use_colors.IsNull() && use_colors.as<bool>(true)));
 }
 
 void YamlSettingsLoader::init_template_engine_setting(Settings* settings, const YAML::Node& config)
@@ -281,7 +284,7 @@ void YamlSettingsLoader::init_template_engine_setting(Settings* settings, const 
 	}
 
 	std::vector<std::shared_ptr<render::abc::ILibrary>> libs{
-		settings->get_library(render::DefaultLibrary::FULL_NAME)
+		settings->build_library(render::DefaultLibrary::FULL_NAME)
 	};
 	auto libraries = config["libraries"];
 	if (libraries && libraries.IsSequence() && libraries.size() > 0)
@@ -291,7 +294,7 @@ void YamlSettingsLoader::init_template_engine_setting(Settings* settings, const 
 		{
 			if (it->IsDefined() && it->IsScalar())
 			{
-				libs.push_back(settings->get_library(it->as<std::string>()));
+				libs.push_back(settings->build_library(it->as<std::string>()));
 			}
 		}
 	}
@@ -305,7 +308,7 @@ void YamlSettingsLoader::init_template_engine_setting(Settings* settings, const 
 		{
 			if (it->IsDefined() && it->IsScalar())
 			{
-				loaders_vec.push_back(settings->get_loader(it->as<std::string>()));
+				loaders_vec.push_back(settings->build_loader(it->as<std::string>()));
 			}
 		}
 	}
@@ -341,7 +344,7 @@ YAML::Node YamlSettingsLoader::load_file(const std::string& base_dir, const std:
 		return config;
 	}
 
-	return this->null();
+	return YamlSettingsLoader::null();
 }
 
 void YamlSettingsLoader::overwrite_config(YAML::Node& config, const YAML::Node& local_config)
@@ -378,7 +381,7 @@ void YamlSettingsLoader::overwrite_config(YAML::Node& config, const YAML::Node& 
 	}
 	else if (local_timezone.IsNull())
 	{
-		config["timezone"] = this->null();
+		config["timezone"] = YamlSettingsLoader::null();
 	}
 	else if (local_timezone.IsMap())
 	{
@@ -391,7 +394,7 @@ void YamlSettingsLoader::overwrite_config(YAML::Node& config, const YAML::Node& 
 		{
 			if (!timezone)
 			{
-				timezone = this->map_node();
+				timezone = YamlSettingsLoader::map_node();
 			}
 
 			this->overwrite_scalar_or_remove_if_null(timezone, local_timezone, "name");
@@ -402,7 +405,7 @@ void YamlSettingsLoader::overwrite_config(YAML::Node& config, const YAML::Node& 
 			}
 			else if (local_offset.IsNull())
 			{
-				timezone["offset"] = this->null();
+				timezone["offset"] = YamlSettingsLoader::null();
 			}
 			else if (local_offset.IsMap())
 			{
@@ -415,7 +418,7 @@ void YamlSettingsLoader::overwrite_config(YAML::Node& config, const YAML::Node& 
 				{
 					if (!offset)
 					{
-						offset = this->map_node();
+						offset = YamlSettingsLoader::map_node();
 					}
 
 					this->overwrite_scalar_or_remove_if_null(offset, local_offset, "days");
@@ -480,7 +483,7 @@ void YamlSettingsLoader::overwrite_config(YAML::Node& config, const YAML::Node& 
 	}
 	else if (local_media.IsNull())
 	{
-		config["media"] = this->null();
+		config["media"] = YamlSettingsLoader::null();
 	}
 	else if (local_media.IsMap())
 	{
@@ -493,7 +496,7 @@ void YamlSettingsLoader::overwrite_config(YAML::Node& config, const YAML::Node& 
 		{
 			if (!media)
 			{
-				media = this->map_node();
+				media = YamlSettingsLoader::map_node();
 			}
 
 			this->overwrite_scalar_or_remove_if_null(media, local_media, "root");
@@ -509,7 +512,7 @@ void YamlSettingsLoader::overwrite_config(YAML::Node& config, const YAML::Node& 
 	}
 	else if (local_static.IsNull())
 	{
-		config["static"] = this->null();
+		config["static"] = YamlSettingsLoader::null();
 	}
 	else if (local_static.IsMap())
 	{
@@ -522,7 +525,7 @@ void YamlSettingsLoader::overwrite_config(YAML::Node& config, const YAML::Node& 
 		{
 			if (!static_)
 			{
-				static_ = this->map_node();
+				static_ = YamlSettingsLoader::map_node();
 			}
 
 			this->overwrite_scalar_or_remove_if_null(static_, local_static, "root");
@@ -531,6 +534,7 @@ void YamlSettingsLoader::overwrite_config(YAML::Node& config, const YAML::Node& 
 		}
 	}
 
+	// TODO: mot working
 	auto local_file_upload_max_memory_size = local_config["file_upload_max_memory_size"];
 	if (local_file_upload_max_memory_size && (
 		local_file_upload_max_memory_size.IsNull() || local_file_upload_max_memory_size.IsScalar()
@@ -539,6 +543,7 @@ void YamlSettingsLoader::overwrite_config(YAML::Node& config, const YAML::Node& 
 		config["file_upload_max_memory_size"] = local_file_upload_max_memory_size;
 	}
 
+	// TODO: mot working
 	auto local_data_upload_max_memory_size = local_config["data_upload_max_memory_size"];
 	if (local_data_upload_max_memory_size && (
 		local_data_upload_max_memory_size.IsNull() || local_data_upload_max_memory_size.IsScalar()
@@ -553,6 +558,7 @@ void YamlSettingsLoader::overwrite_config(YAML::Node& config, const YAML::Node& 
 		config["prepend_www"] = local_prepend_www;
 	}
 
+	// TODO: mot working
 	auto local_data_upload_max_number_fields = local_config["data_upload_max_number_fields"];
 	if (local_data_upload_max_number_fields && (
 		local_data_upload_max_number_fields.IsNull() || local_data_upload_max_number_fields.IsScalar()
@@ -568,7 +574,7 @@ void YamlSettingsLoader::overwrite_config(YAML::Node& config, const YAML::Node& 
 	}
 	else if (local_formats.IsNull())
 	{
-		config["formats"] = this->null();
+		config["formats"] = YamlSettingsLoader::null();
 	}
 	else if (local_formats.IsMap())
 	{
@@ -581,7 +587,7 @@ void YamlSettingsLoader::overwrite_config(YAML::Node& config, const YAML::Node& 
 		{
 			if (!formats)
 			{
-				formats = this->map_node();
+				formats = YamlSettingsLoader::map_node();
 			}
 
 			this->overwrite_scalar_or_remove_if_null(formats, local_formats, "date");
@@ -658,7 +664,7 @@ void YamlSettingsLoader::overwrite_config(YAML::Node& config, const YAML::Node& 
 	}
 	else if (local_csrf.IsNull())
 	{
-		config["csrf"] = this->null();
+		config["csrf"] = YamlSettingsLoader::null();
 	}
 	else if (local_csrf.IsMap())
 	{
@@ -671,7 +677,7 @@ void YamlSettingsLoader::overwrite_config(YAML::Node& config, const YAML::Node& 
 		{
 			if (!csrf)
 			{
-				csrf = this->map_node();
+				csrf = YamlSettingsLoader::map_node();
 			}
 
 			auto local_cookie = local_csrf["cookie"];
@@ -681,7 +687,7 @@ void YamlSettingsLoader::overwrite_config(YAML::Node& config, const YAML::Node& 
 			}
 			else if (local_cookie.IsNull())
 			{
-				csrf["cookie"] = this->null();
+				csrf["cookie"] = YamlSettingsLoader::null();
 			}
 			else if (local_cookie.IsMap())
 			{
@@ -694,7 +700,7 @@ void YamlSettingsLoader::overwrite_config(YAML::Node& config, const YAML::Node& 
 				{
 					if (!cookie)
 					{
-						cookie = this->map_node();
+						cookie = YamlSettingsLoader::map_node();
 					}
 
 					this->overwrite_scalar_or_remove_if_null(cookie, local_cookie, "name");
@@ -728,7 +734,7 @@ void YamlSettingsLoader::overwrite_config(YAML::Node& config, const YAML::Node& 
 	}
 	else if (local_secure.IsNull())
 	{
-		config["secure"] = this->null();
+		config["secure"] = YamlSettingsLoader::null();
 	}
 	else if (local_secure.IsMap())
 	{
@@ -741,7 +747,7 @@ void YamlSettingsLoader::overwrite_config(YAML::Node& config, const YAML::Node& 
 		{
 			if (!secure)
 			{
-				secure = this->map_node();
+				secure = YamlSettingsLoader::map_node();
 			}
 
 			this->overwrite_scalar_or_remove_if_null(secure, local_secure, "browser_xss_filter");
@@ -760,7 +766,7 @@ void YamlSettingsLoader::overwrite_config(YAML::Node& config, const YAML::Node& 
 			}
 			else if (local_psslh.IsNull())
 			{
-				secure["proxy_ssl_header"] = this->null();
+				secure["proxy_ssl_header"] = YamlSettingsLoader::null();
 			}
 			else if (local_psslh.IsMap())
 			{
@@ -773,7 +779,7 @@ void YamlSettingsLoader::overwrite_config(YAML::Node& config, const YAML::Node& 
 				{
 					if (!psslh)
 					{
-						psslh = this->map_node();
+						psslh = YamlSettingsLoader::map_node();
 					}
 
 					this->overwrite_scalar_or_remove_if_null(psslh, local_psslh, "name");
@@ -837,21 +843,21 @@ void YamlSettingsLoader::init_settings(Settings* settings, const YAML::Node& con
 	auto timezone = config["timezone"];
 	if (!timezone || !timezone.IsMap())
 	{
-		settings->TIME_ZONE = std::make_shared<dt::Timezone>(dt::Timezone::UTC);
+		settings->TIMEZONE = std::make_shared<dt::Timezone>(dt::Timezone::UTC);
 	}
 	else
 	{
 		auto timezone_name = str::to_upper(timezone["name"].as<std::string>("UTC"));
 		if (timezone_name == "UTC")
 		{
-			settings->TIME_ZONE = std::make_shared<dt::Timezone>(dt::Timezone::UTC);
+			settings->TIMEZONE = std::make_shared<dt::Timezone>(dt::Timezone::UTC);
 		}
 		else
 		{
 			auto timezone_offset = timezone["offset"];
 			if (timezone_offset && timezone_offset.IsMap())
 			{
-				settings->TIME_ZONE = std::make_shared<dt::Timezone>(
+				settings->TIMEZONE = std::make_shared<dt::Timezone>(
 					dt::Timedelta(
 						timezone_offset["days"].as<long>(0),
 						timezone_offset["seconds"].as<long>(0),
@@ -866,14 +872,14 @@ void YamlSettingsLoader::init_settings(Settings* settings, const YAML::Node& con
 			}
 			else
 			{
-				settings->TIME_ZONE = std::make_shared<dt::Timezone>(
+				settings->TIMEZONE = std::make_shared<dt::Timezone>(
 					dt::Timedelta(), timezone_name
 				);
 			}
 		}
 	}
 
-	settings->USE_TZ = config["use_tz"].as<bool>(false);
+	settings->USE_TIMEZONE = config["use_timezone"].as<bool>(false);
 
 	settings->CHARSET = config["charset"].as<std::string>("utf-8");
 
@@ -897,25 +903,32 @@ void YamlSettingsLoader::init_settings(Settings* settings, const YAML::Node& con
 	auto media = config["media"];
 	if (media && media.IsMap())
 	{
-		auto p = media["root"].as<std::string>("media");
-		settings->MEDIA_ROOT = path::is_absolute(p) ? p : path::join(settings->BASE_DIR, p);
-		settings->MEDIA_URL = media["url"].as<std::string>("/media/");
+		auto p = media["root"].as<std::string>("");
+		settings->MEDIA.ROOT = path::is_absolute(p) ? p : path::join(settings->BASE_DIR, p);
+		settings->MEDIA.URL = media["url"].as<std::string>("");
 	}
 
 	auto static_ = config["static"];
 	if (static_ && static_.IsMap())
 	{
-		auto p = static_["root"].as<std::string>("static");
-		settings->STATIC_ROOT = path::is_absolute(p) ? p : path::join(settings->BASE_DIR, p);
-		settings->STATIC_URL = static_["url"].as<std::string>("/static/");
+		auto p = static_["root"].as<std::string>("");
+		settings->STATIC.ROOT = path::is_absolute(p) ? p : path::join(settings->BASE_DIR, p);
+		settings->STATIC.URL = static_["url"].as<std::string>("");
 	}
 
-	settings->FILE_UPLOAD_MAX_MEMORY_SIZE = config["file_upload_max_memory_size"].as<int>(2621440);
-	settings->DATA_UPLOAD_MAX_MEMORY_SIZE = config["data_upload_max_memory_size"].as<int>(2621440);
+	auto limits = config["limits"];
+	if (limits && limits.IsMap())
+	{
+		settings->LIMITS = {
+			.FILE_UPLOAD_MAX_MEMORY_SIZE = limits["file_upload_max_memory_size"].as<size_t>(2621440),
+			.DATA_UPLOAD_MAX_MEMORY_SIZE = limits["data_upload_max_memory_size"].as<size_t>(2621440),
+			.DATA_UPLOAD_MAX_NUMBER_FIELDS = limits["data_upload_max_number_fields"].as<size_t>(1000),
+			.MAX_HEADER_LENGTH = limits["max_header_length"].as<size_t>(65535),
+			.MAX_HEADERS_COUNT = limits["max_headers_count"].as<size_t>(100)
+		};
+	}
 
 	settings->PREPEND_WWW = config["prepend_www"].as<bool>(false);
-
-	settings->DATA_UPLOAD_MAX_NUMBER_FIELDS = config["data_upload_max_number_fields"].as<int>(1000);
 
 	auto formats = config["formats"];
 	if (formats && formats.IsMap())
@@ -1029,31 +1042,38 @@ void YamlSettingsLoader::_init_ignorable_404_urls(Settings* settings, const YAML
 
 void YamlSettingsLoader::_init_formats(Settings* settings, const YAML::Node& formats)
 {
-	settings->DATE_FORMAT = formats["date"].as<std::string>("%b %d, %Y");
-	settings->DATETIME_FORMAT = formats["datetime"].as<std::string>("%b %d, %Y, %T");
-	settings->TIME_FORMAT = formats["time"].as<std::string>("%T");
-	settings->YEAR_MONTH_FORMAT = formats["year_month"].as<std::string>("%B %Y");
-	settings->MONTH_DAY_FORMAT = formats["month_day"].as<std::string>("%B %d");
-	settings->SHORT_DATE_FORMAT = formats["short_date"].as<std::string>("%m/%d/%Y");
-	settings->SHORT_DATETIME_FORMAT = formats["short_datetime"].as<std::string>("%m/%d/%Y %T");
+	settings->FORMATS = {
+		.DATE_FORMAT = formats["date"].as<std::string>("%b %d, %Y"),
+		.DATETIME_FORMAT = formats["datetime"].as<std::string>("%b %d, %Y, %T"),
+		.TIME_FORMAT = formats["time"].as<std::string>("%T"),
+		.YEAR_MONTH_FORMAT = formats["year_month"].as<std::string>("%B %Y"),
+		.MONTH_DAY_FORMAT = formats["month_day"].as<std::string>("%B %d"),
+		.SHORT_DATE_FORMAT = formats["short_date"].as<std::string>("%m/%d/%Y"),
+		.SHORT_DATETIME_FORMAT = formats["short_datetime"].as<std::string>("%m/%d/%Y %T")
+	};
 }
 
 void YamlSettingsLoader::_init_csrf(Settings* settings, const YAML::Node& csrf)
 {
 	auto cookie = csrf["cookie"];
+	settings->CSRF = {};
 	if (cookie && cookie.IsMap())
 	{
-		settings->CSRF_COOKIE_NAME = cookie["name"].as<std::string>("csrftoken");
-		settings->CSRF_COOKIE_AGE = cookie["age"].as<size_t>(60 * 60 * 24 * 7 * 52);
-		settings->CSRF_COOKIE_DOMAIN = cookie["domain"].as<std::string>("");
-		settings->CSRF_COOKIE_PATH = cookie["path"].as<std::string>("/");
-		settings->CSRF_COOKIE_SECURE = cookie["secure"].as<bool>(false);
-		settings->CSRF_COOKIE_HTTP_ONLY = cookie["http_only"].as<bool>(false);
-		settings->CSRF_COOKIE_SAME_SITE = cookie["same_site"].as<std::string>("Lax");
+		settings->CSRF = {
+			.COOKIE = {
+				.NAME = cookie["name"].as<std::string>("csrftoken"),
+				.AGE = cookie["age"].as<size_t>(60 * 60 * 24 * 7 * 52),
+				.DOMAIN = cookie["domain"].as<std::string>(""),
+				.PATH = cookie["path"].as<std::string>("/"),
+				.SECURE = cookie["secure"].as<bool>(false),
+				.HTTP_ONLY = cookie["http_only"].as<bool>(false),
+				.SAME_SITE = cookie["same_site"].as<std::string>("Lax")
+			}
+		};
 	}
 
-	settings->CSRF_HEADER_NAME = csrf["header_name"].as<std::string>("X-XSRF-TOKEN");
-	settings->CSRF_USE_SESSIONS = csrf["use_sessions"].as<bool>(false);
+	settings->CSRF.HEADER_NAME = csrf["header_name"].as<std::string>("X-XSRF-TOKEN");
+	settings->CSRF.USE_SESSIONS = csrf["use_sessions"].as<bool>(false);
 
 	auto origins = csrf["trusted_origins"];
 	if (origins && origins.IsSequence())
@@ -1065,7 +1085,7 @@ void YamlSettingsLoader::_init_csrf(Settings* settings, const YAML::Node& csrf)
 				auto value = it->as<std::string>();
 				if (!value.empty())
 				{
-					settings->CSRF_TRUSTED_ORIGINS.push_back(value);
+					settings->CSRF.TRUSTED_ORIGINS.push_back(value);
 				}
 			}
 		}
@@ -1119,7 +1139,7 @@ void YamlSettingsLoader::_init_modules(Settings* settings, const YAML::Node& mod
 	{
 		if (it->IsDefined() && it->IsScalar())
 		{
-			auto item = settings->get_module(it->as<std::string>());
+			auto item = settings->build_module(it->as<std::string>());
 			if (item)
 			{
 				settings->MODULES.push_back(item);

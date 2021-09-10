@@ -8,6 +8,9 @@
 
 #pragma once
 
+// C++ libraries.
+#include <algorithm>
+
 // Module definitions.
 #include "./_def_.h"
 
@@ -21,40 +24,35 @@ __CONF_BEGIN__
 class Application
 {
 public:
-	explicit Application(const std::string& version, conf::Settings* settings);
+	explicit Application(conf::Settings* settings);
 
 	void execute(int argc, char** argv) const;
 
-	[[nodiscard]]
-	inline Version get_version() const
-	{
-		return this->version;
-	}
-
 protected:
-	using HandlerFunction = std::function<net::StatusCode(
+	using ServerHandler = std::function<net::StatusCode(
 		net::RequestContext*, const std::map<std::string, std::string>& /* environment */
 	)>;
 
-	Version version;
-	conf::Settings* settings;
+	conf::Settings* settings = nullptr;
+
+	// List of commands to run from command line.
+	std::map<std::string, std::shared_ptr<cmd::BaseCommand>> commands;
+
+	virtual void execute_command(const std::string& command_name, int argc, char** argv) const;
 
 	[[nodiscard]]
-	std::unique_ptr<http::abc::IHttpResponse> error_response(
+	virtual std::unique_ptr<http::abc::IHttpResponse> error_response(
 		http::Request* request, net::StatusCode status_code, const std::string& message
 	) const;
 
 	[[nodiscard]]
-	middleware::Function build_controller_handler() const;
+	virtual middleware::Function build_controller_handler() const;
 
 	[[nodiscard]]
-	middleware::Function build_middleware_chain() const;
+	virtual middleware::Function build_middleware_chain() const;
 
 	[[nodiscard]]
-	HandlerFunction build_server_handler() const;
-
-	[[nodiscard]]
-	bool static_is_allowed(const std::string& static_url) const;
+	ServerHandler build_server_handler() const;
 
 	void build_static_pattern(
 		std::vector<std::shared_ptr<urls::IPattern>>& patterns,
@@ -68,22 +66,66 @@ protected:
 		net::RequestContext* context, std::map<std::string, std::string> env
 	) const;
 
-	[[nodiscard]]
-	uint start_response(net::RequestContext* ctx, const std::unique_ptr<http::abc::IHttpResponse>& response) const;
+	void build_static_patterns();
 
-	net::StatusCode finish_response(net::RequestContext* ctx, http::abc::IHttpResponse* response) const;
+	[[nodiscard]]
+	virtual uint send_response(net::RequestContext* ctx, const std::unique_ptr<http::abc::IHttpResponse>& response) const;
+
+	virtual net::StatusCode finish_response(net::RequestContext* context, http::abc::IHttpResponse* response) const;
+
+	virtual void finish_streaming_response(net::RequestContext* context, http::abc::IHttpResponse* response) const;
+
+	void setup_commands();
+
+	inline void setup_settings(conf::Settings* global_settings)
+	{
+		this->settings = global_settings;
+		require_non_null(settings, "settings is not instantiated", _ERROR_DETAILS_);
+		this->settings->prepare();
+		this->settings->check();
+	}
+
+	inline void setup_template_engine()
+	{
+		// Initialize template engine's libraries.
+		require_non_null(
+			this->settings->TEMPLATE_ENGINE.get(), "template engine is not instantiated", _ERROR_DETAILS_
+		)->load_libraries();
+	}
+
+	[[nodiscard]]
+	virtual std::string build_usage_message() const;
 
 private:
-	std::string _help_message;
+	[[nodiscard]]
+	bool _static_is_allowed(const std::string& static_url) const
+	{
+		auto url = http::parse_url(static_url);
 
-	// List of commands to run from command line.
-	std::map<std::string, std::shared_ptr<cmd::BaseCommand>> _commands;
+		// Allow serving local static files if debug and
+		// static url is local.
+		return this->settings->DEBUG && url.hostname().empty();
+	}
 
-	void _setup_commands();
-
-	void _extend_settings_commands(
+	inline void _append_commands(
 		const std::vector<std::shared_ptr<cmd::BaseCommand>>& from, const std::string& module_name
-	);
+	)
+	{
+		std::for_each(from.begin(),  from.end(), [this, module_name](const auto& command) -> void {
+			this->_append_command(command, module_name);
+		});
+	}
+
+	void _append_command(const std::shared_ptr<cmd::BaseCommand>& command, const std::string& module_name);
+
+	[[nodiscard]]
+	inline bool _has_command(const auto& target_command) const
+	{
+		return std::find_if(
+			this->commands.begin(), this->commands.end(),
+			[target_command](const auto& command) -> bool { return target_command->name() == command.first; }
+		) != this->commands.end();
+	}
 };
 
 __CONF_END__

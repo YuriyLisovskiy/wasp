@@ -37,13 +37,10 @@ StartServerCommand::StartServerCommand(
 Kwargs StartServerCommand::get_kwargs() const
 {
 	auto kwargs = Command::get_kwargs();
-	kwargs.set("workers", std::to_string(this->_threads_count));
-	kwargs.set("max_body_size", std::to_string(this->settings->DATA_UPLOAD_MAX_MEMORY_SIZE));
-	kwargs.set("retries_count", std::to_string(this->_retries_count));
-
-	// TODO: add the next parameters to command flags!
-	kwargs.set("timeout_sec", std::to_string(5));
-	kwargs.set("timeout_usec", std::to_string(0));
+	kwargs.set("workers", std::to_string(this->_workers_count));
+	kwargs.set("retries", std::to_string(this->_retries_count));
+	kwargs.set("timeout_seconds", std::to_string(this->_timeout_seconds));
+	kwargs.set("timeout_microseconds", std::to_string(this->_timeout_microseconds));
 	return kwargs;
 }
 
@@ -58,8 +55,14 @@ void StartServerCommand::add_flags()
 	this->_port_flag = this->flag_set->make_uint16(
 		"p", "port", this->DEFAULT_PORT, "Server port"
 	);
-	this->_threads_flag = this->flag_set->make_unsigned_long(
-		"t", "threads", this->DEFAULT_THREADS, "Threads count"
+	this->_workers_flag = this->flag_set->make_unsigned_long(
+		"t", "workers", this->DEFAULT_WORKERS_COUNT, "Parallel workers count"
+	);
+	this->_timeout_seconds_flag = this->flag_set->make_unsigned_long(
+		"s", "timeout-seconds", this->DEFAULT_TIMEOUT_SECONDS, "Seconds timeout"
+	);
+	this->_timeout_microseconds_flag = this->flag_set->make_unsigned_long(
+		"m", "timeout-microseconds", this->DEFAULT_TIMEOUT_MICROSECONDS, "Microseconds timeout"
 	);
 	this->_use_ipv6_flag = this->flag_set->make_bool(
 		"i", "use-ipv6", false, "Use IPv6 address or not (used in case when host is set to 'localhost')"
@@ -98,25 +101,22 @@ void StartServerCommand::handle()
 	{
 		if (!server)
 		{
-			throw NullPointerException("server is not initialized", _ERROR_DETAILS_);
+			this->settings->LOGGER->error("server is not initialized", _ERROR_DETAILS_);
+			return;
 		}
 
 		server->bind(this->_host, this->_port);
-		std::string message = dt::Datetime::now(this->settings->TIME_ZONE).strftime("%B %d, %Y - %T") + "\n" +
+		std::string message = dt::Datetime::now(this->settings->TIMEZONE).strftime("%B %d, %Y - %T") + "\n" +
 		                      v::framework_name + " version " + v::version.to_string() + "\n" +
-		                      "Starting development server at " +
+		                      "Starting the " + (this->settings->DEBUG ? "development " : "") + "server at " +
 		                      "http://" + this->_host + ":" + std::to_string(this->_port) + "/\n" +
 		                      "Quit the server with CONTROL-C.";
 		server->listen(message);
 	}
 	catch (const InterruptException& exc)
 	{
+		// TODO: remove this catch statement when will not be used.
 		this->settings->LOGGER->debug("Interrupted");
-	}
-	catch (const NullPointerException& exc)
-	{
-		this->settings->LOGGER->error(exc);
-		return;
 	}
 	catch (const BaseException& exc)
 	{
@@ -196,15 +196,44 @@ void StartServerCommand::retrieve_args()
 		}
 	}
 
-	if (!this->_threads_flag->valid())
+	if (!this->_workers_flag->valid())
 	{
 		throw CommandError(
-			"threads count is not a valid positive integer: " + this->_threads_flag->get_raw(),
+			"workers count is not a valid positive integer: " + this->_workers_flag->get_raw(),
 			_ERROR_DETAILS_
 		);
 	}
 
-	this->_threads_count = this->_threads_flag->get();
+	this->_workers_count = this->_workers_flag->get();
+
+	if (!this->_timeout_seconds_flag->valid())
+	{
+		throw CommandError(
+			"timeout seconds is not a valid positive integer: " + this->_timeout_seconds_flag->get_raw(),
+			_ERROR_DETAILS_
+		);
+	}
+
+	this->_timeout_seconds = this->_timeout_seconds_flag->get();
+
+	if (!this->_timeout_microseconds_flag->valid())
+	{
+		throw CommandError(
+			"timeout microseconds is not a valid positive integer: " + this->_timeout_microseconds_flag->get_raw(),
+			_ERROR_DETAILS_
+		);
+	}
+
+	this->_timeout_microseconds = this->_timeout_microseconds_flag->get();
+
+	if (!this->_retries_count_flag->valid())
+	{
+		throw CommandError(
+			"retries count is not a valid positive integer: " + this->_retries_count_flag->get_raw(),
+			_ERROR_DETAILS_
+		);
+	}
+
 	this->_retries_count = this->_retries_count_flag->get();
 }
 

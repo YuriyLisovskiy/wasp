@@ -39,6 +39,11 @@ public:
 	{
 	}
 
+	inline ~Exception() override
+	{
+		this->settings->LOGGER->trace("DELETED", _ERROR_DETAILS_);
+	}
+
 	Function operator() (const Function& next);
 
 protected:

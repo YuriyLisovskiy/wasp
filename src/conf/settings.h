@@ -48,10 +48,16 @@ public:
 	// For development purposes only.
 	bool DEBUG = false;
 
-	std::shared_ptr<log::ILogger> LOGGER = nullptr;
-
 	// By default, it should be current working directory.
 	std::string BASE_DIR;
+
+	std::shared_ptr<log::ILogger> LOGGER = nullptr;
+
+	bool USE_COLORS_IN_LOGGER = true;
+
+	// A secret key for this particular installation. Used in secret-key
+	// hashing algorithms. Set this in your settings.
+	std::string SECRET_KEY;
 
 	// Hosts/domain names that are valid for this site.
 	//
@@ -62,10 +68,10 @@ public:
 	// https://en.wikipedia.org/wiki/List_of_tz_zones_by_name (although not all
 	// systems may support all possibilities). When USE_TZ is true, this is
 	// interpreted as the default user time zone.
-	std::shared_ptr<dt::Timezone> TIME_ZONE = std::make_shared<dt::Timezone>(dt::Timezone::UTC);
+	std::shared_ptr<dt::Timezone> TIMEZONE = std::make_shared<dt::Timezone>(dt::Timezone::UTC);
 
 	// If you set this to True, Django will use timezone-aware datetimes.
-	bool USE_TZ = false;
+	bool USE_TIMEZONE = false;
 
 	// Default charset to use for all HttpResponse objects, if a MIME type isn't
 	// manually specified. It's used to construct the Content-Type header.
@@ -118,64 +124,65 @@ public:
 	//   };
 	std::vector<re::Regex> IGNORABLE_404_URLS;
 
-	// A secret key for this particular installation. Used in secret-key
-	// hashing algorithms. Set this in your settings.
-	std::string SECRET_KEY;
-
-	// Absolute filesystem path to the directory that will hold user-uploaded files.
+	// A pair of absolute filesystem path (root) to the directory that will hold user-uploaded files
+	// and URL that handles the media served from root.
 	//
-	// Example: "/var/www/example.com/media/"
-	std::string MEDIA_ROOT;
+	// Root example: "/var/www/example.com/media/".
+	// URL examples: "http://example.com/media/", "http://media.example.com/".
+	Static MEDIA;
 
-	// URL that handles the media served from MEDIA_ROOT.
+	// A pair of absolute path (root) to the directory static files should be collected to
+	// and URL that handles the static files served from root.
 	//
-	// Examples: "http://example.com/media/", "http://media.example.com/"
-	std::string MEDIA_URL;
+	// Root example: "/var/www/example.com/static/".
+	// URL example: "http://example.com/static/", "http://static.example.com/".
+	Static STATIC;
 
-	// Absolute path to the directory static files should be collected to.
-	//
-	// Example: "/var/www/example.com/static/"
-	std::string STATIC_ROOT;
+	Limits LIMITS = {
+		// Maximum size, in bytes, of a request before it will be streamed to the
+		// file system instead of into memory.
+		.FILE_UPLOAD_MAX_MEMORY_SIZE = 2621440,
 
-	// URL that handles the static files served from STATIC_ROOT.
-	// Example: "http://example.com/static/", "http://static.example.com/"
-	std::string STATIC_URL;
+		// Maximum size in bytes of request data (excluding file uploads) that will be
+		// read before a SuspiciousOperation (RequestDataTooBig) is raised.
+		.DATA_UPLOAD_MAX_MEMORY_SIZE = 2621440,
 
-	// Maximum size, in bytes, of a request before it will be streamed to the
-	// file system instead of into memory.
-	size_t FILE_UPLOAD_MAX_MEMORY_SIZE = 2621440;
+		// Maximum number of GET/POST parameters that will be read before a
+		// SuspiciousOperation (TooManyFieldsSent) is thrown.
+		.DATA_UPLOAD_MAX_NUMBER_FIELDS = 1000,
 
-	// Maximum size in bytes of request data (excluding file uploads) that will be
-	// read before a SuspiciousOperation (RequestDataTooBig) is raised.
-	size_t DATA_UPLOAD_MAX_MEMORY_SIZE = 2621440;
+		// Maximum header length that will be read before returning HTTP 431 error code.
+		.MAX_HEADER_LENGTH = 65535,
+
+		// Maximum number of headers per request.
+		.MAX_HEADERS_COUNT = 100
+	};
 
 	// Whether to prepend the "www." subdomain to URLs that don't have it.
 	bool PREPEND_WWW = false;
 
-	// Maximum number of GET/POST parameters that will be read before a
-	// SuspiciousOperation (TooManyFieldsSent) is thrown.
-	size_t DATA_UPLOAD_MAX_NUMBER_FIELDS = 1000;
+	Formats FORMATS = {
+		// Default formatting for date objects.
+		.DATE_FORMAT = "%b %d, %Y",
 
-	// Default formatting for date objects.
-	std::string DATE_FORMAT = "%b %d, %Y";
+		// Default formatting for datetime objects.
+		.DATETIME_FORMAT = "%b %d, %Y, %T",
 
-	// Default formatting for datetime objects.
-	std::string DATETIME_FORMAT = "%b %d, %Y, %T";
+		// Default formatting for time objects.
+		.TIME_FORMAT = "%T",
 
-	// Default formatting for time objects.
-	std::string TIME_FORMAT = "%T";
+		// Default formatting for date objects when only the year and month are relevant.
+		.YEAR_MONTH_FORMAT = "%B %Y",
 
-	// Default formatting for date objects when only the year and month are relevant.
-	std::string YEAR_MONTH_FORMAT = "%B %Y";
+		// Default formatting for date objects when only the month and day are relevant.
+		.MONTH_DAY_FORMAT = "%B %d",
 
-	// Default formatting for date objects when only the month and day are relevant.
-	std::string MONTH_DAY_FORMAT = "%B %d";
+		// Default short formatting for date objects.
+		.SHORT_DATE_FORMAT = "%m/%d/%Y",
 
-	// Default short formatting for date objects.
-	std::string SHORT_DATE_FORMAT = "%m/%d/%Y";
-
-	// Default short formatting for datetime objects.
-	std::string SHORT_DATETIME_FORMAT = "%m/%d/%Y %T";
+		// Default short formatting for datetime objects.
+		.SHORT_DATETIME_FORMAT = "%m/%d/%Y %T"
+	};
 
 	// First day of week, to be used on calendars
 	// 0 means Sunday, 1 means Monday...
@@ -187,7 +194,7 @@ public:
 	// Boolean that sets whether to add thousand separator when formatting numbers
 	bool USE_THOUSAND_SEPARATOR = false;
 
-	// Thousand separator symbol
+	// A thousand separator symbol
 	char THOUSAND_SEPARATOR = ',';
 
 	// Default X-Frame-Options header value
@@ -196,22 +203,26 @@ public:
 	bool USE_X_FORWARDED_HOST = false;
 	bool USE_X_FORWARDED_PORT = false;
 
-	// List of middleware to use. Order is important; in the request phase, these
+	// List of middleware to use. Order is important; in the request phase, this
 	// middleware will be applied in the order given, and in the response
 	// phase the middleware will be applied in reverse order.
 	std::vector<middleware::Handler> MIDDLEWARE;
 
 	// Settings for CSRF cookie.
-	std::string CSRF_COOKIE_NAME = "csrftoken";
-	size_t CSRF_COOKIE_AGE = 60 * 60 * 24 * 7 * 52;
-	std::string CSRF_COOKIE_DOMAIN;
-	std::string CSRF_COOKIE_PATH = "/";
-	bool CSRF_COOKIE_SECURE = false;
-	bool CSRF_COOKIE_HTTP_ONLY = false;
-	std::string CSRF_COOKIE_SAME_SITE = "Lax";
-	std::string CSRF_HEADER_NAME = "X-XSRF-TOKEN";
-	std::vector<std::string> CSRF_TRUSTED_ORIGINS;
-	bool CSRF_USE_SESSIONS = false;
+	CSRFConfiguration CSRF = {
+		.COOKIE = {
+			.NAME = "csrftoken",
+			.AGE = 60 * 60 * 24 * 7 * 52,
+			.DOMAIN = "",
+			.PATH = "/",
+			.SECURE = false,
+			.HTTP_ONLY = false,
+			.SAME_SITE = "Lax"
+		},
+		.HEADER_NAME = "X-XSRF-TOKEN",
+		.TRUSTED_ORIGINS = {},
+		.USE_SESSIONS = false
+	};
 
 	// SSL settings (will be added in future).
 	bool USE_SSL = false;
@@ -249,9 +260,9 @@ public:
 	[[nodiscard]]
 	virtual std::string render_json_error_template(const net::Status& status, const std::string& message) const;
 
-	void prepare();
+	virtual void prepare();
 
-	void perform_checks();
+	virtual void check();
 
 	inline virtual void register_modules()
 	{
@@ -295,9 +306,9 @@ public:
 	}
 
 	inline virtual std::shared_ptr<net::abc::IServer> build_server(
-		std::function<net::StatusCode(
+		const std::function<net::StatusCode(
 			net::RequestContext*, const std::map<std::string, std::string>& /* environment */
-		)> handler,
+		)>& handler,
 		const Kwargs& kwargs
 	)
 	{
@@ -305,7 +316,7 @@ public:
 	}
 
 	[[nodiscard]]
-	std::shared_ptr<IModuleConfig> get_module(const std::string& full_name) const;
+	std::shared_ptr<IModuleConfig> build_module(const std::string& full_name) const;
 
 	[[nodiscard]]
 	inline middleware::Handler get_middleware_by_name(const std::string& name) const
@@ -314,26 +325,12 @@ public:
 	}
 
 	[[nodiscard]]
-	std::shared_ptr<render::abc::ILibrary> get_library(const std::string& full_name) const;
+	std::shared_ptr<render::abc::ILibrary> build_library(const std::string& full_name) const;
 
 	[[nodiscard]]
-	std::shared_ptr<render::abc::ILoader> get_loader(const std::string& full_name) const;
+	std::shared_ptr<render::abc::ILoader> build_loader(const std::string& full_name) const;
 
-	inline std::list<std::shared_ptr<orm::db::Migration>> get_migrations(orm::abc::ISQLDriver* driver)
-	{
-		if (this->_migrations.empty())
-		{
-			this->register_migrations();
-		}
-
-		std::list<std::shared_ptr<orm::db::Migration>> migrations;
-		for (const auto& migration : this->_migrations)
-		{
-			migrations.push_back(migration(driver));
-		}
-
-		return migrations;
-	}
+	std::list<std::shared_ptr<orm::db::Migration>> build_migrations(orm::abc::ISQLDriver* driver);
 
 	template <class T>
 	[[nodiscard]]

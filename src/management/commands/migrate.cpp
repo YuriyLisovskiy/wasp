@@ -51,7 +51,7 @@ void MigrateCommand::handle()
 	auto driver = this->settings->DATABASES[db_name]->driver();
 	auto executor = orm::db::MigrationExecutor(
 		driver,
-		this->settings->get_migrations(driver),
+		this->settings->build_migrations(driver),
 		[this] (auto msg, auto end) { this->log_progress(msg, end); }
 	);
 	auto editor = require_non_null(driver)->schema_editor();

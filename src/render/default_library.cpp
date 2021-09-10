@@ -17,10 +17,10 @@ std::map<std::string, Tag> DefaultLibrary::get_tags() const
 {
 	return {
 		// Example: {% static('path/to/file.css') -> css_variable %}
-		{tags::TAG_NAME_STATIC, {tags::make_static_tag("static", this->settings()->STATIC_URL)}},
+		{tags::TAG_NAME_STATIC, {tags::make_static_tag("static", this->settings()->STATIC.URL)}},
 
 		// Example: {% media('path/to/file.jpg') -> jpg_variable %}
-		{tags::TAG_NAME_MEDIA, {tags::make_static_tag("media", this->settings()->MEDIA_URL)}},
+		{tags::TAG_NAME_MEDIA, {tags::make_static_tag("media", this->settings()->MEDIA.URL)}},
 
 		// Example: {% url('app_namespace::profile', 256) -> profile_256 %}
 		{tags::TAG_NAME_URL, {tags::make_url_tag(this->settings()->URLPATTERNS)}}

@@ -128,28 +128,6 @@ public:
 	// TODO: docs for Request::environment
 	std::map<std::string, std::string> environment;
 
-protected:
-	ssize_t max_file_upload_size;
-	ssize_t max_fields_count;
-	ssize_t max_header_length;
-	ssize_t max_headers_count;
-
-	[[nodiscard]]
-	std::unique_ptr<mime::multipart::BodyReader> multipart_reader(bool allow_mixed) const;
-
-	// Return the HTTP host using the environment or request headers. Skip
-	// allowed hosts protection, so may return an insecure host.
-	[[nodiscard]]
-	std::string get_raw_host(
-		bool use_x_forwarded_host, bool use_x_forwarded_port,
-		const std::optional<std::pair<std::string, std::string>>& secure_proxy_ssl_header
-	) const;
-
-	// TODO: dos for 'get_port'
-	[[nodiscard]]
-	std::string get_port(bool use_x_forwarded_port) const;
-
-public:
 	explicit Request(
 		const net::RequestContext& context,
 		ssize_t max_file_upload_size, ssize_t max_fields_count,
@@ -263,6 +241,27 @@ public:
 	{
 		return this->scheme(secure_proxy_ssl_header) == "https";
 	}
+
+protected:
+	ssize_t max_file_upload_size;
+	ssize_t max_fields_count;
+	ssize_t max_header_length;
+	ssize_t max_headers_count;
+
+	[[nodiscard]]
+	std::unique_ptr<mime::multipart::BodyReader> multipart_reader(bool allow_mixed) const;
+
+	// Return the HTTP host using the environment or request headers. Skip
+	// allowed hosts protection, so may return an insecure host.
+	[[nodiscard]]
+	std::string get_raw_host(
+		bool use_x_forwarded_host, bool use_x_forwarded_port,
+		const std::optional<std::pair<std::string, std::string>>& secure_proxy_ssl_header
+	) const;
+
+	// TODO: dos for 'get_port'
+	[[nodiscard]]
+	std::string get_port(bool use_x_forwarded_port) const;
 };
 
 // TESTME: valid_method
