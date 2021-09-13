@@ -21,6 +21,18 @@
 
 __CONF_BEGIN__
 
+inline void _throw_interruption_exception(int signal)
+{
+	throw InterruptException("Execution is interrupted with signal: " + std::to_string(signal));
+}
+
+inline void _throw_null_pointer_exception(int signal)
+{
+	throw NullPointerException("invalid storage access (segmentation fault)");
+}
+
+extern void initialize_signal_handlers();
+
 class Application
 {
 public:

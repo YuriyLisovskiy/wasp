@@ -43,14 +43,16 @@ public:
 
 	}
 
-	virtual Function operator() (const Function& next);
+	virtual Function operator() (const Function& next) const;
 
 	// Get the value to set for the X-Frame-Options header. Use the value from
 	// the `setting->get_x_frame_options()` result.
 	//
 	// This method can be overridden if needed, allowing it to vary based on
 	// the `request` or `response`.
-	virtual inline std::string get_x_frame_options_value(http::Request* request, http::abc::IHttpResponse* response)
+	virtual inline std::string get_x_frame_options_value(
+		http::Request* request, http::abc::IHttpResponse* response
+	) const
 	{
 		return this->settings->X_FRAME_OPTIONS.to_string();
 	}

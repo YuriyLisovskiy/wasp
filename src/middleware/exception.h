@@ -39,12 +39,7 @@ public:
 	{
 	}
 
-	inline ~Exception() override
-	{
-		this->settings->LOGGER->trace("DELETED", _ERROR_DETAILS_);
-	}
-
-	Function operator() (const Function& next);
+	Function operator() (const Function& next) const;
 
 protected:
 	inline static const net::Status DEFAULT_ERROR_STATUS = {
@@ -71,9 +66,10 @@ protected:
 		return this->settings->render_html_error_template(status, message);
 	}
 
+	[[nodiscard]]
 	std::unique_ptr<http::abc::IHttpResponse> error_to_response(
 		net::StatusCode status_code, const std::string& message, bool is_json
-	);
+	) const;
 };
 
 __MIDDLEWARE_END__

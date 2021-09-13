@@ -18,9 +18,9 @@
 
 __MIDDLEWARE_BEGIN__
 
-Function Common::operator() (const Function& next)
+Function Common::operator() (const Function& next) const
 {
-	return [this, next](http::Request* request) -> std::unique_ptr<http::abc::IHttpResponse>
+	return [*this, next](http::Request* request) -> std::unique_ptr<http::abc::IHttpResponse>
 	{
 		auto response = this->preprocess(request);
 		if (response)
@@ -39,7 +39,7 @@ Function Common::operator() (const Function& next)
 	};
 }
 
-bool Common::should_redirect_with_slash(http::Request* request)
+bool Common::should_redirect_with_slash(http::Request* request) const
 {
 	if (this->settings->APPEND_SLASH && !request->url.path.ends_with("/"))
 	{
@@ -51,7 +51,7 @@ bool Common::should_redirect_with_slash(http::Request* request)
 	return false;
 }
 
-std::string Common::get_full_path_with_slash(http::Request* request)
+std::string Common::get_full_path_with_slash(http::Request* request) const
 {
 	auto new_path = request->url.full_path(true);
 
@@ -81,7 +81,7 @@ std::string Common::get_full_path_with_slash(http::Request* request)
 	return new_path;
 }
 
-std::unique_ptr<http::abc::IHttpResponse> Common::preprocess(http::Request* request)
+std::unique_ptr<http::abc::IHttpResponse> Common::preprocess(http::Request* request) const
 {
 	require_non_null(request, _ERROR_DETAILS_);
 	if (request->header.contains(http::USER_AGENT))
@@ -136,7 +136,7 @@ std::unique_ptr<http::abc::IHttpResponse> Common::preprocess(http::Request* requ
 
 std::unique_ptr<http::abc::IHttpResponse> Common::postprocess(
 	http::Request* request, http::abc::IHttpResponse* response
-)
+) const
 {
 	require_non_null(response, _ERROR_DETAILS_);
 

@@ -29,10 +29,11 @@ public:
 
 	ConditionalGet() = default;
 
-	virtual Function operator() (const Function& next);
+	virtual Function operator() (const Function& next) const;
 
 protected:
 	// Return true if an ETag header should be added to response.
+	[[nodiscard]]
 	virtual bool needs_etag(const std::unique_ptr<http::abc::IHttpResponse>& response) const;
 };
 

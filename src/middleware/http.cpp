@@ -15,9 +15,9 @@
 
 __MIDDLEWARE_BEGIN__
 
-Function ConditionalGet::operator() (const Function& next)
+Function ConditionalGet::operator() (const Function& next) const
 {
-	return [this, next](http::Request* request) -> std::unique_ptr<http::abc::IHttpResponse>
+	return [*this, next](http::Request* request) -> std::unique_ptr<http::abc::IHttpResponse>
 	{
 		auto response = next(request);
 

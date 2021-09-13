@@ -8,6 +8,7 @@
 
 // C++ libraries.
 #include <iostream>
+#include <csignal>
 
 // Framework libraries.
 #include "../management/module.h"
@@ -18,9 +19,37 @@
 
 __CONF_BEGIN__
 
+void initialize_signal_handlers()
+{
+#if defined(_WIN32) || defined(_WIN64)
+	// Termination
+	signal(SIGINT, &_throw_interruption_exception);
+	signal(SIGTERM, &_throw_interruption_exception);
+
+	// Segmentation fault.
+	signal(SIGSEGV, &_throw_null_pointer_exception);
+#elif defined(__unix__) || defined(__linux__)
+	// Termination.
+	struct sigaction termination_handler{};
+	termination_handler.sa_handler = _throw_interruption_exception;
+	sigemptyset(&termination_handler.sa_mask);
+	termination_handler.sa_flags = 0;
+	sigaction(SIGINT, &termination_handler, nullptr);
+	sigaction(SIGTERM, &termination_handler, nullptr);
+
+	// Segmentation fault.
+	struct sigaction segmentation_fault_handler{};
+	segmentation_fault_handler.sa_handler = _throw_null_pointer_exception;
+	sigemptyset(&segmentation_fault_handler.sa_mask);
+	segmentation_fault_handler.sa_flags = SA_SIGINFO;
+	sigaction(SIGSEGV, &segmentation_fault_handler, nullptr);
+#else
+#error Library is not supported on this platform
+#endif
+}
+
 Application::Application(conf::Settings* settings)
 {
-	InterruptException::initialize();
 	this->setup_settings(settings);
 	this->build_static_patterns();
 
@@ -72,12 +101,13 @@ void Application::execute_command(const std::string& command_name, int argc, cha
 
 Application::ServerHandler Application::build_server_handler() const
 {
+	this->settings->MIDDLEWARE.insert(this->settings->MIDDLEWARE.begin(), middleware::Exception(this->settings));
 	return [this](
 		net::RequestContext* context, const std::map<std::string, std::string>& environment
 	) -> net::StatusCode
 	{
 		auto request = this->build_request(context, environment);
-		auto middleware_chain = middleware::Exception(this->settings)(this->build_middleware_chain());
+		auto middleware_chain = this->build_middleware_chain();
 		auto response = middleware_chain(request.get());
 		return this->send_response(context, response);
 	};

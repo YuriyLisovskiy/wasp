@@ -41,17 +41,17 @@ public:
 		}
 	}
 
-	virtual Function operator() (const Function& next);
+	virtual Function operator() (const Function& next) const;
 
 protected:
 	conf::Secure secure;
 	std::vector<re::Regex> redirect_exempt;
 
-	virtual std::unique_ptr<http::abc::IHttpResponse> preprocess(http::Request* request);
+	virtual std::unique_ptr<http::abc::IHttpResponse> preprocess(http::Request* request) const;
 
 	virtual std::unique_ptr<http::abc::IHttpResponse> postprocess(
 		http::Request* request, http::abc::IHttpResponse* response
-	);
+	) const;
 };
 
 __MIDDLEWARE_END__

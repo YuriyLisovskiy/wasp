@@ -12,9 +12,9 @@
 
 __MIDDLEWARE_BEGIN__
 
-Function Security::operator() (const Function& next)
+Function Security::operator() (const Function& next) const
 {
-	return [this, next](http::Request* request) -> std::unique_ptr<http::abc::IHttpResponse>
+	return [*this, next](http::Request* request) -> std::unique_ptr<http::abc::IHttpResponse>
 	{
 		auto response = this->preprocess(request);
 		if (response)
@@ -33,11 +33,11 @@ Function Security::operator() (const Function& next)
 	};
 }
 
-std::unique_ptr<http::abc::IHttpResponse> Security::preprocess(http::Request* request)
+std::unique_ptr<http::abc::IHttpResponse> Security::preprocess(http::Request* request) const
 {
 	auto path = str::ltrim(request->url.path, "/");
 	bool matched = false;
-	for (auto& pattern : this->redirect_exempt)
+	for (auto pattern : this->redirect_exempt)
 	{
 		matched = pattern.search(path);
 		if (matched)
@@ -76,7 +76,7 @@ std::unique_ptr<http::abc::IHttpResponse> Security::preprocess(http::Request* re
 
 std::unique_ptr<http::abc::IHttpResponse> Security::postprocess(
 	http::Request* request, http::abc::IHttpResponse* response
-)
+) const
 {
 	require_non_null(response, _ERROR_DETAILS_);
 	if (
