@@ -1,24 +1,30 @@
 /**
- * conf/loaders/yaml_settings_loader.cpp
+ * conf/loaders/yaml_loader.cpp
  *
  * Copyright (c) 2021 Yuriy Lisovskiy
  */
 
-#include "./yaml_settings_loader.h"
+#include "./yaml_loader.h"
 
 // Base libraries.
-#include <xalwart.base/path.h>
+//#include <xalwart.base/path.h>
 
 // Render libraries.
-#include <xalwart.render/engine.h>
+//#include <xalwart.render/engine.h>
 
 // Framework libraries.
-#include "../../render/default_library.h"
+//#include "./components/default.h"
+//#include "./components/logger.h"
+//#include "./components/timezone.h"
+//
+//#include "./utilities.h"
+//
+//#include "../../../render/default_library.h"
 
 
 __CONF_BEGIN__
 
-void YamlSettingsLoader::check_config(const YAML::Node& config, const std::string& file_path)
+/*oid YAMLSettingsLoader::check_config(const YAML::Node& config, const std::string& file_path)
 {
 	if (config && config.IsMap())
 	{
@@ -26,16 +32,16 @@ void YamlSettingsLoader::check_config(const YAML::Node& config, const std::strin
 	}
 
 	throw ValueError("'" + file_path + "' file must have map type", _ERROR_DETAILS_);
-}
-
-void YamlSettingsLoader::overwrite_scalar_or_remove_if_null(
+}*/
+/*
+void YAMLSettingsLoader::overwrite_scalar_or_remove_if_null(
 	YAML::Node& config, const YAML::Node& local_config, const std::string& key
 )
 {
 	auto value = local_config[key];
 	if (!value || value.IsNull())
 	{
-		config[key] = YamlSettingsLoader::null();
+		config[key] = null_node();
 	}
 	else if (value.IsScalar())
 	{
@@ -43,14 +49,14 @@ void YamlSettingsLoader::overwrite_scalar_or_remove_if_null(
 	}
 }
 
-void YamlSettingsLoader::overwrite_sequence_or_remove_if_null(
+void YAMLSettingsLoader::overwrite_sequence_or_remove_if_null(
 	YAML::Node& config, const YAML::Node& local_config, const std::string& key
 )
 {
 	auto value = local_config[key];
 	if (!value || value.IsNull())
 	{
-		config[key] = YamlSettingsLoader::null();
+		config[key] = null_node();
 	}
 	else if (value.IsSequence())
 	{
@@ -58,102 +64,19 @@ void YamlSettingsLoader::overwrite_sequence_or_remove_if_null(
 	}
 }
 
-void YamlSettingsLoader::overwrite_logger(YAML::Node& logger, const YAML::Node& local_logger)
-{
-	if (local_logger.IsNull())
-	{
-		logger = YamlSettingsLoader::null();
-	}
-	else if (local_logger.IsMap())
-	{
-		if (!logger)
-		{
-			logger = YamlSettingsLoader::map_node();
-		}
-
-		this->overwrite_scalar_or_remove_if_null(logger, local_logger, "use_colors");
-		auto local_levels = local_logger["levels"];
-		if (!local_levels)
-		{
-			// skip
-		}
-		else if (local_levels.IsNull())
-		{
-			logger["levels"] = YamlSettingsLoader::null();
-		}
-		else if (local_levels.IsScalar() && local_levels.as<std::string>() == "*")
-		{
-			logger["levels"] = "*";
-		}
-		else if (local_levels.IsMap())
-		{
-			auto levels = logger["levels"];
-			if (levels && levels.IsNull())
-			{
-				logger["levels"] = local_levels;
-			}
-			else
-			{
-				if (!levels)
-				{
-					levels = YamlSettingsLoader::map_node();
-				}
-
-				this->overwrite_scalar_or_remove_if_null(levels, local_levels, "info");
-				this->overwrite_scalar_or_remove_if_null(levels, local_levels, "debug");
-				this->overwrite_scalar_or_remove_if_null(levels, local_levels, "warning");
-				this->overwrite_scalar_or_remove_if_null(levels, local_levels, "error");
-				this->overwrite_scalar_or_remove_if_null(levels, local_levels, "fatal");
-				this->overwrite_scalar_or_remove_if_null(levels, local_levels, "print");
-				logger["levels"] = levels;
-			}
-		}
-
-		auto local_out = local_logger["out"];
-		if (!local_out)
-		{
-			// skip
-		}
-		else if (local_out.IsNull())
-		{
-			logger["out"] = YamlSettingsLoader::null();
-		}
-		else if (local_out.IsMap())
-		{
-			auto out = logger["out"];
-			if (out && out.IsNull())
-			{
-				logger["out"] = local_out;
-			}
-			else
-			{
-				if (!out)
-				{
-					out = YamlSettingsLoader::map_node();
-				}
-
-				this->overwrite_scalar_or_remove_if_null(out, local_out, "console");
-				this->overwrite_scalar_or_remove_if_null(out, local_out, "file");
-				this->overwrite_sequence_or_remove_if_null(out, local_out, "files");
-				logger["out"] = out;
-			}
-		}
-	}
-}
-
-void YamlSettingsLoader::overwrite_template_engine(
+void YAMLSettingsLoader::overwrite_template_engine(
 	YAML::Node& template_engine, const YAML::Node& local_template_engine
 )
 {
 	if (local_template_engine.IsNull())
 	{
-		template_engine = YamlSettingsLoader::null();
+		template_engine = null_node();
 	}
 	else if (local_template_engine.IsMap())
 	{
 		if (!template_engine)
 		{
-			template_engine = YamlSettingsLoader::map_node();
+			template_engine = map_node();
 		}
 
 		this->overwrite_sequence_or_remove_if_null(
@@ -174,98 +97,7 @@ void YamlSettingsLoader::overwrite_template_engine(
 	}
 }
 
-void YamlSettingsLoader::init_logger_setting(Settings* settings, const YAML::Node& config)
-{
-	log::Config logger_config{};
-	auto levels = config["levels"];
-	if (!levels)
-	{
-		// skip
-	}
-	else if (levels.IsNull())
-	{
-		logger_config.enable_info = false;
-		logger_config.enable_debug = false;
-		logger_config.enable_warning = false;
-		logger_config.enable_error = false;
-		logger_config.enable_fatal = false;
-		logger_config.enable_trace = false;
-		logger_config.enable_print = false;
-	}
-	else if (levels.IsScalar() && levels.as<std::string>() == "*")
-	{
-		logger_config.enable_info = true;
-		logger_config.enable_debug = true;
-		logger_config.enable_warning = true;
-		logger_config.enable_error = true;
-		logger_config.enable_fatal = true;
-		logger_config.enable_trace = true;
-		logger_config.enable_print = true;
-	}
-	else if (levels.IsMap())
-	{
-		auto info = levels["info"];
-		logger_config.enable_info = !info || (!info.IsNull() && info.as<bool>(true));
-
-		auto debug = levels["debug"];
-		logger_config.enable_debug = !debug || (!debug.IsNull() && debug.as<bool>(true));
-
-		auto warning = levels["warning"];
-		logger_config.enable_warning = !warning || (!warning.IsNull() && warning.as<bool>(true));
-
-		auto error = levels["error"];
-		logger_config.enable_error = !error || (!error.IsNull() && error.as<bool>(true));
-
-		auto fatal = levels["fatal"];
-		logger_config.enable_fatal = !fatal || (!fatal.IsNull() && fatal.as<bool>(true));
-
-		auto trace = levels["trace"];
-		logger_config.enable_trace = !trace || (!trace.IsNull() && trace.as<bool>(true));
-
-		auto print = levels["print"];
-		logger_config.enable_print = !print || (!print.IsNull() && print.as<bool>(true));
-	}
-
-	auto out = config["out"];
-	if (out && !out.IsNull())
-	{
-		auto console = out["console"];
-		if (!console || (!console.IsNull() && console.as<bool>(true)))
-		{
-			logger_config.add_console_stream();
-		}
-
-		auto file_out = out["file"];
-		if (file_out && !file_out.IsNull() && file_out.IsScalar())
-		{
-			auto f_path = file_out.as<std::string>();
-			auto full_path = path::is_absolute(f_path) ? f_path : path::join(settings->BASE_DIR, f_path);
-			logger_config.add_file_stream(full_path);
-		}
-		else
-		{
-			auto files_out = out["files"];
-			if (files_out && files_out.IsSequence())
-			{
-				for (auto it = files_out.begin(); it != files_out.end(); it++)
-				{
-					if (it->IsDefined() && !it->IsNull() && it->IsScalar())
-					{
-						auto f_path = it->as<std::string>();
-						auto full_path = path::is_absolute(f_path) ? f_path : path::join(settings->BASE_DIR, f_path);
-						logger_config.add_file_stream(full_path);
-					}
-				}
-			}
-		}
-	}
-
-	settings->LOGGER = std::make_shared<log::Logger>(logger_config);
-	auto use_colors = config["use_colors"];
-	settings->LOGGER->use_colors(!use_colors || (!use_colors.IsNull() && use_colors.as<bool>(true)));
-}
-
-void YamlSettingsLoader::init_template_engine_setting(Settings* settings, const YAML::Node& config)
+void YAMLSettingsLoader::init_template_engine_setting(Settings* settings, const YAML::Node& config)
 {
 	std::vector<std::string> dirs;
 	auto directories = config["directories"];
@@ -322,21 +154,11 @@ void YamlSettingsLoader::init_template_engine_setting(Settings* settings, const 
 		libs,
 		settings->LOGGER.get()
 	);
-}
-
-std::string YamlSettingsLoader::config_name() const
+}*/
+/*
+YAML::Node YAMLSettingsLoader::load_file(const std::string& base_dir, const std::regex& file_name_pattern)
 {
-	return R"(config\.y(a)?ml)";
-}
-
-std::string YamlSettingsLoader::local_config_name() const
-{
-	return R"(config\.local\.y(a)?ml)";
-}
-
-YAML::Node YamlSettingsLoader::load_file(const std::string& base_dir, const std::string& file_name)
-{
-	auto file_entry = this->find_file(base_dir, file_name);
+	auto file_entry = this->find_file(base_dir, file_name_pattern);
 	if (file_entry.exists())
 	{
 		auto config = YAML::LoadFile(file_entry.path());
@@ -344,10 +166,10 @@ YAML::Node YamlSettingsLoader::load_file(const std::string& base_dir, const std:
 		return config;
 	}
 
-	return YamlSettingsLoader::null();
-}
+	return null_node();
+}*/
 
-void YamlSettingsLoader::overwrite_config(YAML::Node& config, const YAML::Node& local_config)
+/*void YAMLSettingsLoader::overwrite_config(YAML::Node& config, const YAML::Node& local_config)
 {
 	if (!local_config || local_config.IsNull())
 	{
@@ -821,162 +643,162 @@ void YamlSettingsLoader::overwrite_config(YAML::Node& config, const YAML::Node& 
 		this->overwrite_template_engine(template_engine, local_template_engine);
 		config["template_engine"] = template_engine;
 	}
-}
+}*/
 
-void YamlSettingsLoader::init_settings(Settings* settings, const YAML::Node& config)
+/*void YAMLSettingsLoader::init_settings(Settings* settings, const YAML::Node& config)
 {
-	auto debug_mode = config["debug"];
-	settings->DEBUG = !debug_mode.IsNull() && debug_mode.as<bool>(false);
+//	auto debug_mode = config["debug"];
+//	settings->DEBUG = !debug_mode.IsNull() && debug_mode.as<bool>(false);
 
-	auto logger = config["logger"];
-	if (logger && logger.IsMap())
-	{
-		this->init_logger_setting(settings, logger);
-	}
+//	auto logger = config["logger"];
+//	if (logger && logger.IsMap())
+//	{
+//		this->init_logger_setting(settings, logger);
+//	}
 
-	auto allowed_hosts = config["allowed_hosts"];
-	if (allowed_hosts && allowed_hosts.IsSequence())
-	{
-		_init_allowed_hosts(settings, allowed_hosts);
-	}
+//	auto allowed_hosts = config["allowed_hosts"];
+//	if (allowed_hosts && allowed_hosts.IsSequence())
+//	{
+//		_init_allowed_hosts(settings, allowed_hosts);
+//	}
 
-	auto timezone = config["timezone"];
-	if (!timezone || !timezone.IsMap())
-	{
-		settings->TIMEZONE = std::make_shared<dt::Timezone>(dt::Timezone::UTC);
-	}
-	else
-	{
-		auto timezone_name = str::to_upper(timezone["name"].as<std::string>("UTC"));
-		if (timezone_name == "UTC")
-		{
-			settings->TIMEZONE = std::make_shared<dt::Timezone>(dt::Timezone::UTC);
-		}
-		else
-		{
-			auto timezone_offset = timezone["offset"];
-			if (timezone_offset && timezone_offset.IsMap())
-			{
-				settings->TIMEZONE = std::make_shared<dt::Timezone>(
-					dt::Timedelta(
-						timezone_offset["days"].as<long>(0),
-						timezone_offset["seconds"].as<long>(0),
-						timezone_offset["microseconds"].as<long>(0),
-						timezone_offset["milliseconds"].as<long>(0),
-						timezone_offset["minutes"].as<long>(0),
-						timezone_offset["hours"].as<long>(0),
-						timezone_offset["weeks"].as<long>(0)
-					),
-					timezone_name
-				);
-			}
-			else
-			{
-				settings->TIMEZONE = std::make_shared<dt::Timezone>(
-					dt::Timedelta(), timezone_name
-				);
-			}
-		}
-	}
+//	settings->USE_TIMEZONE = config["use_timezone"].as<bool>(false);
 
-	settings->USE_TIMEZONE = config["use_timezone"].as<bool>(false);
+//	auto timezone = config["timezone"];
+//	if (!timezone || !timezone.IsMap())
+//	{
+//		settings->TIMEZONE = std::make_shared<dt::Timezone>(dt::Timezone::UTC);
+//	}
+//	else
+//	{
+//		auto timezone_name = str::to_upper(timezone["name"].as<std::string>("UTC"));
+//		if (timezone_name == "UTC")
+//		{
+//			settings->TIMEZONE = std::make_shared<dt::Timezone>(dt::Timezone::UTC);
+//		}
+//		else
+//		{
+//			auto timezone_offset = timezone["offset"];
+//			if (timezone_offset && timezone_offset.IsMap())
+//			{
+//				settings->TIMEZONE = std::make_shared<dt::Timezone>(
+//					dt::Timedelta(
+//						timezone_offset["days"].as<long>(0),
+//						timezone_offset["seconds"].as<long>(0),
+//						timezone_offset["microseconds"].as<long>(0),
+//						timezone_offset["milliseconds"].as<long>(0),
+//						timezone_offset["minutes"].as<long>(0),
+//						timezone_offset["hours"].as<long>(0),
+//						timezone_offset["weeks"].as<long>(0)
+//					),
+//					timezone_name
+//				);
+//			}
+//			else
+//			{
+//				settings->TIMEZONE = std::make_shared<dt::Timezone>(
+//					dt::Timedelta(), timezone_name
+//				);
+//			}
+//		}
+//	}
 
-	settings->CHARSET = config["charset"].as<std::string>("utf-8");
+//	settings->CHARSET = config["charset"].as<std::string>("utf-8");
 
-	auto append_slash = config["append_slash"];
-	settings->APPEND_SLASH = !append_slash || (!append_slash.IsNull() && append_slash.as<bool>(true));
+//	auto append_slash = config["append_slash"];
+//	settings->APPEND_SLASH = !append_slash || (!append_slash.IsNull() && append_slash.as<bool>(true));
 
-	auto disallowed_user_agents = config["disallowed_user_agents"];
-	if (disallowed_user_agents && disallowed_user_agents.IsSequence())
-	{
-		_init_disallowed_user_agents(settings, disallowed_user_agents);
-	}
+//	auto disallowed_user_agents = config["disallowed_user_agents"];
+//	if (disallowed_user_agents && disallowed_user_agents.IsSequence())
+//	{
+//		_init_disallowed_user_agents(settings, disallowed_user_agents);
+//	}
 
-	auto ignorable_404_urls = config["ignorable_404_urls"];
-	if (ignorable_404_urls && ignorable_404_urls.IsSequence())
-	{
-		_init_ignorable_404_urls(settings, ignorable_404_urls);
-	}
+//	auto ignorable_404_urls = config["ignorable_404_urls"];
+//	if (ignorable_404_urls && ignorable_404_urls.IsSequence())
+//	{
+//		_init_ignorable_404_urls(settings, ignorable_404_urls);
+//	}
 
-	settings->SECRET_KEY = config["secret_key"].as<std::string>("");
+//	settings->SECRET_KEY = config["secret_key"].as<std::string>("");
 
-	auto media = config["media"];
-	if (media && media.IsMap())
-	{
-		auto p = media["root"].as<std::string>("");
-		settings->MEDIA.ROOT = path::is_absolute(p) ? p : path::join(settings->BASE_DIR, p);
-		settings->MEDIA.URL = media["url"].as<std::string>("");
-	}
+//	auto media = config["media"];
+//	if (media && media.IsMap())
+//	{
+//		auto p = media["root"].as<std::string>("");
+//		settings->MEDIA.ROOT = path::is_absolute(p) ? p : path::join(settings->BASE_DIR, p);
+//		settings->MEDIA.URL = media["url"].as<std::string>("");
+//	}
+//
+//	auto static_ = config["static"];
+//	if (static_ && static_.IsMap())
+//	{
+//		auto p = static_["root"].as<std::string>("");
+//		settings->STATIC.ROOT = path::is_absolute(p) ? p : path::join(settings->BASE_DIR, p);
+//		settings->STATIC.URL = static_["url"].as<std::string>("");
+//	}
 
-	auto static_ = config["static"];
-	if (static_ && static_.IsMap())
-	{
-		auto p = static_["root"].as<std::string>("");
-		settings->STATIC.ROOT = path::is_absolute(p) ? p : path::join(settings->BASE_DIR, p);
-		settings->STATIC.URL = static_["url"].as<std::string>("");
-	}
+//	auto limits = config["limits"];
+//	if (limits && limits.IsMap())
+//	{
+//		settings->LIMITS = {
+//			.FILE_UPLOAD_MAX_MEMORY_SIZE = limits["file_upload_max_memory_size"].as<size_t>(2621440),
+//			.DATA_UPLOAD_MAX_MEMORY_SIZE = limits["data_upload_max_memory_size"].as<size_t>(2621440),
+//			.DATA_UPLOAD_MAX_NUMBER_FIELDS = limits["data_upload_max_number_fields"].as<size_t>(1000),
+//			.MAX_HEADER_LENGTH = limits["max_header_length"].as<size_t>(65535),
+//			.MAX_HEADERS_COUNT = limits["max_headers_count"].as<size_t>(100)
+//		};
+//	}
 
-	auto limits = config["limits"];
-	if (limits && limits.IsMap())
-	{
-		settings->LIMITS = {
-			.FILE_UPLOAD_MAX_MEMORY_SIZE = limits["file_upload_max_memory_size"].as<size_t>(2621440),
-			.DATA_UPLOAD_MAX_MEMORY_SIZE = limits["data_upload_max_memory_size"].as<size_t>(2621440),
-			.DATA_UPLOAD_MAX_NUMBER_FIELDS = limits["data_upload_max_number_fields"].as<size_t>(1000),
-			.MAX_HEADER_LENGTH = limits["max_header_length"].as<size_t>(65535),
-			.MAX_HEADERS_COUNT = limits["max_headers_count"].as<size_t>(100)
-		};
-	}
-
-	settings->PREPEND_WWW = config["prepend_www"].as<bool>(false);
-
-	auto formats = config["formats"];
-	if (formats && formats.IsMap())
-	{
-		_init_formats(settings, formats);
-	}
-
-	settings->FIRST_DAY_OF_WEEK = config["first_day_of_week"].as<int>(0);
-
-	settings->DECIMAL_SEPARATOR = config["decimal_separator"].as<char>('.');
-
-	settings->USE_THOUSAND_SEPARATOR = config["use_thousand_separator"].as<bool>(false);
-
-	settings->THOUSAND_SEPARATOR = config["thousand_separator"].as<char>(',');
-
-	settings->X_FRAME_OPTIONS = XFrameOptions::from_string(config["x_frame_options"].as<std::string>("SAMEORIGIN"));
-
-	settings->USE_X_FORWARDED_HOST = config["use_x_forwarded_host"].as<bool>(false);
-
-	settings->USE_X_FORWARDED_PORT = config["use_x_forwarded_port"].as<bool>(false);
-
-	auto csrf = config["csrf"];
-	if (csrf && csrf.IsMap())
-	{
-		_init_csrf(settings, csrf);
-	}
-
-	settings->USE_SSL = config["use_ssl"].as<bool>(false);
-
-	auto secure = config["secure"];
-	if (secure && secure.IsMap())
-	{
-		_init_secure(settings, secure);
-	}
-
-	auto modules = config["modules"];
-	if (modules && modules.IsSequence() && modules.size() > 0)
-	{
-		settings->register_modules();
-		_init_modules(settings, modules);
-	}
-
-	auto middleware = config["middleware"];
-	if (middleware && middleware.IsSequence() && middleware.size() > 0)
-	{
-		settings->register_middleware();
-		_init_middleware(settings, middleware);
-	}
+//	settings->PREPEND_WWW = config["prepend_www"].as<bool>(false);
+//
+//	auto formats = config["formats"];
+//	if (formats && formats.IsMap())
+//	{
+//		_init_formats(settings, formats);
+//	}
+//
+//	settings->FIRST_DAY_OF_WEEK = config["first_day_of_week"].as<int>(0);
+//
+//	settings->DECIMAL_SEPARATOR = config["decimal_separator"].as<char>('.');
+//
+//	settings->USE_THOUSAND_SEPARATOR = config["use_thousand_separator"].as<bool>(false);
+//
+//	settings->THOUSAND_SEPARATOR = config["thousand_separator"].as<char>(',');
+//
+//	settings->X_FRAME_OPTIONS = XFrameOptions::from_string(config["x_frame_options"].as<std::string>("SAMEORIGIN"));
+//
+//	settings->USE_X_FORWARDED_HOST = config["use_x_forwarded_host"].as<bool>(false);
+//
+//	settings->USE_X_FORWARDED_PORT = config["use_x_forwarded_port"].as<bool>(false);
+//
+//	auto csrf = config["csrf"];
+//	if (csrf && csrf.IsMap())
+//	{
+//		_init_csrf(settings, csrf);
+//	}
+//
+//	settings->USE_SSL = config["use_ssl"].as<bool>(false);
+//
+//	auto secure = config["secure"];
+//	if (secure && secure.IsMap())
+//	{
+//		_init_secure(settings, secure);
+//	}
+//
+//	auto modules = config["modules"];
+//	if (modules && modules.IsSequence() && modules.size() > 0)
+//	{
+//		settings->register_modules();
+//		_init_modules(settings, modules);
+//	}
+//
+//	auto middleware = config["middleware"];
+//	if (middleware && middleware.IsSequence() && middleware.size() > 0)
+//	{
+//		settings->register_middleware();
+//		_init_middleware(settings, middleware);
+//	}
 
 	auto databases = config["databases"];
 	if (databases && databases.IsSequence() && databases.size() > 0)
@@ -993,54 +815,9 @@ void YamlSettingsLoader::init_settings(Settings* settings, const YAML::Node& con
 	{
 		this->init_template_engine_setting(settings, template_engine);
 	}
-}
-
-void YamlSettingsLoader::_init_allowed_hosts(Settings* settings, const YAML::Node& allowed_hosts)
-{
-	for (auto it = allowed_hosts.begin(); it != allowed_hosts.end(); it++)
-	{
-		if (it->IsDefined() && it->IsScalar())
-		{
-			auto value = it->as<std::string>();
-			if (!value.empty())
-			{
-				settings->ALLOWED_HOSTS.push_back(value);
-			}
-		}
-	}
-}
-
-void YamlSettingsLoader::_init_disallowed_user_agents(Settings* settings, const YAML::Node& agents)
-{
-	for (auto it = agents.begin(); it != agents.end(); it++)
-	{
-		if (it->IsDefined() && it->IsScalar())
-		{
-			auto value = it->as<std::string>();
-			if (!value.empty())
-			{
-				settings->DISALLOWED_USER_AGENTS.emplace_back(value);
-			}
-		}
-	}
-}
-
-void YamlSettingsLoader::_init_ignorable_404_urls(Settings* settings, const YAML::Node& urls)
-{
-	for (auto it = urls.begin(); it != urls.end(); it++)
-	{
-		if (it->IsDefined() && it->IsScalar())
-		{
-			auto value = it->as<std::string>();
-			if (!value.empty())
-			{
-				settings->IGNORABLE_404_URLS.emplace_back(value);
-			}
-		}
-	}
-}
-
-void YamlSettingsLoader::_init_formats(Settings* settings, const YAML::Node& formats)
+}*/
+/*
+void YAMLSettingsLoader::_init_formats(Settings* settings, const YAML::Node& formats)
 {
 	settings->FORMATS = {
 		.DATE_FORMAT = formats["date"].as<std::string>("%b %d, %Y"),
@@ -1053,7 +830,7 @@ void YamlSettingsLoader::_init_formats(Settings* settings, const YAML::Node& for
 	};
 }
 
-void YamlSettingsLoader::_init_csrf(Settings* settings, const YAML::Node& csrf)
+void YAMLSettingsLoader::_init_csrf(Settings* settings, const YAML::Node& csrf)
 {
 	auto cookie = csrf["cookie"];
 	settings->CSRF = {};
@@ -1092,7 +869,7 @@ void YamlSettingsLoader::_init_csrf(Settings* settings, const YAML::Node& csrf)
 	}
 }
 
-void YamlSettingsLoader::_init_secure(Settings* settings, const YAML::Node& secure)
+void YAMLSettingsLoader::_init_secure(Settings* settings, const YAML::Node& secure)
 {
 	auto content_type_no_sniff = secure["content_type_no_sniff"];
 	settings->SECURE = {
@@ -1133,7 +910,7 @@ void YamlSettingsLoader::_init_secure(Settings* settings, const YAML::Node& secu
 	}
 }
 
-void YamlSettingsLoader::_init_modules(Settings* settings, const YAML::Node& modules)
+void YAMLSettingsLoader::_init_modules(Settings* settings, const YAML::Node& modules)
 {
 	for (auto it = modules.begin(); it != modules.end(); it++)
 	{
@@ -1148,7 +925,7 @@ void YamlSettingsLoader::_init_modules(Settings* settings, const YAML::Node& mod
 	}
 }
 
-void YamlSettingsLoader::_init_middleware(Settings* settings, const YAML::Node& middleware)
+void YAMLSettingsLoader::_init_middleware(Settings* settings, const YAML::Node& middleware)
 {
 	for (auto it = middleware.begin(); it != middleware.end(); it++)
 	{
@@ -1171,7 +948,7 @@ void YamlSettingsLoader::_init_middleware(Settings* settings, const YAML::Node& 
 	}
 }
 
-void YamlSettingsLoader::_init_databases(Settings* settings, const YAML::Node& databases)
+void YAMLSettingsLoader::_init_databases(Settings* settings, const YAML::Node& databases)
 {
 	for (auto it = databases.begin(); it != databases.end(); it++)
 	{
@@ -1244,7 +1021,7 @@ void YamlSettingsLoader::_init_databases(Settings* settings, const YAML::Node& d
 	}
 }
 
-void YamlSettingsLoader::_init_sqlite3_database(
+void YAMLSettingsLoader::_init_sqlite3_database(
 	const std::string& name, Settings* settings,
 	std::shared_ptr<orm::abc::ISQLDriver>& driver, const YAML::Node& database
 )
@@ -1259,6 +1036,6 @@ void YamlSettingsLoader::_init_sqlite3_database(
 	}
 
 	driver = settings->build_sqlite3_database(name, filepath.as<std::string>());
-}
+}*/
 
 __CONF_END__

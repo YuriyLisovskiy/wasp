@@ -17,7 +17,7 @@ TemplateResponseMixin::TemplateResponseMixin(render::abc::IEngine* engine)
 	if (!engine)
 	{
 		throw ImproperlyConfigured(
-			"Template engine must be initialized in order to use the application", _ERROR_DETAILS_
+			"Template engine must be instantiated in order to use rendering.", _ERROR_DETAILS_
 		);
 	}
 

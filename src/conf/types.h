@@ -15,6 +15,7 @@
 
 // Base libraries.
 #include <xalwart.base/exceptions.h>
+#include <xalwart.base/string_utils.h>
 
 // Module definitions.
 #include "./_def_.h"

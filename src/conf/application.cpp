@@ -48,9 +48,13 @@ void initialize_signal_handlers()
 #endif
 }
 
-Application::Application(conf::Settings* settings)
+Application::Application(conf::Settings* settings) : settings(settings), is_configured(false)
 {
-	this->setup_settings(settings);
+}
+
+Application& Application::configure()
+{
+	this->configure_settings();
 	this->build_static_patterns();
 
 	// Retrieve main module patterns and append them to result.
@@ -58,10 +62,20 @@ Application::Application(conf::Settings* settings)
 
 	this->setup_template_engine();
 	this->setup_commands();
+
+	this->is_configured = true;
+	return *this;
 }
 
 void Application::execute(int argc, char** argv) const
 {
+	if (!this->is_configured)
+	{
+		throw RuntimeError(
+			"application is not configured, call `Application::configure()` method before execution"
+		);
+	}
+
 	if (argc > 1)
 	{
 		try

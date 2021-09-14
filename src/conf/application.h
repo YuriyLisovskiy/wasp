@@ -38,6 +38,8 @@ class Application
 public:
 	explicit Application(conf::Settings* settings);
 
+	virtual Application& configure();
+
 	void execute(int argc, char** argv) const;
 
 protected:
@@ -46,6 +48,7 @@ protected:
 	)>;
 
 	conf::Settings* settings = nullptr;
+	bool is_configured;
 
 	// List of commands to run from command line.
 	std::map<std::string, std::shared_ptr<cmd::BaseCommand>> commands;
@@ -64,21 +67,21 @@ protected:
 	virtual middleware::Function build_middleware_chain() const;
 
 	[[nodiscard]]
-	ServerHandler build_server_handler() const;
+	virtual ServerHandler build_server_handler() const;
 
-	void build_static_pattern(
+	virtual void build_static_pattern(
 		std::vector<std::shared_ptr<urls::IPattern>>& patterns,
 		const std::string& root, const std::string& url, const std::string& name
 	) const;
 
-	void build_module_patterns(std::vector<std::shared_ptr<urls::IPattern>>& patterns) const;
+	virtual void build_module_patterns(std::vector<std::shared_ptr<urls::IPattern>>& patterns) const;
 
 	[[nodiscard]]
 	virtual std::shared_ptr<http::Request> build_request(
 		net::RequestContext* context, std::map<std::string, std::string> env
 	) const;
 
-	void build_static_patterns();
+	virtual void build_static_patterns();
 
 	[[nodiscard]]
 	virtual uint send_response(net::RequestContext* ctx, const std::unique_ptr<http::abc::IHttpResponse>& response) const;
@@ -87,22 +90,21 @@ protected:
 
 	virtual void finish_streaming_response(net::RequestContext* context, http::abc::IHttpResponse* response) const;
 
-	void setup_commands();
+	virtual void setup_commands();
 
-	inline void setup_settings(conf::Settings* global_settings)
+	virtual inline void configure_settings()
 	{
-		this->settings = global_settings;
-		require_non_null(settings, "settings is not instantiated", _ERROR_DETAILS_);
+		require_non_null(this->settings, "settings is not instantiated", _ERROR_DETAILS_);
 		this->settings->prepare();
 		this->settings->check();
 	}
 
-	inline void setup_template_engine()
+	virtual inline void setup_template_engine()
 	{
-		// Initialize template engine's libraries.
-		require_non_null(
-			this->settings->TEMPLATE_ENGINE.get(), "template engine is not instantiated", _ERROR_DETAILS_
-		)->load_libraries();
+		if (this->settings->TEMPLATE_ENGINE)
+		{
+			this->settings->TEMPLATE_ENGINE->load_libraries();
+		}
 	}
 
 	[[nodiscard]]

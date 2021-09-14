@@ -86,14 +86,12 @@ std::string Settings::render_json_error_template(const net::Status& status, cons
 
 void Settings::prepare()
 {
-	if (!this->DB)
+	if (!this->DB && !this->DATABASES.empty())
 	{
-		this->LOGGER->warning("Missing 'default' database");
-		if (!this->DATABASES.empty())
-		{
-			this->DB = this->DATABASES.begin()->second;
-			this->LOGGER->warning("Using the first database from 'databases' map");
-		}
+		this->DB = this->DATABASES.begin()->second;
+		this->LOGGER->warning(
+			"Missing 'default' database, the first database from 'databases' map is set as the default."
+		);
 	}
 }
 
@@ -127,16 +125,14 @@ void Settings::check()
 
 	if (!this->DB)
 	{
-		this->LOGGER->error(
-			"No database was set, at least one database must be configured in order to use the application."
-		);
-		err_count++;
+		this->LOGGER->warning("No database was set, database-related functionality will not be available.");
 	}
 
 	if (!this->TEMPLATE_ENGINE)
 	{
-		this->LOGGER->error("'TEMPLATE_ENGINE' must be configured in order to use the application.");
-		err_count++;
+		this->LOGGER->warning(
+			"'TEMPLATE_ENGINE' is not configured, render-related functionality will not be available."
+		);
 	}
 
 	if (this->MIDDLEWARE.empty())
