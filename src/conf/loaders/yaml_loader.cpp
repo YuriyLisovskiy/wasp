@@ -101,47 +101,6 @@ __CONF_BEGIN__
 	);
 }*/
 
-/*void YAMLSettingsLoader::_init_secure(Settings* settings, const YAML::Node& secure)
-{
-	auto content_type_no_sniff = secure["content_type_no_sniff"];
-	settings->SECURE = {
-		.BROWSER_XSS_FILTER = secure["browser_xss_filter"].as<bool>(false),
-		.CONTENT_TYPE_NO_SNIFF = !content_type_no_sniff ||
-			(!content_type_no_sniff.IsNull() && content_type_no_sniff.as<bool>(true)),
-		.HSTS_INCLUDE_SUBDOMAINS = secure["hsts_include_subdomains"].as<bool>(false),
-		.HSTS_PRELOAD = secure["hsts_preload"].as<bool>(false),
-		.HSTS_SECONDS = secure["hsts_seconds"].as<size_t>(0),
-		.REFERRER_POLICY = secure["referrer_policy"].as<std::string>(""),
-		.SSL_HOST = secure["ssl_host"].as<std::string>(""),
-		.SSL_REDIRECT = secure["ssl_redirect"].as<bool>(false)
-	};
-
-	auto redirect_exempt = secure["redirect_exempt"];
-	if (redirect_exempt && redirect_exempt.IsSequence())
-	{
-		for (auto it = redirect_exempt.begin(); it != redirect_exempt.end(); it++)
-		{
-			if (it->IsDefined() && it->IsScalar())
-			{
-				auto value = it->as<std::string>();
-				if (!value.empty())
-				{
-					settings->SECURE.REDIRECT_EXEMPT.push_back(value);
-				}
-			}
-		}
-	}
-
-	auto proxy_ssl_header = secure["proxy_ssl_header"];
-	if (proxy_ssl_header && proxy_ssl_header.IsMap())
-	{
-		settings->SECURE.PROXY_SSL_HEADER = std::pair<std::string, std::string>(
-			proxy_ssl_header["name"].as<std::string>("X-Forwarded-Proto"),
-			proxy_ssl_header["value"].as<std::string>("https")
-		);
-	}
-}*/
-
 /*void YAMLSettingsLoader::_init_databases(Settings* settings, const YAML::Node& databases)
 {
 	for (auto it = databases.begin(); it != databases.end(); it++)
