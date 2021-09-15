@@ -45,7 +45,7 @@ std::unique_ptr<mime::multipart::BodyReader> Request::multipart_reader(bool allo
 
 std::string Request::get_raw_host(
 	bool use_x_forwarded_host, bool use_x_forwarded_port,
-	const std::optional<std::pair<std::string, std::string>>& secure_proxy_ssl_header
+	const std::optional<conf::Secure::Header>& secure_proxy_ssl_header
 ) const
 {
 	std::string raw_host;
@@ -181,14 +181,14 @@ void Request::parse_multipart_form(long long int max_memory)
 	this->multipart_form = std::move(target_form);
 }
 
-std::string Request::scheme(const std::optional<std::pair<std::string, std::string>>& secure_proxy_ssl_header) const
+std::string Request::scheme(const std::optional<conf::Secure::Header>& secure_proxy_ssl_header) const
 {
 	if (secure_proxy_ssl_header.has_value())
 	{
-		auto header_val = this->get_header(secure_proxy_ssl_header->first, "");
+		auto header_val = this->get_header(secure_proxy_ssl_header->name, "");
 		if (!header_val.empty())
 		{
-			return header_val == secure_proxy_ssl_header->second ? "https" : "http";
+			return header_val == secure_proxy_ssl_header->value ? "https" : "http";
 		}
 	}
 
@@ -196,7 +196,7 @@ std::string Request::scheme(const std::optional<std::pair<std::string, std::stri
 }
 
 std::string Request::get_host(
-	const std::optional<std::pair<std::string, std::string>>& secure_proxy_ssl_header,
+	const std::optional<conf::Secure::Header>& secure_proxy_ssl_header,
 	bool use_x_forwarded_host, bool use_x_forwarded_port, bool debug, std::vector<std::string> allowed_hosts
 )
 {

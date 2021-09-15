@@ -22,8 +22,10 @@
 
 // Framework libraries.
 #include "./abstract_loader.h"
+#include "./yaml/csrf.h"
 #include "./yaml/formats.h"
 #include "./yaml/limits.h"
+#include "./yaml/secure.h"
 #include "./yaml/static.h"
 #include "./yaml/timezone.h"
 
@@ -48,28 +50,22 @@ public:
 	inline void register_standard_components(SettingsType* settings)
 	{
 		this->register_component("debug", std::make_unique<config::YAMLScalarComponent>(settings->DEBUG));
-
 		this->register_component("secret_key", std::make_unique<config::YAMLScalarComponent>(settings->SECRET_KEY));
-
 		this->register_component(
 			"allowed_hosts", std::make_unique<config::YAMLSequenceComponent>([settings](const YAML::Node& host)
 			{
-				auto value = host.as<std::string>();
+				auto value = host.as<std::string>("");
 			    if (!value.empty())
 			    {
 					settings->ALLOWED_HOSTS.push_back(value);
 			    }
 			})
 		);
-
 		this->register_component(
 			"use_timezone", std::make_unique<config::YAMLScalarComponent>(settings->USE_TIMEZONE)
 		);
-
 		this->register_component("timezone", std::make_unique<YAMLTimezoneComponent>(settings->TIMEZONE));
-
 		this->register_component("charset", std::make_unique<config::YAMLScalarComponent>(settings->CHARSET));
-
 		this->register_component(
 			"append_slash", std::make_unique<config::YAMLScalarComponent>(
 				[settings](const YAML::Node& append_slash)
@@ -78,61 +74,49 @@ public:
 				}
 			)
 		);
-
 		this->register_component(
 			"disallowed_user_agents",
 			std::make_unique<config::YAMLSequenceComponent>([settings](const YAML::Node& user_agent)
 			{
-				auto regular_expression = user_agent.as<std::string>();
+				auto regular_expression = user_agent.as<std::string>("");
 				if (!regular_expression.empty())
 				{
 					settings->DISALLOWED_USER_AGENTS.emplace_back(regular_expression);
 				}
 			})
 		);
-
 		this->register_component(
 			"ignorable_404_urls",
 			std::make_unique<config::YAMLSequenceComponent>([settings](const YAML::Node& url)
 			{
-				auto regular_expression = url.as<std::string>();
+				auto regular_expression = url.as<std::string>("");
 				if (!regular_expression.empty())
 				{
 					settings->IGNORABLE_404_URLS.emplace_back(regular_expression);
 				}
 			})
 		);
-
 		this->register_component(
 			"media", std::make_unique<YAMLStaticComponent>(settings->MEDIA, settings->BASE_DIR)
 		);
-
 		this->register_component(
 			"static", std::make_unique<YAMLStaticComponent>(settings->STATIC, settings->BASE_DIR)
 		);
-
 		this->register_component("limits", std::make_unique<YAMLLimitsComponent>(settings->LIMITS));
-
 		this->register_component("prepend_www", std::make_unique<config::YAMLScalarComponent>(settings->PREPEND_WWW));
-		
 		this->register_component("formats", std::make_unique<YAMLFormatsComponent>(settings->FORMATS));
-
 		this->register_component(
 			"first_day_of_week", std::make_unique<config::YAMLScalarComponent>(settings->FIRST_DAY_OF_WEEK)
 		);
-
 		this->register_component(
 			"decimal_separator", std::make_unique<config::YAMLScalarComponent>(settings->DECIMAL_SEPARATOR)
 		);
-
 		this->register_component(
 			"use_thousand_separator", std::make_unique<config::YAMLScalarComponent>(settings->USE_THOUSAND_SEPARATOR)
 		);
-
 		this->register_component(
 			"thousand_separator", std::make_unique<config::YAMLScalarComponent>(settings->THOUSAND_SEPARATOR)
 		);
-
 		this->register_component(
 			"x_frame_options", std::make_unique<config::YAMLScalarComponent>([settings](const YAML::Node& node)
 			{
@@ -141,35 +125,19 @@ public:
 				);
 			})
 		);
-
 		this->register_component(
 			"use_x_forwarded_host", std::make_unique<config::YAMLScalarComponent>(settings->USE_X_FORWARDED_HOST)
 		);
-
 		this->register_component(
 			"use_x_forwarded_port", std::make_unique<config::YAMLScalarComponent>(settings->USE_X_FORWARDED_PORT)
 		);
-
-		// TODO:
-	//	auto csrf = config["csrf"];
-	//	if (csrf && csrf.IsMap())
-	//	{
-	//		_init_csrf(settings, csrf);
-	//	}
-
+		this->register_component("csrf", std::make_unique<YAMLCSRFComponent>(settings->CSRF));
 		this->register_component("use_ssl", std::make_unique<config::YAMLScalarComponent>(settings->USE_SSL));
-
-		// TODO:
-	//	auto secure = config["secure"];
-	//	if (secure && secure.IsMap())
-	//	{
-	//		_init_secure(settings, secure);
-	//	}
-
+		this->register_component("secure", std::make_unique<YAMLSecureComponent>(settings->SECURE));
 		this->register_component(
 			"modules", std::make_unique<config::YAMLSequenceComponent>([settings](const YAML::Node& node)
 			{
-				auto module_name = node.as<std::string>();
+				auto module_name = node.as<std::string>("");
 				if (!module_name.empty())
 				{
 					auto module = settings->build_module(module_name);
@@ -180,19 +148,21 @@ public:
 				}
 			})
 		);
-
 		this->register_component(
 			"middleware", std::make_unique<config::YAMLSequenceComponent>([settings](const YAML::Node& node)
 			{
-				auto middleware_name = node.as<std::string>();
-				auto middleware = settings->get_middleware_by_name(middleware_name);
-				if (middleware)
+				auto middleware_name = node.as<std::string>("");
+				if (!middleware_name.empty())
 				{
-					settings->MIDDLEWARE.push_back(middleware);
-				}
-				else if (settings->LOGGER)
-				{
-					settings->LOGGER->warning("Middleware not registered: '" + middleware_name + "'");
+					auto middleware = settings->get_middleware_by_name(middleware_name);
+					if (middleware)
+					{
+						settings->MIDDLEWARE.push_back(middleware);
+					}
+					else if (settings->LOGGER)
+					{
+						settings->LOGGER->warning("Middleware not registered: '" + middleware_name + "'");
+					}
 				}
 			})
 		);

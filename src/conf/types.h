@@ -108,7 +108,14 @@ struct Secure final
 	std::string REFERRER_POLICY;
 	std::string SSL_HOST;
 	bool SSL_REDIRECT;
-	std::optional<std::pair<std::string, std::string>> PROXY_SSL_HEADER;
+
+	struct Header
+	{
+		std::string name;
+		std::string value;
+	};
+
+	std::optional<Header> PROXY_SSL_HEADER;
 };
 
 // TODO: docs for 'Static'
@@ -168,8 +175,8 @@ struct Formats
 	std::string SHORT_DATETIME_FORMAT;
 };
 
-// TODO: docs for 'CSRFConfiguration'
-struct CSRFConfiguration
+// TODO: docs for 'CSRF'
+struct CSRF
 {
 	// Settings for CSRF cookie.
 	struct Cookie

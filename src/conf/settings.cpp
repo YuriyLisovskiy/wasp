@@ -89,9 +89,12 @@ void Settings::prepare()
 	if (!this->DB && !this->DATABASES.empty())
 	{
 		this->DB = this->DATABASES.begin()->second;
-		this->LOGGER->warning(
-			"Missing 'default' database, the first database from 'databases' map is set as the default."
-		);
+		if (this->LOGGER)
+		{
+			this->LOGGER->warning(
+				"Missing 'default' database, the first database from 'databases' map is set as the default."
+			);
+		}
 	}
 }
 

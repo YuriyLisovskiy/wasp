@@ -209,7 +209,7 @@ public:
 	std::vector<middleware::Handler> MIDDLEWARE;
 
 	// Settings for CSRF cookie.
-	CSRFConfiguration CSRF = {
+	CSRF CSRF = {
 		.COOKIE = {
 			.NAME = "csrftoken",
 			.AGE = 60 * 60 * 24 * 7 * 52,
@@ -246,7 +246,10 @@ public:
 		// that header/value, request.is_secure() will return true.
 		// WARNING! Only set this if you fully understand what you're doing. Otherwise,
 		// you may be opening yourself up to a security risk.
-		.PROXY_SSL_HEADER = std::pair<std::string, std::string>("X-Forwarded-Proto", "https")
+		.PROXY_SSL_HEADER = Secure::Header{
+			.name = "X-Forwarded-Proto",
+			.value = "https"
+		}
 	};
 
 	explicit Settings(const std::string& base_dir);
