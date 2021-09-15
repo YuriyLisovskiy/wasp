@@ -249,7 +249,6 @@ public:
 		.PROXY_SSL_HEADER = std::pair<std::string, std::string>("X-Forwarded-Proto", "https")
 	};
 
-public:
 	explicit Settings(const std::string& base_dir);
 
 	virtual ~Settings() = default;
@@ -264,48 +263,36 @@ public:
 
 	virtual void check();
 
-	inline virtual void register_modules()
+	virtual inline void register_components()
+	{
+		this->register_template_loaders();
+		this->register_template_libraries();
+		this->register_middleware();
+		this->register_migrations();
+		this->register_modules();
+	}
+
+	virtual inline void register_modules()
 	{
 	}
 
-	inline virtual void register_middleware()
+	virtual inline void register_middleware()
 	{
 	}
 
-	inline virtual void register_libraries()
+	virtual inline void register_template_libraries()
 	{
 	}
 
-	inline virtual void register_loaders()
+	virtual inline void register_template_loaders()
 	{
 	}
 
-	inline virtual void register_migrations()
+	virtual inline void register_migrations()
 	{
 	}
 
-	inline virtual std::shared_ptr<orm::abc::ISQLDriver> build_sqlite3_database(
-		const std::string& name, const std::string& filepath
-	)
-	{
-		std::shared_ptr<orm::abc::ISQLDriver> db;
-		#ifdef USE_SQLITE3
-			auto file_path = path::join(this->BASE_DIR, filepath);
-			db = std::make_shared<orm::sqlite3::Driver>(file_path.c_str());
-		#else
-			db = nullptr;
-		#endif
-		return db;
-	}
-
-	inline virtual std::shared_ptr<orm::abc::ISQLDriver> build_database(
-		const std::string& name, const YAML::Node& database
-	)
-	{
-		return nullptr;
-	}
-
-	inline virtual std::shared_ptr<net::abc::IServer> build_server(
+	virtual inline std::shared_ptr<net::abc::IServer> build_server(
 		const std::function<net::StatusCode(
 			net::RequestContext*, const std::map<std::string, std::string>& /* environment */
 		)>& handler,
@@ -325,13 +312,14 @@ public:
 	}
 
 	[[nodiscard]]
-	std::shared_ptr<render::abc::ILibrary> build_library(const std::string& full_name) const;
+	std::shared_ptr<render::abc::ILibrary> build_template_library(const std::string& full_name) const;
 
 	[[nodiscard]]
-	std::shared_ptr<render::abc::ILoader> build_loader(const std::string& full_name) const;
+	std::shared_ptr<render::abc::ILoader> build_template_loader(const std::string& full_name) const;
 
 	std::list<std::shared_ptr<orm::db::Migration>> build_migrations(orm::abc::ISQLDriver* driver);
 
+protected:
 	template <class T>
 	[[nodiscard]]
 	inline std::string get_name_or(const std::string& full_name) const
@@ -344,7 +332,6 @@ public:
 		return full_name;
 	}
 
-protected:
 	template <module_config_type ModuleConfigT>
 	inline void module(const std::string& custom_name="")
 	{

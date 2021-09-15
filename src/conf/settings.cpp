@@ -175,7 +175,7 @@ std::shared_ptr<IModuleConfig> Settings::build_module(const std::string& full_na
 	return nullptr;
 }
 
-std::shared_ptr<render::abc::ILibrary> Settings::build_library(const std::string& full_name) const
+std::shared_ptr<render::abc::ILibrary> Settings::build_template_library(const std::string& full_name) const
 {
 	if (this->_libraries.find(full_name) != this->_libraries.end())
 	{
@@ -185,7 +185,7 @@ std::shared_ptr<render::abc::ILibrary> Settings::build_library(const std::string
 	return nullptr;
 }
 
-std::shared_ptr<render::abc::ILoader> Settings::build_loader(const std::string& full_name) const
+std::shared_ptr<render::abc::ILoader> Settings::build_template_loader(const std::string& full_name) const
 {
 	if (this->_loaders.find(full_name) != this->_loaders.end())
 	{

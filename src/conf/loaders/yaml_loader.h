@@ -10,6 +10,7 @@
 
 // C++ libraries.
 #include <regex>
+#include <functional>
 
 // Base libraries.
 #include <xalwart.base/yaml/yaml-cpp/yaml.h>
@@ -21,8 +22,10 @@
 
 // Framework libraries.
 #include "./abstract_loader.h"
+#include "./yaml/formats.h"
 #include "./yaml/limits.h"
 #include "./yaml/static.h"
+#include "./yaml/timezone.h"
 
 
 __CONF_BEGIN__
@@ -35,14 +38,16 @@ public:
 	{
 	}
 
-protected:
-	inline void initialize_components(SettingsType* settings) override
+	inline void register_default_logger(SettingsType* settings)
 	{
-		this->register_component("debug", std::make_unique<config::YAMLScalarComponent>(settings->DEBUG));
-
 		this->register_component("logger", std::make_unique<config::YAMLLoggerComponent>(
 			settings->BASE_DIR, settings->LOGGER
 		));
+	}
+
+	inline void register_standard_components(SettingsType* settings)
+	{
+		this->register_component("debug", std::make_unique<config::YAMLScalarComponent>(settings->DEBUG));
 
 		this->register_component("secret_key", std::make_unique<config::YAMLScalarComponent>(settings->SECRET_KEY));
 
@@ -61,8 +66,7 @@ protected:
 			"use_timezone", std::make_unique<config::YAMLScalarComponent>(settings->USE_TIMEZONE)
 		);
 
-		// TODO:
-		//	this->register_component("timezone", initialize_timezone);
+		this->register_component("timezone", std::make_unique<YAMLTimezoneComponent>(settings->TIMEZONE));
 
 		this->register_component("charset", std::make_unique<config::YAMLScalarComponent>(settings->CHARSET));
 
@@ -88,7 +92,7 @@ protected:
 		);
 
 		this->register_component(
-			"disallowed_user_agents",
+			"ignorable_404_urls",
 			std::make_unique<config::YAMLSequenceComponent>([settings](const YAML::Node& url)
 			{
 				auto regular_expression = url.as<std::string>();
@@ -110,13 +114,8 @@ protected:
 		this->register_component("limits", std::make_unique<YAMLLimitsComponent>(settings->LIMITS));
 
 		this->register_component("prepend_www", std::make_unique<config::YAMLScalarComponent>(settings->PREPEND_WWW));
-
-		// TODO:
-	//	auto formats = config["formats"];
-	//	if (formats && formats.IsMap())
-	//	{
-	//		_init_formats(settings, formats);
-	//	}
+		
+		this->register_component("formats", std::make_unique<YAMLFormatsComponent>(settings->FORMATS));
 
 		this->register_component(
 			"first_day_of_week", std::make_unique<config::YAMLScalarComponent>(settings->FIRST_DAY_OF_WEEK)
@@ -167,7 +166,6 @@ protected:
 	//		_init_secure(settings, secure);
 	//	}
 
-		settings->register_modules();
 		this->register_component(
 			"modules", std::make_unique<config::YAMLSequenceComponent>([settings](const YAML::Node& node)
 			{
@@ -183,7 +181,6 @@ protected:
 			})
 		);
 
-		settings->register_middleware();
 		this->register_component(
 			"middleware", std::make_unique<config::YAMLSequenceComponent>([settings](const YAML::Node& node)
 			{
@@ -199,6 +196,29 @@ protected:
 				}
 			})
 		);
+	}
+
+	inline YAMLSettingsLoader<SettingsType>& with_components(
+		std::function<void(YAMLSettingsLoader<SettingsType>*, SettingsType*)> function
+	)
+	{
+		if (function)
+		{
+			this->initializer = std::move(function);
+		}
+
+		return *this;
+	}
+
+protected:
+	std::function<void(YAMLSettingsLoader<SettingsType>*, SettingsType*)> initializer;
+
+	inline void initialize_components(SettingsType* settings) override
+	{
+		if (this->initializer)
+		{
+			this->initializer(this, settings);
+		}
 	}
 
 	virtual inline void check_config(const YAML::Node& config, const std::string& file_path)
@@ -238,29 +258,6 @@ protected:
 
 		return YAML::Node(YAML::NodeType::Null);
 	}
-
-//	void overwrite_config(YAML::Node& config, const YAML::Node& local_config) override;
-//
-//	void init_settings(Settings* settings, const YAML::Node& config) override;
-
-private:
-
-//	static void _init_formats(Settings* settings, const YAML::Node& config);
-//
-//	static void _init_csrf(Settings* settings, const YAML::Node& config);
-//
-//	static void _init_secure(Settings* settings, const YAML::Node& config);
-//
-//	static void _init_modules(Settings* settings, const YAML::Node& modules);
-//
-//	static void _init_middleware(Settings* settings, const YAML::Node& middleware);
-//
-//	static void _init_databases(Settings* settings, const YAML::Node& databases);
-//
-//	static void _init_sqlite3_database(
-//		const std::string& name, Settings* settings,
-//		std::shared_ptr<orm::abc::ISQLDriver>& driver, const YAML::Node& database
-//	);
 };
 
 __CONF_END__

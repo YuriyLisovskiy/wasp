@@ -55,6 +55,7 @@ public:
 			throw RuntimeError("'" + this->configuration_name_regex() + "' is not found");
 		}
 
+		settings->register_components();
 		this->initialize_components(settings.get());
 
 		auto local_config = this->load_file(

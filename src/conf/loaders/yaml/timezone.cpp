@@ -6,61 +6,56 @@
 
 #include "./timezone.h"
 
+// Base libraries.
+#include <xalwart.base/string_utils.h>
+
 
 __CONF_BEGIN__
 
-/*void _initialize_name(std::string& value, const YAML::Node& name, const YAML::Node& local_name)
+YAMLTimezoneComponent::YAMLTimezoneComponent(std::shared_ptr<dt::Timezone>& timezone) : timezone(timezone)
 {
-	auto component = local_name.IsScalar() || local_name.IsMap() ? local_name : name;
-	value = component.as<std::string>("");
+	this->register_component("name", std::make_unique<config::YAMLScalarComponent>(this->timezone_name));
+
+	auto offset_component = std::make_unique<config::YAMLMapComponent>();
+	offset_component->register_component(
+		"days", std::make_unique<config::YAMLScalarComponent>(this->timezone_offset.days)
+	);
+	offset_component->register_component(
+		"seconds", std::make_unique<config::YAMLScalarComponent>(this->timezone_offset.seconds)
+	);
+	offset_component->register_component(
+		"microseconds", std::make_unique<config::YAMLScalarComponent>(this->timezone_offset.microseconds)
+	);
+	offset_component->register_component(
+		"milliseconds", std::make_unique<config::YAMLScalarComponent>(this->timezone_offset.milliseconds)
+	);
+	offset_component->register_component(
+		"minutes", std::make_unique<config::YAMLScalarComponent>(this->timezone_offset.minutes)
+	);
+	offset_component->register_component(
+		"hours", std::make_unique<config::YAMLScalarComponent>(this->timezone_offset.hours)
+	);
+	offset_component->register_component(
+		"weeks", std::make_unique<config::YAMLScalarComponent>(this->timezone_offset.weeks)
+	);
+	this->register_component("offset", std::move(offset_component));
 }
 
-void initialize_timezone(Settings* settings, const YAML::Node& timezone, const YAML::Node& local_timezone)
+void YAMLTimezoneComponent::initialize(const YAML::Node& node) const
 {
-	std::string timezone_name;
-	_initialize_name(
-		timezone_name,
-		timezone.IsMap() ? timezone["name"] : null_node(),
-		local_timezone.IsMap() ? local_timezone["name"] : null_node()
-	);
-
-	if (!timezone_name.empty())
+	this->components.front().second->initialize(node[this->components.front().first]);
+	if (!this->timezone_name.empty())
 	{
-		if (str::to_upper(timezone_name) == "UTC")
+		if (str::to_upper(this->timezone_name) == "UTC")
 		{
-			settings->TIMEZONE = std::make_shared<dt::Timezone>(dt::Timezone::UTC);
+			this->timezone = std::make_shared<dt::Timezone>(dt::Timezone::UTC);
 		}
 		else
 		{
-			YAML::Node offset_component;
-			if (local_timezone.IsMap())
-			{
-
-			}
-
-
-			auto timezone_offset = timezone["offset"];
-			if (timezone_offset && timezone_offset.IsMap())
-			{
-				settings->TIMEZONE = std::make_shared<dt::Timezone>(
-					dt::Timedelta(
-						timezone_offset["days"].as<long>(0),
-						timezone_offset["seconds"].as<long>(0),
-						timezone_offset["microseconds"].as<long>(0),
-						timezone_offset["milliseconds"].as<long>(0),
-						timezone_offset["minutes"].as<long>(0),
-						timezone_offset["hours"].as<long>(0),
-						timezone_offset["weeks"].as<long>(0)
-					),
-					timezone_name
-				);
-			}
-			else
-			{
-				settings->TIMEZONE = std::make_shared<dt::Timezone>(dt::Timedelta(), timezone_name);
-			}
+			this->components.back().second->initialize(node[this->components.back().first]);
+			this->timezone = std::make_shared<dt::Timezone>(this->timezone_offset.to_timedelta(), this->timezone_name);
 		}
 	}
-}*/
+}
 
 __CONF_END__
