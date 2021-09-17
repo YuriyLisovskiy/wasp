@@ -36,7 +36,9 @@ template <settings_type SettingsType>
 class YAMLSettingsLoader : public AbstractSettingsLoader<YAML::Node, SettingsType>
 {
 public:
-	inline YAMLSettingsLoader() : AbstractSettingsLoader<YAML::Node, SettingsType>(R"(y(a)?ml)")
+	inline explicit YAMLSettingsLoader(
+		const std::vector<std::string>& filename_patterns={"config", R"(config\.dev)"}
+	) : AbstractSettingsLoader<YAML::Node, SettingsType>(R"(y(a)?ml)", filename_patterns)
 	{
 	}
 
@@ -181,6 +183,7 @@ public:
 	}
 
 protected:
+	std::vector<std::string> configuration_files;
 	std::function<void(YAMLSettingsLoader<SettingsType>*, SettingsType*)> initializer;
 
 	inline void initialize_components(SettingsType* settings) override
@@ -198,24 +201,11 @@ protected:
 			return;
 		}
 
-		throw ValueError("'" + file_path + "' file must have map type", _ERROR_DETAILS_);
+		throw ValueError(
+			"Configuration file with pattern '" + file_path + "' should have map type", _ERROR_DETAILS_
+		);
 	}
 
-	// Override this method to change the default config name.
-	[[nodiscard]]
-	inline std::string configuration_name_regex() const override
-	{
-		return "config";
-	}
-
-	// Override this method to change the default local config name.
-	[[nodiscard]]
-	inline std::string local_configuration_name_regex() const override
-	{
-		return R"(config\.local)";
-	}
-
-	// Reads and loads yaml from file.
 	inline YAML::Node load_file(const std::string& base_dir, const std::regex& file_name_pattern) override
 	{
 		auto file_entry = this->find_file(base_dir, file_name_pattern);

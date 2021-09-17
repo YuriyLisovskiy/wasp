@@ -14,6 +14,7 @@
 #include <filesystem>
 #include <regex>
 #include <functional>
+#include <vector>
 
 // Base libraries.
 #include <xalwart.base/path.h>
@@ -37,8 +38,17 @@ template <typename ConfigType, settings_type SettingsType>
 class AbstractSettingsLoader
 {
 public:
-	explicit AbstractSettingsLoader(std::string file_extension_pattern) :
-		_file_extension_pattern(std::move(file_extension_pattern))
+	// `filename_patterns` is a list of filenames regular expressions without an
+	// extension which will be read and the previous one will be overwritten by the
+	// next in the list.
+	//
+	// Example:
+	//  filename_patterns = {"config", R"(config\.dev)", "config.prod"}
+	//  '->' means A overwrites B:
+	//  config.prod.yaml -> config.dev.yaml -> config.yaml
+	explicit AbstractSettingsLoader(
+		std::string file_extension_pattern, std::vector<std::string> filename_patterns
+	) : _file_extension_pattern(std::move(file_extension_pattern)), filename_patterns(std::move(filename_patterns))
 	{
 	}
 
@@ -46,64 +56,65 @@ public:
 	inline std::unique_ptr<SettingsType> load(SettingsArgs&& ...args)
 	{
 		auto settings = std::make_unique<SettingsType>(std::forward<SettingsArgs>(args)...);
-		auto config = this->load_file(
-			settings->BASE_DIR,
-			std::regex(this->configuration_name_regex() + R"(\.)" + this->extension_pattern())
-		);
-		if (!config)
+		if (!this->filename_patterns.empty())
 		{
-			throw RuntimeError("'" + this->configuration_name_regex() + "' is not found");
-		}
+			auto config_pattern = this->filename_patterns.front() + R"(\.)" + this->extension_pattern();
+			auto main_config = this->load_file(settings->BASE_DIR, std::regex(config_pattern));
+			if (!main_config)
+			{
+				throw RuntimeError("Main configuration file with pattern '" + config_pattern + "' is not found.");
+			}
 
-		settings->register_components();
-		this->initialize_components(settings.get());
+			settings->register_components();
+			this->initialize_components(settings.get());
 
-		auto local_config = this->load_file(
-			settings->BASE_DIR,
-			std::regex(this->local_configuration_name_regex() + R"(\.)" + this->extension_pattern())
-		);
-		if (local_config)
-		{
+			auto filenames_count = this->filename_patterns.size();
+			for (size_t i = 1; i < filenames_count; i++)
+			{
+				auto pattern = this->filename_patterns[i] + R"(\.)" + this->extension_pattern();
+				auto next_config = this->load_file(settings->BASE_DIR, std::regex(pattern));
+				if (next_config)
+				{
+					for (const auto& component : this->components)
+					{
+						auto to_component = main_config[component.first];
+						component.second->overwrite(next_config[component.first], to_component);
+						main_config[component.first] = to_component;
+					}
+				}
+			}
+
 			for (const auto& component : this->components)
 			{
-				auto to_component = config[component.first];
-				component.second->overwrite(local_config[component.first], to_component);
-				config[component.first] = to_component;
+				component.second->initialize(main_config[component.first]);
 			}
-		}
-
-		for (const auto& component : this->components)
-		{
-			component.second->initialize(config[component.first]);
 		}
 
 		return settings;
 	}
 
-	inline void register_component(std::string name, std::unique_ptr<config::AbstractComponent<ConfigType>> loader)
+	inline void register_component(
+		std::string name, std::unique_ptr<config::AbstractComponent<ConfigType>> component
+	)
 	{
-		this->components.template emplace_back(std::move(name), std::move(loader));
+		this->components.template emplace_back(std::move(name), std::move(component));
 	}
 
 protected:
+	std::vector<std::string> filename_patterns;
 	std::list<std::pair<std::string, std::unique_ptr<config::AbstractComponent<ConfigType>>>> components{};
 
 	virtual void initialize_components(SettingsType* settings) = 0;
+
+	// Reads and loads config from file.
+	// Should return `nullptr` if file is not found.
+	virtual ConfigType load_file(const std::string& base_dir, const std::regex& file_name_pattern) = 0;
 
 	[[nodiscard]]
 	inline std::string extension_pattern() const
 	{
 		return this->_file_extension_pattern;
 	}
-
-	[[nodiscard]]
-	virtual std::string configuration_name_regex() const = 0;
-
-	[[nodiscard]]
-	virtual std::string local_configuration_name_regex() const = 0;
-
-	// Reads and loads config from file.
-	virtual ConfigType load_file(const std::string& base_dir, const std::regex& file_name_pattern) = 0;
 
 	inline std::filesystem::directory_entry find_file(const std::string& base_dir, const std::regex& file_name_pattern)
 	{
