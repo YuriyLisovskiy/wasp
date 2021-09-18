@@ -8,8 +8,8 @@
 
 #pragma once
 
-// Render libraries.
-#include <xalwart.render/abc.h>
+// Base libraries.
+#include <xalwart.base/abc/render.h>
 
 // Module definitions.
 #include "./_def_.h"
@@ -29,16 +29,16 @@ class TemplateResponseMixin
 protected:
 	std::string template_name;
 	std::string content_type;
-	render::abc::IEngine* engine;
+	abc::render::IEngine* engine;
 
 public:
-	explicit TemplateResponseMixin(render::abc::IEngine* engine);
+	explicit TemplateResponseMixin(abc::render::IEngine* engine);
 
 	// Returns a response with a template rendered with
 	// the given context.
 	virtual std::unique_ptr<http::abc::IHttpResponse> render(
 		http::Request* request,
-		const std::shared_ptr<render::abc::IContext>& context,
+		const std::shared_ptr<abc::render::IContext>& context,
 		const std::string& template_name="",
 		unsigned short int status=200,
 		const std::string& content_type="",
@@ -65,7 +65,7 @@ public:
 
 	// Used in default get() method, can be overridden
 	// in derived classes.
-	virtual inline std::shared_ptr<render::abc::IContext> get_context(UrlArgsT ...args)
+	virtual inline std::shared_ptr<abc::render::IContext> get_context(UrlArgsT ...args)
 	{
 		return nullptr;
 	}

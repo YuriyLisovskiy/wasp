@@ -6,12 +6,8 @@
 
 #include "./settings.h"
 
-// Render libraries.
-#include <xalwart.render/engine.h>
-#include <xalwart.render/loaders.h>
-
 // Framework modules.
-#include "../render/default_library.h"
+#include "../render/standard_library.h"
 #include "../middleware/clickjacking.h"
 #include "../middleware/common.h"
 #include "../middleware/http.h"
@@ -31,15 +27,16 @@ Settings::Settings(const std::string& base_dir)
 	};
 
 	this->_libraries = {
-		{render::DefaultLibrary::FULL_NAME, [this]() -> std::shared_ptr<render::abc::ILibrary> {
-			return std::make_shared<render::DefaultLibrary>(this);
+		{render::StandardLibrary::NAME, [this]() -> std::shared_ptr<abc::render::ILibrary> {
+			return std::make_shared<render::StandardLibrary>(this);
 		}}
 	};
 
+	// TODO: register loaders!
 	this->_loaders = {
-		{render::DefaultLoader::FULL_NAME, []() -> std::shared_ptr<render::DefaultLoader> {
-			return std::make_shared<render::DefaultLoader>();
-		}}
+//		{render::DefaultLoader::FULL_NAME, []() -> std::shared_ptr<render::DefaultLoader> {
+//			return std::make_shared<render::DefaultLoader>();
+//		}}
 	};
 }
 
@@ -178,7 +175,7 @@ std::shared_ptr<IModuleConfig> Settings::build_module(const std::string& full_na
 	return nullptr;
 }
 
-std::shared_ptr<render::abc::ILibrary> Settings::build_template_library(const std::string& full_name) const
+std::shared_ptr<abc::render::ILibrary> Settings::build_template_library(const std::string& full_name) const
 {
 	if (this->_libraries.find(full_name) != this->_libraries.end())
 	{
@@ -188,7 +185,7 @@ std::shared_ptr<render::abc::ILibrary> Settings::build_template_library(const st
 	return nullptr;
 }
 
-std::shared_ptr<render::abc::ILoader> Settings::build_template_loader(const std::string& full_name) const
+std::shared_ptr<abc::render::ILoader> Settings::build_template_loader(const std::string& full_name) const
 {
 	if (this->_loaders.find(full_name) != this->_loaders.end())
 	{

@@ -6,16 +6,16 @@
 
 #include "./response.h"
 
-// Render libraries.
-#include <xalwart.render/exceptions.h>
+// Base libraries.
+#include <xalwart.base/exceptions.h>
 
 
 __RENDER_BEGIN__
 
 TemplateResponse::TemplateResponse(
-	render::abc::IEngine* engine,
+	abc::render::IEngine* engine,
 	const std::string& template_name,
-	abc::IContext* context,
+	abc::render::IContext* context,
 	unsigned short int status,
 	const std::string& content_type,
 	const std::string& charset
@@ -46,9 +46,7 @@ std::string TemplateResponse::get_content() const
 		return this->content;
 	}
 
-	throw ContentNotRenderedError(
-		"The response content must be rendered before it can be accessed.", _ERROR_DETAILS_
-	);
+	throw RuntimeError("The response content must be rendered before it can be accessed.", _ERROR_DETAILS_);
 }
 
 __RENDER_END__

@@ -12,7 +12,7 @@
 
 __CONTROLLERS_BEGIN__
 
-TemplateResponseMixin::TemplateResponseMixin(render::abc::IEngine* engine)
+TemplateResponseMixin::TemplateResponseMixin(abc::render::IEngine* engine)
 {
 	if (!engine)
 	{
@@ -26,7 +26,7 @@ TemplateResponseMixin::TemplateResponseMixin(render::abc::IEngine* engine)
 
 std::unique_ptr<http::abc::IHttpResponse> TemplateResponseMixin::render(
 	http::Request* request,
-	const std::shared_ptr<render::abc::IContext>& context,
+	const std::shared_ptr<abc::render::IContext>& context,
 	const std::string& template_name,
 	unsigned short int status,
 	const std::string& content_type,
@@ -50,7 +50,7 @@ std::string TemplateResponseMixin::get_template_name()
 	if (this->template_name.empty())
 	{
 		throw ImproperlyConfigured(
-			"TemplateResponseMixin requires either a definition of '_template_name' or an "
+			"TemplateResponseMixin requires either a definition of 'template_name' or an "
 			"implementation of 'get_template_name()'",
 			_ERROR_DETAILS_
 		);

@@ -21,10 +21,7 @@
 #include <xalwart.base/yaml/yaml-cpp/yaml.h>
 #include <xalwart.base/net/abc.h>
 #include <xalwart.base/net/status.h>
-
-// Render libraries.
-#include <xalwart.render/abc.h>
-#include <xalwart.render/library/abc.h>
+#include <xalwart.base/abc/render.h>
 
 // ORM libraries.
 #include <xalwart.orm/client.h>
@@ -87,7 +84,7 @@ public:
 	std::vector<std::shared_ptr<IModuleConfig>> MODULES;
 
 	// Engine for rendering templates.
-	std::shared_ptr<render::abc::IEngine> TEMPLATE_ENGINE = nullptr;
+	std::shared_ptr<abc::render::IEngine> TEMPLATE_ENGINE = nullptr;
 
 	// Default database instance.
 	std::shared_ptr<orm::Client> DB = nullptr;
@@ -315,10 +312,10 @@ public:
 	}
 
 	[[nodiscard]]
-	std::shared_ptr<render::abc::ILibrary> build_template_library(const std::string& full_name) const;
+	std::shared_ptr<abc::render::ILibrary> build_template_library(const std::string& full_name) const;
 
 	[[nodiscard]]
-	std::shared_ptr<render::abc::ILoader> build_template_loader(const std::string& full_name) const;
+	std::shared_ptr<abc::render::ILoader> build_template_loader(const std::string& full_name) const;
 
 	std::list<std::shared_ptr<orm::db::Migration>> build_migrations(orm::abc::ISQLDriver* driver);
 
@@ -353,7 +350,7 @@ protected:
 
 	void middleware(const std::string& name, middleware::Handler handler);
 
-	template <render::abc::library_type LibraryT>
+	template <abc::render::library_type LibraryT>
 	inline void library(const std::string& custom_name="")
 	{
 		auto name = this->get_name_or<LibraryT>(custom_name);
@@ -362,12 +359,12 @@ protected:
 			this->LOGGER->warning("library '" + name + "' will be overwritten");
 		}
 
-		this->_libraries[name] = [this]() -> std::shared_ptr<render::abc::ILibrary> {
+		this->_libraries[name] = [this]() -> std::shared_ptr<abc::render::ILibrary> {
 			return std::make_shared<LibraryT>(this);
 		};
 	}
 
-	template <render::abc::loader_type LoaderT>
+	template <abc::render::loader_type LoaderT>
 	inline void loader(const std::string& custom_name="")
 	{
 		auto name = this->get_name_or<LoaderT>(custom_name);
@@ -376,7 +373,7 @@ protected:
 			this->LOGGER->warning("loader '" + name + "' will be overwritten");
 		}
 
-		this->_loaders[name] = [this]() -> std::shared_ptr<render::abc::ILoader> {
+		this->_loaders[name] = [this]() -> std::shared_ptr<abc::render::ILoader> {
 			return std::make_shared<LoaderT>(this);
 		};
 	}
@@ -392,9 +389,9 @@ protected:
 
 private:
 	std::map<std::string, middleware::Handler> _middleware;
-	std::map<std::string, std::function<std::shared_ptr<render::abc::ILibrary>()>> _libraries;
+	std::map<std::string, std::function<std::shared_ptr<abc::render::ILibrary>()>> _libraries;
 	std::map<std::string, std::function<std::shared_ptr<IModuleConfig>()>> _modules;
-	std::map<std::string, std::function<std::shared_ptr<render::abc::ILoader>()>> _loaders;
+	std::map<std::string, std::function<std::shared_ptr<abc::render::ILoader>()>> _loaders;
 	std::list<std::function<std::shared_ptr<orm::db::Migration>(orm::abc::ISQLDriver* driver)>> _migrations;
 };
 

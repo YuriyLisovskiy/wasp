@@ -8,8 +8,11 @@
 
 #pragma once
 
-// Render libraries.
-#include <xalwart.render/library/abc.h>
+// Base libraries.
+#include <xalwart.base/abc/render.h>
+
+// Module definitions.
+#include "./_def_.h"
 
 // Framework libraries.
 #include "../conf/settings.h"
@@ -19,36 +22,22 @@ __RENDER_BEGIN__
 
 // TESTME: Library
 // TODO: docs for 'Library'
-class Library : public abc::ILibrary
+class Library : public abc::render::ILibrary
 {
-private:
-	conf::Settings* _settings;
-
-protected:
-	inline conf::Settings* settings() const
-	{
-		if (!this->_settings)
-		{
-			throw NullPointerException("'settings' is nullptr", _ERROR_DETAILS_);
-		}
-
-		return this->_settings;
-	}
-
 public:
 	inline explicit Library(conf::Settings* settings) : _settings(settings)
 	{
 	}
 
-	inline std::map<std::string, Filter> get_filters() const override
+protected:
+	[[nodiscard]]
+	inline conf::Settings* settings() const
 	{
-		return {};
+		return require_non_null(this->_settings, "'settings' is nullptr", _ERROR_DETAILS_);
 	}
 
-	inline std::map<std::string, Tag> get_tags() const override
-	{
-		return {};
-	}
+private:
+	conf::Settings* _settings;
 };
 
 __RENDER_END__

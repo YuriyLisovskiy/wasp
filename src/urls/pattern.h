@@ -136,7 +136,7 @@ public:
 			return built_url;
 		}
 
-		throw AttributeError(
+		throw ArgumentError(
 			"unable to build url: arguments do not match pattern '" + this->_orig + "'",
 			_ERROR_DETAILS_
 		);

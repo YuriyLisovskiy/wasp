@@ -9,8 +9,11 @@
 
 #pragma once
 
-// Render libraries.
-#include <xalwart.render/abc.h>
+// Base libraries.
+#include <xalwart.base/abc/render.h>
+
+// Module definitions.
+#include "./_def_.h"
 
 // Framework libraries.
 #include "../http/response.h"
@@ -24,15 +27,15 @@ class TemplateResponse : public http::Response
 {
 protected:
 	std::string template_name;
-	abc::IContext* context;
-	abc::IEngine* engine;
+	abc::render::IContext* context;
+	abc::render::IEngine* engine;
 	bool is_rendered;
 
 public:
 	explicit TemplateResponse(
-		abc::IEngine* engine,
+		abc::render::IEngine* engine,
 		const std::string& template_name,
-		abc::IContext* context=nullptr,
+		abc::render::IContext* context=nullptr,
 		unsigned short int status=200,
 		const std::string& content_type="",
 		const std::string& charset="utf-8"
