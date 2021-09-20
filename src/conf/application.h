@@ -10,6 +10,11 @@
 
 // C++ libraries.
 #include <algorithm>
+#include <memory>
+#include <string>
+
+// Base libraries.
+#include <xalwart.base/exceptions.h>
 
 // Module definitions.
 #include "./_def_.h"
@@ -17,6 +22,7 @@
 // Framework libraries.
 #include "./settings.h"
 #include "../middleware/types.h"
+#include "../urls/abc.h"
 
 
 __CONF_BEGIN__
@@ -26,10 +32,17 @@ inline void _throw_interruption_exception(int signal)
 	throw InterruptException("Execution is interrupted with signal: " + std::to_string(signal));
 }
 
-inline void _throw_null_pointer_exception(int signal)
+inline void _throw_null_pointer_exception(int)
 {
 	throw NullPointerException("invalid storage access (segmentation fault)");
 }
+
+// TESTME: _build_static_pattern
+// TODO: docs for '_build_static_pattern'
+extern std::shared_ptr<urls::IPattern> _build_static_pattern(
+	const conf::Settings* settings,
+	const std::string& static_url, const std::string& static_root, const std::string& name=""
+);
 
 extern void initialize_signal_handlers();
 
@@ -51,7 +64,7 @@ protected:
 	bool is_configured;
 
 	// List of commands to run from command line.
-	std::map<std::string, std::shared_ptr<cmd::BaseCommand>> commands;
+	std::map<std::string, std::shared_ptr<cmd::AbstractCommand>> commands;
 
 	virtual void execute_command(const std::string& command_name, int argc, char** argv) const;
 
@@ -69,7 +82,7 @@ protected:
 	[[nodiscard]]
 	virtual ServerHandler build_server_handler() const;
 
-	virtual void build_static_pattern(
+	virtual void add_static_pattern(
 		std::vector<std::shared_ptr<urls::IPattern>>& patterns,
 		const std::string& root, const std::string& url, const std::string& name
 	) const;
@@ -122,7 +135,7 @@ private:
 	}
 
 	inline void _append_commands(
-		const std::vector<std::shared_ptr<cmd::BaseCommand>>& from, const std::string& module_name
+		const std::vector<std::shared_ptr<cmd::AbstractCommand>>& from, const std::string& module_name
 	)
 	{
 		std::for_each(from.begin(),  from.end(), [this, module_name](const auto& command) -> void {
@@ -130,7 +143,7 @@ private:
 		});
 	}
 
-	void _append_command(const std::shared_ptr<cmd::BaseCommand>& command, const std::string& module_name);
+	void _append_command(const std::shared_ptr<cmd::AbstractCommand>& command, const std::string& module_name);
 
 	[[nodiscard]]
 	inline bool _has_command(const auto& target_command) const

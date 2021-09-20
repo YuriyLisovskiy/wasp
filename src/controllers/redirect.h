@@ -31,7 +31,7 @@ private:
 
 public:
 	inline explicit RedirectController(
-		conf::Settings* settings,
+		const conf::Settings* settings,
 		std::string url,
 		bool permanent=false,
 		bool query_string=false
@@ -44,38 +44,45 @@ public:
 
 	// Return the URL redirect to.
 	[[nodiscard]]
-	std::string get_redirect_url() const;
+	std::string get_redirect_url(http::Request* request) const;
 
-	std::unique_ptr<http::abc::IHttpResponse> get() override;
+	[[nodiscard]]
+	std::unique_ptr<http::abc::IHttpResponse> get(http::Request* request) const override;
 
-	inline std::unique_ptr<http::abc::IHttpResponse> post() override
+	[[nodiscard]]
+	inline std::unique_ptr<http::abc::IHttpResponse> post(http::Request* request) const override
 	{
-		return this->get();
+		return this->get(request);
 	}
 
-	inline std::unique_ptr<http::abc::IHttpResponse> head() override
+	[[nodiscard]]
+	inline std::unique_ptr<http::abc::IHttpResponse> head(http::Request* request) const override
 	{
-		return this->get();
+		return this->get(request);
 	}
 
-	inline std::unique_ptr<http::abc::IHttpResponse> options() override
+	[[nodiscard]]
+	inline std::unique_ptr<http::abc::IHttpResponse> options(http::Request* request) const override
 	{
-		return this->get();
+		return this->get(request);
 	}
 
-	inline std::unique_ptr<http::abc::IHttpResponse> put() override
+	[[nodiscard]]
+	inline std::unique_ptr<http::abc::IHttpResponse> put(http::Request* request) const override
 	{
-		return this->get();
+		return this->get(request);
 	}
 
-	inline std::unique_ptr<http::abc::IHttpResponse> delete_() override
+	[[nodiscard]]
+	inline std::unique_ptr<http::abc::IHttpResponse> delete_(http::Request* request) const override
 	{
-		return this->get();
+		return this->get(request);
 	}
 
-	inline std::unique_ptr<http::abc::IHttpResponse> patch() override
+	[[nodiscard]]
+	inline std::unique_ptr<http::abc::IHttpResponse> patch(http::Request* request) const override
 	{
-		return this->get();
+		return this->get(request);
 	}
 };
 

@@ -30,20 +30,18 @@ extern bool was_modified_since(const std::string& header, size_t time, size_t si
 // Serve static files below a given point in the directory structure.
 class StaticController final : public Controller<const std::string&>
 {
-private:
-	Kwargs _kwargs;
-
 public:
-	inline explicit StaticController(conf::Settings* settings) : Controller({"get"}, settings)
+	inline explicit StaticController(
+		const conf::Settings* settings, std::string static_root
+	) : Controller({"get"}, settings), _static_root(std::move(static_root))
 	{
 	}
 
-	inline void set_kwargs(const Kwargs& kwargs)
-	{
-		this->_kwargs = kwargs;
-	}
+	[[nodiscard]]
+	std::unique_ptr<http::abc::IHttpResponse> get(http::Request* request, const std::string& p) const final;
 
-	std::unique_ptr<http::abc::IHttpResponse> get(const std::string& p) final;
+private:
+	std::string _static_root;
 };
 
 __CONTROLLERS_END__

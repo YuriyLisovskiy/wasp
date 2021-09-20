@@ -48,7 +48,7 @@ void MigrateCommand::handle()
 		);
 	}
 
-	auto driver = this->settings->DATABASES[db_name]->driver();
+	auto driver = this->settings->DATABASES.at(db_name)->driver();
 	auto executor = orm::db::MigrationExecutor(
 		driver,
 		this->settings->build_migrations(driver),

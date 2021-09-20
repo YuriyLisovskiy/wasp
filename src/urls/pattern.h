@@ -19,53 +19,24 @@
 
 // Framework libraries.
 #include "./abc.h"
-#include "../conf/_def_.h"
-
-
-__CONF_BEGIN__
-
-struct Settings;
-
-__CONF_END__
+#include "../conf/settings.h"
+#include "../controllers/controller.h"
 
 
 __URLS_BEGIN__
 
-template <typename ...ArgsT>
-using ControllerHandler = std::function<std::unique_ptr<http::abc::IHttpResponse>(
-	http::Request*, const std::tuple<ArgsT...>&, conf::Settings*
-)>;
+//template <typename ...ArgsT>
+//using ControllerHandler = std::function<std::unique_ptr<http::abc::IHttpResponse>(
+//	http::Request*, const std::tuple<ArgsT...>&, conf::Settings*
+//)>;
 
 // TESTME: Pattern<...ArgsT>
 // TODO: docs for 'Pattern<...ArgsT>'
 template <typename ...ArgsT>
 class Pattern final : public IPattern
 {
-private:
-	std::string _orig;
-	std::vector<std::string> _pattern_parts;
-	ControllerHandler<ArgsT...> _handler;
-	std::string _name;
-	re::ArgRegex _regex;
-
-private:
-	inline void _reload_pattern_parts()
-	{
-		this->_orig = this->_regex.str();
-		this->_pattern_parts = this->_regex.parts();
-		if (!this->_pattern_parts.empty())
-		{
-			if (this->_pattern_parts.back().ends_with("?"))
-			{
-				this->_pattern_parts.back().pop_back();
-			}
-
-			this->_pattern_parts.back() = str::rtrim(this->_pattern_parts.back(), "/");
-		}
-	}
-
 public:
-	inline Pattern(const std::string& rgx, ControllerHandler<ArgsT...> handler, std::string name) :
+	inline Pattern(const std::string& rgx, ctrl::Handler<ArgsT...> handler, std::string name) :
 		_regex(rgx), _handler(std::move(handler)), _name(std::move(name))
 	{
 		if (this->_name.empty())
@@ -85,12 +56,12 @@ public:
 	[[nodiscard]]
 	inline std::string get_pattern_str() const override
 	{
-		return this->_orig;
+		return this->_original_expression;
 	}
 
 	inline void add_prefix(const std::string& prefix) override
 	{
-		this->_regex = re::ArgRegex(prefix + this->_orig);
+		this->_regex = re::ArgRegex(prefix + this->_original_expression);
 		this->_reload_pattern_parts();
 	}
 
@@ -101,7 +72,7 @@ public:
 
 	inline std::unique_ptr<http::abc::IHttpResponse> apply(http::Request* request, conf::Settings* settings) override
 	{
-		return this->_handler(request, this->_regex.template tuple<ArgsT...>(), settings);
+		return this->_handler(request, this->_regex.template args_tuple<ArgsT...>(), settings);
 	}
 
 	inline bool match(const std::string& url) override
@@ -137,9 +108,31 @@ public:
 		}
 
 		throw ArgumentError(
-			"unable to build url: arguments do not match pattern '" + this->_orig + "'",
+			"unable to build url: arguments do not match pattern '" + this->_original_expression + "'",
 			_ERROR_DETAILS_
 		);
+	}
+
+private:
+	std::string _original_expression;
+	std::vector<std::string> _pattern_parts;
+	ctrl::Handler<ArgsT...> _handler;
+	std::string _name;
+	re::ArgRegex _regex;
+
+	inline void _reload_pattern_parts()
+	{
+		this->_original_expression = this->_regex.to_string();
+		this->_pattern_parts = this->_regex.parts();
+		if (!this->_pattern_parts.empty())
+		{
+			if (this->_pattern_parts.back().ends_with("?"))
+			{
+				this->_pattern_parts.back().pop_back();
+			}
+
+			this->_pattern_parts.back() = str::rtrim(this->_pattern_parts.back(), "/");
+		}
 	}
 };
 

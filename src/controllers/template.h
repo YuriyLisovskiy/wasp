@@ -26,16 +26,12 @@ __CONTROLLERS_BEGIN__
 // A mixin that can be used to render a template.
 class TemplateResponseMixin
 {
-protected:
-	std::string template_name;
-	std::string content_type;
-	abc::render::IEngine* engine;
-
 public:
 	explicit TemplateResponseMixin(abc::render::IEngine* engine);
 
 	// Returns a response with a template rendered with
 	// the given context.
+	[[nodiscard]]
 	virtual std::unique_ptr<http::abc::IHttpResponse> render(
 		http::Request* request,
 		const std::shared_ptr<abc::render::IContext>& context,
@@ -43,11 +39,17 @@ public:
 		unsigned short int status=200,
 		const std::string& content_type="",
 		const std::string& charset="utf-8"
-	);
+	) const;
 
 	// Returns a template name to be used for the request.
 	// May not be called if render() is overridden.
-	virtual std::string get_template_name();
+	[[nodiscard]]
+	virtual std::string get_template_name() const;
+
+protected:
+	std::string template_name;
+	std::string content_type;
+	abc::render::IEngine* engine;
 };
 
 // TESTME: TemplateController
@@ -57,31 +59,34 @@ template <typename ...UrlArgsT>
 class TemplateController : public TemplateResponseMixin, public Controller<UrlArgsT...>
 {
 public:
-	explicit TemplateController(conf::Settings* settings) :
+	explicit TemplateController(const conf::Settings* settings) :
 		Controller<UrlArgsT...>({"get", "options"}, settings),
-		TemplateResponseMixin(settings->TEMPLATE_ENGINE.get())
+		TemplateResponseMixin(settings ? settings->TEMPLATE_ENGINE.get() : nullptr)
 	{
 	}
 
 	// Used in default get() method, can be overridden
 	// in derived classes.
-	virtual inline std::shared_ptr<abc::render::IContext> get_context(UrlArgsT ...args)
+	[[nodiscard]]
+	virtual inline std::shared_ptr<abc::render::IContext> get_context(http::Request* request, UrlArgsT ...args) const
 	{
 		return nullptr;
 	}
 
-	inline std::unique_ptr<http::abc::IHttpResponse> get(UrlArgsT ...args) override
+	[[nodiscard]]
+	inline std::unique_ptr<http::abc::IHttpResponse> get(http::Request* request, UrlArgsT ...args) const override
 	{
-		return this->render(this->request, this->get_context(args...), "", 200, "", "utf-8");
+		return this->render(request, this->get_context(request, args...), "", 200, "", "utf-8");
 	}
 
 protected:
 	explicit TemplateController(
 		const std::vector<std::string>& allowed_methods,
-		conf::Settings* settings,
+		const conf::Settings* settings,
 		const std::string& template_name="",
 		const std::string& content_type=""
-	) : Controller<UrlArgsT...>(allowed_methods, settings), TemplateResponseMixin(settings->TEMPLATE_ENGINE.get())
+	) : Controller<UrlArgsT...>(allowed_methods, settings),
+		TemplateResponseMixin(settings ? settings->TEMPLATE_ENGINE.get() : nullptr)
 	{
 		this->template_name = template_name;
 		this->content_type = content_type;

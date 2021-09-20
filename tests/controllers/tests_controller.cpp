@@ -10,7 +10,6 @@
 
 #include <xalwart.base/string_utils.h>
 #include <xalwart.base/collections/dictionary.h>
-#include <xalwart.base/collections/multi_dictionary.h>
 
 #include "../../src/controllers/controller.h"
 
@@ -63,7 +62,7 @@ protected:
 TEST_F(ControllerTestCase, GetTestReturnsNullptr)
 {
 	auto request = ControllerTestCase::make_request(this->settings, "get");
-	auto response = this->controller->get();
+	auto response = this->controller->get(&request);
 
 	ASSERT_EQ(response, nullptr);
 }
@@ -71,31 +70,31 @@ TEST_F(ControllerTestCase, GetTestReturnsNullptr)
 TEST_F(ControllerTestCase, PostTestReturnsNullptr)
 {
 	auto request = ControllerTestCase::make_request(this->settings, "post");
-	ASSERT_EQ(this->controller->post(), nullptr);
+	ASSERT_EQ(this->controller->post(&request), nullptr);
 }
 
 TEST_F(ControllerTestCase, PutTestReturnsNullptr)
 {
 	auto request = ControllerTestCase::make_request(this->settings, "put");
-	ASSERT_EQ(this->controller->put(), nullptr);
+	ASSERT_EQ(this->controller->put(&request), nullptr);
 }
 
 TEST_F(ControllerTestCase, PatchTestReturnsNullptr)
 {
 	auto request = ControllerTestCase::make_request(this->settings, "patch");
-	ASSERT_EQ(this->controller->patch(), nullptr);
+	ASSERT_EQ(this->controller->patch(&request), nullptr);
 }
 
 TEST_F(ControllerTestCase, DeleteTestReturnsNullptr)
 {
 	auto request = ControllerTestCase::make_request(this->settings, "delete");
-	ASSERT_EQ(this->controller->delete_(), nullptr);
+	ASSERT_EQ(this->controller->delete_(&request), nullptr);
 }
 
 TEST_F(ControllerTestCase, HeadTestReturnsNullptr)
 {
 	auto request = ControllerTestCase::make_request(this->settings, "head");
-	ASSERT_EQ(this->controller->head(), nullptr);
+	ASSERT_EQ(this->controller->head(&request), nullptr);
 }
 
 TEST_F(ControllerTestCase, OptionsTest)
@@ -108,7 +107,7 @@ TEST_F(ControllerTestCase, OptionsTest)
 	expected_response.set_header("Content-Length", "0");
 
 	auto request = ControllerTestCase::make_request(this->settings, "options");
-	auto actual_response = this->controller->options();
+	auto actual_response = this->controller->options(&request);
 
 	ASSERT_EQ(actual_response->content_type(), expected_response.content_type());
 	ASSERT_EQ(actual_response->get_status(), expected_response.get_status());
@@ -118,7 +117,7 @@ TEST_F(ControllerTestCase, OptionsTest)
 TEST_F(ControllerTestCase, TraceTestReturnsNullptr)
 {
 	auto request = ControllerTestCase::make_request(this->settings, "trace");
-	ASSERT_EQ(this->controller->trace(), nullptr);
+	ASSERT_EQ(this->controller->trace(&request), nullptr);
 }
 
 TEST_F(ControllerTestCase, AllowedMethodsTest)
@@ -136,12 +135,10 @@ TEST_F(ControllerTestCase, AllowedMethodsTest)
 
 TEST_F(ControllerTestCase, SetupAndDispatchAllowedTest)
 {
+	ASSERT_THROW(auto _ = this->controller->dispatch(nullptr), NullPointerException);
+
 	auto request = ControllerTestCase::make_request(this->settings, "options");
-
-	ASSERT_THROW(this->controller->dispatch(), NullPointerException);
-
-	this->controller->setup(&request);
-	auto response = this->controller->dispatch();
+	auto response = this->controller->dispatch(&request);
 
 	ASSERT_EQ(response->get_status(), 200);
 }
@@ -149,9 +146,8 @@ TEST_F(ControllerTestCase, SetupAndDispatchAllowedTest)
 TEST_F(ControllerTestCase, DispatchNotAllowedTest)
 {
 	auto request = ControllerTestCase::make_request(this->settings, "get");
-	this->controller->setup(&request);
 
-	auto response = this->controller->dispatch();
+	auto response = this->controller->dispatch(&request);
 
 	ASSERT_EQ(response->get_status(), 405);
 }

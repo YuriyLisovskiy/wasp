@@ -46,18 +46,15 @@ bool was_modified_since(const std::string& header, size_t time, size_t size)
 	return result;
 }
 
-std::unique_ptr<http::abc::IHttpResponse> StaticController::get(const std::string& p)
+std::unique_ptr<http::abc::IHttpResponse> StaticController::get(
+	http::Request* request, const std::string& resource_path
+) const
 {
-	if (!this->_kwargs.contains("document_root"))
-	{
-		throw KeyError("ctrl::StaticController requires \"document_root\"", _ERROR_DETAILS_);
-	}
-
-	auto full_path = path::join(this->_kwargs.get<std::string>("document_root", ""), p);
+	auto full_path = path::join(this->_static_root, resource_path);
 	if (!path::exists(full_path))
 	{
 		auto [status, _] = net::get_status_by_code(404);
-		std::string response_content = this->request->is_json() ?
+		std::string response_content = request->is_json() ?
 			this->settings->render_json_error_template(status, "") :
 			this->settings->render_json_error_template(status, "");
 		return std::make_unique<http::resp::NotFound>(response_content);

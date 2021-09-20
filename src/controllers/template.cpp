@@ -31,7 +31,7 @@ std::unique_ptr<http::abc::IHttpResponse> TemplateResponseMixin::render(
 	unsigned short int status,
 	const std::string& content_type,
 	const std::string& charset
-)
+) const
 {
 	auto response = std::make_unique<render::TemplateResponse>(
 		this->engine,
@@ -45,7 +45,7 @@ std::unique_ptr<http::abc::IHttpResponse> TemplateResponseMixin::render(
 	return response;
 }
 
-std::string TemplateResponseMixin::get_template_name()
+std::string TemplateResponseMixin::get_template_name() const
 {
 	if (this->template_name.empty())
 	{

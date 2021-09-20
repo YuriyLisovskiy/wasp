@@ -21,7 +21,7 @@
 
 // Framework libraries.
 #include "../urls/abc.h"
-#include "../commands/base.h"
+#include "../commands/abstract_command.h"
 
 
 __CONF_BEGIN__
@@ -39,7 +39,7 @@ public:
 
 	virtual std::vector<std::shared_ptr<urls::IPattern>> get_urlpatterns() = 0;
 
-	virtual std::vector<std::shared_ptr<cmd::BaseCommand>> get_commands() = 0;
+	virtual std::vector<std::shared_ptr<cmd::AbstractCommand>> get_commands() = 0;
 };
 
 template <typename T>

@@ -24,9 +24,7 @@ __URLS_BEGIN__
 // TESTME: resolve
 // Searches path in urlpatterns and returns an expression
 // to process request if path is found, otherwise returns nullptr.
-extern std::function<std::unique_ptr<http::abc::IHttpResponse>(
-	http::Request* request, conf::Settings* settings
-)> resolve(
+extern std::function<std::unique_ptr<http::abc::IHttpResponse>(http::Request*, conf::Settings*)> resolve(
 	const std::string& path, const std::vector<std::shared_ptr<IPattern>>& urlpatterns
 );
 
