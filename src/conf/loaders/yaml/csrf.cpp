@@ -9,7 +9,7 @@
 
 __CONF_BEGIN__
 
-YAMLCSRFComponent::YAMLCSRFComponent(CSRF& csrf)
+YAMLCSRFComponent::YAMLCSRFComponent(CrossSiteRequestForgery& csrf)
 {
 	auto cookie_component = std::make_unique<config::YAMLMapComponent>();
 	cookie_component->register_component("name", std::make_unique<config::YAMLScalarComponent>(csrf.COOKIE.NAME));

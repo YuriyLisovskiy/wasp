@@ -175,8 +175,8 @@ struct Formats
 	std::string SHORT_DATETIME_FORMAT;
 };
 
-// TODO: docs for 'CSRF'
-struct CSRF
+// TODO: docs for 'CrossSiteRequestForgery'
+struct CrossSiteRequestForgery
 {
 	// Settings for CSRF cookie.
 	struct Cookie

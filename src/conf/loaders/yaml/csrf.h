@@ -25,7 +25,7 @@ __CONF_BEGIN__
 class YAMLCSRFComponent : public config::YAMLMapComponent
 {
 public:
-	explicit YAMLCSRFComponent(CSRF& csrf);
+	explicit YAMLCSRFComponent(CrossSiteRequestForgery& csrf);
 };
 
 __CONF_END__

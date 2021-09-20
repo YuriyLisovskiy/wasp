@@ -206,7 +206,7 @@ public:
 	std::vector<middleware::Handler> MIDDLEWARE;
 
 	// Settings for CSRF cookie.
-	CSRF CSRF = {
+	CrossSiteRequestForgery CSRF = {
 		.COOKIE = {
 			.NAME = "csrftoken",
 			.AGE = 60 * 60 * 24 * 7 * 52,
