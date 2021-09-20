@@ -110,17 +110,6 @@ public:
 	// names, 'host' may be in Punycode or Unicode form.
 	std::string host;
 
-	// 'form' contains the parsed form data, including both the URL
-	// field's query parameters and the PATCH, POST, or PUT form data.
-	// This field is only available after 'parse_form' is called.
-	std::unique_ptr<Query> form = nullptr;
-
-	// 'post_form' contains the parsed form data from PATCH, POST
-	// or PUT body parameters.
-	//
-	// This field is only available after 'parse_form' is called.
-	std::unique_ptr<Query> post_form = nullptr;
-
 	// 'multipart_form' is the parsed multipart form, including file uploads.
 	// This field is only available after 'parse_multipart_form' is called.
 	std::unique_ptr<mime::multipart::Form> multipart_form = nullptr;
@@ -262,6 +251,12 @@ protected:
 	// TODO: dos for 'get_port'
 	[[nodiscard]]
 	std::string get_port(bool use_x_forwarded_port) const;
+
+private:
+	// 'form' contains the parsed form data, including both the URL
+	// field's query parameters and the PATCH, POST, or PUT form data.
+	// This field is only available after 'parse_form' is called.
+	std::unique_ptr<Query> _form = nullptr;
 };
 
 // TESTME: valid_method
