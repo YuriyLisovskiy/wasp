@@ -32,7 +32,7 @@
 #include "./mime/multipart/form.h"
 #include "./mime/multipart/body_reader.h"
 #include "./mime/content_types/application.h"
-#include "../conf/_def_.h"
+#include "../conf/types.h"
 
 
 __HTTP_BEGIN__
@@ -109,17 +109,6 @@ public:
 	// It may be of the form "host:port". For international domain
 	// names, 'host' may be in Punycode or Unicode form.
 	std::string host;
-
-	// 'form' contains the parsed form data, including both the URL
-	// field's query parameters and the PATCH, POST, or PUT form data.
-	// This field is only available after 'parse_form' is called.
-	std::unique_ptr<Query> form = nullptr;
-
-	// 'post_form' contains the parsed form data from PATCH, POST
-	// or PUT body parameters.
-	//
-	// This field is only available after 'parse_form' is called.
-	std::unique_ptr<Query> post_form = nullptr;
 
 	// 'multipart_form' is the parsed multipart form, including file uploads.
 	// This field is only available after 'parse_multipart_form' is called.
@@ -227,17 +216,17 @@ public:
 
 	// TODO: docs for 'scheme'
 	[[nodiscard]]
-	std::string scheme(const std::optional<std::pair<std::string, std::string>>& secure_proxy_ssl_header) const;
+	std::string scheme(const std::optional<conf::Secure::Header>& secure_proxy_ssl_header) const;
 
 	// Return the HTTP host using the environment or request headers.
 	std::string get_host(
-		const std::optional<std::pair<std::string, std::string>>& secure_proxy_ssl_header,
+		const std::optional<conf::Secure::Header>& secure_proxy_ssl_header,
 		bool use_x_forwarded_host, bool use_x_forwarded_port, bool debug, std::vector<std::string> allowed_hosts
 	);
 
 	// TODO: docs for 'is_secure'
 	[[nodiscard]]
-	inline bool is_secure(const std::optional<std::pair<std::string, std::string>>& secure_proxy_ssl_header) const
+	inline bool is_secure(const std::optional<conf::Secure::Header>& secure_proxy_ssl_header) const
 	{
 		return this->scheme(secure_proxy_ssl_header) == "https";
 	}
@@ -256,12 +245,18 @@ protected:
 	[[nodiscard]]
 	std::string get_raw_host(
 		bool use_x_forwarded_host, bool use_x_forwarded_port,
-		const std::optional<std::pair<std::string, std::string>>& secure_proxy_ssl_header
+		const std::optional<conf::Secure::Header>& secure_proxy_ssl_header
 	) const;
 
 	// TODO: dos for 'get_port'
 	[[nodiscard]]
 	std::string get_port(bool use_x_forwarded_port) const;
+
+private:
+	// 'form' contains the parsed form data, including both the URL
+	// field's query parameters and the PATCH, POST, or PUT form data.
+	// This field is only available after 'parse_form' is called.
+	std::unique_ptr<Query> _form = nullptr;
 };
 
 // TESTME: valid_method

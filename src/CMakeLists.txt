@@ -25,7 +25,6 @@ endif()
 target_link_libraries(${LIBRARY_NAME} PUBLIC
     ${FRAMEWORK_NAME}.base
     ${FRAMEWORK_NAME}.orm
-    ${FRAMEWORK_NAME}.render
 )
 
 # Install the library.

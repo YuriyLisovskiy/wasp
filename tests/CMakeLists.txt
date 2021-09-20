@@ -18,7 +18,6 @@ function(add_tests SUB_DIR SUB_NAME)
         gtest
         ${FRAMEWORK_NAME}.base
         ${FRAMEWORK_NAME}.orm
-        ${FRAMEWORK_NAME}.render
         ${LIBRARY_NAME}
     )
 endfunction()

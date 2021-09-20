@@ -21,10 +21,7 @@
 #include <xalwart.base/yaml/yaml-cpp/yaml.h>
 #include <xalwart.base/net/abc.h>
 #include <xalwart.base/net/status.h>
-
-// Render libraries.
-#include <xalwart.render/abc.h>
-#include <xalwart.render/library/abc.h>
+#include <xalwart.base/abc/render.h>
 
 // ORM libraries.
 #include <xalwart.orm/client.h>
@@ -87,7 +84,7 @@ public:
 	std::vector<std::shared_ptr<IModuleConfig>> MODULES;
 
 	// Engine for rendering templates.
-	std::shared_ptr<render::abc::IEngine> TEMPLATE_ENGINE = nullptr;
+	std::shared_ptr<abc::render::IEngine> TEMPLATE_ENGINE = nullptr;
 
 	// Default database instance.
 	std::shared_ptr<orm::Client> DB = nullptr;
@@ -209,7 +206,7 @@ public:
 	std::vector<middleware::Handler> MIDDLEWARE;
 
 	// Settings for CSRF cookie.
-	CSRFConfiguration CSRF = {
+	CrossSiteRequestForgery CSRF = {
 		.COOKIE = {
 			.NAME = "csrftoken",
 			.AGE = 60 * 60 * 24 * 7 * 52,
@@ -246,10 +243,12 @@ public:
 		// that header/value, request.is_secure() will return true.
 		// WARNING! Only set this if you fully understand what you're doing. Otherwise,
 		// you may be opening yourself up to a security risk.
-		.PROXY_SSL_HEADER = std::pair<std::string, std::string>("X-Forwarded-Proto", "https")
+		.PROXY_SSL_HEADER = Secure::Header{
+			.name = "X-Forwarded-Proto",
+			.value = "https"
+		}
 	};
 
-public:
 	explicit Settings(const std::string& base_dir);
 
 	virtual ~Settings() = default;
@@ -264,48 +263,36 @@ public:
 
 	virtual void check();
 
-	inline virtual void register_modules()
+	virtual inline void register_components()
+	{
+		this->register_template_loaders();
+		this->register_template_libraries();
+		this->register_middleware();
+		this->register_migrations();
+		this->register_modules();
+	}
+
+	virtual inline void register_modules()
 	{
 	}
 
-	inline virtual void register_middleware()
+	virtual inline void register_middleware()
 	{
 	}
 
-	inline virtual void register_libraries()
+	virtual inline void register_template_libraries()
 	{
 	}
 
-	inline virtual void register_loaders()
+	virtual inline void register_template_loaders()
 	{
 	}
 
-	inline virtual void register_migrations()
+	virtual inline void register_migrations()
 	{
 	}
 
-	inline virtual std::shared_ptr<orm::abc::ISQLDriver> build_sqlite3_database(
-		const std::string& name, const std::string& filepath
-	)
-	{
-		std::shared_ptr<orm::abc::ISQLDriver> db;
-		#ifdef USE_SQLITE3
-			auto file_path = path::join(this->BASE_DIR, filepath);
-			db = std::make_shared<orm::sqlite3::Driver>(file_path.c_str());
-		#else
-			db = nullptr;
-		#endif
-		return db;
-	}
-
-	inline virtual std::shared_ptr<orm::abc::ISQLDriver> build_database(
-		const std::string& name, const YAML::Node& database
-	)
-	{
-		return nullptr;
-	}
-
-	inline virtual std::shared_ptr<net::abc::IServer> build_server(
+	virtual inline std::shared_ptr<net::abc::IServer> build_server(
 		const std::function<net::StatusCode(
 			net::RequestContext*, const std::map<std::string, std::string>& /* environment */
 		)>& handler,
@@ -325,13 +312,14 @@ public:
 	}
 
 	[[nodiscard]]
-	std::shared_ptr<render::abc::ILibrary> build_library(const std::string& full_name) const;
+	std::shared_ptr<abc::render::ILibrary> build_template_library(const std::string& full_name) const;
 
 	[[nodiscard]]
-	std::shared_ptr<render::abc::ILoader> build_loader(const std::string& full_name) const;
+	std::shared_ptr<abc::render::ILoader> build_template_loader(const std::string& full_name) const;
 
 	std::list<std::shared_ptr<orm::db::Migration>> build_migrations(orm::abc::ISQLDriver* driver);
 
+protected:
 	template <class T>
 	[[nodiscard]]
 	inline std::string get_name_or(const std::string& full_name) const
@@ -344,7 +332,6 @@ public:
 		return full_name;
 	}
 
-protected:
 	template <module_config_type ModuleConfigT>
 	inline void module(const std::string& custom_name="")
 	{
@@ -363,7 +350,7 @@ protected:
 
 	void middleware(const std::string& name, middleware::Handler handler);
 
-	template <render::abc::library_type LibraryT>
+	template <abc::render::library_type LibraryT>
 	inline void library(const std::string& custom_name="")
 	{
 		auto name = this->get_name_or<LibraryT>(custom_name);
@@ -372,12 +359,12 @@ protected:
 			this->LOGGER->warning("library '" + name + "' will be overwritten");
 		}
 
-		this->_libraries[name] = [this]() -> std::shared_ptr<render::abc::ILibrary> {
+		this->_libraries[name] = [this]() -> std::shared_ptr<abc::render::ILibrary> {
 			return std::make_shared<LibraryT>(this);
 		};
 	}
 
-	template <render::abc::loader_type LoaderT>
+	template <abc::render::loader_type LoaderT>
 	inline void loader(const std::string& custom_name="")
 	{
 		auto name = this->get_name_or<LoaderT>(custom_name);
@@ -386,7 +373,7 @@ protected:
 			this->LOGGER->warning("loader '" + name + "' will be overwritten");
 		}
 
-		this->_loaders[name] = [this]() -> std::shared_ptr<render::abc::ILoader> {
+		this->_loaders[name] = [this]() -> std::shared_ptr<abc::render::ILoader> {
 			return std::make_shared<LoaderT>(this);
 		};
 	}
@@ -402,9 +389,9 @@ protected:
 
 private:
 	std::map<std::string, middleware::Handler> _middleware;
-	std::map<std::string, std::function<std::shared_ptr<render::abc::ILibrary>()>> _libraries;
+	std::map<std::string, std::function<std::shared_ptr<abc::render::ILibrary>()>> _libraries;
 	std::map<std::string, std::function<std::shared_ptr<IModuleConfig>()>> _modules;
-	std::map<std::string, std::function<std::shared_ptr<render::abc::ILoader>()>> _loaders;
+	std::map<std::string, std::function<std::shared_ptr<abc::render::ILoader>()>> _loaders;
 	std::list<std::function<std::shared_ptr<orm::db::Migration>(orm::abc::ISQLDriver* driver)>> _migrations;
 };
 

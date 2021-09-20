@@ -45,7 +45,7 @@ std::unique_ptr<mime::multipart::BodyReader> Request::multipart_reader(bool allo
 
 std::string Request::get_raw_host(
 	bool use_x_forwarded_host, bool use_x_forwarded_port,
-	const std::optional<std::pair<std::string, std::string>>& secure_proxy_ssl_header
+	const std::optional<conf::Secure::Header>& secure_proxy_ssl_header
 ) const
 {
 	std::string raw_host;
@@ -115,37 +115,34 @@ Request::Request(
 
 void Request::parse_form()
 {
-	if (!this->post_form)
+	std::unique_ptr<Query> post_form = nullptr;
+	if (this->method == "POST" || this->method == "PUT" || this->method == "PATCH")
 	{
-		if (this->method == "POST" || this->method == "PUT" || this->method == "PATCH")
-		{
-			auto parsed_query = parse_post_form(this);
-			this->post_form = std::make_unique<Query>(parsed_query);
-		}
-
-		if (!this->post_form)
-		{
-			this->post_form = std::make_unique<Query>();
-		}
+		auto parsed_query = parse_post_form(this);
+		post_form = std::make_unique<Query>(parsed_query);
+	}
+	else
+	{
+		post_form = std::make_unique<Query>();
 	}
 
-	if (!this->form)
+	if (!this->_form)
 	{
-		if (!this->post_form->empty())
+		if (!post_form->empty())
 		{
-			this->form = std::make_unique<Query>(*this->post_form);
+			this->_form = std::make_unique<Query>(*post_form);
 		}
 
 		auto new_query = std::make_unique<Query>(parse_query(this->url.raw_query));
-		if (!this->form)
+		if (!this->_form)
 		{
-			this->form = std::move(new_query);
+			this->_form = std::move(new_query);
 		}
 		else
 		{
 			for (auto it = new_query->begin(); it != new_query->end(); it++)
 			{
-				this->form->add(it->first, it->second);
+				this->_form->add(it->first, it->second);
 			}
 		}
 	}
@@ -153,7 +150,7 @@ void Request::parse_form()
 
 void Request::parse_multipart_form(long long int max_memory)
 {
-	if (!this->form)
+	if (!this->_form)
 	{
 		this->parse_form();
 	}
@@ -165,30 +162,22 @@ void Request::parse_multipart_form(long long int max_memory)
 
 	auto reader = this->multipart_reader(false);
 	auto target_form = reader->read_form(max_memory);
-	if (!this->post_form)
-	{
-		this->post_form = std::make_unique<Query>();
-	}
-
 	for (const auto& pair : target_form->values)
 	{
-		this->form->add(pair.first, pair.second);
-
-		// 'post_form' should also be populated.
-		this->post_form->add(pair.first, pair.second);
+		this->_form->add(pair.first, pair.second);
 	}
 
 	this->multipart_form = std::move(target_form);
 }
 
-std::string Request::scheme(const std::optional<std::pair<std::string, std::string>>& secure_proxy_ssl_header) const
+std::string Request::scheme(const std::optional<conf::Secure::Header>& secure_proxy_ssl_header) const
 {
 	if (secure_proxy_ssl_header.has_value())
 	{
-		auto header_val = this->get_header(secure_proxy_ssl_header->first, "");
+		auto header_val = this->get_header(secure_proxy_ssl_header->name, "");
 		if (!header_val.empty())
 		{
-			return header_val == secure_proxy_ssl_header->second ? "https" : "http";
+			return header_val == secure_proxy_ssl_header->value ? "https" : "http";
 		}
 	}
 
@@ -196,7 +185,7 @@ std::string Request::scheme(const std::optional<std::pair<std::string, std::stri
 }
 
 std::string Request::get_host(
-	const std::optional<std::pair<std::string, std::string>>& secure_proxy_ssl_header,
+	const std::optional<conf::Secure::Header>& secure_proxy_ssl_header,
 	bool use_x_forwarded_host, bool use_x_forwarded_port, bool debug, std::vector<std::string> allowed_hosts
 )
 {

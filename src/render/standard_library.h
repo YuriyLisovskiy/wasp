@@ -1,5 +1,5 @@
 /**
- * render/default.h
+ * render/standard_library.h
  *
  * Copyright (c) 2020-2021 Yuriy Lisovskiy
  *
@@ -7,6 +7,9 @@
  */
 
 #pragma once
+
+// Module definitions.
+#include "./_def_.h"
 
 // Framework libraries.
 #include "./library.h"
@@ -16,13 +19,12 @@ __RENDER_BEGIN__
 
 // TESTME: DefaultLibrary
 // TODO: docs for 'DefaultLibrary'
-class DefaultLibrary final : public Library
+class StandardLibrary final : public Library
 {
 public:
-	static inline constexpr const char* FULL_NAME = "xw::render::DefaultLibrary";
+	static inline constexpr const char* NAME = "xw::render::StandardLibrary";
 
-public:
-	inline explicit DefaultLibrary(conf::Settings* settings) : Library(settings)
+	inline explicit StandardLibrary(conf::Settings* settings) : Library(settings)
 	{
 	}
 
@@ -33,12 +35,12 @@ public:
 	}
 
 	[[nodiscard]]
-	std::map<std::string, Tag> get_tags() const override;
+	std::map<std::string, abc::render::ILibrary::Function> get_functions() const override;
 
 	[[nodiscard]]
 	inline std::string name() const override
 	{
-		return DefaultLibrary::FULL_NAME;
+		return StandardLibrary::NAME;
 	}
 };
 

@@ -23,7 +23,7 @@ std::vector<std::shared_ptr<urls::IPattern>> ModuleConfig::get_urlpatterns()
 	return this->_urlpatterns;
 }
 
-std::vector<std::shared_ptr<cmd::BaseCommand>> ModuleConfig::get_commands()
+std::vector<std::shared_ptr<cmd::AbstractCommand>> ModuleConfig::get_commands()
 {
 	if (this->_commands.empty())
 	{

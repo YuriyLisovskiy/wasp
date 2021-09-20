@@ -12,7 +12,7 @@
 #include "./_def_.h"
 
 // Framework libraries.
-#include "./base.h"
+#include "./abstract_command.h"
 #include "../conf/settings.h"
 
 
@@ -20,15 +20,14 @@ __COMMANDS_BEGIN__
 
 // TESTME: Command
 // TODO: docs for 'Command'
-class Command : public BaseCommand
+class Command : public AbstractCommand
 {
 protected:
 	conf::Settings* settings;
-	conf::IModuleConfig* module_config;
+	const conf::IModuleConfig* module_config;
 
-protected:
 	Command(
-		conf::IModuleConfig* module,
+		const conf::IModuleConfig* module,
 		conf::Settings* settings,
 		const std::string& cmd_name,
 		const std::string& help

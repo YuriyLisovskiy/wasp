@@ -10,11 +10,11 @@
 __COMMANDS_BEGIN__
 
 Command::Command(
-	conf::IModuleConfig* module_cfg,
+	const conf::IModuleConfig* module_cfg,
 	conf::Settings* settings,
 	const std::string& cmd_name,
 	const std::string& help
-) : BaseCommand(cmd_name, help), module_config(module_cfg), settings(settings)
+) : AbstractCommand(cmd_name, help), module_config(module_cfg), settings(settings)
 {
 	if (!this->module_config)
 	{

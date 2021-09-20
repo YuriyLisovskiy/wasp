@@ -9,7 +9,7 @@
 
 __CONTROLLERS_BEGIN__
 
-std::string RedirectController::get_redirect_url() const
+std::string RedirectController::get_redirect_url(http::Request* request) const
 {
 	std::string url = this->_url;
 	if (this->_url.empty())
@@ -19,18 +19,18 @@ std::string RedirectController::get_redirect_url() const
 
 	if (this->_query_string)
 	{
-		url += "?" + this->request->url.raw_query;
+		url += "?" + request->url.raw_query;
 	}
 
 	return url;
 }
 
-std::unique_ptr<http::abc::IHttpResponse> RedirectController::get()
+std::unique_ptr<http::abc::IHttpResponse> RedirectController::get(http::Request* request) const
 {
-	std::string url = this->get_redirect_url();
+	std::string url = this->get_redirect_url(request);
 	if (url.empty())
 	{
-		if (this->settings->LOGGER != nullptr)
+		if (this->settings->LOGGER)
 		{
 			this->settings->LOGGER->warning("Gone: " + request->url.path);
 		}

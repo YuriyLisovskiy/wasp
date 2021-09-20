@@ -179,7 +179,6 @@ TEST(MimeTypesTestCase, _consume_media_parameter)
 	size_t i = 0;
 	for (const auto& test : data)
 	{
-		std::cerr << i++ << '\n';
 		auto [param, value, rest] = http::mime::_consume_media_parameter(str::string_to_wstring(test[0]));
 		ASSERT_EQ(param, str::string_to_wstring(test[1]));
 		ASSERT_EQ(value, str::string_to_wstring(test[2]));

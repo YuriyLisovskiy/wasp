@@ -10,14 +10,49 @@
 #include <iostream>
 #include <csignal>
 
+// Base libraries.
+#include <xalwart.base/string_utils.h>
+
 // Framework libraries.
 #include "../management/module.h"
 #include "../urls/resolver.h"
-#include "../urls/utilities.h"
+#include "../urls/pattern.h"
 #include "../middleware/exception.h"
+#include "../controllers/static.h"
 
 
 __CONF_BEGIN__
+
+std::shared_ptr<urls::IPattern> _build_static_pattern(
+	const conf::Settings* settings,
+	const std::string& static_url, const std::string& static_root, const std::string& name
+)
+{
+	if (static_url.empty())
+	{
+		throw ImproperlyConfigured("empty static url is not permitted", _ERROR_DETAILS_);
+	}
+
+	if (name.empty())
+	{
+		throw ImproperlyConfigured("empty static url name is not permitted", _ERROR_DETAILS_);
+	}
+
+	auto controller_function = [static_root](
+		http::Request* request, const std::tuple<std::string>& args, const Settings* settings_pointer
+	) -> std::unique_ptr<http::abc::IHttpResponse>
+	{
+		return std::apply([request, static_root, settings_pointer](const std::string& p) mutable -> auto
+		{
+			ctrl::StaticController controller(settings_pointer, static_root);
+			return controller.dispatch(request, p);
+		}, args);
+	};
+
+	return std::make_unique<urls::Pattern<std::string>>(
+		str::rtrim(static_url, "/") + "/" + "<path>(.*)", controller_function, name
+	);
+}
 
 void initialize_signal_handlers()
 {
@@ -48,9 +83,13 @@ void initialize_signal_handlers()
 #endif
 }
 
-Application::Application(conf::Settings* settings)
+Application::Application(conf::Settings* settings) : settings(settings), is_configured(false)
 {
-	this->setup_settings(settings);
+}
+
+Application& Application::configure()
+{
+	this->configure_settings();
 	this->build_static_patterns();
 
 	// Retrieve main module patterns and append them to result.
@@ -58,10 +97,20 @@ Application::Application(conf::Settings* settings)
 
 	this->setup_template_engine();
 	this->setup_commands();
+
+	this->is_configured = true;
+	return *this;
 }
 
 void Application::execute(int argc, char** argv) const
 {
+	if (!this->is_configured)
+	{
+		throw RuntimeError(
+			"application is not configured, call `Application::configure()` method before execution"
+		);
+	}
+
 	if (argc > 1)
 	{
 		try
@@ -167,14 +216,14 @@ middleware::Function Application::build_middleware_chain() const
 	return chain;
 }
 
-void Application::build_static_pattern(
+void Application::add_static_pattern(
 	std::vector<std::shared_ptr<urls::IPattern>>& patterns,
 	const std::string& root, const std::string& url, const std::string& name
 ) const
 {
 	if (!root.empty() && this->_static_is_allowed(url))
 	{
-		patterns.push_back(urls::make_static(url, root, name));
+		patterns.push_back(_build_static_pattern(this->settings, url, root, name));
 	}
 }
 
@@ -212,10 +261,10 @@ std::shared_ptr<http::Request> Application::build_request(
 void Application::build_static_patterns()
 {
 	// Check if static files can be served and create necessary urls.
-	this->build_static_pattern(
+	this->add_static_pattern(
 		this->settings->URLPATTERNS, this->settings->STATIC.ROOT, this->settings->STATIC.URL, "static"
 	);
-	this->build_static_pattern(
+	this->add_static_pattern(
 		this->settings->URLPATTERNS, this->settings->MEDIA.ROOT, this->settings->MEDIA.URL, "media"
 	);
 }
@@ -316,7 +365,7 @@ std::string Application::build_usage_message() const
 	return usage_message;
 }
 
-void Application::_append_command(const std::shared_ptr<cmd::BaseCommand>& command, const std::string& module_name)
+void Application::_append_command(const std::shared_ptr<cmd::AbstractCommand>& command, const std::string& module_name)
 {
 	if (this->_has_command(command))
 	{

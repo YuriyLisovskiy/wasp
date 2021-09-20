@@ -36,7 +36,7 @@ private:
 	friend class conf::Settings;
 
 	std::vector<std::shared_ptr<urls::IPattern>> _urlpatterns;
-	std::vector<std::shared_ptr<cmd::BaseCommand>> _commands;
+	std::vector<std::shared_ptr<cmd::AbstractCommand>> _commands;
 	std::vector<std::function<void()>> _sub_modules_to_init;
 
 	inline std::shared_ptr<IModuleConfig> _find_module(const std::string& module)
@@ -67,26 +67,28 @@ protected:
 	}
 
 	template <
-		typename ControllerT, typename ...ArgsT,
-		typename = std::enable_if<std::is_base_of<ctrl::Controller<ArgsT...>, ControllerT>::value>
+		typename ControllerType, typename ...RequestArgs, typename ...ControllerArgs,
+		typename = std::enable_if<std::is_base_of<ctrl::Controller<RequestArgs...>, ControllerType>::value>
 	>
-	inline void url(const std::string& pattern, const std::string& name)
+	inline void url(const std::string& pattern, const std::string& name, ControllerArgs ...controller_args)
 	{
-		ctrl::Handler<ArgsT...> controller_handler = [this](
-			http::Request* request, const std::tuple<ArgsT...>& args, conf::Settings* settings_ptr
+		ctrl::Handler<RequestArgs...> controller_handler = [controller_args...](
+			http::Request* request,
+			const std::tuple<RequestArgs...>& request_args,
+			const conf::Settings* settings_pointer
 		) -> std::unique_ptr<http::abc::IHttpResponse>
 		{
-			ControllerT controller(settings_ptr);
-			controller.setup(request);
+			ControllerType controller(settings_pointer, controller_args...);
 			return std::apply(
-				[controller](ArgsT ...a) mutable -> auto { return controller.dispatch(a...); }, args
+				[controller, request](RequestArgs ...a) mutable -> auto { return controller.dispatch(request, a...); },
+				request_args
 			);
 		};
 
-		this->_urlpatterns.push_back(std::make_shared<urls::Pattern<ArgsT...>>(
+		this->_urlpatterns.push_back(std::make_shared<urls::Pattern<RequestArgs...>>(
 			pattern.starts_with("/") ? pattern : "/" + pattern,
 			controller_handler,
-			name.empty() ? demangle(typeid(ControllerT).name()) : name
+			name.empty() ? demangle(typeid(ControllerType).name()) : name
 		));
 	}
 
@@ -105,16 +107,16 @@ protected:
 		});
 	}
 
-	template <cmd::command_type CommandT>
+	template <cmd::command_type CommandType>
 	inline void command()
 	{
-		this->_commands.push_back(std::make_shared<CommandT>(this, this->settings));
+		this->_commands.push_back(std::make_shared<CommandType>(this, this->settings));
 	}
 
-	template <cmd::command_type CommandT, typename ...Args>
+	template <cmd::command_type CommandType, typename ...Args>
 	inline void command(Args&& ...args)
 	{
-		this->_commands.push_back(std::make_shared<CommandT>(std::forward<Args>(args)...));
+		this->_commands.push_back(std::make_shared<CommandType>(std::forward<Args>(args)...));
 	}
 
 	virtual inline void urlpatterns()
@@ -142,7 +144,7 @@ public:
 	std::vector<std::shared_ptr<urls::IPattern>> get_urlpatterns() final;
 
 	[[nodiscard]]
-	std::vector<std::shared_ptr<cmd::BaseCommand>> get_commands() final;
+	std::vector<std::shared_ptr<cmd::AbstractCommand>> get_commands() final;
 
 	virtual void init(const std::string& name);
 };

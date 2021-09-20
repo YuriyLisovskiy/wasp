@@ -10,6 +10,11 @@
 
 // C++ libraries.
 #include <algorithm>
+#include <memory>
+#include <string>
+
+// Base libraries.
+#include <xalwart.base/exceptions.h>
 
 // Module definitions.
 #include "./_def_.h"
@@ -17,6 +22,7 @@
 // Framework libraries.
 #include "./settings.h"
 #include "../middleware/types.h"
+#include "../urls/abc.h"
 
 
 __CONF_BEGIN__
@@ -26,10 +32,17 @@ inline void _throw_interruption_exception(int signal)
 	throw InterruptException("Execution is interrupted with signal: " + std::to_string(signal));
 }
 
-inline void _throw_null_pointer_exception(int signal)
+inline void _throw_null_pointer_exception(int)
 {
 	throw NullPointerException("invalid storage access (segmentation fault)");
 }
+
+// TESTME: _build_static_pattern
+// TODO: docs for '_build_static_pattern'
+extern std::shared_ptr<urls::IPattern> _build_static_pattern(
+	const conf::Settings* settings,
+	const std::string& static_url, const std::string& static_root, const std::string& name=""
+);
 
 extern void initialize_signal_handlers();
 
@@ -37,6 +50,8 @@ class Application
 {
 public:
 	explicit Application(conf::Settings* settings);
+
+	virtual Application& configure();
 
 	void execute(int argc, char** argv) const;
 
@@ -46,9 +61,10 @@ protected:
 	)>;
 
 	conf::Settings* settings = nullptr;
+	bool is_configured;
 
 	// List of commands to run from command line.
-	std::map<std::string, std::shared_ptr<cmd::BaseCommand>> commands;
+	std::map<std::string, std::shared_ptr<cmd::AbstractCommand>> commands;
 
 	virtual void execute_command(const std::string& command_name, int argc, char** argv) const;
 
@@ -64,21 +80,21 @@ protected:
 	virtual middleware::Function build_middleware_chain() const;
 
 	[[nodiscard]]
-	ServerHandler build_server_handler() const;
+	virtual ServerHandler build_server_handler() const;
 
-	void build_static_pattern(
+	virtual void add_static_pattern(
 		std::vector<std::shared_ptr<urls::IPattern>>& patterns,
 		const std::string& root, const std::string& url, const std::string& name
 	) const;
 
-	void build_module_patterns(std::vector<std::shared_ptr<urls::IPattern>>& patterns) const;
+	virtual void build_module_patterns(std::vector<std::shared_ptr<urls::IPattern>>& patterns) const;
 
 	[[nodiscard]]
 	virtual std::shared_ptr<http::Request> build_request(
 		net::RequestContext* context, std::map<std::string, std::string> env
 	) const;
 
-	void build_static_patterns();
+	virtual void build_static_patterns();
 
 	[[nodiscard]]
 	virtual uint send_response(net::RequestContext* ctx, const std::unique_ptr<http::abc::IHttpResponse>& response) const;
@@ -87,22 +103,21 @@ protected:
 
 	virtual void finish_streaming_response(net::RequestContext* context, http::abc::IHttpResponse* response) const;
 
-	void setup_commands();
+	virtual void setup_commands();
 
-	inline void setup_settings(conf::Settings* global_settings)
+	virtual inline void configure_settings()
 	{
-		this->settings = global_settings;
-		require_non_null(settings, "settings is not instantiated", _ERROR_DETAILS_);
+		require_non_null(this->settings, "settings is not instantiated", _ERROR_DETAILS_);
 		this->settings->prepare();
 		this->settings->check();
 	}
 
-	inline void setup_template_engine()
+	virtual inline void setup_template_engine()
 	{
-		// Initialize template engine's libraries.
-		require_non_null(
-			this->settings->TEMPLATE_ENGINE.get(), "template engine is not instantiated", _ERROR_DETAILS_
-		)->load_libraries();
+		if (this->settings->TEMPLATE_ENGINE)
+		{
+			this->settings->TEMPLATE_ENGINE->load_libraries();
+		}
 	}
 
 	[[nodiscard]]
@@ -120,7 +135,7 @@ private:
 	}
 
 	inline void _append_commands(
-		const std::vector<std::shared_ptr<cmd::BaseCommand>>& from, const std::string& module_name
+		const std::vector<std::shared_ptr<cmd::AbstractCommand>>& from, const std::string& module_name
 	)
 	{
 		std::for_each(from.begin(),  from.end(), [this, module_name](const auto& command) -> void {
@@ -128,7 +143,7 @@ private:
 		});
 	}
 
-	void _append_command(const std::shared_ptr<cmd::BaseCommand>& command, const std::string& module_name);
+	void _append_command(const std::shared_ptr<cmd::AbstractCommand>& command, const std::string& module_name);
 
 	[[nodiscard]]
 	inline bool _has_command(const auto& target_command) const
