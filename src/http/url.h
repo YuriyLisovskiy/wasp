@@ -19,7 +19,7 @@
 #include <string>
 
 // Base libraries.
-#include <xalwart.base/collections/multi_dictionary.h>
+#include <xalwart.base/collections/multimap.h>
 #include <xalwart.base/string_utils.h>
 
 // Module definitions.
@@ -45,7 +45,7 @@ enum class EscapeMode
 // TESTME: should_escape
 // Return true if the specified character should be escaped when
 // appearing in a URL string, according to RFC 3986.
-extern bool should_escape(wchar_t c, EscapeMode mode);
+extern bool should_escape(unsigned char c, EscapeMode mode);
 
 // TESTME: escape
 extern std::string escape(const std::string& string, EscapeMode mode);
@@ -53,7 +53,7 @@ extern std::string escape(const std::string& string, EscapeMode mode);
 // TESTME: unescape
 // Unescapes a string; the mode specifies
 // which section of the URL string is being unescaped.
-extern std::string unescape(const std::string& string, EscapeMode mode);
+extern std::string unescape(std::string string, EscapeMode mode);
 
 // TESTME: valid_encoded
 // Checks whether 's' is a valid encoded path or fragment,
@@ -74,7 +74,7 @@ extern std::pair<std::wstring, std::wstring> get_scheme(const std::wstring& raw_
 // Reports whether s contains any ASCII control character.
 inline bool string_contains_ctl_byte(const std::wstring& s)
 {
-	return std::any_of(s.begin(), s.end(), [](const wchar_t& b) -> bool { return b < ' ' || b == 0x7f; });
+	return std::any_of(s.begin(), s.end(), [](unsigned char b) -> bool { return b < ' ' || b == 0x7f; });
 }
 
 // TESTME: parse_host
@@ -95,7 +95,7 @@ __HTTP_INTERNAL_END__
 
 __HTTP_BEGIN__
 
-struct Query : public collections::MultiDictionary<std::string, std::string>
+struct Query : public collections::Multimap<std::string, std::string>
 {
 	// TESTME: encode
 	// Encodes the values into ``URL encoded'' form
@@ -125,9 +125,9 @@ inline std::string query_unescape(const std::string& s)
 
 // TESTME: parse_query
 // 'parse_query' parses the URL-encoded query string and returns
-// a 'collections::MultiDictionary' listing the values specified
+// a 'collections::multimap' listing the values specified
 // for each key.
-// 'parse_query' always returns a 'collections::MultiDictionary'
+// 'parse_query' always returns a 'collections::multimap'
 // containing all the valid query parameters found.
 //
 // Query is expected to be a list of key=value settings separated by

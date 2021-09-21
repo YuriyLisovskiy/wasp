@@ -69,7 +69,7 @@ protected:
 	virtual void execute_command(const std::string& command_name, int argc, char** argv) const;
 
 	[[nodiscard]]
-	virtual std::unique_ptr<http::abc::IHttpResponse> error_response(
+	virtual std::unique_ptr<http::abc::HttpResponse> error_response(
 		http::Request* request, net::StatusCode status_code, const std::string& message
 	) const;
 
@@ -97,11 +97,11 @@ protected:
 	virtual void build_static_patterns();
 
 	[[nodiscard]]
-	virtual uint send_response(net::RequestContext* ctx, const std::unique_ptr<http::abc::IHttpResponse>& response) const;
+	virtual uint send_response(net::RequestContext* ctx, const std::unique_ptr<http::abc::HttpResponse>& response) const;
 
-	virtual net::StatusCode finish_response(net::RequestContext* context, http::abc::IHttpResponse* response) const;
+	virtual net::StatusCode finish_response(net::RequestContext* context, http::abc::HttpResponse* response) const;
 
-	virtual void finish_streaming_response(net::RequestContext* context, http::abc::IHttpResponse* response) const;
+	virtual void finish_streaming_response(net::RequestContext* context, http::abc::HttpResponse* response) const;
 
 	virtual void setup_commands();
 

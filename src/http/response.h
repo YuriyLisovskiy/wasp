@@ -16,6 +16,7 @@
 
 // Base libraries.
 #include <xalwart.base/exceptions.h>
+#include <xalwart.base/json/json.h>
 
 // Module definitions.
 #include "./_def_.h"
@@ -23,7 +24,8 @@
 // Framework libraries.
 #include "./abc.h"
 #include "./headers.h"
-#include "exceptions.h"
+#include "./exceptions.h"
+#include "./mime/content_types.h"
 
 
 __HTTP_BEGIN__
@@ -31,17 +33,14 @@ __HTTP_BEGIN__
 // TESTME: ResponseBase
 // TODO: docs for 'ResponseBase'
 // An HTTP response base class with dictionary-accessed headers.
-//
-// This class doesn't handle content. It should not be used directly.
-// Use the HttpResponse subclass instead.
-class ResponseBase : public abc::IHttpResponse
+class AbstractResponse : public abc::HttpResponse
 {
 public:
-	explicit ResponseBase(
-		unsigned short int status=0, std::string content_type="", std::string reason="", std::string charset=""
+	explicit AbstractResponse(
+		unsigned short int status, std::string content_type, std::string reason, std::string charset
 	);
 
-	~ResponseBase() override = default;
+	~AbstractResponse() override = default;
 
 	[[nodiscard]]
 	inline std::string get_header(const std::string& key, const std::string& default_value) const final
@@ -71,16 +70,6 @@ public:
 	inline bool has_header(const std::string& key) const final
 	{
 		return this->headers.contains(key);
-	}
-
-	inline void set_content(const std::string& content) override
-	{
-	}
-
-	[[nodiscard]]
-	inline std::string get_content() const override
-	{
-		return "";
 	}
 
 	void set_cookie(const Cookie& cookie) final;
@@ -121,12 +110,6 @@ public:
 	}
 
 	[[nodiscard]]
-	inline size_t content_length() const override
-	{
-		return 0;
-	}
-
-	[[nodiscard]]
 	inline std::string get_charset() const final
 	{
 		return this->charset;
@@ -151,37 +134,13 @@ public:
 
 	inline void write(const std::string& content) override
 	{
-		throw RuntimeError("This 'xw::http::ResponseBase' instance is not writable", _ERROR_DETAILS_);
+		throw RuntimeError("Response instance is not writable", _ERROR_DETAILS_);
 	}
 
-	inline void flush() override
-	{
-	}
-
-	inline unsigned long int tell() override
-	{
-		throw RuntimeError("This 'xw::http::ResponseBase' instance cannot tell its position", _ERROR_DETAILS_);
-	}
-
-	// These methods partially implement a stream-like object interface.
-	inline bool readable() override
+	[[nodiscard]]
+	inline bool writable() const override
 	{
 		return false;
-	}
-
-	inline bool seekable() override
-	{
-		return false;
-	}
-
-	inline bool writable() override
-	{
-		return false;
-	}
-
-	inline void write_lines(const std::vector<std::string>& lines) override
-	{
-		throw RuntimeError("This 'xw::http::ResponseBase' instance is not writable", _ERROR_DETAILS_);
 	}
 
 protected:
@@ -193,25 +152,81 @@ protected:
 	std::string reason_phrase;
 	bool streaming;
 
-	std::string serialize_headers();
+	[[nodiscard]]
+	std::string serialize_headers() const;
+};
+
+// TESTME: Response
+// TODO: docs for 'Response'
+// A non-streaming HTTP response class which implements basic
+// functionality based on derived classes which implements content.
+class BaseResponse : public AbstractResponse
+{
+public:
+	explicit BaseResponse(
+		unsigned short int status, const std::string& content_type,
+		const std::string& reason, const std::string& charset
+	) : AbstractResponse(status, content_type, reason, charset)
+	{
+		this->streaming = false;
+	}
+
+	[[nodiscard]]
+	inline size_t content_length() const override
+	{
+		return this->get_content().size();
+	}
+
+	inline void set_content(const std::string& content) override
+	{
+		throw NotImplementedException("'set_content(const std::string&)' is not implemented", _ERROR_DETAILS_);
+	}
+
+	[[nodiscard]]
+	inline std::string get_content() const override
+	{
+		throw NotImplementedException("'get_content()' is not implemented", _ERROR_DETAILS_);
+	}
+
+	inline void write(const std::string& data) override
+	{
+		throw NotImplementedException("'write(const std::string&)' is not implemented", _ERROR_DETAILS_);
+	}
+
+	[[nodiscard]]
+	inline bool writable() const override
+	{
+		return true;
+	}
+
+	std::string serialize() override;
 };
 
 // TESTME: Response
 // TODO: docs for 'Response'
 // An HTTP response class with a string as content.
-class Response : public ResponseBase
+class Response : public BaseResponse
 {
 public:
 	explicit Response(
+		std::string content,
 		unsigned short int status=200,
-		std::string content="",
 		const std::string& content_type="",
 		const std::string& reason="",
 		const std::string& charset=""
-	) : ResponseBase(status, content_type, reason, charset)
+	) : BaseResponse(status, content_type, reason, charset)
 	{
 		this->content = std::move(content);
-		this->streaming = false;
+	}
+
+	explicit Response(
+		unsigned short int status=200,
+		const std::string& content="",
+		const std::string& content_type="",
+		const std::string& reason="",
+		const std::string& charset=""
+	) : Response(content, status, content_type, reason, charset)
+	{
 	}
 
 	[[nodiscard]]
@@ -236,33 +251,81 @@ public:
 		this->content.append(data);
 	}
 
-	inline unsigned long int tell() override
-	{
-		return this->content.size();
-	}
-
-	inline bool writable() override
-	{
-		return true;
-	}
-
-	inline void write_lines(const std::vector<std::string>& lines) override
-	{
-		for (const auto & line : lines)
-		{
-			this->write(line);
-		}
-	}
-
-	std::string serialize() override;
-
 protected:
 	std::string content;
 };
 
+// TESTME: JsonResponse
+// TODO: docs for 'JsonResponse'
+// An HTTP response class with JSON content.
+class JsonResponse final : public BaseResponse
+{
+public:
+	explicit JsonResponse(
+		nlohmann::json data,
+		unsigned short int status=200,
+		const std::string& reason="",
+		const std::string& charset=""
+	) : BaseResponse(status, mime::APPLICATION_JSON, reason, charset)
+	{
+		this->json_content = std::move(data);
+	}
+
+	explicit JsonResponse(
+		const std::string& data,
+		unsigned short int status=200,
+		const std::string& reason="",
+		const std::string& charset=""
+	) : JsonResponse(std::move(nlohmann::json::parse(data)), status, reason, charset)
+	{
+	}
+
+	inline void set_content(const std::string& content) override
+	{
+		this->json_content = nlohmann::json::parse(content);
+	}
+
+	inline void set_content(const nlohmann::json& data)
+	{
+		this->json_content = data;
+	}
+
+	[[nodiscard]]
+	inline std::string get_content() const override
+	{
+		return this->json_content.dump();
+	}
+
+	[[nodiscard]]
+	inline nlohmann::json get_json_content() const
+	{
+		return this->json_content;
+	}
+
+	// Converts `json_content` into JSON array if it is not done
+	// already and parses and appends `data` to `json_content`.
+	inline void write(const std::string& data) override
+	{
+		this->write(nlohmann::json::parse(data));
+	}
+
+	inline void write(const nlohmann::json& data)
+	{
+		if (!this->json_content.is_array())
+		{
+			this->json_content = nlohmann::json::array({this->json_content});
+		}
+
+		this->json_content.push_back(data);
+	}
+
+protected:
+	nlohmann::json json_content;
+};
+
 // TESTME: StreamingResponse
 // TODO: docs for 'StreamingResponse'
-class StreamingResponse : public ResponseBase
+class StreamingResponse : public AbstractResponse
 {
 public:
 	inline explicit StreamingResponse(
@@ -270,10 +333,37 @@ public:
 		const std::string& content_type="",
 		const std::string& reason="",
 		const std::string& charset=""
-	) : ResponseBase(status, content_type, reason, charset)
+	) : AbstractResponse(status, content_type, reason, charset)
 	{
 		this->streaming = true;
 	}
+
+	[[nodiscard]]
+	inline size_t content_length() const final
+	{
+		return 0;
+	}
+
+	inline void set_content(const std::string& new_content) final
+	{
+	}
+
+	[[nodiscard]]
+	inline std::string get_content() const final
+	{
+		return "";
+	}
+
+	[[nodiscard]]
+	virtual unsigned long int tell() const = 0;
+
+	virtual void flush() = 0;
+
+	[[nodiscard]]
+	virtual bool readable() const = 0;
+
+	[[nodiscard]]
+	virtual bool seekable() const = 0;
 
 	inline std::string serialize() final
 	{
@@ -301,7 +391,24 @@ public:
 
 	std::string get_chunk() override;
 
-	inline unsigned long int tell() override
+	inline void flush() override
+	{
+	}
+
+	[[nodiscard]]
+	inline bool readable() const override
+	{
+		return false;
+	}
+
+	[[nodiscard]]
+	inline bool seekable() const override
+	{
+		return false;
+	}
+
+	[[nodiscard]]
+	inline unsigned long int tell() const override
 	{
 		return this->_bytes_read;
 	}
@@ -331,11 +438,6 @@ private:
 	std::string _get_headers_chunk();
 };
 
-__HTTP_END__
-
-
-__HTTP_RESP_BEGIN__
-
 // TESTME: RedirectBase
 // TODO: docs for 'RedirectBase'
 class RedirectBase : public Response
@@ -354,7 +456,7 @@ public:
 	}
 
 protected:
-	inline static const std::set<std::string> ALLOWED_SCHEMES = {"http", "https", "ftp"};
+	static inline const std::set<std::string> ALLOWED_SCHEMES = {"http", "https", "ftp"};
 };
 
 // TESTME: Redirect
@@ -388,7 +490,7 @@ class NotModified : public Response
 public:
 	inline explicit NotModified(
 		const std::string& content, const std::string& content_type="", const std::string& charset=""
-	) : Response(304, content, content_type, "", charset)
+	) : Response(content, 304, content_type, "", charset)
 	{
 		this->remove_header(http::CONTENT_TYPE);
 	}
@@ -403,7 +505,7 @@ class BadRequest : public Response
 public:
 	inline explicit BadRequest(
 		const std::string& content, const std::string& content_type="", const std::string& charset=""
-	) : Response(400, content, content_type, "", charset)
+	) : Response(content, 400, content_type, "", charset)
 	{
 	}
 };
@@ -415,7 +517,7 @@ class NotFound : public Response
 public:
 	inline explicit NotFound(
 		const std::string& content, const std::string& content_type="", const std::string& charset=""
-	) : Response(404, content, content_type, "", charset)
+	) : Response(content, 404, content_type, "", charset)
 	{
 	}
 };
@@ -427,7 +529,7 @@ class Forbidden : public Response
 public:
 	inline explicit Forbidden(
 		const std::string& content, const std::string& content_type="", const std::string& charset=""
-	) : Response(403, content, content_type, "", charset)
+	) : Response(content, 403, content_type, "", charset)
 	{
 	}
 };
@@ -450,7 +552,7 @@ class Gone : public Response
 public:
 	inline explicit Gone(
 		const std::string& content, const std::string& content_type="", const std::string& charset=""
-	) : Response(410, content, content_type, "", charset)
+	) : Response(content, 410, content_type, "", charset)
 	{
 	}
 };
@@ -462,7 +564,7 @@ class EntityTooLarge : public Response
 public:
 	inline explicit EntityTooLarge(
 		const std::string& content, const std::string& content_type="", const std::string& charset=""
-	) : Response(413, content, content_type, "", charset)
+	) : Response(content, 413, content_type, "", charset)
 	{
 	}
 };
@@ -474,9 +576,9 @@ class ServerError : public Response
 public:
 	inline explicit ServerError(
 		const std::string& content, const std::string& content_type="", const std::string& charset=""
-	) : Response(500, content, content_type, "", charset)
+	) : Response(content, 500, content_type, "", charset)
 	{
 	}
 };
 
-__HTTP_RESP_END__
+__HTTP_END__

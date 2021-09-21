@@ -17,14 +17,14 @@ __MIDDLEWARE_BEGIN__
 
 Function ConditionalGet::operator() (const Function& next) const
 {
-	return [*this, next](http::Request* request) -> std::unique_ptr<http::abc::IHttpResponse>
+	return [*this, next](http::Request* request) -> std::unique_ptr<http::abc::HttpResponse>
 	{
 		auto response = next(request);
 
 		// It's too late to prevent an unsafe request with a 412 response, and
 		// for a HEAD request, the response body is always empty so computing
 		// an accurate ETag isn't possible.
-		if (request->method != "GET")
+		if (str::to_upper(request->method()) != "GET")
 		{
 			return response;
 		}
@@ -51,7 +51,7 @@ Function ConditionalGet::operator() (const Function& next) const
 	};
 }
 
-bool ConditionalGet::needs_etag(const std::unique_ptr<http::abc::IHttpResponse>& response) const
+bool ConditionalGet::needs_etag(const std::unique_ptr<http::abc::HttpResponse>& response) const
 {
 	auto cache_control = str::split(response->get_header(http::CACHE_CONTROL, ""), ',');
 	bool result = true;

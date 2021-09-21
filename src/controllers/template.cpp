@@ -24,7 +24,7 @@ TemplateResponseMixin::TemplateResponseMixin(abc::render::IEngine* engine)
 	this->engine = engine;
 }
 
-std::unique_ptr<http::abc::IHttpResponse> TemplateResponseMixin::render(
+std::unique_ptr<http::abc::HttpResponse> TemplateResponseMixin::render(
 	http::Request* request,
 	const std::shared_ptr<abc::render::IContext>& context,
 	const std::string& template_name,

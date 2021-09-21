@@ -14,7 +14,7 @@ __MIDDLEWARE_BEGIN__
 
 Function Security::operator() (const Function& next) const
 {
-	return [*this, next](http::Request* request) -> std::unique_ptr<http::abc::IHttpResponse>
+	return [*this, next](http::Request* request) -> std::unique_ptr<http::abc::HttpResponse>
 	{
 		auto response = this->preprocess(request);
 		if (response)
@@ -33,9 +33,9 @@ Function Security::operator() (const Function& next) const
 	};
 }
 
-std::unique_ptr<http::abc::IHttpResponse> Security::preprocess(http::Request* request) const
+std::unique_ptr<http::abc::HttpResponse> Security::preprocess(http::Request* request) const
 {
-	auto path = str::ltrim(request->url.path, "/");
+	auto path = str::ltrim(request->url().path, "/");
 	bool matched = false;
 	for (auto pattern : this->redirect_exempt)
 	{
@@ -46,11 +46,7 @@ std::unique_ptr<http::abc::IHttpResponse> Security::preprocess(http::Request* re
 		}
 	}
 
-	if (
-		this->secure.SSL_REDIRECT &&
-		!request->is_secure(this->secure.PROXY_SSL_HEADER) &&
-		!matched
-	)
+	if (this->secure.SSL_REDIRECT &&!request->is_secure(this->secure.PROXY_SSL_HEADER) && !matched)
 	{
 		std::string host;
 		if (this->secure.SSL_HOST.empty())
@@ -68,14 +64,14 @@ std::unique_ptr<http::abc::IHttpResponse> Security::preprocess(http::Request* re
 			host = this->secure.SSL_HOST;
 		}
 
-		return std::make_unique<http::resp::PermanentRedirect>("https://" + host + request->url.full_path());
+		return std::make_unique<http::PermanentRedirect>("https://" + host + request->url().full_path());
 	}
 
 	return nullptr;
 }
 
-std::unique_ptr<http::abc::IHttpResponse> Security::postprocess(
-	http::Request* request, http::abc::IHttpResponse* response
+std::unique_ptr<http::abc::HttpResponse> Security::postprocess(
+	http::Request* request, http::abc::HttpResponse* response
 ) const
 {
 	require_non_null(response, _ERROR_DETAILS_);

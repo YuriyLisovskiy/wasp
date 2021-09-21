@@ -14,7 +14,6 @@
 #include <tuple>
 
 // Base libraries.
-#include <xalwart.base/collections/dictionary.h>
 #include <xalwart.base/string_utils.h>
 
 // Module definitions.

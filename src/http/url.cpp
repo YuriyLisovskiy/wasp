@@ -20,7 +20,7 @@ std::string Query::encode() const
 	std::sort(keys.begin(), keys.end());
 	for (const auto& k : keys)
 	{
-		auto vs = this->getlist(k);
+		auto vs = this->get_sequence(k);
 		auto key_escaped = query_escape(k);
 		for (const auto& v : vs)
 		{
@@ -317,7 +317,7 @@ bool valid_optional_port(const std::string& port)
 
 	auto port_subs = port.substr(1);
 	return std::all_of(
-		port.begin() + 1, port.end(), [](const auto& c) -> bool { return c >= '0' && c <= '9'; }
+		port.begin() + 1, port.end(), [](unsigned char c) -> bool { return c >= '0' && c <= '9'; }
 	);
 }
 
@@ -339,7 +339,7 @@ std::pair<std::string, std::string> split_host_port(const std::string& host_port
 	return result;
 }
 
-bool should_escape(wchar_t c, EscapeMode mode)
+bool should_escape(unsigned char c, EscapeMode mode)
 {
 	// §2.3 Unreserved characters (alphanum)
 	if ('a' <= c && c <= 'z' || 'A' <= c && c <= 'Z' || '0' <= c && c <= '9')
@@ -457,9 +457,8 @@ bool should_escape(wchar_t c, EscapeMode mode)
 
 std::string escape(const std::string& string, EscapeMode mode)
 {
-	auto s = str::string_to_wstring(string);
 	unsigned int space_count = 0, hex_count = 0;
-	for (auto c : s)
+	for (unsigned char c : string)
 	{
 		if (should_escape(c, mode))
 		{
@@ -476,27 +475,28 @@ std::string escape(const std::string& string, EscapeMode mode)
 
 	if (space_count == 0 && hex_count == 0)
 	{
-		return str::wstring_to_string(s);
+		return string;
 	}
 
-	auto required = s.size() + 2 * hex_count;
-	auto* t = new wchar_t[required];
+	auto required = string.size() + 2 * hex_count;
+	auto* t = new char[required];
+	t[required] = '\0';
 	try
 	{
 		if (hex_count == 0)
 		{
-			for (size_t i = 0; i < s.size(); i++)
+			for (size_t i = 0; i < string.size(); i++)
 			{
-				t[i] = s[i] == ' ' ? '+' : s[i];
+				t[i] = string[i] == ' ' ? '+' : string[i];
 			}
 
-			auto result = str::wstring_to_string(std::wstring(t));
+			auto result = std::string(t);
 			delete[] t;
 			return result;
 		}
 
 		size_t j = 0;
-		for (auto c : s)
+		for (unsigned char c : string)
 		{
 			if (c == ' ' && mode == EscapeMode::EncodeQueryComponent)
 			{
@@ -512,12 +512,12 @@ std::string escape(const std::string& string, EscapeMode mode)
 			}
 			else
 			{
-				t[j] = c;
+				t[j] = (unsigned char)c;
 				j++;
 			}
 		}
 
-		auto result = str::wstring_to_string(std::wstring(t));
+		auto result = std::string(t);
 		delete[] t;
 		return result;
 	}
@@ -528,10 +528,8 @@ std::string escape(const std::string& string, EscapeMode mode)
 	}
 }
 
-std::string unescape(const std::string& string, EscapeMode mode)
+std::string unescape(std::string s, EscapeMode mode)
 {
-	auto s = str::string_to_wstring(string);
-
 	// Count %, check that they're well-formed.
 	size_t n = 0;
 	bool has_plus = false;
@@ -549,7 +547,7 @@ std::string unescape(const std::string& string, EscapeMode mode)
 						s = s.substr(0, 3);
 					}
 
-					throw EscapeError(str::wstring_to_string(s), _ERROR_DETAILS_);
+					throw EscapeError(s, _ERROR_DETAILS_);
 				}
 
 				// Per https://tools.ietf.org/html/rfc3986#page-21
@@ -558,9 +556,9 @@ std::string unescape(const std::string& string, EscapeMode mode)
 				// But https://tools.ietf.org/html/rfc6874#section-2
 				// introduces %25 being allowed to escape a percent sign
 				// in IPv6 scoped-address literals. Yay.
-				if (mode == EscapeMode::EncodeHost && encoding::unhex(s[i + 1]) < 8 && s.substr(i, 3) != L"%25")
+				if (mode == EscapeMode::EncodeHost && encoding::unhex(s[i + 1]) < 8 && s.substr(i, 3) != "%25")
 				{
-					throw EscapeError(str::wstring_to_string(s.substr(i, 3)), _ERROR_DETAILS_);
+					throw EscapeError(s.substr(i, 3), _ERROR_DETAILS_);
 				}
 
 				if (mode == EscapeMode::EncodeZone)
@@ -573,9 +571,9 @@ std::string unescape(const std::string& string, EscapeMode mode)
 					// to introduce bytes you couldn't just write directly.
 					// But Windows puts spaces here! Yay.
 					auto v = (encoding::unhex(s[i + 1]) << 4) | encoding::unhex(s[i + 2]);
-					if (s.substr(i, 3) != L"%25" && v != ' ' && should_escape(v, EscapeMode::EncodeHost))
+					if (s.substr(i, 3) != "%25" && v != ' ' && should_escape(v, EscapeMode::EncodeHost))
 					{
-						throw EscapeError(str::wstring_to_string(s.substr(i, 3)), _ERROR_DETAILS_);
+						throw EscapeError(s.substr(i, 3), _ERROR_DETAILS_);
 					}
 				}
 
@@ -588,10 +586,10 @@ std::string unescape(const std::string& string, EscapeMode mode)
 			default:
 				if (
 					(mode == EscapeMode::EncodeHost || mode == EscapeMode::EncodeZone) &&
-					s[i] < 0x80 && should_escape(s[i], mode)
+					(unsigned char)s[i] < 0x80 && should_escape(s[i], mode)
 				)
 				{
-					throw EscapeError("invalid host: " + str::wstring_to_string(s.substr(i, 1)), _ERROR_DETAILS_);
+					throw EscapeError("invalid host: " + s.substr(i, 1), _ERROR_DETAILS_);
 				}
 
 				i++;
@@ -601,17 +599,17 @@ std::string unescape(const std::string& string, EscapeMode mode)
 
 	if (n == 0 && !has_plus)
 	{
-		return str::wstring_to_string(s);
+		return s;
 	}
 
-	std::wstring t;
+	std::string t;
 	t.reserve(s.size() - 2 * n);
 	for (size_t i = 0; i < s.size(); i++)
 	{
 		switch (s[i])
 		{
 			case '%':
-				t += (wchar_t)(encoding::unhex(s[i + 1]) << 4 | encoding::unhex(s[i + 2]));
+				t += (char)(encoding::unhex(s[i + 1]) << 4 | encoding::unhex(s[i + 2]));
 				i += 2;
 				break;
 			case '+':
@@ -630,7 +628,7 @@ std::string unescape(const std::string& string, EscapeMode mode)
 		}
 	}
 
-	return str::wstring_to_string(t);
+	return t;
 }
 
 bool valid_encoded(const std::string& s, EscapeMode mode)
@@ -785,7 +783,7 @@ std::string parse_host(std::string host)
 
 bool valid_user_info(const std::string& s)
 {
-	return std::all_of(s.begin(), s.end(), [](const char& r) -> bool {
+	return std::all_of(s.begin(), s.end(), [](unsigned char r) -> bool {
 		if ('A' <= r && r <= 'Z')
 		{
 			return true;

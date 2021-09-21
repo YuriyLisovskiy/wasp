@@ -32,7 +32,7 @@ public:
 	// Returns a response with a template rendered with
 	// the given context.
 	[[nodiscard]]
-	virtual std::unique_ptr<http::abc::IHttpResponse> render(
+	virtual std::unique_ptr<http::abc::HttpResponse> render(
 		http::Request* request,
 		const std::shared_ptr<abc::render::IContext>& context,
 		const std::string& template_name="",
@@ -74,7 +74,7 @@ public:
 	}
 
 	[[nodiscard]]
-	inline std::unique_ptr<http::abc::IHttpResponse> get(http::Request* request, UrlArgsT ...args) const override
+	inline std::unique_ptr<http::abc::HttpResponse> get(http::Request* request, UrlArgsT ...args) const override
 	{
 		return this->render(request, this->get_context(request, args...), "", 200, "", "utf-8");
 	}

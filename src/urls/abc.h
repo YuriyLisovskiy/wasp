@@ -40,7 +40,7 @@ public:
 
 	virtual void add_namespace(const std::string& ns) = 0;
 
-	virtual std::unique_ptr<http::abc::IHttpResponse> apply(http::Request* request, conf::Settings* settings) = 0;
+	virtual std::unique_ptr<http::abc::HttpResponse> apply(http::Request* request, conf::Settings* settings) = 0;
 
 	virtual bool match(const std::string& url) = 0;
 

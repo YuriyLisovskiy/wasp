@@ -22,13 +22,14 @@ To build the library from source CMake 3.12 or later is required.
 The following libraries are required:
 - [xalwart.base](https://github.com/YuriyLisovskiy/xalwart.base) 0.x.x or later
 - [xalwart.orm](https://github.com/YuriyLisovskiy/xalwart.orm) 0.x.x or later
-- [xalwart.render](https://github.com/YuriyLisovskiy/xalwart.render) 0.x.x or later
 
 The following library is optional (you can use alternatives):
+- [xalwart.render](https://github.com/YuriyLisovskiy/xalwart.render) 0.x.x or later
 - [xalwart.server](https://github.com/YuriyLisovskiy/xalwart.server) 0.x.x or later
 
 ### Third party
-- [yaml parser](https://github.com/jbeder/yaml-cpp) (already included v0.6.3 in [xalwart.base](https://github.com/YuriyLisovskiy/xalwart.base))
+- [yaml parser](https://github.com/jbeder/yaml-cpp) 0.6.3 (part of [xalwart.base](https://github.com/YuriyLisovskiy/xalwart.base))
+- [json parser](https://github.com/nlohmann/json) 3.10.2 (part of [xalwart.base](https://github.com/YuriyLisovskiy/xalwart.base))
 
 ## Compile from Source
 * `BUILD_SHARED_LIBS` means to build a shared or static library (`ON` by default).

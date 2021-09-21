@@ -109,36 +109,43 @@ public:
 		return this->_value;
 	}
 
+	[[nodiscard]]
 	inline long max_age() const
 	{
 		return this->_max_age;
 	}
 
+	[[nodiscard]]
 	dt::Datetime expires() const
 	{
 		return this->_expires;
 	}
 
+	[[nodiscard]]
 	std::string domain() const
 	{
 		return this->_domain;
 	}
 
+	[[nodiscard]]
 	std::string path() const
 	{
 		return this->_path;
 	}
 
+	[[nodiscard]]
 	bool is_secure() const
 	{
 		return this->_is_secure;
 	}
 
+	[[nodiscard]]
 	bool is_http_only() const
 	{
 		return this->_is_http_only;
 	}
 
+	[[nodiscard]]
 	std::string same_site() const
 	{
 		return this->_same_site;

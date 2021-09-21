@@ -46,7 +46,7 @@ bool was_modified_since(const std::string& header, size_t time, size_t size)
 	return result;
 }
 
-std::unique_ptr<http::abc::IHttpResponse> StaticController::get(
+std::unique_ptr<http::abc::HttpResponse> StaticController::get(
 	http::Request* request, const std::string& resource_path
 ) const
 {
@@ -56,8 +56,8 @@ std::unique_ptr<http::abc::IHttpResponse> StaticController::get(
 		auto [status, _] = net::get_status_by_code(404);
 		std::string response_content = request->is_json() ?
 			this->settings->render_json_error_template(status, "") :
-			this->settings->render_json_error_template(status, "");
-		return std::make_unique<http::resp::NotFound>(response_content);
+			this->settings->render_html_error_template(status, "");
+		return std::make_unique<http::NotFound>(response_content);
 	}
 
 	auto stat_info = file_stat(full_path);
@@ -65,7 +65,7 @@ std::unique_ptr<http::abc::IHttpResponse> StaticController::get(
 		request->get_header(http::IF_MODIFIED_SINCE, ""), stat_info.st_mtime, stat_info.st_size
 	))
 	{
-		return std::make_unique<http::resp::NotModified>("");
+		return std::make_unique<http::NotModified>("");
 	}
 
 	std::string content_type, encoding;

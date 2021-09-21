@@ -76,7 +76,7 @@ protected:
 			http::Request* request,
 			const std::tuple<RequestArgs...>& request_args,
 			const conf::Settings* settings_pointer
-		) -> std::unique_ptr<http::abc::IHttpResponse>
+		) -> std::unique_ptr<http::abc::HttpResponse>
 		{
 			ControllerType controller(settings_pointer, controller_args...);
 			return std::apply(

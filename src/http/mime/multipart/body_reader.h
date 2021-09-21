@@ -62,7 +62,7 @@ struct BodyReader final
 		this->dash_boundary = b.substr(2, b.size() - 4);
 	}
 
-	std::unique_ptr<Form> read_form(long long int max_memory);
+	Form read_form(long long int max_memory);
 
 	// Returns the next part in the multipart or `nullptr` on error.
 	// When there are no more parts, `nullptr` is returned.

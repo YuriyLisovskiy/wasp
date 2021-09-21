@@ -22,11 +22,11 @@
 
 __HTTP_ABC_BEGIN__
 
-// TODO: docs for 'IHttpResponse'
-class IHttpResponse
+// TODO: docs for 'HttpResponse'
+class HttpResponse
 {
 public:
-	virtual ~IHttpResponse() = default;
+	virtual ~HttpResponse() = default;
 
 	[[nodiscard]]
 	virtual std::string get_header(const std::string& key, const std::string& default_value) const = 0;
@@ -76,24 +76,14 @@ public:
 	[[nodiscard]]
 	virtual bool is_streaming() const = 0;
 
-	// These methods partially implement the file-like object interface.
 	virtual void close() = 0;
 
 	virtual void write(const std::string& content) = 0;
 
-	virtual void flush() = 0;
+	[[nodiscard]]
+	virtual bool writable() const = 0;
 
-	virtual unsigned long int tell() = 0;
-
-	// These methods partially implement a stream-like object interface.
-	virtual bool readable() = 0;
-
-	virtual bool seekable() = 0;
-
-	virtual bool writable() = 0;
-
-	virtual void write_lines(const std::vector<std::string>& lines) = 0;
-
+	[[nodiscard]]
 	virtual std::string serialize() = 0;
 };
 

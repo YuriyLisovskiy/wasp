@@ -17,157 +17,31 @@
 
 __HTTP_BEGIN__
 
-std::unique_ptr<mime::multipart::BodyReader> Request::multipart_reader(bool allow_mixed) const
-{
-	auto content_type = this->get_header(CONTENT_TYPE, "");
-	if (content_type.empty())
-	{
-		throw exc::NotMultipart("request content is not 'multipart/form-data'", _ERROR_DETAILS_);
-	}
-
-	auto [media_type, parameters, ok] = mime::parse_media_type(str::string_to_wstring(content_type));
-	if (!ok || !(media_type == L"multipart/form-data" || allow_mixed && media_type == L"multipart/mixed"))
-	{
-		throw exc::NotMultipart("request content is not 'multipart/form-data'", _ERROR_DETAILS_);
-	}
-
-	if (!parameters.contains(L"boundary"))
-	{
-		throw exc::HttpError(400, "missing start boundary", _ERROR_DETAILS_);
-	}
-
-	auto boundary = str::wstring_to_string(parameters.at(L"boundary"));
-	return std::make_unique<mime::multipart::BodyReader>(
-		this->body, boundary, std::stoll(this->get_header(CONTENT_LENGTH, "0")),
-		this->max_file_upload_size, this->max_fields_count, this->max_header_length, this->max_headers_count
-	);
-}
-
-std::string Request::get_raw_host(
-	bool use_x_forwarded_host, bool use_x_forwarded_port,
-	const std::optional<conf::Secure::Header>& secure_proxy_ssl_header
-) const
-{
-	std::string raw_host;
-	if (use_x_forwarded_host && this->header.contains(http::X_FORWARDED_HOST))
-	{
-		raw_host = this->header.at(http::X_FORWARDED_HOST);
-	}
-	else
-	{
-		if (!this->environment.contains(net::meta::SERVER_NAME))
-		{
-			throw KeyError("'environment' does not contain " + std::string(net::meta::SERVER_NAME));
-		}
-
-		raw_host = this->environment.at(net::meta::SERVER_NAME);
-		auto port = this->get_port(use_x_forwarded_port);
-		if (port != (this->is_secure(secure_proxy_ssl_header) ? "443" : "80"))
-		{
-			raw_host = raw_host + ":" + port;
-		}
-	}
-
-	return raw_host;
-}
-
-std::string Request::get_port(bool use_x_forwarded_port) const
-{
-	std::string port;
-	if (use_x_forwarded_port && this->header.contains(http::X_FORWARDED_PORT))
-	{
-		port = this->header.at(http::X_FORWARDED_PORT);
-	}
-	else
-	{
-		if (!this->environment.contains(net::meta::SERVER_PORT))
-		{
-			throw KeyError("'environment' does not contain " + std::string(net::meta::SERVER_PORT));
-		}
-
-		port = this->environment.at(net::meta::SERVER_PORT);
-	}
-
-	return port;
-}
-
 Request::Request(
 	const net::RequestContext& context,
 	ssize_t max_file_upload_size, ssize_t max_fields_count,
 	ssize_t max_header_length, ssize_t max_headers_count,
+	long long int multipart_max_memory,
 	std::map<std::string, std::string> environment
-) : method(context.method), url(std::move(parse_url(context.path + (context.query.empty() ? "" : "?" + context.query)))),
-	proto("HTTP/" + std::to_string(context.protocol_version.major) + "." + std::to_string(context.protocol_version.minor)),
-	proto_major((int)context.protocol_version.major), proto_minor((int)context.protocol_version.minor),
-	header(context.headers), body(context.body), content_length((ssize_t)context.content_size),
+) : _method(context.method),
+	_headers(context.headers), _body_reader(context.body), _content_length((ssize_t)context.content_size),
 	max_file_upload_size(max_file_upload_size), max_fields_count(max_fields_count),
 	max_headers_count(max_headers_count), max_header_length(max_header_length),
-	environment(std::move(environment))
+	multipart_max_memory(multipart_max_memory), _environment(std::move(environment))
 {
-	if (!valid_method(this->method))
+	if (!valid_method(this->_method))
 	{
-		throw ArgumentError("invalid method: '" + this->method + "'", _ERROR_DETAILS_);
+		throw ArgumentError("invalid method: '" + this->_method + "'", _ERROR_DETAILS_);
 	}
 
-	this->url.host = remove_empty_port(this->url.host);
-	this->host = this->url.host;
-}
-
-void Request::parse_form()
-{
-	std::unique_ptr<Query> post_form = nullptr;
-	if (this->method == "POST" || this->method == "PUT" || this->method == "PATCH")
-	{
-		auto parsed_query = parse_post_form(this);
-		post_form = std::make_unique<Query>(parsed_query);
-	}
-	else
-	{
-		post_form = std::make_unique<Query>();
-	}
-
-	if (!this->_form)
-	{
-		if (!post_form->empty())
-		{
-			this->_form = std::make_unique<Query>(*post_form);
-		}
-
-		auto new_query = std::make_unique<Query>(parse_query(this->url.raw_query));
-		if (!this->_form)
-		{
-			this->_form = std::move(new_query);
-		}
-		else
-		{
-			for (auto it = new_query->begin(); it != new_query->end(); it++)
-			{
-				this->_form->add(it->first, it->second);
-			}
-		}
-	}
-}
-
-void Request::parse_multipart_form(long long int max_memory)
-{
-	if (!this->_form)
-	{
-		this->parse_form();
-	}
-
-	if (this->multipart_form)
-	{
-		return;
-	}
-
-	auto reader = this->multipart_reader(false);
-	auto target_form = reader->read_form(max_memory);
-	for (const auto& pair : target_form->values)
-	{
-		this->_form->add(pair.first, pair.second);
-	}
-
-	this->multipart_form = std::move(target_form);
+	this->_proto = {
+		.name = "HTTP",
+		.major = context.protocol_version.major,
+		.minor = context.protocol_version.minor
+	};
+	this->_url = std::move(parse_url(context.path + (context.query.empty() ? "" : "?" + context.query)));
+	this->_url.host = remove_empty_port(this->_url.host);
+	this->_host = this->_url.host;
 }
 
 std::string Request::scheme(const std::optional<conf::Secure::Header>& secure_proxy_ssl_header) const
@@ -189,7 +63,7 @@ std::string Request::get_host(
 	bool use_x_forwarded_host, bool use_x_forwarded_port, bool debug, std::vector<std::string> allowed_hosts
 )
 {
-	auto raw_host = this->get_raw_host(use_x_forwarded_host, use_x_forwarded_port, secure_proxy_ssl_header);
+	auto raw_host = this->_get_raw_host(use_x_forwarded_host, use_x_forwarded_port, secure_proxy_ssl_header);
 	if (debug && allowed_hosts.empty())
 	{
 		allowed_hosts = {".localhost", "127.0.0.1", "::1"};
@@ -213,6 +87,147 @@ std::string Request::get_host(
 	}
 
 	throw exc::DisallowedHost(msg, _ERROR_DETAILS_);
+}
+
+std::unique_ptr<mime::multipart::BodyReader> Request::_multipart_reader(bool allow_mixed) const
+{
+	auto content_type = this->get_header(CONTENT_TYPE, "");
+	if (content_type.empty())
+	{
+		throw exc::NotMultipart(
+			"request content is not '" + std::string(mime::MULTIPART_FORM_DATA) + "'", _ERROR_DETAILS_
+		);
+	}
+
+	auto [media_type, parameters, ok] = mime::parse_media_type(str::string_to_wstring(content_type));
+	if (!ok || !(media_type == mime::MULTIPART_FORM_DATA_L || allow_mixed && media_type == L"multipart/mixed"))
+	{
+		throw exc::NotMultipart(
+			"request content is not '" + std::string(mime::MULTIPART_FORM_DATA) + "'", _ERROR_DETAILS_
+		);
+	}
+
+	if (!parameters.contains(L"boundary"))
+	{
+		throw exc::HttpError(400, "missing start boundary", _ERROR_DETAILS_);
+	}
+
+	auto boundary = str::wstring_to_string(parameters.at(L"boundary"));
+	return std::make_unique<mime::multipart::BodyReader>(
+		this->_body_reader, boundary, std::stoll(this->get_header(CONTENT_LENGTH, "0")),
+		this->max_file_upload_size, this->max_fields_count, this->max_header_length, this->max_headers_count
+	);
+}
+
+std::string Request::_get_raw_host(
+	bool use_x_forwarded_host, bool use_x_forwarded_port,
+	const std::optional<conf::Secure::Header>& secure_proxy_ssl_header
+) const
+{
+	std::string raw_host;
+	if (use_x_forwarded_host && this->_headers.contains(http::X_FORWARDED_HOST))
+	{
+		raw_host = this->_headers.at(http::X_FORWARDED_HOST);
+	}
+	else
+	{
+		if (!this->_environment.contains(net::meta::SERVER_NAME))
+		{
+			throw KeyError("'environment' does not contain " + std::string(net::meta::SERVER_NAME));
+		}
+
+		raw_host = this->_environment.at(net::meta::SERVER_NAME);
+		auto port = this->_get_port(use_x_forwarded_port);
+		if (port != (this->is_secure(secure_proxy_ssl_header) ? "443" : "80"))
+		{
+			raw_host = raw_host + ":" + port;
+		}
+	}
+
+	return raw_host;
+}
+
+std::string Request::_get_port(bool use_x_forwarded_port) const
+{
+	std::string port;
+	if (use_x_forwarded_port && this->_headers.contains(http::X_FORWARDED_PORT))
+	{
+		port = this->_headers.at(http::X_FORWARDED_PORT);
+	}
+	else
+	{
+		if (!this->_environment.contains(net::meta::SERVER_PORT))
+		{
+			throw KeyError("'environment' does not contain " + std::string(net::meta::SERVER_PORT));
+		}
+
+		port = this->_environment.at(net::meta::SERVER_PORT);
+	}
+
+	return port;
+}
+
+void Request::_parse_form()
+{
+	if (!this->_form.has_value())
+	{
+		Query post_form;
+		if (this->_method == "POST" || this->_method == "PUT" || this->_method == "PATCH")
+		{
+			post_form = parse_post_form(this, this->_body_reader.get());
+		}
+
+		if (!post_form.empty())
+		{
+			this->_form = std::move(post_form);
+		}
+
+		auto new_query = parse_query(this->_url.raw_query);
+		if (!this->_form.has_value())
+		{
+			this->_form = std::move(new_query);
+		}
+		else
+		{
+			for (const auto& item : new_query)
+			{
+				this->_form->add(item.first, item.second);
+			}
+		}
+	}
+}
+
+void Request::_parse_multipart_form()
+{
+	if (!this->_form.has_value())
+	{
+		this->_parse_form();
+	}
+
+	if (this->_multipart_form.has_value())
+	{
+		return;
+	}
+
+	auto reader = this->_multipart_reader(false);
+	auto target_form = reader->read_form(this->multipart_max_memory);
+	for (const auto& pair : target_form.values)
+	{
+		this->_form->add(pair.first, pair.second);
+	}
+
+	this->_multipart_form = std::move(target_form);
+}
+
+void Request::_parse_json_data()
+{
+	auto [content, ok] = read_body_to_string(this, this->_body_reader.get(), mime::APPLICATION_JSON_L);
+	if (!ok)
+	{
+		throw RuntimeError("content is not " + std::string(mime::APPLICATION_JSON), _ERROR_DETAILS_);
+	}
+
+	this->_json = nlohmann::json::parse(content);
 }
 
 bool has_port(const std::string& host)
@@ -273,30 +288,28 @@ void read_full_request_body(std::string& buffer, io::IReader* reader, ssize_t co
 	}
 }
 
-Query parse_post_form(Request* request)
+std::tuple<std::string, bool> read_body_to_string(
+	http::Request* request, io::ILimitedBufferedReader* body_reader, const std::wstring& target_content_type
+)
 {
-	if (!request)
-	{
-		throw NullPointerException("'request' is nullptr", _ERROR_DETAILS_);
-	}
-
-	if (!request->body)
+	require_non_null(request, "'request' is nullptr", _ERROR_DETAILS_);
+	if (!body_reader)
 	{
 		throw exc::HttpError(400, "missing form body", _ERROR_DETAILS_);
 	}
 
-	auto content_type = request->header.contains(CONTENT_TYPE) ? request->header.at(CONTENT_TYPE) : "";
+	auto content_type = request->get_header(CONTENT_TYPE, "");
 
 	// RFC 7231, section 3.1.1.5 - empty type
 	// MAY be treated as application/octet-stream
 	if (content_type.empty())
 	{
-		content_type = "application/octet-stream";
+		content_type = mime::APPLICATION_OCTET_STREAM;
 	}
 
 	Query query;
-	auto [ct, _, ok] = mime::parse_media_type(str::string_to_wstring(content_type));
-	if (ct == L"application/x-www-form-urlencoded")
+	auto [parsed_content_type, _, ok] = mime::parse_media_type(str::string_to_wstring(content_type));
+	if (parsed_content_type == target_content_type)
 	{
 		auto content_length_string = request->get_header(CONTENT_LENGTH, "");
 		if (!content_length_string.empty())
@@ -311,13 +324,21 @@ Query parse_post_form(Request* request)
 			}
 
 			std::string buffer;
-			read_full_request_body(buffer, request->body.get(), content_length);
-			query = parse_query(buffer);
+			read_full_request_body(buffer, body_reader, content_length);
+			return {buffer, true};
 		}
 	}
-	else if (ct == L"multipart/form-data")
+
+	return {"", false};
+}
+
+Query parse_post_form(http::Request* request, io::ILimitedBufferedReader* body_reader)
+{
+	Query query;
+	auto [content, ok] = read_body_to_string(request, body_reader, mime::APPLICATION_X_WWW_FORM_URLENCODED_L);
+	if (ok)
 	{
-		// handled by 'parse_multipart_form' (which is calling us, or should be).
+		query = parse_query(content);
 	}
 
 	return query;

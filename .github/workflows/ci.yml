@@ -40,15 +40,6 @@ jobs:
           name: xalwart.orm-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
           path: xalwart.orm-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
           repo: YuriyLisovskiy/xalwart.orm
-      - name: Download Render Library
-        uses: dawidd6/action-download-artifact@v2
-        with:
-          github_token: ${{ secrets.GH_ACCESS_TOKEN }}
-          workflow: ci.yml
-          branch: dev
-          name: xalwart.render-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
-          path: xalwart.render-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
-          repo: YuriyLisovskiy/xalwart.render
       - name: Build the Library
         run: |
           sudo docker run -i \
@@ -97,15 +88,6 @@ jobs:
           name: xalwart.orm-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
           path: xalwart.orm-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
           repo: YuriyLisovskiy/xalwart.orm
-      - name: Download Render Library
-        uses: dawidd6/action-download-artifact@v2
-        with:
-          github_token: ${{ secrets.GH_ACCESS_TOKEN }}
-          workflow: ci.yml
-          branch: dev
-          name: xalwart.render-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
-          path: xalwart.render-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
-          repo: YuriyLisovskiy/xalwart.render
       - name: Download the Artifact
         uses: actions/download-artifact@v2
         with:

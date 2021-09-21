@@ -20,7 +20,7 @@
 
 __HTTP_BEGIN__
 
-ResponseBase::ResponseBase(
+AbstractResponse::AbstractResponse(
 	unsigned short int status, std::string content_type, std::string reason, std::string charset
 ) : streaming(false), headers({}), closed(false), reason_phrase(std::move(reason)), charset(std::move(charset))
 {
@@ -46,7 +46,7 @@ ResponseBase::ResponseBase(
 	this->set_header(CONTENT_TYPE, content_type);
 }
 
-void ResponseBase::set_cookie(const Cookie& cookie)
+void AbstractResponse::set_cookie(const Cookie& cookie)
 {
 	if (!cookie.same_site().empty())
 	{
@@ -67,7 +67,7 @@ void ResponseBase::set_cookie(const Cookie& cookie)
 	}
 }
 
-void ResponseBase::set_signed_cookie(const std::string& secret_key, const std::string& salt, const Cookie& cookie)
+void AbstractResponse::set_signed_cookie(const std::string& secret_key, const std::string& salt, const Cookie& cookie)
 {
 	auto signed_value = get_cookie_signer(secret_key, cookie.name() + salt).sign(cookie.value());
 	this->set_cookie(Cookie(
@@ -76,7 +76,7 @@ void ResponseBase::set_signed_cookie(const std::string& secret_key, const std::s
 	));
 }
 
-void ResponseBase::delete_cookie(const std::string& name, const std::string& path, const std::string& domain)
+void AbstractResponse::delete_cookie(const std::string& name, const std::string& path, const std::string& domain)
 {
 	bool is_secure = name.starts_with("__Secure-") || name.starts_with("__Host-");
 	auto cookie = Cookie(name, "", 0, domain, path, is_secure);
@@ -90,7 +90,7 @@ void ResponseBase::delete_cookie(const std::string& name, const std::string& pat
 	}
 }
 
-std::string ResponseBase::get_reason_phrase() const
+std::string AbstractResponse::get_reason_phrase() const
 {
 	if (!this->reason_phrase.empty())
 	{
@@ -100,7 +100,7 @@ std::string ResponseBase::get_reason_phrase() const
 	return net::get_status_by_code(this->status).first.phrase;
 }
 
-std::string ResponseBase::serialize_headers()
+std::string AbstractResponse::serialize_headers() const
 {
 	auto expr = [](const std::pair<std::string, std::string>& _p) -> std::string
 	{
@@ -129,14 +129,15 @@ std::string ResponseBase::serialize_headers()
 	return result;
 }
 
-std::string Response::serialize()
+std::string BaseResponse::serialize()
 {
-	this->set_header("Date", dt::Datetime::utc_now().strftime("%a, %d %b %Y %T GMT"));
-	this->set_header("Content-Length", std::to_string(this->content.size()));
+	auto content = this->get_content();
+	this->set_header(DATE, dt::Datetime::utc_now().strftime("%a, %d %b %Y %T GMT"));
+	this->set_header(CONTENT_LENGTH, std::to_string(content.size()));
 	auto reason_phrase = this->get_reason_phrase();
 	auto headers = this->serialize_headers();
 	return "HTTP/1.1 " + std::to_string(this->status) + " " + reason_phrase + "\r\n" +
-	   headers + "\r\n\r\n" + this->content;
+	   headers + "\r\n\r\n" + content;
 }
 
 FileResponse::FileResponse(
@@ -201,7 +202,7 @@ std::string FileResponse::get_chunk()
 
 void FileResponse::_set_headers()
 {
-	auto encoding_map = collections::Dictionary<std::string, std::string>({
+	auto encoding_map = std::map<std::string, std::string>({
 		{"bzip2", "application/x-bzip"},
 		{"gzip", "application/gzip"},
 		{"xz", "application/x-xz"}
@@ -211,7 +212,11 @@ void FileResponse::_set_headers()
 	{
 		std::string content_type, encoding;
 		mime::guess_content_type(this->_file_path, content_type, encoding);
-		content_type = encoding_map.get(encoding, content_type);
+		if (encoding_map.contains(encoding))
+		{
+			content_type = encoding_map.at(encoding);
+		}
+
 		this->set_header(CONTENT_TYPE, !content_type.empty() ? content_type : "application/octet-stream");
 	}
 
@@ -242,18 +247,13 @@ std::string FileResponse::_get_headers_chunk()
 	return headers_chunk;
 }
 
-__HTTP_END__
-
-
-__HTTP_RESP_BEGIN__
-
 RedirectBase::RedirectBase(
 	const std::string& redirect_to,
 	unsigned short int status,
 	const std::string& content_type,
 	const std::string& reason,
 	const std::string& charset
-) : Response(status, "", content_type, reason, charset)
+) : Response("", status, content_type, reason, charset)
 {
 	if (status < 300 || status > 399)
 	{
@@ -283,7 +283,7 @@ NotAllowed::NotAllowed(
 	const std::vector<std::string>& permitted_methods,
 	const std::string& content_type,
 	const std::string& charset
-) : Response(405, content, content_type, "", charset)
+) : Response(content, 405, content_type, "", charset)
 {
 	std::string methods;
 	for (size_t i = 0; i < permitted_methods.size(); i++)
@@ -298,4 +298,4 @@ NotAllowed::NotAllowed(
 	this->set_header(ALLOW, methods);
 }
 
-__HTTP_RESP_END__
+__HTTP_END__

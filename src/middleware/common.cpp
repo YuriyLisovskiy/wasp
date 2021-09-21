@@ -20,7 +20,7 @@ __MIDDLEWARE_BEGIN__
 
 Function Common::operator() (const Function& next) const
 {
-	return [*this, next](http::Request* request) -> std::unique_ptr<http::abc::IHttpResponse>
+	return [*this, next](http::Request* request) -> std::unique_ptr<http::abc::HttpResponse>
 	{
 		auto response = this->preprocess(request);
 		if (response)
@@ -41,11 +41,11 @@ Function Common::operator() (const Function& next) const
 
 bool Common::should_redirect_with_slash(http::Request* request) const
 {
-	if (this->settings->APPEND_SLASH && !request->url.path.ends_with("/"))
+	const auto& request_url = request->url();
+	if (this->settings->APPEND_SLASH && !request_url.path.ends_with("/"))
 	{
-		auto path = request->url.path;
-		return !urls::is_valid_path(path, this->settings->URLPATTERNS) &&
-			urls::is_valid_path(path + "/", this->settings->URLPATTERNS);
+		return !urls::is_valid_path(request_url.path, this->settings->URLPATTERNS) &&
+			urls::is_valid_path(request_url.path + "/", this->settings->URLPATTERNS);
 	}
 
 	return false;
@@ -53,15 +53,13 @@ bool Common::should_redirect_with_slash(http::Request* request) const
 
 std::string Common::get_full_path_with_slash(http::Request* request) const
 {
-	auto new_path = request->url.full_path(true);
+	auto new_path = request->url().full_path(true);
 
 	// Prevent construction of scheme relative urls.
 	http::escape_leading_slashes(new_path);
-	if (this->settings->DEBUG && util::contains<std::string>(
-		request->method, {"POST", "PUT", "PATCH"}
-	))
+	auto method = request->method();
+	if (this->settings->DEBUG && util::contains<std::string>(method, {"POST", "PUT", "PATCH"}))
 	{
-		auto method = request->method;
 		auto host = request->get_host(
 			this->settings->SECURE.PROXY_SSL_HEADER,
 			this->settings->USE_X_FORWARDED_HOST,
@@ -81,12 +79,12 @@ std::string Common::get_full_path_with_slash(http::Request* request) const
 	return new_path;
 }
 
-std::unique_ptr<http::abc::IHttpResponse> Common::preprocess(http::Request* request) const
+std::unique_ptr<http::abc::HttpResponse> Common::preprocess(http::Request* request) const
 {
 	require_non_null(request, _ERROR_DETAILS_);
-	if (request->header.contains(http::USER_AGENT))
+	if (request->has_header(http::USER_AGENT))
 	{
-		auto user_agent = request->header.at(http::USER_AGENT);
+		auto user_agent = request->get_header(http::USER_AGENT);
 		for (const auto& rgx : this->settings->DISALLOWED_USER_AGENTS)
 		{
 			auto to_search = rgx;
@@ -95,7 +93,7 @@ std::unique_ptr<http::abc::IHttpResponse> Common::preprocess(http::Request* requ
 				require_non_null(this->settings->LOGGER.get(), _ERROR_DETAILS_)->trace(
 					"Found user agent which is not allowed: '" + user_agent + "'", _ERROR_DETAILS_
 				);
-				return std::make_unique<http::resp::Forbidden>("Forbidden user agent");
+				return std::make_unique<http::Forbidden>("Forbidden user agent");
 			}
 		}
 	}
@@ -109,9 +107,8 @@ std::unique_ptr<http::abc::IHttpResponse> Common::preprocess(http::Request* requ
 		this->settings->ALLOWED_HOSTS
 	);
 	bool must_prepend = this->settings->PREPEND_WWW && !host.empty() && !host.starts_with("www.");
-	auto redirect_url = must_prepend ? (
-		request->scheme(this->settings->SECURE.PROXY_SSL_HEADER) + "://www." + host
-	) : "";
+	std::string scheme = request->scheme(this->settings->SECURE.PROXY_SSL_HEADER);
+	auto redirect_url = must_prepend ? (scheme + "://www." + host) : "";
 
 	// Check if a slash should be appended.
 	std::string path;
@@ -121,11 +118,11 @@ std::unique_ptr<http::abc::IHttpResponse> Common::preprocess(http::Request* requ
 	}
 	else
 	{
-		path = request->url.full_path();
+		path = request->url().full_path();
 	}
 
 	// Return a redirect if necessary.
-	if (!redirect_url.empty() || path != request->url.full_path())
+	if (!redirect_url.empty() || path != request->url().full_path())
 	{
 		redirect_url += path;
 		return this->get_response_redirect(redirect_url);
@@ -134,8 +131,8 @@ std::unique_ptr<http::abc::IHttpResponse> Common::preprocess(http::Request* requ
 	return nullptr;
 }
 
-std::unique_ptr<http::abc::IHttpResponse> Common::postprocess(
-	http::Request* request, http::abc::IHttpResponse* response
+std::unique_ptr<http::abc::HttpResponse> Common::postprocess(
+	http::Request* request, http::abc::HttpResponse* response
 ) const
 {
 	require_non_null(response, _ERROR_DETAILS_);

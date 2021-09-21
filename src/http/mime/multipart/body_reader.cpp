@@ -32,9 +32,9 @@ inline std::string skip_lwsp_char(std::string s)
 	return s;
 }
 
-std::unique_ptr<Form> BodyReader::read_form(long long int max_memory)
+Form BodyReader::read_form(long long int max_memory)
 {
-	auto form = std::make_unique<Form>();
+	Form form;
 
 	// Reserve an additional 10 MB for non-file parts.
 	auto max_value_bytes = max_memory + (10 << 20);
@@ -66,7 +66,7 @@ std::unique_ptr<Form> BodyReader::read_form(long long int max_memory)
 			}
 
 			this->remaining_content_length -= n;
-			form->values.add(name, buffer);
+			form.values.add(name, buffer);
 			continue;
 		}
 
@@ -126,10 +126,10 @@ std::unique_ptr<Form> BodyReader::read_form(long long int max_memory)
 			max_value_bytes -= n;
 		}
 
-		form->files.add(name, std::move(fh));
+		form.files.add(name, std::move(fh));
 	}
 
-	return std::move(form);
+	return form;
 }
 
 std::shared_ptr<Part> BodyReader::next_part(bool raw_part)

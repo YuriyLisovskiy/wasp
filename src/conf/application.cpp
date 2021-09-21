@@ -40,7 +40,7 @@ std::shared_ptr<urls::IPattern> _build_static_pattern(
 
 	auto controller_function = [static_root](
 		http::Request* request, const std::tuple<std::string>& args, const Settings* settings_pointer
-	) -> std::unique_ptr<http::abc::IHttpResponse>
+	) -> std::unique_ptr<http::abc::HttpResponse>
 	{
 		return std::apply([request, static_root, settings_pointer](const std::string& p) mutable -> auto
 		{
@@ -162,7 +162,7 @@ Application::ServerHandler Application::build_server_handler() const
 	};
 }
 
-std::unique_ptr<http::abc::IHttpResponse> Application::error_response(
+std::unique_ptr<http::abc::HttpResponse> Application::error_response(
 	http::Request* request, net::StatusCode status_code, const std::string& message
 ) const
 {
@@ -175,22 +175,18 @@ std::unique_ptr<http::abc::IHttpResponse> Application::error_response(
 	}
 
 	bool is_json = require_non_null(request, _ERROR_DETAILS_)->is_json();
-	std::string content;
-	if (is_json)
-	{
-		content = this->settings->render_json_error_template(status, message);
-	}
-
-	content = this->settings->render_html_error_template(status, message);
-	return std::make_unique<http::Response>(status_code, content, is_json ? http::mime::APPLICATION_JSON : "");
+	std::string content = is_json ?
+		this->settings->render_json_error_template(status, message) :
+		this->settings->render_html_error_template(status, message);
+	return std::make_unique<http::Response>(content, status_code, is_json ? http::mime::APPLICATION_JSON : "");
 }
 
 middleware::Function Application::build_controller_handler() const
 {
-	return [this](http::Request* request) -> std::unique_ptr<http::abc::IHttpResponse>
+	return [this](http::Request* request) -> std::unique_ptr<http::abc::HttpResponse>
 	{
 		require_non_null(request, _ERROR_DETAILS_);
-		auto apply = urls::resolve(request->url.path, this->settings->URLPATTERNS);
+		auto apply = urls::resolve(request->url().path, this->settings->URLPATTERNS);
 		if (apply)
 		{
 			return apply(request, this->settings);
@@ -254,6 +250,7 @@ std::shared_ptr<http::Request> Application::build_request(
 		this->settings->LIMITS.DATA_UPLOAD_MAX_NUMBER_FIELDS,
 		settings->LIMITS.MAX_HEADER_LENGTH,
 		settings->LIMITS.MAX_HEADERS_COUNT,
+		settings->LIMITS.DATA_UPLOAD_MAX_MEMORY_SIZE,
 		std::move(environment)
 	);
 }
@@ -270,7 +267,7 @@ void Application::build_static_patterns()
 }
 
 net::StatusCode Application::send_response(
-	net::RequestContext* ctx, const std::unique_ptr<http::abc::IHttpResponse>& response
+	net::RequestContext* ctx, const std::unique_ptr<http::abc::HttpResponse>& response
 ) const
 {
 	http::Response no_content(204);
@@ -282,7 +279,7 @@ net::StatusCode Application::send_response(
 	return this->finish_response(ctx, response ? response.get() : &no_content);
 }
 
-net::StatusCode Application::finish_response(net::RequestContext* context, http::abc::IHttpResponse* response) const
+net::StatusCode Application::finish_response(net::RequestContext* context, http::abc::HttpResponse* response) const
 {
 	require_non_null(context, "'context' is nullptr", _ERROR_DETAILS_);
 	if (!context->response_writer)
@@ -307,7 +304,7 @@ net::StatusCode Application::finish_response(net::RequestContext* context, http:
 	return response->get_status();
 }
 
-void Application::finish_streaming_response(net::RequestContext* context, http::abc::IHttpResponse* response) const
+void Application::finish_streaming_response(net::RequestContext* context, http::abc::HttpResponse* response) const
 {
 	auto* streaming_response = dynamic_cast<http::StreamingResponse*>(response);
 	std::string chunk;

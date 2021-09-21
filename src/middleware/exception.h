@@ -23,7 +23,7 @@
 #include "./types.h"
 #include "./base.h"
 #include "../conf/abc.h"
-#include "../http/mime/content_types/application.h"
+#include "../http/mime/content_types.h"
 
 
 __MIDDLEWARE_BEGIN__
@@ -47,7 +47,7 @@ protected:
 	};
 
 	[[nodiscard]]
-	static inline std::unique_ptr<http::abc::IHttpResponse> get_response(
+	static inline std::unique_ptr<http::abc::HttpResponse> get_response(
 		net::StatusCode status_code, const std::string& content, bool is_json
 	)
 	{
@@ -67,7 +67,7 @@ protected:
 	}
 
 	[[nodiscard]]
-	std::unique_ptr<http::abc::IHttpResponse> error_to_response(
+	std::unique_ptr<http::abc::HttpResponse> error_to_response(
 		net::StatusCode status_code, const std::string& message, bool is_json
 	) const;
 };

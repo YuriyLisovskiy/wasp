@@ -25,11 +25,6 @@
 
 __URLS_BEGIN__
 
-//template <typename ...ArgsT>
-//using ControllerHandler = std::function<std::unique_ptr<http::abc::IHttpResponse>(
-//	http::Request*, const std::tuple<ArgsT...>&, conf::Settings*
-//)>;
-
 // TESTME: Pattern<...ArgsT>
 // TODO: docs for 'Pattern<...ArgsT>'
 template <typename ...ArgsT>
@@ -70,7 +65,7 @@ public:
 		this->_name = ns + "::" + this->_name;
 	}
 
-	inline std::unique_ptr<http::abc::IHttpResponse> apply(http::Request* request, conf::Settings* settings) override
+	inline std::unique_ptr<http::abc::HttpResponse> apply(http::Request* request, conf::Settings* settings) override
 	{
 		return this->_handler(request, this->_regex.template args_tuple<ArgsT...>(), settings);
 	}

@@ -28,7 +28,7 @@
 __CONTROLLERS_BEGIN__
 
 template <typename ...ArgsT>
-using Handler = std::function<std::unique_ptr<http::abc::IHttpResponse>(
+using Handler = std::function<std::unique_ptr<http::abc::HttpResponse>(
 	http::Request*, const std::tuple<ArgsT...>&, const conf::Settings*
 )>;
 
@@ -49,7 +49,7 @@ public:
 	// @param args: pointer to requests' url arguments.
 	// @return pointer to http response instance.
 	[[nodiscard]]
-	virtual inline std::unique_ptr<http::abc::IHttpResponse> get(http::Request* request, URLArgsT ...args) const
+	virtual inline std::unique_ptr<http::abc::HttpResponse> get(http::Request* request, URLArgsT ...args) const
 	{
 		return nullptr;
 	}
@@ -61,7 +61,7 @@ public:
 	// @param args: pointer to requests' url arguments.
 	// @return pointer to http response instance.
 	[[nodiscard]]
-	virtual inline std::unique_ptr<http::abc::IHttpResponse> post(http::Request* request, URLArgsT ...args) const
+	virtual inline std::unique_ptr<http::abc::HttpResponse> post(http::Request* request, URLArgsT ...args) const
 	{
 		return nullptr;
 	}
@@ -73,7 +73,7 @@ public:
 	// @param args: pointer to requests' url arguments.
 	// @return pointer to http response instance.
 	[[nodiscard]]
-	virtual inline std::unique_ptr<http::abc::IHttpResponse> put(http::Request* request, URLArgsT ...args) const
+	virtual inline std::unique_ptr<http::abc::HttpResponse> put(http::Request* request, URLArgsT ...args) const
 	{
 		return nullptr;
 	}
@@ -85,7 +85,7 @@ public:
 	// @param args: pointer to requests' url arguments.
 	// @return pointer to http response instance.
 	[[nodiscard]]
-	virtual inline std::unique_ptr<http::abc::IHttpResponse> patch(http::Request* request, URLArgsT ...args) const
+	virtual inline std::unique_ptr<http::abc::HttpResponse> patch(http::Request* request, URLArgsT ...args) const
 	{
 		return nullptr;
 	}
@@ -97,7 +97,7 @@ public:
 	// @param args: pointer to requests' url arguments.
 	// @return pointer to http response instance.
 	[[nodiscard]]
-	virtual inline std::unique_ptr<http::abc::IHttpResponse> delete_(http::Request* request, URLArgsT ...args) const
+	virtual inline std::unique_ptr<http::abc::HttpResponse> delete_(http::Request* request, URLArgsT ...args) const
 	{
 		return nullptr;
 	}
@@ -109,7 +109,7 @@ public:
 	// @param args: pointer to requests' url arguments.
 	// @return pointer to http response instance.
 	[[nodiscard]]
-	virtual inline std::unique_ptr<http::abc::IHttpResponse> head(http::Request* request, URLArgsT ...args) const
+	virtual inline std::unique_ptr<http::abc::HttpResponse> head(http::Request* request, URLArgsT ...args) const
 	{
 		return this->get(request, args...);
 	}
@@ -121,7 +121,7 @@ public:
 	// @param args: pointer to requests' url arguments.
 	// @return pointer to http response instance.
 	[[nodiscard]]
-	virtual inline std::unique_ptr<http::abc::IHttpResponse> options(http::Request* request, URLArgsT ...args) const
+	virtual inline std::unique_ptr<http::abc::HttpResponse> options(http::Request* request, URLArgsT ...args) const
 	{
 		auto response = std::make_unique<http::Response>(200);
 		auto allowed_methods = this->allowed_methods();
@@ -137,7 +137,7 @@ public:
 	// @param args: pointer to requests' url arguments.
 	// @return pointer to http response instance.
 	[[nodiscard]]
-	virtual inline std::unique_ptr<http::abc::IHttpResponse> trace(http::Request* request, URLArgsT ...args) const
+	virtual inline std::unique_ptr<http::abc::HttpResponse> trace(http::Request* request, URLArgsT ...args) const
 	{
 		return nullptr;
 	}
@@ -149,7 +149,7 @@ public:
 	// @param request: an actual http request from client.
 	// @return pointer to http response returned from handler.
 	[[nodiscard]]
-	virtual inline std::unique_ptr<http::abc::IHttpResponse> dispatch(http::Request* request, URLArgsT ...args) const
+	virtual inline std::unique_ptr<http::abc::HttpResponse> dispatch(http::Request* request, URLArgsT ...args) const
 	{
 		if (!request)
 		{
@@ -158,8 +158,8 @@ public:
 			);
 		}
 
-		std::string method = str::to_lower(request->method);
-		std::unique_ptr<http::abc::IHttpResponse> result = nullptr;
+		std::string method = str::to_lower(request->method());
+		std::unique_ptr<http::abc::HttpResponse> result = nullptr;
 		if (this->_has_method(method))
 		{
 			result = this->method_not_allowed_response(request);
@@ -236,16 +236,16 @@ protected:
 	// @param request: pointer to http request.
 	// @return pointer to http response returned from handler.
 	[[nodiscard]]
-	inline std::unique_ptr<http::abc::IHttpResponse> method_not_allowed_response(http::Request* request) const
+	inline std::unique_ptr<http::abc::HttpResponse> method_not_allowed_response(http::Request* request) const
 	{
 		if (this->settings->LOGGER)
 		{
 			this->settings->LOGGER->warning(
-				"Method Not Allowed (" + request->method + "): " + request->url.path, _ERROR_DETAILS_
+				"Method Not Allowed (" + request->method() + "): " + request->url().path, _ERROR_DETAILS_
 			);
 		}
 
-		return std::make_unique<http::resp::NotAllowed>("", this->allowed_methods());
+		return std::make_unique<http::NotAllowed>("", this->allowed_methods());
 	}
 
 private:
@@ -258,7 +258,7 @@ private:
 	}
 
 	[[nodiscard]]
-	inline std::function<std::unique_ptr<http::abc::IHttpResponse>(http::Request*, URLArgsT...)> _get_method(
+	inline std::function<std::unique_ptr<http::abc::HttpResponse>(http::Request*, URLArgsT...)> _get_method(
 		const std::string& method
 	) const
 	{

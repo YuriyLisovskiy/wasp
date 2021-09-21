@@ -44,7 +44,7 @@ TEST(TestCase_url, query_parser_getList)
 
 	ASSERT_TRUE(parameters.contains(key));
 
-	auto actual = parameters.getlist(key);
+	auto actual = parameters.get_sequence(key);
 
 	ASSERT_EQ(actual.size(), expected.size());
 

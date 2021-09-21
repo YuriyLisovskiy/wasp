@@ -79,9 +79,9 @@ bool if_none_match_passes(
 	}
 }
 
-std::unique_ptr<http::abc::IHttpResponse> not_modified(http::Request* request, http::abc::IHttpResponse* response)
+std::unique_ptr<http::abc::HttpResponse> not_modified(http::Request* request, http::abc::HttpResponse* response)
 {
-	auto new_response = std::make_unique<http::resp::NotModified>("");
+	auto new_response = std::make_unique<http::NotModified>("");
 	if (response)
 	{
 		auto headers = {
@@ -120,7 +120,7 @@ __UTIL_CACHE_INTERNAL_END__
 
 __UTIL_CACHE_BEGIN__
 
-void set_response_etag(http::abc::IHttpResponse* response)
+void set_response_etag(http::abc::HttpResponse* response)
 {
 	if (!response->is_streaming() && response->content_length() > 0)
 	{
@@ -128,11 +128,11 @@ void set_response_etag(http::abc::IHttpResponse* response)
 	}
 }
 
-std::unique_ptr<http::abc::IHttpResponse> get_conditional_response(
+std::unique_ptr<http::abc::HttpResponse> get_conditional_response(
 	http::Request* request,
 	const std::string& etag,
 	long last_modified,
-	http::abc::IHttpResponse* response
+	http::abc::HttpResponse* response
 )
 {
 	// Only return conditional responses on successful requests.
@@ -163,10 +163,12 @@ std::unique_ptr<http::abc::IHttpResponse> get_conditional_response(
 		return internal::precondition_failed(request);
 	}
 
+	auto request_method = request->method();
+
 	// Step 3: Test the If-None-Match precondition.
 	if (!if_none_match_etags.empty() && !internal::if_none_match_passes(etag, if_none_match_etags))
 	{
-		if (request->method == "GET" || request->method == "HEAD")
+		if (request_method == "GET" || request_method == "HEAD")
 		{
 			return internal::not_modified(request, response);
 		}
@@ -183,7 +185,7 @@ std::unique_ptr<http::abc::IHttpResponse> get_conditional_response(
 		!internal::if_modified_since_passes(last_modified, if_modified_since)
 	)
 	{
-		if (request->method == "GET" || request->method == "HEAD")
+		if (request_method == "GET" || request_method == "HEAD")
 		{
 			return internal::not_modified(request, response);
 		}

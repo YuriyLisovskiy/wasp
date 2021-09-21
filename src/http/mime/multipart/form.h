@@ -16,7 +16,7 @@
 #include <filesystem>
 
 // Base libraries.
-#include <xalwart.base/collections/multi_dictionary.h>
+#include <xalwart.base/collections/multimap.h>
 
 // Module definitions.
 #include "./_def_.h"
@@ -36,8 +36,8 @@ __HTTP_MIME_MULTIPART_BEGIN__
 // Both are keyed by field name.
 struct Form final
 {
-	collections::MultiDictionary<std::string, std::string> values;
-	collections::MultiDictionary<std::string, std::shared_ptr<FileHeader>> files;
+	collections::multimap<std::string, std::string> values;
+	collections::multimap<std::string, std::shared_ptr<FileHeader>> files;
 
 	// Removes any temporary files associated with a `Form`.
 	inline void remove_all() const
