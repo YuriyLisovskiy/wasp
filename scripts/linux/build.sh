@@ -25,9 +25,6 @@ install_lib "base"
 # Install orm library.
 install_lib "orm"
 
-# Install render library.
-install_lib "render"
-
 mkdir -p /app/build
 cd /app/build || exit 1
 

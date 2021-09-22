@@ -25,9 +25,6 @@ install_lib ".base"
 # Install orm library.
 install_lib ".orm"
 
-# Install render library.
-install_lib ".render"
-
 # Install the library.
 install_lib
 
