@@ -83,10 +83,6 @@ void initialize_signal_handlers()
 #endif
 }
 
-Application::Application(conf::Settings* settings) : settings(settings), is_configured(false)
-{
-}
-
 Application& Application::configure()
 {
 	this->configure_settings();
@@ -96,6 +92,7 @@ Application& Application::configure()
 	this->build_module_patterns(this->settings->URLPATTERNS);
 
 	this->setup_template_engine();
+	this->setup_middleware();
 	this->setup_commands();
 
 	this->is_configured = true;
@@ -132,7 +129,7 @@ void Application::execute(int argc, char** argv) const
 	}
 	else
 	{
-		std::cout << this->build_usage_message();
+		std::cout << this->get_usage_message();
 	}
 }
 
@@ -148,9 +145,41 @@ void Application::execute_command(const std::string& command_name, int argc, cha
 	}
 }
 
-Application::ServerHandler Application::build_server_handler() const
+std::string Application::get_usage_message() const
 {
-	this->settings->MIDDLEWARE.insert(this->settings->MIDDLEWARE.begin(), middleware::Exception(this->settings));
+	size_t max_command_length = 0;
+	for (auto& command : this->commands)
+	{
+		auto current_length = command.second->name().size();
+		if (current_length > max_command_length)
+		{
+			max_command_length = current_length;
+		}
+	}
+
+	std::string usage_message;
+	for (const auto& command : this->commands)
+	{
+		std::string indent(max_command_length - command.second->name().size(), ' ');
+		usage_message += "  " + command.second->name() + indent + "  " + command.second->help_message() + '\n';
+	}
+
+	if (!usage_message.empty())
+	{
+		usage_message = "Usage:\n  application [command]\n\n"
+		                "Available Commands:\n" + usage_message +
+		                "\nUse \"application [command] --help\" for more information about a command.";
+	}
+	else
+	{
+		usage_message = "Application has not commands.\n\n";
+	}
+
+	return usage_message;
+}
+
+Application::ServerHandler Application::get_application_handler() const
+{
 	return [this](
 		net::RequestContext* context, const std::map<std::string, std::string>& environment
 	) -> net::StatusCode
@@ -162,26 +191,7 @@ Application::ServerHandler Application::build_server_handler() const
 	};
 }
 
-std::unique_ptr<http::abc::HttpResponse> Application::error_response(
-	http::Request* request, net::StatusCode status_code, const std::string& message
-) const
-{
-	auto [status, status_is_found] = net::get_status_by_code(status_code);
-	if (!status_is_found)
-	{
-		require_non_null(this->settings->LOGGER.get(), _ERROR_DETAILS_)->warning(
-			"Unknown status code: " + std::to_string(status_code)
-		);
-	}
-
-	bool is_json = require_non_null(request, _ERROR_DETAILS_)->is_json();
-	std::string content = is_json ?
-		this->settings->render_json_error_template(status, message) :
-		this->settings->render_html_error_template(status, message);
-	return std::make_unique<http::Response>(content, status_code, is_json ? http::mime::APPLICATION_JSON : "");
-}
-
-middleware::Function Application::build_controller_handler() const
+middleware::Function Application::get_controller_handler() const
 {
 	return [this](http::Request* request) -> std::unique_ptr<http::abc::HttpResponse>
 	{
@@ -192,13 +202,13 @@ middleware::Function Application::build_controller_handler() const
 			return apply(request, this->settings);
 		}
 
-		return this->error_response(request, 404, "The requested resource was not found.");
+		return this->get_error_response(request, 404, "The requested resource was not found.");
 	};
 }
 
 middleware::Function Application::build_middleware_chain() const
 {
-	middleware::Function chain = this->build_controller_handler();
+	middleware::Function chain = this->get_controller_handler();
 	auto middleware_count = (long long)this->settings->MIDDLEWARE.size() - 1;
 	for (long long i = middleware_count; i >= 0; i--)
 	{
@@ -210,17 +220,6 @@ middleware::Function Application::build_middleware_chain() const
 	}
 
 	return chain;
-}
-
-void Application::add_static_pattern(
-	std::vector<std::shared_ptr<urls::IPattern>>& patterns,
-	const std::string& root, const std::string& url, const std::string& name
-) const
-{
-	if (!root.empty() && this->_static_is_allowed(url))
-	{
-		patterns.push_back(_build_static_pattern(this->settings, url, root, name));
-	}
 }
 
 void Application::build_module_patterns(std::vector<std::shared_ptr<urls::IPattern>>& patterns) const
@@ -251,6 +250,7 @@ std::shared_ptr<http::Request> Application::build_request(
 		settings->LIMITS.MAX_HEADER_LENGTH,
 		settings->LIMITS.MAX_HEADERS_COUNT,
 		settings->LIMITS.DATA_UPLOAD_MAX_MEMORY_SIZE,
+		settings->THROW_ON_INVALID_REQUEST_CONTENT_TYPE,
 		std::move(environment)
 	);
 }
@@ -266,16 +266,61 @@ void Application::build_static_patterns()
 	);
 }
 
+void Application::add_static_pattern(
+	std::vector<std::shared_ptr<urls::IPattern>>& patterns,
+	const std::string& root, const std::string& url, const std::string& name
+) const
+{
+	if (!root.empty() && this->_static_is_allowed(url))
+	{
+		patterns.push_back(_build_static_pattern(this->settings, url, root, name));
+	}
+}
+
+void Application::setup_commands()
+{
+	auto core_module = mgmt::CoreModuleConfig(this->settings, std::move(this->get_application_handler()));
+	this->_append_commands(core_module.get_commands(), core_module.get_name());
+	for (auto& installed_module : this->settings->MODULES)
+	{
+		this->_append_commands(installed_module->get_commands(), installed_module->get_name());
+	}
+}
+
+void Application::setup_middleware()
+{
+	this->settings->MIDDLEWARE.insert(this->settings->MIDDLEWARE.begin(), middleware::Exception(this->settings));
+}
+
+std::unique_ptr<http::abc::HttpResponse> Application::get_error_response(
+	http::Request* request, net::StatusCode status_code, const std::string& message
+) const
+{
+	auto [status, status_is_found] = net::get_status_by_code(status_code);
+	if (!status_is_found)
+	{
+		require_non_null(this->settings->LOGGER.get(), _ERROR_DETAILS_)->warning(
+			"Unknown status code: " + std::to_string(status_code)
+		);
+	}
+
+	bool is_json = require_non_null(request, _ERROR_DETAILS_)->is_json();
+	std::string content = is_json ?
+		this->settings->render_json_error_template(status, message) :
+		this->settings->render_html_error_template(status, message);
+	return std::make_unique<http::Response>(content, status_code, is_json ? http::mime::APPLICATION_JSON : "");
+}
+
 net::StatusCode Application::send_response(
 	net::RequestContext* ctx, const std::unique_ptr<http::abc::HttpResponse>& response
 ) const
 {
-	http::Response no_content(204);
 	if (!response)
 	{
 		this->settings->LOGGER->warning("Response was not instantiated, returned 204.", _ERROR_DETAILS_);
 	}
 
+	http::Response no_content(204);
 	return this->finish_response(ctx, response ? response.get() : &no_content);
 }
 
@@ -307,6 +352,15 @@ net::StatusCode Application::finish_response(net::RequestContext* context, http:
 void Application::finish_streaming_response(net::RequestContext* context, http::abc::HttpResponse* response) const
 {
 	auto* streaming_response = dynamic_cast<http::StreamingResponse*>(response);
+	if (!streaming_response)
+	{
+		throw NullPointerException(
+			"Unable to cast response to streaming response, "
+			"check if the response you returned is derived from 'xw::http::StreamingResponse'.",
+			_ERROR_DETAILS_
+		);
+	}
+
 	std::string chunk;
 	while (!(chunk = streaming_response->get_chunk()).empty())
 	{
@@ -317,49 +371,6 @@ void Application::finish_streaming_response(net::RequestContext* context, http::
 	}
 
 	response->close();
-}
-
-void Application::setup_commands()
-{
-	auto core_module = mgmt::CoreModuleConfig(this->settings, std::move(this->build_server_handler()));
-	this->_append_commands(core_module.get_commands(), core_module.get_name());
-	for (auto& installed_module : this->settings->MODULES)
-	{
-		this->_append_commands(installed_module->get_commands(), installed_module->get_name());
-	}
-}
-
-std::string Application::build_usage_message() const
-{
-	size_t max_command_length = 0;
-	for (auto& command : this->commands)
-	{
-		auto current_length = command.second->name().size();
-		if (current_length > max_command_length)
-		{
-			max_command_length = current_length;
-		}
-	}
-
-	std::string usage_message;
-	for (const auto& command : this->commands)
-	{
-		std::string indent(max_command_length - command.second->name().size(), ' ');
-		usage_message += "  " + command.second->name() + indent + "  " + command.second->help_message() + '\n';
-	}
-
-	if (!usage_message.empty())
-	{
-		usage_message = "Usage:\n  application [command]\n\n"
-						"Available Commands:\n" + usage_message +
-						"\nUse \"application [command] --help\" for more information about a command.";
-	}
-	else
-	{
-		usage_message = "Application has not commands.\n\n";
-	}
-
-	return usage_message;
 }
 
 void Application::_append_command(const std::shared_ptr<cmd::AbstractCommand>& command, const std::string& module_name)

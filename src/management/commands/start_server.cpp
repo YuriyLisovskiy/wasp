@@ -95,7 +95,7 @@ void StartServerCommand::handle()
 		);
 	}
 
-	this->retrieve_args();
+	this->_parse_args();
 	auto server = this->settings->build_server(this->_handler_function, this->get_kwargs());
 	try
 	{
@@ -106,12 +106,7 @@ void StartServerCommand::handle()
 		}
 
 		server->bind(this->_host, this->_port);
-		std::string message = dt::Datetime::now(this->settings->TIMEZONE).strftime("%B %d, %Y - %T") + "\n" +
-		                      v::framework_name + " version " + v::version.to_string() + "\n" +
-		                      "Starting the " + (this->settings->DEBUG ? "development " : "") + "server at " +
-		                      "http://" + this->_host + ":" + std::to_string(this->_port) + "/\n" +
-		                      "Quit the server with CONTROL-C.";
-		server->listen(message);
+		server->listen(this->get_startup_message(server->is_development()));
 	}
 	catch (const InterruptException& exc)
 	{
@@ -130,7 +125,16 @@ void StartServerCommand::handle()
 	server->close();
 }
 
-void StartServerCommand::retrieve_args()
+std::string StartServerCommand::get_startup_message(bool is_development_server) const
+{
+	return dt::Datetime::now(this->settings->TIMEZONE).strftime("%B %d, %Y - %T") + "\n" +
+	       v::framework_name + " version " + v::version.to_string() + "\n" +
+	       "Starting the " + (is_development_server ? "development " : "") + "server at " +
+	       "http://" + this->_host + ":" + std::to_string(this->_port) + "/\n" +
+	       "Quit the server with CONTROL-C.";
+}
+
+void StartServerCommand::_parse_args()
 {
 	// Setup address and port.
 	auto host_port_str = this->_addr_port_flag->get();

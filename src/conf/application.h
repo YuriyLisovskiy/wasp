@@ -46,10 +46,14 @@ extern std::shared_ptr<urls::IPattern> _build_static_pattern(
 
 extern void initialize_signal_handlers();
 
+// TESTME: Application
+// TODO: docs for 'Application'
 class Application
 {
 public:
-	explicit Application(conf::Settings* settings);
+	explicit inline Application(conf::Settings* settings) : settings(settings), is_configured(false)
+	{
+	}
 
 	virtual Application& configure();
 
@@ -69,23 +73,16 @@ protected:
 	virtual void execute_command(const std::string& command_name, int argc, char** argv) const;
 
 	[[nodiscard]]
-	virtual std::unique_ptr<http::abc::HttpResponse> error_response(
-		http::Request* request, net::StatusCode status_code, const std::string& message
-	) const;
+	virtual std::string get_usage_message() const;
 
 	[[nodiscard]]
-	virtual middleware::Function build_controller_handler() const;
+	virtual middleware::Function get_controller_handler() const;
 
 	[[nodiscard]]
 	virtual middleware::Function build_middleware_chain() const;
 
 	[[nodiscard]]
-	virtual ServerHandler build_server_handler() const;
-
-	virtual void add_static_pattern(
-		std::vector<std::shared_ptr<urls::IPattern>>& patterns,
-		const std::string& root, const std::string& url, const std::string& name
-	) const;
+	virtual ServerHandler get_application_handler() const;
 
 	virtual void build_module_patterns(std::vector<std::shared_ptr<urls::IPattern>>& patterns) const;
 
@@ -96,21 +93,14 @@ protected:
 
 	virtual void build_static_patterns();
 
-	[[nodiscard]]
-	virtual uint send_response(net::RequestContext* ctx, const std::unique_ptr<http::abc::HttpResponse>& response) const;
-
-	virtual net::StatusCode finish_response(net::RequestContext* context, http::abc::HttpResponse* response) const;
-
-	virtual void finish_streaming_response(net::RequestContext* context, http::abc::HttpResponse* response) const;
+	virtual void add_static_pattern(
+		std::vector<std::shared_ptr<urls::IPattern>>& patterns,
+		const std::string& root, const std::string& url, const std::string& name
+	) const;
 
 	virtual void setup_commands();
 
-	virtual inline void configure_settings()
-	{
-		require_non_null(this->settings, "settings is not instantiated", _ERROR_DETAILS_);
-		this->settings->prepare();
-		this->settings->check();
-	}
+	virtual void setup_middleware();
 
 	virtual inline void setup_template_engine()
 	{
@@ -120,8 +110,24 @@ protected:
 		}
 	}
 
+	virtual inline void configure_settings()
+	{
+		require_non_null(this->settings, "settings is not instantiated", _ERROR_DETAILS_);
+		this->settings->prepare();
+		this->settings->check();
+	}
+
 	[[nodiscard]]
-	virtual std::string build_usage_message() const;
+	virtual std::unique_ptr<http::abc::HttpResponse> get_error_response(
+		http::Request* request, net::StatusCode status_code, const std::string& message
+	) const;
+
+	[[nodiscard]]
+	virtual uint send_response(net::RequestContext* ctx, const std::unique_ptr<http::abc::HttpResponse>& response) const;
+
+	virtual net::StatusCode finish_response(net::RequestContext* context, http::abc::HttpResponse* response) const;
+
+	virtual void finish_streaming_response(net::RequestContext* context, http::abc::HttpResponse* response) const;
 
 private:
 	[[nodiscard]]

@@ -26,7 +26,7 @@ http::Request make_request(const conf::Settings* settings, const std::string& me
 		.path = "/hello",
 		.method = method
 	};
-	return http::Request(context, 99999, 99, 9999, 99, 9999, {});
+	return http::Request(context, 99999, 99, 9999, 99, 9999, false, {});
 }
 
 struct RedirectControllerTestSettings : public conf::Settings
@@ -256,7 +256,7 @@ TEST_F(RedirectControllerPermanentAndQueryStringTestCase, GetRedirectUrlTest)
 		.query = "param1=100&q=find_user&qqq=собака",
 		.method = "get"
 	};
-	auto request = http::Request(context, 99999, 99, 9999, 99, 9999, {});
+	auto request = http::Request(context, 99999, 99, 9999, 99, 9999, false, {});
 	ASSERT_EQ(
 		this->controller->get_redirect_url(&request), "/hello/world?param1=100&q=find_user&qqq=собака"
 	);

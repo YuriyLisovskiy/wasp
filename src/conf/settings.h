@@ -26,7 +26,6 @@
 // ORM libraries.
 #include <xalwart.orm/client.h>
 #include <xalwart.orm/db/migration.h>
-#include <xalwart.orm/sqlite3/driver.h>
 
 // Module definitions.
 #include "./_def_.h"
@@ -50,7 +49,7 @@ public:
 
 	std::shared_ptr<log::ILogger> LOGGER = nullptr;
 
-	bool USE_COLORS_IN_LOGGER = true;
+	bool THROW_ON_INVALID_REQUEST_CONTENT_TYPE = true;
 
 	// A secret key for this particular installation. Used in secret-key
 	// hashing algorithms. Set this in your settings.
@@ -292,7 +291,7 @@ public:
 	{
 	}
 
-	virtual inline std::shared_ptr<net::abc::IServer> build_server(
+	virtual inline std::unique_ptr<net::abc::Server> build_server(
 		const std::function<net::StatusCode(
 			net::RequestContext*, const std::map<std::string, std::string>& /* environment */
 		)>& handler,

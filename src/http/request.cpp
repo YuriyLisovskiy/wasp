@@ -22,12 +22,14 @@ Request::Request(
 	ssize_t max_file_upload_size, ssize_t max_fields_count,
 	ssize_t max_header_length, ssize_t max_headers_count,
 	long long int multipart_max_memory,
+	bool throw_on_invalid_content_type,
 	std::map<std::string, std::string> environment
 ) : _method(context.method),
 	_headers(context.headers), _body_reader(context.body), _content_length((ssize_t)context.content_size),
 	max_file_upload_size(max_file_upload_size), max_fields_count(max_fields_count),
 	max_headers_count(max_headers_count), max_header_length(max_header_length),
-	multipart_max_memory(multipart_max_memory), _environment(std::move(environment))
+	multipart_max_memory(multipart_max_memory), _environment(std::move(environment)),
+	throw_on_invalid_content_type(throw_on_invalid_content_type)
 {
 	if (!valid_method(this->_method))
 	{
@@ -167,14 +169,14 @@ std::string Request::_get_port(bool use_x_forwarded_port) const
 	return port;
 }
 
-void Request::_parse_form()
+void Request::_parse_form(bool throw_on_invalid_ct)
 {
 	if (!this->_form.has_value())
 	{
 		Query post_form;
 		if (this->_method == "POST" || this->_method == "PUT" || this->_method == "PATCH")
 		{
-			post_form = parse_post_form(this, this->_body_reader.get());
+			post_form = parse_post_form(this, this->_body_reader.get(), throw_on_invalid_ct);
 		}
 
 		if (!post_form.empty())
@@ -201,7 +203,7 @@ void Request::_parse_multipart_form()
 {
 	if (!this->_form.has_value())
 	{
-		this->_parse_form();
+		this->_parse_form(false);
 	}
 
 	if (this->_multipart_form.has_value())
@@ -221,13 +223,13 @@ void Request::_parse_multipart_form()
 
 void Request::_parse_json_data()
 {
-	auto [content, ok] = read_body_to_string(this, this->_body_reader.get(), mime::APPLICATION_JSON_L);
-	if (!ok)
+	auto [content, ok] = read_body_to_string(
+		this, this->_body_reader.get(), mime::APPLICATION_JSON, !this->throw_on_invalid_content_type
+	);
+	if (ok)
 	{
-		throw RuntimeError("content is not " + std::string(mime::APPLICATION_JSON), _ERROR_DETAILS_);
+		this->_json = nlohmann::json::parse(content);
 	}
-
-	this->_json = nlohmann::json::parse(content);
 }
 
 bool has_port(const std::string& host)
@@ -289,7 +291,10 @@ void read_full_request_body(std::string& buffer, io::IReader* reader, ssize_t co
 }
 
 std::tuple<std::string, bool> read_body_to_string(
-	http::Request* request, io::ILimitedBufferedReader* body_reader, const std::wstring& target_content_type
+	http::Request* request,
+	io::ILimitedBufferedReader* body_reader,
+	const std::string& target_content_type,
+	bool mute_invalid_content_type_error
 )
 {
 	require_non_null(request, "'request' is nullptr", _ERROR_DETAILS_);
@@ -298,17 +303,7 @@ std::tuple<std::string, bool> read_body_to_string(
 		throw exc::HttpError(400, "missing form body", _ERROR_DETAILS_);
 	}
 
-	auto content_type = request->get_header(CONTENT_TYPE, "");
-
-	// RFC 7231, section 3.1.1.5 - empty type
-	// MAY be treated as application/octet-stream
-	if (content_type.empty())
-	{
-		content_type = mime::APPLICATION_OCTET_STREAM;
-	}
-
-	Query query;
-	auto [parsed_content_type, _, ok] = mime::parse_media_type(str::string_to_wstring(content_type));
+	auto parsed_content_type = parse_content_type(request);
 	if (parsed_content_type == target_content_type)
 	{
 		auto content_length_string = request->get_header(CONTENT_LENGTH, "");
@@ -328,20 +323,47 @@ std::tuple<std::string, bool> read_body_to_string(
 			return {buffer, true};
 		}
 	}
+	else if (!mute_invalid_content_type_error)
+	{
+		throw RuntimeError("Content is not '" + target_content_type + "'", _ERROR_DETAILS_);
+	}
 
 	return {"", false};
 }
 
-Query parse_post_form(http::Request* request, io::ILimitedBufferedReader* body_reader)
+Query parse_post_form(
+	http::Request* request, io::ILimitedBufferedReader* body_reader, bool mute_invalid_content_type_error
+)
 {
 	Query query;
-	auto [content, ok] = read_body_to_string(request, body_reader, mime::APPLICATION_X_WWW_FORM_URLENCODED_L);
+	auto [content, ok] = read_body_to_string(
+		request, body_reader, mime::APPLICATION_X_WWW_FORM_URLENCODED, mute_invalid_content_type_error
+	);
 	if (ok)
 	{
 		query = parse_query(content);
 	}
 
 	return query;
+}
+
+std::string parse_content_type(http::Request* request)
+{
+	auto content_type = request->get_header(CONTENT_TYPE, "");
+
+	// RFC 7231, section 3.1.1.5 - empty type
+	// MAY be treated as application/octet-stream
+	if (content_type.empty())
+	{
+		content_type = mime::APPLICATION_OCTET_STREAM;
+	}
+
+	auto media_type_result = mime::parse_media_type(str::string_to_wstring(content_type));
+
+	// Return the first item of the result.
+	// In case of some parse error, the first item will be
+	// assigned to Content-Type header value.
+	return str::wstring_to_string(std::get<0>(media_type_result));
 }
 
 __HTTP_END__

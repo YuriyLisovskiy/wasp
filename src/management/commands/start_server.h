@@ -24,8 +24,27 @@ __MANAGEMENT_COMMANDS_BEGIN__
 
 // TESTME: StartServerCommand
 // TODO: docs for 'StartServerCommand'
-class StartServerCommand final : public xw::cmd::Command
+class StartServerCommand : public xw::cmd::Command
 {
+public:
+	explicit StartServerCommand(
+		conf::IModuleConfig* config, conf::Settings* settings, std::function<net::StatusCode(
+		net::RequestContext*, const std::map<std::string, std::string>& /* environment */
+	)> handler
+	);
+
+	// Returns command flags.
+	[[nodiscard]]
+	Kwargs get_kwargs() const override;
+
+protected:
+	void add_flags() override;
+
+	void handle() override;
+
+	[[nodiscard]]
+	virtual std::string get_startup_message(bool is_development_server) const;
+
 private:
 	const std::string DEFAULT_IPV4_HOST = "127.0.0.1";
 	const std::string DEFAULT_IPV6_HOST = "[::1]";
@@ -62,21 +81,7 @@ private:
 		net::RequestContext*, const std::map<std::string, std::string>& /* environment */
 	)> _handler_function;
 
-protected:
-	void add_flags() override;
-	void handle() override;
-	void retrieve_args();
-
-public:
-	explicit StartServerCommand(
-		conf::IModuleConfig* config, conf::Settings* settings, std::function<net::StatusCode(
-			net::RequestContext*, const std::map<std::string, std::string>& /* environment */
-		)> handler
-	);
-
-	// Returns command flags.
-	[[nodiscard]]
-	Kwargs get_kwargs() const override;
+	void _parse_args();
 };
 
 __MANAGEMENT_COMMANDS_END__

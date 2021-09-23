@@ -103,8 +103,6 @@ void Settings::check()
 		throw ImproperlyConfigured("'LOGGER' must be configured", _ERROR_DETAILS_);
 	}
 
-	this->LOGGER->use_colors(this->USE_COLORS_IN_LOGGER);
-
 	size_t err_count = 0;
 	if (this->BASE_DIR.empty())
 	{
