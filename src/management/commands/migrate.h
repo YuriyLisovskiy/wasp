@@ -8,6 +8,9 @@
 
 #pragma once
 
+// Base libraries.
+#include <xalwart.base/abc/base.h>
+
 // Module definitions.
 #include "./_def_.h"
 
@@ -32,7 +35,7 @@ protected:
 	inline void log_progress(const std::string& msg, const std::string& end) const
 	{
 		auto end_ch = end.empty() ? '\0' : end[0];
-		this->settings->LOGGER->print(msg, log::ILogger::Color::Default, end_ch);
+		this->settings->LOGGER->print(msg, abc::Logger::Color::Default, end_ch);
 	}
 
 	void add_flags() final;

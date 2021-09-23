@@ -14,13 +14,13 @@
 // Base libraries.
 #include <xalwart.base/kwargs.h>
 #include <xalwart.base/datetime.h>
-#include <xalwart.base/logger.h>
 #include <xalwart.base/string_utils.h>
 #include <xalwart.base/utility.h>
 #include <xalwart.base/path.h>
 #include <xalwart.base/yaml/yaml-cpp/yaml.h>
 #include <xalwart.base/net/abc.h>
 #include <xalwart.base/net/status.h>
+#include <xalwart.base/abc/base.h>
 #include <xalwart.base/abc/render.h>
 
 // ORM libraries.
@@ -47,7 +47,7 @@ public:
 	// By default, it should be current working directory.
 	std::string BASE_DIR;
 
-	std::shared_ptr<log::ILogger> LOGGER = nullptr;
+	std::shared_ptr<abc::Logger> LOGGER = nullptr;
 
 	bool THROW_ON_INVALID_REQUEST_CONTENT_TYPE = true;
 

@@ -32,6 +32,18 @@ protected:
 		const std::string& cmd_name,
 		const std::string& help
 	);
+
+	inline void use_colors_for_logging(bool use_colors)
+	{
+		if (use_colors)
+		{
+			this->settings->LOGGER->enable_colors();
+		}
+		else
+		{
+			this->settings->LOGGER->disable_colors();
+		}
+	}
 };
 
 template <typename T>

@@ -86,7 +86,7 @@ void StartServerCommand::handle()
 		return;
 	}
 
-	this->settings->LOGGER->use_colors(!this->_no_colors_flag->get());
+	this->use_colors_for_logging(!this->_no_colors_flag->get());
 	if (!this->settings->DEBUG && this->settings->ALLOWED_HOSTS.empty())
 	{
 		throw CommandError(

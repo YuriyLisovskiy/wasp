@@ -9,6 +9,7 @@
 #include <gtest/gtest.h>
 
 #include <xalwart.base/string_utils.h>
+#include <xalwart.base/logger.h>
 
 #include "../../src/controllers/controller.h"
 
@@ -20,12 +21,7 @@ struct ControllerTestSettings : public conf::Settings
 	ControllerTestSettings() : conf::Settings("./")
 	{
 		auto lc = log::Config();
-		lc.enable_info = false;
-		lc.enable_debug = false;
-		lc.enable_warning = false;
-		lc.enable_error = false;
-		lc.enable_fatal = false;
-		lc.enable_print = false;
+		lc.disable_all_levels();
 		this->LOGGER = std::make_shared<log::Logger>(lc);
 	}
 };

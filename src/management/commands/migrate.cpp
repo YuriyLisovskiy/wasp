@@ -39,7 +39,7 @@ void MigrateCommand::handle()
 		return;
 	}
 
-	this->settings->LOGGER->use_colors(!this->_no_colors_flag->get());
+	this->use_colors_for_logging(!this->_no_colors_flag->get());
 	auto db_name = this->_db_flag->get();
 	if (this->settings->DATABASES.find(db_name) == this->settings->DATABASES.end())
 	{
