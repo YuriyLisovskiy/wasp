@@ -318,6 +318,13 @@ std::tuple<std::string, bool> read_body_to_string(
 				);
 			}
 
+			auto content_encoding = request->get_header(CONTENT_ENCODING, "");
+			if (!content_encoding.empty())
+			{
+				// TODO: setup reader according to Content-Encoding:
+				//  https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Encoding
+			}
+
 			std::string buffer;
 			read_full_request_body(buffer, body_reader, content_length);
 			return {buffer, true};

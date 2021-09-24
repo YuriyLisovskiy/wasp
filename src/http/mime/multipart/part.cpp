@@ -14,6 +14,7 @@
 // Framework libraries.
 #include "./body_reader.h"
 #include "./quote_printable_reader.h"
+#include "./base64_reader.h"
 #include "./part_reader.h"
 #include "../media_type.h"
 #include "../../headers.h"
@@ -41,12 +42,16 @@ Part::Part(
 	// `raw_part` is used to switch between `next_part` and `next_raw_part`.
 	if (!raw_part)
 	{
-		if (str::equal_fold(
-				str::string_to_wstring(this->get_header(CONTENT_TRANSFER_ENCODING, "")), L"quoted-printable"
-		))
+		auto transfer_encoding = this->get_header(CONTENT_TRANSFER_ENCODING, "");
+		if (str::equal_fold(transfer_encoding, "quoted-printable"))
 		{
 			this->remove_header(CONTENT_TRANSFER_ENCODING);
 			this->reader = std::make_shared<QuotePrintableReader>(this->reader);
+		}
+		else if (str::equal_fold(transfer_encoding, "base64"))
+		{
+			this->remove_header(CONTENT_TRANSFER_ENCODING);
+			this->reader = std::make_shared<Base64Reader>(this->reader);
 		}
 	}
 }
