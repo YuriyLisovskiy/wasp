@@ -16,7 +16,7 @@
 
 // Base libraries.
 #include <xalwart.base/exceptions.h>
-#include <xalwart.base/json/json.h>
+#include <xalwart.base/vendor/nlohmann/json.h>
 
 // Module definitions.
 #include "./_def_.h"

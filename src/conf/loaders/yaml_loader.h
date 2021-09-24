@@ -13,7 +13,6 @@
 #include <functional>
 
 // Base libraries.
-#include <xalwart.base/yaml/yaml-cpp/yaml.h>
 #include <xalwart.base/config/components/yaml/default.h>
 #include <xalwart.base/config/components/yaml/logger.h>
 

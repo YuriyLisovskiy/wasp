@@ -21,7 +21,7 @@
 #include <xalwart.base/exceptions.h>
 #include <xalwart.base/io.h>
 #include <xalwart.base/net/request_context.h>
-#include <xalwart.base/json/json.h>
+#include <xalwart.base/vendor/nlohmann/json.h>
 
 // Module definitions.
 #include "./_def_.h"

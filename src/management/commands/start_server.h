@@ -9,7 +9,6 @@
 #pragma once
 
 // Base libraries.
-#include <xalwart.base/kwargs.h>
 #include <xalwart.base/net/abc.h>
 
 // Module definitions.
@@ -35,7 +34,7 @@ public:
 
 	// Returns command flags.
 	[[nodiscard]]
-	Kwargs get_kwargs() const override;
+	Options get_options() const override;
 
 protected:
 	void add_flags() override;

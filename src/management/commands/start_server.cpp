@@ -34,14 +34,14 @@ StartServerCommand::StartServerCommand(
 	);
 }
 
-Kwargs StartServerCommand::get_kwargs() const
+Options StartServerCommand::get_options() const
 {
-	auto kwargs = Command::get_kwargs();
-	kwargs.set("workers", std::to_string(this->_workers_count));
-	kwargs.set("retries", std::to_string(this->_retries_count));
-	kwargs.set("timeout_seconds", std::to_string(this->_timeout_seconds));
-	kwargs.set("timeout_microseconds", std::to_string(this->_timeout_microseconds));
-	return kwargs;
+	auto options = Command::get_options();
+	options.set("workers", std::to_string(this->_workers_count));
+	options.set("retries", std::to_string(this->_retries_count));
+	options.set("timeout_seconds", std::to_string(this->_timeout_seconds));
+	options.set("timeout_microseconds", std::to_string(this->_timeout_microseconds));
+	return options;
 }
 
 void StartServerCommand::add_flags()
@@ -96,7 +96,7 @@ void StartServerCommand::handle()
 	}
 
 	this->_parse_args();
-	auto server = this->settings->build_server(this->_handler_function, this->get_kwargs());
+	auto server = this->settings->build_server(this->_handler_function, this->get_options());
 	try
 	{
 		if (!server)

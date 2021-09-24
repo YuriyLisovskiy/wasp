@@ -9,9 +9,6 @@
 
 #pragma once
 
-// Base libraries.
-#include <xalwart.base/kwargs.h>
-
 // Module definitions.
 #include "./_def_.h"
 

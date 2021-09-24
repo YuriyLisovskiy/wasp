@@ -12,12 +12,8 @@
 #include <optional>
 
 // Base libraries.
-#include <xalwart.base/kwargs.h>
+#include <xalwart.base/options.h>
 #include <xalwart.base/datetime.h>
-#include <xalwart.base/string_utils.h>
-#include <xalwart.base/utility.h>
-#include <xalwart.base/path.h>
-#include <xalwart.base/yaml/yaml-cpp/yaml.h>
 #include <xalwart.base/net/abc.h>
 #include <xalwart.base/net/status.h>
 #include <xalwart.base/abc/base.h>
@@ -295,7 +291,7 @@ public:
 		const std::function<net::StatusCode(
 			net::RequestContext*, const std::map<std::string, std::string>& /* environment */
 		)>& handler,
-		const Kwargs& kwargs
+		const Options& options
 	)
 	{
 		return nullptr;

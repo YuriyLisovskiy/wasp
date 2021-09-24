@@ -6,6 +6,10 @@
 
 #include "./settings.h"
 
+// Base libraries.
+#include <xalwart.base/path.h>
+#include <xalwart.base/exceptions.h>
+
 // Framework modules.
 #include "../render/standard_library.h"
 #include "../middleware/clickjacking.h"

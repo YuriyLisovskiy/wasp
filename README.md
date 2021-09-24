@@ -27,10 +27,6 @@ The following library is optional (you can use alternatives):
 - [xalwart.render](https://github.com/YuriyLisovskiy/xalwart.render) 0.x.x or later
 - [xalwart.server](https://github.com/YuriyLisovskiy/xalwart.server) 0.x.x or later
 
-### Third party
-- [yaml parser](https://github.com/jbeder/yaml-cpp) 0.6.3 (part of [xalwart.base](https://github.com/YuriyLisovskiy/xalwart.base))
-- [json parser](https://github.com/nlohmann/json) 3.10.2 (part of [xalwart.base](https://github.com/YuriyLisovskiy/xalwart.base))
-
 ## Compile from Source
 * `BUILD_SHARED_LIBS` means to build a shared or static library (`ON` by default).
 * `XW_USE_DB_DRIVER_NAME` marks the name of a driver that will be used in ORM. `DB_DRIVER_NAME` should be

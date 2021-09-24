@@ -12,7 +12,7 @@
 #include <string>
 
 // Base libraries.
-#include <xalwart.base/kwargs.h>
+#include <xalwart.base/options.h>
 
 // Module definitions.
 #include "./_def_.h"
@@ -34,7 +34,7 @@ public:
 
 	// Returns command flags.
 	[[nodiscard]]
-	virtual inline Kwargs get_kwargs() const
+	virtual inline Options get_options() const
 	{
 		return {};
 	}
@@ -56,8 +56,6 @@ public:
 		return this->label;
 	}
 
-	// Creates flags if they are not created yet,
-	// parses argv and runs handle() method.
 	void run_from_argv(int argc, char** argv, bool is_verbose = false);
 
 protected:
