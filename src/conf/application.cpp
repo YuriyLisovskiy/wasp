@@ -250,7 +250,6 @@ std::shared_ptr<http::Request> Application::build_request(
 		settings->LIMITS.MAX_HEADER_LENGTH,
 		settings->LIMITS.MAX_HEADERS_COUNT,
 		settings->LIMITS.DATA_UPLOAD_MAX_MEMORY_SIZE,
-		settings->THROW_ON_INVALID_REQUEST_CONTENT_TYPE,
 		std::move(environment)
 	);
 }

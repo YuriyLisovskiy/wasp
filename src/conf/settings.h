@@ -45,8 +45,6 @@ public:
 
 	std::shared_ptr<abc::Logger> LOGGER = nullptr;
 
-	bool THROW_ON_INVALID_REQUEST_CONTENT_TYPE = true;
-
 	// A secret key for this particular installation. Used in secret-key
 	// hashing algorithms. Set this in your settings.
 	std::string SECRET_KEY;

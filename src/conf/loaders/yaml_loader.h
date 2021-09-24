@@ -53,10 +53,6 @@ public:
 		this->register_component("debug", std::make_unique<config::YAMLScalarComponent>(settings->DEBUG));
 		this->register_component("secret_key", std::make_unique<config::YAMLScalarComponent>(settings->SECRET_KEY));
 		this->register_component(
-			"throw_on_invalid_request_content_type",
-			std::make_unique<config::YAMLScalarComponent>(settings->THROW_ON_INVALID_REQUEST_CONTENT_TYPE)
-		);
-		this->register_component(
 			"allowed_hosts", std::make_unique<config::YAMLSequenceComponent>([settings](const YAML::Node& host)
 			{
 				auto value = host.as<std::string>("");

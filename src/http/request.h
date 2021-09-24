@@ -71,7 +71,6 @@ public:
 		ssize_t max_file_upload_size, ssize_t max_fields_count,
 		ssize_t max_header_length, ssize_t max_headers_count,
 		long long int multipart_max_memory,
-		bool throw_on_invalid_content_type,
 		std::map<std::string, std::string> environment
 	);
 
@@ -178,7 +177,7 @@ public:
 
 	inline const Query& form()
 	{
-		this->_parse_form(this->throw_on_invalid_content_type);
+		this->_parse_form();
 		return this->_form.value();
 	}
 
@@ -191,7 +190,7 @@ public:
 	inline nlohmann::json json()
 	{
 		this->_parse_json_data();
-		return this->_json;
+		return this->_json.value();
 	}
 
 	[[nodiscard]]
@@ -288,7 +287,7 @@ private:
 	std::optional<mime::multipart::Form> _multipart_form;
 
 	// '_json' is parsed request body when Content-Type is 'application/json'.
-	nlohmann::json _json;
+	std::optional<nlohmann::json> _json;
 
 	// '_host' specifies the host on which the
 	// URL is sought. For HTTP/1 (per RFC 7230, section 5.4), this
@@ -321,8 +320,6 @@ private:
 	ssize_t max_headers_count;
 	ssize_t multipart_max_memory;
 
-	bool throw_on_invalid_content_type;
-
 	// '_parse_form' populates '_form'.
 	//
 	// For all requests, '_parse_form' parses the raw query from the URL and updates
@@ -334,21 +331,21 @@ private:
 	//
 	// For other HTTP methods, or when the Content-Type is not
 	// application/x-www-form-urlencoded, the request 'body' is not read, and
-	// 'post_form' is initialized to a non-nil, empty value.
+	// 'form' is initialized to a non-nil, empty value.
 	//
-	// '_parse_multipart_form' calls '_parse_form' automatically.
+	// '_parse_multipart_form' and '_parse_json_data' call '_parse_form' automatically.
 	// '_parse_form' is idempotent.
-	void _parse_form(bool throw_on_invalid_ct);
+	void _parse_form();
 
 	// '_parse_multipart_form' parses a request body as multipart/form-data.
 	// The whole request body is parsed and up to a total of `multipart_max_memory` bytes of
 	// its file parts are stored in memory, with the remainder stored on
 	// disk in temporary files.
-	// `_parse_multipart_form` calls `_parse_form` if necessary.
 	// After one call to `_parse_multipart_form`, subsequent calls have no effect.
 	void _parse_multipart_form();
 
-	// TODO: docs for '_parse_json_data'
+	// '_parse_json_data' parses a request body as application/json.
+	// After one call to `_parse_json_data`, subsequent calls have no effect.
 	void _parse_json_data();
 
 	[[nodiscard]]
@@ -402,17 +399,12 @@ extern void read_full_request_body(std::string& buffer, io::IReader* reader, ssi
 // TESTME: read_body_to_string
 // TODO: docs for 'read_body_to_string'
 extern std::tuple<std::string, bool> read_body_to_string(
-	http::Request* request,
-	io::ILimitedBufferedReader* body_reader,
-	const std::string& target_content_type,
-	bool throw_on_invalid_content_type
+	http::Request* request, io::ILimitedBufferedReader* body_reader, const std::string& target_content_type
 );
 
 // TESTME: parse_post_form
 // TODO: docs for 'parse_post_form'
-extern Query parse_post_form(
-	http::Request* request, io::ILimitedBufferedReader* body_reader, bool throw_on_invalid_content_type
-);
+extern Query parse_post_form(http::Request* request, io::ILimitedBufferedReader* body_reader);
 
 // TESTME: 'get_content_type'
 // TODO: docs for 'get_content_type'

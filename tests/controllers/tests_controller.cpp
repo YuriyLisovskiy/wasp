@@ -34,7 +34,7 @@ public:
 		auto context = net::RequestContext{
 			.method = method
 		};
-		return http::Request(context, 99999, 99, 9999, 99, 9999, false, {});
+		return http::Request(context, 99999, 99, 9999, 99, 9999, {});
 	}
 
 protected:

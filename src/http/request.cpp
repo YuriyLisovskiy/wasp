@@ -22,14 +22,12 @@ Request::Request(
 	ssize_t max_file_upload_size, ssize_t max_fields_count,
 	ssize_t max_header_length, ssize_t max_headers_count,
 	long long int multipart_max_memory,
-	bool throw_on_invalid_content_type,
 	std::map<std::string, std::string> environment
 ) : _method(context.method),
 	_headers(context.headers), _body_reader(context.body), _content_length((ssize_t)context.content_size),
 	max_file_upload_size(max_file_upload_size), max_fields_count(max_fields_count),
 	max_headers_count(max_headers_count), max_header_length(max_header_length),
-	multipart_max_memory(multipart_max_memory), _environment(std::move(environment)),
-	throw_on_invalid_content_type(throw_on_invalid_content_type)
+	multipart_max_memory(multipart_max_memory), _environment(std::move(environment))
 {
 	if (!valid_method(this->_method))
 	{
@@ -169,14 +167,14 @@ std::string Request::_get_port(bool use_x_forwarded_port) const
 	return port;
 }
 
-void Request::_parse_form(bool throw_on_invalid_ct)
+void Request::_parse_form()
 {
 	if (!this->_form.has_value())
 	{
 		Query post_form;
 		if (this->_method == "POST" || this->_method == "PUT" || this->_method == "PATCH")
 		{
-			post_form = parse_post_form(this, this->_body_reader.get(), throw_on_invalid_ct);
+			post_form = parse_post_form(this, this->_body_reader.get());
 		}
 
 		if (!post_form.empty())
@@ -201,11 +199,7 @@ void Request::_parse_form(bool throw_on_invalid_ct)
 
 void Request::_parse_multipart_form()
 {
-	if (!this->_form.has_value())
-	{
-		this->_parse_form(false);
-	}
-
+	this->_parse_form();
 	if (this->_multipart_form.has_value())
 	{
 		return;
@@ -223,12 +217,20 @@ void Request::_parse_multipart_form()
 
 void Request::_parse_json_data()
 {
-	auto [content, ok] = read_body_to_string(
-		this, this->_body_reader.get(), mime::APPLICATION_JSON, !this->throw_on_invalid_content_type
-	);
+	this->_parse_form();
+	if (this->_json.has_value())
+	{
+		return;
+	}
+
+	auto [content, ok] = read_body_to_string(this, this->_body_reader.get(), mime::APPLICATION_JSON);
 	if (ok)
 	{
 		this->_json = nlohmann::json::parse(content);
+	}
+	else
+	{
+		this->_json = {{}};
 	}
 }
 
@@ -291,10 +293,7 @@ void read_full_request_body(std::string& buffer, io::IReader* reader, ssize_t co
 }
 
 std::tuple<std::string, bool> read_body_to_string(
-	http::Request* request,
-	io::ILimitedBufferedReader* body_reader,
-	const std::string& target_content_type,
-	bool mute_invalid_content_type_error
+	http::Request* request, io::ILimitedBufferedReader* body_reader, const std::string& target_content_type
 )
 {
 	require_non_null(request, "'request' is nullptr", _ERROR_DETAILS_);
@@ -330,22 +329,15 @@ std::tuple<std::string, bool> read_body_to_string(
 			return {buffer, true};
 		}
 	}
-	else if (!mute_invalid_content_type_error)
-	{
-		throw RuntimeError("Content is not '" + target_content_type + "'", _ERROR_DETAILS_);
-	}
 
+	// Skip if Content-Type is invalid.
 	return {"", false};
 }
 
-Query parse_post_form(
-	http::Request* request, io::ILimitedBufferedReader* body_reader, bool mute_invalid_content_type_error
-)
+Query parse_post_form(http::Request* request, io::ILimitedBufferedReader* body_reader)
 {
 	Query query;
-	auto [content, ok] = read_body_to_string(
-		request, body_reader, mime::APPLICATION_X_WWW_FORM_URLENCODED, mute_invalid_content_type_error
-	);
+	auto [content, ok] = read_body_to_string(request, body_reader, mime::APPLICATION_X_WWW_FORM_URLENCODED);
 	if (ok)
 	{
 		query = parse_query(content);
