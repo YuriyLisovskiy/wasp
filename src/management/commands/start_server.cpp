@@ -6,6 +6,9 @@
 
 #include "./start_server.h"
 
+// C++ libraries.
+#include <iostream>
+
 // Base libraries.
 #include <xalwart.base/string_utils.h>
 #include <xalwart.base/datetime.h>

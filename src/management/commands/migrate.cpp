@@ -6,6 +6,9 @@
 
 #include "./migrate.h"
 
+// C++ libraries.
+#include <iostream>
+
 // Orm libraries.
 #include <xalwart.orm/db/executor.h>
 
@@ -48,13 +51,13 @@ void MigrateCommand::handle()
 		);
 	}
 
-	auto driver = this->settings->DATABASES.at(db_name)->driver();
+	auto backend = (orm::abc::SQLBackend*)this->settings->DATABASES.at(db_name).get();
+	require_non_null(backend, "Database backend is nullptr", _ERROR_DETAILS_);
 	auto executor = orm::db::MigrationExecutor(
-		driver,
-		this->settings->build_migrations(driver),
+		backend, this->settings->build_migrations(backend),
 		[this] (auto msg, auto end) { this->log_progress(msg, end); }
 	);
-	auto editor = require_non_null(driver)->schema_editor();
+	auto editor = backend->schema_editor();
 	auto migration_name = this->_migration_flag->get();
 	if (this->_rollback_flag->get())
 	{

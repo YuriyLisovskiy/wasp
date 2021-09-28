@@ -18,9 +18,9 @@
 #include <xalwart.base/net/status.h>
 #include <xalwart.base/abc/base.h>
 #include <xalwart.base/abc/render.h>
+#include <xalwart.base/abc/orm.h>
 
 // ORM libraries.
-#include <xalwart.orm/client.h>
 #include <xalwart.orm/db/migration.h>
 
 // Module definitions.
@@ -80,10 +80,10 @@ public:
 	std::shared_ptr<abc::render::IEngine> TEMPLATE_ENGINE = nullptr;
 
 	// Default database instance.
-	std::shared_ptr<orm::Client> DB = nullptr;
+	std::shared_ptr<abc::orm::Backend> DB = nullptr;
 
 	// List of databases.
-	std::map<std::string, std::shared_ptr<orm::Client>> DATABASES;
+	std::map<std::string, std::shared_ptr<abc::orm::Backend>> DATABASES;
 
 	// Whether to append trailing slashes to URLs.
 	bool APPEND_SLASH = true;
@@ -310,7 +310,7 @@ public:
 	[[nodiscard]]
 	std::shared_ptr<abc::render::ILoader> build_template_loader(const std::string& full_name) const;
 
-	std::list<std::shared_ptr<orm::db::Migration>> build_migrations(orm::abc::ISQLDriver* driver);
+	std::list<std::shared_ptr<orm::db::Migration>> build_migrations(abc::orm::Backend* backend);
 
 protected:
 	template <class T>
@@ -374,9 +374,9 @@ protected:
 	template <class MigrationT, class ...Args>
 	inline void migration(Args&& ...args)
 	{
-		this->_migrations.push_back([args...](auto* driver) -> std::shared_ptr<orm::db::Migration>
+		this->_migrations.push_back([args...](auto* backend) -> std::shared_ptr<orm::db::Migration>
 		{
-			return std::make_shared<MigrationT>(driver, std::forward<Args>(args)...);
+			return std::make_shared<MigrationT>(backend, std::forward<Args>(args)...);
 		});
 	}
 
@@ -385,7 +385,7 @@ private:
 	std::map<std::string, std::function<std::shared_ptr<abc::render::ILibrary>()>> _libraries;
 	std::map<std::string, std::function<std::shared_ptr<IModuleConfig>()>> _modules;
 	std::map<std::string, std::function<std::shared_ptr<abc::render::ILoader>()>> _loaders;
-	std::list<std::function<std::shared_ptr<orm::db::Migration>(orm::abc::ISQLDriver* driver)>> _migrations;
+	std::list<std::function<std::shared_ptr<orm::db::Migration>(abc::orm::Backend*)>> _migrations;
 };
 
 __CONF_END__

@@ -6,6 +6,9 @@
 
 #include "./settings.h"
 
+// C++ libraries.
+#include <iostream>
+
 // Base libraries.
 #include <xalwart.base/path.h>
 #include <xalwart.base/exceptions.h>
@@ -89,12 +92,21 @@ void Settings::prepare()
 {
 	if (!this->DB && !this->DATABASES.empty())
 	{
-		this->DB = this->DATABASES.begin()->second;
-		if (this->LOGGER)
+		if (this->DATABASES.contains("default"))
 		{
-			this->LOGGER->warning(
-				"Missing 'default' database, the first database from 'databases' map is set as the default."
-			);
+			this->DB = this->DATABASES.at("default");
+		}
+		else
+		{
+			auto first_backend = this->DATABASES.begin();
+			this->DB = first_backend->second;
+			if (this->LOGGER)
+			{
+				this->LOGGER->warning(
+					"Missing 'default' database, the first database from "
+					"'databases' map is set as the default: " + first_backend->first
+				);
+			}
 		}
 	}
 }
@@ -197,7 +209,7 @@ std::shared_ptr<abc::render::ILoader> Settings::build_template_loader(const std:
 	return nullptr;
 }
 
-std::list<std::shared_ptr<orm::db::Migration>> Settings::build_migrations(orm::abc::ISQLDriver* driver)
+std::list<std::shared_ptr<orm::db::Migration>> Settings::build_migrations(abc::orm::Backend* backend)
 {
 	if (this->_migrations.empty())
 	{
@@ -207,7 +219,7 @@ std::list<std::shared_ptr<orm::db::Migration>> Settings::build_migrations(orm::a
 	std::list<std::shared_ptr<orm::db::Migration>> migrations;
 	for (const auto& migration : this->_migrations)
 	{
-		migrations.push_back(migration(driver));
+		migrations.push_back(migration(backend));
 	}
 
 	return migrations;
