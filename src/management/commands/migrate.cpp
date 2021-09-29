@@ -51,7 +51,7 @@ void MigrateCommand::handle()
 		);
 	}
 
-	auto backend = (orm::abc::SQLBackend*)this->settings->DATABASES.at(db_name).get();
+	auto backend = (orm::abc::ISQLBackend*)this->settings->DATABASES.at(db_name).get();
 	require_non_null(backend, "Database backend is nullptr", _ERROR_DETAILS_);
 	auto executor = orm::db::MigrationExecutor(
 		backend, this->settings->build_migrations(backend),

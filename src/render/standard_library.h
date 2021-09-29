@@ -35,7 +35,7 @@ public:
 	}
 
 	[[nodiscard]]
-	std::map<std::string, abc::render::ILibrary::Function> get_functions() const override;
+	std::map<std::string, render::abc::ILibrary::Function> get_functions() const override;
 
 	[[nodiscard]]
 	inline std::string name() const override

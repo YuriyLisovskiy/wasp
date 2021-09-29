@@ -25,10 +25,10 @@ __RENDER_BEGIN__
 
 // TESTME: make_static_function
 // TODO: docs for 'make_static_function'
-extern abc::render::ILibrary::Function make_static_function(const std::string& prefix);
+extern render::abc::ILibrary::Function make_static_function(const std::string& prefix);
 
 // TESTME: make_url_function
 // TODO: docs for 'make_url_function'
-extern abc::render::ILibrary::Function make_url_function(const std::vector<std::shared_ptr<urls::IPattern>>& patterns);
+extern render::abc::ILibrary::Function make_url_function(const std::vector<std::shared_ptr<urls::IPattern>>& patterns);
 
 __RENDER_END__

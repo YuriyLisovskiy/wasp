@@ -22,7 +22,7 @@ __RENDER_BEGIN__
 
 // TESTME: Library
 // TODO: docs for 'Library'
-class Library : public abc::render::ILibrary
+class Library : public render::abc::ILibrary
 {
 public:
 	inline explicit Library(conf::Settings* settings) : _settings(settings)

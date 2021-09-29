@@ -27,14 +27,14 @@ __CONTROLLERS_BEGIN__
 class TemplateResponseMixin
 {
 public:
-	explicit TemplateResponseMixin(abc::render::IEngine* engine);
+	explicit TemplateResponseMixin(render::abc::IEngine* engine);
 
 	// Returns a response with a template rendered with
 	// the given context.
 	[[nodiscard]]
 	virtual std::unique_ptr<http::abc::HttpResponse> render(
 		http::Request* request,
-		const std::shared_ptr<abc::render::IContext>& context,
+		const std::shared_ptr<render::abc::IContext>& context,
 		const std::string& template_name="",
 		unsigned short int status=200,
 		const std::string& content_type="",
@@ -49,7 +49,7 @@ public:
 protected:
 	std::string template_name;
 	std::string content_type;
-	abc::render::IEngine* engine;
+	render::abc::IEngine* engine;
 };
 
 // TESTME: TemplateController
@@ -68,7 +68,7 @@ public:
 	// Used in default get() method, can be overridden
 	// in derived classes.
 	[[nodiscard]]
-	virtual inline std::shared_ptr<abc::render::IContext> get_context(http::Request* request, UrlArgsT ...args) const
+	virtual inline std::shared_ptr<render::abc::IContext> get_context(http::Request* request, UrlArgsT ...args) const
 	{
 		return nullptr;
 	}

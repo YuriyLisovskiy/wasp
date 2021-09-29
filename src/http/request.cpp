@@ -230,7 +230,7 @@ void Request::_parse_json_data()
 	}
 	else
 	{
-		this->_json = {{}};
+		this->_json = nlohmann::json(nlohmann::json::value_t::null);
 	}
 }
 

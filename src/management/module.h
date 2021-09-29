@@ -10,9 +10,11 @@
 
 // C++ libraries.
 #include <memory>
+#include <memory>
+#include <string>
 
 // Base libraries.
-#include <xalwart.base/net/abc.h>
+#include <xalwart.base/net/request_context.h>
 
 // Module definitions.
 #include "./_def_.h"
