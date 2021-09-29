@@ -43,7 +43,7 @@ private:
 	{
 		auto result = std::find_if(
 			this->settings->MODULES.begin(), this->settings->MODULES.end(),
-			[module](const std::shared_ptr<IModuleConfig>& entry) -> bool {
+			[&module](const std::shared_ptr<IModuleConfig>& entry) -> bool {
 				return entry->get_name() == module;
 			}
 		);
@@ -80,7 +80,10 @@ protected:
 		{
 			ControllerType controller(settings_pointer, controller_args...);
 			return std::apply(
-				[controller, request](RequestArgs ...a) mutable -> auto { return controller.dispatch(request, a...); },
+				[&controller, request](RequestArgs ...a) mutable -> auto
+				{
+					return controller.dispatch(request, a...);
+				},
 				request_args
 			);
 		};
