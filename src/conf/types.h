@@ -183,7 +183,7 @@ struct CrossSiteRequestForgery
 	{
 		std::string NAME;
 		size_t AGE;
-		std::string DOMAIN;
+		std::string DOMAIN_;
 		std::string PATH;
 		bool SECURE;
 		bool HTTP_ONLY;

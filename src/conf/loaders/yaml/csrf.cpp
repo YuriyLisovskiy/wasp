@@ -14,7 +14,7 @@ YAMLCSRFComponent::YAMLCSRFComponent(CrossSiteRequestForgery& csrf)
 	auto cookie_component = std::make_unique<config::YAMLMapComponent>();
 	cookie_component->register_component("name", std::make_unique<config::YAMLScalarComponent>(csrf.COOKIE.NAME));
 	cookie_component->register_component("age", std::make_unique<config::YAMLScalarComponent>(csrf.COOKIE.AGE));
-	cookie_component->register_component("domain", std::make_unique<config::YAMLScalarComponent>(csrf.COOKIE.DOMAIN));
+	cookie_component->register_component("domain", std::make_unique<config::YAMLScalarComponent>(csrf.COOKIE.DOMAIN_));
 	cookie_component->register_component("path", std::make_unique<config::YAMLScalarComponent>(csrf.COOKIE.PATH));
 	cookie_component->register_component("secure", std::make_unique<config::YAMLScalarComponent>(csrf.COOKIE.SECURE));
 	cookie_component->register_component(

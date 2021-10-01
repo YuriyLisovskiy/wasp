@@ -15,7 +15,8 @@ TEST(CookieTestCase, toStringTestAllParameters)
 {
 	http::Cookie cookie(
 		"hello", "World",
-		dt::Datetime::strptime("Thu, 18 Jul 2019 16:25:19 GMT", http::COOKIE_DATE_TIME_FORMAT),
+		dt::Datetime::strptime("Thu, 18 Jul 2019 16:25:19 GMT", http::COOKIE_DATE_TIME_FORMAT)
+			.as_timezone(std::make_shared<dt::Timezone>(dt::Timezone::UTC)),
 		"localhost.com", "/hello", true, true
 	);
 	std::string expected = "Set-Cookie: hello=World; Domain=localhost.com; Path=/hello; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Secure; HttpOnly";

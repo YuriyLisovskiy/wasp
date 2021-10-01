@@ -203,7 +203,7 @@ public:
 		.COOKIE = {
 			.NAME = "csrftoken",
 			.AGE = 60 * 60 * 24 * 7 * 52,
-			.DOMAIN = "",
+			.DOMAIN_ = "",
 			.PATH = "/",
 			.SECURE = false,
 			.HTTP_ONLY = false,
