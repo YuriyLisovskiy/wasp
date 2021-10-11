@@ -18,7 +18,7 @@ YAMLStaticComponent::YAMLStaticComponent(Static& static_, const std::string& bas
 		"root", std::make_unique<config::YAMLScalarComponent>([&, base_directory](const YAML::Node& root)
 		{
 			auto string_root = root.as<std::string>(static_.ROOT);
-			static_.ROOT = path::is_absolute(string_root) ?
+			static_.ROOT = path::Path(string_root).is_absolute() ?
 				string_root : path::join(base_directory, string_root);
 		})
 	);

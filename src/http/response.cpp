@@ -154,7 +154,7 @@ FileResponse::FileResponse(
 	_file_path(std::move(file_path)),
 	_headers_is_got(false)
 {
-	if (!path::exists(this->_file_path))
+	if (!path::Path(this->_file_path).exists())
 	{
 		throw exc::FileDoesNotExist("file '" + this->_file_path + "' does not exist", _ERROR_DETAILS_);
 	}
@@ -222,7 +222,7 @@ void FileResponse::_set_headers()
 
 	std::string disposition = this->_as_attachment ? "attachment" : "inline";
 	std::string file_expr;
-	std::string file_name = path::basename(this->_file_path);
+	std::string file_name = path::Path(this->_file_path).basename();
 	try
 	{
 		file_expr = "filename=\"" + encoding::encode(file_name, encoding::Encoding::ASCII) + "\"";

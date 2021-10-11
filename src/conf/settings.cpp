@@ -125,7 +125,7 @@ void Settings::check()
 		this->LOGGER->error("'BASE_DIR' must not be empty in order to use the application.");
 		err_count++;
 	}
-	else if (!path::exists(this->BASE_DIR))
+	else if (!path::Path(this->BASE_DIR).exists())
 	{
 		this->LOGGER->error("'BASE_DIR' must exist in order to use the application.");
 		err_count++;

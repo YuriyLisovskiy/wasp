@@ -23,7 +23,10 @@ endif()
 
 # Link dependencies.
 target_link_libraries(${LIBRARY_NAME} PUBLIC
+    crypto
+    ssl
     ${FRAMEWORK_NAME}.base
+    ${FRAMEWORK_NAME}.crypto
     ${FRAMEWORK_NAME}.orm
 )
 

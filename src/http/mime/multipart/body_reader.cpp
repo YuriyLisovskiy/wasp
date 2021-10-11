@@ -106,7 +106,7 @@ Form BodyReader::read_form(long long int max_memory)
 				}
 				catch (const FileError& exc)
 				{
-					if (path::exists(file->path()))
+					if (path::Path(file->path()).exists())
 					{
 						std::filesystem::remove(file->path());
 					}

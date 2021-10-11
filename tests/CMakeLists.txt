@@ -15,6 +15,8 @@ function(add_tests SUB_DIR SUB_NAME)
     add_executable(${FULL_BIN} ${SOURCES} ${TESTS_DIR}/main.cpp)
     target_include_directories(${FULL_BIN} PUBLIC ${INCLUDE_DIR})
     target_link_libraries(${FULL_BIN} PUBLIC
+        crypto
+        ssl
         gtest
         ${FRAMEWORK_NAME}.base
         ${FRAMEWORK_NAME}.orm

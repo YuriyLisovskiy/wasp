@@ -47,3 +47,6 @@ lib/
 
 # Other stuff
 Makefile
+
+# macOS files
+*.DS_Store
