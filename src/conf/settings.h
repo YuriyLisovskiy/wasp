@@ -19,6 +19,7 @@
 #include <xalwart.base/abc/render.h>
 #include <xalwart.base/abc/orm.h>
 #include <xalwart.base/abc/server.h>
+#include <xalwart.base/path.h>
 
 // ORM libraries.
 #include <xalwart.orm/db/migration.h>
@@ -41,7 +42,7 @@ public:
 	bool DEBUG = false;
 
 	// By default, it should be current working directory.
-	std::string BASE_DIR;
+	path::Path BASE_DIR;
 
 	std::shared_ptr<abc::ILogger> LOGGER = nullptr;
 
@@ -242,7 +243,12 @@ public:
 		}
 	};
 
-	explicit Settings(const std::string& base_dir);
+	explicit Settings(const std::string& root_directory="") :
+		Settings(path::Path(root_directory))
+	{
+	}
+
+	explicit Settings(path::Path root_directory);
 
 	virtual ~Settings() = default;
 

@@ -54,7 +54,7 @@ __CONF_BEGIN__
 			{
 				auto p = it->as<std::string>();
 				dirs.push_back(
-					path::is_absolute(p) ? p : path::join(settings->BASE_DIR, p)
+					path::is_absolute(p) ? p : path::join(settings->BASE_DIR.to_string(), p)
 				);
 			}
 		}
@@ -99,96 +99,6 @@ __CONF_BEGIN__
 		libs,
 		settings->LOGGER.get()
 	);
-}*/
-
-/*void YAMLSettingsLoader::_init_databases(Settings* settings, const YAML::Node& databases)
-{
-	for (auto it = databases.begin(); it != databases.end(); it++)
-	{
-		if (it->IsDefined() && it->IsMap())
-		{
-			auto db_info = *it;
-			if (!db_info || !db_info.IsMap())
-			{
-				throw ImproperlyConfigured(
-					"databases: parameter must be non-empty map", _ERROR_DETAILS_
-				);
-			}
-
-			auto driver_node = db_info["driver"];
-			if (!driver_node || !driver_node.IsScalar())
-			{
-				throw ImproperlyConfigured(
-					"databases: the 'driver' parameter is required and must have a string type",
-					_ERROR_DETAILS_
-				);
-			}
-
-			auto name_node = db_info["name"];
-			if (!name_node || !name_node.IsScalar())
-			{
-				throw ImproperlyConfigured(
-					"databases: the 'name' parameter is required and must have a string type",
-					_ERROR_DETAILS_
-				);
-			}
-
-			auto db_name = name_node.as<std::string>();
-			auto driver_name = driver_node.as<std::string>();
-			std::shared_ptr<orm::abc::ISQLDriver> driver;
-			if (driver_name == "sqlite3")
-			{
-				_init_sqlite3_database(db_name, settings, driver, db_info);
-			}
-			else
-			{
-				// TODO: add more driver initializations.
-				driver = settings->build_database(db_name, db_info);
-			}
-
-			if (driver)
-			{
-				settings->DATABASES[db_name] = std::make_shared<orm::Client>(driver);
-//				if (db_name == "default")
-//				{
-//					settings->DB = std::make_shared<orm::Client>(driver);
-//				}
-//				else
-//				{
-//					settings->DATABASES.push_back();
-//				}
-			}
-		}
-	}
-
-	if (settings->DATABASES.find("default") != settings->DATABASES.end())
-	{
-		settings->DB = settings->DATABASES["default"];
-	}
-	else
-	{
-		throw ImproperlyConfigured(
-			"databases: default database is required to be configured",
-			_ERROR_DETAILS_
-		);
-	}
-}*/
-
-/*void YAMLSettingsLoader::_init_sqlite3_database(
-	const std::string& name, Settings* settings,
-	std::shared_ptr<orm::abc::ISQLDriver>& driver, const YAML::Node& database
-)
-{
-	auto filepath = database["file"];
-	if (!filepath || !filepath.IsScalar())
-	{
-		throw ImproperlyConfigured(
-			"databases: the 'file' parameter of SQLite3 database info is required and must have a string type",
-			_ERROR_DETAILS_
-		);
-	}
-
-	driver = settings->build_sqlite3_database(name, filepath.as<std::string>());
 }*/
 
 __CONF_END__

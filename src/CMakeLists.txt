@@ -21,6 +21,10 @@ if (${XW_USE_SQLITE3})
     target_link_libraries(${LIBRARY_NAME} PUBLIC sqlite3)
 endif()
 
+if (NOT APPLE)
+    target_link_libraries(${LIBRARY_NAME} PUBLIC stdc++fs)
+endif()
+
 # Link dependencies.
 target_link_libraries(${LIBRARY_NAME} PUBLIC
     crypto
