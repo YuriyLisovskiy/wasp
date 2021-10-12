@@ -22,6 +22,9 @@ function install_lib {
 # Install base library.
 install_lib "base"
 
+# Install crypto library.
+install_lib "crypto"
+
 # Install orm library.
 install_lib "orm"
 

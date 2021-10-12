@@ -14,15 +14,15 @@ option(BUILD_SHARED_LIBS "Build shared libraries (DLLs)." ON)
 # Add the library.
 add_library(${LIBRARY_NAME} ${SOURCES})
 
+if (NOT APPLE)
+    target_link_libraries(${LIBRARY_NAME} PUBLIC stdc++fs)
+endif()
+
 option(XW_USE_SQLITE3 "Link sqlite3 library and add compile XW_USE_SQLITE3 compile definition." OFF)
 if (${XW_USE_SQLITE3})
     # Use sqlite3 driver.
     add_compile_definitions(USE_SQLITE3)
     target_link_libraries(${LIBRARY_NAME} PUBLIC sqlite3)
-endif()
-
-if (NOT APPLE)
-    target_link_libraries(${LIBRARY_NAME} PUBLIC stdc++fs)
 endif()
 
 # Link dependencies.
