@@ -8,36 +8,38 @@ set(LIBRARY_VERSION "0.0.0")
 
 project(${LIBRARY_NAME})
 
-set(ROOT_DIR /usr/local)
-set(INCLUDE_DIR ${ROOT_DIR}/include)
-set(LIB_DIR ${ROOT_DIR}/lib)
+# Search for OpenSSL
+find_package(OpenSSL 1.1 REQUIRED)
+include_directories(${OPENSSL_INCLUDE_DIR})
 
-include_directories(${INCLUDE_DIR})
-link_directories(${LIB_DIR})
+set(
+    DEFAULT_INCLUDE_PATHS
+        "/usr/local"
+        "/usr"
+)
 
-if (APPLE)
-    set(XW_OPENSSL_DIR "openssl@1.1/1.1.1l" CACHE STRING "OpenSSL version to use for compiling lib.")
+foreach(ENTRY ${DEFAULT_INCLUDE_PATHS})
+    include_directories(${ENTRY}/include)
+    link_directories(${ENTRY}/lib)
+endforeach()
 
-    set(XW_OPENSSL_OPT_HOMEBREW_INCLUDE /opt/homebrew/Cellar/${XW_OPENSSL_DIR}/include)
-    if (EXISTS ${XW_OPENSSL_OPT_HOMEBREW_INCLUDE})
-        include_directories(${XW_OPENSSL_OPT_HOMEBREW_INCLUDE})
-    endif()
+# Search for xalwart.base
+find_library(
+    XALWART_BASE xalwart.base REQUIRED
+    PATHS ${DEFAULT_INCLUDE_PATHS}
+)
 
-    set(XW_OPENSSL_OPT_HOMEBREW_LIB /opt/homebrew/Cellar/${XW_OPENSSL_DIR}/lib)
-    if (EXISTS ${XW_OPENSSL_OPT_HOMEBREW_LIB})
-        link_directories(${XW_OPENSSL_OPT_HOMEBREW_LIB})
-    endif()
+# Search for xalwart.crypto
+find_library(
+    XALWART_CRYPTO xalwart.crypto REQUIRED
+    PATHS ${DEFAULT_INCLUDE_PATHS}
+)
 
-    set(XW_OPENSSL_USR_LOCAL_INCLUDE /usr/local/Cellar/${XW_OPENSSL_DIR}/include)
-    if (EXISTS ${XW_OPENSSL_USR_LOCAL_INCLUDE})
-        include_directories(${XW_OPENSSL_USR_LOCAL_INCLUDE})
-    endif()
-
-    set(XW_OPENSSL_USR_LOCAL_LIB /usr/local/Cellar/${XW_OPENSSL_DIR}/lib)
-    if (EXISTS ${XW_OPENSSL_USR_LOCAL_LIB})
-        link_directories(${XW_OPENSSL_USR_LOCAL_LIB})
-    endif()
-endif()
+# Search for xalwart.orm
+find_library(
+    XALWART_ORM xalwart.orm REQUIRED
+    PATHS ${DEFAULT_INCLUDE_PATHS}
+)
 
 option(XW_CONFIGURE_LIB "Configure the library." ON)
 if (${XW_CONFIGURE_LIB})

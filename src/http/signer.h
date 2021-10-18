@@ -8,9 +8,6 @@
 
 #pragma once
 
-// OpenSSL libraries.
-#include <openssl/evp.h>
-
 // Base libraries.
 #include <xalwart.base/re/regex.h>
 
@@ -55,7 +52,7 @@ private:
 // TODO: docs for '_get_default_algorithm'
 inline std::unique_ptr<crypto::abc::ISignatureAlgorithm> _get_default_algorithm(const std::string& secret_key)
 {
-	return std::make_unique<crypto::HMAC>(secret_key, EVP_md5, "HMAC-MD5");
+	return std::make_unique<crypto::HMAC>(secret_key, crypto::md5, "HMAC-MD5");
 }
 
 // TESTME: salted_hmac

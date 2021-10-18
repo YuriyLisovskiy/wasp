@@ -84,8 +84,17 @@ std::string salted_hmac_hex_digest(
 	}
 
 	// We need to generate a derived key from our base key.
-	auto salted_key = algorithm->hash_function()(salt + secret_key);
-	algorithm->update_secret_key(salted_key);
+	auto hash_function = algorithm->get_digest_function();
+	if (!hash_function)
+	{
+		throw NullPointerException(
+			"Digest function of '" + algorithm->get_name() + "' signature algorithm is nullptr",
+			_ERROR_DETAILS_
+		);
+	}
+
+	auto salted_key = hash_function(salt + secret_key);
+	algorithm->set_secret_key(salted_key);
 	auto digest = algorithm->sign_to_hex(value);
 	algorithm->reset_secret_key();
 	return digest;

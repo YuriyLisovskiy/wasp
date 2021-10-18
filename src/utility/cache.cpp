@@ -11,7 +11,7 @@
 #include <xalwart.base/string_utils.h>
 
 // Crypto libraries.
-#include <xalwart.crypto/md.h>
+#include <xalwart.crypto/digest.h>
 
 // Framework libraries.
 #include "../http/headers.h"

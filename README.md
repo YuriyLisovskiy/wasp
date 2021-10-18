@@ -25,23 +25,24 @@ To build the library from source CMake 3.12 or later is required.
 
 ### Dependencies
 The following libraries are required:
-- [xalwart.base](https://github.com/YuriyLisovskiy/xalwart.base) 0.x.x or later
-- [xalwart.crypto](https://github.com/YuriyLisovskiy/xalwart.crypto) 0.x.x or later
-- [xalwart.orm](https://github.com/YuriyLisovskiy/xalwart.orm) 0.x.x or later
+- [xalwart.base](https://github.com/YuriyLisovskiy/xalwart.base) 0.0.0 or later
+- [xalwart.crypto](https://github.com/YuriyLisovskiy/xalwart.crypto) 0.0.0 or later
+- [xalwart.orm](https://github.com/YuriyLisovskiy/xalwart.orm) 0.0.0 or later
 
 The following library is optional (you can use alternatives):
-- [xalwart.render](https://github.com/YuriyLisovskiy/xalwart.render) 0.x.x or later
-- [xalwart.server](https://github.com/YuriyLisovskiy/xalwart.server) 0.x.x or later
+- [xalwart.render](https://github.com/YuriyLisovskiy/xalwart.render) 0.0.0 or later
+- [xalwart.server](https://github.com/YuriyLisovskiy/xalwart.server) 0.0.0 or later
 
 ## Compile from Source
-* `BUILD_SHARED_LIBS` means to build a shared or static library (`ON` by default).
+* `BUILD_SHARED_LIBS`: build a shared or static library (`ON` by default).
+* `OPENSSL_ROOT_DIR`: root directory for OpenSSL library in case of non-standard installation path.
+* `LIBRARY_ROOT`: installation directory root (`/usr/local` by default).
+* `LIBRARY_INCLUDE_DIR`: include installation directory (`${LIBRARY_ROOT}/include` by default).
+* `LIBRARY_LINK_DIR`: library installation directory (`${LIBRARY_ROOT}/lib` by default).
 
 Specific options for [xalwart.orm](https://github.com/YuriyLisovskiy/xalwart.orm):
-* `XW_USE_DB_DRIVER_NAME` marks the name of a driver that will be used in ORM. `DB_DRIVER_NAME` should be
+* `XW_USE_DB_DRIVER_NAME`: the name of a driver that will be used in ORM. `DB_DRIVER_NAME` should be
   replaced by one of the [available drivers](https://github.com/YuriyLisovskiy/xalwart.orm/tree/dev#available-drivers).
-
-Specific options for macOS:
-* `XW_OPENSSL_DIR` sets version of OpenSSL library (`openssl@1.1/1.1.1l` by default).
 ```bash
 git clone https://github.com/YuriyLisovskiy/xalwart.git
 cd xalwart
