@@ -88,4 +88,7 @@ protected:
 	virtual void handle() = 0;
 };
 
+template <typename T>
+concept command_type = std::is_base_of_v<AbstractCommand, T>;
+
 __COMMANDS_END__

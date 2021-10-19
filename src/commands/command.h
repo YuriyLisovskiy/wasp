@@ -46,7 +46,4 @@ protected:
 	}
 };
 
-template <typename T>
-concept command_type = std::is_base_of_v<Command, T>;
-
 __COMMANDS_END__
