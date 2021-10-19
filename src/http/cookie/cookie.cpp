@@ -91,7 +91,10 @@ Cookie::Cookie(
 	auto tz_name = this->_expires.tz_name();
 	if (!tz_name.empty() && tz_name != dt::Timezone::UTC.tz_name(nullptr))
 	{
-		throw ValueError("'expires' should have UTC timezone or created without it", _ERROR_DETAILS_);
+		throw ValueError(
+			"'expires' should have UTC timezone or created without it, got " + tz_name,
+			_ERROR_DETAILS_
+		);
 	}
 
 	this->_max_age = _get_max_age(this->_expires);
