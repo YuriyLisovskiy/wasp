@@ -46,6 +46,7 @@ Options StartServerCommand::get_options() const
 
 void StartServerCommand::add_flags()
 {
+	xw::cmd::Command::add_flags();
 	this->_addr_port_flag = this->flag_set->make_string(
 		"b", "bind", "", "Server address and port formatted as host:port"
 	);

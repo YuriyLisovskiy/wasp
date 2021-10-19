@@ -69,17 +69,13 @@ protected:
 	// Create flags if they are not created yet.
 	void create_flags();
 
-	inline void add_subcommand(std::shared_ptr<AbstractCommand> command);
+	void add_subcommand(std::shared_ptr<AbstractCommand> command);
 
 	// Override in child class to add more commands.
-	virtual inline void add_flags()
-	{
-	}
+	virtual void add_flags() = 0;
 
 	// Validates arguments before processing the command.
-	virtual inline void validate() const
-	{
-	}
+	virtual void validate() const = 0;
 
 	// The actual logic of the command. Subclasses must implement
 	// this method.

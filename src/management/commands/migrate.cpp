@@ -14,6 +14,7 @@ __MANAGEMENT_COMMANDS_BEGIN__
 
 void MigrateCommand::add_flags()
 {
+	xw::cmd::Command::add_flags();
 	this->_db_flag = this->flag_set->make_string(
 		"d", "database", "default", "The database to migrate"
 	);

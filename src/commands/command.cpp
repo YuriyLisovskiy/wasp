@@ -44,12 +44,12 @@ void Command::validate() const
 {
 	if (!this->_print_help_flag->valid())
 	{
-		throw CommandError("got invalid boolean flag: -h, --help");
+		throw CommandError("Got invalid value of boolean flag: -h, --help");
 	}
 
 	if (!this->_use_colors_flag->valid())
 	{
-		throw CommandError("got invalid boolean flag: -c, --colors");
+		throw CommandError("Got invalid value of boolean flag: -c, --colors");
 	}
 }
 

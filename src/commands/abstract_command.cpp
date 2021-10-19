@@ -20,27 +20,36 @@ std::string AbstractCommand::usage()
 void AbstractCommand::run_from_argv(int argc, char** argv, size_t start_from, bool is_verbose)
 {
 	this->create_flags();
-	std::string first_token = argv[start_from];
-	if (first_token.starts_with('-'))
+	if (start_from < argc)
+	{
+		std::string first_token = argv[start_from];
+		if (first_token.starts_with('-'))
+		{
+			this->flag_set->parse(argc, argv, start_from, is_verbose);
+			this->validate();
+			this->handle();
+		}
+		else
+		{
+			// subcommand detected
+			if (this->_subcommands.contains(first_token))
+			{
+				this->_subcommands.at(first_token)->run_from_argv(argc, argv, start_from + 1, is_verbose);
+			}
+			else
+			{
+				throw CommandError(
+					"Command '" + this->name() + "' does not contain subcommand with name '" + first_token + "'",
+					_ERROR_DETAILS_
+				);
+			}
+		}
+	}
+	else
 	{
 		this->flag_set->parse(argc, argv, start_from, is_verbose);
 		this->validate();
 		this->handle();
-	}
-	else
-	{
-		// subcommand detected
-		if (this->_subcommands.contains(first_token))
-		{
-			this->_subcommands.at(first_token)->run_from_argv(argc, argv, start_from + 1, is_verbose);
-		}
-		else
-		{
-			throw CommandError(
-				"Command '" + this->name() + "' does not contain subcommand with name '" + first_token + "'",
-				_ERROR_DETAILS_
-			);
-		}
 	}
 }
 
