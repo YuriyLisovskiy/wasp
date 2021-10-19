@@ -6,9 +6,6 @@
 
 #include "./migrate.h"
 
-// C++ libraries.
-#include <iostream>
-
 // Orm libraries.
 #include <xalwart.orm/db/executor.h>
 
@@ -26,23 +23,15 @@ void MigrateCommand::add_flags()
 	this->_rollback_flag = this->flag_set->make_bool(
 		"r", "rollback", false, "Identifies whether to rollback database migrations"
 	);
-	this->_no_colors_flag = this->flag_set->make_bool(
-		"c", "colors", true, "Enables colors in logs"
-	);
-	this->_print_help_flag = this->flag_set->make_bool(
-		"h", "help", false, "Print usage"
-	);
 }
 
-void MigrateCommand::handle()
+bool MigrateCommand::handle()
 {
-	if (this->_print_help_flag->get())
+	if (xw::cmd::Command::handle())
 	{
-		std::cout << this->usage() << '\n';
-		return;
+		return true;
 	}
 
-	this->use_colors_for_logging(!this->_no_colors_flag->get());
 	auto db_name = this->_db_flag->get();
 	if (this->settings->DATABASES.find(db_name) == this->settings->DATABASES.end())
 	{
@@ -67,6 +56,8 @@ void MigrateCommand::handle()
 	{
 		executor.apply(editor, migration_name);
 	}
+
+	return true;
 }
 
 __MANAGEMENT_COMMANDS_END__

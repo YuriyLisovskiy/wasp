@@ -6,6 +6,9 @@
 
 #include "./command.h"
 
+// STL libraries.
+#include <iostream>
+
 
 __COMMANDS_BEGIN__
 
@@ -25,6 +28,41 @@ Command::Command(
 	{
 		throw NullPointerException("xw::cmd::ModuleCommand: settings is nullptr", _ERROR_DETAILS_);
 	}
+}
+
+void Command::add_flags()
+{
+	this->_use_colors_flag = this->flag_set->make_bool(
+		"c", "colors", true, "Enables colors for logging in terminal"
+	);
+	this->_print_help_flag = this->flag_set->make_bool(
+		"h", "help", false, "Print usage"
+	);
+}
+
+void Command::validate() const
+{
+	if (!this->_print_help_flag->valid())
+	{
+		throw CommandError("got invalid boolean flag: -h, --help");
+	}
+
+	if (!this->_use_colors_flag->valid())
+	{
+		throw CommandError("got invalid boolean flag: -c, --colors");
+	}
+}
+
+bool Command::handle()
+{
+	if (this->_print_help_flag->get())
+	{
+		std::cout << this->usage() << '\n';
+		return true;
+	}
+
+	this->_use_colors_for_logging(this->_use_colors_flag->get());
+	return false;
 }
 
 __COMMANDS_END__

@@ -6,9 +6,6 @@
 
 #include "./start_server.h"
 
-// C++ libraries.
-#include <iostream>
-
 // Base libraries.
 #include <xalwart.base/string_utils.h>
 #include <xalwart.base/datetime.h>
@@ -70,26 +67,18 @@ void StartServerCommand::add_flags()
 	this->_use_ipv6_flag = this->flag_set->make_bool(
 		"i", "use-ipv6", false, "Use IPv6 address or not (used in case when host is set to 'localhost')"
 	);
-	this->_no_colors_flag = this->flag_set->make_bool(
-		"c", "colors", false, "Disable colors in logs"
-	);
 	this->_retries_count_flag = this->flag_set->make_unsigned_long(
 		"r", "retries", this->DEFAULT_RETRIES_COUNT, "Max retries count to bind socket"
 	);
-	this->_print_help_flag = this->flag_set->make_bool(
-		"h", "help", false, "Print usage"
-	);
 }
 
-void StartServerCommand::handle()
+bool StartServerCommand::handle()
 {
-	if (this->_print_help_flag->get())
+	if (xw::cmd::Command::handle())
 	{
-		std::cout << this->usage() << '\n';
-		return;
+		return true;
 	}
 
-	this->use_colors_for_logging(!this->_no_colors_flag->get());
 	if (!this->settings->DEBUG && this->settings->ALLOWED_HOSTS.empty())
 	{
 		throw CommandError(
@@ -105,7 +94,7 @@ void StartServerCommand::handle()
 		if (!server)
 		{
 			this->settings->LOGGER->error("server is not initialized", _ERROR_DETAILS_);
-			return;
+			return true;
 		}
 
 		server->bind(this->_host, this->_port);
@@ -126,6 +115,7 @@ void StartServerCommand::handle()
 	}
 
 	server->close();
+	return true;
 }
 
 std::string StartServerCommand::get_startup_message(bool is_development_server) const
