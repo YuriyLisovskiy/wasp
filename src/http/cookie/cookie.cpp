@@ -64,11 +64,6 @@ Cookie::Cookie(
 
 	if (this->_max_age < 0)
 	{
-		throw ValueError("cookie's Max-age can not be less than zero", _ERROR_DETAILS_);
-	}
-
-	if (this->_max_age < 0)
-	{
 		this->_max_age = 0;
 	}
 
@@ -91,11 +86,6 @@ Cookie::Cookie(
 	if (this->_name.empty())
 	{
 		throw ValueError("cookie's name can not be empty", _ERROR_DETAILS_);
-	}
-
-	if (this->_max_age < 0)
-	{
-		throw ValueError("cookie's Max-age can not be less than zero", _ERROR_DETAILS_);
 	}
 
 	auto tz_name = this->_expires.tz_name();
