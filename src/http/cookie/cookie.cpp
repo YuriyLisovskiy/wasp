@@ -89,10 +89,11 @@ Cookie::Cookie(
 	}
 
 	auto tz_name = this->_expires.tz_name();
-	if (!tz_name.empty() && tz_name != dt::Timezone::UTC.tz_name(nullptr))
+	auto utc_tz_name = dt::Timezone::UTC.tz_name(nullptr);
+	if (!tz_name.empty() && !utc_tz_name.starts_with(tz_name))
 	{
 		throw ValueError(
-			"'expires' should have UTC timezone or created without it, got " + tz_name,
+			"expected '" + utc_tz_name + "' or empty timezone for 'expires', got " + tz_name,
 			_ERROR_DETAILS_
 		);
 	}
