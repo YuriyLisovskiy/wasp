@@ -10,7 +10,7 @@
 #include <iostream>
 
 // Base libraries.
-#include <xalwart.base/path.h>
+#include <xalwart.base/vendor/nlohmann/json.h>
 #include <xalwart.base/exceptions.h>
 
 // Framework modules.
@@ -23,9 +23,13 @@
 
 __CONF_BEGIN__
 
-Settings::Settings(const std::string& base_dir)
+Settings::Settings(path::Path root_directory) : BASE_DIR(std::move(root_directory))
 {
-	this->BASE_DIR = base_dir;
+	if (this->BASE_DIR.empty())
+	{
+		this->BASE_DIR = path::working_directory();
+	}
+
 	this->_middleware = {
 		{middleware::XFrameOptions::NAME, middleware::XFrameOptions(this)},
 		{middleware::Common::NAME, middleware::Common(this)},
@@ -81,11 +85,11 @@ std::string Settings::render_html_error_template(const net::Status& status, cons
 
 std::string Settings::render_json_error_template(const net::Status& status, const std::string& message) const
 {
-	return "{\n"
-	       "  \"status\" : " + std::to_string(status.code) + ",\n"
-	       "  \"error\" : \"" + status.phrase + "\",\n"
-	       "  \"message\" : \"" + message + "\"\n"
-	       "}";
+	return nlohmann::json{
+		{"status", status.code},
+		{"error", status.phrase},
+		{"message", message}
+	}.dump();
 }
 
 void Settings::prepare()
@@ -125,7 +129,7 @@ void Settings::check()
 		this->LOGGER->error("'BASE_DIR' must not be empty in order to use the application.");
 		err_count++;
 	}
-	else if (!path::exists(this->BASE_DIR))
+	else if (!this->BASE_DIR.exists())
 	{
 		this->LOGGER->error("'BASE_DIR' must exist in order to use the application.");
 		err_count++;

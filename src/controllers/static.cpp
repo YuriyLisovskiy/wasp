@@ -51,7 +51,7 @@ std::unique_ptr<http::abc::HttpResponse> StaticController::get(
 ) const
 {
 	auto full_path = path::join(this->_static_root, resource_path);
-	if (!path::exists(full_path))
+	if (!path::Path(full_path).exists())
 	{
 		auto [status, _] = net::get_status_by_code(404);
 		std::string response_content = request->is_json() ?

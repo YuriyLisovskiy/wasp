@@ -10,8 +10,10 @@
 #include <xalwart.base/utility.h>
 #include <xalwart.base/string_utils.h>
 
+// Crypto libraries.
+#include <xalwart.crypto/digest.h>
+
 // Framework libraries.
-#include "./crypto/md5.h"
 #include "../http/headers.h"
 #include "../http/utility.h"
 
@@ -124,7 +126,9 @@ void set_response_etag(http::abc::HttpResponse* response)
 {
 	if (!response->is_streaming() && response->content_length() > 0)
 	{
-		response->set_header(http::E_TAG, http::quote_etag(util::crypto::MD5(response->get_content()).hex_digest()));
+		response->set_header(
+			http::E_TAG, http::quote_etag(crypto::md5(response->get_content()))
+		);
 	}
 }
 

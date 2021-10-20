@@ -63,7 +63,7 @@ void initialize_signal_handlers()
 
 	// Segmentation fault.
 	signal(SIGSEGV, &_throw_null_pointer_exception);
-#elif defined(__unix__) || defined(__linux__)
+#else
 	// Termination.
 	struct sigaction termination_handler{};
 	termination_handler.sa_handler = _throw_interruption_exception;
@@ -78,8 +78,6 @@ void initialize_signal_handlers()
 	sigemptyset(&segmentation_fault_handler.sa_mask);
 	segmentation_fault_handler.sa_flags = SA_SIGINFO;
 	sigaction(SIGSEGV, &segmentation_fault_handler, nullptr);
-#else
-#error Library is not supported on this platform
 #endif
 }
 

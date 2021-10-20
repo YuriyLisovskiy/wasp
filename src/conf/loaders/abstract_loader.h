@@ -56,10 +56,17 @@ public:
 	inline std::unique_ptr<SettingsType> load(SettingsArgs&& ...args)
 	{
 		auto settings = std::make_unique<SettingsType>(std::forward<SettingsArgs>(args)...);
+		if (!settings->BASE_DIR.exists())
+		{
+			throw ImproperlyConfigured(
+				"'BASE_DIR' must exist in order to use the application.", _ERROR_DETAILS_
+			);
+		}
+
 		if (!this->filename_patterns.empty())
 		{
 			auto config_pattern = this->filename_patterns.front() + R"(\.)" + this->extension_pattern();
-			auto main_config = this->load_file(settings->BASE_DIR, std::regex(config_pattern));
+			auto main_config = this->load_file(settings->BASE_DIR.to_string(), std::regex(config_pattern));
 			if (!main_config)
 			{
 				throw RuntimeError("Main configuration file with pattern '" + config_pattern + "' is not found.");
@@ -72,7 +79,7 @@ public:
 			for (size_t i = 1; i < filenames_count; i++)
 			{
 				auto pattern = this->filename_patterns[i] + R"(\.)" + this->extension_pattern();
-				auto next_config = this->load_file(settings->BASE_DIR, std::regex(pattern));
+				auto next_config = this->load_file(settings->BASE_DIR.to_string(), std::regex(pattern));
 				if (next_config)
 				{
 					for (const auto& component : this->components)

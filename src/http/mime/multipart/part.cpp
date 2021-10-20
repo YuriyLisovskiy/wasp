@@ -94,7 +94,7 @@ std::string Part::file_name()
 
 	// RFC 7578, Section 4.2 requires that if a filename is provided, the
 	// directory path information must not be used.
-	return path::basename(filename);
+	return path::Path(filename).basename();
 }
 
 ssize_t Part::read(std::string& buffer, size_t max_count)

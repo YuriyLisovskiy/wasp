@@ -40,14 +40,12 @@ protected:
 
 	void add_flags() final;
 
-	void handle() final;
+	bool handle() final;
 
 private:
 	std::shared_ptr<xw::cmd::flags::StringFlag> _db_flag = nullptr;
 	std::shared_ptr<xw::cmd::flags::StringFlag> _migration_flag = nullptr;
 	std::shared_ptr<xw::cmd::flags::BoolFlag> _rollback_flag = nullptr;
-	std::shared_ptr<xw::cmd::flags::BoolFlag> _no_colors_flag = nullptr;
-	std::shared_ptr<xw::cmd::flags::BoolFlag> _print_help_flag = nullptr;
 };
 
 __MANAGEMENT_COMMANDS_END__

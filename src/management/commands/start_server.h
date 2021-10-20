@@ -39,7 +39,7 @@ public:
 protected:
 	void add_flags() override;
 
-	void handle() override;
+	bool handle() override;
 
 	[[nodiscard]]
 	virtual std::string get_startup_message(bool is_development_server) const;
@@ -68,9 +68,7 @@ private:
 	std::shared_ptr<xw::cmd::flags::UnsignedLongFlag> _timeout_seconds_flag;
 	std::shared_ptr<xw::cmd::flags::UnsignedLongFlag> _timeout_microseconds_flag;
 	std::shared_ptr<xw::cmd::flags::BoolFlag> _use_ipv6_flag;
-	std::shared_ptr<xw::cmd::flags::BoolFlag> _no_colors_flag;
 	std::shared_ptr<xw::cmd::flags::UnsignedLongFlag> _retries_count_flag;
-	std::shared_ptr<xw::cmd::flags::BoolFlag> _print_help_flag;
 
 	re::Regex _ipv4_ipv6_port_regex;
 	re::Regex _ipv4_regex;

@@ -8,11 +8,16 @@
 
 #pragma once
 
+// STL libraries.
+#include <memory>
+#include <string>
+
 // Module definitions.
 #include "./_def_.h"
 
 // Framework libraries.
 #include "./abstract_command.h"
+#include "./flags/default.h"
 #include "../conf/settings.h"
 
 
@@ -33,7 +38,17 @@ protected:
 		const std::string& help
 	);
 
-	inline void use_colors_for_logging(bool use_colors)
+	void add_flags() override;
+
+	void validate() const override;
+
+	bool handle() override;
+
+private:
+	std::shared_ptr<flags::BoolFlag> _print_help_flag = nullptr;
+	std::shared_ptr<flags::BoolFlag> _use_colors_flag = nullptr;
+
+	inline void _use_colors_for_logging(bool use_colors)
 	{
 		if (use_colors)
 		{
@@ -45,8 +60,5 @@ protected:
 		}
 	}
 };
-
-template <typename T>
-concept command_type = std::is_base_of_v<Command, T>;
 
 __COMMANDS_END__

@@ -44,7 +44,7 @@ public:
 	inline void register_default_logger(SettingsType* settings)
 	{
 		this->register_component("logger", std::make_unique<config::YAMLLoggerComponent>(
-			settings->BASE_DIR, settings->LOGGER
+			settings->BASE_DIR.to_string(), settings->LOGGER
 		));
 	}
 
@@ -98,10 +98,10 @@ public:
 			})
 		);
 		this->register_component(
-			"media", std::make_unique<YAMLStaticComponent>(settings->MEDIA, settings->BASE_DIR)
+			"media", std::make_unique<YAMLStaticComponent>(settings->MEDIA, settings->BASE_DIR.to_string())
 		);
 		this->register_component(
-			"static", std::make_unique<YAMLStaticComponent>(settings->STATIC, settings->BASE_DIR)
+			"static", std::make_unique<YAMLStaticComponent>(settings->STATIC, settings->BASE_DIR.to_string())
 		);
 		this->register_component("limits", std::make_unique<YAMLLimitsComponent>(settings->LIMITS));
 		this->register_component("prepend_www", std::make_unique<config::YAMLScalarComponent>(settings->PREPEND_WWW));

@@ -13,11 +13,16 @@ function(add_tests SUB_DIR SUB_NAME)
     list(FILTER SOURCES EXCLUDE REGEX ".*main.cpp$")
     set(FULL_BIN ${BINARY}-${SUB_NAME})
     add_executable(${FULL_BIN} ${SOURCES} ${TESTS_DIR}/main.cpp)
-    target_include_directories(${FULL_BIN} PUBLIC ${GNU_INCLUDE_DIR})
+    target_include_directories(${FULL_BIN} PUBLIC ${INCLUDE_DIR})
+    if (NOT APPLE)
+        target_link_libraries(${FULL_BIN} PUBLIC stdc++fs)
+    endif()
     target_link_libraries(${FULL_BIN} PUBLIC
+        ${OPENSSL_LIBRARIES}
         gtest
-        ${FRAMEWORK_NAME}.base
-        ${FRAMEWORK_NAME}.orm
+        ${XALWART_BASE}
+        ${XALWART_CRYPTO}
+        ${XALWART_ORM}
         ${LIBRARY_NAME}
     )
 endfunction()

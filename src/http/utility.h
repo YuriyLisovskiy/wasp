@@ -17,7 +17,7 @@
 #include "./_def_.h"
 
 // Framework libraries.
-#include "../utility/crypto/signer.h"
+#include "signer.h"
 
 
 __HTTP_BEGIN__
@@ -104,12 +104,11 @@ extern void escape_leading_slashes(std::string& url);
 
 // TESTME: get_cookie_signer
 // TODO: docs for 'get_cookie_signer'
-inline util::crypto::Signer get_cookie_signer(
-	const std::string& secret_key,
-	const std::string& salt="xw::http::get_cookie_signer"
+inline Signer get_cookie_signer(
+	const std::string& secret_key, const std::string& salt="xw::http::get_cookie_signer"
 )
 {
-	return util::crypto::Signer("" + secret_key, ':', salt);
+	return Signer("" + secret_key, ':', salt);
 }
 
 // TESTME: parse_http_date
