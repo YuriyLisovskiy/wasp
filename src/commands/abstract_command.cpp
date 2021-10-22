@@ -6,15 +6,48 @@
 
 #include "./abstract_command.h"
 
+// STL
+#include <algorithm>
+
 
 __COMMANDS_BEGIN__
 
 std::string AbstractCommand::usage()
 {
 	this->create_flags();
-	return this->help_message() +
-		"\n\nUsage:\n  application " + this->name() + " [flags]\n\n" +
-		"Flags:\n" + this->flag_set->usage("  ");
+	bool has_commands = !this->_subcommands.empty();
+	auto usage_message = this->help_message() +
+		"\n\nUsage:\n  application " + this->name() + (has_commands ? " [command]" : " [flags]");
+	if (has_commands)
+	{
+		usage_message += "\n\nCommands:";
+		std::vector<size_t> sizes;
+		sizes.reserve(this->_subcommands.size());
+		std::transform(
+			this->_subcommands.begin(), this->_subcommands.end(), std::back_inserter(sizes),
+			[](const auto& pair) -> size_t { return pair.second ? pair.second->name().size() : 0; }
+		);
+
+		size_t max_command_length = *std::max_element(sizes.begin(), sizes.end());
+		for (const auto& subcommand : this->_subcommands)
+		{
+			if (subcommand.second)
+			{
+				std::string indent(max_command_length - subcommand.second->name().size(), ' ');
+				usage_message += "\n  " + subcommand.second->name() + indent + "  " +
+					subcommand.second->help_message();
+			}
+		}
+
+		usage_message +=  + "\n\nUse \"application " + this->name() +
+			" [command] --help\" for more information about a command.";
+	}
+	else
+	{
+		usage_message += "\n\nFlags:\n" + this->flag_set->usage("  ");
+	}
+
+	return usage_message;
 }
 
 void AbstractCommand::run_from_argv(int argc, char** argv, size_t start_from, bool is_verbose)
