@@ -1,9 +1,9 @@
 /**
- * conf/abs.h
+ * conf/interfaces.h
  *
  * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
- * Abstract base classes for 'conf' module.
+ * Interfaces for 'conf' module.
  */
 
 #pragma once
@@ -20,7 +20,7 @@
 #include "./_def_.h"
 
 // Framework libraries.
-#include "../urls/abc.h"
+#include "../urls/interfaces.h"
 #include "../commands/abstract_command.h"
 
 

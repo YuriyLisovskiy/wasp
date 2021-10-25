@@ -1,9 +1,9 @@
 /**
- * http/abc.h
+ * http/interfaces.h
  *
  * Copyright (c) 2020-2021 Yuriy Lisovskiy
  *
- * Purpose: TODO
+ * Interfaces for http components.
  */
 
 #pragma once
@@ -20,7 +20,7 @@
 #include "./cookie/cookie.h"
 
 
-__HTTP_ABC_BEGIN__
+__HTTP_BEGIN__
 
 // TODO: docs for 'HttpResponse'
 class HttpResponse
@@ -87,4 +87,4 @@ public:
 	virtual std::string serialize() = 0;
 };
 
-__HTTP_ABC_END__
+__HTTP_END__

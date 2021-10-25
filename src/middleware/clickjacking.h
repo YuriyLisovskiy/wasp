@@ -51,7 +51,7 @@ public:
 	// This method can be overridden if needed, allowing it to vary based on
 	// the `request` or `response`.
 	virtual inline std::string get_x_frame_options_value(
-		http::Request* request, http::abc::HttpResponse* response
+		http::Request* request, http::HttpResponse* response
 	) const
 	{
 		return this->settings->X_FRAME_OPTIONS.to_string();

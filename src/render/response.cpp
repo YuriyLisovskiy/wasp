@@ -13,9 +13,9 @@
 __RENDER_BEGIN__
 
 TemplateResponse::TemplateResponse(
-	render::abc::IEngine* engine,
+	render::IEngine* engine,
 	const std::string& template_name,
-	render::abc::IContext* context,
+	render::IContext* context,
 	unsigned short int status,
 	const std::string& content_type,
 	const std::string& charset

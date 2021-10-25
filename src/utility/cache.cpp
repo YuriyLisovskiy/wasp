@@ -81,7 +81,7 @@ bool if_none_match_passes(
 	}
 }
 
-std::unique_ptr<http::abc::HttpResponse> not_modified(http::Request* request, http::abc::HttpResponse* response)
+std::unique_ptr<http::HttpResponse> not_modified(http::Request* request, http::HttpResponse* response)
 {
 	auto new_response = std::make_unique<http::NotModified>("");
 	if (response)
@@ -122,7 +122,7 @@ __UTIL_CACHE_INTERNAL_END__
 
 __UTIL_CACHE_BEGIN__
 
-void set_response_etag(http::abc::HttpResponse* response)
+void set_response_etag(http::HttpResponse* response)
 {
 	if (!response->is_streaming() && response->content_length() > 0)
 	{
@@ -132,11 +132,11 @@ void set_response_etag(http::abc::HttpResponse* response)
 	}
 }
 
-std::unique_ptr<http::abc::HttpResponse> get_conditional_response(
+std::unique_ptr<http::HttpResponse> get_conditional_response(
 	http::Request* request,
 	const std::string& etag,
 	long last_modified,
-	http::abc::HttpResponse* response
+	http::HttpResponse* response
 )
 {
 	// Only return conditional responses on successful requests.

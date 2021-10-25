@@ -35,7 +35,7 @@ public:
 	}
 
 	[[nodiscard]]
-	std::unique_ptr<http::abc::HttpResponse> get(http::Request* request, const std::string& p) const final;
+	std::unique_ptr<http::HttpResponse> get(http::Request* request, const std::string& p) const final;
 
 private:
 	std::string _static_root;

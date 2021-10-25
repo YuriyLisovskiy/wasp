@@ -40,7 +40,7 @@ std::shared_ptr<urls::IPattern> _build_static_pattern(
 
 	auto controller_function = [static_root](
 		http::Request* request, const std::tuple<std::string>& args, const Settings* settings_pointer
-	) -> std::unique_ptr<http::abc::HttpResponse>
+	) -> std::unique_ptr<http::HttpResponse>
 	{
 		return std::apply([request, static_root, settings_pointer](const std::string& p) mutable -> auto
 		{
@@ -191,7 +191,7 @@ Application::ServerHandler Application::get_application_handler() const
 
 middleware::Function Application::get_controller_handler() const
 {
-	return [this](http::Request* request) -> std::unique_ptr<http::abc::HttpResponse>
+	return [this](http::Request* request) -> std::unique_ptr<http::HttpResponse>
 	{
 		require_non_null(request, _ERROR_DETAILS_);
 		auto apply = urls::resolve(request->url().path, this->settings->URLPATTERNS);
@@ -289,7 +289,7 @@ void Application::setup_middleware()
 	this->settings->MIDDLEWARE.insert(this->settings->MIDDLEWARE.begin(), middleware::Exception(this->settings));
 }
 
-std::unique_ptr<http::abc::HttpResponse> Application::get_error_response(
+std::unique_ptr<http::HttpResponse> Application::get_error_response(
 	http::Request* request, net::StatusCode status_code, const std::string& message
 ) const
 {
@@ -309,7 +309,7 @@ std::unique_ptr<http::abc::HttpResponse> Application::get_error_response(
 }
 
 net::StatusCode Application::send_response(
-	net::RequestContext* ctx, const std::unique_ptr<http::abc::HttpResponse>& response
+	net::RequestContext* ctx, const std::unique_ptr<http::HttpResponse>& response
 ) const
 {
 	if (!response)
@@ -321,7 +321,7 @@ net::StatusCode Application::send_response(
 	return this->finish_response(ctx, response ? response.get() : &no_content);
 }
 
-net::StatusCode Application::finish_response(net::RequestContext* context, http::abc::HttpResponse* response) const
+net::StatusCode Application::finish_response(net::RequestContext* context, http::HttpResponse* response) const
 {
 	require_non_null(context, "'context' is nullptr", _ERROR_DETAILS_);
 	if (!context->response_writer)
@@ -346,7 +346,7 @@ net::StatusCode Application::finish_response(net::RequestContext* context, http:
 	return response->get_status();
 }
 
-void Application::finish_streaming_response(net::RequestContext* context, http::abc::HttpResponse* response) const
+void Application::finish_streaming_response(net::RequestContext* context, http::HttpResponse* response) const
 {
 	auto* streaming_response = dynamic_cast<http::StreamingResponse*>(response);
 	if (!streaming_response)

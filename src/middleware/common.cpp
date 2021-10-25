@@ -20,7 +20,7 @@ __MIDDLEWARE_BEGIN__
 
 Function Common::operator() (const Function& next) const
 {
-	return [*this, next](http::Request* request) -> std::unique_ptr<http::abc::HttpResponse>
+	return [*this, next](http::Request* request) -> std::unique_ptr<http::HttpResponse>
 	{
 		auto response = this->preprocess(request);
 		if (response)
@@ -79,7 +79,7 @@ std::string Common::get_full_path_with_slash(http::Request* request) const
 	return new_path;
 }
 
-std::unique_ptr<http::abc::HttpResponse> Common::preprocess(http::Request* request) const
+std::unique_ptr<http::HttpResponse> Common::preprocess(http::Request* request) const
 {
 	require_non_null(request, _ERROR_DETAILS_);
 	if (request->has_header(http::USER_AGENT))
@@ -131,8 +131,8 @@ std::unique_ptr<http::abc::HttpResponse> Common::preprocess(http::Request* reque
 	return nullptr;
 }
 
-std::unique_ptr<http::abc::HttpResponse> Common::postprocess(
-	http::Request* request, http::abc::HttpResponse* response
+std::unique_ptr<http::HttpResponse> Common::postprocess(
+	http::Request* request, http::HttpResponse* response
 ) const
 {
 	require_non_null(response, _ERROR_DETAILS_);

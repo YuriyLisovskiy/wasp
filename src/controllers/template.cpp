@@ -12,7 +12,7 @@
 
 __CONTROLLERS_BEGIN__
 
-TemplateResponseMixin::TemplateResponseMixin(render::abc::IEngine* engine)
+TemplateResponseMixin::TemplateResponseMixin(render::IEngine* engine)
 {
 	if (!engine)
 	{
@@ -24,9 +24,9 @@ TemplateResponseMixin::TemplateResponseMixin(render::abc::IEngine* engine)
 	this->engine = engine;
 }
 
-std::unique_ptr<http::abc::HttpResponse> TemplateResponseMixin::render(
+std::unique_ptr<http::HttpResponse> TemplateResponseMixin::render(
 	http::Request* request,
-	const std::shared_ptr<render::abc::IContext>& context,
+	const std::shared_ptr<render::IContext>& context,
 	const std::string& template_name,
 	unsigned short int status,
 	const std::string& content_type,

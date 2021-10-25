@@ -47,40 +47,40 @@ public:
 	std::string get_redirect_url(http::Request* request) const;
 
 	[[nodiscard]]
-	std::unique_ptr<http::abc::HttpResponse> get(http::Request* request) const override;
+	std::unique_ptr<http::HttpResponse> get(http::Request* request) const override;
 
 	[[nodiscard]]
-	inline std::unique_ptr<http::abc::HttpResponse> post(http::Request* request) const override
+	inline std::unique_ptr<http::HttpResponse> post(http::Request* request) const override
 	{
 		return this->get(request);
 	}
 
 	[[nodiscard]]
-	inline std::unique_ptr<http::abc::HttpResponse> head(http::Request* request) const override
+	inline std::unique_ptr<http::HttpResponse> head(http::Request* request) const override
 	{
 		return this->get(request);
 	}
 
 	[[nodiscard]]
-	inline std::unique_ptr<http::abc::HttpResponse> options(http::Request* request) const override
+	inline std::unique_ptr<http::HttpResponse> options(http::Request* request) const override
 	{
 		return this->get(request);
 	}
 
 	[[nodiscard]]
-	inline std::unique_ptr<http::abc::HttpResponse> put(http::Request* request) const override
+	inline std::unique_ptr<http::HttpResponse> put(http::Request* request) const override
 	{
 		return this->get(request);
 	}
 
 	[[nodiscard]]
-	inline std::unique_ptr<http::abc::HttpResponse> delete_(http::Request* request) const override
+	inline std::unique_ptr<http::HttpResponse> delete_(http::Request* request) const override
 	{
 		return this->get(request);
 	}
 
 	[[nodiscard]]
-	inline std::unique_ptr<http::abc::HttpResponse> patch(http::Request* request) const override
+	inline std::unique_ptr<http::HttpResponse> patch(http::Request* request) const override
 	{
 		return this->get(request);
 	}

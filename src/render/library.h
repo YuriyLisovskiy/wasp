@@ -9,7 +9,7 @@
 #pragma once
 
 // Base libraries.
-#include <xalwart.base/abc/render.h>
+#include <xalwart.base/interfaces/render.h>
 
 // Module definitions.
 #include "./_def_.h"
@@ -22,7 +22,7 @@ __RENDER_BEGIN__
 
 // TESTME: Library
 // TODO: docs for 'Library'
-class Library : public render::abc::ILibrary
+class Library : public render::ILibrary
 {
 public:
 	inline explicit Library(conf::Settings* settings) : _settings(settings)

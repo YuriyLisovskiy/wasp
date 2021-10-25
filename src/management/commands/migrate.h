@@ -9,13 +9,13 @@
 #pragma once
 
 // Base libraries.
-#include <xalwart.base/abc/base.h>
+#include <xalwart.base/interfaces/base.h>
 
 // Module definitions.
 #include "./_def_.h"
 
 // Framework libraries.
-#include "../../conf/abc.h"
+#include "../../conf/interfaces.h"
 #include "../../conf/settings.h"
 #include "../../commands/command.h"
 #include "../../commands/flags/default.h"
@@ -52,7 +52,7 @@ private:
 	inline void _log_progress(const std::string& msg, const std::string& end) const
 	{
 		auto end_ch = end.empty() ? '\0' : end[0];
-		this->_settings->LOGGER->print(msg, abc::ILogger::Color::Default, end_ch);
+		this->_settings->LOGGER->print(msg, ILogger::Color::Default, end_ch);
 	}
 };
 

@@ -46,15 +46,15 @@ inline bool if_unmodified_since_passes(long last_modified, long if_unmodified_si
 
 // TESTME: precondition_failed
 // TODO: docs for 'precondition_failed'
-inline std::unique_ptr<http::abc::HttpResponse> precondition_failed(http::Request* request)
+inline std::unique_ptr<http::HttpResponse> precondition_failed(http::Request* request)
 {
 	return std::make_unique<http::Response>(412);
 }
 
 // TESTME: not_modified
 // TODO: docs for 'not_modified'
-extern std::unique_ptr<http::abc::HttpResponse> not_modified(
-	http::Request* request, http::abc::HttpResponse* response
+extern std::unique_ptr<http::HttpResponse> not_modified(
+	http::Request* request, http::HttpResponse* response
 );
 
 __UTIL_CACHE_INTERNAL_END__
@@ -64,15 +64,15 @@ __UTIL_CACHE_BEGIN__
 
 // TESTME: set_response_etag
 // TODO: docs for 'set_response_etag'
-extern void set_response_etag(http::abc::HttpResponse* response);
+extern void set_response_etag(http::HttpResponse* response);
 
 // TESTME: get_conditional_response
 // TODO: docs for 'get_conditional_response'
-extern std::unique_ptr<http::abc::HttpResponse> get_conditional_response(
+extern std::unique_ptr<http::HttpResponse> get_conditional_response(
 	http::Request* request,
 	const std::string& etag,
 	long last_modified,
-	http::abc::HttpResponse* response
+	http::HttpResponse* response
 );
 
 __UTIL_CACHE_END__

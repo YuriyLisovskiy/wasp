@@ -16,7 +16,7 @@
 #include "./_def_.h"
 
 // Framework libraries.
-#include "./abc.h"
+#include "./interfaces.h"
 #include "../urls/pattern.h"
 #include "../controllers/controller.h"
 #include "../commands/command.h"
@@ -76,7 +76,7 @@ protected:
 			http::Request* request,
 			const std::tuple<RequestArgs...>& request_args,
 			const conf::Settings* settings_pointer
-		) -> std::unique_ptr<http::abc::HttpResponse>
+		) -> std::unique_ptr<http::HttpResponse>
 		{
 			ControllerType controller(settings_pointer, controller_args...);
 			return std::apply(

@@ -46,7 +46,7 @@ public:
 
 protected:
 	[[nodiscard]]
-	virtual inline std::unique_ptr<http::abc::HttpResponse> get_response_redirect(
+	virtual inline std::unique_ptr<http::HttpResponse> get_response_redirect(
 		const std::string& redirect_to
 	) const
 	{
@@ -64,12 +64,12 @@ protected:
 
 	// Check for denied User-Agents and rewrite the URL based on
 	// `settings->APPEND_SLASH` and `settings->PREPEND_WWW`.
-	virtual std::unique_ptr<http::abc::HttpResponse> preprocess(http::Request* request) const;
+	virtual std::unique_ptr<http::HttpResponse> preprocess(http::Request* request) const;
 
 	// When the status code of the response is 404, it may redirect to a path
 	// with an appended slash if `should_redirect_with_slash` returns `true`.
-	virtual std::unique_ptr<http::abc::HttpResponse> postprocess(
-		http::Request* request, http::abc::HttpResponse* response
+	virtual std::unique_ptr<http::HttpResponse> postprocess(
+		http::Request* request, http::HttpResponse* response
 	) const;
 };
 

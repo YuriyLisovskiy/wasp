@@ -14,7 +14,7 @@ __MIDDLEWARE_BEGIN__
 
 Function XFrameOptions::operator() (const Function& next) const
 {
-	return [*this, next](http::Request* request) -> std::unique_ptr<http::abc::HttpResponse>
+	return [*this, next](http::Request* request) -> std::unique_ptr<http::HttpResponse>
 	{
 		auto response = next(request);
 

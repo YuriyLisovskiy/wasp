@@ -16,7 +16,7 @@
 #include "./_def_.h"
 
 // Base libraries.
-#include <xalwart.base/abc/base.h>
+#include <xalwart.base/interfaces/base.h>
 
 // Framework libraries.
 #include "./abstract_command.h"
@@ -30,9 +30,9 @@ __COMMANDS_BEGIN__
 class Command : public AbstractCommand
 {
 protected:
-	std::shared_ptr<abc::ILogger> logger;
+	std::shared_ptr<ILogger> logger;
 
-	Command(const std::string& cmd_name, const std::string& help, std::shared_ptr<abc::ILogger> logger) :
+	Command(const std::string& cmd_name, const std::string& help, std::shared_ptr<ILogger> logger) :
 		AbstractCommand(cmd_name, help)
 	{
 		this->logger = std::move(logger);

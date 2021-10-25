@@ -46,7 +46,7 @@ bool was_modified_since(const std::string& header, size_t time, size_t size)
 	return result;
 }
 
-std::unique_ptr<http::abc::HttpResponse> StaticController::get(
+std::unique_ptr<http::HttpResponse> StaticController::get(
 	http::Request* request, const std::string& resource_path
 ) const
 {

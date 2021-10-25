@@ -15,10 +15,10 @@
 #include <xalwart.base/options.h>
 #include <xalwart.base/datetime.h>
 #include <xalwart.base/net/status.h>
-#include <xalwart.base/abc/base.h>
-#include <xalwart.base/abc/render.h>
-#include <xalwart.base/abc/orm.h>
-#include <xalwart.base/abc/server.h>
+#include <xalwart.base/interfaces/base.h>
+#include <xalwart.base/interfaces/render.h>
+#include <xalwart.base/interfaces/orm.h>
+#include <xalwart.base/interfaces/server.h>
 #include <xalwart.base/path.h>
 
 // ORM libraries.
@@ -28,7 +28,7 @@
 #include "./_def_.h"
 
 // Framework libraries.
-#include "./abc.h"
+#include "./interfaces.h"
 #include "./types.h"
 #include "../middleware/types.h"
 
@@ -44,7 +44,7 @@ public:
 	// By default, it should be current working directory.
 	path::Path BASE_DIR;
 
-	std::shared_ptr<abc::ILogger> LOGGER = nullptr;
+	std::shared_ptr<ILogger> LOGGER = nullptr;
 
 	// A secret key for this particular installation. Used in secret-key
 	// hashing algorithms. Set this in your settings.
@@ -78,13 +78,13 @@ public:
 	std::vector<std::shared_ptr<IModuleConfig>> MODULES;
 
 	// Engine for rendering templates.
-	std::shared_ptr<render::abc::IEngine> TEMPLATE_ENGINE = nullptr;
+	std::shared_ptr<render::IEngine> TEMPLATE_ENGINE = nullptr;
 
 	// Default database instance.
-	std::shared_ptr<orm::abc::IBackend> DB = nullptr;
+	std::shared_ptr<orm::IBackend> DB = nullptr;
 
 	// List of databases.
-	std::map<std::string, std::shared_ptr<orm::abc::IBackend>> DATABASES;
+	std::map<std::string, std::shared_ptr<orm::IBackend>> DATABASES;
 
 	// Whether to append trailing slashes to URLs.
 	bool APPEND_SLASH = true;
@@ -291,7 +291,7 @@ public:
 	{
 	}
 
-	virtual inline std::unique_ptr<server::abc::IServer> build_server(
+	virtual inline std::unique_ptr<server::IServer> build_server(
 		const std::function<net::StatusCode(
 			net::RequestContext*, const std::map<std::string, std::string>& /* environment */
 		)>& handler,
@@ -311,12 +311,12 @@ public:
 	}
 
 	[[nodiscard]]
-	std::shared_ptr<render::abc::ILibrary> build_template_library(const std::string& full_name) const;
+	std::shared_ptr<render::ILibrary> build_template_library(const std::string& full_name) const;
 
 	[[nodiscard]]
-	std::shared_ptr<render::abc::ILoader> build_template_loader(const std::string& full_name) const;
+	std::shared_ptr<render::ILoader> build_template_loader(const std::string& full_name) const;
 
-	std::list<std::shared_ptr<orm::db::Migration>> build_migrations(orm::abc::IBackend* backend);
+	std::list<std::shared_ptr<orm::db::Migration>> build_migrations(orm::IBackend* backend);
 
 protected:
 	template <class T>
@@ -349,7 +349,7 @@ protected:
 
 	void middleware(const std::string& name, middleware::Handler handler);
 
-	template <render::abc::library_type LibraryT>
+	template <render::library_type LibraryT>
 	inline void library(const std::string& custom_name="")
 	{
 		auto name = this->get_name_or<LibraryT>(custom_name);
@@ -358,12 +358,12 @@ protected:
 			this->LOGGER->warning("library '" + name + "' will be overwritten");
 		}
 
-		this->_libraries[name] = [this]() -> std::shared_ptr<render::abc::ILibrary> {
+		this->_libraries[name] = [this]() -> std::shared_ptr<render::ILibrary> {
 			return std::make_shared<LibraryT>(this);
 		};
 	}
 
-	template <render::abc::loader_type LoaderT>
+	template <render::loader_type LoaderT>
 	inline void loader(const std::string& custom_name="")
 	{
 		auto name = this->get_name_or<LoaderT>(custom_name);
@@ -372,7 +372,7 @@ protected:
 			this->LOGGER->warning("loader '" + name + "' will be overwritten");
 		}
 
-		this->_loaders[name] = [this]() -> std::shared_ptr<render::abc::ILoader> {
+		this->_loaders[name] = [this]() -> std::shared_ptr<render::ILoader> {
 			return std::make_shared<LoaderT>(this);
 		};
 	}
@@ -388,10 +388,10 @@ protected:
 
 private:
 	std::map<std::string, middleware::Handler> _middleware;
-	std::map<std::string, std::function<std::shared_ptr<render::abc::ILibrary>()>> _libraries;
+	std::map<std::string, std::function<std::shared_ptr<render::ILibrary>()>> _libraries;
 	std::map<std::string, std::function<std::shared_ptr<IModuleConfig>()>> _modules;
-	std::map<std::string, std::function<std::shared_ptr<render::abc::ILoader>()>> _loaders;
-	std::list<std::function<std::shared_ptr<orm::db::Migration>(orm::abc::IBackend*)>> _migrations;
+	std::map<std::string, std::function<std::shared_ptr<render::ILoader>()>> _loaders;
+	std::list<std::function<std::shared_ptr<orm::db::Migration>(orm::IBackend*)>> _migrations;
 };
 
 __CONF_END__

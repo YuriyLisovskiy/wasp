@@ -22,7 +22,7 @@
 // Framework libraries.
 #include "./settings.h"
 #include "../middleware/types.h"
-#include "../urls/abc.h"
+#include "../urls/interfaces.h"
 
 
 __CONF_BEGIN__
@@ -118,16 +118,16 @@ protected:
 	}
 
 	[[nodiscard]]
-	virtual std::unique_ptr<http::abc::HttpResponse> get_error_response(
+	virtual std::unique_ptr<http::HttpResponse> get_error_response(
 		http::Request* request, net::StatusCode status_code, const std::string& message
 	) const;
 
 	[[nodiscard]]
-	virtual uint send_response(net::RequestContext* ctx, const std::unique_ptr<http::abc::HttpResponse>& response) const;
+	virtual uint send_response(net::RequestContext* ctx, const std::unique_ptr<http::HttpResponse>& response) const;
 
-	virtual net::StatusCode finish_response(net::RequestContext* context, http::abc::HttpResponse* response) const;
+	virtual net::StatusCode finish_response(net::RequestContext* context, http::HttpResponse* response) const;
 
-	virtual void finish_streaming_response(net::RequestContext* context, http::abc::HttpResponse* response) const;
+	virtual void finish_streaming_response(net::RequestContext* context, http::HttpResponse* response) const;
 
 private:
 	[[nodiscard]]

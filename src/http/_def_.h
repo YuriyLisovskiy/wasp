@@ -14,10 +14,6 @@
 #define __HTTP_BEGIN__ __MAIN_NAMESPACE_BEGIN__ namespace http {
 #define __HTTP_END__ } __MAIN_NAMESPACE_END__
 
-// xw::http::abc
-#define __HTTP_ABC_BEGIN__ __HTTP_BEGIN__ namespace abc {
-#define __HTTP_ABC_END__ } __HTTP_END__
-
 // xw::http::exc
 #define __HTTP_EXC_BEGIN__ __HTTP_BEGIN__ namespace exc {
 #define __HTTP_EXC_END__ } __HTTP_END__
