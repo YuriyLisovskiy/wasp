@@ -15,10 +15,12 @@
 // Module definitions.
 #include "./_def_.h"
 
+// Base libraries.
+#include <xalwart.base/abc/base.h>
+
 // Framework libraries.
 #include "./abstract_command.h"
 #include "./flags/default.h"
-#include "../conf/settings.h"
 
 
 __COMMANDS_BEGIN__
@@ -28,15 +30,14 @@ __COMMANDS_BEGIN__
 class Command : public AbstractCommand
 {
 protected:
-	conf::Settings* settings;
-	const conf::IModuleConfig* module_config;
+	std::shared_ptr<abc::ILogger> logger;
 
-	Command(
-		const conf::IModuleConfig* module,
-		conf::Settings* settings,
-		const std::string& cmd_name,
-		const std::string& help
-	);
+	Command(const std::string& cmd_name, const std::string& help, std::shared_ptr<abc::ILogger> logger) :
+		AbstractCommand(cmd_name, help)
+	{
+		this->logger = std::move(logger);
+		require_non_null(this->logger.get(), "logger is nullptr", _ERROR_DETAILS_);
+	}
 
 	void add_flags() override;
 
@@ -52,11 +53,11 @@ private:
 	{
 		if (use_colors)
 		{
-			this->settings->LOGGER->enable_colors();
+			this->logger->enable_colors();
 		}
 		else
 		{
-			this->settings->LOGGER->disable_colors();
+			this->logger->disable_colors();
 		}
 	}
 };

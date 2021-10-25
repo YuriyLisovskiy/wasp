@@ -110,12 +110,6 @@ protected:
 		});
 	}
 
-	template <cmd::command_type CommandType>
-	inline void command()
-	{
-		this->_commands.push_back(std::make_shared<CommandType>(this, this->settings));
-	}
-
 	template <cmd::command_type CommandType, typename ...Args>
 	inline void command(Args&& ...args)
 	{

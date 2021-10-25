@@ -34,18 +34,18 @@ bool MigrateCommand::handle()
 	}
 
 	auto db_name = this->_db_flag->get();
-	if (this->settings->DATABASES.find(db_name) == this->settings->DATABASES.end())
+	if (this->_settings->DATABASES.find(db_name) == this->_settings->DATABASES.end())
 	{
 		throw CommandError(
 			"migrate: database with name '" + db_name + "' does not exist", _ERROR_DETAILS_
 		);
 	}
 
-	auto backend = (orm::abc::ISQLBackend*)this->settings->DATABASES.at(db_name).get();
+	auto backend = (orm::abc::ISQLBackend*)this->_settings->DATABASES.at(db_name).get();
 	require_non_null(backend, "Database backend is nullptr", _ERROR_DETAILS_);
 	auto executor = orm::db::MigrationExecutor(
-		backend, this->settings->build_migrations(backend),
-		[this] (auto msg, auto end) { this->log_progress(msg, end); }
+		backend, this->_settings->build_migrations(backend),
+		[this](auto msg, auto end) { this->_log_progress(msg, end); }
 	);
 	auto editor = backend->schema_editor();
 	auto migration_name = this->_migration_flag->get();

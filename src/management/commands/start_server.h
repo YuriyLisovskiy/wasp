@@ -10,11 +10,13 @@
 
 // Base libraries.
 #include <xalwart.base/net/request_context.h>
+#include <xalwart.base/re/regex.h>
 
 // Module definitions.
 #include "./_def_.h"
 
 // Framework libraries.
+#include "../../conf/settings.h"
 #include "../../commands/command.h"
 #include "../../commands/flags/default.h"
 
@@ -27,9 +29,9 @@ class StartServerCommand : public xw::cmd::Command
 {
 public:
 	explicit StartServerCommand(
-		conf::IModuleConfig* config, conf::Settings* settings, std::function<net::StatusCode(
-		net::RequestContext*, const std::map<std::string, std::string>& /* environment */
-	)> handler
+		conf::Settings* settings, std::function<net::StatusCode(
+			net::RequestContext*, const std::map<std::string, std::string>& /* environment */
+		)> handler
 	);
 
 	// Returns command flags.
@@ -77,6 +79,8 @@ private:
 	std::function<net::StatusCode(
 		net::RequestContext*, const std::map<std::string, std::string>& /* environment */
 	)> _handler_function;
+
+	conf::Settings* _settings = nullptr;
 
 	void _parse_args();
 };
