@@ -32,7 +32,9 @@ public:
 	virtual ~IModuleConfig() = default;
 
 	[[nodiscard]]
-	virtual bool ready() const = 0;
+	virtual bool is_configured() const = 0;
+
+	virtual void configure() = 0;
 
 	[[nodiscard]]
 	virtual std::string get_name() const = 0;

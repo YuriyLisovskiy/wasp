@@ -30,40 +30,40 @@ __CONF_BEGIN__
 // to 'conf::Settings' parameter.
 class ModuleConfig : public IModuleConfig
 {
-private:
-	bool _is_initialized;
-
-	friend class conf::Settings;
-
-	std::vector<std::shared_ptr<urls::IPattern>> _urlpatterns;
-	std::vector<std::shared_ptr<cmd::AbstractCommand>> _commands;
-	std::vector<std::function<void()>> _sub_modules_to_init;
-
-	inline std::shared_ptr<IModuleConfig> _find_module(const std::string& module)
+public:
+	[[nodiscard]]
+	inline bool is_configured() const override
 	{
-		auto result = std::find_if(
-			this->settings->MODULES.begin(), this->settings->MODULES.end(),
-			[&module](const std::shared_ptr<IModuleConfig>& entry) -> bool {
-				return entry->get_name() == module;
-			}
-		);
-		if (result == this->settings->MODULES.end())
-		{
-			throw ImproperlyConfigured(
-				"module is used but was not registered: " + module, _ERROR_DETAILS_
-			);
-		}
-
-		return *result;
+		return this->_is_configured;
 	}
 
-protected:
-	std::string module_name;
-	conf::Settings* settings;
+	inline void configure() override
+	{
+		this->set_ready();
+	}
+
+	[[nodiscard]]
+	inline std::string get_name() const final
+	{
+		return this->_module_name;
+	}
+
+	[[nodiscard]]
+	std::vector<std::shared_ptr<urls::IPattern>> get_urlpatterns() final;
+
+	[[nodiscard]]
+	std::vector<std::shared_ptr<cmd::AbstractCommand>> get_commands() final;
 
 protected:
-	inline explicit ModuleConfig(conf::Settings* settings) : _is_initialized(false), settings(settings)
+	conf::Settings* settings;
+
+	inline explicit ModuleConfig(std::string name, conf::Settings* settings) :
+		_module_name(std::move(name)), _is_configured(false), settings(settings)
 	{
+		if (_module_name.empty())
+		{
+			throw ValueError("module name should not be empty", _ERROR_DETAILS_);
+		}
 	}
 
 	template <
@@ -124,26 +124,38 @@ protected:
 	{
 	}
 
-public:
-	[[nodiscard]]
-	inline bool ready() const override
+	void set_ready()
 	{
-		return this->_is_initialized;
+		this->_is_configured = true;
 	}
 
-	[[nodiscard]]
-	inline std::string get_name() const final
+private:
+	bool _is_configured;
+	std::string _module_name;
+
+	friend class conf::Settings;
+
+	std::vector<std::shared_ptr<urls::IPattern>> _urlpatterns;
+	std::vector<std::shared_ptr<cmd::AbstractCommand>> _commands;
+	std::vector<std::function<void()>> _sub_modules_to_init;
+
+	inline std::shared_ptr<IModuleConfig> _find_module(const std::string& module)
 	{
-		return this->module_name;
+		auto result = std::find_if(
+			this->settings->MODULES.begin(), this->settings->MODULES.end(),
+			[&module](const std::shared_ptr<IModuleConfig>& entry) -> bool {
+				return entry->get_name() == module;
+			}
+		);
+		if (result == this->settings->MODULES.end())
+		{
+			throw ImproperlyConfigured(
+				"module is used but was not registered: " + module, _ERROR_DETAILS_
+			);
+		}
+
+		return *result;
 	}
-
-	[[nodiscard]]
-	std::vector<std::shared_ptr<urls::IPattern>> get_urlpatterns() final;
-
-	[[nodiscard]]
-	std::vector<std::shared_ptr<cmd::AbstractCommand>> get_commands() final;
-
-	virtual void init(const std::string& name);
 };
 
 __CONF_END__

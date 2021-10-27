@@ -197,7 +197,23 @@ middleware::Function Application::get_controller_handler() const
 		auto apply = urls::resolve(request->url().path, this->settings->URLPATTERNS);
 		if (apply)
 		{
-			return apply(request, this->settings);
+			auto response = apply(request, this->settings);
+			if (!response)
+			{
+				if (this->settings->DEBUG)
+				{
+					throw NullPointerException(
+						"Controller returns nullptr on '" + request->method() + "'.",
+						_ERROR_DETAILS_
+					);
+				}
+				else
+				{
+					response = std::make_unique<http::Response>(204);
+				}
+			}
+
+			return response;
 		}
 
 		return this->get_error_response(request, 404, "The requested resource was not found.");
@@ -224,16 +240,14 @@ void Application::build_module_patterns(std::vector<std::shared_ptr<urls::IPatte
 {
 	if (!this->settings->MODULES.empty())
 	{
-		for (auto& module : this->settings->MODULES)
+		auto root_module = this->settings->MODULES.front();
+		if (!root_module)
 		{
-			if (!module)
-			{
-				throw NullPointerException("'module' is nullptr", _ERROR_DETAILS_);
-			}
-
-			auto modules_patterns = module->get_urlpatterns();
-			patterns.insert(patterns.end(), modules_patterns.begin(), modules_patterns.end());
+			throw NullPointerException("root module is nullptr", _ERROR_DETAILS_);
 		}
+
+		auto modules_patterns = root_module->get_urlpatterns();
+		patterns.insert(patterns.end(), modules_patterns.begin(), modules_patterns.end());
 	}
 }
 
@@ -279,6 +293,7 @@ void Application::add_static_pattern(
 void Application::setup_commands()
 {
 	auto core_module = mgmt::CoreModuleConfig(this->settings, std::move(this->get_application_handler()));
+	core_module.configure();
 	this->_append_commands(core_module.get_commands(), core_module.get_name());
 	for (auto& installed_module : this->settings->MODULES)
 	{

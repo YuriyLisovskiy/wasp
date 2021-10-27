@@ -33,18 +33,4 @@ std::vector<std::shared_ptr<cmd::AbstractCommand>> ModuleConfig::get_commands()
 	return this->_commands;
 }
 
-void ModuleConfig::init(const std::string& name)
-{
-	if (name.empty())
-	{
-		throw ValueError("module name should not be empty", _ERROR_DETAILS_);
-	}
-
-	if (!this->_is_initialized)
-	{
-		this->module_name = name;
-		this->_is_initialized = true;
-	}
-}
-
 __CONF_END__

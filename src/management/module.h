@@ -38,7 +38,7 @@ private:
 
 public:
 	explicit CoreModuleConfig(conf::Settings* settings, HandlerFunction handler) :
-		ModuleConfig(settings), _handler_function(std::move(handler))
+		ModuleConfig("xw::mgmt::CoreModuleConfig", settings), _handler_function(std::move(handler))
 	{
 	}
 

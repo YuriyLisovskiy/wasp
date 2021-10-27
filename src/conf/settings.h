@@ -341,9 +341,7 @@ protected:
 		}
 
 		this->_modules[name] = [this, name]() -> std::shared_ptr<IModuleConfig> {
-			auto module = std::make_shared<ModuleConfigT>(this);
-			module->init(name);
-			return module;
+			return std::make_shared<ModuleConfigT>(name, this);
 		};
 	}
 

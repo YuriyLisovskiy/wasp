@@ -113,6 +113,11 @@ void Settings::prepare()
 			}
 		}
 	}
+
+	for (auto& module : this->MODULES)
+	{
+		module->configure();
+	}
 }
 
 void Settings::check()
@@ -165,7 +170,7 @@ void Settings::check()
 
 	for (auto& module : this->MODULES)
 	{
-		if (!module->ready())
+		if (!module->is_configured())
 		{
 			this->LOGGER->error("Module '" + module->get_name() + "' is not ready.");
 			err_count++;
