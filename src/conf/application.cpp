@@ -224,14 +224,16 @@ void Application::build_module_patterns(std::vector<std::shared_ptr<urls::IPatte
 {
 	if (!this->settings->MODULES.empty())
 	{
-		auto root_module = this->settings->MODULES.front();
-		if (!root_module)
+		for (auto& module : this->settings->MODULES)
 		{
-			throw NullPointerException("'root_module' is nullptr", _ERROR_DETAILS_);
-		}
+			if (!module)
+			{
+				throw NullPointerException("'module' is nullptr", _ERROR_DETAILS_);
+			}
 
-		auto modules_patterns = root_module->get_urlpatterns();
-		patterns.insert(patterns.end(), modules_patterns.begin(), modules_patterns.end());
+			auto modules_patterns = module->get_urlpatterns();
+			patterns.insert(patterns.end(), modules_patterns.begin(), modules_patterns.end());
+		}
 	}
 }
 
