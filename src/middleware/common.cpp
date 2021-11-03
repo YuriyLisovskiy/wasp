@@ -20,7 +20,7 @@ __MIDDLEWARE_BEGIN__
 
 Function Common::operator() (const Function& next) const
 {
-	return [*this, next](http::Request* request) -> std::unique_ptr<http::HttpResponse>
+	return [*this, next](http::IRequest* request) -> std::unique_ptr<http::IResponse>
 	{
 		auto response = this->preprocess(request);
 		if (response)
@@ -39,7 +39,7 @@ Function Common::operator() (const Function& next) const
 	};
 }
 
-bool Common::should_redirect_with_slash(http::Request* request) const
+bool Common::should_redirect_with_slash(http::IRequest* request) const
 {
 	const auto& request_url = request->url();
 	if (this->settings->APPEND_SLASH && !request_url.path.ends_with("/"))
@@ -51,7 +51,7 @@ bool Common::should_redirect_with_slash(http::Request* request) const
 	return false;
 }
 
-std::string Common::get_full_path_with_slash(http::Request* request) const
+std::string Common::get_full_path_with_slash(http::IRequest* request) const
 {
 	auto new_path = request->url().full_path(true);
 
@@ -79,12 +79,12 @@ std::string Common::get_full_path_with_slash(http::Request* request) const
 	return new_path;
 }
 
-std::unique_ptr<http::HttpResponse> Common::preprocess(http::Request* request) const
+std::unique_ptr<http::IResponse> Common::preprocess(http::IRequest* request) const
 {
 	require_non_null(request, _ERROR_DETAILS_);
 	if (request->has_header(http::USER_AGENT))
 	{
-		auto user_agent = request->get_header(http::USER_AGENT);
+		auto user_agent = request->get_header(http::USER_AGENT, "");
 		for (const auto& rgx : this->settings->DISALLOWED_USER_AGENTS)
 		{
 			auto to_search = rgx;
@@ -131,8 +131,8 @@ std::unique_ptr<http::HttpResponse> Common::preprocess(http::Request* request) c
 	return nullptr;
 }
 
-std::unique_ptr<http::HttpResponse> Common::postprocess(
-	http::Request* request, http::HttpResponse* response
+std::unique_ptr<http::IResponse> Common::postprocess(
+	http::IRequest* request, http::IResponse* response
 ) const
 {
 	require_non_null(response, _ERROR_DETAILS_);

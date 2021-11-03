@@ -47,7 +47,7 @@ protected:
 	};
 
 	[[nodiscard]]
-	static inline std::unique_ptr<http::HttpResponse> get_response(
+	static inline std::unique_ptr<http::IResponse> get_response(
 		net::StatusCode status_code, const std::string& content, bool is_json
 	)
 	{
@@ -67,7 +67,7 @@ protected:
 	}
 
 	[[nodiscard]]
-	std::unique_ptr<http::HttpResponse> error_to_response(
+	std::unique_ptr<http::IResponse> error_to_response(
 		net::StatusCode status_code, const std::string& message, bool is_json
 	) const;
 };

@@ -293,7 +293,7 @@ void read_full_request_body(std::string& buffer, io::IReader* reader, ssize_t co
 }
 
 std::tuple<std::string, bool> read_body_to_string(
-	http::Request* request, io::ILimitedBufferedReader* body_reader, const std::string& target_content_type
+	http::IRequest* request, io::ILimitedBufferedReader* body_reader, const std::string& target_content_type
 )
 {
 	require_non_null(request, "'request' is nullptr", _ERROR_DETAILS_);
@@ -334,7 +334,7 @@ std::tuple<std::string, bool> read_body_to_string(
 	return {"", false};
 }
 
-Query parse_post_form(http::Request* request, io::ILimitedBufferedReader* body_reader)
+Query parse_post_form(http::IRequest* request, io::ILimitedBufferedReader* body_reader)
 {
 	Query query;
 	auto [content, ok] = read_body_to_string(request, body_reader, mime::APPLICATION_X_WWW_FORM_URLENCODED);
@@ -346,7 +346,7 @@ Query parse_post_form(http::Request* request, io::ILimitedBufferedReader* body_r
 	return query;
 }
 
-std::string parse_content_type(http::Request* request)
+std::string parse_content_type(http::IRequest* request)
 {
 	auto content_type = request->get_header(CONTENT_TYPE, "");
 

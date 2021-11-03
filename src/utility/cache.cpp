@@ -81,7 +81,7 @@ bool if_none_match_passes(
 	}
 }
 
-std::unique_ptr<http::HttpResponse> not_modified(http::Request* request, http::HttpResponse* response)
+std::unique_ptr<http::IResponse> not_modified(http::IRequest* request, http::IResponse* response)
 {
 	auto new_response = std::make_unique<http::NotModified>("");
 	if (response)
@@ -122,7 +122,7 @@ __UTIL_CACHE_INTERNAL_END__
 
 __UTIL_CACHE_BEGIN__
 
-void set_response_etag(http::HttpResponse* response)
+void set_response_etag(http::IResponse* response)
 {
 	if (!response->is_streaming() && response->content_length() > 0)
 	{
@@ -132,11 +132,11 @@ void set_response_etag(http::HttpResponse* response)
 	}
 }
 
-std::unique_ptr<http::HttpResponse> get_conditional_response(
-	http::Request* request,
+std::unique_ptr<http::IResponse> get_conditional_response(
+	http::IRequest* request,
 	const std::string& etag,
 	long last_modified,
-	http::HttpResponse* response
+	http::IResponse* response
 )
 {
 	// Only return conditional responses on successful requests.
@@ -149,7 +149,7 @@ std::unique_ptr<http::HttpResponse> get_conditional_response(
 	auto if_match_etags = http::parse_etags(request->get_header(http::IF_MATCH, ""));
 	long if_unmodified_since = http::parse_http_date(request->get_header(http::IF_UNMODIFIED_SINCE, ""));
 	auto if_none_match_etags = http::parse_etags(request->get_header(http::IF_NONE_MATCH, ""));
-	long if_modified_since = http::parse_http_date(request->get_header(http::IF_MODIFIED_SINCE));
+	long if_modified_since = http::parse_http_date(request->get_header(http::IF_MODIFIED_SINCE, ""));
 
 	// Step 1 of section 6 of RFC 7232: Test the If-Match precondition.
 	if (!if_match_etags.empty() && !internal::if_match_passes(etag, if_match_etags))

@@ -73,10 +73,10 @@ protected:
 	inline void url(const std::string& pattern, const std::string& name, ControllerArgs ...controller_args)
 	{
 		ctrl::Handler<RequestArgs...> controller_handler = [controller_args...](
-			http::Request* request,
+			http::IRequest* request,
 			const std::tuple<RequestArgs...>& request_args,
 			const Settings* settings_ptr
-		) -> std::unique_ptr<http::HttpResponse>
+		) -> std::unique_ptr<http::IResponse>
 		{
 			ControllerType controller(
 				require_non_null(settings_ptr, "'settings' is nullptr", _ERROR_DETAILS_)->LOGGER.get(),

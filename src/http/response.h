@@ -33,7 +33,7 @@ __HTTP_BEGIN__
 // TESTME: ResponseBase
 // TODO: docs for 'ResponseBase'
 // An HTTP response base class with dictionary-accessed headers.
-class AbstractResponse : public HttpResponse
+class AbstractResponse : public IResponse
 {
 public:
 	explicit AbstractResponse(

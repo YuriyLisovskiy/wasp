@@ -27,45 +27,20 @@
 #include "./_def_.h"
 
 // Framework libraries.
-#include "./url.h"
 #include "./headers.h"
-#include "./cookie/cookie.h"
 #include "./cookie/parser.h"
-#include "./mime/multipart/form.h"
 #include "./mime/multipart/body_reader.h"
 #include "./mime/content_types.h"
-#include "../conf/types.h"
+#include "./interfaces.h"
 
 
 __HTTP_BEGIN__
 
 // TESTME: Request
 // TODO: docs for 'Request'
-class Request
+class Request : public IRequest
 {
 public:
-	// "HTTP/1.0"
-	struct Proto
-	{
-		std::string name;     // HTTP
-		unsigned short major; // 1
-		unsigned short minor; // 0
-
-		// 'at_least' reports whether the HTTP protocol used
-		// in the request is at least major.minor.
-		[[nodiscard]]
-		inline bool at_least(int major_number, int minor_number) const
-		{
-			return this->major > major_number || this->major == major_number && this->minor >= minor_number;
-		}
-
-		[[nodiscard]]
-		std::string to_string() const
-		{
-			return name + "/" + std::to_string(this->major) + "." + std::to_string(this->minor);
-		}
-	};
-
 	explicit Request(
 		const net::RequestContext& context,
 		ssize_t max_file_upload_size, ssize_t max_fields_count,
@@ -75,52 +50,52 @@ public:
 	);
 
 	[[nodiscard]]
-	inline std::string method() const
+	inline std::string method() const final
 	{
 		return this->_method;
 	}
 
 	[[nodiscard]]
-	const URL& url() const
+	const URL& url() const final
 	{
 		return this->_url;
 	}
 
 	[[nodiscard]]
-	inline Proto proto() const
+	inline Proto proto() const final
 	{
 		return this->_proto;
 	}
 
 	[[nodiscard]]
-	inline const std::map<std::string, std::string>& headers() const
+	inline const std::map<std::string, std::string>& headers() const final
 	{
 		return this->_headers;
 	}
 
 	// 'user_agent' returns the client's User-Agent, if sent in the request.
 	[[nodiscard]]
-	inline std::string user_agent() const
+	inline std::string user_agent() const final
 	{
 		return this->get_header(USER_AGENT, "");
 	}
 
 	// TODO: docs for 'has_header'
 	[[nodiscard]]
-	inline bool has_header(const std::string& key) const
+	inline bool has_header(const std::string& key) const final
 	{
 		return this->_headers.contains(key);
 	}
 
 	// TODO: docs for 'get_header'
 	[[nodiscard]]
-	inline std::string get_header(const std::string& key, const std::string& default_value="") const
+	inline std::string get_header(const std::string& key, const std::string& default_value="") const final
 	{
 		return this->_headers.contains(key) ? this->_headers.at(key) : default_value;
 	}
 
 	// TODO: docs for 'set_header'
-	inline void set_header(const std::string& key, const std::string& value)
+	inline void set_header(const std::string& key, const std::string& value) final
 	{
 		if (this->_headers.contains(key))
 		{
@@ -133,14 +108,14 @@ public:
 	}
 
 	[[nodiscard]]
-	inline bool is_json() const
+	inline bool is_json() const final
 	{
 		return this->get_header(CONTENT_TYPE, "").find(mime::APPLICATION_JSON) != std::string::npos;
 	}
 
 	// 'cookies' parses and returns the HTTP cookies sent with the request.
 	[[nodiscard]]
-	inline std::vector<Cookie> cookies() const
+	inline std::vector<Cookie> cookies() const final
 	{
 		return parse_cookies(this->get_header(COOKIE, ""), "");
 	}
@@ -150,7 +125,7 @@ public:
 	// If multiple cookies match the given name, only one cookie will
 	// be returned.
 	[[nodiscard]]
-	inline std::optional<Cookie> cookie(const std::string& name) const
+	inline std::optional<Cookie> cookie(const std::string& name) const final
 	{
 		auto cookies = parse_cookies(this->get_header(COOKIE), name);
 		if (cookies.empty())
@@ -170,66 +145,66 @@ public:
 	// alternate (correct English) spelling req.referrer() but cannot
 	// diagnose programs that use header.get("Referrer").
 	[[nodiscard]]
-	inline std::string referer() const
+	inline std::string referer() const final
 	{
 		return this->get_header(REFERER, "");
 	}
 
-	inline const Query& form()
+	inline const Query& form() final
 	{
 		this->_parse_form();
 		return this->_form.value();
 	}
 
-	inline const mime::multipart::Form& multipart_form()
+	inline const mime::multipart::Form& multipart_form() final
 	{
 		this->_parse_multipart_form();
 		return this->_multipart_form.value();
 	}
 
-	inline nlohmann::json json()
+	inline nlohmann::json json() final
 	{
 		this->_parse_json_data();
 		return this->_json.value();
 	}
 
 	[[nodiscard]]
-	inline std::string host() const
+	inline std::string host() const final
 	{
 		return this->_host;
 	}
 
 	[[nodiscard]]
-	inline ssize_t content_length() const
+	inline ssize_t content_length() const final
 	{
 		return this->_content_length;
 	}
 
 	[[nodiscard]]
-	const std::vector<std::string>& transfer_encoding() const
+	const std::vector<std::string>& transfer_encoding() const final
 	{
 		return this->_transfer_encoding;
 	}
 
 	[[nodiscard]]
-	inline const std::map<std::string, std::string>& environment() const
+	inline const std::map<std::string, std::string>& environment() const final
 	{
 		return this->_environment;
 	}
 
 	// TODO: docs for 'scheme'
 	[[nodiscard]]
-	std::string scheme(const std::optional<conf::Secure::Header>& secure_proxy_ssl_header) const;
+	std::string scheme(const std::optional<conf::Secure::Header>& secure_proxy_ssl_header) const final;
 
 	// Return the HTTP host using the environment or request headers.
 	std::string get_host(
 		const std::optional<conf::Secure::Header>& secure_proxy_ssl_header,
 		bool use_x_forwarded_host, bool use_x_forwarded_port, bool debug, std::vector<std::string> allowed_hosts
-	);
+	) final;
 
 	// TODO: docs for 'is_secure'
 	[[nodiscard]]
-	inline bool is_secure(const std::optional<conf::Secure::Header>& secure_proxy_ssl_header) const
+	inline bool is_secure(const std::optional<conf::Secure::Header>& secure_proxy_ssl_header) const final
 	{
 		return this->scheme(secure_proxy_ssl_header) == "https";
 	}
@@ -399,15 +374,15 @@ extern void read_full_request_body(std::string& buffer, io::IReader* reader, ssi
 // TESTME: read_body_to_string
 // TODO: docs for 'read_body_to_string'
 extern std::tuple<std::string, bool> read_body_to_string(
-	http::Request* request, io::ILimitedBufferedReader* body_reader, const std::string& target_content_type
+	http::IRequest* request, io::ILimitedBufferedReader* body_reader, const std::string& target_content_type
 );
 
 // TESTME: parse_post_form
 // TODO: docs for 'parse_post_form'
-extern Query parse_post_form(http::Request* request, io::ILimitedBufferedReader* body_reader);
+extern Query parse_post_form(http::IRequest* request, io::ILimitedBufferedReader* body_reader);
 
 // TESTME: 'get_content_type'
 // TODO: docs for 'get_content_type'
-extern std::string parse_content_type(http::Request* request);
+extern std::string parse_content_type(http::IRequest* request);
 
 __HTTP_END__

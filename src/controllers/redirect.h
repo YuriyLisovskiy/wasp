@@ -43,43 +43,43 @@ public:
 
 	// Return the URL redirect to.
 	[[nodiscard]]
-	std::string get_redirect_url(http::Request* request) const;
+	std::string get_redirect_url(http::IRequest* request) const;
 
 	[[nodiscard]]
-	std::unique_ptr<http::HttpResponse> get(http::Request* request) const override;
+	std::unique_ptr<http::IResponse> get(http::IRequest* request) const override;
 
 	[[nodiscard]]
-	inline std::unique_ptr<http::HttpResponse> post(http::Request* request) const override
+	inline std::unique_ptr<http::IResponse> post(http::IRequest* request) const override
 	{
 		return this->get(request);
 	}
 
 	[[nodiscard]]
-	inline std::unique_ptr<http::HttpResponse> head(http::Request* request) const override
+	inline std::unique_ptr<http::IResponse> head(http::IRequest* request) const override
 	{
 		return this->get(request);
 	}
 
 	[[nodiscard]]
-	inline std::unique_ptr<http::HttpResponse> options(http::Request* request) const override
+	inline std::unique_ptr<http::IResponse> options(http::IRequest* request) const override
 	{
 		return this->get(request);
 	}
 
 	[[nodiscard]]
-	inline std::unique_ptr<http::HttpResponse> put(http::Request* request) const override
+	inline std::unique_ptr<http::IResponse> put(http::IRequest* request) const override
 	{
 		return this->get(request);
 	}
 
 	[[nodiscard]]
-	inline std::unique_ptr<http::HttpResponse> delete_(http::Request* request) const override
+	inline std::unique_ptr<http::IResponse> delete_(http::IRequest* request) const override
 	{
 		return this->get(request);
 	}
 
 	[[nodiscard]]
-	inline std::unique_ptr<http::HttpResponse> patch(http::Request* request) const override
+	inline std::unique_ptr<http::IResponse> patch(http::IRequest* request) const override
 	{
 		return this->get(request);
 	}

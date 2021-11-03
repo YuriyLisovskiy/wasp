@@ -17,7 +17,7 @@ __MIDDLEWARE_BEGIN__
 
 Function ConditionalGet::operator() (const Function& next) const
 {
-	return [*this, next](http::Request* request) -> std::unique_ptr<http::HttpResponse>
+	return [*this, next](http::IRequest* request) -> std::unique_ptr<http::IResponse>
 	{
 		auto response = next(request);
 
@@ -51,7 +51,7 @@ Function ConditionalGet::operator() (const Function& next) const
 	};
 }
 
-bool ConditionalGet::needs_etag(const std::unique_ptr<http::HttpResponse>& response) const
+bool ConditionalGet::needs_etag(const std::unique_ptr<http::IResponse>& response) const
 {
 	auto cache_control = str::split(response->get_header(http::CACHE_CONTROL, ""), ',');
 	bool result = true;

@@ -21,7 +21,7 @@
 
 __MIDDLEWARE_BEGIN__
 
-using Function = std::function<std::unique_ptr<http::HttpResponse>(http::Request* request)>;
+using Function = std::function<std::unique_ptr<http::IResponse>(http::IRequest* request)>;
 using Handler = std::function<Function(const Function&)>;
 
 __MIDDLEWARE_END__

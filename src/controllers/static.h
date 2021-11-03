@@ -36,7 +36,7 @@ public:
 	}
 
 	[[nodiscard]]
-	std::unique_ptr<http::HttpResponse> get(http::Request* request, const std::string& p) const final;
+	std::unique_ptr<http::IResponse> get(http::IRequest* request, const std::string& p) const final;
 
 private:
 	const conf::Settings* settings = nullptr;

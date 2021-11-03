@@ -34,7 +34,7 @@ public:
 protected:
 	// Return true if an ETag header should be added to response.
 	[[nodiscard]]
-	virtual bool needs_etag(const std::unique_ptr<http::HttpResponse>& response) const;
+	virtual bool needs_etag(const std::unique_ptr<http::IResponse>& response) const;
 };
 
 __MIDDLEWARE_END__

@@ -24,8 +24,8 @@ TemplateResponseMixin::TemplateResponseMixin(render::IEngine* engine)
 	this->engine = engine;
 }
 
-std::unique_ptr<http::HttpResponse> TemplateResponseMixin::render(
-	http::Request* request,
+std::unique_ptr<http::IResponse> TemplateResponseMixin::render(
+	http::IRequest* request,
 	const std::shared_ptr<render::IContext>& context,
 	const std::string& template_name,
 	unsigned short int status,

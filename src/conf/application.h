@@ -86,7 +86,7 @@ protected:
 	virtual void build_module_patterns(std::vector<std::shared_ptr<urls::IPattern>>& patterns) const;
 
 	[[nodiscard]]
-	virtual std::shared_ptr<http::Request> build_request(
+	virtual std::shared_ptr<http::IRequest> build_request(
 		net::RequestContext* context, std::map<std::string, std::string> env
 	) const;
 
@@ -117,16 +117,16 @@ protected:
 	}
 
 	[[nodiscard]]
-	virtual std::unique_ptr<http::HttpResponse> get_error_response(
-		http::Request* request, net::StatusCode status_code, const std::string& message
+	virtual std::unique_ptr<http::IResponse> get_error_response(
+		http::IRequest* request, net::StatusCode status_code, const std::string& message
 	) const;
 
 	[[nodiscard]]
-	virtual uint send_response(net::RequestContext* ctx, const std::unique_ptr<http::HttpResponse>& response) const;
+	virtual uint send_response(net::RequestContext* ctx, const std::unique_ptr<http::IResponse>& response) const;
 
-	virtual net::StatusCode finish_response(net::RequestContext* context, http::HttpResponse* response) const;
+	virtual net::StatusCode finish_response(net::RequestContext* context, http::IResponse* response) const;
 
-	virtual void finish_streaming_response(net::RequestContext* context, http::HttpResponse* response) const;
+	virtual void finish_streaming_response(net::RequestContext* context, http::IResponse* response) const;
 
 private:
 	[[nodiscard]]

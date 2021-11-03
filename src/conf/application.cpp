@@ -38,8 +38,8 @@ std::shared_ptr<urls::IPattern> _build_static_pattern(
 	}
 
 	auto controller_function = [static_root](
-		http::Request* request, const std::tuple<std::string>& args, const Settings* settings
-	) -> std::unique_ptr<http::HttpResponse>
+		http::IRequest* request, const std::tuple<std::string>& args, const Settings* settings
+	) -> std::unique_ptr<http::IResponse>
 	{
 		return std::apply([request, static_root, settings](const std::string& p) mutable -> auto
 		{
@@ -191,7 +191,7 @@ Application::ServerHandler Application::get_application_handler() const
 
 middleware::Function Application::get_controller_handler() const
 {
-	return [this](http::Request* request) -> std::unique_ptr<http::HttpResponse>
+	return [this](http::IRequest* request) -> std::unique_ptr<http::IResponse>
 	{
 		require_non_null(request, _ERROR_DETAILS_);
 		auto apply = urls::resolve(request->url().path, this->settings->URLPATTERNS);
@@ -251,7 +251,7 @@ void Application::build_module_patterns(std::vector<std::shared_ptr<urls::IPatte
 	}
 }
 
-std::shared_ptr<http::Request> Application::build_request(
+std::shared_ptr<http::IRequest> Application::build_request(
 	net::RequestContext* context, std::map<std::string, std::string> environment
 ) const
 {
@@ -306,8 +306,8 @@ void Application::setup_middleware()
 	this->settings->MIDDLEWARE.insert(this->settings->MIDDLEWARE.begin(), middleware::Exception(this->settings));
 }
 
-std::unique_ptr<http::HttpResponse> Application::get_error_response(
-	http::Request* request, net::StatusCode status_code, const std::string& message
+std::unique_ptr<http::IResponse> Application::get_error_response(
+	http::IRequest* request, net::StatusCode status_code, const std::string& message
 ) const
 {
 	auto [status, status_is_found] = net::get_status_by_code(status_code);
@@ -326,7 +326,7 @@ std::unique_ptr<http::HttpResponse> Application::get_error_response(
 }
 
 net::StatusCode Application::send_response(
-	net::RequestContext* ctx, const std::unique_ptr<http::HttpResponse>& response
+	net::RequestContext* ctx, const std::unique_ptr<http::IResponse>& response
 ) const
 {
 	if (!response)
@@ -338,7 +338,7 @@ net::StatusCode Application::send_response(
 	return this->finish_response(ctx, response ? response.get() : &no_content);
 }
 
-net::StatusCode Application::finish_response(net::RequestContext* context, http::HttpResponse* response) const
+net::StatusCode Application::finish_response(net::RequestContext* context, http::IResponse* response) const
 {
 	require_non_null(context, "'context' is nullptr", _ERROR_DETAILS_);
 	if (!context->response_writer)
@@ -363,7 +363,7 @@ net::StatusCode Application::finish_response(net::RequestContext* context, http:
 	return response->get_status();
 }
 
-void Application::finish_streaming_response(net::RequestContext* context, http::HttpResponse* response) const
+void Application::finish_streaming_response(net::RequestContext* context, http::IResponse* response) const
 {
 	auto* streaming_response = dynamic_cast<http::StreamingResponse*>(response);
 	if (!streaming_response)

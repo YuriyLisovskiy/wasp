@@ -32,8 +32,8 @@ public:
 	// Returns a response with a template rendered with
 	// the given context.
 	[[nodiscard]]
-	virtual std::unique_ptr<http::HttpResponse> render(
-		http::Request* request,
+	virtual std::unique_ptr<http::IResponse> render(
+		http::IRequest* request,
 		const std::shared_ptr<render::IContext>& context,
 		const std::string& template_name="",
 		unsigned short int status=200,
@@ -67,13 +67,13 @@ public:
 	// Used in default get() method, can be overridden
 	// in derived classes.
 	[[nodiscard]]
-	virtual inline std::shared_ptr<render::IContext> get_context(http::Request* request, UrlArgs ...args) const
+	virtual inline std::shared_ptr<render::IContext> get_context(http::IRequest* request, UrlArgs ...args) const
 	{
 		return nullptr;
 	}
 
 	[[nodiscard]]
-	inline std::unique_ptr<http::HttpResponse> get(http::Request* request, UrlArgs ...args) const override
+	inline std::unique_ptr<http::IResponse> get(http::IRequest* request, UrlArgs ...args) const override
 	{
 		return this->render(request, this->get_context(request, args...), "", 200, "", "utf-8");
 	}

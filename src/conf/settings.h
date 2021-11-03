@@ -64,7 +64,7 @@ public:
 	// If you set this to True, Django will use timezone-aware datetimes.
 	bool USE_TIMEZONE = false;
 
-	// Default charset to use for all HttpResponse objects, if a MIME type isn't
+	// Default charset to use for all IResponse objects, if a MIME type isn't
 	// manually specified. It's used to construct the Content-Type header.
 	std::string CHARSET = "utf-8";
 
