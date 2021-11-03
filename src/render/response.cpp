@@ -21,32 +21,38 @@ TemplateResponse::TemplateResponse(
 	const std::string& charset
 ) : Response(status, "", content_type, "", charset)
 {
-	this->engine = engine;
-	this->template_name = template_name;
-	this->context = context;
-	this->is_rendered = false;
+	this->_engine = engine;
+	this->_template_name = template_name;
+	this->_context = context;
+	this->_is_rendered = false;
 }
 
 void TemplateResponse::render()
 {
-	if (this->is_rendered)
+	if (this->_is_rendered)
 	{
 		return;
 	}
 
-	auto template_ = this->engine->get_template(this->template_name);
-	this->set_content(template_->render(this->context));
-	this->is_rendered = true;
+	auto template_ = require_non_null(
+		this->_engine, "'engine' is nullptr", _ERROR_DETAILS_
+	)->get_template(this->_template_name);
+	this->set_content(require_non_null(
+		template_.get(), "template is nullptr", _ERROR_DETAILS_
+	)->render(this->_context));
+	this->_is_rendered = true;
 }
 
 std::string TemplateResponse::get_content() const
 {
-	if (this->is_rendered)
+	if (this->_is_rendered)
 	{
-		return this->content;
+		return http::Response::get_content();
 	}
 
-	throw RuntimeError("The response content must be rendered before it can be accessed.", _ERROR_DETAILS_);
+	throw RuntimeError(
+		"The response content must be rendered before it can be accessed.", _ERROR_DETAILS_
+	);
 }
 
 __RENDER_END__

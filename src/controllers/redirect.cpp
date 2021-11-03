@@ -30,9 +30,9 @@ std::unique_ptr<http::HttpResponse> RedirectController::get(http::Request* reque
 	std::string url = this->get_redirect_url(request);
 	if (url.empty())
 	{
-		if (this->settings->LOGGER)
+		if (this->logger)
 		{
-			this->settings->LOGGER->warning("Gone: " + request->url().path);
+			this->logger->warning("Gone: " + request->url().path);
 		}
 
 		return std::make_unique<http::Gone>("");

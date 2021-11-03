@@ -75,10 +75,13 @@ protected:
 		ctrl::Handler<RequestArgs...> controller_handler = [controller_args...](
 			http::Request* request,
 			const std::tuple<RequestArgs...>& request_args,
-			const conf::Settings* settings_pointer
+			const Settings* settings_ptr
 		) -> std::unique_ptr<http::HttpResponse>
 		{
-			ControllerType controller(settings_pointer, controller_args...);
+			ControllerType controller(
+				require_non_null(settings_ptr, "'settings' is nullptr", _ERROR_DETAILS_)->LOGGER.get(),
+				controller_args...
+			);
 			return std::apply(
 				[&controller, request](RequestArgs ...a) mutable -> auto
 				{

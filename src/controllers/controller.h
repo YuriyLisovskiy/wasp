@@ -15,6 +15,7 @@
 // Base libraries.
 #include <xalwart.base/utility.h>
 #include <xalwart.base/string_utils.h>
+#include <xalwart.base/interfaces/base.h>
 
 // Module definitions.
 #include "./_def_.h"
@@ -38,7 +39,7 @@ template <typename ...URLArgsT>
 class Controller
 {
 public:
-	inline explicit Controller(const conf::Settings* settings) : Controller<URLArgsT...>({"options"}, settings)
+	inline explicit Controller(const ILogger* logger) : Controller<URLArgsT...>({"options"}, logger)
 	{
 	}
 
@@ -203,7 +204,7 @@ public:
 	}
 
 protected:
-	const conf::Settings* settings = nullptr;
+	const ILogger* logger = nullptr;
 
 	// Contains all possible http methods which controller can handle.
 	const std::vector<std::string> http_method_names = {
@@ -213,12 +214,10 @@ protected:
 	// List of methods witch will be returned when 'OPTIONS' is in request.
 	std::vector<std::string> allowed_methods_list{};
 
-protected:
 	inline explicit Controller(
-		const std::vector<std::string>& allowed_methods, const conf::Settings* settings
-	) : settings(settings)
+		const std::vector<std::string>& allowed_methods, const ILogger* logger
+	) : logger(logger)
 	{
-		require_non_null(this->settings, "'settings' is nullptr", _ERROR_DETAILS_);
 		for (const auto& method : allowed_methods)
 		{
 			this->allowed_methods_list.push_back(str::to_lower(method));
@@ -238,9 +237,9 @@ protected:
 	[[nodiscard]]
 	inline std::unique_ptr<http::HttpResponse> method_not_allowed_response(http::Request* request) const
 	{
-		if (this->settings->LOGGER)
+		if (this->logger)
 		{
-			this->settings->LOGGER->warning(
+			this->logger->warning(
 				"Method Not Allowed (" + request->method() + "): " + request->url().path, _ERROR_DETAILS_
 			);
 		}

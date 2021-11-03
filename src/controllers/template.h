@@ -55,26 +55,25 @@ protected:
 // TESTME: TemplateController
 // TODO: docs for 'TemplateController'
 // A controller that can render a template.
-template <typename ...UrlArgsT>
-class TemplateController : public TemplateResponseMixin, public Controller<UrlArgsT...>
+template <typename ...UrlArgs>
+class TemplateController : public TemplateResponseMixin, public Controller<UrlArgs...>
 {
 public:
-	explicit TemplateController(const conf::Settings* settings) :
-		Controller<UrlArgsT...>({"get", "options"}, settings),
-		TemplateResponseMixin(settings ? settings->TEMPLATE_ENGINE.get() : nullptr)
+	explicit TemplateController(render::IEngine* engine, const ILogger* logger) :
+		Controller<UrlArgs...>({"get", "options"}, logger), TemplateResponseMixin(engine)
 	{
 	}
 
 	// Used in default get() method, can be overridden
 	// in derived classes.
 	[[nodiscard]]
-	virtual inline std::shared_ptr<render::IContext> get_context(http::Request* request, UrlArgsT ...args) const
+	virtual inline std::shared_ptr<render::IContext> get_context(http::Request* request, UrlArgs ...args) const
 	{
 		return nullptr;
 	}
 
 	[[nodiscard]]
-	inline std::unique_ptr<http::HttpResponse> get(http::Request* request, UrlArgsT ...args) const override
+	inline std::unique_ptr<http::HttpResponse> get(http::Request* request, UrlArgs ...args) const override
 	{
 		return this->render(request, this->get_context(request, args...), "", 200, "", "utf-8");
 	}
@@ -82,11 +81,11 @@ public:
 protected:
 	explicit TemplateController(
 		const std::vector<std::string>& allowed_methods,
-		const conf::Settings* settings,
+		render::IEngine* engine,
+		const ILogger* logger,
 		const std::string& template_name="",
 		const std::string& content_type=""
-	) : Controller<UrlArgsT...>(allowed_methods, settings),
-		TemplateResponseMixin(settings ? settings->TEMPLATE_ENGINE.get() : nullptr)
+	) : Controller<UrlArgs...>(allowed_methods, logger), TemplateResponseMixin(engine)
 	{
 		this->template_name = template_name;
 		this->content_type = content_type;

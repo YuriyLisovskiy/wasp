@@ -31,13 +31,12 @@ private:
 
 public:
 	inline explicit RedirectController(
-		const conf::Settings* settings,
+		const ILogger* logger,
 		std::string url,
 		bool permanent=false,
 		bool query_string=false
 	) : Controller(
-		{"get", "post", "put", "patch", "delete", "head", "options"},
-		settings
+		{"get", "post", "put", "patch", "delete", "head", "options"}, logger
 	), _url(std::move(url)), _permanent(permanent), _query_string(query_string)
 	{
 	}

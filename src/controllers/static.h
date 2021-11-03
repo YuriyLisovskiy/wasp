@@ -29,15 +29,17 @@ class StaticController final : public Controller<const std::string&>
 {
 public:
 	inline explicit StaticController(
-		const conf::Settings* settings, std::string static_root
-	) : Controller({"get"}, settings), _static_root(std::move(static_root))
+		std::string static_root, const conf::Settings* settings, const ILogger* logger
+	) : Controller({"get"}, logger), _static_root(std::move(static_root))
 	{
+		this->settings = require_non_null(settings, "'settings' is nullptr", _ERROR_DETAILS_);
 	}
 
 	[[nodiscard]]
 	std::unique_ptr<http::HttpResponse> get(http::Request* request, const std::string& p) const final;
 
 private:
+	const conf::Settings* settings = nullptr;
 	std::string _static_root;
 };
 

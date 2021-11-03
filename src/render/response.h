@@ -25,12 +25,6 @@ __RENDER_BEGIN__
 // TODO: docs for 'TemplateResponse'
 class TemplateResponse : public http::Response
 {
-protected:
-	std::string template_name;
-	render::IContext* context;
-	render::IEngine* engine;
-	bool is_rendered;
-
 public:
 	explicit TemplateResponse(
 		render::IEngine* engine,
@@ -44,7 +38,13 @@ public:
 	void render();
 
 	[[nodiscard]]
-	std::string get_content() const override;
+	std::string get_content() const final;
+
+private:
+	std::string _template_name;
+	render::IContext* _context;
+	render::IEngine* _engine;
+	bool _is_rendered;
 };
 
 __RENDER_END__

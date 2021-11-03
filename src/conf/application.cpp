@@ -24,7 +24,6 @@
 __CONF_BEGIN__
 
 std::shared_ptr<urls::IPattern> _build_static_pattern(
-	const conf::Settings* settings,
 	const std::string& static_url, const std::string& static_root, const std::string& name
 )
 {
@@ -39,12 +38,13 @@ std::shared_ptr<urls::IPattern> _build_static_pattern(
 	}
 
 	auto controller_function = [static_root](
-		http::Request* request, const std::tuple<std::string>& args, const Settings* settings_pointer
+		http::Request* request, const std::tuple<std::string>& args, const Settings* settings
 	) -> std::unique_ptr<http::HttpResponse>
 	{
-		return std::apply([request, static_root, settings_pointer](const std::string& p) mutable -> auto
+		return std::apply([request, static_root, settings](const std::string& p) mutable -> auto
 		{
-			ctrl::StaticController controller(settings_pointer, static_root);
+			require_non_null(settings, "'settings' is nullptr", _ERROR_DETAILS_);
+			ctrl::StaticController controller(static_root, settings, settings->LOGGER.get());
 			return controller.dispatch(request, p);
 		}, args);
 	};
@@ -286,7 +286,7 @@ void Application::add_static_pattern(
 {
 	if (!root.empty() && this->_static_is_allowed(url))
 	{
-		patterns.push_back(_build_static_pattern(this->settings, url, root, name));
+		patterns.push_back(_build_static_pattern(url, root, name));
 	}
 }
 

@@ -16,20 +16,10 @@
 using namespace xw;
 
 
-struct ControllerTestSettings : public conf::Settings
-{
-	ControllerTestSettings() : conf::Settings("./")
-	{
-		auto lc = log::Config();
-		lc.disable_all_levels();
-		this->LOGGER = std::make_shared<log::Logger>(lc);
-	}
-};
-
 class ControllerTestCase : public ::testing::Test
 {
 public:
-	static http::Request make_request(const conf::Settings* settings, const std::string& method)
+	static http::Request make_request(const std::string& method)
 	{
 		auto context = net::RequestContext{
 			.method = method
@@ -39,24 +29,25 @@ public:
 
 protected:
 	ctrl::Controller<>* controller = nullptr;
-	ControllerTestSettings* settings = nullptr;
+	std::shared_ptr<ILogger> logger = nullptr;
 
 	void SetUp() override
 	{
-		this->settings = new ControllerTestSettings();
-		this->controller = new ctrl::Controller<>(this->settings);
+		auto lc = log::Config();
+		lc.disable_all_levels();
+		this->logger = std::make_shared<log::Logger>(lc);
+		this->controller = new ctrl::Controller<>(this->logger.get());
 	}
 
 	void TearDown() override
 	{
-		delete this->settings;
 		delete this->controller;
 	}
 };
 
 TEST_F(ControllerTestCase, GetTestReturnsNullptr)
 {
-	auto request = ControllerTestCase::make_request(this->settings, "get");
+	auto request = ControllerTestCase::make_request("get");
 	auto response = this->controller->get(&request);
 
 	ASSERT_EQ(response, nullptr);
@@ -64,31 +55,31 @@ TEST_F(ControllerTestCase, GetTestReturnsNullptr)
 
 TEST_F(ControllerTestCase, PostTestReturnsNullptr)
 {
-	auto request = ControllerTestCase::make_request(this->settings, "post");
+	auto request = ControllerTestCase::make_request("post");
 	ASSERT_EQ(this->controller->post(&request), nullptr);
 }
 
 TEST_F(ControllerTestCase, PutTestReturnsNullptr)
 {
-	auto request = ControllerTestCase::make_request(this->settings, "put");
+	auto request = ControllerTestCase::make_request("put");
 	ASSERT_EQ(this->controller->put(&request), nullptr);
 }
 
 TEST_F(ControllerTestCase, PatchTestReturnsNullptr)
 {
-	auto request = ControllerTestCase::make_request(this->settings, "patch");
+	auto request = ControllerTestCase::make_request("patch");
 	ASSERT_EQ(this->controller->patch(&request), nullptr);
 }
 
 TEST_F(ControllerTestCase, DeleteTestReturnsNullptr)
 {
-	auto request = ControllerTestCase::make_request(this->settings, "delete");
+	auto request = ControllerTestCase::make_request("delete");
 	ASSERT_EQ(this->controller->delete_(&request), nullptr);
 }
 
 TEST_F(ControllerTestCase, HeadTestReturnsNullptr)
 {
-	auto request = ControllerTestCase::make_request(this->settings, "head");
+	auto request = ControllerTestCase::make_request("head");
 	ASSERT_EQ(this->controller->head(&request), nullptr);
 }
 
@@ -101,7 +92,7 @@ TEST_F(ControllerTestCase, OptionsTest)
 	);
 	expected_response.set_header("Content-Length", "0");
 
-	auto request = ControllerTestCase::make_request(this->settings, "options");
+	auto request = ControllerTestCase::make_request("options");
 	auto actual_response = this->controller->options(&request);
 
 	ASSERT_EQ(actual_response->content_type(), expected_response.content_type());
@@ -111,7 +102,7 @@ TEST_F(ControllerTestCase, OptionsTest)
 
 TEST_F(ControllerTestCase, TraceTestReturnsNullptr)
 {
-	auto request = ControllerTestCase::make_request(this->settings, "trace");
+	auto request = ControllerTestCase::make_request("trace");
 	ASSERT_EQ(this->controller->trace(&request), nullptr);
 }
 
@@ -132,7 +123,7 @@ TEST_F(ControllerTestCase, SetupAndDispatchAllowedTest)
 {
 	ASSERT_THROW(auto _ = this->controller->dispatch(nullptr), NullPointerException);
 
-	auto request = ControllerTestCase::make_request(this->settings, "options");
+	auto request = ControllerTestCase::make_request("options");
 	auto response = this->controller->dispatch(&request);
 
 	ASSERT_EQ(response->get_status(), 200);
@@ -140,7 +131,7 @@ TEST_F(ControllerTestCase, SetupAndDispatchAllowedTest)
 
 TEST_F(ControllerTestCase, DispatchNotAllowedTest)
 {
-	auto request = ControllerTestCase::make_request(this->settings, "get");
+	auto request = ControllerTestCase::make_request("get");
 
 	auto response = this->controller->dispatch(&request);
 

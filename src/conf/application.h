@@ -40,7 +40,6 @@ inline void _throw_null_pointer_exception(int)
 // TESTME: _build_static_pattern
 // TODO: docs for '_build_static_pattern'
 extern std::shared_ptr<urls::IPattern> _build_static_pattern(
-	const conf::Settings* settings,
 	const std::string& static_url, const std::string& static_root, const std::string& name=""
 );
 
