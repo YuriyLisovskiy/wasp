@@ -98,6 +98,44 @@ protected:
 		));
 	}
 
+	template <
+		typename ControllerType, typename ...RequestArgs,
+		typename = std::enable_if<std::is_base_of<ctrl::Controller<RequestArgs...>, ControllerType>::value>
+	>
+	inline void url_func(
+		const std::string& pattern,
+		const std::string& name,
+		const std::function<ControllerType(const Settings*)>& builder
+	)
+	{
+		if (!builder)
+		{
+			throw NullPointerException("controller builder is nullptr", _ERROR_DETAILS_);
+		}
+
+		ctrl::Handler<RequestArgs...> controller_handler = [builder](
+			http::IRequest* request,
+			const std::tuple<RequestArgs...>& request_args,
+			const Settings* settings_ptr
+		) -> std::unique_ptr<http::IResponse>
+		{
+			auto controller = builder(settings_ptr);
+			return std::apply(
+				[&controller, request](RequestArgs ...a) mutable -> auto
+				{
+					return controller.dispatch(request, a...);
+				},
+				request_args
+			);
+		};
+
+		this->_urlpatterns.push_back(std::make_shared<urls::Pattern<RequestArgs...>>(
+			pattern.starts_with("/") ? pattern : "/" + pattern,
+			controller_handler,
+			name.empty() ? demangle(typeid(ControllerType).name()) : name
+		));
+	}
+
 	inline void include(const std::string& module, const std::string& prefix, const std::string& namespace_="")
 	{
 		this->_sub_modules_to_init.emplace_back([this, prefix, namespace_, module]() -> void {
