@@ -25,7 +25,7 @@ jobs:
         uses: dawidd6/action-download-artifact@v2
         with:
           github_token: ${{ secrets.GH_ACCESS_TOKEN }}
-          workflow: ci.yml
+          workflow: test.yml
           branch: dev
           name: xalwart.base-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
           path: xalwart.base-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
@@ -34,7 +34,7 @@ jobs:
         uses: dawidd6/action-download-artifact@v2
         with:
           github_token: ${{ secrets.GH_ACCESS_TOKEN }}
-          workflow: ci.yml
+          workflow: test.yml
           branch: dev
           name: xalwart.crypto-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
           path: xalwart.crypto-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
@@ -43,7 +43,7 @@ jobs:
         uses: dawidd6/action-download-artifact@v2
         with:
           github_token: ${{ secrets.GH_ACCESS_TOKEN }}
-          workflow: ci.yml
+          workflow: test.yml
           branch: dev
           name: xalwart.orm-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
           path: xalwart.orm-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
@@ -83,7 +83,7 @@ jobs:
         uses: dawidd6/action-download-artifact@v2
         with:
           github_token: ${{ secrets.GH_ACCESS_TOKEN }}
-          workflow: ci.yml
+          workflow: test.yml
           branch: dev
           name: xalwart.base-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
           path: xalwart.base-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
@@ -92,7 +92,7 @@ jobs:
         uses: dawidd6/action-download-artifact@v2
         with:
           github_token: ${{ secrets.GH_ACCESS_TOKEN }}
-          workflow: ci.yml
+          workflow: test.yml
           branch: dev
           name: xalwart.crypto-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
           path: xalwart.crypto-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
@@ -101,7 +101,7 @@ jobs:
         uses: dawidd6/action-download-artifact@v2
         with:
           github_token: ${{ secrets.GH_ACCESS_TOKEN }}
-          workflow: ci.yml
+          workflow: test.yml
           branch: dev
           name: xalwart.orm-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
           path: xalwart.orm-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
@@ -131,7 +131,7 @@ jobs:
         uses: dawidd6/action-download-artifact@v2
         with:
           github_token: ${{ secrets.GH_ACCESS_TOKEN }}
-          workflow: ci.yml
+          workflow: test.yml
           branch: dev
           name: xalwart.base-${{ matrix.os_name }}-${{ matrix.os_version }}
           path: /usr/local
@@ -140,7 +140,7 @@ jobs:
         uses: dawidd6/action-download-artifact@v2
         with:
           github_token: ${{ secrets.GH_ACCESS_TOKEN }}
-          workflow: ci.yml
+          workflow: test.yml
           branch: dev
           name: xalwart.crypto-${{ matrix.os_name }}-${{ matrix.os_version }}
           path: /usr/local
@@ -149,7 +149,7 @@ jobs:
         uses: dawidd6/action-download-artifact@v2
         with:
           github_token: ${{ secrets.GH_ACCESS_TOKEN }}
-          workflow: ci.yml
+          workflow: test.yml
           branch: dev
           name: xalwart.orm-${{ matrix.os_name }}-${{ matrix.os_version }}
           path: /usr/local
@@ -196,7 +196,7 @@ jobs:
         uses: dawidd6/action-download-artifact@v2
         with:
           github_token: ${{ secrets.GH_ACCESS_TOKEN }}
-          workflow: ci.yml
+          workflow: test.yml
           branch: dev
           name: xalwart.base-${{ matrix.os_name }}-${{ matrix.os_version }}
           path: /usr/local
@@ -205,7 +205,7 @@ jobs:
         uses: dawidd6/action-download-artifact@v2
         with:
           github_token: ${{ secrets.GH_ACCESS_TOKEN }}
-          workflow: ci.yml
+          workflow: test.yml
           branch: dev
           name: xalwart.crypto-${{ matrix.os_name }}-${{ matrix.os_version }}
           path: /usr/local
@@ -214,7 +214,7 @@ jobs:
         uses: dawidd6/action-download-artifact@v2
         with:
           github_token: ${{ secrets.GH_ACCESS_TOKEN }}
-          workflow: ci.yml
+          workflow: test.yml
           branch: dev
           name: xalwart.orm-${{ matrix.os_name }}-${{ matrix.os_version }}
           path: /usr/local
