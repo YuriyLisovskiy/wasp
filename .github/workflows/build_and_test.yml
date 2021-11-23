@@ -1,0 +1,260 @@
+name: Tests
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+jobs:
+  linux-build:
+    name: '[linux build]'
+    runs-on: ubuntu-18.04
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - name: alpine
+            version: 3.13
+          - name: ubuntu
+            version: 18.04
+        compiler: [ gcc, clang ]
+        compiler_version: [ 10 ]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Extract branch name
+        shell: bash
+        run: echo "::set-output name=branch::$(bash ${GITHUB_WORKSPACE}/scripts/get_branch.sh ${GITHUB_REF##*/})"
+        id: extract_branch
+      - name: Download Base library
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          github_token: ${{ secrets.GH_ACCESS_TOKEN }}
+          workflow: test.yml
+          branch: ${{ steps.extract_branch.outputs.branch }}
+          name: xalwart.base-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
+          path: xalwart.base-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
+          repo: YuriyLisovskiy/xalwart.base
+      - name: Download Crypto library
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          github_token: ${{ secrets.GH_ACCESS_TOKEN }}
+          workflow: test.yml
+          branch: ${{ steps.extract_branch.outputs.branch }}
+          name: xalwart.crypto-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
+          path: xalwart.crypto-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
+          repo: YuriyLisovskiy/xalwart.crypto
+      - name: Download ORM library
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          github_token: ${{ secrets.GH_ACCESS_TOKEN }}
+          workflow: test.yml
+          branch: ${{ steps.extract_branch.outputs.branch }}
+          name: xalwart.orm-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
+          path: xalwart.orm-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
+          repo: YuriyLisovskiy/xalwart.orm
+      - name: Build the library
+        run: |
+          sudo docker run -i \
+                          -v ${{ github.workspace }}:/app \
+                          xalwart/${{ matrix.compiler }}:${{ matrix.compiler_version }}-${{ matrix.os.name }}-${{ matrix.os.version }} \
+                          bash /app/scripts/linux/build.sh ${{ matrix.os.name }} ${{ matrix.compiler }} ${{ matrix.compiler_version }}
+      - name: Upload the artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: xalwart-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
+          path: xalwart-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
+          retention-days: 90
+  macos-build:
+    name: '[macOS build]'
+    runs-on: ${{ matrix.os_name }}-${{ matrix.os_version }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os_name: [ macos ]
+        os_version: [ 11 ]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Extract branch name
+        shell: bash
+        run: echo "::set-output name=branch::$(bash ${GITHUB_WORKSPACE}/scripts/get_branch.sh ${GITHUB_REF##*/})"
+        id: extract_branch
+      - name: Download Base library
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          github_token: ${{ secrets.GH_ACCESS_TOKEN }}
+          workflow: test.yml
+          branch: ${{ steps.extract_branch.outputs.branch }}
+          name: xalwart.base-${{ matrix.os_name }}-${{ matrix.os_version }}
+          path: /usr/local
+          repo: YuriyLisovskiy/xalwart.base
+      - name: Download Crypto library
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          github_token: ${{ secrets.GH_ACCESS_TOKEN }}
+          workflow: test.yml
+          branch: ${{ steps.extract_branch.outputs.branch }}
+          name: xalwart.crypto-${{ matrix.os_name }}-${{ matrix.os_version }}
+          path: /usr/local
+          repo: YuriyLisovskiy/xalwart.crypto
+      - name: Download ORM library
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          github_token: ${{ secrets.GH_ACCESS_TOKEN }}
+          workflow: test.yml
+          branch: ${{ steps.extract_branch.outputs.branch }}
+          name: xalwart.orm-${{ matrix.os_name }}-${{ matrix.os_version }}
+          path: /usr/local
+          repo: YuriyLisovskiy/xalwart.orm
+      - name: Build the library
+        run: |
+          mkdir build && cd build
+          cmake -D CMAKE_BUILD_TYPE=Release -D OPENSSL_ROOT_DIR=/usr/local/Cellar/openssl@1.1/1.1.1l_1 ..
+          sudo mkdir -p /usr/local/include && sudo mkdir -p /usr/local/lib
+          make xalwart && sudo make install
+          cd && mkdir ~/target-build && cd ~/target-build
+          mkdir -p include && mkdir -p lib && cd
+          sudo cp -r /usr/local/include/xalwart ~/target-build/include
+          sudo cp -r /usr/local/lib/libxalwart.dylib ~/target-build/lib
+      - name: Upload the artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: xalwart-${{ matrix.os_name }}-${{ matrix.os_version }}
+          path: ~/target-build
+          retention-days: 60
+  linux-test:
+    name: '[linux test]'
+    runs-on: ubuntu-18.04
+    needs:
+      - 'linux-build'
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - name: alpine
+            version: 3.13
+          - name: ubuntu
+            version: 18.04
+          - name: ubuntu
+            version: 20.04
+        compiler: [ clang, gcc ]
+        compiler_version: [ 10 ]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Extract branch name
+        shell: bash
+        run: echo "::set-output name=branch::$(bash ${GITHUB_WORKSPACE}/scripts/get_branch.sh ${GITHUB_REF##*/})"
+        id: extract_branch
+      - name: Download Base library
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          github_token: ${{ secrets.GH_ACCESS_TOKEN }}
+          workflow: test.yml
+          branch: ${{ steps.extract_branch.outputs.branch }}
+          name: xalwart.base-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
+          path: xalwart.base-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
+          repo: YuriyLisovskiy/xalwart.base
+      - name: Download Crypto library
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          github_token: ${{ secrets.GH_ACCESS_TOKEN }}
+          workflow: test.yml
+          branch: ${{ steps.extract_branch.outputs.branch }}
+          name: xalwart.crypto-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
+          path: xalwart.crypto-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
+          repo: YuriyLisovskiy/xalwart.crypto
+      - name: Download ORM library
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          github_token: ${{ secrets.GH_ACCESS_TOKEN }}
+          workflow: test.yml
+          branch: ${{ steps.extract_branch.outputs.branch }}
+          name: xalwart.orm-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
+          path: xalwart.orm-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
+          repo: YuriyLisovskiy/xalwart.orm
+      - name: Download the library to test from artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: xalwart-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
+          path: xalwart-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
+      - name: Build and run tests
+        run: |
+          sudo docker run -i \
+                          -v ${{ github.workspace }}:/app \
+                          xalwart/gtest:1.11.0-${{ matrix.compiler }}-${{ matrix.compiler_version }}-${{ matrix.os.name }}-${{ matrix.os.version }} \
+                          bash /app/scripts/linux/test.sh ${{ matrix.os.name }} ${{ matrix.compiler }} ${{ matrix.compiler_version }}
+  macos-test:
+    name: '[macOS test]'
+    runs-on: ${{ matrix.os_name }}-${{ matrix.os_version }}
+    needs:
+      - 'macos-build'
+    strategy:
+      fail-fast: false
+      matrix:
+        os_name: [ macos ]
+        os_version: [ 11 ]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Extract branch name
+        shell: bash
+        run: echo "::set-output name=branch::$(bash ${GITHUB_WORKSPACE}/scripts/get_branch.sh ${GITHUB_REF##*/})"
+        id: extract_branch
+      - name: Install Valgrind
+        continue-on-error: true
+        id: install_valgrind
+        run: |
+          brew tap LouisBrunner/valgrind
+          brew install --HEAD LouisBrunner/valgrind/valgrind
+      - name: Install Google Test Framework
+        run: |
+          brew install googletest
+      - name: Create Target Directories
+        run: |
+          sudo mkdir -p /usr/local
+      - name: Download Base library
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          github_token: ${{ secrets.GH_ACCESS_TOKEN }}
+          workflow: test.yml
+          branch: ${{ steps.extract_branch.outputs.branch }}
+          name: xalwart.base-${{ matrix.os_name }}-${{ matrix.os_version }}
+          path: /usr/local
+          repo: YuriyLisovskiy/xalwart.base
+      - name: Download Crypto library
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          github_token: ${{ secrets.GH_ACCESS_TOKEN }}
+          workflow: test.yml
+          branch: ${{ steps.extract_branch.outputs.branch }}
+          name: xalwart.crypto-${{ matrix.os_name }}-${{ matrix.os_version }}
+          path: /usr/local
+          repo: YuriyLisovskiy/xalwart.crypto
+      - name: Download ORM library
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          github_token: ${{ secrets.GH_ACCESS_TOKEN }}
+          workflow: test.yml
+          branch: ${{ steps.extract_branch.outputs.branch }}
+          name: xalwart.orm-${{ matrix.os_name }}-${{ matrix.os_version }}
+          path: /usr/local
+          repo: YuriyLisovskiy/xalwart.orm
+      - name: Download the library to test from artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: xalwart-${{ matrix.os_name }}-${{ matrix.os_version }}
+          path: /usr/local
+      - name: Build tests
+        run: |
+          mkdir build && cd build
+          cmake -D CMAKE_BUILD_TYPE=Release \
+                -D XW_CONFIGURE_LIB=OFF \
+                -D XW_CONFIGURE_TESTS=ON \
+                -D OPENSSL_ROOT_DIR=/usr/local/Cellar/openssl@1.1/1.1.1l_1 \
+                ..
+          make unittests-all
+      - name: Run tests with Valgrind
+        if: steps.install_valgrind.outcome == 'success'
+        run:
+          valgrind --leak-check=full ./build/tests/unittests-all
+      - name: Run tests
+        if: steps.install_valgrind.outcome != 'success'
+        run:
+          ./build/tests/unittests-all

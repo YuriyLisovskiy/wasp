@@ -31,7 +31,22 @@
 *.out
 *.app
 
-# Other
+# Visual Studio
+.vs/
+out/
+CMakeSettings.json
+
+# CLion
 .idea/
 cmake-build-*
-main.cpp
+build/
+
+# Dependencies
+include/
+lib/
+
+# Other stuff
+Makefile
+
+# macOS files
+*.DS_Store

@@ -1,37 +1,53 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.12)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
-# package information
-set(PACKAGE_NAME       "leaf")
-set(PACKAGE_VERSION    "0.0.1-dev")
-set(PACKAGE_STRING     "${PACKAGE_NAME} ${PACKAGE_VERSION}")
-set(PACKAGE_TAR_NAME   "${PACKAGE_NAME}-${PACKAGE_VERSION}")
-set(PACKAGE_BUG_REPORT "https://github.com/YuriyLisovskiy/leaf/issues")
+set(FRAMEWORK_NAME "xalwart")
+set(LIBRARY_NAME "${FRAMEWORK_NAME}")
+set(LIBRARY_VERSION "0.0.0")
 
-set(PACKAGE_TESTS "unit-tests")
+project(${LIBRARY_NAME})
 
-set(CMAKE_CXX_FLAGS "-pthread")
+# Search for OpenSSL
+find_package(OpenSSL 1.1 REQUIRED)
+include_directories(${OPENSSL_INCLUDE_DIR})
 
-project(${PACKAGE_NAME})
+set(
+    DEFAULT_INCLUDE_PATHS
+        "/usr/local"
+        "/usr"
+)
 
-file(GLOB LIB_FILES
-        "src/utils/*.h"
-        "src/utils/*.cpp"
-        "src/core/*.h"
-        "src/core/*.cpp"
-        "src/*.h"
-        "src/*.cpp"
-    )
+foreach(ENTRY ${DEFAULT_INCLUDE_PATHS})
+    include_directories(${ENTRY}/include)
+    link_directories(${ENTRY}/lib)
+endforeach()
 
-file(GLOB TEST_FILES
-        "tests/*.h"
-    )
+# Search for xalwart.base
+find_library(
+    XALWART_BASE xalwart.base REQUIRED
+    PATHS ${DEFAULT_INCLUDE_PATHS}
+)
 
-set(LIB_SRC ${LIB_FILES})
-set(TEST_SRC ${TEST_FILES})
+# Search for xalwart.crypto
+find_library(
+    XALWART_CRYPTO xalwart.crypto REQUIRED
+    PATHS ${DEFAULT_INCLUDE_PATHS}
+)
 
-add_executable(${PACKAGE_NAME} ${LIB_SRC} "main.cpp")
+# Search for xalwart.orm
+find_library(
+    XALWART_ORM xalwart.orm REQUIRED
+    PATHS ${DEFAULT_INCLUDE_PATHS}
+)
 
-add_executable(${PACKAGE_TESTS} ${LIB_SRC} ${TEST_SRC} "tests/main.cpp")
-target_link_libraries(${PACKAGE_TESTS} gtest gtest_main rt pthread ${TEST_SRC})
+option(XW_CONFIGURE_LIB "Configure the library." ON)
+if (${XW_CONFIGURE_LIB})
+    add_subdirectory(src)
+endif()
+
+option(XW_CONFIGURE_TESTS "Configure tests." OFF)
+if (${XW_CONFIGURE_TESTS})
+    enable_testing()
+    add_subdirectory(tests)
+endif()

@@ -1,5 +1,5 @@
 /**
- * main.cpp
+ * utils/main.cpp
  *
  * Copyright (c) 2019 Yuriy Lisovskiy
  */

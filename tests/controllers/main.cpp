@@ -1,5 +1,5 @@
 /**
- * main.cpp
+ * controllers/main.cpp
  *
  * Copyright (c) 2019 Yuriy Lisovskiy
  */
