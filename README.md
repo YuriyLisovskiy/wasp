@@ -5,11 +5,10 @@
 [![ubuntu](https://img.shields.io/badge/Ubuntu-E95420?style=flat&logo=ubuntu&logoColor=white)](https://ubuntu.com/)
 [![macOS](https://img.shields.io/badge/macOS-343D46?style=flat&logo=apple&logoColor=F0F0F0)](https://www.apple.com/macos)
 
-### Status
-| @ | Build | Tests |
-|---|---|---|
-| Dev branch: | [![Build](https://github.com/YuriyLisovskiy/xalwart/actions/workflows/build.yml/badge.svg?branch=dev)](https://github.com/YuriyLisovskiy/xalwart/actions/workflows/build.yml?query=branch%3Adev) | [![Tests](https://github.com/YuriyLisovskiy/xalwart/actions/workflows/test.yml/badge.svg?branch=dev)](https://github.com/YuriyLisovskiy/xalwart/actions/workflows/test.yml?query=branch%3Adev) |
-| Master branch: | [![Build](https://github.com/YuriyLisovskiy/xalwart/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/YuriyLisovskiy/xalwart/actions/workflows/build.yml?query=branch%3Amaster) | [![Tests](https://github.com/YuriyLisovskiy/xalwart/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/YuriyLisovskiy/xalwart/actions/workflows/test.yml?query=branch%3Amaster) |
+| @ | Status |
+|---|---|
+| Dev branch: | [![Build](https://github.com/YuriyLisovskiy/xalwart/actions/workflows/build_and_test.yml/badge.svg?branch=dev)](https://github.com/YuriyLisovskiy/xalwart/actions/workflows/build_and_test.yml?query=branch%3Adev) |
+| Master branch: | [![Build](https://github.com/YuriyLisovskiy/xalwart/actions/workflows/build_and_test.yml/badge.svg?branch=master)](https://github.com/YuriyLisovskiy/xalwart/actions/workflows/build_and_test.yml?query=branch%3Amaster) |
 
 ## Requirements
 The following compilers are tested with the CI system, and are known to work on:
