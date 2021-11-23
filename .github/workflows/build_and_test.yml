@@ -170,12 +170,9 @@ jobs:
           name: xalwart.orm-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
           path: xalwart.orm-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
           repo: YuriyLisovskiy/xalwart.orm
-      - name: Download the library to test
-        uses: dawidd6/action-download-artifact@v2
+      - name: Download the library to test from artifacts
+        uses: actions/download-artifact@v2
         with:
-          github_token: ${{ secrets.GH_ACCESS_TOKEN }}
-          workflow: build.yml
-          branch: ${{ steps.extract_branch.outputs.branch }}
           name: xalwart-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
           path: xalwart-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
       - name: Build and run tests
@@ -239,12 +236,9 @@ jobs:
           name: xalwart.orm-${{ matrix.os_name }}-${{ matrix.os_version }}
           path: /usr/local
           repo: YuriyLisovskiy/xalwart.orm
-      - name: Download the library to test
-        uses: dawidd6/action-download-artifact@v2
+      - name: Download the library to test from artifacts
+        uses: actions/download-artifact@v2
         with:
-          github_token: ${{ secrets.GH_ACCESS_TOKEN }}
-          workflow: build.yml
-          branch: ${{ steps.extract_branch.outputs.branch }}
           name: xalwart-${{ matrix.os_name }}-${{ matrix.os_version }}
           path: /usr/local
       - name: Build tests
