@@ -24,7 +24,6 @@
 __CONF_BEGIN__
 
 std::shared_ptr<urls::IPattern> _build_static_pattern(
-	const conf::Settings* settings,
 	const std::string& static_url, const std::string& static_root, const std::string& name
 )
 {
@@ -39,12 +38,13 @@ std::shared_ptr<urls::IPattern> _build_static_pattern(
 	}
 
 	auto controller_function = [static_root](
-		http::Request* request, const std::tuple<std::string>& args, const Settings* settings_pointer
-	) -> std::unique_ptr<http::abc::HttpResponse>
+		http::IRequest* request, const std::tuple<std::string>& args, const Settings* settings
+	) -> std::unique_ptr<http::IResponse>
 	{
-		return std::apply([request, static_root, settings_pointer](const std::string& p) mutable -> auto
+		return std::apply([request, static_root, settings](const std::string& p) mutable -> auto
 		{
-			ctrl::StaticController controller(settings_pointer, static_root);
+			require_non_null(settings, "'settings' is nullptr", _ERROR_DETAILS_);
+			ctrl::StaticController controller(static_root, settings, settings->LOGGER.get());
 			return controller.dispatch(request, p);
 		}, args);
 	};
@@ -191,13 +191,29 @@ Application::ServerHandler Application::get_application_handler() const
 
 middleware::Function Application::get_controller_handler() const
 {
-	return [this](http::Request* request) -> std::unique_ptr<http::abc::HttpResponse>
+	return [this](http::IRequest* request) -> std::unique_ptr<http::IResponse>
 	{
 		require_non_null(request, _ERROR_DETAILS_);
 		auto apply = urls::resolve(request->url().path, this->settings->URLPATTERNS);
 		if (apply)
 		{
-			return apply(request, this->settings);
+			auto response = apply(request, this->settings);
+			if (!response)
+			{
+				if (this->settings->DEBUG)
+				{
+					throw NullPointerException(
+						"Controller returns nullptr on '" + request->method() + "'.",
+						_ERROR_DETAILS_
+					);
+				}
+				else
+				{
+					response = std::make_unique<http::Response>(204);
+				}
+			}
+
+			return response;
 		}
 
 		return this->get_error_response(request, 404, "The requested resource was not found.");
@@ -227,7 +243,7 @@ void Application::build_module_patterns(std::vector<std::shared_ptr<urls::IPatte
 		auto root_module = this->settings->MODULES.front();
 		if (!root_module)
 		{
-			throw NullPointerException("'root_module' is nullptr", _ERROR_DETAILS_);
+			throw NullPointerException("root module is nullptr", _ERROR_DETAILS_);
 		}
 
 		auto modules_patterns = root_module->get_urlpatterns();
@@ -235,7 +251,7 @@ void Application::build_module_patterns(std::vector<std::shared_ptr<urls::IPatte
 	}
 }
 
-std::shared_ptr<http::Request> Application::build_request(
+std::shared_ptr<http::IRequest> Application::build_request(
 	net::RequestContext* context, std::map<std::string, std::string> environment
 ) const
 {
@@ -270,13 +286,14 @@ void Application::add_static_pattern(
 {
 	if (!root.empty() && this->_static_is_allowed(url))
 	{
-		patterns.push_back(_build_static_pattern(this->settings, url, root, name));
+		patterns.push_back(_build_static_pattern(url, root, name));
 	}
 }
 
 void Application::setup_commands()
 {
 	auto core_module = mgmt::CoreModuleConfig(this->settings, std::move(this->get_application_handler()));
+	core_module.configure();
 	this->_append_commands(core_module.get_commands(), core_module.get_name());
 	for (auto& installed_module : this->settings->MODULES)
 	{
@@ -289,8 +306,8 @@ void Application::setup_middleware()
 	this->settings->MIDDLEWARE.insert(this->settings->MIDDLEWARE.begin(), middleware::Exception(this->settings));
 }
 
-std::unique_ptr<http::abc::HttpResponse> Application::get_error_response(
-	http::Request* request, net::StatusCode status_code, const std::string& message
+std::unique_ptr<http::IResponse> Application::get_error_response(
+	http::IRequest* request, net::StatusCode status_code, const std::string& message
 ) const
 {
 	auto [status, status_is_found] = net::get_status_by_code(status_code);
@@ -309,7 +326,7 @@ std::unique_ptr<http::abc::HttpResponse> Application::get_error_response(
 }
 
 net::StatusCode Application::send_response(
-	net::RequestContext* ctx, const std::unique_ptr<http::abc::HttpResponse>& response
+	net::RequestContext* ctx, const std::unique_ptr<http::IResponse>& response
 ) const
 {
 	if (!response)
@@ -321,7 +338,7 @@ net::StatusCode Application::send_response(
 	return this->finish_response(ctx, response ? response.get() : &no_content);
 }
 
-net::StatusCode Application::finish_response(net::RequestContext* context, http::abc::HttpResponse* response) const
+net::StatusCode Application::finish_response(net::RequestContext* context, http::IResponse* response) const
 {
 	require_non_null(context, "'context' is nullptr", _ERROR_DETAILS_);
 	if (!context->response_writer)
@@ -346,7 +363,7 @@ net::StatusCode Application::finish_response(net::RequestContext* context, http:
 	return response->get_status();
 }
 
-void Application::finish_streaming_response(net::RequestContext* context, http::abc::HttpResponse* response) const
+void Application::finish_streaming_response(net::RequestContext* context, http::IResponse* response) const
 {
 	auto* streaming_response = dynamic_cast<http::StreamingResponse*>(response);
 	if (!streaming_response)

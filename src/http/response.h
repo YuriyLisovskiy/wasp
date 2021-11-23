@@ -22,7 +22,7 @@
 #include "./_def_.h"
 
 // Framework libraries.
-#include "./abc.h"
+#include "./interfaces.h"
 #include "./headers.h"
 #include "./exceptions.h"
 #include "./mime/content_types.h"
@@ -33,7 +33,7 @@ __HTTP_BEGIN__
 // TESTME: ResponseBase
 // TODO: docs for 'ResponseBase'
 // An HTTP response base class with dictionary-accessed headers.
-class AbstractResponse : public abc::HttpResponse
+class AbstractResponse : public IResponse
 {
 public:
 	explicit AbstractResponse(

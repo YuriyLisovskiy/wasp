@@ -12,7 +12,7 @@
 
 __RENDER_BEGIN__
 
-std::map<std::string, render::abc::ILibrary::Function> StandardLibrary::get_functions() const
+std::map<std::string, render::ILibrary::Function> StandardLibrary::get_functions() const
 {
 	return {
 		// Example: {% static('path/to/file.css') -> css_variable %}

@@ -18,7 +18,7 @@
 #include "./_def_.h"
 
 // Framework libraries.
-#include "./abc.h"
+#include "./interfaces.h"
 #include "../conf/settings.h"
 #include "../controllers/controller.h"
 
@@ -65,7 +65,7 @@ public:
 		this->_name = ns + "::" + this->_name;
 	}
 
-	inline std::unique_ptr<http::abc::HttpResponse> apply(http::Request* request, conf::Settings* settings) override
+	inline std::unique_ptr<http::IResponse> apply(http::IRequest* request, conf::Settings* settings) override
 	{
 		return this->_handler(request, this->_regex.template args_tuple<ArgsT...>(), settings);
 	}

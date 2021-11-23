@@ -31,56 +31,55 @@ private:
 
 public:
 	inline explicit RedirectController(
-		const conf::Settings* settings,
+		const ILogger* logger,
 		std::string url,
 		bool permanent=false,
 		bool query_string=false
 	) : Controller(
-		{"get", "post", "put", "patch", "delete", "head", "options"},
-		settings
+		{"get", "post", "put", "patch", "delete", "head", "options"}, logger
 	), _url(std::move(url)), _permanent(permanent), _query_string(query_string)
 	{
 	}
 
 	// Return the URL redirect to.
 	[[nodiscard]]
-	std::string get_redirect_url(http::Request* request) const;
+	std::string get_redirect_url(http::IRequest* request) const;
 
 	[[nodiscard]]
-	std::unique_ptr<http::abc::HttpResponse> get(http::Request* request) const override;
+	std::unique_ptr<http::IResponse> get(http::IRequest* request) const override;
 
 	[[nodiscard]]
-	inline std::unique_ptr<http::abc::HttpResponse> post(http::Request* request) const override
+	inline std::unique_ptr<http::IResponse> post(http::IRequest* request) const override
 	{
 		return this->get(request);
 	}
 
 	[[nodiscard]]
-	inline std::unique_ptr<http::abc::HttpResponse> head(http::Request* request) const override
+	inline std::unique_ptr<http::IResponse> head(http::IRequest* request) const override
 	{
 		return this->get(request);
 	}
 
 	[[nodiscard]]
-	inline std::unique_ptr<http::abc::HttpResponse> options(http::Request* request) const override
+	inline std::unique_ptr<http::IResponse> options(http::IRequest* request) const override
 	{
 		return this->get(request);
 	}
 
 	[[nodiscard]]
-	inline std::unique_ptr<http::abc::HttpResponse> put(http::Request* request) const override
+	inline std::unique_ptr<http::IResponse> put(http::IRequest* request) const override
 	{
 		return this->get(request);
 	}
 
 	[[nodiscard]]
-	inline std::unique_ptr<http::abc::HttpResponse> delete_(http::Request* request) const override
+	inline std::unique_ptr<http::IResponse> delete_(http::IRequest* request) const override
 	{
 		return this->get(request);
 	}
 
 	[[nodiscard]]
-	inline std::unique_ptr<http::abc::HttpResponse> patch(http::Request* request) const override
+	inline std::unique_ptr<http::IResponse> patch(http::IRequest* request) const override
 	{
 		return this->get(request);
 	}

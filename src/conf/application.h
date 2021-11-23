@@ -22,7 +22,7 @@
 // Framework libraries.
 #include "./settings.h"
 #include "../middleware/types.h"
-#include "../urls/abc.h"
+#include "../urls/interfaces.h"
 
 
 __CONF_BEGIN__
@@ -40,7 +40,6 @@ inline void _throw_null_pointer_exception(int)
 // TESTME: _build_static_pattern
 // TODO: docs for '_build_static_pattern'
 extern std::shared_ptr<urls::IPattern> _build_static_pattern(
-	const conf::Settings* settings,
 	const std::string& static_url, const std::string& static_root, const std::string& name=""
 );
 
@@ -87,7 +86,7 @@ protected:
 	virtual void build_module_patterns(std::vector<std::shared_ptr<urls::IPattern>>& patterns) const;
 
 	[[nodiscard]]
-	virtual std::shared_ptr<http::Request> build_request(
+	virtual std::shared_ptr<http::IRequest> build_request(
 		net::RequestContext* context, std::map<std::string, std::string> env
 	) const;
 
@@ -118,16 +117,16 @@ protected:
 	}
 
 	[[nodiscard]]
-	virtual std::unique_ptr<http::abc::HttpResponse> get_error_response(
-		http::Request* request, net::StatusCode status_code, const std::string& message
+	virtual std::unique_ptr<http::IResponse> get_error_response(
+		http::IRequest* request, net::StatusCode status_code, const std::string& message
 	) const;
 
 	[[nodiscard]]
-	virtual uint send_response(net::RequestContext* ctx, const std::unique_ptr<http::abc::HttpResponse>& response) const;
+	virtual uint send_response(net::RequestContext* ctx, const std::unique_ptr<http::IResponse>& response) const;
 
-	virtual net::StatusCode finish_response(net::RequestContext* context, http::abc::HttpResponse* response) const;
+	virtual net::StatusCode finish_response(net::RequestContext* context, http::IResponse* response) const;
 
-	virtual void finish_streaming_response(net::RequestContext* context, http::abc::HttpResponse* response) const;
+	virtual void finish_streaming_response(net::RequestContext* context, http::IResponse* response) const;
 
 private:
 	[[nodiscard]]

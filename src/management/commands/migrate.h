@@ -9,12 +9,14 @@
 #pragma once
 
 // Base libraries.
-#include <xalwart.base/abc/base.h>
+#include <xalwart.base/interfaces/base.h>
 
 // Module definitions.
 #include "./_def_.h"
 
 // Framework libraries.
+#include "../../conf/interfaces.h"
+#include "../../conf/settings.h"
 #include "../../commands/command.h"
 #include "../../commands/flags/default.h"
 
@@ -26,18 +28,16 @@ __MANAGEMENT_COMMANDS_BEGIN__
 class MigrateCommand final : public xw::cmd::Command
 {
 public:
-	inline explicit MigrateCommand(conf::IModuleConfig* config, conf::Settings* settings) :
-		Command(config, settings, "migrate", "Migrates changes to the database")
+	inline explicit MigrateCommand(conf::Settings* settings) :
+		Command(
+			"migrate", "Migrates changes to the database",
+			require_non_null(settings, "settings is nullptr", _ERROR_DETAILS_)->LOGGER
+		)
 	{
+		this->_settings = settings;
 	}
 
 protected:
-	inline void log_progress(const std::string& msg, const std::string& end) const
-	{
-		auto end_ch = end.empty() ? '\0' : end[0];
-		this->settings->LOGGER->print(msg, abc::ILogger::Color::Default, end_ch);
-	}
-
 	void add_flags() final;
 
 	bool handle() final;
@@ -46,6 +46,14 @@ private:
 	std::shared_ptr<xw::cmd::flags::StringFlag> _db_flag = nullptr;
 	std::shared_ptr<xw::cmd::flags::StringFlag> _migration_flag = nullptr;
 	std::shared_ptr<xw::cmd::flags::BoolFlag> _rollback_flag = nullptr;
+
+	conf::Settings* _settings = nullptr;
+
+	inline void _log_progress(const std::string& msg, const std::string& end) const
+	{
+		auto end_ch = end.empty() ? '\0' : end[0];
+		this->_settings->LOGGER->print(msg, ILogger::Color::Default, end_ch);
+	}
 };
 
 __MANAGEMENT_COMMANDS_END__

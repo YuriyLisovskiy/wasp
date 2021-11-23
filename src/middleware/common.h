@@ -46,7 +46,7 @@ public:
 
 protected:
 	[[nodiscard]]
-	virtual inline std::unique_ptr<http::abc::HttpResponse> get_response_redirect(
+	virtual inline std::unique_ptr<http::IResponse> get_response_redirect(
 		const std::string& redirect_to
 	) const
 	{
@@ -55,21 +55,21 @@ protected:
 
 	// Return `true` if `settings->APPEND_SLASH` is `true` and appending a slash to
 	// the request path turns an invalid path into a valid one.
-	virtual bool should_redirect_with_slash(http::Request* request) const;
+	virtual bool should_redirect_with_slash(http::IRequest* request) const;
 
 	// Return the full path of the `request` with a trailing slash appended.
 	// Throws a `RuntimeError` if `settings->DEBUG` is `true` and request method is
 	// POST, PUT, or PATCH.
-	virtual std::string get_full_path_with_slash(http::Request* request) const;
+	virtual std::string get_full_path_with_slash(http::IRequest* request) const;
 
 	// Check for denied User-Agents and rewrite the URL based on
 	// `settings->APPEND_SLASH` and `settings->PREPEND_WWW`.
-	virtual std::unique_ptr<http::abc::HttpResponse> preprocess(http::Request* request) const;
+	virtual std::unique_ptr<http::IResponse> preprocess(http::IRequest* request) const;
 
 	// When the status code of the response is 404, it may redirect to a path
 	// with an appended slash if `should_redirect_with_slash` returns `true`.
-	virtual std::unique_ptr<http::abc::HttpResponse> postprocess(
-		http::Request* request, http::abc::HttpResponse* response
+	virtual std::unique_ptr<http::IResponse> postprocess(
+		http::IRequest* request, http::IResponse* response
 	) const;
 };
 

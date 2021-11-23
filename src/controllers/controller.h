@@ -15,6 +15,7 @@
 // Base libraries.
 #include <xalwart.base/utility.h>
 #include <xalwart.base/string_utils.h>
+#include <xalwart.base/interfaces/base.h>
 
 // Module definitions.
 #include "./_def_.h"
@@ -28,8 +29,8 @@
 __CONTROLLERS_BEGIN__
 
 template <typename ...ArgsT>
-using Handler = std::function<std::unique_ptr<http::abc::HttpResponse>(
-	http::Request*, const std::tuple<ArgsT...>&, const conf::Settings*
+using Handler = std::function<std::unique_ptr<http::IResponse>(
+	http::IRequest*, const std::tuple<ArgsT...>&, const conf::Settings*
 )>;
 
 // TESTME: Controller<...URLArgsT>
@@ -38,7 +39,7 @@ template <typename ...URLArgsT>
 class Controller
 {
 public:
-	inline explicit Controller(const conf::Settings* settings) : Controller<URLArgsT...>({"options"}, settings)
+	inline explicit Controller(const ILogger* logger) : Controller<URLArgsT...>({"options"}, logger)
 	{
 	}
 
@@ -49,7 +50,7 @@ public:
 	// @param args: pointer to requests' url arguments.
 	// @return pointer to http response instance.
 	[[nodiscard]]
-	virtual inline std::unique_ptr<http::abc::HttpResponse> get(http::Request* request, URLArgsT ...args) const
+	virtual inline std::unique_ptr<http::IResponse> get(http::IRequest* request, URLArgsT ...args) const
 	{
 		return nullptr;
 	}
@@ -61,7 +62,7 @@ public:
 	// @param args: pointer to requests' url arguments.
 	// @return pointer to http response instance.
 	[[nodiscard]]
-	virtual inline std::unique_ptr<http::abc::HttpResponse> post(http::Request* request, URLArgsT ...args) const
+	virtual inline std::unique_ptr<http::IResponse> post(http::IRequest* request, URLArgsT ...args) const
 	{
 		return nullptr;
 	}
@@ -73,7 +74,7 @@ public:
 	// @param args: pointer to requests' url arguments.
 	// @return pointer to http response instance.
 	[[nodiscard]]
-	virtual inline std::unique_ptr<http::abc::HttpResponse> put(http::Request* request, URLArgsT ...args) const
+	virtual inline std::unique_ptr<http::IResponse> put(http::IRequest* request, URLArgsT ...args) const
 	{
 		return nullptr;
 	}
@@ -85,7 +86,7 @@ public:
 	// @param args: pointer to requests' url arguments.
 	// @return pointer to http response instance.
 	[[nodiscard]]
-	virtual inline std::unique_ptr<http::abc::HttpResponse> patch(http::Request* request, URLArgsT ...args) const
+	virtual inline std::unique_ptr<http::IResponse> patch(http::IRequest* request, URLArgsT ...args) const
 	{
 		return nullptr;
 	}
@@ -97,7 +98,7 @@ public:
 	// @param args: pointer to requests' url arguments.
 	// @return pointer to http response instance.
 	[[nodiscard]]
-	virtual inline std::unique_ptr<http::abc::HttpResponse> delete_(http::Request* request, URLArgsT ...args) const
+	virtual inline std::unique_ptr<http::IResponse> delete_(http::IRequest* request, URLArgsT ...args) const
 	{
 		return nullptr;
 	}
@@ -109,7 +110,7 @@ public:
 	// @param args: pointer to requests' url arguments.
 	// @return pointer to http response instance.
 	[[nodiscard]]
-	virtual inline std::unique_ptr<http::abc::HttpResponse> head(http::Request* request, URLArgsT ...args) const
+	virtual inline std::unique_ptr<http::IResponse> head(http::IRequest* request, URLArgsT ...args) const
 	{
 		return this->get(request, args...);
 	}
@@ -121,7 +122,7 @@ public:
 	// @param args: pointer to requests' url arguments.
 	// @return pointer to http response instance.
 	[[nodiscard]]
-	virtual inline std::unique_ptr<http::abc::HttpResponse> options(http::Request* request, URLArgsT ...args) const
+	virtual inline std::unique_ptr<http::IResponse> options(http::IRequest* request, URLArgsT ...args) const
 	{
 		auto response = std::make_unique<http::Response>(200);
 		auto allowed_methods = this->allowed_methods();
@@ -137,7 +138,7 @@ public:
 	// @param args: pointer to requests' url arguments.
 	// @return pointer to http response instance.
 	[[nodiscard]]
-	virtual inline std::unique_ptr<http::abc::HttpResponse> trace(http::Request* request, URLArgsT ...args) const
+	virtual inline std::unique_ptr<http::IResponse> trace(http::IRequest* request, URLArgsT ...args) const
 	{
 		return nullptr;
 	}
@@ -149,7 +150,7 @@ public:
 	// @param request: an actual http request from client.
 	// @return pointer to http response returned from handler.
 	[[nodiscard]]
-	virtual inline std::unique_ptr<http::abc::HttpResponse> dispatch(http::Request* request, URLArgsT ...args) const
+	virtual inline std::unique_ptr<http::IResponse> dispatch(http::IRequest* request, URLArgsT ...args) const
 	{
 		if (!request)
 		{
@@ -159,7 +160,7 @@ public:
 		}
 
 		std::string method = str::to_lower(request->method());
-		std::unique_ptr<http::abc::HttpResponse> result = nullptr;
+		std::unique_ptr<http::IResponse> result = nullptr;
 		if (this->_has_method(method))
 		{
 			result = this->method_not_allowed_response(request);
@@ -203,7 +204,7 @@ public:
 	}
 
 protected:
-	const conf::Settings* settings = nullptr;
+	const ILogger* logger = nullptr;
 
 	// Contains all possible http methods which controller can handle.
 	const std::vector<std::string> http_method_names = {
@@ -213,12 +214,10 @@ protected:
 	// List of methods witch will be returned when 'OPTIONS' is in request.
 	std::vector<std::string> allowed_methods_list{};
 
-protected:
 	inline explicit Controller(
-		const std::vector<std::string>& allowed_methods, const conf::Settings* settings
-	) : settings(settings)
+		const std::vector<std::string>& allowed_methods, const ILogger* logger
+	) : logger(logger)
 	{
-		require_non_null(this->settings, "'settings' is nullptr", _ERROR_DETAILS_);
 		for (const auto& method : allowed_methods)
 		{
 			this->allowed_methods_list.push_back(str::to_lower(method));
@@ -236,11 +235,11 @@ protected:
 	// @param request: pointer to http request.
 	// @return pointer to http response returned from handler.
 	[[nodiscard]]
-	inline std::unique_ptr<http::abc::HttpResponse> method_not_allowed_response(http::Request* request) const
+	inline std::unique_ptr<http::IResponse> method_not_allowed_response(http::IRequest* request) const
 	{
-		if (this->settings->LOGGER)
+		if (this->logger)
 		{
-			this->settings->LOGGER->warning(
+			this->logger->warning(
 				"Method Not Allowed (" + request->method() + "): " + request->url().path, _ERROR_DETAILS_
 			);
 		}
@@ -258,7 +257,7 @@ private:
 	}
 
 	[[nodiscard]]
-	inline std::function<std::unique_ptr<http::abc::HttpResponse>(http::Request*, URLArgsT...)> _get_method(
+	inline std::function<std::unique_ptr<http::IResponse>(http::IRequest*, URLArgsT...)> _get_method(
 		const std::string& method
 	) const
 	{

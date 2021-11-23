@@ -18,11 +18,11 @@
 
 __RENDER_BEGIN__
 
-render::abc::ILibrary::Function make_static_function(const std::string& prefix)
+render::ILibrary::Function make_static_function(const std::string& prefix)
 {
 	return [prefix](
-		render::abc::IContext* context,
-		const std::vector<render::abc::ILibrary::Argument>& arguments,
+		render::IContext* context,
+		const std::vector<render::ILibrary::Argument>& arguments,
 		const std::optional<std::string>& result_variable,
 		size_t function_call_line
 	) -> std::string
@@ -49,11 +49,11 @@ render::abc::ILibrary::Function make_static_function(const std::string& prefix)
 	};
 }
 
-render::abc::ILibrary::Function make_url_function(const std::vector<std::shared_ptr<urls::IPattern>>& patterns)
+render::ILibrary::Function make_url_function(const std::vector<std::shared_ptr<urls::IPattern>>& patterns)
 {
 	return [patterns](
-		render::abc::IContext* context,
-		const std::vector<render::abc::ILibrary::Argument>& arguments,
+		render::IContext* context,
+		const std::vector<render::ILibrary::Argument>& arguments,
 		const std::optional<std::string>& result_variable,
 		size_t function_call_line
 	) -> std::string

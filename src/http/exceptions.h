@@ -137,6 +137,18 @@ public:
 	}
 };
 
+// TESTME: BadRequest
+// TODO: docs for 'BadRequest'
+class BadRequest : public HttpError
+{
+public:
+	inline explicit BadRequest(
+		const std::string& message, int line=0, const char* function="", const char* file=""
+	) : HttpError(400, message, line, function, file, "xw::http::exc::BadRequest")
+	{
+	}
+};
+
 // TESTME: PermissionDenied
 // TODO: docs for 'PermissionDenied'
 class PermissionDenied : public HttpError

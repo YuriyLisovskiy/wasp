@@ -1,9 +1,9 @@
 /**
- * conf/abs.h
+ * conf/interfaces.h
  *
  * Copyright (c) 2019-2021 Yuriy Lisovskiy
  *
- * Abstract base classes for 'conf' module.
+ * Interfaces for 'conf' module.
  */
 
 #pragma once
@@ -20,7 +20,7 @@
 #include "./_def_.h"
 
 // Framework libraries.
-#include "../urls/abc.h"
+#include "../urls/interfaces.h"
 #include "../commands/abstract_command.h"
 
 
@@ -32,7 +32,9 @@ public:
 	virtual ~IModuleConfig() = default;
 
 	[[nodiscard]]
-	virtual bool ready() const = 0;
+	virtual bool is_configured() const = 0;
+
+	virtual void configure() = 0;
 
 	[[nodiscard]]
 	virtual std::string get_name() const = 0;

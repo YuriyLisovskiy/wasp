@@ -38,7 +38,7 @@ Settings::Settings(path::Path root_directory) : BASE_DIR(std::move(root_director
 	};
 
 	this->_libraries = {
-		{render::StandardLibrary::NAME, [this]() -> std::shared_ptr<render::abc::ILibrary> {
+		{render::StandardLibrary::NAME, [this]() -> std::shared_ptr<render::ILibrary> {
 			return std::make_shared<render::StandardLibrary>(this);
 		}}
 	};
@@ -113,6 +113,11 @@ void Settings::prepare()
 			}
 		}
 	}
+
+	for (auto& module : this->MODULES)
+	{
+		module->configure();
+	}
 }
 
 void Settings::check()
@@ -165,7 +170,7 @@ void Settings::check()
 
 	for (auto& module : this->MODULES)
 	{
-		if (!module->ready())
+		if (!module->is_configured())
 		{
 			this->LOGGER->error("Module '" + module->get_name() + "' is not ready.");
 			err_count++;
@@ -193,7 +198,7 @@ std::shared_ptr<IModuleConfig> Settings::build_module(const std::string& full_na
 	return nullptr;
 }
 
-std::shared_ptr<render::abc::ILibrary> Settings::build_template_library(const std::string& full_name) const
+std::shared_ptr<render::ILibrary> Settings::build_template_library(const std::string& full_name) const
 {
 	if (this->_libraries.find(full_name) != this->_libraries.end())
 	{
@@ -203,7 +208,7 @@ std::shared_ptr<render::abc::ILibrary> Settings::build_template_library(const st
 	return nullptr;
 }
 
-std::shared_ptr<render::abc::ILoader> Settings::build_template_loader(const std::string& full_name) const
+std::shared_ptr<render::ILoader> Settings::build_template_loader(const std::string& full_name) const
 {
 	if (this->_loaders.find(full_name) != this->_loaders.end())
 	{
@@ -213,7 +218,7 @@ std::shared_ptr<render::abc::ILoader> Settings::build_template_loader(const std:
 	return nullptr;
 }
 
-std::list<std::shared_ptr<orm::db::Migration>> Settings::build_migrations(orm::abc::IBackend* backend)
+std::list<std::shared_ptr<orm::db::Migration>> Settings::build_migrations(orm::IBackend* backend)
 {
 	if (this->_migrations.empty())
 	{

@@ -47,10 +47,10 @@ protected:
 	conf::Secure secure;
 	std::vector<re::Regex> redirect_exempt;
 
-	virtual std::unique_ptr<http::abc::HttpResponse> preprocess(http::Request* request) const;
+	virtual std::unique_ptr<http::IResponse> preprocess(http::IRequest* request) const;
 
-	virtual std::unique_ptr<http::abc::HttpResponse> postprocess(
-		http::Request* request, http::abc::HttpResponse* response
+	virtual std::unique_ptr<http::IResponse> postprocess(
+		http::IRequest* request, http::IResponse* response
 	) const;
 };
 

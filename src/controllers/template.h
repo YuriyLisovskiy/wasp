@@ -9,7 +9,7 @@
 #pragma once
 
 // Base libraries.
-#include <xalwart.base/abc/render.h>
+#include <xalwart.base/interfaces/render.h>
 
 // Module definitions.
 #include "./_def_.h"
@@ -27,14 +27,14 @@ __CONTROLLERS_BEGIN__
 class TemplateResponseMixin
 {
 public:
-	explicit TemplateResponseMixin(render::abc::IEngine* engine);
+	explicit TemplateResponseMixin(render::IEngine* engine);
 
 	// Returns a response with a template rendered with
 	// the given context.
 	[[nodiscard]]
-	virtual std::unique_ptr<http::abc::HttpResponse> render(
-		http::Request* request,
-		const std::shared_ptr<render::abc::IContext>& context,
+	virtual std::unique_ptr<http::IResponse> render(
+		http::IRequest* request,
+		const std::shared_ptr<render::IContext>& context,
 		const std::string& template_name="",
 		unsigned short int status=200,
 		const std::string& content_type="",
@@ -49,32 +49,31 @@ public:
 protected:
 	std::string template_name;
 	std::string content_type;
-	render::abc::IEngine* engine;
+	render::IEngine* engine;
 };
 
 // TESTME: TemplateController
 // TODO: docs for 'TemplateController'
 // A controller that can render a template.
-template <typename ...UrlArgsT>
-class TemplateController : public TemplateResponseMixin, public Controller<UrlArgsT...>
+template <typename ...UrlArgs>
+class TemplateController : public TemplateResponseMixin, public Controller<UrlArgs...>
 {
 public:
-	explicit TemplateController(const conf::Settings* settings) :
-		Controller<UrlArgsT...>({"get", "options"}, settings),
-		TemplateResponseMixin(settings ? settings->TEMPLATE_ENGINE.get() : nullptr)
+	explicit TemplateController(render::IEngine* engine, const ILogger* logger) :
+		Controller<UrlArgs...>({"get", "options"}, logger), TemplateResponseMixin(engine)
 	{
 	}
 
 	// Used in default get() method, can be overridden
 	// in derived classes.
 	[[nodiscard]]
-	virtual inline std::shared_ptr<render::abc::IContext> get_context(http::Request* request, UrlArgsT ...args) const
+	virtual inline std::shared_ptr<render::IContext> get_context(http::IRequest* request, UrlArgs ...args) const
 	{
 		return nullptr;
 	}
 
 	[[nodiscard]]
-	inline std::unique_ptr<http::abc::HttpResponse> get(http::Request* request, UrlArgsT ...args) const override
+	inline std::unique_ptr<http::IResponse> get(http::IRequest* request, UrlArgs ...args) const override
 	{
 		return this->render(request, this->get_context(request, args...), "", 200, "", "utf-8");
 	}
@@ -82,11 +81,11 @@ public:
 protected:
 	explicit TemplateController(
 		const std::vector<std::string>& allowed_methods,
-		const conf::Settings* settings,
+		render::IEngine* engine,
+		const ILogger* logger,
 		const std::string& template_name="",
 		const std::string& content_type=""
-	) : Controller<UrlArgsT...>(allowed_methods, settings),
-		TemplateResponseMixin(settings ? settings->TEMPLATE_ENGINE.get() : nullptr)
+	) : Controller<UrlArgs...>(allowed_methods, logger), TemplateResponseMixin(engine)
 	{
 		this->template_name = template_name;
 		this->content_type = content_type;

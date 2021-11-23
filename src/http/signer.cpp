@@ -35,9 +35,9 @@ Signer::Signer(const std::string& key, char sep, const std::string& salt)
 	this->_salt = salt.empty() ? "xw::util::crypto::Signer" : salt;
 }
 
-std::string Signer::signature(const std::string& value, crypto::abc::ISignatureAlgorithm* algorithm) const
+std::string Signer::signature(const std::string& value, crypto::ISignatureAlgorithm* algorithm) const
 {
-	std::unique_ptr<crypto::abc::ISignatureAlgorithm> default_algorithm = nullptr;
+	std::unique_ptr<crypto::ISignatureAlgorithm> default_algorithm = nullptr;
 	if (!algorithm)
 	{
 		default_algorithm = _get_default_algorithm("");
@@ -48,7 +48,7 @@ std::string Signer::signature(const std::string& value, crypto::abc::ISignatureA
 	);
 }
 
-std::string Signer::unsign(const std::string& signed_value, crypto::abc::ISignatureAlgorithm* algorithm)
+std::string Signer::unsign(const std::string& signed_value, crypto::ISignatureAlgorithm* algorithm)
 {
 	if (signed_value.find(this->_sep) == std::string::npos)
 	{
@@ -68,7 +68,7 @@ std::string salted_hmac_hex_digest(
 	const std::string& salt,
 	const std::string& value,
 	const std::string& secret_key,
-	crypto::abc::ISignatureAlgorithm* algorithm
+	crypto::ISignatureAlgorithm* algorithm
 )
 {
 	if (secret_key.empty())
@@ -76,7 +76,7 @@ std::string salted_hmac_hex_digest(
 		throw ValueError("'secret_key' can not be empty", _ERROR_DETAILS_);
 	}
 
-	std::unique_ptr<crypto::abc::ISignatureAlgorithm> default_algorithm = nullptr;
+	std::unique_ptr<crypto::ISignatureAlgorithm> default_algorithm = nullptr;
 	if (!algorithm)
 	{
 		default_algorithm = _get_default_algorithm("");

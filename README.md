@@ -40,15 +40,11 @@ The following library is optional (you can use alternatives):
 * `LIBRARY_INCLUDE_DIR`: include installation directory (`${LIBRARY_ROOT}/include` by default).
 * `LIBRARY_LINK_DIR`: library installation directory (`${LIBRARY_ROOT}/lib` by default).
 
-Specific options for [xalwart.orm](https://github.com/YuriyLisovskiy/xalwart.orm):
-* `XW_USE_DB_DRIVER_NAME`: the name of a driver that will be used in ORM. `DB_DRIVER_NAME` should be
-  replaced by one of the [available drivers](https://github.com/YuriyLisovskiy/xalwart.orm/tree/dev#available-drivers).
 ```bash
 git clone https://github.com/YuriyLisovskiy/xalwart.git
 cd xalwart
 mkdir build && cd build
 cmake -D CMAKE_BUILD_TYPE=Release \
-      -D XW_USE_DB_DRIVER_NAME=yes \
       ..
 make xalwart && make install
 ```

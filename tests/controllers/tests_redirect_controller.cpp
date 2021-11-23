@@ -16,7 +16,7 @@
 using namespace xw;
 
 
-http::Request make_request(const conf::Settings* settings, const std::string& method)
+http::Request make_request(const std::string& method)
 {
 	auto context = net::RequestContext{
 		.protocol_version = {
@@ -29,39 +29,30 @@ http::Request make_request(const conf::Settings* settings, const std::string& me
 	return http::Request(context, 99999, 99, 9999, 99, 9999, {});
 }
 
-struct RedirectControllerTestSettings : public conf::Settings
-{
-	RedirectControllerTestSettings() : conf::Settings("./")
-	{
-		auto lc = log::Config();
-		lc.disable_all_levels();
-		this->LOGGER = std::make_shared<log::Logger>(lc);
-	}
-};
-
 
 class RedirectControllerWithDefaultParamsTestCase : public ::testing::Test
 {
 protected:
 	ctrl::RedirectController* controller = nullptr;
-	RedirectControllerTestSettings* settings = nullptr;
+	std::shared_ptr<ILogger> logger = nullptr;
 
 	void SetUp() override
 	{
-		this->settings = new RedirectControllerTestSettings();
-		this->controller = new ctrl::RedirectController(this->settings, "/hello");
+		auto lc = log::Config();
+		lc.disable_all_levels();
+		this->logger = std::make_shared<log::Logger>(lc);
+		this->controller = new ctrl::RedirectController(this->logger.get(), "/hello");
 	}
 
 	void TearDown() override
 	{
-		delete this->settings;
 		delete this->controller;
 	}
 };
 
 TEST_F(RedirectControllerWithDefaultParamsTestCase, GetTest)
 {
-	auto request = make_request(this->settings, "get");
+	auto request = make_request("get");
 	auto response = this->controller->get(&request);
 
 	ASSERT_TRUE(dynamic_cast<http::Redirect*>(response.get()));
@@ -69,7 +60,7 @@ TEST_F(RedirectControllerWithDefaultParamsTestCase, GetTest)
 
 TEST_F(RedirectControllerWithDefaultParamsTestCase, PostTest)
 {
-	auto request = make_request(this->settings, "post");
+	auto request = make_request("post");
 	auto response = this->controller->post(&request);
 
 	ASSERT_TRUE(dynamic_cast<http::Redirect*>(response.get()));
@@ -77,7 +68,7 @@ TEST_F(RedirectControllerWithDefaultParamsTestCase, PostTest)
 
 TEST_F(RedirectControllerWithDefaultParamsTestCase, PutTest)
 {
-	auto request = make_request(this->settings, "put");
+	auto request = make_request("put");
 	auto response = this->controller->put(&request);
 
 	ASSERT_TRUE(dynamic_cast<http::Redirect*>(response.get()));
@@ -85,7 +76,7 @@ TEST_F(RedirectControllerWithDefaultParamsTestCase, PutTest)
 
 TEST_F(RedirectControllerWithDefaultParamsTestCase, PatchTest)
 {
-	auto request = make_request(this->settings, "patch");
+	auto request = make_request("patch");
 	auto response = this->controller->patch(&request);
 
 	ASSERT_TRUE(dynamic_cast<http::Redirect*>(response.get()));
@@ -93,7 +84,7 @@ TEST_F(RedirectControllerWithDefaultParamsTestCase, PatchTest)
 
 TEST_F(RedirectControllerWithDefaultParamsTestCase, DeleteTest)
 {
-	auto request = make_request(this->settings, "delete");
+	auto request = make_request("delete");
 	auto response = this->controller->delete_(&request);
 
 	ASSERT_TRUE(dynamic_cast<http::Redirect*>(response.get()));
@@ -101,7 +92,7 @@ TEST_F(RedirectControllerWithDefaultParamsTestCase, DeleteTest)
 
 TEST_F(RedirectControllerWithDefaultParamsTestCase, HeadTest)
 {
-	auto request = make_request(this->settings, "head");
+	auto request = make_request("head");
 	auto response = this->controller->head(&request);
 
 	ASSERT_TRUE(dynamic_cast<http::Redirect*>(response.get()));
@@ -109,7 +100,7 @@ TEST_F(RedirectControllerWithDefaultParamsTestCase, HeadTest)
 
 TEST_F(RedirectControllerWithDefaultParamsTestCase, OptionsTest)
 {
-	auto request = make_request(this->settings, "options");
+	auto request = make_request("options");
 	auto response = this->controller->options(&request);
 
 	ASSERT_TRUE(dynamic_cast<http::Redirect*>(response.get()));
@@ -117,7 +108,7 @@ TEST_F(RedirectControllerWithDefaultParamsTestCase, OptionsTest)
 
 TEST_F(RedirectControllerWithDefaultParamsTestCase, TraceTest)
 {
-	auto request = make_request(this->settings, "trace");
+	auto request = make_request("trace");
 	auto response = this->controller->trace(&request);
 
 	ASSERT_EQ(response, nullptr);
@@ -140,7 +131,7 @@ TEST_F(RedirectControllerWithDefaultParamsTestCase, SetupAndDispatchAllowedTest)
 {
 	ASSERT_THROW(auto _ = this->controller->dispatch(nullptr), NullPointerException);
 
-	auto request = make_request(this->settings, "get");
+	auto request = make_request("get");
 	auto response = this->controller->dispatch(&request);
 
 	ASSERT_EQ(response->get_status(), 302);
@@ -149,7 +140,7 @@ TEST_F(RedirectControllerWithDefaultParamsTestCase, SetupAndDispatchAllowedTest)
 
 TEST_F(RedirectControllerWithDefaultParamsTestCase, DispatchTraceNotAllowedTest)
 {
-	auto request = make_request(this->settings, "trace");
+	auto request = make_request("trace");
 
 	auto response = this->controller->dispatch(&request);
 
@@ -158,7 +149,7 @@ TEST_F(RedirectControllerWithDefaultParamsTestCase, DispatchTraceNotAllowedTest)
 
 TEST_F(RedirectControllerWithDefaultParamsTestCase, GetRedirectUrlTest)
 {
-	auto request = make_request(this->settings, "get");
+	auto request = make_request("get");
 	ASSERT_EQ(this->controller->get_redirect_url(&request), "/hello");
 }
 
@@ -167,26 +158,27 @@ class RedirectControllerPermanentAndQueryStringTestCase : public ::testing::Test
 {
 protected:
 	ctrl::RedirectController* controller = nullptr;
-	RedirectControllerTestSettings* settings = nullptr;
+	std::shared_ptr<ILogger> logger = nullptr;
 
 	void SetUp() override
 	{
-		this->settings = new RedirectControllerTestSettings();
+		auto lc = log::Config();
+		lc.disable_all_levels();
+		this->logger = std::make_shared<log::Logger>(lc);
 		this->controller = new ctrl::RedirectController(
-			this->settings, "/hello/world", true, true
+			this->logger.get(), "/hello/world", true, true
 		);
 	}
 
 	void TearDown() override
 	{
-		delete this->settings;
 		delete this->controller;
 	}
 };
 
 TEST_F(RedirectControllerPermanentAndQueryStringTestCase, GetTest)
 {
-	auto request = make_request(this->settings, "get");
+	auto request = make_request("get");
 	auto response = this->controller->get(&request);
 
 	ASSERT_TRUE(dynamic_cast<http::PermanentRedirect*>(response.get()));
@@ -194,7 +186,7 @@ TEST_F(RedirectControllerPermanentAndQueryStringTestCase, GetTest)
 
 TEST_F(RedirectControllerPermanentAndQueryStringTestCase, PostTest)
 {
-	auto request = make_request(this->settings, "post");
+	auto request = make_request("post");
 	auto response = this->controller->post(&request);
 
 	ASSERT_TRUE(dynamic_cast<http::PermanentRedirect*>(response.get()));
@@ -202,7 +194,7 @@ TEST_F(RedirectControllerPermanentAndQueryStringTestCase, PostTest)
 
 TEST_F(RedirectControllerPermanentAndQueryStringTestCase, PutTest)
 {
-	auto request = make_request(this->settings, "put");
+	auto request = make_request("put");
 	auto response = this->controller->put(&request);
 
 	ASSERT_TRUE(dynamic_cast<http::PermanentRedirect*>(response.get()));
@@ -210,7 +202,7 @@ TEST_F(RedirectControllerPermanentAndQueryStringTestCase, PutTest)
 
 TEST_F(RedirectControllerPermanentAndQueryStringTestCase, PatchTest)
 {
-	auto request = make_request(this->settings, "patch");
+	auto request = make_request("patch");
 	auto response = this->controller->patch(&request);
 
 	ASSERT_TRUE(dynamic_cast<http::PermanentRedirect*>(response.get()));
@@ -218,7 +210,7 @@ TEST_F(RedirectControllerPermanentAndQueryStringTestCase, PatchTest)
 
 TEST_F(RedirectControllerPermanentAndQueryStringTestCase, DeleteTest)
 {
-	auto request = make_request(this->settings, "delete");
+	auto request = make_request("delete");
 	auto response = this->controller->delete_(&request);
 
 	ASSERT_TRUE(dynamic_cast<http::PermanentRedirect*>(response.get()));
@@ -226,7 +218,7 @@ TEST_F(RedirectControllerPermanentAndQueryStringTestCase, DeleteTest)
 
 TEST_F(RedirectControllerPermanentAndQueryStringTestCase, HeadTest)
 {
-	auto request = make_request(this->settings, "head");
+	auto request = make_request("head");
 	auto response = this->controller->head(&request);
 
 	ASSERT_TRUE(dynamic_cast<http::PermanentRedirect*>(response.get()));
@@ -234,7 +226,7 @@ TEST_F(RedirectControllerPermanentAndQueryStringTestCase, HeadTest)
 
 TEST_F(RedirectControllerPermanentAndQueryStringTestCase, OptionsTest)
 {
-	auto request = make_request(this->settings, "options");
+	auto request = make_request("options");
 	auto response = this->controller->options(&request);
 
 	ASSERT_TRUE(dynamic_cast<http::PermanentRedirect*>(response.get()));
@@ -261,24 +253,25 @@ class RedirectControllerEmptyUrlTestCase : public ::testing::Test
 {
 protected:
 	ctrl::RedirectController* controller = nullptr;
-	RedirectControllerTestSettings* settings = nullptr;
+	std::shared_ptr<ILogger> logger = nullptr;
 
 	void SetUp() override
 	{
-		this->settings = new RedirectControllerTestSettings();
-		this->controller = new ctrl::RedirectController(this->settings, "");
+		auto lc = log::Config();
+		lc.disable_all_levels();
+		this->logger = std::make_shared<log::Logger>(lc);
+		this->controller = new ctrl::RedirectController(this->logger.get(), "");
 	}
 
 	void TearDown() override
 	{
-		delete this->settings;
 		delete this->controller;
 	}
 };
 
 TEST_F(RedirectControllerEmptyUrlTestCase, GetTest)
 {
-	auto request = make_request(this->settings, "get");
+	auto request = make_request("get");
 	auto response = this->controller->get(&request);
 
 	ASSERT_TRUE(dynamic_cast<http::Gone*>(response.get()));
@@ -286,7 +279,7 @@ TEST_F(RedirectControllerEmptyUrlTestCase, GetTest)
 
 TEST_F(RedirectControllerEmptyUrlTestCase, PostTest)
 {
-	auto request = make_request(this->settings, "post");
+	auto request = make_request("post");
 	auto response = this->controller->post(&request);
 
 	ASSERT_TRUE(dynamic_cast<http::Gone*>(response.get()));
@@ -294,7 +287,7 @@ TEST_F(RedirectControllerEmptyUrlTestCase, PostTest)
 
 TEST_F(RedirectControllerEmptyUrlTestCase, PutTest)
 {
-	auto request = make_request(this->settings, "put");
+	auto request = make_request("put");
 	auto response = this->controller->put(&request);
 
 	ASSERT_TRUE(dynamic_cast<http::Gone*>(response.get()));
@@ -302,7 +295,7 @@ TEST_F(RedirectControllerEmptyUrlTestCase, PutTest)
 
 TEST_F(RedirectControllerEmptyUrlTestCase, PatchTest)
 {
-	auto request = make_request(this->settings, "patch");
+	auto request = make_request("patch");
 	auto response = this->controller->patch(&request);
 
 	ASSERT_TRUE(dynamic_cast<http::Gone*>(response.get()));
@@ -310,7 +303,7 @@ TEST_F(RedirectControllerEmptyUrlTestCase, PatchTest)
 
 TEST_F(RedirectControllerEmptyUrlTestCase, DeleteTest)
 {
-	auto request = make_request(this->settings, "delete");
+	auto request = make_request("delete");
 	auto response = this->controller->delete_(&request);
 
 	ASSERT_TRUE(dynamic_cast<http::Gone*>(response.get()));
@@ -318,7 +311,7 @@ TEST_F(RedirectControllerEmptyUrlTestCase, DeleteTest)
 
 TEST_F(RedirectControllerEmptyUrlTestCase, HeadTest)
 {
-	auto request = make_request(this->settings, "head");
+	auto request = make_request("head");
 	auto response = this->controller->head(&request);
 
 	ASSERT_TRUE(dynamic_cast<http::Gone*>(response.get()));
@@ -326,7 +319,7 @@ TEST_F(RedirectControllerEmptyUrlTestCase, HeadTest)
 
 TEST_F(RedirectControllerEmptyUrlTestCase, OptionsTest)
 {
-	auto request = make_request(this->settings, "options");
+	auto request = make_request("options");
 	auto response = this->controller->options(&request);
 
 	ASSERT_TRUE(dynamic_cast<http::Gone*>(response.get()));
@@ -334,7 +327,7 @@ TEST_F(RedirectControllerEmptyUrlTestCase, OptionsTest)
 
 TEST_F(RedirectControllerEmptyUrlTestCase, GetRedirectUrlTest)
 {
-	auto request = make_request(this->settings, "get");
+	auto request = make_request("get");
 
 	ASSERT_EQ(this->controller->get_redirect_url(&request), "");
 }

@@ -14,12 +14,17 @@
 __MANAGEMENT_COMMANDS_BEGIN__
 
 StartServerCommand::StartServerCommand(
-	conf::IModuleConfig* config, conf::Settings* settings, std::function<net::StatusCode(
+	conf::Settings* settings, std::function<net::StatusCode(
 		net::RequestContext*, const std::map<std::string, std::string>& /* environment */
 	)> handler
-) : Command(config, settings, "start-server", "Starts a web application"),
+) : Command(
+		"start-server", "Starts a web application",
+		require_non_null(settings, "settings is nullptr", _ERROR_DETAILS_)->LOGGER
+	),
 	_handler_function(std::move(handler))
 {
+	this->_settings = settings;
+
 	std::string ipv4 = R"((\d{1,3}(?:\.\d{1,3}){3})|localhost)";
 	this->_ipv4_regex = re::Regex(ipv4);
 
@@ -80,7 +85,7 @@ bool StartServerCommand::handle()
 		return true;
 	}
 
-	if (!this->settings->DEBUG && this->settings->ALLOWED_HOSTS.empty())
+	if (!this->_settings->DEBUG && this->_settings->ALLOWED_HOSTS.empty())
 	{
 		throw CommandError(
 			"you must set 'allowed_hosts' if 'debug' is false.",
@@ -89,12 +94,12 @@ bool StartServerCommand::handle()
 	}
 
 	this->_parse_args();
-	auto server = this->settings->build_server(this->_handler_function, this->get_options());
+	auto server = this->_settings->build_server(this->_handler_function, this->get_options());
 	try
 	{
 		if (!server)
 		{
-			this->settings->LOGGER->error("server is not initialized", _ERROR_DETAILS_);
+			this->_settings->LOGGER->error("server is not initialized", _ERROR_DETAILS_);
 			return true;
 		}
 
@@ -104,15 +109,15 @@ bool StartServerCommand::handle()
 	catch (const InterruptException& exc)
 	{
 		// TODO: remove this catch statement when will not be used.
-		this->settings->LOGGER->debug("Interrupted");
+		this->_settings->LOGGER->debug("Interrupted");
 	}
 	catch (const BaseException& exc)
 	{
-		this->settings->LOGGER->error(exc);
+		this->_settings->LOGGER->error(exc);
 	}
 	catch (const std::exception& exc)
 	{
-		this->settings->LOGGER->error(exc.what(), _ERROR_DETAILS_);
+		this->_settings->LOGGER->error(exc.what(), _ERROR_DETAILS_);
 	}
 
 	server->close();
@@ -121,7 +126,7 @@ bool StartServerCommand::handle()
 
 std::string StartServerCommand::get_startup_message(bool is_development_server) const
 {
-	return dt::Datetime::now(this->settings->TIMEZONE).strftime("%B %d, %Y - %T") + "\n" +
+	return dt::Datetime::now(this->_settings->TIMEZONE).strftime("%B %d, %Y - %T") + "\n" +
 	       v::framework_name + " version " + v::version.to_string() + "\n" +
 	       "Starting the " + (is_development_server ? "development " : "") + "server at " +
 	       "http://" + this->_host + ":" + std::to_string(this->_port) + "/\n" +

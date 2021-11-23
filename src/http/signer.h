@@ -12,7 +12,7 @@
 #include <xalwart.base/re/regex.h>
 
 // Crypto libraries.
-#include <xalwart.crypto/abc.h>
+#include <xalwart.crypto/interfaces.h>
 #include <xalwart.crypto/hmac.h>
 
 // Module definitions.
@@ -31,15 +31,15 @@ public:
 	explicit Signer(const std::string& key, char sep=':', const std::string& salt="");
 
 	[[nodiscard]]
-	std::string signature(const std::string& value, crypto::abc::ISignatureAlgorithm* algorithm=nullptr) const;
+	std::string signature(const std::string& value, crypto::ISignatureAlgorithm* algorithm=nullptr) const;
 
 	[[nodiscard]]
-	inline std::string sign(const std::string& value, crypto::abc::ISignatureAlgorithm* algorithm=nullptr) const
+	inline std::string sign(const std::string& value, crypto::ISignatureAlgorithm* algorithm=nullptr) const
 	{
 		return value + this->_sep + this->signature(value, algorithm);
 	}
 
-	std::string unsign(const std::string& signed_value, crypto::abc::ISignatureAlgorithm* algorithm=nullptr);
+	std::string unsign(const std::string& signed_value, crypto::ISignatureAlgorithm* algorithm=nullptr);
 
 private:
 	std::string _key;
@@ -50,7 +50,7 @@ private:
 
 // TESTME: _get_default_algorithm
 // TODO: docs for '_get_default_algorithm'
-inline std::unique_ptr<crypto::abc::ISignatureAlgorithm> _get_default_algorithm(const std::string& secret_key)
+inline std::unique_ptr<crypto::ISignatureAlgorithm> _get_default_algorithm(const std::string& secret_key)
 {
 	return std::make_unique<crypto::HMAC>(secret_key, crypto::md5, "HMAC-MD5");
 }
@@ -58,13 +58,13 @@ inline std::unique_ptr<crypto::abc::ISignatureAlgorithm> _get_default_algorithm(
 // TESTME: salted_hmac
 // Returns the 'HMAC' of 'value', using a key generated from 'salt' and a
 // 'secret_key'. Default algorithm is 'MD5', but any algorithm witch inherits
-// 'abc::IHash' is supported and can be passed. A different 'salt' should be
+// 'crypto::ISignatureAlgorithm' is supported and can be passed. A different 'salt' should be
 // passed in for every application of 'HMAC'.
 extern std::string salted_hmac_hex_digest(
 	const std::string& salt,
 	const std::string& value,
 	const std::string& secret_key,
-	crypto::abc::ISignatureAlgorithm* algorithm=nullptr
+	crypto::ISignatureAlgorithm* algorithm=nullptr
 );
 
 __HTTP_END__

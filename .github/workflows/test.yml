@@ -1,11 +1,9 @@
-name: "ci"
+name: Test
 on:
   pull_request:
   push:
     branches:
-      - master
       - dev
-      - release
 jobs:
   linux-build:
     name: '[Linux] Build the library'
@@ -22,7 +20,7 @@ jobs:
         compiler_version: [ 10 ]
     steps:
       - uses: actions/checkout@v2
-      - name: Download Base Library
+      - name: Download Base library
         uses: dawidd6/action-download-artifact@v2
         with:
           github_token: ${{ secrets.GH_ACCESS_TOKEN }}
@@ -31,7 +29,7 @@ jobs:
           name: xalwart.base-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
           path: xalwart.base-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
           repo: YuriyLisovskiy/xalwart.base
-      - name: Download Crypto Library
+      - name: Download Crypto library
         uses: dawidd6/action-download-artifact@v2
         with:
           github_token: ${{ secrets.GH_ACCESS_TOKEN }}
@@ -40,7 +38,7 @@ jobs:
           name: xalwart.crypto-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
           path: xalwart.crypto-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
           repo: YuriyLisovskiy/xalwart.crypto
-      - name: Download ORM Library
+      - name: Download ORM library
         uses: dawidd6/action-download-artifact@v2
         with:
           github_token: ${{ secrets.GH_ACCESS_TOKEN }}
@@ -49,13 +47,13 @@ jobs:
           name: xalwart.orm-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
           path: xalwart.orm-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
           repo: YuriyLisovskiy/xalwart.orm
-      - name: Build the Library
+      - name: Build the library
         run: |
           sudo docker run -i \
                           -v ${{ github.workspace }}:/app \
                           xalwart/${{ matrix.compiler }}:${{ matrix.compiler_version }}-${{ matrix.os.name }}-${{ matrix.os.version }} \
                           bash /app/scripts/linux/build.sh ${{ matrix.os.name }} ${{ matrix.compiler }} ${{ matrix.compiler_version }}
-      - name: Upload the Artifact
+      - name: Upload the artifact
         uses: actions/upload-artifact@v2
         with:
           name: xalwart-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
@@ -79,7 +77,7 @@ jobs:
         compiler_version: [ 10 ]
     steps:
       - uses: actions/checkout@v2
-      - name: Download Base Library
+      - name: Download Base library
         uses: dawidd6/action-download-artifact@v2
         with:
           github_token: ${{ secrets.GH_ACCESS_TOKEN }}
@@ -88,7 +86,7 @@ jobs:
           name: xalwart.base-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
           path: xalwart.base-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
           repo: YuriyLisovskiy/xalwart.base
-      - name: Download Crypto Library
+      - name: Download Crypto library
         uses: dawidd6/action-download-artifact@v2
         with:
           github_token: ${{ secrets.GH_ACCESS_TOKEN }}
@@ -97,7 +95,7 @@ jobs:
           name: xalwart.crypto-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
           path: xalwart.crypto-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
           repo: YuriyLisovskiy/xalwart.crypto
-      - name: Download ORM Library
+      - name: Download ORM library
         uses: dawidd6/action-download-artifact@v2
         with:
           github_token: ${{ secrets.GH_ACCESS_TOKEN }}
@@ -106,12 +104,12 @@ jobs:
           name: xalwart.orm-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
           path: xalwart.orm-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
           repo: YuriyLisovskiy/xalwart.orm
-      - name: Download the Artifact
+      - name: Download the artifact
         uses: actions/download-artifact@v2
         with:
           name: xalwart-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
           path: xalwart-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
-      - name: Build and Run Tests
+      - name: Build and run tests
         run: |
           sudo docker run -i \
                           -v ${{ github.workspace }}:/app \
@@ -127,7 +125,7 @@ jobs:
         os_version: [ 11 ]
     steps:
       - uses: actions/checkout@v2
-      - name: Download Base Library
+      - name: Download Base library
         uses: dawidd6/action-download-artifact@v2
         with:
           github_token: ${{ secrets.GH_ACCESS_TOKEN }}
@@ -136,7 +134,7 @@ jobs:
           name: xalwart.base-${{ matrix.os_name }}-${{ matrix.os_version }}
           path: /usr/local
           repo: YuriyLisovskiy/xalwart.base
-      - name: Download Crypto Library
+      - name: Download Crypto library
         uses: dawidd6/action-download-artifact@v2
         with:
           github_token: ${{ secrets.GH_ACCESS_TOKEN }}
@@ -145,7 +143,7 @@ jobs:
           name: xalwart.crypto-${{ matrix.os_name }}-${{ matrix.os_version }}
           path: /usr/local
           repo: YuriyLisovskiy/xalwart.crypto
-      - name: Download ORM Library
+      - name: Download ORM library
         uses: dawidd6/action-download-artifact@v2
         with:
           github_token: ${{ secrets.GH_ACCESS_TOKEN }}
@@ -154,7 +152,7 @@ jobs:
           name: xalwart.orm-${{ matrix.os_name }}-${{ matrix.os_version }}
           path: /usr/local
           repo: YuriyLisovskiy/xalwart.orm
-      - name: Build the Library
+      - name: Build the library
         run: |
           mkdir build && cd build
           cmake -D CMAKE_BUILD_TYPE=Release -D OPENSSL_ROOT_DIR=/usr/local/Cellar/openssl@1.1/1.1.1l_1 ..
@@ -164,7 +162,7 @@ jobs:
           mkdir -p include && mkdir -p lib && cd
           sudo cp -r /usr/local/include/xalwart ~/target-build/include
           sudo cp -r /usr/local/lib/libxalwart.dylib ~/target-build/lib
-      - name: Upload the Artifact
+      - name: Upload the artifact
         uses: actions/upload-artifact@v2
         with:
           name: xalwart-${{ matrix.os_name }}-${{ matrix.os_version }}
@@ -191,7 +189,7 @@ jobs:
       - name: Create Target Directories
         run: |
           sudo mkdir -p /usr/local
-      - name: Download Base Library
+      - name: Download Base library
         uses: dawidd6/action-download-artifact@v2
         with:
           github_token: ${{ secrets.GH_ACCESS_TOKEN }}
@@ -200,7 +198,7 @@ jobs:
           name: xalwart.base-${{ matrix.os_name }}-${{ matrix.os_version }}
           path: /usr/local
           repo: YuriyLisovskiy/xalwart.base
-      - name: Download Crypto Library
+      - name: Download Crypto library
         uses: dawidd6/action-download-artifact@v2
         with:
           github_token: ${{ secrets.GH_ACCESS_TOKEN }}
@@ -209,7 +207,7 @@ jobs:
           name: xalwart.crypto-${{ matrix.os_name }}-${{ matrix.os_version }}
           path: /usr/local
           repo: YuriyLisovskiy/xalwart.crypto
-      - name: Download ORM Library
+      - name: Download ORM library
         uses: dawidd6/action-download-artifact@v2
         with:
           github_token: ${{ secrets.GH_ACCESS_TOKEN }}
@@ -218,12 +216,12 @@ jobs:
           name: xalwart.orm-${{ matrix.os_name }}-${{ matrix.os_version }}
           path: /usr/local
           repo: YuriyLisovskiy/xalwart.orm
-      - name: Download the Artifact
+      - name: Download the artifact
         uses: actions/download-artifact@v2
         with:
           name: xalwart-${{ matrix.os_name }}-${{ matrix.os_version }}
           path: /usr/local
-      - name: Build and Run Tests
+      - name: Build and run tests
         run: |
           mkdir build && cd build
           cmake -D CMAKE_BUILD_TYPE=Release \
