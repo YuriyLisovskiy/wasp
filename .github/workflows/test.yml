@@ -1,13 +1,13 @@
 name: Test
 on:
-  pull_request:
-  push:
-    branches:
-      - '!master'
+  workflow_run:
+    workflows:
+      - 'Build'
+    types:
+      - completed
 jobs:
   linux-test:
     name: '[Linux] Testing [${{ matrix.os.name }}-${{ matrix.os.version }}] [${{ matrix.compiler }}-${{ matrix.compiler_version }}]'
-    needs: [ linux-build ]
     runs-on: ubuntu-18.04
     strategy:
       fail-fast: false
@@ -70,7 +70,6 @@ jobs:
                           bash /app/scripts/linux/test.sh ${{ matrix.os.name }} ${{ matrix.compiler }} ${{ matrix.compiler_version }}
   macos-test:
     name: '[macOS] Testing [${{ matrix.os_name }}-${{ matrix.os_version }}] [clang]'
-    needs: [ macos-build ]
     runs-on: ${{ matrix.os_name }}-${{ matrix.os_version }}
     strategy:
       fail-fast: false
