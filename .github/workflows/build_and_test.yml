@@ -253,8 +253,8 @@ jobs:
       - name: Run tests with Valgrind
         if: steps.install_valgrind.outcome == 'success'
         run:
-          valgrind --leak-check=full ./tests/unittests-all
+          valgrind --leak-check=full ./build/tests/unittests-all
       - name: Run tests
         if: steps.install_valgrind.outcome != 'success'
         run:
-          ./tests/unittests-all
+          ./build/tests/unittests-all
