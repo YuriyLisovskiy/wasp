@@ -7,8 +7,11 @@
 
 | @ | Status |
 |---|---|
-| Dev branch: | [![Build](https://github.com/YuriyLisovskiy/xalwart/actions/workflows/build_and_test.yml/badge.svg?branch=dev)](https://github.com/YuriyLisovskiy/xalwart/actions/workflows/build_and_test.yml?query=branch%3Adev) |
-| Master branch: | [![Build](https://github.com/YuriyLisovskiy/xalwart/actions/workflows/build_and_test.yml/badge.svg?branch=master)](https://github.com/YuriyLisovskiy/xalwart/actions/workflows/build_and_test.yml?query=branch%3Amaster) |
+| Dev branch: | [![Tests](https://github.com/YuriyLisovskiy/xalwart/actions/workflows/build_and_test.yml/badge.svg?branch=dev)](https://github.com/YuriyLisovskiy/xalwart/actions/workflows/build_and_test.yml?query=branch%3Adev) |
+| Master branch: | [![Tests](https://github.com/YuriyLisovskiy/xalwart/actions/workflows/build_and_test.yml/badge.svg?branch=master)](https://github.com/YuriyLisovskiy/xalwart/actions/workflows/build_and_test.yml?query=branch%3Amaster) |
+
+> ATTENTION: this project still has [issues](https://github.com/YuriyLisovskiy/xalwart/issues),
+> requires testing, documentation, and is not stable.
 
 ## Requirements
 The following compilers are tested with the CI system, and are known to work on:
