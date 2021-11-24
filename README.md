@@ -7,8 +7,11 @@
 
 | @ | Status |
 |---|---|
-| Dev branch: | [![Build](https://github.com/YuriyLisovskiy/xalwart/actions/workflows/build_and_test.yml/badge.svg?branch=dev)](https://github.com/YuriyLisovskiy/xalwart/actions/workflows/build_and_test.yml?query=branch%3Adev) |
-| Master branch: | [![Build](https://github.com/YuriyLisovskiy/xalwart/actions/workflows/build_and_test.yml/badge.svg?branch=master)](https://github.com/YuriyLisovskiy/xalwart/actions/workflows/build_and_test.yml?query=branch%3Amaster) |
+| Dev branch: | [![Tests](https://github.com/YuriyLisovskiy/xalwart/actions/workflows/build_and_test.yml/badge.svg?branch=dev)](https://github.com/YuriyLisovskiy/xalwart/actions/workflows/build_and_test.yml?query=branch%3Adev) |
+| Master branch: | [![Tests](https://github.com/YuriyLisovskiy/xalwart/actions/workflows/build_and_test.yml/badge.svg?branch=master)](https://github.com/YuriyLisovskiy/xalwart/actions/workflows/build_and_test.yml?query=branch%3Amaster) |
+
+> ATTENTION: this project still has [issues](https://github.com/YuriyLisovskiy/xalwart/issues),
+> requires testing, documentation, and is not stable.
 
 ## Requirements
 The following compilers are tested with the CI system, and are known to work on:
@@ -29,7 +32,6 @@ The following libraries are required:
 - [xalwart.orm](https://github.com/YuriyLisovskiy/xalwart.orm) 0.0.0 or later
 
 The following library is optional (you can use alternatives):
-- [xalwart.render](https://github.com/YuriyLisovskiy/xalwart.render) 0.0.0 or later
 - [xalwart.server](https://github.com/YuriyLisovskiy/xalwart.server) 0.0.0 or later
 
 ## Compile from Source
