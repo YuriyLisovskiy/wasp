@@ -26,7 +26,7 @@ install_lib ".base"
 install_lib ".crypto"
 
 # Install orm library.
-install_lib ".orm"
+install_lib ".orm-sqlite"
 
 # Install the library.
 install_lib
@@ -38,14 +38,20 @@ ldconfig /etc/ld.so.conf.d
 mkdir -p /app/build
 cd /app/build || exit 1
 if [[ "${SYSTEM_NAME}" == "alpine"* ]]; then
+  apk update && apk upgrade
+  apk add --update sqlite-libs sqlite-dev
   cmake -D CMAKE_C_COMPILER="${CC_NAME}" \
         -D CMAKE_CXX_COMPILER="${CXX_NAME}" \
         -D CMAKE_BUILD_TYPE=Release \
+        -D XW_USE_SQLITE3=yes \
         -D XW_CONFIGURE_LIB=OFF \
         -D XW_CONFIGURE_TESTS=ON \
         ..
 elif [[ "${SYSTEM_NAME}" == "ubuntu"* ]]; then
+  apt-get update && apt-get -y upgrade
+  apt-get install -y sqlite3 libsqlite3-dev
   cmake -D CMAKE_BUILD_TYPE=Release \
+        -D XW_USE_SQLITE3=yes \
         -D XW_CONFIGURE_LIB=OFF \
         -D XW_CONFIGURE_TESTS=ON \
         ..

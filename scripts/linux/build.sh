@@ -26,19 +26,24 @@ install_lib "base"
 install_lib "crypto"
 
 # Install orm library.
-install_lib "orm"
+install_lib "orm-sqlite"
 
 mkdir -p /app/build
 cd /app/build || exit 1
 
 # Build the library.
 if [[ "${SYSTEM_NAME}" == "alpine"* ]]; then
+  apk update && apk upgrade
+  apk add --update sqlite-libs sqlite-dev
   cmake -D CMAKE_C_COMPILER="${CC_NAME}" \
         -D CMAKE_CXX_COMPILER="${CXX_NAME}" \
         -D CMAKE_BUILD_TYPE=Release \
+        -D XW_USE_SQLITE3=yes \
         ..
 elif [[ "${SYSTEM_NAME}" == "ubuntu"* ]]; then
-  cmake -D CMAKE_BUILD_TYPE=Release ..
+  apt-get update && apt-get -y upgrade
+  apt-get install -y sqlite3 libsqlite3-dev
+  cmake -D CMAKE_BUILD_TYPE=Release -D XW_USE_SQLITE3=yes ..
 else
   echo "System is not supported: ${SYSTEM_NAME}" && exit 1
 fi

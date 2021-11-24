@@ -48,8 +48,8 @@ jobs:
           github_token: ${{ secrets.GH_ACCESS_TOKEN }}
           workflow: test.yml
           branch: ${{ steps.extract_branch.outputs.branch }}
-          name: xalwart.orm-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
-          path: xalwart.orm-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
+          name: xalwart.orm-sqlite-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
+          path: xalwart.orm-sqlite-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
           repo: YuriyLisovskiy/xalwart.orm
       - name: Build the library
         run: |
@@ -101,13 +101,16 @@ jobs:
           github_token: ${{ secrets.GH_ACCESS_TOKEN }}
           workflow: test.yml
           branch: ${{ steps.extract_branch.outputs.branch }}
-          name: xalwart.orm-${{ matrix.os_name }}-${{ matrix.os_version }}
+          name: xalwart.orm-sqlite-${{ matrix.os_name }}-${{ matrix.os_version }}
           path: /usr/local
           repo: YuriyLisovskiy/xalwart.orm
       - name: Build the library
         run: |
           mkdir build && cd build
-          cmake -D CMAKE_BUILD_TYPE=Release -D OPENSSL_ROOT_DIR=/usr/local/Cellar/openssl@1.1/1.1.1l_1 ..
+          cmake -D CMAKE_BUILD_TYPE=Release \
+                -D XW_USE_SQLITE3=yes \
+                -D OPENSSL_ROOT_DIR=/usr/local/Cellar/openssl@1.1/1.1.1l_1 \
+                ..
           sudo mkdir -p /usr/local/include && sudo mkdir -p /usr/local/lib
           make xalwart && sudo make install
           cd && mkdir ~/target-build && cd ~/target-build
@@ -167,8 +170,8 @@ jobs:
           github_token: ${{ secrets.GH_ACCESS_TOKEN }}
           workflow: test.yml
           branch: ${{ steps.extract_branch.outputs.branch }}
-          name: xalwart.orm-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
-          path: xalwart.orm-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
+          name: xalwart.orm-sqlite-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
+          path: xalwart.orm-sqlite-${{ matrix.os.name }}-${{ matrix.compiler }}-${{ matrix.compiler_version }}
           repo: YuriyLisovskiy/xalwart.orm
       - name: Download the library to test from artifacts
         uses: actions/download-artifact@v2
@@ -233,7 +236,7 @@ jobs:
           github_token: ${{ secrets.GH_ACCESS_TOKEN }}
           workflow: test.yml
           branch: ${{ steps.extract_branch.outputs.branch }}
-          name: xalwart.orm-${{ matrix.os_name }}-${{ matrix.os_version }}
+          name: xalwart.orm-sqlite-${{ matrix.os_name }}-${{ matrix.os_version }}
           path: /usr/local
           repo: YuriyLisovskiy/xalwart.orm
       - name: Download the library to test from artifacts
@@ -247,6 +250,7 @@ jobs:
           cmake -D CMAKE_BUILD_TYPE=Release \
                 -D XW_CONFIGURE_LIB=OFF \
                 -D XW_CONFIGURE_TESTS=ON \
+                -D XW_USE_SQLITE3=yes \
                 -D OPENSSL_ROOT_DIR=/usr/local/Cellar/openssl@1.1/1.1.1l_1 \
                 ..
           make unittests-all
