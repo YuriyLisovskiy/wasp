@@ -34,11 +34,6 @@ The following libraries are required:
 The following library is optional (you can use alternatives):
 - [xalwart.server](https://github.com/YuriyLisovskiy/xalwart.server) 0.0.0 or later
 
-## Download
-Development build of the library can be downloaded from the latest
-[asset](https://github.com/YuriyLisovskiy/xalwart/actions?query=branch%3Amaster)
-of action results.
-
 ## Compile from Source
 * `BUILD_SHARED_LIBS`: build a shared or static library (`ON` by default).
 * `OPENSSL_ROOT_DIR`: root directory for OpenSSL library in case of non-standard installation path.
