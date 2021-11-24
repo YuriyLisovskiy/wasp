@@ -32,7 +32,6 @@ The following libraries are required:
 - [xalwart.orm](https://github.com/YuriyLisovskiy/xalwart.orm) 0.0.0 or later
 
 The following library is optional (you can use alternatives):
-- [xalwart.render](https://github.com/YuriyLisovskiy/xalwart.render) 0.0.0 or later
 - [xalwart.server](https://github.com/YuriyLisovskiy/xalwart.server) 0.0.0 or later
 
 ## Compile from Source
